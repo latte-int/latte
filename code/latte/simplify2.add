@@ -1,0 +1,9 @@
+read("simplify.sum");
+read("simplify.term");
+x:=normal(x):
+readlib(coeftayl):
+y:=coeftayl(x,s=0,d):
+y:=normal(y):
+HS:=normal(HS+y):
+save HS,"simplify.sum":
+quit;

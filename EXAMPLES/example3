@@ -1,0 +1,7 @@
+3 3
+1 -1 0
+1 0 -1
+1 -1 -1
+linearity 1 3
+nonnegative 2 1 2
+

@@ -1,0 +1,68 @@
+CC = g++
+
+Libs = -lm -lntl
+
+all: latte
+
+barvinok/dec.o:
+	$(MAKE) -C barvinok dec.o
+
+barvinok/barvinok.o:
+	$(MAKE) -C barvinok barvinok.o
+
+barvinok/cone.o:
+	$(MAKE) -C barvinok cone.o
+
+barvinok/ConeDecom.o:
+	$(MAKE) -C barvinok ConeDecom.o
+
+barvinok/Triangulation.o:
+	$(MAKE) -C barvinok Triangulation.o
+
+genFunction/maple.o:
+	$(MAKE) -C genFunction maple.o
+
+genFunction/piped.o:
+	$(MAKE) -C genFunction piped.o
+
+vertices/cdd.o:
+	$(MAKE) -C vertices cdd.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
+
+%.o: %.cc
+	$(CC) $(CFLAGS) -c $<
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $<
+
+.phony: all clean
+
+clean:
+	@-echo "CLEANING..."
+	@-rm -f *.o *~ core latte
+	@-$(MAKE) -C barvinok clean
+	@-$(MAKE) -C genFunction clean
+	@-$(MAKE) -C vertices clean
+
+objC = barvinok/dec.o barvinok/barvinok.o  barvinok/cone.o barvinok/ConeDecom.o barvinok/Triangulation.o genFunction/piped.o genFunction/maple.o vertices/cdd.o preprocess.o rational.o cone.o print.o ramon.o timing.o ConeDeterminant.o dual.o PolyTree.o RudyResNTL.o ResSingle.o printsingle.cpp IntegralHull.o ReadingFile.o Grobner.o ConeInfo.o binarySearchIP.o CheckEmpty.o maximize.o
+
+objD = barvinok/dec.o barvinok/barvinok.o  barvinok/cone.o barvinok/ConeDecom.o barvinok/Triangulation.o genFunction/piped.o genFunction/maple.o vertices/cdd.o preprocess.o rational.o cone.o print.o ramon.o timing.o ConeDeterminant.o dual.o PolyTree.o RudyResNTL.o ResSingle.o printsingle.cpp IntegralHull.o ReadingFile.o Grobner.o ConeInfo.o binarySearchIP.o CheckEmpty.o  minimize.o
+
+objE = barvinok/dec.o barvinok/barvinok.o  barvinok/cone.o barvinok/ConeDecom.o barvinok/Triangulation.o genFunction/piped.o genFunction/maple.o vertices/cdd.o preprocess.o rational.o cone.o print.o ramon.o timing.o ConeDeterminant.o dual.o PolyTree.o RudyResNTL.o ResSingle.o printsingle.cpp IntegralHull.o ReadingFile.o Grobner.o ConeInfo.o binarySearchIP.o CheckEmpty.o count.o
+
+objF = barvinok/dec.o barvinok/barvinok.o  barvinok/cone.o barvinok/ConeDecom.o barvinok/Triangulation.o genFunction/piped.o genFunction/maple.o vertices/cdd.o preprocess.o rational.o cone.o print.o ramon.o timing.o ConeDeterminant.o dual.o PolyTree.o RudyResNTL.o ResSingle.o printsingle.cpp IntegralHull.o ReadingFile.o Grobner.o ConeInfo.o binarySearchIP.o CheckEmpty.o ehrhart.o
+
+latte: $(objC)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(objC) -o maximize $(Lib_Dirs) $(Libs)
+	$(CC) $(CFLAGS) -c minimize.cpp
+	$(CC) $(CFLAGS) $(LDFLAGS) $(objD) -o minimize $(Lib_Dirs) $(Libs)
+	$(CC) $(CFLAGS) -c count.cpp
+	$(CC) $(CFLAGS) $(LDFLAGS) $(objE) -o count $(Lib_Dirs) $(Libs)
+	$(CC) $(CFLAGS) -c ehrhart.cpp
+	$(CC) $(CFLAGS) $(LDFLAGS) $(objF) -o ehrhart $(Lib_Dirs) $(Libs)
+
+clobber:
+	rm -f *.o latte core
+

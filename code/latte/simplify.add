@@ -1,0 +1,7 @@
+read("simplify.sum"):
+read("simplify.term"):
+x:=normal(x):
+s:=normal(s+x):
+save s,"simplify.sum":
+quit:
+
