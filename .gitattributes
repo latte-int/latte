@@ -1,2 +1,3 @@
 * text=auto !eol
+code/latte/cdd -text svneol=unset#application/octet-stream
 /manual_v1.1.pdf -text
