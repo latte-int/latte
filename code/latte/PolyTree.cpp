@@ -137,8 +137,7 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		Temp_Parameters->Degree_of_Expansion = Parameters->Degree_of_Expansion;
 		Temp_Parameters->Ten_Power = Parameters->Ten_Power;
 		
-		ZZ New_Array [Parameters->Degree_of_Expansion + 1];
-		Temp_Parameters->Result = New_Array;
+		Temp_Parameters->Result = new ZZ [Parameters->Degree_of_Expansion + 1];
 		
 		//Assume Result is DIRTY, so zero out all terms before continuing		
 		for (int i = 0; i <= Parameters->Degree_of_Expansion;i++)
@@ -155,7 +154,8 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 			}
 			
 		}
-		
+
+		delete Temp_Parameters->Result;
 		delete Temp_Parameters;
 
 		
@@ -189,8 +189,7 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		Temp_Parameters->Degree_of_Expansion = Parameters->Degree_of_Expansion;
 		Temp_Parameters->Ten_Power = Parameters->Ten_Power;
 		
-		ZZ New_Array [Parameters->Degree_of_Expansion + 1];
-		Temp_Parameters->Result = New_Array;
+		Temp_Parameters->Result = new ZZ[Parameters->Degree_of_Expansion + 1];
 		//cout << "done in MUL" << endl;
 	
 		// Copy first childs result into Parameters for shmushing to commence.	
@@ -214,7 +213,7 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		}
 		//cout << "Done smushing" << endl;
 
-	  
+		delete Temp_Parameters->Result;
 		delete Temp_Parameters;
 
 		
@@ -239,16 +238,14 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		Temp_Numerator_Parameters->Degree_of_Expansion = Parameters->Degree_of_Expansion;
 		Temp_Numerator_Parameters->Ten_Power = Parameters->Ten_Power;
 		
-		ZZ New_Array [Parameters->Degree_of_Expansion + 1];
-		Temp_Numerator_Parameters->Result = New_Array;
+		Temp_Numerator_Parameters->Result = new ZZ[Parameters->Degree_of_Expansion + 1];
 		
 
 		Children[0]->Taylor_Expansion ( Temp_Numerator_Parameters );
 
 		Temp_Denominator_Parameters->Degree_of_Expansion = Parameters->Degree_of_Expansion;
 		Temp_Denominator_Parameters->Ten_Power = Parameters->Ten_Power;
-		ZZ New_Array2 [Parameters->Degree_of_Expansion + 1];
-		Temp_Denominator_Parameters->Result = New_Array2;
+		Temp_Denominator_Parameters->Result = new ZZ[Parameters->Degree_of_Expansion + 1];
 
 		Children[1]->Taylor_Expansion ( Temp_Denominator_Parameters );
 
@@ -317,8 +314,7 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		Temp_Parameters = new Taylor_Parameters;
 		Temp_Parameters->Degree_of_Expansion = Parameters->Degree_of_Expansion;
 		Temp_Parameters->Ten_Power = Parameters->Ten_Power;
-		ZZ New_Array [Parameters->Degree_of_Expansion + 1];
-		Temp_Parameters->Result = New_Array;
+		Temp_Parameters->Result = new ZZ[Parameters->Degree_of_Expansion + 1];
 		       	
 
 		Children[0]->Taylor_Expansion(Temp_Parameters);
@@ -364,7 +360,8 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		     
 		  	}
 		
-		
+
+		delete Temp_Parameters->Result;
 		delete Temp_Parameters;
 		
 		
