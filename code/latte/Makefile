@@ -1,7 +1,11 @@
-CC = g++
-CFLAGS = -I/localapp/imosoft/sparc-sun-solaris2.7/include
+CC = gcc
+CXX = g++
+Libs = -lm -L/localapp/imosoft/sparc-sun-solaris2.7/alpha/ntl-5.3.1-gcc/lib -lntl -L/localapp/imosoft/sparc-sun-solaris2.7/lib -lgmp
+#CC = cc
+#CXX = CC
+#Libs = -lm -L/localapp/imosoft/sparc-sun-solaris2.7/lib -lntl
+CFLAGS = -I/localapp/imosoft/sparc-sun-solaris2.7/alpha/ntl-5.3.1-gcc/include -I/localapp/imosoft/sparc-sun-solaris2.7/include 
 
-Libs = -lm -L/localapp/imosoft/sparc-sun-solaris2.7/lib -lntl
 
 all: latte
 
@@ -9,10 +13,10 @@ all: latte
 	$(CC) $(CFLAGS) -c $< -o $@
 
 %.o: %.cc
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 %.o: %.cpp
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 .phony: all clean
 
@@ -35,16 +39,16 @@ objF = barvinok/dec.o barvinok/barvinok.o  barvinok/Cone.o barvinok/ConeDecom.o 
 latte: maximize minimize count ehrhart redcheck
 
 maximize: $(objC)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(objC) -o maximize $(Lib_Dirs) $(Libs)
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(objC) -o maximize $(Lib_Dirs) $(Libs)
 
 minimize: $(objD)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(objD) -o minimize $(Lib_Dirs) $(Libs)
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(objD) -o minimize $(Lib_Dirs) $(Libs)
 
 count: $(objE)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(objE) -o count $(Lib_Dirs) $(Libs)
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(objE) -o count $(Lib_Dirs) $(Libs)
 
 ehrhart: $(objF)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(objF) -o ehrhart $(Lib_Dirs) $(Libs)
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(objF) -o ehrhart $(Lib_Dirs) $(Libs)
 
 redcheck:
 	$(MAKE) -C adjacency

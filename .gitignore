@@ -3,6 +3,9 @@ code/latte/Check_emp.lp
 code/latte/Check_emp.lps
 code/latte/Check_emp.out
 code/latte/ComputeAdjacency
+code/latte/SunWS_cache
+code/latte/adjacency/ComputeAdjacency
+code/latte/adjacency/redcheck
 code/latte/count
 code/latte/ehrhart
 code/latte/maximize
@@ -10,4 +13,5 @@ code/latte/minimize
 code/latte/numOfLatticePoints
 code/latte/numOfUnimodularCones
 code/latte/redcheck
+code/latte/vertices/SunWS_cache
 code/latte/vertices/redcheck
