@@ -17,7 +17,7 @@
 #include "../ramon.h"
 #include "../print.h"
 #include "../cone.h"
-#include "cone.h"
+#include "Cone.h"
 #include "barvinok.h"
 #include "Triangulation.h"
 #include <NTL/mat_ZZ.h>

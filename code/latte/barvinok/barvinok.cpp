@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <time.h>
 
-#include "cone.h"
+#include "Cone.h"
 #include "barvinok.h"
 #include "../myheader.h"
 #include "../ramon.h"
@@ -212,32 +212,51 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
 	if each matrix is negative, we assign negative sign.  Otherwise,
 	we assign positive to each matrix. */
     
-
-     
      Det = determinant(tmp.generator);
-     
-     for(int i = 0; i < m; i++) AssignSign(tmp, cones1[i]);
-     
+
+     ZZ *Dets = new ZZ[m];
+     for(int i = 0; i < m; i++)
+       Dets[i] = determinant(cones1[i].generator);
+
      for(int i = 0; i < m; i++){
-       if(abs(determinant(cones1[i].generator)) >= abs(Det)){
+       if(abs(Dets[i]) >= abs(Det)){
          cout << "Second loop... " << endl;
 	 Z = ComputeOmega(tmp.generator, m, 2, 2);
 	 Z = CheckOmega(tmp.generator, Z);
 	 for(int k = 1; k <= m; k++)
 	   for(int j = 1; j <= m; j++)
 	     cones1[k-1].generator(k, j) = Z(j);
-
-	 for(int s = 0; s < m; s++)  AssignSign(tmp, cones1[i]);
        }
-       
      }
+
+     for(int i = 0; i < m; i++) {
+       //This is AssignSign(tmp, cones1[i]): 
+       if ((tmp.sign)>0) {
+	 if((Det * Dets[i]) >= 0)
+	   cones1[i].sign = 1;
+	 else
+	   cones1[i].sign = 0;
+       } else {
+	 if((Det * Dets[i]) >= 0)
+	   cones1[i].sign = 0;
+	 else
+	   cones1[i].sign = 1;
+       }
+     }
+
+#ifdef SHOWDETS
+     cout << "Determinant: " << Det << " -> ";
+     for(int i = 0; i < m; i++)
+       cout << Dets[i] << " ";
+     cout << endl;
+#endif
      
      /* If a matrix is unimodular, then we put a matrix into QUni queue.
 	Otherwise, we put it inot QNonUni queue. */
-
-
-     for(int i = 0; i < m; i++)
-       if(abs(determinant(cones1[i].generator)) == 1)
+     
+     for(int i = 0; i < m; i++) {
+       ZZ Det_i = Dets[i];
+       if(abs(Det_i) == 1)
 	 {
   listVector *L, *endL;
 
@@ -256,17 +275,20 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
          cout << numOfUniCones << " unimodular cones are done. " << endl;
 	   width++;
 	 }
-       else if(determinant(cones1[i].generator) == 0)
+       else if(Det_i == 0)
 	 ;
      
-       else if(abs(determinant(cones1[i].generator)) < abs(Det))
+       else if(abs(Det_i) < abs(Det))
 	 QNonUni.push_back(cones1[i]);
      
        else
 	 {
 	   cerr << "Error!  We cannot have smaller determinant!" << endl;
 	   exit(5);}
+     }
+     
       for(int i = 0; i < m; i++) cones1[i].generator.kill();
+      delete[] Dets;
      Z.kill();
      Z2.kill();
      tmp.generator.kill();
@@ -526,12 +548,16 @@ int barvinok_DFS(Cone *C, Barvinok_DFS_Parameters *Parameters)
      	ZZ max;
      	max = -1;
 
+	cout << "Determinant " << Det << " -> ";
+	
      	for(int i = 0; i < m; i++)
      	{
 		Dets[i] = abs(determinant(cones1[i]->generator));
+		cout << Dets[i] << ", ";
 	     	if(Dets[i] > max)
  			max = Dets[i];
-     	} 
+     	}
+	cout << endl;
      
      	int current;
      	ZZ min;

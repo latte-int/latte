@@ -25,7 +25,7 @@
 #include "myheader.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
-#include "barvinok/cone.h"
+#include "barvinok/Cone.h"
 #include "barvinok/ConeDecom.h"
 #include "barvinok/Triangulation.h"
 #include "vertices/cdd.h"
@@ -183,7 +183,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   }
  
   int * NewIndex;
-  system("./redcheck Check_red &> Check_red.out");
+  system("./redcheck Check_red > Check_red.out");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
   if(!in2){

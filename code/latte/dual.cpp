@@ -19,7 +19,7 @@
 #include "ramon.h"
 #include "rational.h"
 #include "vertices/cdd.h"
-#include "barvinok/cone.h"
+#include "barvinok/Cone.h"
 #include "barvinok/ConeDecom.h"
 #include "barvinok/dec.h"
 #include <list>

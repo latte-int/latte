@@ -11,7 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 
-#include "cone.h"
+#include "Cone.h"
 
 
 int Test_Points(int level, RR (*Min_Max)[2], int dim, mat_RR *A_inverse, vec_RR *point);
