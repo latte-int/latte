@@ -1,0 +1,7 @@
+chmod 700 cdd
+chmod 700 count
+chmod 700 ehrhart
+chmod 700 maximize
+chmod 700 minimize
+chmod 700 redcheck
+
