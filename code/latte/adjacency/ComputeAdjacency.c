@@ -19,8 +19,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "/h/ruriko/CDD/cddlib-093a/include/setoper.h"
-#include "/h/ruriko/CDD/cddlib-093a/include/cdd.h"
+#include <setoper.h>
+#include <cdd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>

@@ -26,7 +26,7 @@
 #include <NTL/HNF.h>
 #include <NTL/ZZ.h>
 #include "Triangulation.h"
-#include "cone.h"
+#include "Cone.h"
 #include "../flags.h"
 #include <string.h>
 #include <stdio.h>

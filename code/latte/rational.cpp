@@ -14,7 +14,7 @@
 #include "myheader.h"
 #include "print.h"
 #include "ramon.h"
-#include "barvinok/cone.h"
+#include "barvinok/Cone.h"
 #include <NTL/mat_ZZ.h>
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>

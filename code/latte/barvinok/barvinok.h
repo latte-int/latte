@@ -18,7 +18,7 @@
 #include <time.h>
 #include "../myheader.h"
 #include "../ramon.h"
-#include "cone.h"
+#include "Cone.h"
 #include <NTL/mat_ZZ.h>
 #include <NTL/vec_ZZ.h>
 #include <NTL/mat_RR.h>

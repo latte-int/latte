@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <time.h>
 
-#include "cone.h"
+#include "Cone.h"
 #include "barvinok.h"
 #include "../myheader.h"
 #include "../ramon.h"
