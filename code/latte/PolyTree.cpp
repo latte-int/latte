@@ -528,7 +528,7 @@ Node_Controller::Node_Controller (int Dimension, int Degree)
 	PolyTree_Node_Head->Data = new PolyTree_Node;
 
 	PolyTree_Node_Head->Data->Number_of_Children = Dimension_Plus_One;
-	PolyTree_Node_Head->Data->Children = new (PolyTree_Node *) [Dimension_Plus_One];
+	PolyTree_Node_Head->Data->Children = new PolyTree_Node*[Dimension_Plus_One];
 	// Taylor_Expansion_Result_Dirty already 1 when allocated
 	
 	PolyTree_Node_Head->Data->Taylor_Expansion_Result = new ZZ [Degree + 1];
@@ -573,7 +573,7 @@ PolyTree_Node *Node_Controller::Get_PolyTree_Node ()
       		PolyTree_Node_Unused->Data = new PolyTree_Node;
 
       		PolyTree_Node_Unused->Data->Number_of_Children = Dimension_Plus_One;
-      		PolyTree_Node_Unused->Data->Children = new (PolyTree_Node *) [Dimension_Plus_One];
+      		PolyTree_Node_Unused->Data->Children = new PolyTree_Node*[Dimension_Plus_One];
       		// Taylor_Expansion_Result_Dirty already 1 when allocated
 	
       		PolyTree_Node_Unused->Data->Taylor_Expansion_Result = new ZZ [Degree_of_Expansion + 1];
