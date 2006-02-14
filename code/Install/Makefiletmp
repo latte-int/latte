@@ -1,0 +1,79 @@
+CC = g++
+
+Libs = -lm -lntl
+CFLAGS = -Wall -Wno-deprecated -g -DLINUX -I//h/ruriko/latte/NewLattE/Install/NTL/NTL/include
+
+Lib_Dirs = -L//h/ruriko/latte/NewLattE/Install/NTL/NTL/lib
+
+
+all: latte
+
+barvinok/dec.o:
+	$(MAKE) -C barvinok dec.o
+
+barvinok/barvinok.o:
+	$(MAKE) -C barvinok barvinok.o
+
+barvinok/cone.o:
+	$(MAKE) -C barvinok cone.o
+
+barvinok/ConeDecom.o:
+	$(MAKE) -C barvinok ConeDecom.o
+
+barvinok/Triangulation.o:
+	$(MAKE) -C barvinok Triangulation.o
+
+genFunction/maple.o:
+	$(MAKE) -C genFunction maple.o
+
+genFunction/piped.o:
+	$(MAKE) -C genFunction piped.o
+
+vertices/cdd.o:
+	$(MAKE) -C vertices cdd.o
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $<
+
+%.o: %.cc
+	$(CC) $(CFLAGS) -c $<
+
+%.o: %.cpp
+	$(CC) $(CFLAGS) -c $<
+
+.phony: all clean
+
+clean:
+	@-echo "CLEANING..."
+	@-rm -f *.o *~ core latte
+	@-$(MAKE) -C barvinok clean
+	@-$(MAKE) -C genFunction clean
+	@-$(MAKE) -C vertices clean
+
+objA = barvinok/dec.o barvinok/barvinok.o  barvinok/cone.o barvinok/ConeDecom.o barvinok/Triangulation.o genFunction/piped.o genFunction/maple.o vertices/cdd.o preprocess.o rational.o cone.o print.o ramon.o timing.o ConeDeterminant.o dual.o PolyTree.o RudyResNTL.o latte.o ResSingle.o printsingle.cpp IntegralHull.o ReadingFile.o Grobner.o ConeInfo.o binarySearchIP.o
+
+
+objB = runExamples.o
+
+latte: $(objA)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(objA) -o latte $(Lib_Dirs) $(Libs) 
+
+
+latte2: $(objA)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(objA) -o latte2 $(Lib_Dirs) $(Libs)
+
+run: $(objB)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(objB) -o runExamples $(Lib_Dirs) $(Libs)
+
+17gon: 17gon.o
+	$(CC) $(CFLAGS) $(LDFLAGS) 17gon.o -o 17gon $(Lib_Dirs) $(Libs)
+
+test: runIPCO.o
+	$(CC) $(CFLAGS) $(LDFLAGS) runIPCO.o -o runIPCO $(Lib_Dirs) $(Libs)
+
+knap: KnapSackEst.o
+	$(CC) $(CFLAGS) $(LDFLAGS) KnapSackEst.o -o KnapSackEst $(Lib_Dirs) $(Libs)
+clobber:
+	rm -f *.o latte core
+
+
