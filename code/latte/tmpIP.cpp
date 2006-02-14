@@ -49,7 +49,7 @@ listCone* FindRationalFunction(listCone* cones, vector a, vector cost, int numOf
 
   	while(tmpcone)
 	{
-   		tmpDotProd = 0;
+    		tmpDotProd = 0;
     		number = 0;
     		tmpVector = tmpcone -> rays;
 
@@ -122,9 +122,9 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
   	listCone * tmpcone;
   	listVector  *tmpmatrix;
   	tmpcone = cones;
-  	list< vector > solutions;
+  	list< vector > solutions, optimalSolutions;
   	vector		Temp_Vector;
-  
+	int numOfOptSolutions = 0;
 	vector possible;
   	ZZ RHS;
   
@@ -164,23 +164,23 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 		if (new_info->S_Values_Zero_Flag == 1)
 		{
 			Pertubation_Count++;
-			if(SINGLE_CONE == 1) {
+			/*if(SINGLE_CONE == 1) {
 
 			  cerr << "Zero Dot product.  Please start IP without a single cone method." << endl;
 			  exit(1);
-			}
-			cout << "S_Value zero for some cone. Pertubating. " << endl;
+			}*/
+			//cout << "S_Value zero for some cone. Pertubating. " << endl;
 			
 			//if ((Pertubation_Count % 1) == 0)
 			//       cout << "%";	
 			cone_heap.Clear_Tree ();
 
 			tmpcone = cones;
-			//ZZ 	Normalize_Length;
+			ZZ 	Normalize_Length;
 			//Normalize_Length = 10000;			
-			//Normalize_Length = Calculate_Polytope_Width (cones, matrix, numOfVars);
+			Normalize_Length = Calculate_Polytope_Width (cones, matrix, numOfVars);
 			
-			Our_Cost = Calculate_Pertubation (cones, &cost, 10, numOfVars);			
+			Our_Cost = Calculate_Pertubation (&cost, 10, numOfVars, Normalize_Length);			
 			Cone_Heap_Count = 0;
 		}	
 			
@@ -307,7 +307,8 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 							flag = 1;
           						break;
 						}
-      						else ;
+      						else{ optimalSolutions.push_front(possible); 
+						numOfOptSolutions++;}
       						tmpmatrix = tmpmatrix -> rest;
     					}
     					if(flag == 0)
@@ -316,7 +317,7 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 						//solutions.clear ();
 						//possible = solutions2.front ();
 						//cout << "Solution feasible, breaking." << endl;
-						break;
+						//	break;
 					}
 					if(solutions2.empty())
 					{
@@ -356,14 +357,8 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 		}
 		
 	}
-	if(Pertubation_Count == 0){
-	  if(Coefficient_Sum == 1)
-	    cout << endl << "There is one optimal solution. \t\t" << endl;
-	  else
-	    cout << endl << "There are " << Coefficient_Sum << " optimal solutions.\t\t" << endl;
-	  //cout << "SolveIP: coefficient_sum is nonzero, exit while loop." << endl;
-	}
-	
+	//cout << endl << "Coefficient_Sum: " << Coefficient_Sum << "\t\t";
+	//cout << "SolveIP: coefficient_sum is nonzero, exit while loop." << endl;
 	//if (SINGLE_CONE != 1)
 	//{
 	
@@ -545,7 +540,12 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 	if ( (OptVertex * cost) != Max_IP)
 		cout << "Oracle wrong!" << endl;
 	*/
-	
+        cout <<"There are "<<numOfOptSolutions <<" optimal solutions."<< endl;
+        cout<< "Optimal solutions are: " << endl;
+	while(!optimalSolutions.empty()){
+	  cout << optimalSolutions.front() << endl;
+          optimalSolutions.pop_front();
+	}
 	return OptVertex;
 	
 	

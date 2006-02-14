@@ -183,26 +183,27 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   }
  
   int * NewIndex;
-  system("./redcheck Check_red &> Check_red.out");
+  system("./redcheck_gmp Check_red &> Check_red.out");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
   if(!in2){
     cerr << "Missing Check_red.out file..." << endl;
     exit(0);
   }
-  while(tmpString != "begin") {
+  while(tmpString != "H-representation")
     in2 >> tmpString;
-    if(tmpString == "linearity")
-      { 
-	in2 >> numOfEqu2; 
-	NewIndex = new int[numOfEqu2];
-        for(int i = 0; i < numOfEqu2; i++)  NewIndex[i] = 0;
-	for(int i = 0; i < numOfEqu2; i++) {
-	  // NewIndex[i] = 0; 
-	  in2 >> NewIndex[i];
-	  //  cout << NewIndex[i];
-	}
+  in2 >> tmpString;
+  if(tmpString == "linearity")
+    { 
+      in2 >> numOfEqu2; 
+      NewIndex = new int[numOfEqu2];
+      for(int i = 0; i < numOfEqu2; i++)  NewIndex[i] = 0;
+      for(int i = 0; i < numOfEqu2; i++) {
+	// NewIndex[i] = 0; 
+	in2 >> NewIndex[i];
+	//  cout << NewIndex[i];
       }
+      
   }
     in2.close();
   if(flag == 2) strcpy(nonneg, "no");
@@ -725,14 +726,17 @@ void CheckLength(char * filename, char * equ)
    int numOfConstraints = 0, numOfVars = 0, numOfequ = 0;
    in >> numOfConstraints >> numOfVars;
    int Total = numOfConstraints * numOfVars;
-   int counts = 0, tmpint;
-   while( in >> tmpint){
-      counts++;
+   int counts = 0, tmpint2 = 0;
+   char tmpint[2000];
+   while(in >> tmpint){
+     counts++; 
       if(equ[0] == 'y') 
-         if(Total == counts-1) numOfequ = tmpint + 1;
+	if(Total == counts-1){ tmpint2 = atoi(tmpint);
+	numOfequ = tmpint2 + 1;}
       }
    counts = counts - numOfequ; 
   
+
    if(Total > counts){
      ofstream out("Error");
      out << "The wrong number of elements in the file.  The number of elements are less than you indicated" << endl;

@@ -233,15 +233,15 @@ int main(int argc, char *argv[]) {
     CheckEmpty(fileName);
   //vector cost;
   /* Read problem data. */
-   if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) CheckRed(fileName, equationsPresent, maximum, nonneg, interior, dilation, dilation_const); 
-   dilation_const = 1;
+  if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) CheckRed(fileName, equationsPresent, maximum, nonneg, interior, dilation, dilation_const); 
+
   if((cddstyle[0] == 'n') && (grobner[0] == 'n'))
     readLatteProblem(fileName,&equations,&inequalities,equationsPresent,
 		     &numOfVars, nonneg, dualApproach, grobner, maximum, 
 		     cost,Vrepresentation);
 
-//   if((equationsPresent[0] == 'n') && (interior[0] == 'y'))
-//     Interior(inequalities);
+  if((equationsPresent[0] == 'n') && (interior[0] == 'y'))
+    Interior(inequalities);
 
   // if(minimize[0] == 'y') cost = -cost;
   if(cddstyle[0] == 'y'){
@@ -295,13 +295,8 @@ int main(int argc, char *argv[]) {
   }
 
   numOfAllVars=numOfVars;
-  mat_ZZ ProjU, ProjU2, AA;
-  vec_ZZ bb;
-  mat_ZZ AAA;
-
+  mat_ZZ ProjU;
   ProjU.SetDims(numOfVars, numOfVars);
-  ProjU2.SetDims(numOfVars, numOfVars);
-
   oldnumofvars = numOfVars;
   generators=createArrayVector(numOfVars);
   if (equationsPresent[0]=='y') {
@@ -311,13 +306,6 @@ int main(int argc, char *argv[]) {
      
      }*/
     matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
-    ProjU2 = transpose(ProjU);
-    bb = ProjU2[0];
-    AAA.SetDims(ProjU2.NumRows() - 1, ProjU2.NumCols());
-    for(i = 1; i <= numOfVars; i++){
-      AAA[i - 1] = ProjU2[i];
-    }
-    AA = transpose(AAA);
       templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows()); 
   } else {
     dilateListVector(inequalities, numOfVars, dilation_const);
@@ -364,7 +352,7 @@ int main(int argc, char *argv[]) {
 	cout <<"\nWe found a single vertex cone for IP.\n" << endl;
        cout <<"A vertex which we found via LP is: " << ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       //printRationalVector(LP_vertex, numOfVars);
-       LP_OPT = holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars);//cout << cost << endl;
+       LP_OPT = Rat_cost*Rat_solution; //cout << cost << endl;
       cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       }else {cones = tmpcones;
     cout << "\nThe polytope has " << lengthListCone(cones) << " vertices.\n";
@@ -471,14 +459,12 @@ int main(int argc, char *argv[]) {
   printListCone(cones,numOfVars);
 
  if(inthull[0] == 'y')
-   printListVector(IntegralHull(cones, inequalities, equations, numOfVars), numOfVars);
+
+    printListVector(IntegralHull(cones, matrix, numOfVars), numOfVars);
 
  
  if(maximum[0] == 'y') {
    listCone * Opt_cones;
-   if(equationsPresent[0] == 'y'){
-     cones = ProjectUp2(cones, oldnumofvars, numOfVars, AA, bb); 
-     numOfVars = oldnumofvars;} 
    if(Singlecone[0] == 'n'){
    Opt_cones = CopyListCones(cones, numOfVars);
    ZZ NumOfLatticePoints; //printListCone(Opt_cones, numOfVars);
@@ -492,18 +478,16 @@ int main(int argc, char *argv[]) {
 	int singleCone = 0;
 	if(Singlecone[0] == 'y') singleCone = 1;
 	vector Opt_solution; 
-
-	Opt_solution = SolveIP(cones,inequalities, equations, holdCost, numOfVars, singleCone); 
 	if(minimize[0] == 'y') holdCost = -holdCost;
-	cout << "An optimal solution for " <<  holdCost << " is: " << Opt_solution << "." << endl;
-	//	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * Opt_solution << "." << endl;
-	ZZ IP_OPT; IP_OPT = holdCost*Opt_solution;
+	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
+	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
+	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
-	conv(tmp_RR, holdCost * Opt_solution);
+	conv(tmp_RR, cost * Opt_solution);
 	// cout << cost * Opt_solution << endl;
-	if(minimize[0] == 'y') {LP_OPT = - LP_OPT; holdCost = - holdCost;}
-	//cout << LP_OPT << " " << tmp_RR << endl;
+	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;
@@ -535,15 +519,15 @@ int main(int argc, char *argv[]) {
 	if(Singlecone[0] == 'y') singleCone = 1;
 	vector Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
-	Opt_solution = SolveIP(cones, inequalities, equations,  holdCost, numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << Opt_solution << "." << endl;
+	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
+	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
 	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * Opt_solution << "." << endl;
-	ZZ IP_OPT; IP_OPT = holdCost*Opt_solution;
+	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
 	conv(tmp_RR, cost * Opt_solution);
 	// cout << cost * Opt_solution << endl;
-	//if(minimize[0] == 'y') LP_OPT = - LP_OPT;
+	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;

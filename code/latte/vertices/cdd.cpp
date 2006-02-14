@@ -406,17 +406,20 @@ listCone* readCddExtFile() {
     ofstream OUT("numOfLatticePoints");
     // cout << tmpString << endl;
     //getline(in , tmpString);
-    in.get(read);
+    in.get(read); 
     //cout << tmpString << endl;
+    
     while(((read == '\n' || read == '\r') || read == ' ') || read == '\t')
-      {in.get( read); }
+      {in.get( read); 
+      if(read == '0') {	cout << "\n\nUnbounded polytope!" << endl << endl;
+      exit(0);}}
     
     while(read != '\n' && read != '\r')
       {
 	if(read == '/')
 	  flag = 1;
 
-	in.get( read); //cout << read << "there" << endl;
+	in.get( read); 
       }
     
     if(flag)
@@ -425,7 +428,7 @@ listCone* readCddExtFile() {
 	OUT << 0 << endl;
 
       }
-
+    
     else
       {
 	cout << "\n\n*****  Total number of lattice points: " << 1 << " ****" << endl << endl;

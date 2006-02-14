@@ -470,8 +470,103 @@ int main(int argc, char *argv[]) {
  if(inthull[0] == 'y')
    ;
  //   printListVector(IntegralHull(cones,  inequalities, equations, numOfVars), numOfVars);
+ if(maximum[0] == 'y') {
+   listCone * Opt_cones;
+   if(Singlecone[0] == 'n'){
+   Opt_cones = CopyListCones(cones, numOfVars);
+   ZZ NumOfLatticePoints; //printListCone(Opt_cones, numOfVars);
+   NumOfLatticePoints = Residue(Opt_cones, numOfVars);
+   cout <<"Finished computing a rational function. " << endl;
+   cout <<"Time: " << GetTime() << " sec." << endl;
+   if(IsZero(NumOfLatticePoints) == 1){
+     cerr<<"Integrally empty polytope.  Check the right hand side."<< endl;
+     exit(0);}
+      else{
+	int singleCone = 0;
+	if(Singlecone[0] == 'y') singleCone = 1;
+	vector Opt_solution; 
+	if(minimize[0] == 'y') holdCost = -holdCost;
+	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
+        if(minimize[0] == 'y') cost = -cost;
+	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
+	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
+	RR tmp_RR;
 
- 
+	conv(tmp_RR, cost * Opt_solution);
+	// cout << tmp_RR << " " << LP_OPT << endl;
+	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
+	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
+	cout << "Computation done." << endl;
+	cout <<"Time: " << GetTime() << " sec." << endl;
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        strcat(command,".ext");
+        system(command);
+
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        strcat(command,".cdd");
+        system(command);
+
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        strcat(command,".ead");
+        system(command);
+
+	if(cddstyle[0] == 'n'){
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        system(command);
+	}
+
+	exit(1);
+      }
+   }
+   else{
+	int singleCone = 0;
+	if(Singlecone[0] == 'y') singleCone = 1;
+	vector Opt_solution; 
+	if(minimize[0] == 'y') holdCost = -holdCost;
+	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
+	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+        if(minimize[0] == 'y') cost = -cost;
+	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
+	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
+	RR tmp_RR;
+	conv(tmp_RR, IP_OPT);
+	// cout << cost * Opt_solution << endl;
+	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
+	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
+	cout << "Computation done." << endl;
+	cout <<"Time: " << GetTime() << " sec." << endl;
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        strcat(command,".ext");
+        system(command);
+
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        strcat(command,".cdd");
+        system(command);
+
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        strcat(command,".ead");
+        system(command);
+
+	if(cddstyle[0] == 'n'){
+        strcpy(command,"rm ");
+        strcat(command,fileName);
+        system(command);
+	}
+
+	exit(1);
+   }
+ }else{
+   /* 
  if(maximum[0] == 'y') {
    listCone * Opt_cones;
    if(Singlecone[0] == 'n'){
@@ -520,7 +615,7 @@ int main(int argc, char *argv[]) {
 	cout <<"Time: " << GetTime() << " sec." << endl;
 	exit(1);
    }
- }else{
+   }else{*/
 if(Memory_Save[0] == 'n')
 {
 

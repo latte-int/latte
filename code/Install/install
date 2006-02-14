@@ -1,0 +1,6 @@
+./PreInstall
+cd ntl-5.3.1/src
+./NTLinstall
+cd ../../
+make
+./SetUp

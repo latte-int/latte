@@ -1,3 +1,7 @@
 * text=auto !eol
-code/latte/cdd -text svneol=unset#application/octet-stream
+code/Install/Install.tar svneol=native#unset
+code/latte/ComputeAdjacency svneol=native#unset
+code/latte/cdd -text
+code/latte/lrs1 -text
 /manual_v1.1.pdf -text
+/redcheck_gmp -text

@@ -26,11 +26,11 @@ using namespace std;
 
 listCone* FindRationalFunction(listCone* cones, vector a, vector cost, int numOfVars);
 listVector* Push_Vector(listVector* head, listVector* tail, int numOfVars);
-vector SolveIP(listCone* cones, listVector* matrix, listVector* matrix2, vector cost, int numOfVars, int SINGLE_CONE);
+vector SolveIP(listCone* cones, listVector* matrix,  vector cost, int numOfVars, int SINGLE_CONE);
 int CheckVertices(listVector* vertices, listVector* newVertices);
-listVector* GetVertices(listCone* cones,  listVector* matrix, listVector* matrix2, listVector* hyperplane, int numOfVars, int flag);
+listVector* GetVertices(listCone* cones,  listVector* matrix,  listVector* hyperplane, int numOfVars, int flag);
 listVector* GetHRepresentation(listVector* vertices, int numOfVars);
-listVector* IntegralHull(listCone* cones, listVector* matrix, listVector* matrix2,int numOfVars);
+listVector* IntegralHull(listCone* cones, listVector* matrix, int numOfVars);
 ZZ Calculate_Polytope_Width (listCone *cones,listVector *matrix,int numOfVars);
 #endif
 

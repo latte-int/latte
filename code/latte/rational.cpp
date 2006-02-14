@@ -7,7 +7,7 @@
 /* Author     : Raymond Hemmecke, modified by R. Yoshida             */
 /*                                                                   */
 /* Created    : 13-AUG-02                                            */
-/* Last Update: 08-DEC-02                                            */
+/* Last Update: 25-JUL-05                                            */
 /*                                                                   */
 /* ----------------------------------------------------------------- */
 #include <stdlib.h>
@@ -54,7 +54,7 @@ rationalVector* createRationalVector(int numOfVars) {
 rationalVector** createArrayRationalVector(int numOfVectors) {
   rationalVector** w;
 
-  w = new (rationalVector*)[numOfVectors+1];
+  w = new rationalVector*[numOfVectors+1];
 
 //    w = (rationalVector**)calloc(sizeof(rationalVector*),(numOfVectors+1));
   if (w==0) exit(0);
@@ -333,9 +333,10 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
      December 4th:  Debug copying the string for numerator.
                     It did not copy right.  I needed to add new memory
                     everytime, it is called.
+     March 4th, 2005: Change tmpString[200] to tmpString[2000].
 */
   int i, len;
-  char* tmpString = new char[200];
+  char* tmpString = new char[2000];
   in >> tmpString;
 //  cout << endl;
 //  cout << tmpString << endl; 
