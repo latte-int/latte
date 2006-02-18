@@ -8,7 +8,7 @@
 #ifndef CONEDETERMINANT__H
 #define CONEDETERMINANT__H
 
-#include <fstream.h>
+#include <fstream>
 #include <cstdlib>
 #include <cstring>
 #include <time.h>
@@ -20,7 +20,8 @@
 #include <NTL/LLL.h>
 #include <NTL/HNF.h>
 #include <NTL/ZZ.h>
-
+using namespace NTL_NAMESPACE;
+using namespace std;
 
 int computeDeterminant(int**, int);
 

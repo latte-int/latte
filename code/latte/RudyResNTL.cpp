@@ -1,5 +1,5 @@
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <strstream>
 #include <NTL/ZZ.h>
 #include <time.h>

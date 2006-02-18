@@ -17,6 +17,7 @@
 #include <NTL/HNF.h>
 #include <NTL/ZZ.h>
 
+#include "config.h"
 #include "myheader.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
@@ -143,7 +144,7 @@ void CheckEmpty(char * Filename){
     out << entries[0][j] << " "; }
   out << endl;
 
-  system("./cdd Check_emp.lp > Check_emp.out");
+  system(CDD_PATH " Check_emp.lp > Check_emp.out");
 
   int FLAG = 0;
 

@@ -8,8 +8,8 @@
 
 
 #include <list>
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <cstdlib>
 #include <string>
 #include <math.h>

@@ -1,6 +1,6 @@
 #include "PolyTree.h"
 #include <stdlib.h>
-#include <fstream.h>
+#include <fstream>
 
 int PolyTree_Node::Print ()
 {

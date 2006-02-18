@@ -7,7 +7,7 @@
 
 *********************************************************************/
 
-#include <fstream.h>
+#include <fstream>
 #include <cstdlib>
 #include <cstring>
 
@@ -142,7 +142,7 @@ vec_ZZ ComputeOmega( const mat_ZZ & B, long m, int l, int y)
   		ZZ tmp, tmp2;
   		if(l == 2)
   		{
-     			for(int i = 0; i < pow(10, m) - 1; i++)
+		  for(int i = 0; i < pow(10.0, (int)m) - 1; i++)
 			{
        				tmp = count;
        				for(int j = m - 1; j > -1; j--)

@@ -1,6 +1,0 @@
-Install: Install.o
-	g++ Install.cpp -o Install
-ntl: NTLinstall.o
-	g++ NTLinstall.cpp -o NTLinstall
-setup: SetUp.o
-	g++ SetUp.cpp -o SetUp

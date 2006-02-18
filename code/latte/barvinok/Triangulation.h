@@ -20,6 +20,7 @@
 #include <NTL/HNF.h>
 #include <NTL/ZZ.h>
 using namespace std;
+using namespace NTL_NAMESPACE;
 
 int Triangulation(const mat_ZZ &, const int &, const int &, char*, list< int >&);
 

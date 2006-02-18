@@ -1,0 +1,16 @@
+AC_INIT(latte, 1.2)
+AC_CONFIG_HEADERS([code/config.h:code/config.hin])
+AM_INIT_AUTOMAKE(foreign)
+AM_MAINTAINER_MODE
+AC_CONFIG_FILES([Makefile code/Makefile code/latte/Makefile])
+AC_PROG_RANLIB
+AC_PROG_CC
+AC_PROG_CXX
+AC_LANG(C++)
+
+LB_CHECK_NTL
+
+AC_PATH_PROGS(CDD, [cddr+])
+AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD binary.])
+
+AC_OUTPUT

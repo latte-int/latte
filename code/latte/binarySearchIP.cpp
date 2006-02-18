@@ -29,6 +29,8 @@
 #include "flags.h"
 #include "binarySearchIP.h"
 
+#include "../config.h"
+
 using namespace std;
 
 ZZ  NOT_FOUND;
@@ -111,7 +113,7 @@ rationalVector* LP2(listVector* matrix, listVector* ineq, vector& cost, int numO
   rationalVector* Opt_vector;
    createCddIneLPFile2(matrix, ineq, numOfVars+1, cost);
    cout << "Computing LP...";
-  system("./cdd LP.ine > LP.out");
+  system(CDD_PATH " LP.ine > LP.out");
   cout << "done.\n\n";
   Opt_vector = ReadLpsFile2(numOfVars);
   //  cout << Opt_vector->enumerator << " " << Opt_vector -> denominator << endl;

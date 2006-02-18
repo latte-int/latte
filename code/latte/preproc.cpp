@@ -1,6 +1,6 @@
 #include <iostream.h>
 #include <stdio.h>
-#include <fstream.h>
+#include <fstream>
 #include <NTL/ZZ.h>
 #include <NTL/config.h>
 #include <string.h>

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string>
 #include <math.h>
-#include <fstream.h>
+#include <fstream>
 #include <ctype.h>
 
 #include <NTL/mat_ZZ.h>

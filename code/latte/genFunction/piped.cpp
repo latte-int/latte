@@ -10,6 +10,7 @@
 /* Last Update: 20-DEC-02 by Rudy                                    */
 /*                                                                   */
 /* ----------------------------------------------------------------- */
+#include "config.h"
 #include "../myheader.h"
 #include "../cone.h"
 #include "../print.h"
@@ -93,7 +94,7 @@ listVector* pointsInParallelepiped(rationalVector *vertex, listVector *rays,
     out.close();
 
 //      printf("Computing facets with cdd...");
-    system("./cdd latte_cdd.ine > latte_cdd.out");
+    system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
 //      printf("done.\n");
 
     strcpy(cddInFileName,"latte_cdd.ext");

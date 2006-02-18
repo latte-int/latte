@@ -9,7 +9,8 @@
 #ifndef CONE__H
 #define CONE__H
 
-#include <fstream.h>
+#include <fstream>
+#include <iostream>
 #include <cstdlib>
 #include <cstring>
 #include <time.h>
@@ -22,6 +23,8 @@
 #include <NTL/HNF.h>
 #include <NTL/ZZ.h>
 
+using namespace std;
+using namespace NTL_NAMESPACE;
 
  class Cone {
  public:

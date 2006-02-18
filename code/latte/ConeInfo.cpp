@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include "ConeInfo.h"
-#include <iostream.h>
+#include <iostream>
 
-//using namespace std;
+using namespace std;
 
 Hash_Table_Entry ConeInfo::Hash_Table[HASH_TABLE_SIZE];
 int	ConeInfo::Object_Count = 0;

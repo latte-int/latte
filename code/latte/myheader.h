@@ -1,7 +1,7 @@
 #ifndef MYHEADER__H
 #define MYHEADER__H
-#include <iostream.h>
-#include <fstream.h>
+#include <iostream>
+#include <fstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -9,6 +9,9 @@
 #include <string.h>
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
+
+using namespace NTL_NAMESPACE;
+using namespace std;
 
 #ifdef SUN
   #define GIVETIME times(&tms_buf);z=tms_buf.tms_utime;z=z/CLK_TCK;

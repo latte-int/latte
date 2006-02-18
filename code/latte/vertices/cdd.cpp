@@ -10,6 +10,7 @@
 /* Last Update: 06-DEC-02                                            */
 /*                                                                   */
 /* ----------------------------------------------------------------- */
+#include "config.h"
 #include "../myheader.h"
 #include "../cone.h"
 #include "../print.h"
@@ -636,7 +637,7 @@ listCone* computeVertexCones(char* fileName, listVector* matrix,
   inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices and edges with cdd...";
-  system("./cdd latte_cdd.ine > latte_cdd.out");
+  system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
   cout << "done.\n\n";
 
   strcpy(command,"cp latte_cdd.ext ");
@@ -682,7 +683,7 @@ listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix,
   createLrsExtFileToPostAnalysys(matrix, numOfVars + 1);
 
   cout << "Computing edges with cdd...";
-  system("./cdd latte_cdd.ine > latte_cdd.out");
+  system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
   cout << "done.\n\n";
 
   strcpy(command,"cp latte_cdd.ext ");
@@ -749,7 +750,7 @@ rationalVector* LP(listVector* matrix, vector& cost, int numOfVars) {
   rationalVector* Opt_vector;
    createCddIneLPFile(matrix,numOfVars+1,cost);
    cout << "Computing LP...";
-  system("./cdd LP.ine > LP.out");
+  system(CDD_PATH " LP.ine > LP.out");
   cout << "done.\n\n";
   Opt_vector = ReadLpsFile(numOfVars);
   //  cout << Opt_vector->enumerator << " " << Opt_vector -> denominator << endl;

@@ -15,7 +15,7 @@
 #include "../print.h"
 #include "../ramon.h"
 #include "ConeDecom.h"
-#include <fstream.h>
+#include <fstream>
 #include "../RudyResNTL.h"
 #include "../PolyTree.h"
 #include <stdlib.h>

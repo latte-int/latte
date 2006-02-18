@@ -10,11 +10,11 @@
 ************************************************************************************/
 //  #ifndef TRIANGULATION__H
 //  #define TRIANGULATION__H
-#include <iostream.h>
-#include <fstream.h>
-#include <ctype.h>
+#include <iostream>
+#include <fstream>
+#include <cctype>
 #include <cstring>
-#include <stdlib.h> // exit()
+#include <cstdlib> // exit()
 #include <string>
 #include <math.h>
 #include <NTL/mat_ZZ.h>
@@ -30,6 +30,7 @@
 #include "../flags.h"
 #include <string.h>
 #include <stdio.h>
+#include "config.h"
 using namespace std;
 
 /*
@@ -187,7 +188,7 @@ int Triangulation(const mat_ZZ & Mat, const int & m, const int & n,
   srand(seed);
   
   writeCDDextFileRudy(m,n,Mat);
-  system("./cdd tri.ext > tri.out");
+  system(CDD_PATH " tri.ext > tri.out");
   system("rm -f tri.out");
   
   int face3 = 0, dim3 = 0;
@@ -281,7 +282,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 
 			cout << "Triangulation_Load_Save: File not present.  Calculation triangulation." << endl;
   			writeCDDextFileRudy(m,n,Mat);
-  			system("./cdd tri.ext > tri.out");
+  			system(CDD_PATH "tri.ext > tri.out");
   			system("rm -f tri.out");
 		}	
 		else
@@ -299,7 +300,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 	{
 
   			writeCDDextFileRudy(m,n,Mat);
-  			system("./cdd tri.ext > tri.out");
+  			system(CDD_PATH " tri.ext > tri.out");
   			system("rm -f tri.out");
 	}	
   

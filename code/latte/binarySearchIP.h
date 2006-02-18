@@ -9,7 +9,7 @@
 #ifndef BINARYSEARCHIP__H
 #define BINARYSEARCHIP__H
 
-#include <fstream.h>
+#include <fstream>
 #include <cstdlib>
 #include <cstring>
 #include <math.h>

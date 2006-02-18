@@ -12,6 +12,7 @@
 /* ----------------------------------------------------------------- */
 
 /*  Rudy Yoshid edited a dualiz back function                        */
+#include "config.h"
 #include "myheader.h"
 #include "cone.h"
 #include "ConeDeterminant.h"
@@ -255,7 +256,7 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
       out.close();
 
 /*      printf("Computing facets with cdd..."); */
-      system("./cdd latte_cdd.ine > latte_cdd.out");
+      system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
 /*      printf("done.\n"); */
 
       strcpy(cddInFileName,"latte_cdd.ext");

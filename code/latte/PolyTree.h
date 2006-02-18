@@ -2,7 +2,9 @@
 #define POLYTREE_H 1
 
 #include <NTL/ZZ.h>
-#include <fstream.h>
+#include <fstream>
+using namespace NTL_NAMESPACE;
+using namespace std;
 
 // Definitions of the types of PolyTree structures
 #define POLYTREE_ADD 0

@@ -8,7 +8,7 @@
 *********************************************************************/
 #include <list>
 
-#include <fstream.h>
+#include <fstream>
 #include <cstdlib>
 #include <cstring>
 #include <math.h>

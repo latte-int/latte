@@ -21,7 +21,7 @@
 #include <NTL/mat_RR.h>
 #include <NTL/vec_RR.h>
 
-#include <fstream.h>
+#include <fstream>
 #include <cstdlib>
 #include <cstring>
 #include <string>

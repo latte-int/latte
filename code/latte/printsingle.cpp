@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include "Array.h"
 #include <iostream.h>
-#include <fstream.h>
+#include <fstream>
 #include <strstream>
 #include <NTL/ZZ.h>
 #include <time.h>

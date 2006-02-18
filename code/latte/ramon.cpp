@@ -1,6 +1,6 @@
 #include "myheader.h"
 #include "barvinok/Cone.h"
-#include <fstream.h>
+#include <fstream>
 #include <NTL/ZZ.h>
 #include <NTL/vec_ZZ.h>
 /* ----------------------------------------------------------------- */
