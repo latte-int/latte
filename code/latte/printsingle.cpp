@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include "Array.h"
-#include <iostream.h>
+#include <iostream>
 #include <fstream>
-#include <strstream>
+#include <sstream>
 #include <NTL/ZZ.h>
 #include <time.h>
 #include <list>
