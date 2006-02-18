@@ -22,6 +22,7 @@
 #include <NTL/HNF.h>
 #include <NTL/ZZ.h>
 
+#include "config.h"
 #include "myheader.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
@@ -183,7 +184,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   }
  
   int * NewIndex;
-  system("./redcheck_gmp Check_red &> Check_red.out");
+  system(REDCHECK_PATH " Check_red &> Check_red.out");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
   if(!in2){

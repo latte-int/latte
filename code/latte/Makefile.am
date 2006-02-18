@@ -6,7 +6,7 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 
 LDADD = liblatte.a
-CXXFLAGS = $(NTL_CFLAGS) $(AM_CXXFLAGS)
+AM_CXXFLAGS := $(NTL_CFLAGS) $(AM_CXXFLAGS)
 LIBS += $(NTL_LIBS)
 
 noinst_LIBRARIES = liblatte.a

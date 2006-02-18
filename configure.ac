@@ -10,7 +10,12 @@ AC_LANG(C++)
 
 LB_CHECK_NTL
 
+# From CDD+
 AC_PATH_PROGS(CDD, [cddr+])
-AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD binary.])
+AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD+ binary.])
+
+# From cddlib
+AC_PATH_PROGS(REDCHECK, [redcheck_gmp])
+AC_DEFINE_UNQUOTED(REDCHECK_PATH, "${REDCHECK}", [The path to the cddlib redcheck binary.])
 
 AC_OUTPUT
