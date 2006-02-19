@@ -18,6 +18,7 @@ code/latte/Check_emp.lp
 code/latte/Check_emp.lps
 code/latte/Check_emp.out
 code/latte/ComputeAdjacency
+code/latte/Makefile
 code/latte/Makefile.in
 code/latte/SunWS_cache
 code/latte/adjacency/ComputeAdjacency
