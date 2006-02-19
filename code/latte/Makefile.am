@@ -17,5 +17,6 @@ liblatte_a_SOURCES = \
 	preprocess.cpp rational.cpp cone.cpp print.cpp ramon.cpp \
 	timing.cpp ConeDeterminant.cpp dual.cpp PolyTree.cpp RudyResNTL.cpp \
 	ResSingle.cpp printsingle.cpp IntegralHull.cpp ReadingFile.cpp \
-	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp 
+	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
+	banner.cpp
 

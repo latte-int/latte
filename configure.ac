@@ -1,4 +1,4 @@
-AC_INIT(latte, 1.2)
+AC_INIT(latte, 1.2-mk-0.1)
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(foreign)
 AM_MAINTAINER_MODE

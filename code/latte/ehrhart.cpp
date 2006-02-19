@@ -49,6 +49,8 @@
 #include "binarySearchIP.h"
 #include "CheckEmpty.h"
 
+#include "banner.h"
+
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
 #ifdef SUN
@@ -72,9 +74,7 @@ int main(int argc, char *argv[]) {
   listVector *templistVec;
   listCone *cones, *tmp, *tmpcones;
 
-  cout << endl;
-  cout << "This is LattE v1.0 beta.   (September 17, 2002)\n";
-  cout << "Revised version.           (Aug        1, 2003)\n\n";
+  latte_banner(cout);
 
   z=0;
   setbuf(stdout,0);
