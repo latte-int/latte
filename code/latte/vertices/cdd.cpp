@@ -676,7 +676,7 @@ listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix,
   inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices with lrs...";
-  system("./lrs1 latte_lrs.ine > latte_lrs.ext");
+  system(LRS_PATH " latte_lrs.ine > latte_lrs.ext");
   cout << "done.\n\n";
 
   createLrsIneFileToPostAnalysys(matrix, numOfVars + 1);
