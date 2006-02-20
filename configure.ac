@@ -13,13 +13,22 @@ LB_CHECK_NTL
 # From CDD+
 AC_PATH_PROGS(CDD, [cddr+])
 AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD+ binary.])
+if test -z "$CDD"; then
+  AC_MSG_ERROR([The `cddr+' binary from CDD+ is required for LattE.])			
+fi
 
 # From cddlib
 AC_PATH_PROGS(REDCHECK, [redcheck_gmp])
 AC_DEFINE_UNQUOTED(REDCHECK_PATH, "${REDCHECK}", [The path to the cddlib redcheck binary.])
-
+if test -z "$REDCHECK"; then
+  AC_MSG_ERROR([The `redcheck' binary from cddlib is required for LattE.])			
+fi
+	  
 # From LRS
 AC_PATH_PROGS(LRS, [lrs1])
 AC_DEFINE_UNQUOTED(LRS_PATH, "${LRS}", [The path to the lrs binary.])
+if test -z "$LRS"; then
+  AC_MSG_WARN([The `lrs1' binary from LRS is missing; LattE can optionally uses LRS instead of CDD.])
+fi
 
 AC_OUTPUT
