@@ -32,6 +32,7 @@ code/latte/numOfUnimodularCones
 code/latte/redcheck
 code/latte/vertices/SunWS_cache
 code/latte/vertices/redcheck
+code/stamp-h.in
 code/stamp-h1
 /config.h.in
 /config.log
