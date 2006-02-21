@@ -16,6 +16,8 @@ dnl Test for LIDIA Library and define LIDIA_CFLAGS and LIDIA_LIBS
 AC_DEFUN([LB_CHECK_LIDIA],
 [
 
+LIDIA_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+
 AC_ARG_WITH(lidia,
 	    [  --with-lidia=<path>|yes|no 
 					   Use Lidia library. 

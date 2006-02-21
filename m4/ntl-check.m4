@@ -17,6 +17,8 @@ dnl NTL_CFLAGS and NTL_LIBS
 AC_DEFUN([LB_CHECK_NTL],
 [
 
+NTL_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+
 AC_ARG_WITH(ntl,
 	    [  --with-ntl=<path>|yes|no 
 					   Use NTL library. 
