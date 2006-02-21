@@ -8,7 +8,19 @@ AC_PROG_CC
 AC_PROG_CXX
 AC_LANG(C++)
 
-LB_CHECK_NTL
+LB_MISC
+LB_CHECK_GMP(,,[AC_MSG_ERROR([GMP not found!
+GMP version 3.1.1 or greater is required for LattE to compile. Please
+make sure GMP is installed and specify its location with the option
+--with-gmp=<prefix> when running configure.])
+])
+LB_CHECK_NTL(,,[AC_MSG_ERROR([NTL not found!
+NTL version 5.0 or greater is required for LattE to compile. Please
+make sure NTL is installed and specify its location with the option
+--with-ntl=<prefix> when running configure.])
+])
+LB_CHECK_LIDIA(,,
+  AC_MSG_WARN([LiDIA not found.  We need LiDIA for computing Smith normal forms!]))
 
 # From CDD+
 AC_PATH_PROGS(CDD, [cddr+])
@@ -28,7 +40,7 @@ fi
 AC_PATH_PROGS(LRS, [lrs1])
 AC_DEFINE_UNQUOTED(LRS_PATH, "${LRS}", [The path to the lrs binary.])
 if test -z "$LRS"; then
-  AC_MSG_WARN([The `lrs1' binary from LRS is missing; LattE can optionally uses LRS instead of CDD.])
+  AC_MSG_WARN([The `lrs1' binary from LRS is missing; LattE can optionally use LRS instead of CDD.])
 fi
 
 AC_OUTPUT
