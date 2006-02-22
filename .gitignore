@@ -30,8 +30,10 @@ code/latte/Makefile.in
 code/latte/SunWS_cache
 code/latte/adjacency/ComputeAdjacency
 code/latte/adjacency/redcheck
+code/latte/barvinok/SunWS_cache
 code/latte/count
 code/latte/ehrhart
+code/latte/genFunction/SunWS_cache
 code/latte/maximize
 code/latte/minimize
 code/latte/numOfLatticePoints
