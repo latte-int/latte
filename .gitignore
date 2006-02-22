@@ -1,9 +1,16 @@
+/Check_emp.ddl
+/Check_emp.lp
+/Check_emp.lps
+/Check_emp.out
 EXAMPLES/Check_emp.ddl
 EXAMPLES/Check_emp.lp
 EXAMPLES/Check_emp.lps
 EXAMPLES/Check_emp.out
 EXAMPLES/Check_red
 EXAMPLES/Check_red.out
+EXAMPLES/numOfLatticePoints
+EXAMPLES/numOfUnimodularCones
+/Error
 /Makefile
 /Makefile.in
 /aclocal.m4
@@ -41,4 +48,6 @@ code/stamp-h1
 /config.log
 /config.status
 /configure
+/numOfLatticePoints
+/numOfUnimodularCones
 /stamp-h1
