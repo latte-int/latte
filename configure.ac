@@ -62,6 +62,6 @@ fi
 
 # We need Maple to generate the code for evaluation of the Todd polynomial. 
 AC_PATH_PROG(MAPLEBIN, maple)
-AM_CONDITIONAL(HAVE_MAPLE, test -n $MAPLEBIN)
+AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != x )
 
 AC_OUTPUT
