@@ -1,3 +1,7 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.59)
 AC_INIT(latte, 1.2-mk-0.1)
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(foreign)
@@ -6,6 +10,19 @@ AC_CONFIG_FILES([Makefile code/Makefile code/latte/Makefile])
 AC_PROG_RANLIB
 AC_PROG_CC
 AC_PROG_CXX
+
+# Checks for header files.
+AC_HEADER_STDC
+AC_CHECK_HEADERS([malloc.h stdlib.h string.h sys/param.h])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_C_CONST
+
+# Checks for library functions.
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([pow sqrt])
+
 AC_LANG(C++)
 
 LB_MISC
