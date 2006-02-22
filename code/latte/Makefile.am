@@ -22,6 +22,17 @@ liblatte_a_SOURCES = \
 	banner.cpp \
 	todd/todd.cpp todd/gmp_pow.cpp
 
+noinst_HEADERS =							\
+	Array.h CheckEmpty.h CheckRedundant.h ConeDeterminant.h		\
+	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
+	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
+	myheader.h preprocess.h print.h ramon.h rational.h timing.h	\
+	barvinok/Cone.h barvinok/ConeDecom.h				\
+	barvinok/ConeDeterminant.h barvinok/Triangulation.h		\
+	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
+	genFunction/piped.h vertices/cdd.h				\
+	todd/gmp_pow.h todd/todd.h 
+
 BUILT_SOURCES = todd/todd.cpp
 EXTRA_DIST = todd/todd.cpp
 if HAVE_MAPLE
