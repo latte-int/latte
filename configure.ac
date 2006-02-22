@@ -43,4 +43,8 @@ if test -z "$LRS"; then
   AC_MSG_WARN([The `lrs1' binary from LRS is missing; LattE can optionally use LRS instead of CDD.])
 fi
 
+# We need Maple to generate the code for evaluation of the Todd polynomial. 
+AC_PATH_PROG(MAPLEBIN, maple)
+AM_CONDITIONAL(HAVE_MAPLE, test -n $MAPLEBIN)
+
 AC_OUTPUT
