@@ -1,3 +1,4 @@
+/* This is a -*- C++ -*- header file. */
 #ifndef MYHEADER__H
 #define MYHEADER__H
 #include <iostream>
@@ -35,6 +36,7 @@ listVector;
 
 typedef struct PtrCone {
   bool sign;
+  ZZ determinant;
   listVector *Generator;
 }
 PtrCone;
@@ -51,11 +53,11 @@ typedef struct listRationalVector {
 
 typedef struct listCone {
   int coefficient;
+  ZZ determinant;
   rationalVector* vertex;
   listVector *rays;
   listVector *facets;
   listVector *latticePoints;
-  int numOfLatticePoints;
   struct listCone *rest;
 } listCone;
 
