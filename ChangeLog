@@ -1,0 +1,65 @@
+2006-02-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/todd/gmp_pow.cpp, code/latte/todd/gmp_pow.h,
+	code/latte/todd/test-todd.cpp, code/latte/todd/todd.h,
+	code/latte/todd/todd.maple, code/latte/todd/todd.sed:  New files.
+
+2006-02-21  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* acinclude.m4, configure.ac: Check for LiDIA.
+
+	* m4/gmp-check.m4, m4/Makefile.am, m4/latte-misc.m4,
+	m4/lidia-check.m4, m4/ntl-check.m4: More autoconf scripts stolen
+	from LinBox.
+
+2006-02-20  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* m4/lidia-check.m4: autoconf macro checking for LiDIA, stolen
+	from LinBox
+
+	* configure.ac: Signal error/warning when CDD or LRS binaries are
+	not found at configure time.
+
+2006-02-19  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/banner.cpp, code/latte/banner.h,
+	code/latte/Makefile.am, code/latte/count.cpp,
+	code/latte/ehrhart.cpp, code/latte/maximize.cpp,
+	code/latte/minimize.cpp, configure.ac: Bump version number.  Show
+	actual version in banners.
+
+	* code/latte/IntegralHull.cpp, code/latte/tmpIP.cpp,
+	code/latte/vertices/cdd.cpp, configure.ac: Check for LRS binary in
+	configure, use this path rather than "./lrs1".
+
+2006-02-18  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Autoconfiscate.
+	Minor fixes to get it compiled with modern C++ compilers.
+
+2006-02-15  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/simple-main.cpp: Simplified version of the main program
+	for use in the approximate counting project.
+
+2006-02-14  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Imported LattE 1.2
+
+2005-01-26  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/barvinok/barvinok.cpp: Avoid some redundant
+	determinant computations.
+
+2005-01-21  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/PolyTree.cpp: Remove some g++-isms.
+
+2005-01-20  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Renamed barvinok/cone.cpp and cone.h to Cone.cpp and Cone.h to
+	remove filename clash.
+
+	First adjustments to make it compile.
+
+	Imported LattE release v 1.1
