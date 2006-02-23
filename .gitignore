@@ -39,6 +39,7 @@ code/latte/minimize
 code/latte/numOfLatticePoints
 code/latte/numOfUnimodularCones
 code/latte/redcheck
+code/latte/simple-count
 code/latte/test-todd
 code/latte/todd/todd.cpp
 code/latte/todd/todd.pre-cpp
