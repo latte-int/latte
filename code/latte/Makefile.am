@@ -1,10 +1,11 @@
 bin_PROGRAMS = maximize minimize count ehrhart \
-	test-todd
+	test-todd simple-count
 
 maximize_SOURCES = maximize.cpp
 minimize_SOURCES = minimize.cpp
 count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
+simple_count_SOURCES = simple-main.cpp
 
 LDADD = liblatte.a
 AM_CXXFLAGS := $(NTL_CFLAGS) $(AM_CXXFLAGS)
