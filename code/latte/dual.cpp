@@ -337,7 +337,7 @@ scaled_inverse(const mat_ZZ &W)
       conv(R(i, j), W(i, j));
     }
   }
-  R5 = determinant(R) * inv(R);
+  R5 = abs(determinant(R)) * inv(R);
   for(int i = 1; i <= m; i++){
     for(int j = 1; j <= m; j++){
       R5(i, j) = round(R5(i, j));
