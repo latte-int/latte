@@ -50,8 +50,11 @@ struct Barvinok_DFS_Parameters
 	Node_Controller *Controller;
 };
 
-
-int barvinok(mat_ZZ &, list< PtrCone > &, int&);
+/* Do a signed decomposition, modulo lower-dimensional cones, of the
+   cone spanned by B, until the determinants of all cones are at most
+   MAX_DETERMINANT.  Return the cones in UNI. */ 
+int barvinok(mat_ZZ &B, list< PtrCone > &Uni, int &numOfUniCones,
+	     int max_determinant = 1);
 
 int barvinok_Single (mat_ZZ &, int &, Single_Cone_Parameters *, Node_Controller *, rationalVector *vertex);
 

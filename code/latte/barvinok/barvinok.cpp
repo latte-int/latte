@@ -122,7 +122,8 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
 }
 
 /**********************************************************************/
-int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones)
+int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones,
+	     int max_determinant)
 {
    long m, n;
   m = B.NumRows();
@@ -259,7 +260,10 @@ int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones)
      
      for(int i = 0; i < m; i++) {
        ZZ Det_i = Dets[i];
-       if(abs(Det_i) == 1) {
+       if (Det_i == 0) {
+	 /* do nothing */
+       }
+       else if(abs(Det_i) <= max_determinant) {
 	 listVector *L, *endL;
 
 	 L=createListVector(cones1[i].generator[0]);
@@ -278,9 +282,6 @@ int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones)
 	   cout << numOfUniCones << " unimodular cones are done. " << endl;
 	 width++;
        }
-       else if(Det_i == 0)
-	 ;
-     
        else if(abs(Det_i) < abs(Det))
 	 QNonUni.push_back(cones1[i]);
      
