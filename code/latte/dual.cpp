@@ -12,6 +12,7 @@
 /* ----------------------------------------------------------------- */
 
 /*  Rudy Yoshid edited a dualiz back function                        */
+#include <cassert>
 #include "config.h"
 #include "myheader.h"
 #include "cone.h"
@@ -356,11 +357,8 @@ listCone* dualizeBackCones(listCone *cones, int numOfVars)
 {
   int i,len,numOfConesDualized,numOfAllCones;
   ZZ x,y;
- // rationalVector *w;
   listVector *rays, *rays2;
   listCone *tmp;
-//  char cddInFileName[127];
- // string tmpString;
 
   mat_ZZ Inverse;
   Inverse.SetDims(numOfVars, numOfVars);
@@ -372,53 +370,39 @@ listCone* dualizeBackCones(listCone *cones, int numOfVars)
     rays=tmp->rays;
     rays2=rays;
     len=lengthListVector(rays);
-/*      if (len!=numOfVars) { */
-/*      if (1>0) { */
 
-      for(i = 0; i < numOfVars; i++)
-      { Inverse[i] = rays->first;
-        rays = rays -> rest;}
-      ZZ det = determinant(Inverse);
-     //cout << Inverse << endl; exit(9);
-      Inverse = - transpose(scaled_inverse(Inverse));
+    for(i = 0; i < numOfVars; i++) {
+      Inverse[i] = rays->first;
+      rays = rays -> rest;
+    }
+    ZZ det = determinant(Inverse);
+    assert(abs(det) == tmp->determinant);
+    Inverse = - transpose(scaled_inverse(Inverse));
 
-      for (i = 0; i < numOfVars; i++) {
-	/* Cancel GCD: */
-	ZZ gcd;
-	int j;
+    for (i = 0; i < numOfVars; i++) {
+      /* Cancel GCD: */
+      ZZ gcd;
+      int j;
+      for (j = 0; j<numOfVars; j++)
+	gcd = GCD(gcd, Inverse[i][j]);
+      if (gcd != 0 && gcd != 1) {
 	for (j = 0; j<numOfVars; j++)
-	  gcd = GCD(gcd, Inverse[i][j]);
-	if (gcd != 0 && gcd != 1) {
-	  for (j = 0; j<numOfVars; j++)
-	    Inverse[i][j] /= gcd;
-	}
+	  Inverse[i][j] /= gcd;
       }
-      for(i = 0; i < numOfVars; i++) {
-	rays2->first = Inverse[i];
-	rays2 = rays2 -> rest;
-      }
-
-      cout << "Determinant of dual: " << det << ", primal: " << determinant(Inverse) << endl;
-       
-   //   cout << Inverse << endl; exit(9);
-     // tmp->facets=tmp->rays;
-     // tmp->rays=facets->rest;
-/*      } else { */
-/*        tmp->facets=tmp->rays;     */
-/*        tmp->rays=dualizeSimplicialCone(rays,numOfVars); */
-
-/*      if (len==numOfVars) { */
-//      if (1<0) {
-//        printf("cdd\n");
-//        printListVector(tmp->rays,numOfVars);
-//        printf("dualize\n");
-//        printListVector(dualizeSimplicialCone(rays2,numOfVars),numOfVars);
-//      }
+    }
+    for(i = 0; i < numOfVars; i++) {
+      rays2->first = Inverse[i];
+      rays2 = rays2 -> rest;
+    }
+    ZZ new_det = determinant(Inverse);
+    if (abs(det) > 1) 
+      cout << "Determinant of dual: " << det
+	   << ", primal: " <<  new_det << endl;
+    tmp->determinant = abs(new_det);
 
     tmp=tmp->rest;
     numOfConesDualized++;
     if (numOfConesDualized==50*(numOfConesDualized/50)) {
-/*        exit(0); */
       printf("%d / %d done.\n",numOfConesDualized,numOfAllCones);
     }
   }
