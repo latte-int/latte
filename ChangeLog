@@ -1,9 +1,40 @@
-2006-02-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+2006-02-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/dual.cpp (scaled_inverse): Fix to always get the
+	right sign. 
+
+	* code/latte/barvinok/barvinok.cpp (barvinok): New optional arg,
+	"max_determinant"; allows stopping decomposition before
+	unimodularity is reached.
+	* code/latte/barvinok/dec.cpp (decomposeCones): Likewise.
+	* code/latte/barvinok/ConeDecom.cpp (barvinokDecomposition): 
+	Likewise.
 
 	* code/latte/dual.cpp (scaled_inverse): New.
 	(dualizeBackCones): Handle the non-unimodular case.
 
-2006-02-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+	* code/latte/barvinok/barvinok.cpp (barvinok): Store the
+	determinants in the result list.
+	(barvinok_DFS): Likewise.
+	(transformRudyListConeIntoRamonListCone_Single): Copy the
+	determinant. 
+
+	* code/latte/barvinok/ConeDecom.cpp
+	(transformRudyListConeIntoRamonListCone): Copy the determinant.
+
+	* code/latte/myheader.h (PtrCone): New slot "determinant".
+	(listCone): New slot "determinant"; removed unused slot.
+
+	* code/latte/cone.cpp (createListCone): Initialize it here to 0.
+
+	* code/latte/genFunction/piped.cpp (computePointsInParallelepipeds): 
+	New function, factored out from all the main programs.
+	
+	* latte.el: New file, Emacs customizations for work on LattE.
+
+	* code/latte/Makefile.am: Build test program simple-count from
+	simple-main.cpp; this is where the new experiments will take
+	place.
 
 	* code/latte/todd/gmp_pow.cpp, code/latte/todd/gmp_pow.h,
 	code/latte/todd/test-todd.cpp, code/latte/todd/todd.h,
