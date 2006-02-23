@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
   vector cost;
   listVector *templistVec;
-  listCone *cones, *tmp, *tmpcones;
+  listCone *cones, *tmpcones;
 
   latte_banner(cout);
 
@@ -82,9 +82,6 @@ int main(int argc, char *argv[]) {
   strcpy(invocation,"Invocation: ");
   strcat(invocation,argv[0]);
   strcat(invocation," ");
-/*    strcat(invocation,argv[argc-1]); */
-/*    strcat(invocation,"\n\n"); */
-/*    printf(invocation); */
 
   strcpy(Vrepresentation,"no");
   strcpy(interior,"no");
@@ -103,7 +100,7 @@ int main(int argc, char *argv[]) {
   strcpy(taylor,"no");
   strcpy(rationalCone,"no");
   strcpy(nonneg, "no");
-  strcpy(Memory_Save, "yes");
+  strcpy(Memory_Save, "no");
   strcpy(Save_Tri, "no");
   strcpy(Load_Tri, "no");
   strcpy(Print, "no");
@@ -115,49 +112,33 @@ int main(int argc, char *argv[]) {
     strcat(invocation,argv[i]);
     strcat(invocation," ");
     if (strncmp(argv[i],"vrep",3)==0) strcpy(Vrepresentation,"yes"); 
-    // if (strncmp(argv[i],"bbs",3)==0) strcpy(binary,"yes");
-    if (strncmp(argv[i],"int",3)==0) strcpy(interior,"yes");
-    //if (strncmp(argv[i],"min",3)==0) strcpy(minimize,"yes");
-    //if (strncmp(argv[i],"gro",3)==0) strcpy(grobner,"yes");
-    //if (strncmp(argv[i],"nodecom",3)==0) strcpy(decompose,"no");
-    if (strncmp(argv[i],"homog",3)==0) {strcpy(dualApproach,"yes"); flags |= DUAL_APPROACH;}
-    if (strncmp(argv[i],"equ",3)==0) strcpy(equationsPresent,"yes");
-    if (strncmp(argv[i],"uni",3)==0) strcpy(assumeUnimodularCones,"yes");
-    //if (strncmp(argv[i],"simp",4)==0) {strcpy(printfile,"yes"); flags |= PRINT;}
-    if(strncmp(argv[i],"file",4)==0) strcpy(Memory_Save, "no");
-    //if (strncmp(argv[i],"single",6)==0) strcpy(Singlecone,"yes");
-    //if (strncmp(argv[i],"tay",3)==0) strcpy(taylor,"yes");
-    //if (strncmp(argv[i],"ehrhartsimp",3)==0) strcpy(rationalCone,"yes");
-    if (strncmp(argv[i],"+", 1) ==0) strcpy(nonneg,"yes");
-    if (strncmp(argv[i],"memsave",7)==0) strcpy (Memory_Save, "yes");
-    if (strncmp(argv[i],"printcones",3)==0) strcpy (Print, "yes");
-    if (strncmp(argv[i],"cdd",3)==0) strcpy (cddstyle, "yes");
-    //if (strncmp(argv[i],"hull",3)==0) strcpy (inthull, "yes");
-    // if (strncmp(argv[i],"max",3)==0) strcpy (maximum, "yes");
-    if (strncmp(argv[i],"lrs",3)==0) strcpy (LRS, "yes");
-    if (strncmp(argv[i],"dil",3)==0) strcpy (dilation, "yes");
-    if (strncmp(argv[i],"rem",3)==0) strcpy (removeFiles, "no");
-    if (strncmp(argv[i],"rem",3)==0) strcpy (Memory_Save, "no");
-    if (strncmp(argv[i],"trisave",7)==0) {strcpy (Save_Tri, "yes"); flags |= SAVE;}
-    if (strncmp(argv[i],"triload",7)==0) {strcpy (Load_Tri, "yes"); flags |= LOAD;}
+    else if (strncmp(argv[i],"int",3)==0) strcpy(interior,"yes");
+    else if (strncmp(argv[i],"equ",3)==0) strcpy(equationsPresent,"yes");
+    else if(strncmp(argv[i],"file",4)==0) strcpy(Memory_Save, "no");
+    else if (strncmp(argv[i],"+", 1) ==0) strcpy(nonneg,"yes");
+    else if (strncmp(argv[i],"printcones",3)==0) strcpy (Print, "yes");
+    else if (strncmp(argv[i],"cdd",3)==0) strcpy (cddstyle, "yes");
+    else if (strncmp(argv[i],"lrs",3)==0) strcpy (LRS, "yes");
+    else if (strncmp(argv[i],"dil",3)==0) strcpy (dilation, "yes");
+    else if (strncmp(argv[i],"rem",3)==0) {
+      strcpy (removeFiles, "no");
+      strcpy (Memory_Save, "no");
+    }
+    else if (strncmp(argv[i],"trisave",7)==0) {
+      strcpy (Save_Tri, "yes");
+      flags |= SAVE;
+    }
+    else if (strncmp(argv[i],"triload",7)==0) {
+      strcpy (Load_Tri, "yes");
+      flags |= LOAD;
+    }
+    else {
+      cerr << "Unknown command/option " << argv[i] << endl;
+      exit(1);
+    }
   }
-  if(minimize[0] == 'y') strcpy(maximum, "yes");
-  if(grobner[0] == 'y') strcpy(equationsPresent,"yes");
-  if(binary[0] == 'y') {strcpy(maximum,"yes"); strcpy(Memory_Save, "no");}
-  if(maximum[0] == 'y') strcpy(Memory_Save, "no");
   if(printfile[0] == 'y') strcpy(Memory_Save, "no");
-  if(rationalCone[0] == 'y') strcpy(Memory_Save, "no");
   if(printfile[0] == 'y') print_flag = 1;
-  if(taylor[0] == 'y'){
-    degree = atoi(argv[argc-2]);
-  }
-  if(rationalCone[0] == 'y'){
-    
-    //HugInt digit(argv[1]);
-    //conv(output_cone, digit.BigInt);
-    // User can use only Mode one
-    output_cone = 3;
-  }
   int dilation_const = 1;
 
   if(dilation[0] == 'y') dilation_const = atoi(argv[argc-2]);
@@ -168,45 +149,13 @@ int main(int argc, char *argv[]) {
     cerr << "Use not cdd style and v-representation." << endl;
     exit(2);
   }
-  if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
-    cerr<<"You cannot use + and dua at the same time." << endl;
-    exit(2);
-  }
   
-  if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
-    cerr<<"You cannot use int and memsave at the same time." << endl;
-    exit(3);
-  }
-
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
   cout << invocation;
   char costFile[127];
-  if(maximum[0] == 'y'){
-    strcpy(fileName,argv[argc-1]);
-    strcpy(costFile, argv[argc - 1]);
-    strcat(costFile, ".cost");
-  }
-  else strcpy(fileName,argv[argc-1]);
+  strcpy(fileName,argv[argc-1]);
   //  cout << fileName << " " << costFile << endl;
-  if(maximum[0] == 'y') {
-    ifstream ReadTest(fileName);
-    if(!ReadTest){
-      cerr << "Need a polytope input file." << endl;
-      exit(2);
-    }
-    //    cout << fileName << " " << costFile << endl;
-    ifstream INCost(costFile);
-    if(!INCost){
-      cerr << "Need a cost input file." << endl;
-      exit(3);
-    }
-    int costDim, dummy;
-    INCost >> dummy >> costDim; 
-    cost.SetLength(costDim);
-    for(i = 0; i < costDim; i++)
-      INCost >> cost[i]; 
-  }
   //strcpy (fileName,"stdin");
   
   /* Check input file. */
@@ -215,13 +164,7 @@ int main(int argc, char *argv[]) {
       CheckInputFile(fileName);
       CheckLength(fileName, equationsPresent);
     }
-    if(minimize[0] == 'y')  strcpy (maximum, "yes");   
  
-    if((cddstyle[0] == 'n') && (grobner[0] == 'n') && (maximum[0] == 'y')){
-      CheckInputFile(fileName);
-      CheckLength(fileName,equationsPresent);
-    }
-
     if(cddstyle[0] == 'y')
       { CheckInputFileCDDRep(argv[argc - 1]);
       CheckInputFileCDDRep1(argv[argc - 1]);
@@ -241,7 +184,6 @@ int main(int argc, char *argv[]) {
 		     cost,Vrepresentation);
 //   if((equationsPresent[0] == 'n') && (interior[0] == 'y'))
 //     Interior(inequalities);
-  // if(minimize[0] == 'y') cost = -cost;
   if(cddstyle[0] == 'y'){
     int tmpoutput, tmpflags;
     CDDstylereadLatteProblem(fileName,&equations,&inequalities,equationsPresent,
@@ -254,43 +196,18 @@ int main(int argc, char *argv[]) {
   
   // cout << grobner << endl;
   vector holdCost;
-  if(minimize[0] == 'y') cost = - cost;
   holdCost = cost;
   //cout <<"Cost is: " << cost << endl;
   vec_RR holdcost_RR;
   holdcost_RR.SetLength(holdCost.length());
   for(i = 0; i < holdCost.length(); i++) conv(holdcost_RR[i], holdCost[i]);
 
-  if(minimize[0] == 'y') holdcost_RR = - holdcost_RR;
-  if(grobner[0] == 'y'){
-
-    CheckGrobner(fileName, cddstyle);
-    SolveGrobner(fileName,  nonneg, dualApproach,
-		 grobner, equationsPresent, cddstyle);}
-  else{
-  if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
-    cerr<<"You cannot use + and dua at the same time." << endl;
-    exit(2);
-  }
-  
-  if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
-    cerr<<"You cannot use int and memsave at the same time." << endl;
-    exit(3);
-  }
-  
   if((Vrepresentation[0] == 'y') && (equationsPresent[0] == 'y')){
     cerr<<"You cannot use vrep and equ at the same time." << endl;
     exit(4);
   }
 
   numOfVars--;
-  /* Binary seach IP*/
-
-  if(binary[0] == 'y'){
-    cout << "The number of optimal solutions: " << binarySearch(equations, inequalities,cost, numOfVars, minimize) << endl;
-    cout << "Time: " << GetTime() << endl;
-    exit(0);
-  }
 
   numOfAllVars=numOfVars;
   mat_ZZ ProjU, ProjU2, AA;
@@ -321,11 +238,7 @@ int main(int argc, char *argv[]) {
     dilateListVector(inequalities, numOfVars, dilation_const);
     matrixTmp=inequalities;
   }
-  if((dualApproach[0] == 'y')&&(equationsPresent[0]=='y')){
-   matrix = TransformToDualCone(matrixTmp,numOfVars);
-   }
-  else {
-    matrix = matrixTmp;}
+  matrix = matrixTmp;
 /* Now matrix contains the new inequalities. */
   RR LP_OPT;
     cout << "\nTime: " << GetTime() << " sec\n\n";
@@ -341,7 +254,7 @@ int main(int argc, char *argv[]) {
     tmp_num.SetLength(numOfVars);
 /* Compute vertices and edges. */
     rationalVector* LP_vertex;
-    if ((dualApproach[0]=='n') && (Vrepresentation[0] == 'n')) {
+    if (Vrepresentation[0] == 'n') {
     if(LRS[0] == 'n')
     tmpcones=computeVertexCones(fileName,matrix,numOfVars);
     else
@@ -354,81 +267,29 @@ int main(int argc, char *argv[]) {
 
     /* Compute triangulation or decomposition of each vertex cone. */
 
-    {
+    cones=dualizeCones(cones,numOfVars);
+    cones=decomposeCones(cones,numOfVars, flags, fileName);
+    cones=dualizeBackCones(cones,numOfVars);
 
-      if (assumeUnimodularCones[0]=='n') {
-
-
-      cones=dualizeCones(cones,numOfVars);
-      
-      if (decompose[0]=='y') 
-      {
-	if(Memory_Save[0] == 'n')      
-     	 	cones=decomposeCones(cones,numOfVars, flags, fileName);
-	// Iterator through simplicial cones, DFS
-	else
-		decomposeCones_Single(cones,numOfVars, degree, flags, fileName);	
-      }
-      
-      if(Memory_Save[0] == 'n')
-      	cones=dualizeBackCones(cones,numOfVars);
-    }
-   }
-
-/* Compute points in parallelepipeds, unless we already did using memsave version!  */
-
-
- if(Memory_Save[0] == 'n')
- {
-	 cout << "Computing the points in the Parallelepiped of the unimodular Cones." << endl;
-  	tmp=cones;
-	int	Cones_Processed_Count = 0;
- 	while (tmp) 
-	{
-    		if (decompose[0]=='n') 
-		{
-      			tmp->latticePoints=pointsInParallelepiped(tmp->vertex,tmp->rays,0,numOfVars);
-    		} 
-		else 
-		{
-      			tmp->latticePoints=pointsInParallelepipedOfUnimodularCone(tmp->vertex,tmp->rays,numOfVars);
-    		}
-		
-    		tmp=tmp->rest;
-
-		Cones_Processed_Count++;
-
-		if ((Cones_Processed_Count % 1000) == 0 )
-			cout << Cones_Processed_Count << " cones processed." << endl;
-  	}
-}
-  
-
-
+    /* Compute points in parallelepipeds, unless we already did using memsave version!  */
+    
+    cout << "Computing the points in the Parallelepiped of the unimodular Cones." << endl;
+    computePointsInParallelepipeds(cones, numOfVars);
 
  if(Print[0] == 'y')
-  printListCone(cones,numOfVars);
+   printListCone(cones,numOfVars);
 
- {
-   if(Memory_Save[0] == 'n')
-     {
-
-       if(dualApproach[0] == 'n'){
-	 cout << "Creating generating function.\n"; 
-	 //printListVector(templistVec, oldnumofvars); cout << ProjU << endl;
-	 if(equationsPresent[0] == 'y'){ cones = ProjectUp2(cones, oldnumofvars, numOfVars, AA, bb);
-	 numOfVars = oldnumofvars;}
-
-	 createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);
-       }
-       //printListCone(cones, numOfVars);
-       if(dualApproach[0] == 'n'){
-	 cout << "Starting final computation.\n";
-	 cout << endl << "****  The number of lattice points is: " << Residue(cones,numOfVars) << "  ****" << endl << endl;
-       }
-
-}
+ cout << "Creating generating function.\n"; 
+ //printListVector(templistVec, oldnumofvars); cout << ProjU << endl;
+ if(equationsPresent[0] == 'y') {
+   cones = ProjectUp2(cones, oldnumofvars, numOfVars, AA, bb);
+   numOfVars = oldnumofvars;
  }
+ createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);
+ //printListCone(cones, numOfVars);
+ cout << "Starting final computation.\n";
+ cout << endl << "****  The number of lattice points is: " << Residue(cones,numOfVars) << "  ****" << endl << endl;
+
 
  if(rationalCone[0] == 'y') {
    strcpy(command, "mv ");
@@ -445,7 +306,7 @@ int main(int argc, char *argv[]) {
    strcat(command, ".rat");
    system(command);
  }
- if((removeFiles[0] == 'y') && (dualApproach[0] == 'n')){
+ if((removeFiles[0] == 'y')){
    
   strcpy(command,"rm ");
   strcat(command,fileName);
@@ -457,12 +318,10 @@ int main(int argc, char *argv[]) {
   strcat(command,".cdd");
   system(command); 
   
-  if(Memory_Save[0] == 'n'){
     strcpy(command,"rm ");
     strcat(command,fileName);
     strcat(command,".maple");
     system(command); 
-  }
 
   strcpy(command,"rm ");
   strcat(command,fileName);
@@ -475,16 +334,8 @@ int main(int argc, char *argv[]) {
     system(command);
   }
  }
-  }
+  
 
-
-  if((dualApproach[0] == 'y') && (cddstyle[0] == 'n')){
-
-    strcpy(command,"rm ");
-    strcat(command,fileName);
-    system(command);
-
-  }
  cout << "Computation done. " << endl;
  cout << "Time: " << GetTime() << " sec\n\n";
  
