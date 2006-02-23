@@ -1,5 +1,5 @@
 /*******************************************************************
-   Auther: Ruriko Yoshida
+   Author: Ruriko Yoshida
    Date: July 25th, 2002
    Update: Febrary 3rd, 2003
    This program computes Barvinok's decomposition of a cone.
@@ -122,7 +122,8 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
 }
 
 /**********************************************************************/
- int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones){
+int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones)
+{
    long m, n;
   m = B.NumRows();
 
@@ -164,20 +165,22 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
    dummy.generator = B;
    dummy.sign = 1;
 
-   if(abs(determinant(dummy.generator)) == 1){
-  listVector *L, *endL;
+   ZZ dummy_determinant = abs(determinant(dummy.generator));
+   if(dummy_determinant == 1){
+     listVector *L, *endL;
 
-  L=createListVector(dummy.generator[0]);
-  endL=L;
+     L=createListVector(dummy.generator[0]);
+     endL=L;
 
-  for (int k=1; k<m; k++) {
-    v=dummy.generator[k];
-    endL->rest = createListVector(v);
-    endL = endL->rest;
-  }
-      tmpPtrCone.Generator = L;
-      tmpPtrCone.sign = 1;
-      Uni.push_back(tmpPtrCone);
+     for (int k=1; k<m; k++) {
+       v=dummy.generator[k];
+       endL->rest = createListVector(v);
+       endL = endL->rest;
+     }
+     tmpPtrCone.Generator = L;
+     tmpPtrCone.sign = 1;
+     tmpPtrCone.determinant = dummy_determinant;
+     Uni.push_back(tmpPtrCone);
    }
 
    else
@@ -256,25 +259,25 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
      
      for(int i = 0; i < m; i++) {
        ZZ Det_i = Dets[i];
-       if(abs(Det_i) == 1)
-	 {
-  listVector *L, *endL;
+       if(abs(Det_i) == 1) {
+	 listVector *L, *endL;
 
-  L=createListVector(cones1[i].generator[0]);
-  endL=L;
+	 L=createListVector(cones1[i].generator[0]);
+	 endL=L;
 
-  for (int k=1; k<m; k++) {
-   endL->rest = createListVector(cones1[i].generator[k]);
-    endL = endL->rest;
-  }
-      tmpPtrCone.Generator = L;
-      tmpPtrCone.sign = cones1[i].sign;
-      Uni.push_back(tmpPtrCone);
-      numOfUniCones++;
-      if((numOfUniCones % 1000) == 0)
-         cout << numOfUniCones << " unimodular cones are done. " << endl;
-	   width++;
+	 for (int k=1; k<m; k++) {
+	   endL->rest = createListVector(cones1[i].generator[k]);
+	   endL = endL->rest;
 	 }
+	 tmpPtrCone.Generator = L;
+	 tmpPtrCone.sign = cones1[i].sign;
+	 tmpPtrCone.determinant = abs(Det_i);
+	 Uni.push_back(tmpPtrCone);
+	 numOfUniCones++;
+	 if((numOfUniCones % 1000) == 0)
+	   cout << numOfUniCones << " unimodular cones are done. " << endl;
+	 width++;
+       }
        else if(Det_i == 0)
 	 ;
      
@@ -382,6 +385,7 @@ listCone* transformRudyListConeIntoRamonListCone_Single( PtrCone RudyCone,
 	if (s==0) s=-1;
 
 	cones->coefficient=s;
+	cones->determinant = RudyCone.determinant;
 	cones->rays = RudyCone.Generator;
   return (cones);
 }
@@ -430,7 +434,8 @@ int barvinok_DFS(Cone *C, Barvinok_DFS_Parameters *Parameters)
  	 	}
       	
 		tmpPtrCone.Generator = L;
-
+		tmpPtrCone.determinant = Det;
+		
 		// if something don't work, check this!
       		tmpPtrCone.sign = C->sign;
 
@@ -548,16 +553,21 @@ int barvinok_DFS(Cone *C, Barvinok_DFS_Parameters *Parameters)
      	ZZ max;
      	max = -1;
 
+#ifdef SHOWDETS
 	cout << "Determinant " << Det << " -> ";
-	
+#endif
      	for(int i = 0; i < m; i++)
      	{
 		Dets[i] = abs(determinant(cones1[i]->generator));
+#ifdef SHOWDETS
 		cout << Dets[i] << ", ";
+#endif
 	     	if(Dets[i] > max)
  			max = Dets[i];
      	}
+#ifdef SHOWDETS
 	cout << endl;
+#endif
      
      	int current;
      	ZZ min;
