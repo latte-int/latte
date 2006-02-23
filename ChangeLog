@@ -1,3 +1,8 @@
+2006-02-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/dual.cpp (scaled_inverse): New.
+	(dualizeBackCones): Handle the non-unimodular case.
+
 2006-02-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/todd/gmp_pow.cpp, code/latte/todd/gmp_pow.h,
