@@ -290,7 +290,9 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 	endFacets=endFacets->rest;
       }
       in.close();
+#if 0
       system("rm latte_cdd.*");
+#endif
       tmp->facets=tmp->rays;    
       tmp->rays=facets->rest;
 /*      } else { */
@@ -319,6 +321,37 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 }
 /* ----------------------------------------------------------------- */
 
+static mat_ZZ
+scaled_inverse(const mat_ZZ &W)
+{   
+  mat_RR R, R5;
+  int m;
+  m = W.NumRows();
+  assert(m == W.NumCols());
+  R.SetDims(m, m);
+  R5.SetDims(m, m);
+ 
+  for(int i = 1; i <= m; i++){
+    for(int j = 1; j <= m; j++){
+      conv(R(i, j), W(i, j));
+    }
+  }
+  R5 = determinant(R) * inv(R);
+  for(int i = 1; i <= m; i++){
+    for(int j = 1; j <= m; j++){
+      R5(i, j) = round(R5(i, j));
+    }
+  }
+  mat_ZZ L;
+  L.SetDims(m, m);
+  for(int i = 1; i <= m; i++){
+    for(int j = 1; j <= m; j++){
+      conv(L(i, j), R5(i, j));
+    }
+  }
+  return L;
+}
+
 listCone* dualizeBackCones(listCone *cones, int numOfVars) 
 {
   int i,len,numOfConesDualized,numOfAllCones;
@@ -345,11 +378,28 @@ listCone* dualizeBackCones(listCone *cones, int numOfVars)
       for(i = 0; i < numOfVars; i++)
       { Inverse[i] = rays->first;
         rays = rays -> rest;}
+      ZZ det = determinant(Inverse);
      //cout << Inverse << endl; exit(9);
-      Inverse = -transpose(inv(Inverse));
-       for(i = 0; i < numOfVars; i++)
-      {  rays2->first = Inverse[i];
-        rays2 = rays2 -> rest;}
+      Inverse = - transpose(scaled_inverse(Inverse));
+
+      for (i = 0; i < numOfVars; i++) {
+	/* Cancel GCD: */
+	ZZ gcd;
+	int j;
+	for (j = 0; j<numOfVars; j++)
+	  gcd = GCD(gcd, Inverse[i][j]);
+	if (gcd != 0 && gcd != 1) {
+	  for (j = 0; j<numOfVars; j++)
+	    Inverse[i][j] /= gcd;
+	}
+      }
+      for(i = 0; i < numOfVars; i++) {
+	rays2->first = Inverse[i];
+	rays2 = rays2 -> rest;
+      }
+
+      cout << "Determinant of dual: " << det << ", primal: " << determinant(Inverse) << endl;
+       
    //   cout << Inverse << endl; exit(9);
      // tmp->facets=tmp->rays;
      // tmp->rays=facets->rest;
