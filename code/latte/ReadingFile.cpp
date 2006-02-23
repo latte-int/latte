@@ -77,12 +77,6 @@ listCone* IntCone2(listCone* cones, int numOfVars) {
 
 /* ----------------------------------------------------------------- */
 
-void Mail(char * name, char * address, char* message){
-
-}
-
-/* ----------------------------------------------------------------- */
-
 void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, char* dil, int dilation){
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
   string tmpString;
