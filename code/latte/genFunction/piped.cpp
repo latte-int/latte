@@ -395,3 +395,19 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
   return(points);
 }
 /* ----------------------------------------------------------------- */
+
+void computePointsInParallelepipeds(listCone *cones, int numOfVars)
+{
+  listCone *tmp = cones;
+  int Cones_Processed_Count = 0;
+  while (tmp) {
+    if (tmp->determinant != 1)
+      tmp->latticePoints=pointsInParallelepiped(tmp->vertex,tmp->rays,0,numOfVars);
+    else 
+      tmp->latticePoints=pointsInParallelepipedOfUnimodularCone(tmp->vertex,tmp->rays,numOfVars);
+    tmp=tmp->rest;
+    Cones_Processed_Count++;
+    if ((Cones_Processed_Count % 1000) == 0 )
+      cout << Cones_Processed_Count << " cones processed." << endl;
+  }
+}
