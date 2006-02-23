@@ -17,7 +17,6 @@
 #include "flags.h"
 
 
-#define      mpz_t ZZ
 #define		Integer ZZ
 
 

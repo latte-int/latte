@@ -12,7 +12,6 @@
 #include "ramon.h"
 using namespace std;
 
-#define      mpz_t ZZ
 #define		Integer ZZ
 
 

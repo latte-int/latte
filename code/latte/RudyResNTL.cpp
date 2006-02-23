@@ -24,7 +24,6 @@ using namespace std;
 //#define OUTPUT_S_T_FUNCTION 0
 //#define OUTPUT_CONE 1
 
-#define      mpz_t ZZ
 #define		Integer ZZ
 
 
