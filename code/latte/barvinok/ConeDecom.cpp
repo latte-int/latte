@@ -68,6 +68,7 @@ listCone* transformRudyListConeIntoRamonListCone(list< PtrCone > RudyCones,
     if (s==0) s=-1;
 
     newCone->coefficient=s;
+    newCone->determinant = tmp.determinant;
     newCone->rays = tmp.Generator;
     endCones->rest=newCone;
     endCones=endCones->rest;
