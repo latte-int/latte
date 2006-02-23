@@ -268,7 +268,8 @@ int main(int argc, char *argv[]) {
     /* Compute triangulation or decomposition of each vertex cone. */
 
     cones=dualizeCones(cones,numOfVars);
-    cones=decomposeCones(cones,numOfVars, flags, fileName);
+    cones=decomposeCones(cones,numOfVars, flags, fileName,
+			 /* Max Determinant: */ 1000);
     cones=dualizeBackCones(cones,numOfVars);
 
     /* Compute points in parallelepipeds, unless we already did using memsave version!  */
