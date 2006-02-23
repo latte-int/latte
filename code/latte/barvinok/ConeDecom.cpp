@@ -86,8 +86,11 @@ listCone* transformRudyListConeIntoRamonListCone(list< PtrCone > RudyCones,
 */
 
 /* ----------------------------------------------------------------- */
-listCone* barvinokDecomposition(mat_ZZ Mat, int m, int n, int & numOfUniCones, char *File_Name, unsigned int Flags, int Cone_Index) {
-
+listCone *
+barvinokDecomposition(mat_ZZ Mat, int m, int n, int &numOfUniCones,
+		      char *File_Name, unsigned int Flags, int Cone_Index,
+		      int max_determinant = 1)
+{ 
   list< PtrCone > Uni;
 
   /* m is the number of vectors and n is the number of dims. */
@@ -148,7 +151,7 @@ listCone* barvinokDecomposition(mat_ZZ Mat, int m, int n, int & numOfUniCones, c
    int total = 0;
     for(int i = 0; i < Faces; i++){
       if(IsZero(B[i]) != 1){
-        total += barvinok(B[i],  Uni, numOfUniCones);
+        total += barvinok(B[i],  Uni, numOfUniCones, max_determinant);
         }
       }
 
