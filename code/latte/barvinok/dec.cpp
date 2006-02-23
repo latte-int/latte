@@ -90,7 +90,10 @@ mat_ZZ createConeDecMatrix(listCone *cones, int numOfRays, int numOfVars) {
   return (mat);
 }
 /* ----------------------------------------------------------------- */
-listCone* decomposeCones(listCone *cones, int numOfVars, unsigned int Flags, char *File_Name) {
+listCone*
+decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
+	       char *File_Name, int max_determinant)
+{
   int numOfConesDecomposed,numOfAllCones,numOfRays, numOfUniCones = 0;
   mat_ZZ mat;
   listCone *tmp, *tmp2, *newCones, *endNewCones, *unimodularCones;
@@ -109,7 +112,7 @@ listCone* decomposeCones(listCone *cones, int numOfVars, unsigned int Flags, cha
   while (tmp) {
     numOfRays=lengthListVector(tmp->rays);
     mat=createConeDecMatrix(tmp,numOfRays,numOfVars);
-    unimodularCones=barvinokDecomposition(mat,numOfRays,numOfVars, numOfUniCones, File_Name, Flags, Cone_Index);
+    unimodularCones=barvinokDecomposition(mat,numOfRays,numOfVars, numOfUniCones, File_Name, Flags, Cone_Index, max_determinant);
     tmp2=unimodularCones;
     while(tmp2) {
       tmp2->vertex=tmp->vertex;
