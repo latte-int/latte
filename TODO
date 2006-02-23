@@ -1,0 +1,25 @@
+Code clean-up:
+
+* Residue calculations:
+   - "Re-implement" Residue (print.cpp) 
+      in terms of Residue_Single_Cone (print-single.cpp).
+      (and move them to a separate file, residue.cpp).
+   - Likewise, consolidate ResidueFunction (RudyResNTL.cpp) and
+      ResidueFunction_Single_Cone (ResSingle.cpp)
+   - Factor out construction of generic vector.
+
+* Data structures:
+   - Get rid of duplications & conversions.
+     (e.g. listCone vs. PtrCone)
+   - ZZ vs. HugeInt vs. Integer
+
+* Main program:
+   Factor out code.
+
+* Remove:
+   - ConeDeterminant.cpp, .h
+   - hnf.cpp, rand.cpp
+   - CreateExample.cpp (or move to test-suite generators)
+   - KnapSackEst.cpp
+   - preproc.cpp
+
