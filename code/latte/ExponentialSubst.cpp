@@ -49,28 +49,29 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 {
   mpz_class *ray_scalar_products = new mpz_class[numOfVars];
   mpz_class prod_ray_scalar_products;
-    prod_ray_scalar_products = 1;
-    {
-      listVector *ray;
-      int k;
-      for (k = 0, ray = cone->rays; ray != NULL; k++, ray = ray->rest) {
-	ZZ inner;
-	InnerProduct(inner, generic_vector, ray->first);
-	ray_scalar_products[k] = convert_ZZ_to_mpz(inner);
-	if (ray_scalar_products[k] == 0)
-	  throw not_generic;
-	prod_ray_scalar_products *= ray_scalar_products[k];
-      }
-      assert(k == numOfVars);
+  int dimension = 0;
+  prod_ray_scalar_products = 1;
+  {
+    listVector *ray;
+    int k;
+    for (k = 0, ray = cone->rays; ray != NULL; k++, ray = ray->rest) {
+      ZZ inner;
+      InnerProduct(inner, generic_vector, ray->first);
+      ray_scalar_products[k] = convert_ZZ_to_mpz(inner);
+      if (ray_scalar_products[k] == 0)
+	throw not_generic;
+      prod_ray_scalar_products *= ray_scalar_products[k];
     }
+    dimension = k; // can be smaller than numOfVars
+  }
   int k;
   mpz_class k_factorial;
   mpq_class result;
   result = 0;
-  for (k = 0, k_factorial = 1; k<=numOfVars; k++, k_factorial *= k) {
+  for (k = 0, k_factorial = 1; k<=dimension; k++, k_factorial *= k) {
     Integer sum = sum_of_scalar_powers(generic_vector,
 				       cone->latticePoints, k);
-    mpq_class td = todd(numOfVars, numOfVars - k, ray_scalar_products);
+    mpq_class td = todd(dimension, dimension - k, ray_scalar_products);
     td /= prod_ray_scalar_products;
     result += convert_ZZ_to_mpz(sum) * td / k_factorial;
   }
