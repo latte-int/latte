@@ -4,6 +4,7 @@
 #define EXPONENTIALSUBST_H
 
 #include "myheader.h"
+#include <gmpxx.h>
 
 /* Compute the limit of the generating function for the integer points
    in CONE, whose "latticePoints" (in the fundamental parallelepiped)
@@ -12,8 +13,9 @@
    as described in [Barvinok--Pommersheim].
    The function takes the "coefficient" of the cone into consideration.
 */
-Integer
-computeExponentialResidue_Single(listCone *cone, int numOfVars);
+mpq_class
+computeExponentialResidue_Single(const vec_ZZ &lambda,
+				 listCone *cone, int numOfVars);
 
 /* Likewise, but for the whole list of CONES, summing up the
    results. */
