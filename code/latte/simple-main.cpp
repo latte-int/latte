@@ -33,7 +33,6 @@
 #include "genFunction/maple.h"
 #include "genFunction/piped.h"
 #include "cone.h"
-#include "ConeDeterminant.h"
 #include "dual.h"
 #include "RudyResNTL.h"
 #include "Grobner.h"
@@ -51,6 +50,22 @@
 #include "CheckEmpty.h" 
 
 #include "banner.h"
+#include "ExponentialSubst.cpp"
+
+ZZ computeNumberOfLatticePoints(listCone *cones, int numOfVars,
+				const BarvinokParameters &param)
+{
+  switch (param.substitution) {
+  case BarvinokParameters::PolynomialSubstitution:
+    return Residue(cones, numOfVars);
+  case BarvinokParameters::ExponentialSubstitution:
+    return computeExponentialResidue(cones, numOfVars);
+  default:
+    cerr << "Unknown BarvinokParameters::substitution" << endl;
+    abort();
+  }
+}
+
 
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
@@ -69,6 +84,7 @@ int main(int argc, char *argv[]) {
     Load_Tri[127], Print[127], inthull[127], cddstyle[127], grobner[127],
     removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
+  struct BarvinokParameters params;
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
   vector cost;
   listVector *templistVec;
@@ -107,6 +123,8 @@ int main(int argc, char *argv[]) {
   strcpy(inthull, "no");
   strcpy(cddstyle, "no");
   strcpy(LRS, "no");
+  params.substitution = BarvinokParameters::PolynomialSubstitution;
+  params.max_determinant = 1;
 
   for (i=1; i<argc-1; i++) {
     strcat(invocation,argv[i]);
@@ -132,6 +150,10 @@ int main(int argc, char *argv[]) {
       strcpy (Load_Tri, "yes");
       flags |= LOAD;
     }
+    else if (strncmp(argv[i], "--exp", 5) == 0)
+      params.substitution = BarvinokParameters::ExponentialSubstitution;
+    else if (strncmp(argv[i], "--maxdet=", 9) == 0)
+      params.max_determinant = atoi(argv[i] + 9);
     else {
       cerr << "Unknown command/option " << argv[i] << endl;
       exit(1);
@@ -269,7 +291,7 @@ int main(int argc, char *argv[]) {
 
     cones=dualizeCones(cones,numOfVars);
     cones=decomposeCones(cones,numOfVars, flags, fileName,
-			 /* Max Determinant: */ 1000);
+			 params.max_determinant);
     cones=dualizeBackCones(cones,numOfVars);
 
     /* Compute points in parallelepipeds, unless we already did using memsave version!  */
@@ -286,10 +308,12 @@ int main(int argc, char *argv[]) {
    cones = ProjectUp2(cones, oldnumofvars, numOfVars, AA, bb);
    numOfVars = oldnumofvars;
  }
- createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);
+ //createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);
  //printListCone(cones, numOfVars);
  cout << "Starting final computation.\n";
- cout << endl << "****  The number of lattice points is: " << Residue(cones,numOfVars) << "  ****" << endl << endl;
+ cout << endl << "****  The number of lattice points is: "
+      << computeNumberOfLatticePoints(cones, numOfVars, params)
+      << "  ****" << endl << endl;
 
 
  if(rationalCone[0] == 'y') {
@@ -343,6 +367,4 @@ int main(int argc, char *argv[]) {
  return(0);
 }
 /* ----------------------------------------------------------------- */
-
-
 
