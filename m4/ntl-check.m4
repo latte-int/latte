@@ -65,7 +65,13 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	[
 	AC_TRY_RUN(
 	[#include <NTL/version.h>
-	int main () { if (NTL_MAJOR_VERSION < 5) return -1; else return 0; }	
+	 #include <NTL/config.h>
+	int main () { if (NTL_MAJOR_VERSION < 5) return -1; 
+	#ifdef NTL_GMP_LIP
+	return 0;
+	#else
+	return -2;
+	}	
 	],[
 	ntl_found="yes"	
 	break
@@ -105,12 +111,12 @@ if test "x$ntl_found" = "xyes" ; then
 	ifelse([$2], , :, [$2])
 elif test -n "$ntl_problem"; then
 	AC_MSG_RESULT(problem)
-	echo "Sorry, your NTL version is too old. Disabling."
+	echo "Sorry, your NTL version is too old or not configured right.  LattE also requires the NTL namespace to be enabled, and that NTL is configured to use GMP as the primary long integer package ("./configure NTL_GMP_LIP=on").  Please make sure NTL is compiled correctly."
 	ifelse([$3], , :, [$3])
 elif test   "x$ntl_found" = "xno";  then
 	AC_MSG_RESULT(not found)
 	if test "x$NTL_HOME" != "x/usr" -a "x$NTL_HOME" != "x/usr/local" ; then
-		AC_MSG_WARN(NTL >= $min_ntl_version was not found.  LattE also requires the NTL namespace to be enabled.  Please make sure NTL is compiled correctly.)
+		AC_MSG_WARN(NTL >= $min_ntl_version was not found.  LattE also requires the NTL namespace to be enabled, and that NTL is configured to use GMP as the primary long integer package ("./configure NTL_GMP_LIP=on").  Please make sure NTL is compiled correctly.)
 	fi
 	ifelse([$3], , :, [$3])	
 fi	
