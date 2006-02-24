@@ -9,7 +9,7 @@ simple_count_SOURCES = simple-main.cpp
 
 LDADD = liblatte.a
 AM_CXXFLAGS := $(NTL_CFLAGS) $(AM_CXXFLAGS)
-LIBS += $(NTL_LIBS)
+LIBS += $(NTL_LIBS) $(LIDIA_LIBS)
 
 noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES = \
@@ -17,14 +17,15 @@ liblatte_a_SOURCES = \
 	barvinok/ConeDecom.cpp barvinok/Triangulation.cpp \
 	genFunction/piped.cpp genFunction/maple.cpp vertices/cdd.cpp \
 	preprocess.cpp rational.cpp cone.cpp print.cpp ramon.cpp \
-	timing.cpp ConeDeterminant.cpp dual.cpp PolyTree.cpp RudyResNTL.cpp \
+	timing.cpp dual.cpp PolyTree.cpp RudyResNTL.cpp \
 	ResSingle.cpp printsingle.cpp IntegralHull.cpp ReadingFile.cpp \
 	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
 	banner.cpp \
-	todd/todd.cpp todd/gmp_pow.cpp
+	todd/todd.cpp todd/gmp_pow.cpp \
+	ExponentialSubst.cpp
 
 noinst_HEADERS =							\
-	Array.h CheckEmpty.h CheckRedundant.h ConeDeterminant.h		\
+	Array.h CheckEmpty.h CheckRedundant.h 				\
 	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
 	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
 	myheader.h preprocess.h print.h ramon.h rational.h timing.h	\
@@ -32,7 +33,8 @@ noinst_HEADERS =							\
 	barvinok/ConeDeterminant.h barvinok/Triangulation.h		\
 	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
 	genFunction/piped.h vertices/cdd.h				\
-	todd/gmp_pow.h todd/todd.h 
+	todd/gmp_pow.h todd/todd.h 					\
+	ExponentialSubst.cpp
 
 BUILT_SOURCES = todd/todd.cpp
 EXTRA_DIST = todd/todd.cpp
