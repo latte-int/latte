@@ -192,8 +192,6 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 		*(Barvinok_Parameters->Max_Simplicial_Cones_Total) = 0;
 
 		//Compute Random lambda
-		srand (time(0));
-
 		cout << "decomposeCone_Single: Random Lambda = ";
 		for (int i = 0;  i < numOfVars; i++)
 		{

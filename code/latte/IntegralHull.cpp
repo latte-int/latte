@@ -144,8 +144,6 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 
 	Our_Cost = cost;
 	
-	srand(clock());
-  
 	int	Pertubation_Count = 0;	
 
 	int	Cone_Heap_Count = 0;	
@@ -631,7 +629,6 @@ listVector* GetVertices(listCone* cones, listVector* matrix, listVector* hyperpl
 	{
     		if(hyperplane == 0)
 		{
-      			srand(time(0));
       			vertices = createListVector(createVector(numOfVars));
       			endVertex = vertices;
       			for(int j = 0; j < numOfVars; j++)

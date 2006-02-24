@@ -182,10 +182,6 @@ int Triangulation(const mat_ZZ & Mat, const int & m, const int & n,
 		  char* a, list< int >& List) {
   int seed;
   vec_ZZ neg;
-  ZZ tmp_ZZ;
-  tmp_ZZ = Mat[0][0];
-  conv(seed, tmp_ZZ);
-  srand(seed);
   
   writeCDDextFileRudy(m,n,Mat);
   system(CDD_PATH " tri.ext > tri.out");
@@ -238,13 +234,7 @@ int Triangulation(const mat_ZZ & Mat, const int & m, const int & n,
 int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, char* a, list< int >& List, char *File_Name, int Cone_Index, unsigned int Flags) 
 {
 //	cout << "Triangulation_Load_Save: Cone_Index: " << Cone_Index << "  Flags: " << Flags << endl;
-  int seed;
-  vec_ZZ neg;
-  ZZ tmp_ZZ;
-  tmp_ZZ = Mat[0][0];
-  conv(seed, tmp_ZZ);
-  srand(seed);
- 
+  vec_ZZ neg; 
  	int	File_Present = 1;	 
 	char		File_Path [256];
 	char		System_Command[256];

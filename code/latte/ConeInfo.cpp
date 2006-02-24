@@ -582,8 +582,6 @@ ConeInfo::ConeInfo (vector *cost, listCone *listCone_pointer, int numOfVars)
 			//cout << "Creating hash coefficients." << endl;
 			Hash_Function_Coefficients = new int[Number_of_Generators];
 
-			srand(clock());
-		
 			for (int i = 0; i < Number_of_Generators; i ++)
 			{
 				Hash_Function_Coefficients[i] = rand();
@@ -1394,8 +1392,6 @@ vector	Calculate_Pertubation (listCone *cones, vector *Cost, int Mod_Value, int 
 
 	Return_Vector = *Cost;
 
-	//srand(clock());
-
 	//unsigned long int	Integral_Factor = 1000;
 
 	//ZZ	Normalize_Length;
@@ -1432,8 +1428,6 @@ vector	Calculate_Pertubation (listCone *cones, vector *Cost, int Mod_Value, int 
 	
 	tmpcone = cones;
 	
-	srand(clock());
-
 	while (tmpcone)
 	{
 		tmpVector = tmpcone->rays;

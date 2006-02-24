@@ -315,7 +315,6 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
        // each time through the loop, to fix the problem generator.
   //if(k<15000) {for(i=0;i<dim;i++) lambda[i]=-1;} if running random algorithm
   //halt=0; if running random algorithm
-  srand(time(0));
   int ss = 0;
   while(k < 150000) {
 //      ss = ( k - 9960) / 10;
