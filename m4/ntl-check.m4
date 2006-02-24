@@ -42,7 +42,7 @@ BACKUP_CXXFLAGS=${CXXFLAGS}
 BACKUP_LIBS=${LIBS}
 
 if test -n "$NTL_HOME_PATH"; then
-AC_MSG_CHECKING(for NTL >= $min_ntl_version)
+AC_MSG_CHECKING(for NTL >= $min_ntl_version with GMP)
 fi
 
 for NTL_HOME in ${NTL_HOME_PATH} 
@@ -71,6 +71,7 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	return 0;
 	#else
 	return -2;
+	#endif
 	}	
 	],[
 	ntl_found="yes"	
@@ -111,7 +112,11 @@ if test "x$ntl_found" = "xyes" ; then
 	ifelse([$2], , :, [$2])
 elif test -n "$ntl_problem"; then
 	AC_MSG_RESULT(problem)
-	echo "Sorry, your NTL version is too old or not configured right.  LattE also requires the NTL namespace to be enabled, and that NTL is configured to use GMP as the primary long integer package ("./configure NTL_GMP_LIP=on").  Please make sure NTL is compiled correctly."
+	echo "Sorry, your NTL version is too old or not configured right.  
+LattE also requires the NTL namespace to be enabled, and that 
+NTL is configured to use GMP as the primary long integer package
+("./configure NTL_GMP_LIP=on").  
+Please make sure NTL is compiled correctly."
 	ifelse([$3], , :, [$3])
 elif test   "x$ntl_found" = "xno";  then
 	AC_MSG_RESULT(not found)
