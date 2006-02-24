@@ -26,13 +26,14 @@ using namespace std;
   #define GIVETIME z=getcputime();
 #endif
 
+typedef ZZ Integer;
+
 typedef vec_ZZ vector;
 
-typedef struct listVector {
+struct listVector {
   vector first;
   struct listVector *rest;
-}
-listVector;
+};
 
 typedef struct PtrCone {
   bool sign;
