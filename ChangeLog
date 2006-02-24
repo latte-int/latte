@@ -1,3 +1,28 @@
+2006-02-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* ExponentialSubst.cpp, ExponentialSubst.h
+	(computeExponentialResidue_Single, computeExponentialResidue): New
+	functions.
+
+	* ExponentialSubst.cpp, ExponentialSubst.h: New files.
+
+	* gmp-interface.cpp, gmp-interface.h: New files.
+
+	* simple-main.cpp: New command-line args, --exp, --maxdet.
+
+	* flags.h (struct BarvinokParameters): New.
+
+	* myheader.h: Add typedef ZZ Integer.
+
+	* Makefile.am: Link against LiDIA and gmpxx.
+
+	* code/latte/ReadingFile.cpp (Mail): Removed.
+
+	* code/latte/ConeDeterminant.cpp, code/latte/ConeDeterminant.h,
+	code/latte/KnapSackEst.cpp, code/latte/hnf.cpp,
+	code/latte/preproc.cpp, code/latte/rand.cpp: Removed unused source
+	files and test programs.
+
 2006-02-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/dual.cpp (scaled_inverse): Fix to always get the
