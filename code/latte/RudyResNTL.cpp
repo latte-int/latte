@@ -24,8 +24,6 @@ using namespace std;
 //#define OUTPUT_S_T_FUNCTION 0
 //#define OUTPUT_CONE 1
 
-#define		Integer ZZ
-
 
 /***********************************************************************************
  Rudy is messing around Jeremy's code in order to update it.
