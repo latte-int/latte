@@ -16,10 +16,6 @@
 #include <stdlib.h>
 #include "flags.h"
 
-
-#define		Integer ZZ
-
-
 int ResidueFunction_Single_Cone ( Single_Cone_Parameters *Residue_Parameters, Node_Controller *Controller)
 {
 	

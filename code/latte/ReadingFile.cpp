@@ -33,7 +33,6 @@
 #include "genFunction/maple.h"
 #include "genFunction/piped.h"
 #include "cone.h"
-#include "ConeDeterminant.h"
 #include "dual.h"
 #include "RudyResNTL.h"
 //  #include "jesus.h"
