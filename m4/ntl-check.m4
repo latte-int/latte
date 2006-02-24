@@ -109,7 +109,7 @@ if test "x$ntl_found" = "xyes" ; then
 elif test -n "$ntl_problem"; then
 	AC_MSG_RESULT(problem)
 	echo "Sorry, your NTL version is too old or not configured right.  
-LattE also requires the NTL namespace to be enabled").  
+LattE also requires the NTL namespace to be enabled.
 Please make sure NTL is compiled correctly."
 	ifelse([$3], , :, [$3])
 elif test   "x$ntl_found" = "xno";  then
