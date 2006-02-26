@@ -34,6 +34,7 @@ code/latte/barvinok/SunWS_cache
 code/latte/count
 code/latte/ehrhart
 code/latte/genFunction/SunWS_cache
+code/latte/gmptest
 code/latte/maximize
 code/latte/minimize
 code/latte/numOfLatticePoints
