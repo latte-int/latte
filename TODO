@@ -11,15 +11,12 @@ Code clean-up:
 * Data structures:
    - Get rid of duplications & conversions.
      (e.g. listCone vs. PtrCone)
-   - ZZ vs. HugeInt vs. Integer
+   - ZZ vs. Integer
+     We will use Integer (typedefed to ZZ).
 
-* Main program:
+* Main programs:
    Factor out code.
 
 * Remove:
-   - ConeDeterminant.cpp, .h
-   - hnf.cpp, rand.cpp
    - CreateExample.cpp (or move to test-suite generators)
-   - KnapSackEst.cpp
-   - preproc.cpp
 
