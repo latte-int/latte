@@ -2,14 +2,6 @@
 /Check_emp.lp
 /Check_emp.lps
 /Check_emp.out
-EXAMPLES/Check_emp.ddl
-EXAMPLES/Check_emp.lp
-EXAMPLES/Check_emp.lps
-EXAMPLES/Check_emp.out
-EXAMPLES/Check_red
-EXAMPLES/Check_red.out
-EXAMPLES/numOfLatticePoints
-EXAMPLES/numOfUnimodularCones
 /Error
 /Makefile
 /Makefile.in
