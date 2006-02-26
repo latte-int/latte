@@ -1,6 +1,5 @@
 #include <cassert>
 #include "ExponentialSubst.h"
-#include "todd/todd.h"
 #include "todd/gmp_pow.h"
 #include "latte_gmp.h"
 #include "todd/todd-expansion.h"
@@ -56,20 +55,17 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
   vector<mpz_class> ray_scalar_products(dimension);
   mpz_class prod_ray_scalar_products;
   prod_ray_scalar_products = 1;
-  cout << "Scalar products: ";
   {
     int k;
     for (k = 0, ray = cone->rays; ray != NULL; k++, ray = ray->rest) {
       ZZ inner;
       InnerProduct(inner, generic_vector, ray->first);
       ray_scalar_products[k] = convert_ZZ_to_mpz(inner);
-      cout << ray_scalar_products[k] << " ";
       if (ray_scalar_products[k] == 0)
 	throw not_generic;
       prod_ray_scalar_products *= ray_scalar_products[k];
     }
   }
-  cout << endl;
   int k;
   mpz_class k_factorial;
   mpq_class result;
@@ -79,15 +75,6 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
     Integer sum = sum_of_scalar_powers(generic_vector,
 				       cone->latticePoints, k);
     mpq_class td = todds[dimension - k];
-    cerr << "scalar product still: ";
-    for (int l = 0; l<dimension; l++)
-      cerr << ray_scalar_products[l];
-    cerr << endl;
-    mpq_class td_maple = todd(dimension, dimension - k, ray_scalar_products);
-    if (td != td_maple) {
-      cerr << "Todd discrepancy: " << td << " (us) vs. "
-	   << td_maple << " (Maple)" << endl;
-    }
     td /= prod_ray_scalar_products;
     result += convert_ZZ_to_mpz(sum) * td / k_factorial;
   }
