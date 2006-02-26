@@ -22,7 +22,7 @@ liblatte_a_SOURCES = \
 	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
 	banner.cpp \
 	todd/todd.cpp todd/gmp_pow.cpp todd/todd-expansion.cpp \
-	gmp-interface.cpp		\
+	latte_gmp.cpp		\
 	ExponentialSubst.cpp
 
 noinst_HEADERS =							\
