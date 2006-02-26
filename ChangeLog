@@ -1,3 +1,52 @@
+2006-02-26  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Makefile.am, code/latte/Array.h,
+	code/latte/ResSingle.cpp, code/latte/RudyResNTL.cpp,
+	code/latte/print.cpp, code/latte/printsingle.cpp: 
+	Remove BigArray in favor of std::vector.
+
+	* code/latte/ExponentialSubst.cpp, code/latte/Makefile.am,
+	code/latte/todd/todd.cpp, code/latte/todd/todd.h,
+	code/latte/todd/todd.maple, code/latte/todd/todd.sed,
+	code/latte/todd/test-todd.cpp: Remove Maple Todd code.
+
+	* code/latte/latte_gmp.cpp, code/latte/latte_gmp.h:
+	New files, replacing gmp-interface.h and .cpp
+
+	* code/latte/gmp-interface.cpp, code/latte/gmp-interface.h:
+	Removed, replaced by latte_gmp.h and .cpp
+
+	* code/latte/todd/todd-expansion.cpp, code/latte/todd/todd-expansion.h:
+	New files, compute evaluation of Todd polynomial by Tayloring.
+
+	* code/latte/CheckEmpty.cpp, code/latte/ConeInfo.cpp,
+	code/latte/ConeInfo.h, code/latte/ExponentialSubst.cpp,
+	code/latte/Grobner.cpp, code/latte/Grobner.h,
+	code/latte/IntegralHull.cpp, code/latte/IntegralHull.h,
+	code/latte/Makefile.am, code/latte/ReadingFile.cpp,
+	code/latte/ReadingFile.h, code/latte/barvinok/Cone.h,
+	code/latte/barvinok/dec.cpp, code/latte/barvinok/dec.h,
+	code/latte/binarySearchIP.cpp, code/latte/binarySearchIP.h,
+	code/latte/count.cpp, code/latte/dual.cpp, code/latte/ehrhart.cpp,
+	code/latte/genFunction/maple.cpp, code/latte/genFunction/maple.h,
+	code/latte/genFunction/piped.cpp, code/latte/genFunction/piped.h,
+	code/latte/maximize.cpp, code/latte/minimize.cpp,
+	code/latte/myheader.h, code/latte/preprocess.cpp,
+	code/latte/preprocess.h, code/latte/print.cpp, code/latte/print.h,
+	code/latte/ramon.cpp, code/latte/ramon.h, code/latte/rational.cpp,
+	code/latte/rational.h, code/latte/simple-main.cpp,
+	code/latte/todd/todd.cpp, code/latte/todd/todd.h,
+	code/latte/todd/todd.maple, code/latte/vertices/cdd.cpp,
+	code/latte/vertices/cdd.h: Replace vector by vec_ZZ to get rid of
+	type clash with STL.
+
+2006-02-24  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ConeInfo.cpp, code/latte/IntegralHull.cpp,
+	code/latte/RudyResNTL.cpp, code/latte/barvinok/Triangulation.cpp,
+	code/latte/barvinok/dec.cpp, code/latte/print.cpp: Don't seed the
+	random generator in the middle of the algorithms.
+
 2006-02-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* ExponentialSubst.cpp, ExponentialSubst.h
