@@ -7,7 +7,7 @@
 
 #define HASH_TABLE_SIZE 1247677
 
-vector	Calculate_Pertubation (listCone *cones, vector *Cost, int Mod_Value, int Number_of_Variables);
+vec_ZZ	Calculate_Pertubation (listCone *cones, vec_ZZ *Cost, int Mod_Value, int Number_of_Variables);
 
 
 class ConeInfo;
@@ -95,12 +95,12 @@ class Vector_Heap
 class ConeInfo
 {
 	public:
-		ConeInfo (vector *cost, listCone *the_cone, int numOfVars);
+		ConeInfo (vec_ZZ *cost, listCone *the_cone, int numOfVars);
 		~ConeInfo ();
 		ZZ	*Get_Current_Highest_Term ();
 		int	Get_Coefficient ();
 		void	Calculate_Next_Highest_Term ();
-		int	Calculate_Integral_Point (vector &);
+		int	Calculate_Integral_Point (vec_ZZ &);
 	//	Vector_Heap	*Heap;
 
 		int	S_Values_Zero_Flag; // 0 not zero, 1 some value is zero

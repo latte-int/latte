@@ -75,9 +75,9 @@ int main(int argc, char *argv[]) {
   float z;
   int i,numOfVars,numOfAllVars, degree = 1;
   unsigned int flags = 0, print_flag = 0, output_cone = 0;
-  vector dim, v, w;
+  vec_ZZ dim, v, w;
   int oldnumofvars;
-  vector *generators;
+  vec_ZZ *generators;
   char fileName[127], invocation[127], decompose[10], equationsPresent[10],
     assumeUnimodularCones[127], dualApproach[127], taylor[127], printfile[127],
     rationalCone[127], nonneg[127], Memory_Save[127], Save_Tri[127],
@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   struct BarvinokParameters params;
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
-  vector cost;
+  vec_ZZ cost;
   listVector *templistVec;
   listCone *cones, *tmpcones;
 
@@ -126,7 +126,8 @@ int main(int argc, char *argv[]) {
   params.substitution = BarvinokParameters::PolynomialSubstitution;
   params.max_determinant = 1;
 
-  for (i=1; i<argc-1; i++) {
+  int last_command_index = argc - 2;
+  for (i=1; i<=last_command_index; i++) {
     strcat(invocation,argv[i]);
     strcat(invocation," ");
     if (strncmp(argv[i],"vrep",3)==0) strcpy(Vrepresentation,"yes"); 
@@ -137,7 +138,10 @@ int main(int argc, char *argv[]) {
     else if (strncmp(argv[i],"printcones",3)==0) strcpy (Print, "yes");
     else if (strncmp(argv[i],"cdd",3)==0) strcpy (cddstyle, "yes");
     else if (strncmp(argv[i],"lrs",3)==0) strcpy (LRS, "yes");
-    else if (strncmp(argv[i],"dil",3)==0) strcpy (dilation, "yes");
+    else if (strncmp(argv[i],"dil",3)==0) {
+      strcpy (dilation, "yes");
+      last_command_index--;
+    }
     else if (strncmp(argv[i],"rem",3)==0) {
       strcpy (removeFiles, "no");
       strcpy (Memory_Save, "no");
@@ -195,7 +199,7 @@ int main(int argc, char *argv[]) {
       }
   }else CheckInputFileVrep(fileName);
   CheckEmpty(fileName);
-  //vector cost;
+  //vec_ZZ cost;
   /* Read problem data. */
   if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) CheckRed(fileName, equationsPresent, maximum, nonneg, interior, dilation, dilation_const); 
 
@@ -217,7 +221,7 @@ int main(int argc, char *argv[]) {
   }
   
   // cout << grobner << endl;
-  vector holdCost;
+  vec_ZZ holdCost;
   holdCost = cost;
   //cout <<"Cost is: " << cost << endl;
   vec_RR holdcost_RR;

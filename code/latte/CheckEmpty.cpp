@@ -50,7 +50,7 @@ void CheckEmpty(char * Filename){
   equ[0] = 'n';
   nonneg[0] = 'n';
   int numOfNonneg = 0, hold = 0;
-  vector Index, Index2;
+  vec_ZZ Index, Index2;
   cout << "Checking whether the input polytope is empty or not..." << endl;
   ifstream IN(Filename);
   if(!IN){

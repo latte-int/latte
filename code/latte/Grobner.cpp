@@ -147,9 +147,9 @@ void readLatteGrobProblem(char *fileName, listVector **equations,
                       int *numOfVars, char *nonneg, char* dual,
 		      char* grobner, ZZ bignum) {
   int i,j,eq,ind,numOfVectors,numOfEquations;
-  vector indexEquations, tmpVector;
+  vec_ZZ indexEquations, tmpVector;
   listVector *basis, *endBasis, *tmp, *endEquations, *endInequalities;
-  vector b;
+  vec_ZZ b;
 
   /* Reads numOfVars, matrix A, and rhs b. */
 
@@ -402,13 +402,13 @@ void CheckFeasibility(listVector* basis, vec_ZZ infeas, int & flag) {
 
 /******************************************************************/
 listVector* Grobner(listVector *equations, 
-		    listVector *inequalities, vector **generators,
+		    listVector *inequalities, vec_ZZ **generators,
 		    int *numOfVars, listVector **newVec,
 		    int & oldnumofvars, int & flag) {
   int i,j,k,ind,ind2,indSol,lenOfMatrix,lenOfBasis,numOfIndependentRows,
     numOfRows,numOfVectors,newNumOfVars;
   ZZ det;
-  vector a,b,bas,rhs,A,U,H,sol,particularSolution;
+  vec_ZZ a,b,bas,rhs,A,U,H,sol,particularSolution;
   listVector *tmp, *tmp2, *basis, *endBasis, *newInequalities, 
     *endNewInequalities, *endtemplistVec, *tmplist, *templistVec;
   mat_ZZ M,unimodM;
@@ -635,7 +635,7 @@ void SolveGrobner(char * filename, char * nonneg, char * dualApproach,
  ZZ TotalNumLattice; 
  // for(int i = 0; i < nn; i++){
  //  numOfVars = n;
-  vector *generators;
+  vec_ZZ *generators;
   listVector *templistVec;
   listCone *cones, *tmp;
  listVector *matrix, *equations, *inequalities;

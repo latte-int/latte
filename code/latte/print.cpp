@@ -15,7 +15,7 @@ using namespace std;
 #define      mpz_t ZZ
 #define		Integer ZZ
 /* ----------------------------------------------------------------- */
-void printVector(vector v, int numOfVars) {
+void printVector(vec_ZZ v, int numOfVars) {
   int i;
 
 //    if (v==0) {
@@ -94,7 +94,7 @@ void printListCone(listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printVectorToFile(ofstream & out, vector v, int numOfVars) {
+void printVectorToFile(ofstream & out, vec_ZZ v, int numOfVars) {
   int i;
 
 //    if (v==0) {
@@ -122,7 +122,7 @@ void printListVectorToFile(ofstream & out, listVector* basis, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printVectorToFileWithoutBrackets(ofstream & out, vector v, 
+void printVectorToFileWithoutBrackets(ofstream & out, vec_ZZ v, 
 				      int numOfVars) {
   int i;
 

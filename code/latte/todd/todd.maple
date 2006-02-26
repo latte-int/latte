@@ -6,9 +6,9 @@ todd_series := dim -> taylor(todd_generator(dim), t=0, 2*dim+1):
 emit_todd_code := proc(filename, maxdim)
   local fd, dim, k, seri, coef;
   fd := fopen(filename, WRITE, TEXT);
-  fprintf(fd, "#include <gmpxx.h>\n");
+  fprintf(fd, "#include \"todd/todd.h\"\n");
   fprintf(fd, "#include \"todd/gmp_pow.h\"\n\n");
-  fprintf(fd, "mpq_class todd(int dim, int k, mpz_class x[]) {\n");
+  fprintf(fd, "mpq_class todd(int dim, int k, const mpz_vector &x) {\n");
   fprintf(fd, "switch (dim) {\n");
   for dim from 1 to maxdim do
     fprintf(fd, "case %d:\n", dim);

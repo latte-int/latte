@@ -446,11 +446,11 @@ int Vector_Heap::Get_Node_Count ()
 	return Node_Count;
 }
 
-ConeInfo::ConeInfo (vector *cost, listCone *listCone_pointer, int numOfVars)
+ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 {
 	int NumGensPerCone = lengthListVector(listCone_pointer->rays);
 	int *zero_vector = new int[NumGensPerCone];
-	vector Our_Cost;
+	vec_ZZ Our_Cost;
 	
 	Number_of_Variables = numOfVars;	
 	
@@ -1322,7 +1322,7 @@ int	ConeInfo::Get_Coefficient ()
 	return Coefficient;
 }
 
-int	ConeInfo::Calculate_Integral_Point (vector &Temp_Vector)
+int	ConeInfo::Calculate_Integral_Point (vec_ZZ &Temp_Vector)
 {
 	if(Vector_List_Head == NULL)
 		return 0;
@@ -1384,11 +1384,11 @@ int	ConeInfo::Hash_Integer_Vector (int *Integer_Array)
 		return (-1)*Return_Value;
 }
 
-vector	Calculate_Pertubation (listCone *cones, vector *Cost, int Mod_Value, int Number_of_Variables)
+vec_ZZ	Calculate_Pertubation (listCone *cones, vec_ZZ *Cost, int Mod_Value, int Number_of_Variables)
 {
 	/* OLD CODE: 
 	//cout << "Calculate_Pertubation: " << (*Cost)*(*Cost) << endl;
-	vector	Return_Vector;
+	vec_ZZ	Return_Vector;
 
 	Return_Vector = *Cost;
 
@@ -1417,7 +1417,7 @@ vector	Calculate_Pertubation (listCone *cones, vector *Cost, int Mod_Value, int 
 	
 	*/
 	// NEW CODE: Dave + Pete 10/3/03
-	vector	Return_Vector;
+	vec_ZZ	Return_Vector;
 	Return_Vector = *Cost;
 
 	listCone *tmpcone;

@@ -20,9 +20,9 @@
 #include <NTL/mat_ZZ.h>
 #include <NTL/LLL.h>
 /* ----------------------------------------------------------------- */
-vector transpose(vector mat, int numOfVars, int numOfRows){
+vec_ZZ transpose(vec_ZZ mat, int numOfVars, int numOfRows){
   int i,j,k,lenOfMatrix;
-  vector transposedMat;
+  vec_ZZ transposedMat;
 
 /*    printf("Transposing matrix\n"); */
 
@@ -37,7 +37,7 @@ vector transpose(vector mat, int numOfVars, int numOfRows){
 /* ----------------------------------------------------------------- */
 /* Code originally from TiGERS. This is an adapted version from MLP. */
 
-int ihermite(vector *S, vector *U, vector* rhs, int m, int n){
+int ihermite(vec_ZZ *S, vec_ZZ *U, vec_ZZ* rhs, int m, int n){
   int i,j,k,done,sign,c,mc,mn,crk;
   ZZ mv,t;
 
@@ -178,12 +178,12 @@ void Interior(listVector* basis){
 
 /* ----------------------------------------------------------------- */
 listVector* preprocessProblem(listVector *equations, 
-			      listVector *inequalities, vector **generators,
-			      int *numOfVars, vector & cost, mat_ZZ & ProjU, char* interior, int dil) {
+			      listVector *inequalities, vec_ZZ **generators,
+			      int *numOfVars, vec_ZZ & cost, mat_ZZ & ProjU, char* interior, int dil) {
   int i,j,k,ind,ind2,indSol,lenOfMatrix,lenOfBasis,numOfIndependentRows,
     numOfRows,numOfVectors,newNumOfVars;
   ZZ det;
-  vector a,b,bas,rhs,A,U,H,sol,particularSolution;
+  vec_ZZ a,b,bas,rhs,A,U,H,sol,particularSolution;
   listVector *tmp, *tmp2, *basis, *endBasis, *newInequalities, 
     *endNewInequalities;
   mat_ZZ M,unimodM, Solve;
@@ -199,7 +199,7 @@ listVector* preprocessProblem(listVector *equations,
 	tmp = tmp -> rest;
       }
       // cout << Solve << sol << endl;
-      vector x;
+      vec_ZZ x;
       x.SetLength(*numOfVars);
       ZZ d, sum, sum2;
       mat_ZZ Inv;
@@ -309,7 +309,7 @@ listVector* preprocessProblem(listVector *equations,
   mat_ZZ invHH;
   inv(DD, invHH, HHH);
   //  cout <<  invHH <<endl << rhs << endl << DD << endl;
-  vector sol2;
+  vec_ZZ sol2;
   sol=createVector(*numOfVars);
   sol2=createVector(*numOfVars);
   if(DD != 0)
@@ -388,7 +388,7 @@ listVector* preprocessProblem(listVector *equations,
   newInequalities=createListVector(createVector(*numOfVars));
   endNewInequalities=newInequalities;
   tmp=inequalities;
-  vector tmpcost;
+  vec_ZZ tmpcost;
   if((flag == 1)||(flag == 0))
     { 
       ProjU.SetDims((*numOfVars), newNumOfVars);
@@ -546,10 +546,10 @@ listVector* transformZZMatToListVector(mat_ZZ A, int numOfVectors,
 }
 /* ----------------------------------------------------------------- */
 
-vector ProjectingUp(mat_ZZ ProjU, vector cost, int numOfVars){
+vec_ZZ ProjectingUp(mat_ZZ ProjU, vec_ZZ cost, int numOfVars){
   // cout << ProjU << endl;
   int numOfrows = ProjU.NumRows(), numOfcolms = ProjU.NumCols();
-  vector answer; 
+  vec_ZZ answer; 
   if(IsZero(ProjU))
     answer = cost;
   else{

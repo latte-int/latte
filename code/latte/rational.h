@@ -66,6 +66,6 @@ rationalVector* normalizeRationalVector(rationalVector*, int);
 rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector*, 
 						    rationalVector*, int);
 rationalVector* subRationalVector(rationalVector*, rationalVector*, int);
-vector constructRay(rationalVector*, rationalVector*, int);
-vector* subtractRowFromRow(vector*, int, int, int, vector*, int);
-rationalVector* solveLinearSystem(vector*, vector, int, int);
+vec_ZZ constructRay(rationalVector*, rationalVector*, int);
+vec_ZZ* subtractRowFromRow(vec_ZZ*, int, int, int, vec_ZZ*, int);
+rationalVector* solveLinearSystem(vec_ZZ*, vec_ZZ, int, int);

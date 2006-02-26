@@ -2,21 +2,21 @@
 #define RAMON__H
 #include "myheader.h"
 
-listVector* appendVectorToListVector(vector, listVector*);
-vector createVector(int);
-vector* createArrayVector(int);
-listVector* createListVector(vector);
-vector copyVector(vector, int);
-vector addVector(vector, vector, int);
-vector subVector(vector, vector, int);
+listVector* appendVectorToListVector(vec_ZZ, listVector*);
+vec_ZZ createVector(int);
+vec_ZZ* createArrayVector(int);
+listVector* createListVector(vec_ZZ);
+vec_ZZ copyVector(vec_ZZ, int);
+vec_ZZ addVector(vec_ZZ, vec_ZZ, int);
+vec_ZZ subVector(vec_ZZ, vec_ZZ, int);
 void removeListVector( listVector* p );
-vector negativeVector(vector, int);
+vec_ZZ negativeVector(vec_ZZ, int);
 int lengthListVector(listVector*);
 listVector* updateBasis(listVector*, listVector*);
-vector* transformListVectorToArrayVector(listVector*, vector*);
-listVector* transformArrayVectorToListVector(vector*, int);
-int isVectorEqualToVector(vector, vector, int);
-int isVectorInListVector(vector, listVector*, int);
+vec_ZZ* transformListVectorToArrayVector(listVector*, vec_ZZ*);
+listVector* transformArrayVectorToListVector(vec_ZZ*, int);
+int isVectorEqualToVector(vec_ZZ, vec_ZZ, int);
+int isVectorInListVector(vec_ZZ, listVector*, int);
 listVector* readListVector(char*,int*);
 listVector* readListVectorMLP(char*,int*);
 

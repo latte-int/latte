@@ -28,10 +28,8 @@ using namespace std;
 
 typedef ZZ Integer;
 
-typedef vec_ZZ vector;
-
 struct listVector {
-  vector first;
+  vec_ZZ first;
   struct listVector *rest;
 };
 
@@ -43,8 +41,8 @@ typedef struct PtrCone {
 PtrCone;
 
 typedef struct rationalVector {
-  vector enumerator;
-  vector denominator;
+  vec_ZZ enumerator;
+  vec_ZZ denominator;
 } rationalVector;
 
 typedef struct listRationalVector {

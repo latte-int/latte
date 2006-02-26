@@ -29,7 +29,7 @@
 /* ----------------------------------------------------------------- */
 rationalVector* createRationalVector(int numOfVars) {
   int i;
-  vector x,y;
+  vec_ZZ x,y;
   rationalVector* z;
 
   x = createVector(numOfVars+1);
@@ -175,7 +175,7 @@ rationalVector* subRationalVector(rationalVector *x, rationalVector *y,
   return (z);
 }
 /* ----------------------------------------------------------------- */
-vector constructRay(rationalVector* v, rationalVector* w, int numOfVars) {
+vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars) {
   int i;
   ZZ d,g,factorV,factorW;
   rationalVector* z;
@@ -220,7 +220,7 @@ vector constructRay(rationalVector* v, rationalVector* w, int numOfVars) {
   return (z->enumerator);
 }
 /* ----------------------------------------------------------------- */
-vector* subtractRowFromRow(vector* M, int x, int y, int k, vector* w, 
+vec_ZZ* subtractRowFromRow(vec_ZZ* M, int x, int y, int k, vec_ZZ* w, 
 			   int numOfVars) {
   int i;
   ZZ g,factorX,factorY;
@@ -251,12 +251,12 @@ vector* subtractRowFromRow(vector* M, int x, int y, int k, vector* w,
   return (M);
 }
 /* ----------------------------------------------------------------- */
-rationalVector* solveLinearSystem(vector* A, vector rhs, int numOfEquations, 
+rationalVector* solveLinearSystem(vec_ZZ* A, vec_ZZ rhs, int numOfEquations, 
 				  int numOfVars) {
   int i,j,m;
   ZZ k;
-  vector w,z;
-  vector *matrix;
+  vec_ZZ w,z;
+  vec_ZZ *matrix;
   rationalVector *lambda;
 
 /* This function assumes that the system of linear equations has

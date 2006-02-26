@@ -1,7 +1,7 @@
-#include <gmpxx.h>
+#include "todd/todd.h"
 #include "todd/gmp_pow.h"
 
-mpq_class todd(int dim, int k, mpz_class x[]) {
+mpq_class todd(int dim, int k, const mpz_vector &x) {
 switch (dim) {
 case 1:
 switch (k) {

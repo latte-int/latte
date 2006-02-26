@@ -5,7 +5,7 @@
 #include "../flags.h"
 
 listCone* readListCone(rationalVector*, int);
-vector* createConeDecMatrix(listCone*, int, int);
+vec_ZZ* createConeDecMatrix(listCone*, int, int);
 
 listCone*
 decomposeCones(listCone*, int, unsigned int Flags,

@@ -3,7 +3,7 @@
 #include "../ramon.h"
 #include "../vertices/cdd.h"
 /* ----------------------------------------------------------------- */
-void writeTermToFile(ofstream & out, vector v, int numOfVars) {
+void writeTermToFile(ofstream & out, vec_ZZ v, int numOfVars) {
   int i,firstEntry;
 
   firstEntry=0;
@@ -26,7 +26,7 @@ void writeTermToFile(ofstream & out, vector v, int numOfVars) {
 void writeTermOfGeneratingFunctionToFile(ofstream & out, listCone *cone, 
 					 int numOfVars) {
   int len;
-  vector v;
+  vec_ZZ v;
   listVector *tmp;
 
   if (cone->coefficient==0) return;

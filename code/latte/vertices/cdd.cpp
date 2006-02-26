@@ -261,7 +261,7 @@ void createCddExtFile2(char* filename) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void createCddIneLPFile(listVector* matrix, int numOfVars, vector & cost) {
+void createCddIneLPFile(listVector* matrix, int numOfVars, vec_ZZ & cost) {
   int i;
   listVector* tmp;
   // cout << cost << " " << numOfVars << endl;
@@ -326,7 +326,7 @@ rationalVector* ReadLpsFile(int numOfVars)
 listVector* createListOfInequalities(listVector* matrix, int numOfVars) {
   int i,j;
   ZZ g;
-  vector v;
+  vec_ZZ v;
   listVector *tmp, *inequalities, *endInequalities;
 
   /* Copying equality constraints as Az<=b, -Az<=-b. */
@@ -473,7 +473,7 @@ listCone* readCddExtFile() {
 listCone* readCddEadFile(listCone* cones, int numOfVars) {
   int i,j,k,numOfVertices,numOfRays;
   char cddInFileName[127];
-  vector v;
+  vec_ZZ v;
   rationalVector **vertices;
   listVector *rays, *endRays;
   listCone *tmp;
@@ -564,7 +564,7 @@ void CreatExtEadFile(){
 listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
   int i,j,k,numOfVertices,numOfRays, counter = 0;
   char cddInFileName[127];
-  vector v;
+  vec_ZZ v;
   rationalVector **vertices;
   listVector *rays, *endRays;
   listCone *tmp;
@@ -745,7 +745,7 @@ listCone* computeVertexConesFromVrep(char* fileName, listVector* matrix,
 }
 
 /* ----------------------------------------------------------------- */
-rationalVector* LP(listVector* matrix, vector& cost, int numOfVars) {
+rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars) {
 
   rationalVector* Opt_vector;
    createCddIneLPFile(matrix,numOfVars+1,cost);

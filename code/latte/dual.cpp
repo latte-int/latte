@@ -27,14 +27,14 @@
 using namespace std;
 
 /* ----------------------------------------------------------------- */
-//  vector computeFacet(vector *mat, int numOfVars) {
+//  vec_ZZ computeFacet(vec_ZZ *mat, int numOfVars) {
 //    /* I assume that mat has numOfVars+1 rows and numOfVars columns. 
 //       It corresponds to the matrix formed by the extreme rays collected as
 //       columns. 
 //       Note that I permute the entries in mat! */
 //    int sign,i;
-//    vector facet,tmp;
-//    vector *localMat;
+//    vec_ZZ facet,tmp;
+//    vec_ZZ *localMat;
 
 //  /*  printf("Computing normal vector...\n"); */
 
@@ -67,8 +67,8 @@ using namespace std;
 //  listVector* dualizeSimplicialCone(listVector* rays, int numOfVars) {
 //    /* I assume that the cone is simplicial! */
 //    int i,j;
-//    vector tmp, facet;
-//    vector *mat, *mat2;
+//    vec_ZZ tmp, facet;
+//    vec_ZZ *mat, *mat2;
 //    listVector *dual, *endDual;
 
 //  printf("Starting dualizing step...\n");

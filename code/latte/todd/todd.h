@@ -1,8 +1,13 @@
+// This is a -*- C++ -*- header file.
+
 #ifndef TODD_TODD_H
 #define TODD_TODD_H
 
-#include <gmpxx.h>
+#include <vector>
+using namespace std;
 
-mpq_class todd(int dim, int k, mpz_class x[]);
+#include "latte_gmp.h"
+
+mpq_class todd(int dim, int k, const mpz_vector &x);
 
 #endif

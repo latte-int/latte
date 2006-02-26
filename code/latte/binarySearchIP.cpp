@@ -36,7 +36,7 @@ using namespace std;
 ZZ  NOT_FOUND;
 
 /* ----------------------------------------------------------------- */
-void createCddIneLPFile2(listVector* matrix, listVector* ineq, int numOfVars, vector & cost) {
+void createCddIneLPFile2(listVector* matrix, listVector* ineq, int numOfVars, vec_ZZ & cost) {
   int i;
   listVector* tmp, *tmp2;
   // cout << cost << " " << numOfVars << endl;
@@ -108,7 +108,7 @@ rationalVector* ReadLpsFile2(int numOfVars)
 }
 
 /* ----------------------------------------------------------------- */
-rationalVector* LP2(listVector* matrix, listVector* ineq, vector& cost, int numOfVars) {
+rationalVector* LP2(listVector* matrix, listVector* ineq, vec_ZZ& cost, int numOfVars) {
 
   rationalVector* Opt_vector;
    createCddIneLPFile2(matrix, ineq, numOfVars+1, cost);
@@ -123,7 +123,7 @@ rationalVector* LP2(listVector* matrix, listVector* ineq, vector& cost, int numO
 }
 /* ----------------------------------------------------------------- */
 
-void createLatteFileEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vector lhs) {
+void createLatteFileEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec_ZZ lhs) {
   int i;
   listVector* tmp, *tmp2;
   //cout << rhs << endl;
@@ -157,7 +157,7 @@ void createLatteFileEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ 
 }
 /* ----------------------------------------------------------------- */
 
-ZZ OptimalCheckEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vector lhs)
+ZZ OptimalCheckEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec_ZZ lhs)
 {
   ZZ NumOfLatticePoints;
 
@@ -175,7 +175,7 @@ ZZ OptimalCheckEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, 
 
 /* ----------------------------------------------------------------- */
 
-void createLatteFile(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vector lhs) {
+void createLatteFile(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec_ZZ lhs) {
   int i;
   listVector* tmp, *tmp2;
   //cout << rhs << endl;
@@ -209,7 +209,7 @@ void createLatteFile(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs
 }
 /* ----------------------------------------------------------------- */
 
-ZZ OptimalCheck(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vector lhs, ZZ & TotalNumOfUniCones)
+ZZ OptimalCheck(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec_ZZ lhs, ZZ & TotalNumOfUniCones)
 {
   ZZ NumOfLatticePoints;
 
@@ -237,14 +237,14 @@ ZZ OptimalCheck(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec
 
 /* ----------------------------------------------------------------- */
 
-ZZ binarySearch(listVector* matrix, listVector* ineq, vector cost, int numOfVars, char * min)
+ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars, char * min)
 {
       int i = 0, counter = 0;
       ZZ low, high, mid, Opt, TotalNumOfUniCones;
       rationalVector *Low_opt, *High_opt;
       vec_RR Low_solution, High_solution, tmp_den, tmp_num, Rat_cost, Rat_cost2;
       RR Rat_low, Rat_high;
-      vector low_cost;
+      vec_ZZ low_cost;
       // cout << cost << endl;
       low_cost = -cost;
       //      cout << cost << endl;

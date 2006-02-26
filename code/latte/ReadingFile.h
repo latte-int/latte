@@ -54,7 +54,7 @@ void readLatteProblem(char *fileName, listVector **equations,
 		      listVector **inequalities, 
 		      char *equationsPresent,
                       int *numOfVars, char *nonneg, char* dual,
-		      char* grobner, char* max, vector & cost, char* Vrep);
+		      char* grobner, char* max, vec_ZZ & cost, char* Vrep);
 
 ZZ FindBigElt(listVector* equation, int numOfVars);
 

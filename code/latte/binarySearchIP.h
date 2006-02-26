@@ -33,7 +33,7 @@
 #include <NTL/HNF.h>
 #include <NTL/ZZ.h>
 
-  ZZ binarySearch(listVector* matrix, listVector* ineq, vector cost, int numOfVars, char* min);
+  ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars, char* min);
 
 #endif
 

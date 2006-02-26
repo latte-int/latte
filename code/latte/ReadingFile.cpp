@@ -80,7 +80,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
   string tmpString;
   int numOfNonneg = 0, hold = 0;
-  vector Index, Index2;
+  vec_ZZ Index, Index2;
   cout << "Removing redundant inequalities and finding hidden equalities...." << endl;
   ifstream IN(Filename);
   if(!IN){
@@ -331,7 +331,7 @@ listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
              listVector *equations){
 
   listCone *current_cone = cone;
-  vector newVector;
+  vec_ZZ newVector;
 
   newVector.SetLength(oldNumOfVars);
  
@@ -417,7 +417,7 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
   // d =  oldNumOfVars and k = newNumOfVars
   
   listCone *current_cone = cone;
-  vector newVector;
+  vec_ZZ newVector;
   
   newVector.SetLength(oldNumOfVars);
   
@@ -798,11 +798,11 @@ void readLatteProblem(char *fileName, listVector **equations,
 		      listVector **inequalities, 
 		      char *equationsPresent,
                       int *numOfVars, char *nonneg, char* dual,
-		      char* grobner, char* max, vector & cost, char * Vrep) {
+		      char* grobner, char* max, vec_ZZ & cost, char * Vrep) {
   int i,j,eq,ind,numOfVectors,numOfEquations;
-  vector indexEquations, tmpVector;
+  vec_ZZ indexEquations, tmpVector;
   listVector *basis, *endBasis, *tmp, *endEquations, *endInequalities;
-  vector b;
+  vec_ZZ b;
   ZZ bignum;
   /* Reads numOfVars, matrix A, and rhs b. */
 
@@ -1072,9 +1072,9 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
                       char* Memory_Save, char* uni, char* inthull,
 		      char* grobner) {
   int i,j,eq,ind, length = 0, f = 0, numOfVectors,numOfEquations;
-  vector indexEquations, tmpVector;
+  vec_ZZ indexEquations, tmpVector;
   listVector *basis, *endBasis, *tmp, *endEquations, *endInequalities;
-  vector b;
+  vec_ZZ b;
   string tmpString;
   
   if(grobner[0] == 'y') strcpy(equationsPresent, "yes");

@@ -1,7 +1,7 @@
 #ifndef GENFUNCTION_PIPED_H
 #define GENFUNCTION_PIPED_H
 
-vector movePoint(vector, rationalVector*, rationalVector*, vector*, int, int);
+vec_ZZ movePoint(vec_ZZ, rationalVector*, rationalVector*, vec_ZZ*, int, int);
 listVector* pointsInParallelepiped(rationalVector*, listVector*, listVector*,
 				   int);
 listVector* pointsInParallelepipedOfUnimodularCone(rationalVector*, 

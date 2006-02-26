@@ -12,7 +12,7 @@
 #include <NTL/LLL.h>
 
 listVector* Grobner(listVector *equations, 
-		    listVector *inequalities, vector **generators,
+		    listVector *inequalities, vec_ZZ **generators,
 		    int *numOfVars, listVector **newVec, int & oldnumber,
 		    int bignum);
 void SolveGrobner(char * filename, char * nonneg, char * dualApproach,

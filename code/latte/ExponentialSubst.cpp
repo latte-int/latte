@@ -2,7 +2,7 @@
 #include "ExponentialSubst.h"
 #include "todd/todd.h"
 #include "todd/gmp_pow.h"
-#include "gmp-interface.h"
+#include "latte_gmp.h"
 
 Integer
 scalar_power(const vec_ZZ &generic_vector,
@@ -47,7 +47,7 @@ mpq_class
 computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 				 listCone *cone, int numOfVars)
 {
-  mpz_class *ray_scalar_products = new mpz_class[numOfVars];
+  vector<mpz_class> ray_scalar_products(numOfVars);
   mpz_class prod_ray_scalar_products;
   int dimension = 0;
   prod_ray_scalar_products = 1;

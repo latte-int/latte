@@ -32,10 +32,10 @@ ZZ	Polytope_Max_Width;
 
 #define BOUND 150
 
-listCone* FindRationalFunction(listCone* cones, vector a, vector cost, int numOfVars)
+listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOfVars)
 {
   	listVector * endRays, *rays, *tmpRays;
-  	vector Vertex, OptVertex, numerator, v;
+  	vec_ZZ Vertex, OptVertex, numerator, v;
   	numerator.SetLength(numOfVars);
   	ZZ Opt, tmpDotProd;
   	Opt = -10000000;
@@ -44,7 +44,7 @@ listCone* FindRationalFunction(listCone* cones, vector a, vector cost, int numOf
   	listVector* tmpVector;
   	tmpcone = cones;
   	int number = 0, Coeff;
-  	list< vector > solutions;
+  	list< vec_ZZ > solutions;
   	Tmpcones =createListCone();  
   	endcone = Tmpcones;
 
@@ -113,20 +113,20 @@ listCone* FindRationalFunction(listCone* cones, vector a, vector cost, int numOf
   	return Tmpcones -> rest;
 } // FindRationalFunction
 
-vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, int SINGLE_CONE)
+vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, int SINGLE_CONE)
 {
   //int SINGLE_CONE = 1;
 	//cout << "SolveIP Called. Cost = " << cost << endl;
   	int	Digging_Count = 0;
-	vector OptVertex;
+	vec_ZZ OptVertex;
   	int  flag = 0;
   	listCone * tmpcone;
   	listVector  *tmpmatrix;
   	tmpcone = cones;
-  	list< vector > solutions;
-  	vector		Temp_Vector;
+  	list< vec_ZZ > solutions;
+  	vec_ZZ		Temp_Vector;
   
-	vector possible;
+	vec_ZZ possible;
   	ZZ RHS;
   
 	//  cout << cost << endl;
@@ -140,7 +140,7 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 	
 	ConeInfo_Heap cone_heap;
 	
-	vector Our_Cost;
+	vec_ZZ Our_Cost;
 
 	Our_Cost = cost;
 	
@@ -270,7 +270,7 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 			flag = 0;
 			//if (SINGLE_CONE == 1)
 			//{
-				list< vector > solutions2;
+				list< vec_ZZ > solutions2;
 
 				Temp_ConeInfo_List = Head_ConeInfo_List;
 				Temp_Vector.SetLength(numOfVars);
@@ -594,7 +594,7 @@ listVector* GetHRepresentation(listVector* vertices, int numOfVars){
 
   while (tmpString != "begin") getline(in2,tmpString);
   in2 >> tmpString >> tmpdim >> tmpString;
-  vector Hyperplane;
+  vec_ZZ Hyperplane;
 
  basis = createListVector(createVector(numOfVars));
   endBasis = basis;
@@ -667,7 +667,7 @@ listVector* GetVertices(listCone* cones, listVector* matrix, listVector* hyperpl
     		vertices = createListVector(createVector(numOfVars));
     		endVertex = vertices;
     		cout << "Enter a cost function." << endl;
-    		vector cost;
+    		vec_ZZ cost;
     		cost.SetLength(numOfVars);
     		for(int i = 0; i < numOfVars; i++)  
 			cin >> cost[i];
@@ -686,7 +686,7 @@ int CheckVertices(listVector* vertices, listVector* newVertices)
 {
   	int flag = 0, len1 = 0, len2 = 0, counter = 0;
   	listVector * tmpvertices, *tmpnewVertices;
-  	vector vertex, newvertex;
+  	vec_ZZ vertex, newvertex;
 
   	tmpvertices = vertices;
 
@@ -717,12 +717,12 @@ listVector* Push_Vector(listVector* head, listVector* tail, int numOfVars){
 
   listVector* List, *endList;
   int len1, len2;
-  vector tmp;
+  vec_ZZ tmp;
   len1 = lengthListVector(head);
   len2 = lengthListVector(tail);
   List = createListVector(createVector(numOfVars));
   endList = List;
-  vector ArrayVec[len1];
+  vec_ZZ ArrayVec[len1];
   int flag = 0;
 
   for(int i = 0; i < (len1); i++) ArrayVec[i].SetLength(numOfVars); 
@@ -753,10 +753,10 @@ listVector* Push_Vector(listVector* head, listVector* tail, int numOfVars){
 ZZ Calculate_Polytope_Width (listCone *cones,listVector *matrix,int numOfVars)	
 {
 	//cout << "SolveIP Called. Cost = " << cost << endl;
-	vector OptVertex;
+	vec_ZZ OptVertex;
   	listCone * tmpcone;
   	listVector *tmpVector;
-  	vector	numerator, Temp_Vector, Max_Direction;
+  	vec_ZZ	numerator, Temp_Vector, Max_Direction;
 	ZZ 	S_Min, S_Max;
 
 	S_Min = 0;
@@ -877,7 +877,7 @@ listVector* IntegralHull(listCone* cones,listVector* matrix, int numOfVars)
 		if (Cost_File.fail())
 			exit (1);
 
-		vector Cost_Vector;
+		vec_ZZ Cost_Vector;
 
 		Cost_Vector.SetLength (numOfVars);
 		int	Int_Read;

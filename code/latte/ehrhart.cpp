@@ -58,9 +58,9 @@ int main(int argc, char *argv[]) {
   float z;
   int i,numOfVars,numOfAllVars, degree = 1;
   unsigned int flags = 0, print_flag = 0, output_cone = 0;
-  vector dim, v, w;
+  vec_ZZ dim, v, w;
   int oldnumofvars;
-  vector *generators;
+  vec_ZZ *generators;
   char fileName[127], invocation[127], decompose[10], equationsPresent[10],
     assumeUnimodularCones[127], dualApproach[127], taylor[127], printfile[127],
     rationalCone[127], nonneg[127], Memory_Save[127], Save_Tri[127],
@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
     Vrepresentation[127], dilation[127], minimize[127], binary[127], 
     interior[127];
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
-  vector cost;
+  vec_ZZ cost;
   listVector *templistVec;
   listCone *cones, *tmp, *tmpcones;
 
@@ -311,7 +311,7 @@ int main(int argc, char *argv[]) {
   }
   
   // cout << grobner << endl;
-  vector holdCost;
+  vec_ZZ holdCost;
   if(minimize[0] == 'y') cost = - cost;
   holdCost = cost;
   //cout <<"Cost is: " << cost << endl;
@@ -532,7 +532,7 @@ int main(int argc, char *argv[]) {
       else{
 	int singleCone = 0;
 	if(Singlecone[0] == 'y') singleCone = 1;
-	vector Opt_solution; 
+	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
         if(minimize[0] == 'y') cost = -cost;
@@ -575,7 +575,7 @@ int main(int argc, char *argv[]) {
    else{
 	int singleCone = 0;
 	if(Singlecone[0] == 'y') singleCone = 1;
-	vector Opt_solution; 
+	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
 	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
@@ -628,7 +628,7 @@ int main(int argc, char *argv[]) {
       else{
 	int singleCone = 0;
 	if(Singlecone[0] == 'y') singleCone = 1;
-	vector Opt_solution; 
+	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, inequalities, equations,  cost, numOfVars, singleCone); 
 	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
@@ -647,7 +647,7 @@ int main(int argc, char *argv[]) {
    else{
 	int singleCone = 0;
 	if(Singlecone[0] == 'y') singleCone = 1;
-	vector Opt_solution; 
+	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, inequalities, equations,  cost, numOfVars, singleCone); 
 	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;

@@ -1,12 +1,12 @@
-void printVector(vector, int);
+void printVector(vec_ZZ, int);
 void printListVector(listVector*, int);
 listVector* Changeproj(listVector* basis, listVector* equ, int numOfVars);
 void printRationalVector(rationalVector*, int);
 void printCone(listCone*, int);
 void printListCone(listCone*, int);
-void printVectorToFile(ofstream &, vector, int);
+void printVectorToFile(ofstream &, vec_ZZ, int);
 void printListVectorToFile(ofstream &, listVector*, int);
-void printVectorToFileWithoutBrackets(ofstream &, vector, int);
+void printVectorToFileWithoutBrackets(ofstream &, vec_ZZ, int);
 void printListVectorToFileWithoutBrackets(ofstream &, listVector*, int);
 void printRationalVectorToFile(ofstream &, rationalVector*, int);
 void printRationalVectorToFileWithoutBrackets(ofstream &, rationalVector*, 

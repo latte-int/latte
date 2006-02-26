@@ -21,7 +21,7 @@ liblatte_a_SOURCES = \
 	ResSingle.cpp printsingle.cpp IntegralHull.cpp ReadingFile.cpp \
 	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
 	banner.cpp \
-	todd/todd.cpp todd/gmp_pow.cpp \
+	todd/todd.cpp todd/gmp_pow.cpp todd/todd-expansion.cpp \
 	gmp-interface.cpp		\
 	ExponentialSubst.cpp
 
@@ -34,8 +34,8 @@ noinst_HEADERS =							\
 	barvinok/Triangulation.h					\
 	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
 	genFunction/piped.h vertices/cdd.h				\
-	todd/gmp_pow.h todd/todd.h 					\
-	gmp-interface.h							\
+	todd/gmp_pow.h todd/todd.h todd/todd-expansion.h		\
+	latte_gmp.h
 	ExponentialSubst.cpp
 
 BUILT_SOURCES = todd/todd.cpp

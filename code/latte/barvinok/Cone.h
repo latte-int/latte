@@ -1,4 +1,4 @@
-/***********************************************************************
+/*********************************************************** -*- c++ -*-
   Author: Ruriko Yoshida
   July 24th, 2002
   Update: October 4th, 2002
@@ -26,11 +26,10 @@
 using namespace std;
 using namespace NTL_NAMESPACE;
 
- class Cone {
- public:
-  mat_ZZ generator;
+class Cone {
+public:
   bool sign;
-  int number;
+  mat_ZZ generator;
   Cone(){
   sign = 0;
   }

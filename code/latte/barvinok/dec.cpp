@@ -30,7 +30,7 @@
 /* ----------------------------------------------------------------- */
 listCone* readListCone(rationalVector *vertex, int numOfVars) {
   int i,j,k,numOfCones,coeff;
-  vector v;
+  vec_ZZ v;
   listVector *tmp, *endtmp;
   listCone *cones, *endCones;
   char fileName[127];

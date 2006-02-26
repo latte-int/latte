@@ -4,7 +4,7 @@
 #include <NTL/ZZ.h>
 #include <NTL/vec_ZZ.h>
 /* ----------------------------------------------------------------- */
-listVector* appendVectorToListVector(vector v, listVector *REST) {
+listVector* appendVectorToListVector(vec_ZZ v, listVector *REST) {
   // listVector *LIST;
   listVector * LIST = new listVector;  
   // LIST=(listVector *)malloc(sizeof(listVector));
@@ -13,24 +13,24 @@ listVector* appendVectorToListVector(vector v, listVector *REST) {
   return (LIST);
 }
 /* ----------------------------------------------------------------- */
-vector createVector(int numOfVars) {
-  vector w;
+vec_ZZ createVector(int numOfVars) {
+  vec_ZZ w;
 
   w.SetLength(numOfVars);
   return (w);
 }
 /* ----------------------------------------------------------------- */
-vector* createArrayVector(int numOfVectors) {
-  vector* w;
+vec_ZZ* createArrayVector(int numOfVectors) {
+  vec_ZZ* w;
 
-  w = new vector[numOfVectors+1];
+  w = new vec_ZZ[numOfVectors+1];
 
-//    w = (vector*)calloc(sizeof(vector*),(numOfVectors+1));
+//    w = (vec_ZZ*)calloc(sizeof(vec_ZZ*),(numOfVectors+1));
   if (w==0) exit(0);
   return (w);
 }
 /* ----------------------------------------------------------------- */
-listVector* createListVector(vector v) {
+listVector* createListVector(vec_ZZ v) {
   return (appendVectorToListVector(v,0));
 }
 /* ----------------------------------------------------------------- */
@@ -45,30 +45,30 @@ listVector* createListVector(vector v) {
             }
         }
 /* ----------------------------------------------------------------- */
-vector copyVector(vector v, int numOfVars) {
+vec_ZZ copyVector(vec_ZZ v, int numOfVars) {
   int i;
-  vector w;
+  vec_ZZ w;
 
   w = createVector(numOfVars);
   for (i=0; i<numOfVars; i++) w[i] = v[i];
   return (w);
 }
 /* ----------------------------------------------------------------- */
-vector addVector(vector v, vector w, int numOfVars) {
+vec_ZZ addVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
   int i;
 
   for (i=0; i<numOfVars; i++) v[i]=v[i]+w[i];
   return (v);
 }
 /* ----------------------------------------------------------------- */
-vector subVector(vector v, vector w, int numOfVars) {
+vec_ZZ subVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
   int i;
 
   for (i=0; i<numOfVars; i++) v[i]=v[i]-w[i];
   return (v);
 }
 /* ----------------------------------------------------------------- */
-vector negativeVector(vector v, int numOfVars) {
+vec_ZZ negativeVector(vec_ZZ v, int numOfVars) {
   int i;
 
   for (i=0; i<numOfVars; i++) v[i]=-v[i];
@@ -89,7 +89,7 @@ listVector* updateBasis(listVector *v, listVector *endBasis) {
   return (endBasis);
 }
 /* ----------------------------------------------------------------- */
-vector* transformListVectorToArrayVector(listVector *L, vector* A) {
+vec_ZZ* transformListVectorToArrayVector(listVector *L, vec_ZZ* A) {
   int i;
   listVector *tmp;
 
@@ -105,7 +105,7 @@ vector* transformListVectorToArrayVector(listVector *L, vector* A) {
   return (A);
 }
 /* ----------------------------------------------------------------- */
-listVector* transformArrayVectorToListVector(vector *A, int numOfVectors) {
+listVector* transformArrayVectorToListVector(vec_ZZ *A, int numOfVectors) {
   int i;
   listVector *L, *endL;
 
@@ -120,7 +120,7 @@ listVector* transformArrayVectorToListVector(vector *A, int numOfVectors) {
   return (L->rest);
 }
 /* ----------------------------------------------------------------- */
-int isVectorEqualToVector(vector v, vector w, int numOfVars) {
+int isVectorEqualToVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
   int i;
 
 //    if ((v==0) || (w==0)) return (0);
@@ -128,8 +128,8 @@ int isVectorEqualToVector(vector v, vector w, int numOfVars) {
   return (1);
 }
 /* ----------------------------------------------------------------- */
-int isVectorInListVector(vector v, listVector* LIST, int numOfVars) {
-  vector w;
+int isVectorInListVector(vec_ZZ v, listVector* LIST, int numOfVars) {
+  vec_ZZ w;
 
   while (LIST) {
     w = LIST->first;
@@ -142,7 +142,7 @@ int isVectorInListVector(vector v, listVector* LIST, int numOfVars) {
 listVector* readListVector(char *fileName, int* numOfVars) {
   int i,j,numOfVectors;
   listVector *basis, *endBasis;
-  vector b;
+  vec_ZZ b;
 
   /* Reads numOfVars, numOfVectors, list of vectors. */
 
@@ -176,7 +176,7 @@ listVector* readListVector(char *fileName, int* numOfVars) {
 listVector* readListVectorMLP(char *fileName, int* numOfVars) {
   int i,j,numOfVectors;
   listVector *basis, *endBasis;
-  vector b;
+  vec_ZZ b;
 
   /* Reads numOfVars, numOfVectors, list of vectors. */
 

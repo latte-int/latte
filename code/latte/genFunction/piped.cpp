@@ -22,11 +22,11 @@
 
 using namespace std;
 /* ----------------------------------------------------------------- */
-vector movePoint(vector x, rationalVector *coeffsX, 
-		 rationalVector *coeffsVertex, vector *matrix, 
+vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX, 
+		 rationalVector *coeffsVertex, vec_ZZ *matrix, 
 		 int numOfRays, int numOfVars) {
   int i,j;
-  vector z, movement;
+  vec_ZZ z, movement;
   rationalVector *difference;
 
   difference=subRationalVector(coeffsX,coeffsVertex,numOfVars);
@@ -60,8 +60,8 @@ listVector* pointsInParallelepiped(rationalVector *vertex, listVector *rays,
   int i,j,k,ii,counter,numOfVertices,numOfRays,nextIndex,tmpInt;
   rationalVector *c, *w, *coeffsVertex;
   rationalVector **coeffs;
-  vector z;
-  vector *points, *matrix, *originalMatrix;
+  vec_ZZ z;
+  vec_ZZ *points, *matrix, *originalMatrix;
   listVector *tmp, *endFacets, *hilbertBasis, *interiorHilbertBasis,
       *listOfPoints, *endListOfPoints;
   char cddInFileName[127],mlpInFileName[127];
@@ -295,8 +295,8 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 						  int numOfVars) {
   int i,j,k,numOfRays;
   ZZ a,b;
-  vector lambda,w,z;
-  vector *matrix, *originalMatrix;
+  vec_ZZ lambda,w,z;
+  vec_ZZ *matrix, *originalMatrix;
   listVector *points, *tmp;
   rationalVector *coeffs;
 
