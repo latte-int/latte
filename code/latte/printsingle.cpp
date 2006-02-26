@@ -1,19 +1,15 @@
 #include <stdlib.h>
-#include "Array.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <NTL/ZZ.h>
 #include <time.h>
 #include <list>
-
+#include <vector>
 #include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
 using namespace std;
-
-#define		Integer ZZ
-
 
 
 int Residue_Single_Cone(listCone* cones, int numOfVars, ZZ *Random_Lambda, ZZ *Total_Lattice_Points, ZZ *Ten_Power) 
@@ -63,7 +59,7 @@ int Residue_Single_Cone(listCone* cones, int numOfVars, ZZ *Random_Lambda, ZZ *T
   Integer tmp_A;
   int result = 1;
 
-  BigArray<Integer> dotProducts(totalNoGs);
+  vector<Integer> dotProducts(totalNoGs);
   
   listVector* basis, *listtmp1, *listtmp2;
   listCone *listtmp3;

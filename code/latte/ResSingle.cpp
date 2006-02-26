@@ -10,7 +10,6 @@
 #include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
-#include "Array.h"
 #include "RudyResNTL.h"
 #include <malloc.h>
 #include <stdlib.h>

@@ -5,12 +5,11 @@
 #include <time.h>
 #include <stdlib.h>
 #include <list>
-//#include <vector>
+#include <vector>
 #include "PolyTree.h"
 #include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
-#include "Array.h"
 #include "RudyResNTL.h"
 #include <malloc.h>
 #include <stdlib.h>
@@ -226,7 +225,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   //lambda[0] = 327;
   Integer dlambda[dim]; // dlambda tracks change in 2 successive test-lambdas
   //for(i=0;i<dim;i++) lambda[i]=0;  // lambda starts at 0
-  BigArray<Integer> dotProducts(totalNoGs); // ith entry tracks lambda dot row i of B
+  vector<Integer> dotProducts(totalNoGs); // ith entry tracks lambda dot row i of B
   //  dotProducts and dlambda used to try to improve calculational efficiency
   long int halt, haltCone;
   halt = 0;

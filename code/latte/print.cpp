@@ -1,11 +1,11 @@
 #include <stdlib.h>
-#include "Array.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <NTL/ZZ.h>
 #include <time.h>
 #include <list>
+#include <vector>
 
 #include "myheader.h"
 #include "cone.h"
@@ -425,7 +425,7 @@ ZZ Residue(listCone* cones, int numOfVars) {
   Integer lambda[dim];
   Integer dlambda[dim]; // dlambda tracks change in 2 successive test-lambdas
   //for(i=0;i<dim;i++) lambda[i]=0;  // lambda starts at 0
-  BigArray<Integer> dotProducts(totalNoGs); // ith entry tracks lambda dot row i of B
+  vector<Integer> dotProducts(totalNoGs); // ith entry tracks lambda dot row i of B
   //  dotProducts and dlambda used to try to improve calculational efficiency
   long int halt, haltCone;
   halt = 0;
