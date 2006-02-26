@@ -3,6 +3,7 @@
 #include "todd/todd.h"
 #include "todd/gmp_pow.h"
 #include "latte_gmp.h"
+#include "todd/todd-expansion.h"
 
 Integer
 scalar_power(const vec_ZZ &generic_vector,
@@ -47,31 +48,46 @@ mpq_class
 computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 				 listCone *cone, int numOfVars)
 {
-  vector<mpz_class> ray_scalar_products(numOfVars);
-  mpz_class prod_ray_scalar_products;
+  // Compute dimension; can be smaller than numOfVars
   int dimension = 0;
+  listVector *ray;
+  for (ray = cone->rays; ray != NULL; ray = ray->rest)
+    dimension++;
+  vector<mpz_class> ray_scalar_products(dimension);
+  mpz_class prod_ray_scalar_products;
   prod_ray_scalar_products = 1;
+  cout << "Scalar products: ";
   {
-    listVector *ray;
     int k;
     for (k = 0, ray = cone->rays; ray != NULL; k++, ray = ray->rest) {
       ZZ inner;
       InnerProduct(inner, generic_vector, ray->first);
       ray_scalar_products[k] = convert_ZZ_to_mpz(inner);
+      cout << ray_scalar_products[k] << " ";
       if (ray_scalar_products[k] == 0)
 	throw not_generic;
       prod_ray_scalar_products *= ray_scalar_products[k];
     }
-    dimension = k; // can be smaller than numOfVars
   }
+  cout << endl;
   int k;
   mpz_class k_factorial;
   mpq_class result;
+  mpq_vector todds = evaluate_todd(ray_scalar_products);
   result = 0;
   for (k = 0, k_factorial = 1; k<=dimension; k++, k_factorial *= k) {
     Integer sum = sum_of_scalar_powers(generic_vector,
 				       cone->latticePoints, k);
-    mpq_class td = todd(dimension, dimension - k, ray_scalar_products);
+    mpq_class td = todds[dimension - k];
+    cerr << "scalar product still: ";
+    for (int l = 0; l<dimension; l++)
+      cerr << ray_scalar_products[l];
+    cerr << endl;
+    mpq_class td_maple = todd(dimension, dimension - k, ray_scalar_products);
+    if (td != td_maple) {
+      cerr << "Todd discrepancy: " << td << " (us) vs. "
+	   << td_maple << " (Maple)" << endl;
+    }
     td /= prod_ray_scalar_products;
     result += convert_ZZ_to_mpz(sum) * td / k_factorial;
   }
