@@ -13,17 +13,6 @@
 #include <algorithm>
 #include <time.h>
 
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
-
-using namespace std;
-
 listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOfVars);
 listVector* Push_Vector(listVector* head, listVector* tail, int numOfVars);
 vec_ZZ SolveIP(listCone* cones, listVector* matrix,  vec_ZZ cost, int numOfVars, int SINGLE_CONE);

@@ -17,7 +17,6 @@
 #include "../ramon.h"
 #include "../rational.h"
 #include "../vertices/cdd.h"
-#include <NTL/ZZ.h>
 #include <string>
 
 using namespace std;

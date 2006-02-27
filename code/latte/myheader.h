@@ -8,10 +8,9 @@
 #include <math.h>
 #include <malloc.h>
 #include <string.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/ZZ.h>
 
-using namespace NTL_NAMESPACE;
+#include "latte_ntl.h"
+
 using namespace std;
 
 #ifdef SUN

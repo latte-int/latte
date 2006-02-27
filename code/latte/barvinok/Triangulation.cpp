@@ -17,14 +17,7 @@
 #include <cstdlib> // exit()
 #include <string>
 #include <math.h>
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
+#include "latte_ntl.h"
 #include "Triangulation.h"
 #include "Cone.h"
 #include "../flags.h"

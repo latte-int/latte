@@ -1,7 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <NTL/ZZ.h>
 #include <time.h>
 #include <stdlib.h>
 #include <list>

@@ -34,8 +34,8 @@ noinst_HEADERS =							\
 	barvinok/Triangulation.h					\
 	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
 	genFunction/piped.h vertices/cdd.h				\
-	todd/gmp_pow.h todd/todd-expansion.h		\
-	latte_gmp.h
+	todd/gmp_pow.h todd/todd-expansion.h				\
+	latte_gmp.h latte_ntl.h						\
 	ExponentialSubst.cpp
 
 test_todd_SOURCES = todd/test-todd.cpp

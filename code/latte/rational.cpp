@@ -15,11 +15,6 @@
 #include "print.h"
 #include "ramon.h"
 #include "barvinok/Cone.h"
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
 
 #include <fstream>
 #include <cstdlib>

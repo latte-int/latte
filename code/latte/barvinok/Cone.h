@@ -14,17 +14,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <time.h>
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
+#include "latte_ntl.h"
 
 using namespace std;
-using namespace NTL_NAMESPACE;
 
 class Cone {
 public:

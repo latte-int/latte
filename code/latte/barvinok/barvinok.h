@@ -19,14 +19,6 @@
 #include "../myheader.h"
 #include "../ramon.h"
 #include "Cone.h"
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
 #include "../RudyResNTL.h"
 #include "../flags.h"
 using namespace std;

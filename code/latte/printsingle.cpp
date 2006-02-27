@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <NTL/ZZ.h>
 #include <time.h>
 #include <list>
 #include <vector>

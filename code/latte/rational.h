@@ -15,11 +15,7 @@
 #ifndef RATIONAL__H
 #define RATIONAL__H
 
-
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
+#include "latte_ntl.h"
 
 #include <fstream>
 #include <cstdlib>

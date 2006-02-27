@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <NTL/ZZ.h>
 #include <time.h>
 #include <list>
 #include <vector>
@@ -10,10 +9,7 @@
 #include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
-using namespace std;
 
-#define      mpz_t ZZ
-#define		Integer ZZ
 /* ----------------------------------------------------------------- */
 void printVector(vec_ZZ v, int numOfVars) {
   int i;

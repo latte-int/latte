@@ -24,14 +24,6 @@
 #include "timing.h"
 #include "flags.h"
 #include "vertices/cdd.h"
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
 
   ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars, char* min);
 

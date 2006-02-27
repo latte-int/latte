@@ -1,7 +1,6 @@
 #ifndef CONEINFO_H
 #define CONEINFO_H
 
-#include <NTL/ZZ.h>
 #include "myheader.h"
 #include "ramon.h"
 

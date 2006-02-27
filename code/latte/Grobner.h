@@ -6,10 +6,6 @@
 #include "print.h"
 #include "ramon.h"
 #include "ReadingFile.h"
-#include <NTL/ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_ZZ.h>
-#include <NTL/LLL.h>
 
 listVector* Grobner(listVector *equations, 
 		    listVector *inequalities, vec_ZZ **generators,

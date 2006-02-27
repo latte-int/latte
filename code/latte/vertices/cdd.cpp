@@ -16,7 +16,6 @@
 #include "../print.h"
 #include "../ramon.h"
 #include "../rational.h"
-#include <NTL/ZZ.h>
 #include <list>
 
 using namespace std;

@@ -15,11 +15,6 @@ I modified Raymond's code.
 #include "ramon.h"
 #include "ReadingFile.h"
 #include "preprocess.h"
-#include <NTL/ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_ZZ.h>
-#include <NTL/LLL.h>
-
 
 /* ---------------------------------------------------------------------- */
 void CheckGrobner(char* filename, char * cdd){

@@ -24,16 +24,6 @@
 #include "../print.h"
 #include "../genFunction/piped.h"
 
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
-using namespace std;
-
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
 

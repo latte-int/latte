@@ -20,14 +20,6 @@
 #include "Cone.h"
 #include "barvinok.h"
 #include "Triangulation.h"
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
 
 /* ----------------------------------------------------------------- */
 listVector* transformArrayBigVectorToListVector(mat_ZZ A, int numOfVectors, 

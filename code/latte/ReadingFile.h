@@ -1,14 +1,6 @@
 #ifndef READINGFILE__H
 #define READINGFILE__H
 #include <list>
-#include <NTL/mat_ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
 
 #include "myheader.h"
 #include "barvinok/dec.h"

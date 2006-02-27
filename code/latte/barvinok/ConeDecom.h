@@ -8,14 +8,6 @@
 ************************************************************************/
 #ifndef CONEDECOM__H
 #define CONEDECOM__H
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_ZZ.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/config.h>
-#include <NTL/LLL.h>
-#include <NTL/HNF.h>
-#include <NTL/ZZ.h>
 #include "../PolyTree.h"
 #include "../myheader.h"
 #include "../RudyResNTL.h"
