@@ -21,7 +21,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include "../flags.h"
-
+#include "dual.h"
+#include "genFunction/piped.h"
 
 #define MODULUS 1000000000
 #define Exponent_Ten_Power 10
@@ -140,13 +141,31 @@ decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
 }
 /* ----------------------------------------------------------------- */
 
+int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
+{
+  Cone = dualizeBackCones (Cone, this->Number_of_Variables );   	
+  //cout << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
+  if ( (this->Flags & DUAL_APPROACH) == 0)
+    computePointsInParallelepiped(Cone, this->Number_of_Variables);
+		
+  if (this->Flags & DUAL_APPROACH)	
+    {
+      //cout << "barvinok_DFS: Calling ResidueFunction_Single_Cone" << endl;
+      return ResidueFunction_Single_Cone (Cone, (Standard_Single_Cone_Parameters *) this);
+    }	
+  else
+    {
+      return Residue_Single_Cone (Cone, this->Number_of_Variables, this->Random_Lambda, this->Total_Lattice_Points, this->Ten_Power);
+    }	
+}
+
 void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned int flags, char *File_Name) 
 {
 	int numOfConesDecomposed,numOfAllCones,numOfRays, numOfUniCones = 0;
   	mat_ZZ mat;
   	listCone *tmp;
 	/*  char command[127]; */
-	Single_Cone_Parameters	*Barvinok_Parameters = new Single_Cone_Parameters;
+	Standard_Single_Cone_Parameters	*Barvinok_Parameters = new Standard_Single_Cone_Parameters;
 	
 	int	Success = 0;
 	
@@ -176,9 +195,7 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 	Barvinok_Parameters->Current_Simplicial_Cones_Total = new ZZ;
 	Barvinok_Parameters->Max_Simplicial_Cones_Total = new ZZ;
 
-	
-	Node_Controller *Controller;
-	Controller = new Node_Controller(numOfVars + 1, degree);			
+	Barvinok_Parameters->Controller = new Node_Controller(numOfVars + 1, degree);			
 	
 	cout << "Number of cones: " << numOfAllCones << endl;
 	
@@ -213,9 +230,10 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 		{
     			numOfRays=lengthListVector(tmp->rays);
     			mat=createConeDecMatrix(tmp,numOfRays,numOfVars);
+			Barvinok_Parameters->Cone = tmp;
 				
 			// reminder, set vertex, pass vertex
-			if(barvinokDecomposition_Single(mat,numOfRays, numOfUniCones, tmp->vertex,Barvinok_Parameters, Controller, File_Name, Cone_Index) == -1)
+			if(barvinokDecomposition_Single(mat,numOfRays, numOfUniCones, tmp->vertex,Barvinok_Parameters, File_Name, Cone_Index) == -1)
 			{
 				Success = 0;		
 				break;
@@ -277,7 +295,7 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 	
   	//cout << lengthListCone(newCones->rest) << " cones in total.\n";
 
-	delete Controller;
+	delete Barvinok_Parameters->Controller;
 	delete Barvinok_Parameters->Total_Lattice_Points;
 	delete Barvinok_Parameters->Total_Uni_Cones;
 	delete [] Barvinok_Parameters->Random_Lambda;
