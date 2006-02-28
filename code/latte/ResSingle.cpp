@@ -14,9 +14,10 @@
 #include <stdlib.h>
 #include "flags.h"
 
-int ResidueFunction_Single_Cone ( Single_Cone_Parameters *Residue_Parameters, Node_Controller *Controller)
+int ResidueFunction_Single_Cone(listCone *cones,
+				Standard_Single_Cone_Parameters *Residue_Parameters)
 {
-	
+  Node_Controller *Controller = Residue_Parameters->Controller;
   	listCone *C, * cones1;
   	int OUTPUT_S_T_FUNCTION = 0, COMPUTE_SUM_MAPLE = 0, OUTPUT_CONE = 0;
   	int DEGREE;
@@ -32,10 +33,6 @@ int ResidueFunction_Single_Cone ( Single_Cone_Parameters *Residue_Parameters, No
  	else if( ((Residue_Parameters->Flags & OUTPUT) >> 1) == 3) 
 		OUTPUT_S_T_FUNCTION = 1;
 
-	listCone	*cones = Residue_Parameters->Cone;
-
-		
-	
   	int numOfTerms=0;
 
   	C=cones;
