@@ -190,7 +190,14 @@ int main(int argc, char *argv[]) {
       CheckInputFileCDDRep4(argv[argc - 1]);
       }
   }else CheckInputFileVrep(fileName);
-  CheckEmpty(fileName);
+  if (cddstyle[0] == 'y') {
+    cerr << "Warning: Not performing check for empty polytope, "
+	 << "because it is unimplemented for the CDD-style input format. "
+	 << endl;
+  }
+  else {
+    CheckEmpty(fileName);
+  }
   //vec_ZZ cost;
   /* Read problem data. */
   if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) CheckRed(fileName, equationsPresent, maximum, nonneg, interior, dilation, dilation_const); 
