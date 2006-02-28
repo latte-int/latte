@@ -18,7 +18,7 @@ barvinokDecomposition(mat_ZZ, int, int, int&, char *File_Name, unsigned int Flag
 listVector* transformArrayBigVectorToListVector(mat_ZZ A, int numOfVectors,
 						int numOfVars);
 
-int barvinokDecomposition_Single (const mat_ZZ, int Number_of_Rays, int &Number_of_Uni_Cones, rationalVector *Cone_Vertex, Single_Cone_Parameters *, Node_Controller *Controller, char *File_Name, int Cone_Index);
+int barvinokDecomposition_Single (const mat_ZZ, int Number_of_Rays, int &Number_of_Uni_Cones, rationalVector *Cone_Vertex, Single_Cone_Parameters *, char *File_Name, int Cone_Index);
 
 #endif
 
