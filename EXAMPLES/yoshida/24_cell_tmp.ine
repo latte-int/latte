@@ -1,0 +1,43 @@
+*Warning: Extension of inputfile name should ``.ext'' for hull computation.
+* cdd+: Double Description Method in C++:Version 0.76a1 (June 8, 1999)
+* Copyright (C) 1999, Komei Fukuda, fukuda@ifor.math.ethz.ch
+* Compiled for Rational Exact Arithmetic with G++
+*Input File:Examples/24_cell_tmp(24x6)
+*HyperplaneOrder: LexMin
+*Degeneracy preknowledge for computation: None (possible degeneracy)
+*Hull computation is chosen.
+*Computation starts     at Mon Feb 24 20:26:04 2003
+*            terminates at Mon Feb 24 20:26:04 2003
+*Total processor time = 0 seconds
+*                     = 0h 0m 0s
+*Since hull computation is chosen, the output is a minimal inequality system
+*FINAL RESULT:
+*Number of Facets = 24
+H-representation
+begin
+24  6  rational
+ 0 -1 1 -1 -1 2
+ 0 0 0 -1 0 1
+ 0 -1 1 -1 1 2
+ 0 -1 1 1 1 2
+ 0 0 0 0 1 1
+ 0 0 1 0 0 1
+ 0 1 -1 1 -1 2
+ 0 1 1 -1 1 2
+ 0 1 1 1 1 2
+ 0 1 0 0 0 1
+ 0 1 1 1 -1 2
+ 0 1 1 -1 -1 2
+ 0 1 -1 1 1 2
+ 0 1 -1 -1 1 2
+ 0 1 -1 -1 -1 2
+ 0 0 0 1 0 1
+ 0 -1 1 1 -1 2
+ 0 0 0 0 -1 1
+ 0 -1 -1 1 -1 2
+ 0 0 -1 0 0 1
+ 0 -1 -1 1 1 2
+ 0 -1 -1 -1 1 2
+ 0 -1 -1 -1 -1 2
+ 0 -1 0 0 0 1
+end

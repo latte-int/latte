@@ -1,0 +1,25 @@
+
+tenPow: 10000
+noLatticePts before division: 12259142767685140004
+denominator subclock: 20000
+numerator subclock: 10000
+clocks per second: 1000000
+
+TIME FOR CALCULATION (in seconds): 0.05
+
+  **** THE GRAND TOTAL IS: 1225914276768514 ****
+
+Computation done.   Time: 0.28 sec
+  
+
+For usinf uni:
+real    0m1.048s
+user    0m0.830s
+sys     0m0.220s
+
+For only equ:
+real    1m48.192s
+user    0m44.060s
+sys     0m47.780s
+
+
