@@ -156,7 +156,7 @@ barvinokDecomposition(mat_ZZ Mat, int m, int n, int &numOfUniCones,
 
 
 /* ----------------------------------------------------------------- */
-int barvinokDecomposition_Single(const mat_ZZ Mat, int m, int & numOfUniCones, rationalVector *vertex, Single_Cone_Parameters *Parameters, Node_Controller *Controller, char *File_Name, int Cone_Index) 
+int barvinokDecomposition_Single(const mat_ZZ Mat, int m, int & numOfUniCones, rationalVector *vertex, Single_Cone_Parameters *Parameters, char *File_Name, int Cone_Index) 
 {
 
   list< PtrCone > Uni;
@@ -222,7 +222,7 @@ int barvinokDecomposition_Single(const mat_ZZ Mat, int m, int & numOfUniCones, r
    //cout << "BarvinokDecomposition: Number of simplicies = " << Faces << endl;
     for(int i = 0; i < Faces; i++){
       if(IsZero(B[i]) != 1){
-        if ( barvinok_Single(B[i], numOfUniCones, Parameters, Controller, vertex) == -1)
+        if ( barvinok_Single(B[i], numOfUniCones, Parameters, vertex) == -1)
 	{
   		for(int i = 0; i < Faces; i++)
 			B[i].kill ();
