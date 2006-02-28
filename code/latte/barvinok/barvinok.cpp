@@ -19,10 +19,8 @@
 #include "barvinok.h"
 #include "../myheader.h"
 #include "../ramon.h"
-#include "../dual.h"
 #include "../RudyResNTL.h"
 #include "../print.h"
-#include "../genFunction/piped.h"
 
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
@@ -296,7 +294,7 @@ int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones,
 
 
 
-int barvinok_Single(mat_ZZ & B, int & numOfUniCones, Single_Cone_Parameters *Parameters, Node_Controller *Controller, rationalVector *vertex)
+int barvinok_Single(mat_ZZ & B, int & numOfUniCones, Single_Cone_Parameters *Parameters, rationalVector *vertex)
 {
 	//cout << "barvinok_Single Called." << endl;;
 	
@@ -337,27 +335,9 @@ int barvinok_Single(mat_ZZ & B, int & numOfUniCones, Single_Cone_Parameters *Par
    	dummy->generator = B;
    	dummy->sign = 1;
 
-	Barvinok_DFS_Parameters *DFS_Parameters = new Barvinok_DFS_Parameters;
-
-	DFS_Parameters->vertex = vertex;
-	DFS_Parameters->Controller = Controller;
-	DFS_Parameters->Number_of_Variables = Parameters->Number_of_Variables;
-	DFS_Parameters->Degree_of_Taylor_Expansion = Parameters->Degree_of_Taylor_Expansion;
-	DFS_Parameters->Flags = Parameters->Flags;
-	DFS_Parameters->Taylor_Expansion_Result = Parameters->Taylor_Expansion_Result;
-	DFS_Parameters->Random_Lambda = Parameters->Random_Lambda;
-	DFS_Parameters->Ten_Power = Parameters->Ten_Power;
-	DFS_Parameters->Total_Lattice_Points = Parameters->Total_Lattice_Points;	
-	DFS_Parameters->Total_Uni_Cones = Parameters->Total_Uni_Cones;    	
-	DFS_Parameters->Current_Simplicial_Cones_Total = Parameters->Current_Simplicial_Cones_Total;
-	DFS_Parameters->Max_Simplicial_Cones_Total = Parameters->Max_Simplicial_Cones_Total;
-	
-	
 	int result;
-	
-	result = barvinok_DFS(dummy, DFS_Parameters);
+	result = barvinok_DFS(dummy, Parameters);
 
-	delete DFS_Parameters;
 	dummy->generator.kill ();
 	delete dummy;
 	
@@ -382,7 +362,7 @@ listCone* transformRudyListConeIntoRamonListCone_Single( PtrCone RudyCone,
 }
 
 
-int barvinok_DFS(Cone *C, Barvinok_DFS_Parameters *Parameters)
+int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
 {
        	
     	ZZ Det = abs(determinant(C->generator));
@@ -434,36 +414,11 @@ int barvinok_DFS(Cone *C, Barvinok_DFS_Parameters *Parameters)
 
 		//cout << "barvinok_DFS: Transforming Rudy list to Raymond list...";
 		Cone = transformRudyListConeIntoRamonListCone_Single (tmpPtrCone, Parameters->Number_of_Variables );
+		Cone->vertex = Parameters->Cone->vertex;
 		//cout << "done." << endl;
-	
-		Cone = dualizeBackCones (Cone, Parameters->Number_of_Variables );   	
 
-		//cout << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
-		if ( (Parameters->Flags & DUAL_APPROACH) == 0)
-			Cone->latticePoints = pointsInParallelepipedOfUnimodularCone (Parameters->vertex, Cone->rays, Parameters->Number_of_Variables);	
+		result = Parameters->ConsumeCone(Cone);
 		
-		Single_Cone_Parameters *Residue_Parameters = new Single_Cone_Parameters;
-
-		Residue_Parameters->Cone = Cone;
-		Residue_Parameters->Number_of_Variables = Parameters->Number_of_Variables;
-		Residue_Parameters->Degree_of_Taylor_Expansion = Parameters->Degree_of_Taylor_Expansion;
-		Residue_Parameters->Flags = Parameters->Flags;
-		Residue_Parameters->Ten_Power = Parameters->Ten_Power;
-		Residue_Parameters->Random_Lambda = Parameters->Random_Lambda;
-		Residue_Parameters->Taylor_Expansion_Result = Parameters->Taylor_Expansion_Result;
-	
-		if (Parameters->Flags & DUAL_APPROACH)	
-		{
-			//cout << "barvinok_DFS: Calling ResidueFunction_Single_Cone" << endl;
-			result =  ResidueFunction_Single_Cone ( Residue_Parameters, Parameters->Controller);
-			
-		}	
-		else
-		{
-			result = Residue_Single_Cone (Cone, Parameters->Number_of_Variables, Parameters->Random_Lambda, Parameters->Total_Lattice_Points, Parameters->Ten_Power);
-		
-		}	
-
 		//clean up
 		//
 		
@@ -475,9 +430,6 @@ int barvinok_DFS(Cone *C, Barvinok_DFS_Parameters *Parameters)
 			delete tempvector;
 			
 		}*/
-
-		delete Residue_Parameters;
-		
 		
 		return result;
   	} 		     
