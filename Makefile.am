@@ -1,1 +1,2 @@
-SUBDIRS = code
+SUBDIRS = code EXAMPLES
+
