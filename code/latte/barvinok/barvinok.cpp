@@ -110,7 +110,14 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
 }
 
 /**********************************************************************/
-int barvinok(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones,
+
+/// FIXME: Scheduled for removal.
+//
+// Left here only as a reminder because this code avoids some
+// determinant computations, in contrast to barvinok_DFS.
+// Also has some nice comments.
+
+int barvinok_NO_LONGER_IN_USE(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones,
 	     int max_determinant)
 {
    long m, n;
@@ -373,14 +380,14 @@ int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
 	 	//cout << "barvinok_DFS: Det = 0." << endl;
 		return 1;	
    	  }		     
-    	 else if(Det == 1)
+    	 else if (Det <= Parameters->max_determinant)
     	 {
 	 	//cout << "barvinok_DFS: Cone is unimod " << endl;
 		
-		*(Parameters->Total_Uni_Cones) += 1;
+	   Parameters->Total_Uni_Cones += 1;
 
-		if ( *(Parameters->Total_Uni_Cones) % 1000 == 0)
-			cout << *(Parameters->Total_Uni_Cones) << " unimodular cones dones." << endl;
+		if ( Parameters->Total_Uni_Cones % 1000 == 0)
+			cout << Parameters->Total_Uni_Cones << " unimodular cones dones." << endl;
 		 
 		listVector *L, *endL;
    		vec_ZZ v;
@@ -516,12 +523,10 @@ int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
      	ZZ min;
 
 
-	*(Parameters->Current_Simplicial_Cones_Total) = *(Parameters->Current_Simplicial_Cones_Total) + m;
-
+	Parameters->Current_Simplicial_Cones_Total += m;
 	
-	
-	if(*(Parameters->Current_Simplicial_Cones_Total) > *(Parameters->Max_Simplicial_Cones_Total))
-		*(Parameters->Max_Simplicial_Cones_Total) = *(Parameters->Current_Simplicial_Cones_Total);
+	if (Parameters->Current_Simplicial_Cones_Total > Parameters->Max_Simplicial_Cones_Total)
+	  Parameters->Max_Simplicial_Cones_Total = Parameters->Current_Simplicial_Cones_Total;
 	
 	
      	//cout << "barvinok_DFS: max = " << max << endl;
@@ -548,7 +553,7 @@ int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
 	Dets[current] = -1;
 	delete cones1[current];
 
-	*(Parameters->Current_Simplicial_Cones_Total) = *(Parameters->Current_Simplicial_Cones_Total) - 1;
+	Parameters->Current_Simplicial_Cones_Total--;
 	//cout << " - " ;
 	
      	}
