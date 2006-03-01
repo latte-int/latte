@@ -26,7 +26,7 @@
 	in DFS Barvinok is now performed by the virtual method
 	Single_Cone_Parameters::ConsumeCone.
 
-	* configure.ac: Bump version number to 1.2.
+	* configure.ac: Bump version number to 1.2-mk-0.2.
 
 2006-02-26  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
