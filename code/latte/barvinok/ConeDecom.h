@@ -12,9 +12,6 @@
 #include "../myheader.h"
 #include "../RudyResNTL.h"
 
-listCone*
-barvinokDecomposition(mat_ZZ, int, int, int&, char *File_Name, unsigned int Flags, int Cone_Index, int max_determinant = 1);
-
 listVector* transformArrayBigVectorToListVector(mat_ZZ A, int numOfVectors,
 						int numOfVars);
 

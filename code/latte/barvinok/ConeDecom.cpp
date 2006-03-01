@@ -41,119 +41,11 @@ listVector* transformArrayBigVectorToListVector(mat_ZZ A, int numOfVectors,
   return (L->rest);
 }
 
-/* ----------------------------------------------------------------- */
-listCone* transformRudyListConeIntoRamonListCone(list< PtrCone > RudyCones,
-						 int numOfVars) {
-  int s;
-  listCone *cones, *endCones, *newCone;
-  PtrCone tmp;
-
-  cones=createListCone();
-  endCones=cones;
-
-  while (!RudyCones.empty()) {
-    newCone=createListCone();
-
-    tmp = RudyCones.back();
-    RudyCones.pop_back();
-    s = tmp.sign;
-    if (s==0) s=-1;
-
-    newCone->coefficient=s;
-    newCone->determinant = tmp.determinant;
-    newCone->rays = tmp.Generator;
-    endCones->rest=newCone;
-    endCones=endCones->rest;
-   // tmp.generator.kill();
-  }
-//    printListCone(cones->rest,numOfVars);
-  return (cones->rest);
-}
-/* ----------------------------------------------------------------- */
-
 /*
   The first step is to triangulate a cone into simplicial cones.
   Then, by using Barvinok's decomposition, we decompose each
   simplicial cone into unimodular cones.
 */
-
-/* ----------------------------------------------------------------- */
-listCone *
-barvinokDecomposition(mat_ZZ Mat, int m, int n, int &numOfUniCones,
-		      char *File_Name, unsigned int Flags, int Cone_Index,
-		      int max_determinant = 1)
-{ 
-  list< PtrCone > Uni;
-
-  /* m is the number of vectors and n is the number of dims. */
-  if((m == 0) || (n == 0)){
-    cerr << "The polytope is empty!" << endl;
-    //    system("rm latte_dec");
-    //system("rm core");
-    exit(2);
-  }
-//      mat_ZZ Mat;
-
-//      Mat.SetDims(m, n);
-
-//      for(int i= 0; i< m; i++)
-//        for(int j = 0; j < n; j++)
-//          conv(Mat[i][j], MatRays[i][j]);
-    
-  int Face = 1, Faces = 10000;
-  char* s1 = "latte_dec";
-  list< int > List;
-  if(m != n){
-    Face = Triangulation_Load_Save(Mat, m, n, s1, List, File_Name, Cone_Index, Flags);
-  } /*Call triangulation fun.*/
-
-   /*
-     In this fun, a cone is decomposed into simplicial cones.
-   */
-  Faces = Face;
-  mat_ZZ B[Faces];
-
-  for(int i = 0; i < Faces; i++)
-    B[i].SetDims(n, n);
-
-  if(m != n){
-    long tmp = 0;
-    int counter = 0, index = 0;
-
-    while(!List.empty())
-     {
-       tmp = List.back();
-       List.pop_back();
-       B[index]((counter % n) + 1) = Mat(tmp);
-       counter++;
-       if((counter % n == 0))
-         index++;
-       
-     } 
-  }
-  if(m == n) 
-  {
-	  B[0] = Mat;
-  }
-   /*
-     Call barvinok fun.  barvinok function decompose each
-     simplicial cone into unimodular cones.
-
-   */
-   int total = 0;
-    for(int i = 0; i < Faces; i++){
-      if(IsZero(B[i]) != 1){
-        total += barvinok(B[i],  Uni, numOfUniCones, max_determinant);
-        }
-      }
-
-  for(int i = 0; i < Faces; i++)
-    B[i].kill();
-
-   return (transformRudyListConeIntoRamonListCone(Uni,n));
-}
-
-
 
 /* ----------------------------------------------------------------- */
 int barvinokDecomposition_Single(const mat_ZZ Mat, int m, int & numOfUniCones, rationalVector *vertex, Single_Cone_Parameters *Parameters, char *File_Name, int Cone_Index) 
