@@ -1,3 +1,33 @@
+2006-02-28  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp, code/latte/simple-main.cpp:
+	Avoid CheckEmpty call for CDD-style input format (does not work), warn.
+
+	* code/latte/genFunction/piped.cpp, code/latte/genFunction/piped.h
+	(computePointsInParallelepiped): New function.
+	(computePointsInParallelepipeds): Use it here.
+
+	* code/latte/barvinok/ConeDecom.cpp,
+	code/latte/barvinok/ConeDecom.h (barvinokDecomposition_Single):
+	Simplify arglist by moving Node_Controller into
+	Single_Cone_Parameters.
+
+	* code/latte/RudyResNTL.h, code/latte/ResSingle.cpp
+	(ResidueFunction_Single_Cone): Simplify arglist by moving
+	Node_Controller into Single_Cone_Parameters.
+
+	* code/latte/RudyResNTL.h (Single_Cone_Parameters)
+	(Standard_Single_Cone_Parameters): Use subclassing and virtual
+	method ConsumeCone to refactor the code.
+
+	* code/latte/barvinok/barvinok.cpp (barvinok_Single)
+	(barvinok_DFS): Factor out residue calculation from DFS Barvinok.
+	* code/latte/barvinok/dec.cpp (ConsumeCone): Residue calculation
+	in DFS Barvinok is now performed by the virtual method
+	Single_Cone_Parameters::ConsumeCone.
+
+	* configure.ac: Bump version number to 1.2.
+
 2006-02-26  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/Makefile.am, code/latte/Array.h,
