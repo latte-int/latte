@@ -410,7 +410,7 @@ void computePointsInParallelepipeds(listCone *cones, int numOfVars)
   listCone *tmp = cones;
   int Cones_Processed_Count = 0;
   while (tmp) {
-    computePointsInParallelepipeds(tmp, numOfVars);
+    computePointsInParallelepiped(tmp, numOfVars);
     tmp=tmp->rest;
     Cones_Processed_Count++;
     if ((Cones_Processed_Count % 1000) == 0 )
