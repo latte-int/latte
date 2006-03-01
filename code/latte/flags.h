@@ -2,6 +2,9 @@
 #ifndef FLAGS_H
 #define FLAGS_H 1
 
+#include "myheader.h"   // FIXME: For ListCone
+#include "PolyTree.h"  // FIXME: For NodeController
+
 #define PRINT 0x1
 #define OUTPUT 0x6
 #define OUTPUT0 0x2
@@ -10,6 +13,9 @@
 #define DECOMPOSE 0x10
 #define LOAD	0x20
 #define SAVE    0x40
+
+// FIXME: This file (flags.h) is certainly not the right place yet for
+// these class definitions.  --mkoeppe
 
 struct BarvinokParameters {
   // Whether we use the
@@ -21,5 +27,48 @@ struct BarvinokParameters {
   // only.
   int max_determinant;
 };
+
+// Later we will reduce the slots in this class and use further
+// subclassing for the individual computation modes.  For instance,
+// Taylor_Expansion_Result is only used in the "dual" method.
+// -- mkoeppe
+
+class Single_Cone_Parameters : public BarvinokParameters {
+ public:
+	listCone	*Cone; // The master cone to be decomposed.
+	ZZ		Total_Uni_Cones;
+	ZZ		Current_Simplicial_Cones_Total;
+	ZZ		Max_Simplicial_Cones_Total;
+	int		Number_of_Variables;
+	unsigned int	Flags;
+	virtual int ConsumeCone(listCone *cone) = 0;
+};
+
+// The traditional LattE mode: Simply collect all subdivided cones
+// into a list.
+class Collecting_Single_Cone_Parameters : public Single_Cone_Parameters {
+public:
+  Collecting_Single_Cone_Parameters();
+  listCone *Decomposed_Cones;
+  virtual int ConsumeCone(listCone *cone);
+};
+
+// The "Memory Save" mode: Perform residue calculations immediately
+// at each subdivided cone in the tree, don't store the cones.
+class Standard_Single_Cone_Parameters : public Single_Cone_Parameters {
+ public:
+	int		Degree_of_Taylor_Expansion;
+	
+	ZZ		*Taylor_Expansion_Result;
+	ZZ		*Random_Lambda;
+	ZZ		Ten_Power;
+	ZZ		Total_Lattice_Points;
+
+	Node_Controller *Controller;
+ public:
+	virtual int ConsumeCone(listCone *cone);
+};
+
+
 
 #endif
