@@ -288,7 +288,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	
 	//Calculate the taylor expasion for the first DEGREE + 1 many terms
 	Cone_Taylor_Parameters->Result = new ZZ [DEGREE + 1];
-	Cone_Taylor_Parameters->Ten_Power = Residue_Parameters->Ten_Power;
+	Cone_Taylor_Parameters->Ten_Power = &Residue_Parameters->Ten_Power;
 	Cone_Taylor_Parameters->Degree_of_Expansion = DEGREE;
 	ofstream Rational_Function_Output_File;
 	
