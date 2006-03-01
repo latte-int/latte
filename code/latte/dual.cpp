@@ -155,63 +155,7 @@ mat_ZZ createConeDecMatrix2(listVector *cones, int numOfRays, int numOfVars) {
   return (mat);
 }
 /* ----------------------------------------------------------------- */
-listCone* transformRudyListConeIntoRamonListCone2(list< Cone > RudyCones,
-						 int numOfVars) {
-  int s;
-  listCone *cones, *endCones, *newCone;
-  Cone tmp;
 
-  cones=createListCone();
-  endCones=cones;
-
-  while (!RudyCones.empty()) {
-    newCone=createListCone();
-
-    tmp = RudyCones.back();
-    RudyCones.pop_back();
-    s = tmp.sign;
-    if (s==0) s=-1;
-
-    newCone->coefficient=s;
-    newCone->rays = transformArrayBigVectorToListVector(tmp.generator,
-							numOfVars,numOfVars);
-    endCones->rest=newCone;
-    endCones=endCones->rest;
-  }
-//    printListCone(cones->rest,numOfVars);
-  return (cones->rest);
-}
-
-/* ----------------------------------------------------------------- */
-/*list< Cone > transformRamonListConeIntoRudyListCone(listCone* cones,
-						 int numOfVars) {
-  int s;
-  list< Cone > RudyCones;
-  listCone *tmpcones, *endCones, *newCone;
-  Cone tmp;
-  listVector *rays;
-
-  tmpcones = cones;
-  //cones=createListCone();
-  //endCones=cones;
-
-  while (tmpcones) {
-    //newCone=createListCone();
-    if(tmpcones->coefficient == -1)
-    tmp.sign = 0;
-    else tmp.sign = 1;
-    rays = tmpcones->rays;
-    tmp.generator.SetDims(numOfVars, numOfVars);
-    for(int i = 0; i < numOfVars; i++){
-      tmp.generator[i] = rays->first;
-      rays->rest;
-      }
-    tmpcones = tmpcones -> rest;
-    RudyCones.push_back(tmp);
-  }
-//    printListCone(cones->rest,numOfVars);
-  return (RudyCones);
-}        */
 listCone* dualizeCones(listCone *cones, int numOfVars) {
   int i,j,tmpInt,len,numOfVertices,numOfConesDualized,numOfAllCones;
   ZZ x,y;
