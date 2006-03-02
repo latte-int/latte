@@ -20,11 +20,11 @@ taylor_reciprocal(const mpq_vector &a)
   mpq_vector b(a.size());
   // Compute the first coefficient.
   b[0] = 1 / a[0];
-  int i;
+  unsigned int i;
   for (i = 1; i<a.size(); i++) {
     // We have 0 = a_0 b_i + a_1 b_{i-1} + ... + a_i b_0.
     // Compute b_i from that.
-    int j;
+    unsigned int j;
     mpq_class sum = 0;
     for (j = 1; j<=i; j++)
       sum += a[j] * b[i-j];
