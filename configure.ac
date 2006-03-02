@@ -11,6 +11,8 @@ AC_PROG_RANLIB
 AC_PROG_CC
 AC_PROG_CXX
 
+AC_LANG(C++)
+
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([malloc.h stdlib.h string.h sys/param.h])
@@ -23,7 +25,7 @@ AC_C_CONST
 AC_FUNC_MALLOC
 AC_CHECK_FUNCS([pow sqrt])
 
-AC_LANG(C++)
+AC_CHECK_HEADERS([sstream])
 
 LB_MISC
 LB_CHECK_GMP(,,[AC_MSG_ERROR([GMP not found!
@@ -40,7 +42,7 @@ LB_CHECK_LIDIA(,,
   AC_MSG_WARN([LiDIA not found.  We need LiDIA for computing Smith normal forms!]))
 
 # From CDD+
-AC_PATH_PROGS(CDD, [cddr+])
+AC_PATH_PROGS(CDD, [cddr+_gmp cddr+])
 AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD+ binary.])
 if test -z "$CDD"; then
   AC_MSG_ERROR([The `cddr+' binary from CDD+ is required for LattE.])			
