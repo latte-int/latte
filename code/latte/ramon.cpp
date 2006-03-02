@@ -44,6 +44,16 @@ listVector* createListVector(vec_ZZ v) {
             }
         }
 /* ----------------------------------------------------------------- */
+void freeListVector( listVector* p )
+{
+  while (p != NULL) {
+    listVector *rest = p->rest;
+    delete p;
+    p = rest;
+  }
+}
+
+/* ----------------------------------------------------------------- */
 vec_ZZ copyVector(vec_ZZ v, int numOfVars) {
   int i;
   vec_ZZ w;
