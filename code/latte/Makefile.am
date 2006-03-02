@@ -20,7 +20,7 @@ liblatte_a_SOURCES = \
 	timing.cpp dual.cpp PolyTree.cpp RudyResNTL.cpp \
 	ResSingle.cpp printsingle.cpp IntegralHull.cpp ReadingFile.cpp \
 	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
-	banner.cpp \
+	banner.cpp convert.cpp \
 	todd/gmp_pow.cpp todd/todd-expansion.cpp \
 	latte_gmp.cpp		\
 	ExponentialSubst.cpp
@@ -35,6 +35,7 @@ noinst_HEADERS =							\
 	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
 	genFunction/piped.h vertices/cdd.h				\
 	todd/gmp_pow.h todd/todd-expansion.h				\
+	convert.h							\
 	latte_gmp.h latte_ntl.h						\
 	ExponentialSubst.cpp
 
