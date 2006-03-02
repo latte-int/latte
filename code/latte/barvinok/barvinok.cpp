@@ -298,7 +298,10 @@ int barvinok_NO_LONGER_IN_USE(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniC
  }
 
 
-
+/* Likewise barvinok_Single, but the cone is given by an instance of class Cone. */
+int
+barvinok_DFS(Cone *cone, Single_Cone_Parameters *Parameters,
+	     rationalVector *vertex);
 
 int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,

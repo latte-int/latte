@@ -19,7 +19,6 @@
 #include "../print.h"
 #include "../cone.h"
 #include "convert.h"
-#include "Cone.h"
 #include "barvinok.h"
 #include "Triangulation.h"
 

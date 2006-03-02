@@ -19,7 +19,6 @@
 #include <math.h>
 #include "latte_ntl.h"
 #include "Triangulation.h"
-#include "Cone.h"
 #include "../flags.h"
 #include <string.h>
 #include <stdio.h>
@@ -172,8 +171,8 @@ void readCDDicdFileRudy(int & face2, vec_ZZ & numOfPoints, mat_ZZ & Result) {
 }
 /* ----------------------------------------------------------------- */
 int Triangulation(const mat_ZZ & Mat, const int & m, const int & n, 
-		  char* a, list< int >& List) {
-  int seed;
+		  char* a, list< int >& List)
+{
   vec_ZZ neg;
   
   writeCDDextFileRudy(m,n,Mat);

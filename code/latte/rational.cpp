@@ -14,7 +14,6 @@
 #include "myheader.h"
 #include "print.h"
 #include "ramon.h"
-#include "barvinok/Cone.h"
 
 #include <fstream>
 #include <cstdlib>
@@ -73,6 +72,14 @@ rationalVector* normalizeRationalVector(rationalVector *z, int numOfVars) {
   }
   return (z);
 }
+
+/* ----------------------------------------------------------------- */
+static ZZ
+lcm(const ZZ& a, const ZZ& b)
+{
+  return a * ( b / GCD(a, b));
+}
+
 /* ----------------------------------------------------------------- */
 rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector *x, 
 						    rationalVector *y, 

@@ -1,5 +1,4 @@
 #include "myheader.h"
-#include "barvinok/Cone.h"
 #include <fstream>
 
 /* ----------------------------------------------------------------- */

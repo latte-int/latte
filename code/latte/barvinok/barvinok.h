@@ -10,7 +10,6 @@
 #define BARVINOK__H
 
 #include "myheader.h"
-#include "Cone.h"
 #include "flags.h"
 
 /* Do a signed decomposition, modulo lower-dimensional cones, of the
@@ -24,10 +23,6 @@ int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 		rationalVector *vertex);
 
-/* Likewise, but the cone is given by an instance of class Cone. */
-int
-barvinok_DFS(Cone *cone, Single_Cone_Parameters *Parameters,
-	     rationalVector *vertex);
 
 
 #endif

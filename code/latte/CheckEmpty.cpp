@@ -13,7 +13,6 @@
 #include "myheader.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
-#include "barvinok/Cone.h"
 #include "barvinok/ConeDecom.h"
 #include "barvinok/Triangulation.h"
 #include "vertices/cdd.h"
