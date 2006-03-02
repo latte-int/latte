@@ -13,6 +13,6 @@ transformArrayBigVectorToListVector(const mat_ZZ &A,
 				    int numOfVars);
 
 mat_ZZ
-createConeDecMatrix(listCone *cones, int numOfRays, int numOfVars);
+createConeDecMatrix(const listCone *cone, int numOfRays, int numOfVars);
 
 #endif
