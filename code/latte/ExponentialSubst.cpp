@@ -3,6 +3,10 @@
 #include "todd/gmp_pow.h"
 #include "latte_gmp.h"
 #include "todd/todd-expansion.h"
+#include "genFunction/piped.h"
+#include "dual.h"
+#include "cone.h"
+#include "barvinok/ConeDecom.h"
 
 Integer
 scalar_power(const vec_ZZ &generic_vector,
@@ -78,8 +82,8 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
     td /= prod_ray_scalar_products;
     result += convert_ZZ_to_mpz(sum) * td / k_factorial;
   }
-  cout << "Cone contributes: "
-       << cone->coefficient << " * " << result << endl;
+//   cout << "Cone contributes: "
+//        << cone->coefficient << " * " << result << endl;
   return cone->coefficient * result;
 }
 
@@ -97,6 +101,47 @@ computeExponentialResidue(listCone *cones, int numOfVars)
       //cout << "Result: " << result << endl;
       assert(result.get_den()==1);
       return convert_mpz_to_ZZ(result.get_num());
+    }
+    catch (NotGenericException) {};
+  } while (1);
+}
+
+int Exponential_Single_Cone_Parameters::ConsumeCone(listCone *cone)
+{
+  assert(cone->rest == NULL);
+  cone = dualizeBackCones (cone, Number_of_Variables);   	
+  computePointsInParallelepiped(cone, Number_of_Variables);
+  int status = 1;
+  try {
+    result += computeExponentialResidue_Single(generic_vector,
+					       cone, Number_of_Variables);
+  } catch (NotGenericException) {
+    status = -1;
+  }
+  freeListCone(cone);
+  return status;
+}
+
+Integer
+decomposeAndComputeExponentialResidue(listCone *cones, 
+				      Exponential_Single_Cone_Parameters &param)
+{
+  listCone *cone;
+  do {
+    param.generic_vector
+      = guess_generic_vector(param.Number_of_Variables);
+    param.result = 0;
+    try {
+      for (cone = cones; cone != NULL; cone = cone->rest) {
+	int status;
+	status = barvinokDecomposition_Single(cone, &param);
+	if (status < 0)
+	  throw not_generic;  // FIXME: Later replace this return
+			      // value handling by exception.
+      }
+      //cout << "Result: " << param.result << endl;
+      assert(param.result.get_den()==1);
+      return convert_mpz_to_ZZ(param.result.get_num());
     }
     catch (NotGenericException) {};
   } while (1);
