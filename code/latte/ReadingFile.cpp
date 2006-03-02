@@ -169,7 +169,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   }
  
   int * NewIndex;
-  system(REDCHECK_PATH " Check_red &> Check_red.out");
+  system(REDCHECK_PATH " Check_red > Check_red.out 2>&1");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
   if(!in2){
