@@ -1,5 +1,10 @@
 2006-03-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
+	* code/latte/todd/todd-expansion.cpp (taylor_reciprocal): Fix
+	warning shown by -Wall.
+
+2006-03-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
 	This set of changes cleans up several interfaces (notably
 	barvinok.h and ConeDecom.h are now simple and useful) and
 	adds a memory-save mode for the exponential substitution.
