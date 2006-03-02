@@ -27,3 +27,15 @@ int lengthListCone(listCone* LIST) {
   return (len);
 }
 /* ----------------------------------------------------------------- */
+void freeListCone(listCone *list)
+{
+  while (list != NULL) {
+    listCone *rest = list->rest;
+    delete list->vertex;
+    freeListVector(list->rays);
+    freeListVector(list->facets);
+    freeListVector(list->latticePoints);
+    delete list;
+    list = rest;
+  }
+}
