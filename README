@@ -2,9 +2,14 @@ This is a version of LattE, derived from Release 1.2
 
 It requires the following programs and libraries: 
 
+  * GMP, compiled with --enable-cxx
   * NTL
   * CDD+
-  * LRS
+  * cddlib
+  * (optional) LRS
+  * (optional) LiDIA
+
+
 
 
 
