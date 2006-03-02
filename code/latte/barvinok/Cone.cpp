@@ -10,9 +10,10 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include <iostream>
 
 #include "Cone.h"
-
+using namespace std;
 
 int Test_Points(int level, RR (*Min_Max)[2], int dim, mat_RR *A_inverse, vec_RR *point);
 
