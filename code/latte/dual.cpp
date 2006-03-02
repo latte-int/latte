@@ -233,7 +233,9 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 
 static mat_ZZ
 scaled_inverse(const mat_ZZ &W)
-{   
+{
+  // FIXME: The code below is a computation with arbitary-length
+  // floats.  Should use rationals instead!
   mat_RR R, R5;
   int m;
   m = W.NumRows();
@@ -284,30 +286,36 @@ listCone* dualizeBackCones(listCone *cones, int numOfVars)
       Inverse[i] = rays->first;
       rays = rays -> rest;
     }
-    ZZ det = determinant(Inverse);
-    assert(abs(det) == tmp->determinant);
-    Inverse = - transpose(scaled_inverse(Inverse));
-
-    for (i = 0; i < numOfVars; i++) {
-      /* Cancel GCD: */
-      ZZ gcd;
-      int j;
-      for (j = 0; j<numOfVars; j++)
-	gcd = GCD(gcd, Inverse[i][j]);
-      if (gcd != 0 && gcd != 1) {
-	for (j = 0; j<numOfVars; j++)
-	  Inverse[i][j] /= gcd;
-      }
+    ZZ det = tmp->determinant;
+    ZZ new_det;
+    // assert(abs(determinant(Inverse)) == det);
+    if (abs(det) == 1) {
+      Inverse = - transpose(inv(Inverse));
+      new_det = 1;
     }
+    else {
+      Inverse = - transpose(scaled_inverse(Inverse));
+      for (i = 0; i < numOfVars; i++) {
+	/* Cancel GCD: */
+	ZZ gcd;
+	int j;
+	for (j = 0; j<numOfVars; j++)
+	  gcd = GCD(gcd, Inverse[i][j]);
+	if (gcd != 0 && gcd != 1) {
+	  for (j = 0; j<numOfVars; j++)
+	    Inverse[i][j] /= gcd;
+	}
+      }
+      new_det = determinant(Inverse);
+      if (abs(det) > 1) 
+	cout << "Determinant of dual: " << det
+	     << ", primal: " <<  new_det << endl;
+    }
+    tmp->determinant = abs(new_det);
     for(i = 0; i < numOfVars; i++) {
       rays2->first = Inverse[i];
       rays2 = rays2 -> rest;
     }
-    ZZ new_det = determinant(Inverse);
-    if (abs(det) > 1) 
-      cout << "Determinant of dual: " << det
-	   << ", primal: " <<  new_det << endl;
-    tmp->determinant = abs(new_det);
 
     tmp=tmp->rest;
     numOfConesDualized++;
