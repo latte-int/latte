@@ -11,6 +11,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include <cassert>
 #include <math.h>
 #include <time.h>
 
@@ -79,14 +80,14 @@ void MatrixGCD(mat_ZZ & B, long & m){
 void AssignSign_Single( Cone *tmp, Cone *cones){ 
 
   ZZ Det = determinant(tmp->generator);
-  if ((tmp->sign)>0) {
+  if ((tmp->sign) == 1) {
     if((Det * determinant(cones->generator)) >= 0)
       cones->sign = 1;
     else
-      cones->sign = 0;
+      cones->sign = -1;
   } else {
     if((Det * determinant(cones->generator)) >= 0)
-      cones->sign = 0;
+      cones->sign = -1;
     else
       cones->sign = 1;
   }
@@ -95,7 +96,7 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
 /**********************************************************************/
 
 struct PtrCone {
-  bool sign;
+  int sign;
   ZZ determinant;
   listVector *Generator;
 };
@@ -219,14 +220,14 @@ int barvinok_NO_LONGER_IN_USE(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniC
 
      for(int i = 0; i < m; i++) {
        //This is AssignSign(tmp, cones1[i]): 
-       if ((tmp.sign)>0) {
+       if ((tmp.sign) == 1) {
 	 if((Det * Dets[i]) >= 0)
 	   cones1[i].sign = 1;
 	 else
-	   cones1[i].sign = 0;
+	   cones1[i].sign = -1;
        } else {
 	 if((Det * Dets[i]) >= 0)
-	   cones1[i].sign = 0;
+	   cones1[i].sign = -1;
 	 else
 	   cones1[i].sign = 1;
        }
@@ -339,15 +340,12 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 listCone* transformRudyListConeIntoRamonListCone_Single( PtrCone RudyCone,
 						 int numOfVars) 
 {
-  int s;
   listCone *cones;
 
   	cones=createListCone();
-  	
-  	s = RudyCone.sign;
-	if (s==0) s=-1;
 
-	cones->coefficient=s;
+	assert(abs(RudyCone.sign) == 1);
+	cones->coefficient = RudyCone.sign;
 	cones->determinant = RudyCone.determinant;
 	cones->rays = RudyCone.Generator;
   return (cones);

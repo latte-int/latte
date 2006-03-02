@@ -20,20 +20,18 @@ using namespace std;
 
 class Cone {
 public:
-  bool sign;
+  int sign;
   mat_ZZ generator;
   Cone(){
-  sign = 0;
+    sign = -1;
   }
   Cone( const Cone& cone ){
-     mat_ZZ one = cone.generator;
-     generator = one;
-/*       int onesign; */
+     generator = cone.generator;
      sign = cone.sign;
-     }
+  }
   ~Cone(){
      generator.kill();
-     sign = 0;}
+  }
   friend Cone Equal(const Cone & cone){
   Cone tmp;
   tmp.generator = cone.generator;
