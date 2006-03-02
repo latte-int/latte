@@ -719,7 +719,7 @@ listCone* computeVertexConesFromVrep(char* fileName, listVector* matrix,
  // inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices and edges with cdd...";
-  system("./ComputeAdjacency latte_cdd.ext &> latte_cdd.jnk");
+  system("./ComputeAdjacency latte_cdd.ext > latte_cdd.jnk 2>&1");
   cout << "done.\n\n";
   //  CreatExtEadFile();
    strcpy(command,"cp latte_cdd.ext ");
