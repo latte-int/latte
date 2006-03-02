@@ -26,7 +26,7 @@ liblatte_a_SOURCES = \
 	ExponentialSubst.cpp
 
 noinst_HEADERS =							\
-	CheckEmpty.h CheckRedundant.h 					\
+	CheckEmpty.h 		 					\
 	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
 	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
 	myheader.h preprocess.h print.h ramon.h rational.h timing.h	\
