@@ -32,13 +32,6 @@ struct listVector {
   struct listVector *rest;
 };
 
-typedef struct PtrCone {
-  bool sign;
-  ZZ determinant;
-  listVector *Generator;
-}
-PtrCone;
-
 typedef struct rationalVector {
   vec_ZZ enumerator;
   vec_ZZ denominator;

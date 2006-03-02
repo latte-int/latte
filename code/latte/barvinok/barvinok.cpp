@@ -75,22 +75,6 @@ void MatrixGCD(mat_ZZ & B, long & m){
 
 }
 /**********************************************************************/
-void AssignSign(const Cone& tmp, Cone & cones){ 
-
-  ZZ Det = determinant(tmp.generator);
-  if ((tmp.sign)>0) {
-    if((Det * determinant(cones.generator)) >= 0)
-      cones.sign = 1;
-    else
-      cones.sign = 0;
-  } else {
-    if((Det * determinant(cones.generator)) >= 0)
-      cones.sign = 0;
-    else
-      cones.sign = 1;
-  }
-
-}
 
 void AssignSign_Single( Cone *tmp, Cone *cones){ 
 
@@ -109,6 +93,12 @@ void AssignSign_Single( Cone *tmp, Cone *cones){
 }
 
 /**********************************************************************/
+
+struct PtrCone {
+  bool sign;
+  ZZ determinant;
+  listVector *Generator;
+};
 
 /// FIXME: Scheduled for removal.
 //
