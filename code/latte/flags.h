@@ -26,22 +26,30 @@ struct BarvinokParameters {
   // further.  Set to 1 to subdivide until we reach unimodular cones
   // only.
   int max_determinant;
+  // A file name that is used for constructing file names for
+  // temporary and semi-temporary files.
+  char *File_Name;
+  // Ambient dimension.
+  int Number_of_Variables;
 };
 
-// Later we will reduce the slots in this class and use further
-// subclassing for the individual computation modes.  For instance,
-// Taylor_Expansion_Result is only used in the "dual" method.
-// -- mkoeppe
-
 class Single_Cone_Parameters : public BarvinokParameters {
- public:
-	listCone	*Cone; // The master cone to be decomposed.
-	ZZ		Total_Uni_Cones;
-	ZZ		Current_Simplicial_Cones_Total;
-	ZZ		Max_Simplicial_Cones_Total;
-	int		Number_of_Variables;
-	unsigned int	Flags;
-	virtual int ConsumeCone(listCone *cone) = 0;
+public:
+  // Parameters that control the computation.
+  unsigned int	Flags;
+public:
+  // Data that are used during the computation.
+  //listCone	*Cone;		// The master cone to be decomposed.
+  int		Cone_Index;	/* Its index in the list of all master
+				   cones; only used for naming
+				   triangulation caches. */
+public:
+  // Statistics collected during the computation.
+  ZZ		Total_Uni_Cones;
+  ZZ		Current_Simplicial_Cones_Total;
+  ZZ		Max_Simplicial_Cones_Total;
+public:
+  virtual int ConsumeCone(listCone *cone) = 0;
 };
 
 // The traditional LattE mode: Simply collect all subdivided cones
@@ -55,6 +63,11 @@ public:
 
 // The "Memory Save" mode: Perform residue calculations immediately
 // at each subdivided cone in the tree, don't store the cones.
+//
+// FIXME: Later we will reduce the slots in this class and use further
+// subclassing for the individual computation modes.  For instance,
+// Taylor_Expansion_Result is only used in the "dual" method.  -- mkoeppe
+
 class Standard_Single_Cone_Parameters : public Single_Cone_Parameters {
  public:
 	int		Degree_of_Taylor_Expansion;
