@@ -299,7 +299,7 @@ int main(int argc, char *argv[]) {
     switch (params.substitution) {
     case BarvinokParameters::PolynomialSubstitution:
       decomposeCones_Single(cones,numOfVars, degree, flags, fileName);
-      // FIXME: Where does number_of_lattice_points come from?
+      // FIXME: This outputs the number of lattice points itself.
       break;
     case BarvinokParameters::ExponentialSubstitution:
       {
@@ -309,15 +309,15 @@ int main(int argc, char *argv[]) {
 	exp_param.File_Name = fileName;
 	number_of_lattice_points
 	  = decomposeAndComputeExponentialResidue(cones, exp_param);
+	cout << endl << "****  The number of lattice points is: "
+	     << number_of_lattice_points
+	     << "  ****" << endl << endl;
 	break;
       }
     default:
       cerr << "Unknown BarvinokParameters::substitution" << endl;
       abort();
     }
-    cout << endl << "****  The number of lattice points is: "
-	 << number_of_lattice_points
-	 << "  ****" << endl << endl;
 
  if(rationalCone[0] == 'y') {
    strcpy(command, "mv ");
