@@ -16,8 +16,6 @@
 
 int Test_Points(int level, RR (*Min_Max)[2], int dim, mat_RR *A_inverse, vec_RR *point);
 
-ZZ lcm(const ZZ& a, const ZZ& b) { return a * ( b / GCD(a, b)); }
-
 ZZ norm(const vec_ZZ& x, long m){
   ZZ normal;
 

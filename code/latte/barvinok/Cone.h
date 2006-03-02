@@ -60,10 +60,7 @@ public:
 vec_ZZ ComputeOmega( const mat_ZZ & B, long m, int x, int y);
 vec_ZZ ComputeOmega_2(mat_ZZ &B, long m);
 
-
-
 #endif
 
-ZZ lcm(const ZZ&, const ZZ&);
 
 
