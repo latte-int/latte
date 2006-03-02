@@ -24,6 +24,7 @@
 #include "../RudyResNTL.h"
 #include "../PolyTree.h"
 #include "../flags.h"
+#include "convert.h"
 #include "dual.h"
 #include "genFunction/piped.h"
 
@@ -78,22 +79,6 @@ listCone* readListCone(rationalVector *vertex, int numOfVars) {
   return (cones->rest);
 }
 /* ----------------------------------------------------------------- */
-mat_ZZ createConeDecMatrix(listCone *cones, int numOfRays, int numOfVars) {
-  int i;
-  mat_ZZ mat;
-  listVector *tmp;
-
-  mat.SetDims(numOfRays, numOfVars);
-
-  tmp=cones->rays;
-  for (i=0; i<numOfRays; i++) {
-    mat[i]=copyVector(tmp->first,numOfVars);
-    tmp=tmp->rest;
-  }
-  //removeListVector(cones->rays);
-  return (mat);
-}
-/* ----------------------------------------------------------------- */
 
 Collecting_Single_Cone_Parameters::Collecting_Single_Cone_Parameters()
   : Decomposed_Cones(NULL)
@@ -112,33 +97,25 @@ listCone*
 decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
 	       char *File_Name, int max_determinant)
 {
-  int numOfConesDecomposed,numOfAllCones,numOfRays, numOfUniCones = 0;
-  mat_ZZ mat;
+  int numOfConesDecomposed,numOfAllCones;
   listCone *tmp;
 
   Collecting_Single_Cone_Parameters parameters;
   parameters.Flags = Flags;
   parameters.Number_of_Variables = numOfVars;
   parameters.max_determinant = max_determinant;
+  parameters.File_Name = File_Name;
 
   cout << "Decomposing all cones.\n";
   numOfConesDecomposed=0;
   numOfAllCones=lengthListCone(cones);
 
-  int Cone_Index = 0;
-  
+  parameters.Cone_Index = 0;
   tmp=cones;
   while (tmp) {
-    numOfRays=lengthListVector(tmp->rays);
-    mat=createConeDecMatrix(tmp,numOfRays,numOfVars);
-
-    parameters.Cone = tmp;
-
-    
-    int result = barvinokDecomposition_Single(mat, numOfRays,
-					      numOfUniCones, tmp->vertex,
-					      &parameters, File_Name,
-					      Cone_Index);
+    //parameters.Cone = tmp;
+    int result = barvinokDecomposition_Single(tmp,
+					      &parameters);
     assert(result >= 0);
     
     tmp=tmp->rest;
@@ -146,7 +123,7 @@ decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
     if (numOfConesDecomposed==50*(numOfConesDecomposed/50)) {
       cout << numOfConesDecomposed << " / " << numOfAllCones << " done.\n";
     }
-    Cone_Index++;
+    parameters.Cone_Index++;
   }
 
   cout << "All cones have been decomposed.\n";
@@ -177,7 +154,7 @@ int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 
 void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned int flags, char *File_Name) 
 {
-	int numOfConesDecomposed,numOfAllCones,numOfRays, numOfUniCones = 0;
+	int numOfConesDecomposed,numOfAllCones,numOfRays;
   	mat_ZZ mat;
   	listCone *tmp;
 	/*  char command[127]; */
@@ -204,7 +181,7 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 	Barvinok_Parameters->Number_of_Variables = numOfVars;
 	Barvinok_Parameters->max_determinant = 1;
 	Barvinok_Parameters->Random_Lambda = new ZZ [numOfVars];
-
+	Barvinok_Parameters->File_Name = File_Name;
 	Barvinok_Parameters->Controller = new Node_Controller(numOfVars + 1, degree);			
 	
 	cout << "Number of cones: " << numOfAllCones << endl;
@@ -232,17 +209,16 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 		
 		Barvinok_Parameters->Total_Lattice_Points = 0;
 		Barvinok_Parameters->Total_Uni_Cones = 0;
-	
-		int Cone_Index = 0;
+		Barvinok_Parameters->Cone_Index = 0; 
 		
   		while (tmp) 
 		{
     			numOfRays=lengthListVector(tmp->rays);
     			mat=createConeDecMatrix(tmp,numOfRays,numOfVars);
-			Barvinok_Parameters->Cone = tmp;
+			//Barvinok_Parameters->Cone = tmp;
 				
 			// reminder, set vertex, pass vertex
-			if(barvinokDecomposition_Single(mat,numOfRays, numOfUniCones, tmp->vertex,Barvinok_Parameters, File_Name, Cone_Index) == -1)
+			if(barvinokDecomposition_Single(mat, tmp->vertex,Barvinok_Parameters) == -1)
 			{
 				Success = 0;		
 				break;
@@ -257,7 +233,7 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 			
   			tmp = tmp->rest;
 			
-			Cone_Index++;
+			Barvinok_Parameters->Cone_Index++;
 		}
 		
 		if (Success == 0)
