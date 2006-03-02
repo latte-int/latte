@@ -21,6 +21,7 @@
 #include "../ramon.h"
 #include "../RudyResNTL.h"
 #include "rational.h"
+#include "convert.h"
 
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
@@ -77,222 +78,10 @@ void MatrixGCD(mat_ZZ & B, long & m){
 }
 /**********************************************************************/
 
-void AssignSign_Single( Cone *tmp, Cone *cones){ 
-
-  ZZ Det = determinant(tmp->generator);
-  if ((tmp->sign) == 1) {
-    if((Det * determinant(cones->generator)) >= 0)
-      cones->sign = 1;
-    else
-      cones->sign = -1;
-  } else {
-    if((Det * determinant(cones->generator)) >= 0)
-      cones->sign = -1;
-    else
-      cones->sign = 1;
-  }
-}
-
-/**********************************************************************/
-
-struct PtrCone {
-  int sign;
-  ZZ determinant;
-  listVector *Generator;
-};
-
-/// FIXME: Scheduled for removal.
-//
-// Left here only as a reminder because this code avoids some
-// determinant computations, in contrast to barvinok_DFS.
-// Also has some nice comments.
-
-int barvinok_NO_LONGER_IN_USE(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniCones,
-	     int max_determinant)
-{
-   long m, n;
-  m = B.NumRows();
-
-
-  n = B.NumCols();
-
-  vec_ZZ v;
-   v.SetLength(m);
-
-   PtrCone tmpPtrCone;
-
-   if( m != n)
-   {
-       cerr << "Input must be square. " << endl;
-       exit(2);
-   }
-
-   ZZ D = determinant(B);
-
-         if( D == 0)
-   {
-       cerr << "Input must be linearly independent. " << endl;
-       exit(3);
-   }
-
-   vec_ZZ Z, Z2;
-   ZZ Det;
-
-   /* The following routine is to get the minimal
-      integral generators for the cone.  */
-
-   MatrixGCD(B, m);
-
-   int  width = 0;
-   list< Cone > QNonUni;
-
-   Cone cones1[m];
-   Cone dummy;
-   dummy.generator = B;
-   dummy.sign = 1;
-
-   ZZ dummy_determinant = abs(determinant(dummy.generator));
-   if(dummy_determinant == 1){
-     listVector *L, *endL;
-
-     L=createListVector(dummy.generator[0]);
-     endL=L;
-
-     for (int k=1; k<m; k++) {
-       v=dummy.generator[k];
-       endL->rest = createListVector(v);
-       endL = endL->rest;
-     }
-     tmpPtrCone.Generator = L;
-     tmpPtrCone.sign = 1;
-     tmpPtrCone.determinant = dummy_determinant;
-     Uni.push_back(tmpPtrCone);
-   }
-
-   else
-     QNonUni.push_back(dummy);
-   int counter = 0, count = 0;
-   Cone tmp;
-   
-   while(!QNonUni.empty()){
-     tmp = Equal(QNonUni.back());  
-     QNonUni.pop_back();
-     
-     /* ComputeOmega(const mat_ZZ &, long& ) computes
-	an integral vector in the parallelogram. */
-     
-     Z = ComputeOmega(tmp.generator, m, 0, 0);
-     
-     Z = CheckOmega(tmp.generator, Z);
-     /* Copy the original matrix into m matrices. */
-     
-     for(int i = 0; i < m; i++){
-       cones1[i].generator = tmp.generator;
-     }
-     /* Copy the vector which calculated into each ith row
-	of each matrix (we are dealing with the row space). */
-     
-     for(int i = 1; i <= m; i++)
-       for(int j = 1; j <= m; j++)
-         cones1[i-1].generator(i, j) = Z(j);
-     
-     /* Compute a determinant of each matrices of an array.
-	If the product of the determinant of the tmp and a determinant
-	if each matrix is negative, we assign negative sign.  Otherwise,
-	we assign positive to each matrix. */
-    
-     Det = determinant(tmp.generator);
-
-     ZZ *Dets = new ZZ[m];
-     for(int i = 0; i < m; i++)
-       Dets[i] = determinant(cones1[i].generator);
-
-     for(int i = 0; i < m; i++){
-       if(abs(Dets[i]) >= abs(Det)){
-         cout << "Second loop... " << endl;
-	 Z = ComputeOmega(tmp.generator, m, 2, 2);
-	 Z = CheckOmega(tmp.generator, Z);
-	 for(int k = 1; k <= m; k++)
-	   for(int j = 1; j <= m; j++)
-	     cones1[k-1].generator(k, j) = Z(j);
-       }
-     }
-
-     for(int i = 0; i < m; i++) {
-       //This is AssignSign(tmp, cones1[i]): 
-       if ((tmp.sign) == 1) {
-	 if((Det * Dets[i]) >= 0)
-	   cones1[i].sign = 1;
-	 else
-	   cones1[i].sign = -1;
-       } else {
-	 if((Det * Dets[i]) >= 0)
-	   cones1[i].sign = -1;
-	 else
-	   cones1[i].sign = 1;
-       }
-     }
-
-#ifdef SHOWDETS
-     cout << "Determinant: " << Det << " -> ";
-     for(int i = 0; i < m; i++)
-       cout << Dets[i] << " ";
-     cout << endl;
-#endif
-     
-     /* If a matrix is unimodular, then we put a matrix into QUni queue.
-	Otherwise, we put it inot QNonUni queue. */
-     
-     for(int i = 0; i < m; i++) {
-       ZZ Det_i = Dets[i];
-       if (Det_i == 0) {
-	 /* do nothing */
-       }
-       else if(abs(Det_i) <= max_determinant) {
-	 listVector *L, *endL;
-
-	 L=createListVector(cones1[i].generator[0]);
-	 endL=L;
-
-	 for (int k=1; k<m; k++) {
-	   endL->rest = createListVector(cones1[i].generator[k]);
-	   endL = endL->rest;
-	 }
-	 tmpPtrCone.Generator = L;
-	 tmpPtrCone.sign = cones1[i].sign;
-	 tmpPtrCone.determinant = abs(Det_i);
-	 Uni.push_back(tmpPtrCone);
-	 numOfUniCones++;
-	 if((numOfUniCones % 1000) == 0)
-	   cout << numOfUniCones << " unimodular cones are done. " << endl;
-	 width++;
-       }
-       else if(abs(Det_i) < abs(Det))
-	 QNonUni.push_back(cones1[i]);
-     
-       else
-	 {
-	   cerr << "Error!  We cannot have smaller determinant!" << endl;
-	   exit(5);}
-     }
-     
-      for(int i = 0; i < m; i++) cones1[i].generator.kill();
-      delete[] Dets;
-     Z.kill();
-     Z2.kill();
-     tmp.generator.kill();
-     counter++;
-     count = 0;  
-   }
-   for(int i = 0; i < m; i++) cones1[i].generator.kill();
-   return width;
- }
-
-
-/* Likewise barvinok_Single, but the cone is given by an instance of class Cone. */
+/* Likewise barvinok_Single, but the cone is given as a listCone;
+   the function consumes the cone. */
 int
-barvinok_DFS(Cone *cone, Single_Cone_Parameters *Parameters,
-	     rationalVector *vertex);
+barvinok_DFS(listCone *cone, Single_Cone_Parameters *Parameters);
 
 int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
@@ -323,225 +112,178 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 
    	MatrixGCD(B, m);
 
-
-   	Cone *dummy = new Cone;
-   	dummy->generator = B;
-   	dummy->sign = 1;
+   	listCone *dummy = createListCone();
+   	dummy->coefficient = 1;
+	dummy->determinant = D;
+	dummy->vertex = copyRationalVector(vertex);
+	dummy->rays = transformArrayBigVectorToListVector(B, m, n);
 
 	int result;
-	result = barvinok_DFS(dummy, Parameters, vertex);
+	result = barvinok_DFS(dummy, Parameters);
 
-	dummy->generator.kill ();
-	delete dummy;
-	
 	return result;
 }
 	
-listCone* transformRudyListConeIntoRamonListCone_Single( PtrCone RudyCone,
-						 int numOfVars) 
+/* Let GENERATOR and MAT be the same matrix, with determinant DET.
+   Copy the vector Z into each row of the matrix (we are dealing with
+   the row space) and compute the determinant of the resulting matrix;
+   store the determinants in DETS[].  When any determinant is
+   larger-or-equal than DET in absolute value, stop the computation
+   and return false.  Otherwise return true.
+*/
+static bool
+computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
+			    const vec_ZZ &Z, int m, 
+			    mat_ZZ &mat, ZZ Dets[])
 {
-  listCone *cones;
-
-  	cones=createListCone();
-
-	assert(abs(RudyCone.sign) == 1);
-	cones->coefficient = RudyCone.sign;
-	cones->determinant = RudyCone.determinant;
-	cones->rays = RudyCone.Generator;
-  return (cones);
+  ZZ absDet = abs(Det);
+  for (int i = 1; i <= m; i++) {
+    /* Copy in the row */
+    for(int j = 1; j <= m; j++)
+      mat(i, j) = Z(j);
+    /* Compute and store the determinant. */
+    determinant(Dets[i - 1], mat);
+    /* Restore the original row */
+    for(int j = 1; j <= m; j++)
+      mat(i, j) = generator(i, j);
+    if (abs(Dets[i - 1]) >= absDet) 
+      return false;
+  }
+  return true;
 }
 
+/* Decompose the cone spanned by GENERATOR (which has determinant DET)
+   according to Barvinok's theory into M (the dimension) many CONES
+   and store their determinants in DETS.
 
-int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters, rationalVector *vertex)
+   Entries with Det[i] == 0 have Cones[i] == NULL (we don't generate
+   lower-dimensional cones).
+*/
+static void
+barvinokStep(const listCone *Cone, 
+	     listCone *Cones[], ZZ Dets[],
+	     int m)
+{
+  mat_ZZ generator = createConeDecMatrix(Cone, m, m);
+  /* ComputeOmega(const mat_ZZ &, long& ) computes
+     an integral vector in the parallelogram. */
+  vec_ZZ Z = ComputeOmega(generator, m, 0, 0);
+  Z = CheckOmega(generator, Z);
+     
+  mat_ZZ mat = generator;
+  bool success
+    = computeAndCheckDeterminants(generator, Cone->determinant, Z,
+				  m, mat, Dets);
+  if (!success) {
+    cout << "Second loop... " << endl;
+    Z = ComputeOmega(generator, m, 2, 2);
+    Z = CheckOmega(generator, Z);
+    success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
+					  m, mat, Dets);
+    assert(success);
+  }
+
+  for(int i = 0; i < m; i++) {
+    if (Dets[i] == 0)
+      Cones[i] = NULL;
+    else {
+      Cones[i] = createListCone();
+      {
+	/* Create the rays: */
+	/* Copy in the row */
+	for(int j = 1; j <= m; j++)
+	  mat(i+1, j) = Z(j);
+	Cones[i]->rays
+	  = transformArrayBigVectorToListVector(mat, m, m);
+	/* Restore the original row */
+	for(int j = 1; j <= m; j++)
+	  mat(i+1, j) = generator(i+1, j);
+      }
+      Cones[i]->determinant = Dets[i];
+      {
+	/* Compute the sign: */
+	long signDet = sign(Cone->determinant);
+	long signDeti = sign(Dets[i]);
+	Cones[i]->coefficient = Cone->coefficient * signDet * signDeti;
+      }
+      Cones[i]->vertex = copyRationalVector(Cone->vertex);
+    }
+  }
+}
+
+int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 {
        	
-    	ZZ Det = abs(determinant(C->generator));
-    	int result = 1;
+  ZZ absDet = abs(C->determinant);
        	
-     	if(Det == 0)
-     	{
-	 	//cout << "barvinok_DFS: Det = 0." << endl;
-		return 1;	
-   	  }		     
-    	 else if (Det <= Parameters->max_determinant)
-    	 {
-	 	//cout << "barvinok_DFS: Cone is unimod " << endl;
-		
-	   Parameters->Total_Uni_Cones += 1;
-
-		if ( Parameters->Total_Uni_Cones % 1000 == 0)
-			cout << Parameters->Total_Uni_Cones << " unimodular cones done." << endl;
-		 
-		listVector *L, *endL;
-   		vec_ZZ v;
-		PtrCone tmpPtrCone;
-	
-		//cout << "barvinok_DFS: Setting NumRows...";	
-		int m = C->generator.NumRows(); 
-		//cout << "done." << endl;
-	
-		v.SetLength(m);
-	
-		//cout << "barvinok_DFS: Creating list... ";
-		L=createListVector(C->generator[0]);
-		//cout << "done." << endl;
-  		endL=L;
-
- 	 	for (int k=1; k<m; k++) 
-		{
- 	   		v=C->generator[k];
- 	   		endL->rest = createListVector(v);
- 	   		endL = endL->rest;
- 	 	}
-      	
-		tmpPtrCone.Generator = L;
-		tmpPtrCone.determinant = Det;
-		
-		// if something don't work, check this!
-      		tmpPtrCone.sign = C->sign;
-
-		listCone *Cone;
-
-		//cout << "barvinok_DFS: Transforming Rudy list to Raymond list...";
-		Cone = transformRudyListConeIntoRamonListCone_Single (tmpPtrCone, Parameters->Number_of_Variables );
-		Cone->vertex = copyRationalVector(vertex);
-		//cout << "done." << endl;
-
-		result = Parameters->ConsumeCone(Cone);
-		return result;
-  	} 		     
-     
-    
-	//cout << "barvinok_DFS: non-uni cone." << endl;
-
-     
-     	vec_ZZ Z;    
-     	long m = C->generator.NumRows();
-     	//long n = C->generator.NumCols();
-
-     	ZZ Dets[m];	     
-     	Cone  *cones1 [m];
-     
-     	Z = ComputeOmega(C->generator, m, 0, 0);
-     
-     	Z = CheckOmega(C->generator, Z);
-     
-     	/* Copy the original matrix into m matrices. */
-     
-     	for(int i = 0; i < m; i++)
-     	{
-		cones1[i] = new Cone;	
-      	 	cones1[i]->generator = C->generator;
-     	}
-     
-     	/* Copy the vector which calculated into each ith row
-	of each matrix (we are dealing with the row space). */
-     
-     	for(int i = 1; i <= m; i++)
-       		for(int j = 1; j <= m; j++)
-       		{       
-         		cones1[i-1]->generator(i, j) = Z(j);
-       		} 
-     
-     	/* Compute a determinant of each matrices of an array.
-	If the product of the determinant of the tmp and a determinant
-	if each matrix is negative, we assign negative sign.  Otherwise,
-	we assign positive to each matrix. */
-    
-
-     
-     
-     	for(int i = 0; i < m; i++) AssignSign_Single(C, (cones1[i]));
-     
-     	for(int i = 0; i < m; i++)
-     	{
-       		if(abs(determinant(cones1[i]->generator)) >= Det)
-		{
-         		cout << "Second loop... " << endl;
-	 		Z = ComputeOmega(C->generator, m, 2, 2);
-	 		Z = CheckOmega(C->generator, Z);
-	 		for(int k = 1; k <= m; k++)
-	   			for(int j = 1; j <= m; j++)
-	     				cones1[k-1]->generator(k, j) = Z(j);
-
-	 		for(int s = 0; s < m; s++)  
-				AssignSign_Single(C, (cones1[s]));
-       		}
-       
-     	}
-
-     	ZZ max;
-     	max = -1;
-
-#ifdef SHOWDETS
-	cout << "Determinant " << Det << " -> ";
-#endif
-     	for(int i = 0; i < m; i++)
-     	{
-		Dets[i] = abs(determinant(cones1[i]->generator));
-#ifdef SHOWDETS
-		cout << Dets[i] << ", ";
-#endif
-	     	if(Dets[i] > max)
- 			max = Dets[i];
-     	}
-#ifdef SHOWDETS
-	cout << endl;
-#endif
-     
-     	int current;
-     	ZZ min;
-
-
-	Parameters->Current_Simplicial_Cones_Total += m;
-	
-	if (Parameters->Current_Simplicial_Cones_Total > Parameters->Max_Simplicial_Cones_Total)
-	  Parameters->Max_Simplicial_Cones_Total = Parameters->Current_Simplicial_Cones_Total;
-	
-	
-     	//cout << "barvinok_DFS: max = " << max << endl;
-     	for(int i = 0; i < m; i++)
-     	{
-	
-		min = max + 1;
-	     
-		for(int j = 0; j < m; j++)
-		{
-			if(Dets[j] < min && Dets[j] != -1)
-			{
-				current = j;
-				min = Dets[j];
-			}
-		}
-
-	
-	//cout << "barvinok_DFS: current = " << current << "   Dets[current] = " << Dets[current] << endl;	
-   	if(barvinok_DFS(cones1[current], Parameters, vertex) == -1)
-		result = -1;
-	
-      	cones1[current]->generator.kill();
-	Dets[current] = -1;
-	delete cones1[current];
-
-	Parameters->Current_Simplicial_Cones_Total--;
-	//cout << " - " ;
-	
-     	}
+  if (absDet == 0) {
+    //cout << "barvinok_DFS: Det = 0." << endl;
+    return 1;	
+  }		     
+  else if (absDet <= Parameters->max_determinant) {
+    Parameters->Total_Uni_Cones += 1;
+    if ( Parameters->Total_Uni_Cones % 1000 == 0)
+      cout << Parameters->Total_Uni_Cones
+	   << " unimodular cones done." << endl;
+    return Parameters->ConsumeCone(C);
+  } 		     
   
-    	//cout << "barvinok_DFS: Done with DFS on " << m << " items." << endl; 
-      
-     	Z.kill();
+  //cout << "barvinok_DFS: non-uni cone." << endl;
      
-     	//delete [] cones1;
+  int result = 1;
+  long m = Parameters->Number_of_Variables;
+  mat_ZZ generator = createConeDecMatrix(C, m, m);
 
-     	return result;
-   
- }
+  ZZ Dets[m];	     
+  listCone *cones1 [m];
 
+  barvinokStep(C, cones1, Dets, m);
+  
+  ZZ max;
+  max = -1;
 
+#ifdef SHOWDETS
+  cout << "Determinant " << Det << " -> ";
+#endif
+  for(int i = 0; i < m; i++)
+    {
+      Dets[i] = abs(Dets[i]);
+#ifdef SHOWDETS
+      cout << Dets[i] << ", ";
+#endif
+      if(Dets[i] > max)
+	max = Dets[i];
+      else if (Dets[i] == 0)
+	Parameters->Current_Simplicial_Cones_Total ++;
+    }
+#ifdef SHOWDETS
+  cout << endl;
+#endif
+     
+  int current;
+  ZZ min;
 
-
-
-
-
+  if (Parameters->Current_Simplicial_Cones_Total > Parameters->Max_Simplicial_Cones_Total)
+    Parameters->Max_Simplicial_Cones_Total = Parameters->Current_Simplicial_Cones_Total;
+	
+  do {
+    min = max + 1;
+    current = -1;
+    for(int j = 0; j < m; j++) {
+      if(Dets[j] < min && Dets[j] != 0)
+	{
+	  current = j;
+	  min = Dets[j];
+	}
+    }
+    if (current >= 0) {
+      Dets[current] = 0; // mark done
+      if(barvinok_DFS(cones1[current], Parameters) == -1)
+	result = -1;
+      Parameters->Current_Simplicial_Cones_Total--;
+    }
+  } while (current >= 0 && result == 1);
+  freeListCone(C);
+  return result;
+}
 
