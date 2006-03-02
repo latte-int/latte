@@ -11,35 +11,17 @@
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
+#include <cassert>
 #include <string>
 
 #include "../myheader.h"
 #include "../ramon.h"
 #include "../print.h"
 #include "../cone.h"
+#include "convert.h"
 #include "Cone.h"
 #include "barvinok.h"
 #include "Triangulation.h"
-
-/* ----------------------------------------------------------------- */
-listVector* transformArrayBigVectorToListVector(mat_ZZ A, int numOfVectors, 
-						int numOfVars) {
-  int i;
-  vec_ZZ v;
-  listVector *L, *endL;
-
-  v=createVector(numOfVars);
-  L=createListVector(v);
-  endL=L;
-
-  for (i=0; i<numOfVectors; i++) {
-    v=A[i];
-    endL->rest = createListVector(v);
-    endL = endL->rest;
-  }
-
-  return (L->rest);
-}
 
 /*
   The first step is to triangulate a cone into simplicial cones.
@@ -48,36 +30,24 @@ listVector* transformArrayBigVectorToListVector(mat_ZZ A, int numOfVectors,
 */
 
 /* ----------------------------------------------------------------- */
-int barvinokDecomposition_Single(const mat_ZZ Mat, int m, int & numOfUniCones, rationalVector *vertex, Single_Cone_Parameters *Parameters, char *File_Name, int Cone_Index) 
+int barvinokDecomposition_Single(const mat_ZZ &Mat, rationalVector *vertex,
+				 Single_Cone_Parameters *Parameters) 
 {
-
-  list< PtrCone > Uni;
-
   /* m is the number of vectors and n is the number of dims. */
 
+  int m = Mat.NumRows();
   int n = Parameters->Number_of_Variables;
+  assert(Mat.NumCols() == n);
   
-  //cout << "BarvinokDecomposition_Single Called:  " << endl;
- 
   if((m == 0) || (n == 0)){
     cerr << "The polytope is empty!" << endl;
-    //    system("rm latte_dec");
-    //system("rm core");
     exit(2);
   }
-//      mat_ZZ Mat;
-
-//      Mat.SetDims(m, n);
-
-//      for(int i= 0; i< m; i++)
-//        for(int j = 0; j < n; j++)
-//          conv(Mat[i][j], MatRays[i][j]);
-    
   int Face = 1, Faces = 10000;
   char* s1 = "latte_dec";
   list< int > List;
   if(m != n){
-    Face = Triangulation_Load_Save(Mat, m, n, s1, List, File_Name, Cone_Index, Parameters->Flags);
+    Face = Triangulation_Load_Save(Mat, m, n, s1, List, Parameters->File_Name, Parameters->Cone_Index, Parameters->Flags);
   } /*Call triangulation fun.*/
 
    /*
@@ -111,22 +81,14 @@ int barvinokDecomposition_Single(const mat_ZZ Mat, int m, int & numOfUniCones, r
      simplicial cone into unimodular cones.
 
    */
-   //cout << "BarvinokDecomposition: Number of simplicies = " << Faces << endl;
     for(int i = 0; i < Faces; i++){
       if(IsZero(B[i]) != 1){
-        if ( barvinok_Single(B[i], numOfUniCones, Parameters, vertex) == -1)
+        if ( barvinok_Single(B[i], Parameters, vertex) == -1)
 	{
   		for(int i = 0; i < Faces; i++)
 			B[i].kill ();
 		return -1;
 	}
-	//cout << "BarvinokDecomposition: Current total lattice points (not div by ten pow): " << *(Parameters->Total_Lattice_Points) << endl;
-	
-      	//cout << "BarvinokDecomposition: Taylor Expansion: ";  
-	
-	//for (int j = 0; j <= Parameters->Degree_of_Taylor_Expansion; j++)
-	//	cout << Parameters->Taylor_Expansion_Result[j] << "t^" << j << " ";
-        //cout << endl;	
       	}
       }
 
@@ -136,15 +98,14 @@ int barvinokDecomposition_Single(const mat_ZZ Mat, int m, int & numOfUniCones, r
   return 1;
 }
 
-
-
-
-
-
-
-
-
-
-
-
+int
+barvinokDecomposition_Single (listCone *cone,
+			      Single_Cone_Parameters *Parameters)
+{
+  int numOfVars = Parameters->Number_of_Variables;
+  int numOfRays = lengthListVector(cone->rays);
+  mat_ZZ mat = createConeDecMatrix(cone,numOfRays,numOfVars);
+  return barvinokDecomposition_Single(mat, cone->vertex,
+				      Parameters);
+}
 

@@ -8,14 +8,27 @@
 ************************************************************************/
 #ifndef CONEDECOM__H
 #define CONEDECOM__H
-#include "../PolyTree.h"
-#include "../myheader.h"
-#include "../RudyResNTL.h"
 
-listVector* transformArrayBigVectorToListVector(mat_ZZ A, int numOfVectors,
-						int numOfVars);
+#include "myheader.h"
+#include "flags.h"
 
-int barvinokDecomposition_Single (const mat_ZZ, int Number_of_Rays, int &Number_of_Uni_Cones, rationalVector *Cone_Vertex, Single_Cone_Parameters *, char *File_Name, int Cone_Index);
+/* Do a signed decomposition, modulo lower-dimensional cones, of the
+   polyhedral cone spanned by the ROW VECTORS of B with apex at
+   CONE_VERTEX, until the determinants of all cones are at most
+   PARAMETERS->max_determinant.  (When the cone is not simplicial, we
+   triangulate it first.)
+
+   Call PARAMETERS->ConsumeCone() for each of the small cones.
+*/ 
+int
+barvinokDecomposition_Single (const mat_ZZ &B, rationalVector *Cone_Vertex,
+			      Single_Cone_Parameters *Parameters);
+
+/* Likewise, but the cone is given as a listCone (whose "rest" we
+   ignore). */ 
+int
+barvinokDecomposition_Single (listCone *cone,
+			      Single_Cone_Parameters *Parameters);
 
 #endif
 
