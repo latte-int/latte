@@ -54,7 +54,6 @@ public:
    }
 };
 int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator);
-#endif
 
 rationalVector* createRationalVector(int);
 rationalVector** createArrayRationalVector(int);
@@ -65,3 +64,6 @@ rationalVector* subRationalVector(rationalVector*, rationalVector*, int);
 vec_ZZ constructRay(rationalVector*, rationalVector*, int);
 vec_ZZ* subtractRowFromRow(vec_ZZ*, int, int, int, vec_ZZ*, int);
 rationalVector* solveLinearSystem(vec_ZZ*, vec_ZZ, int, int);
+rationalVector* copyRationalVector(const rationalVector *);
+
+#endif

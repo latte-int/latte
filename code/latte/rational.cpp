@@ -385,3 +385,10 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
   return 1;
 }
 /* ----------------------------------------------------------------- */
+rationalVector* copyRationalVector(const rationalVector *v)
+{
+  rationalVector *w = new rationalVector;
+  w->enumerator = v->enumerator;
+  w->denominator = v->denominator;
+  return w;
+}
