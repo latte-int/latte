@@ -1,5 +1,12 @@
 2006-03-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
+	Version 1.2-mk-0.2
+	
+	* code/latte/dual.cpp (dualizeBackCones): Special case
+	unimodular cones for speed. 
+
+2006-03-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
 	Fixes to get it running on Solaris.
 	
 	* configure.ac: Check for cddr+_gmp in preference of cddr+.
