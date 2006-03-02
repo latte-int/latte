@@ -41,6 +41,7 @@
 #include "CheckEmpty.h"
 
 #include "banner.h"
+#include "convert.h"
 
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
