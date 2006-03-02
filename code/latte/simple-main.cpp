@@ -42,6 +42,7 @@
 #include "CheckEmpty.h" 
 
 #include "banner.h"
+#include "convert.h"
 #include "ExponentialSubst.cpp"
 
 ZZ computeNumberOfLatticePoints(listCone *cones, int numOfVars,
@@ -293,31 +294,30 @@ int main(int argc, char *argv[]) {
     /* Compute triangulation or decomposition of each vertex cone. */
 
     cones=dualizeCones(cones,numOfVars);
-    cones=decomposeCones(cones,numOfVars, flags, fileName,
-			 params.max_determinant);
-    cones=dualizeBackCones(cones,numOfVars);
 
-    /* Compute points in parallelepipeds, unless we already did using memsave version!  */
-    
-    cout << "Computing the points in the Parallelepiped of the unimodular Cones." << endl;
-    computePointsInParallelepipeds(cones, numOfVars);
-
- if(Print[0] == 'y')
-   printListCone(cones,numOfVars);
-
- cout << "Creating generating function.\n"; 
- //printListVector(templistVec, oldnumofvars); cout << ProjU << endl;
- if(equationsPresent[0] == 'y') {
-   cones = ProjectUp2(cones, oldnumofvars, numOfVars, AA, bb);
-   numOfVars = oldnumofvars;
- }
- //createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);
- //printListCone(cones, numOfVars);
- cout << "Starting final computation.\n";
- cout << endl << "****  The number of lattice points is: "
-      << computeNumberOfLatticePoints(cones, numOfVars, params)
-      << "  ****" << endl << endl;
-
+    Integer number_of_lattice_points;
+    switch (params.substitution) {
+    case BarvinokParameters::PolynomialSubstitution:
+      decomposeCones_Single(cones,numOfVars, degree, flags, fileName);
+      // FIXME: Where does number_of_lattice_points come from?
+      break;
+    case BarvinokParameters::ExponentialSubstitution:
+      {
+	Exponential_Single_Cone_Parameters exp_param;
+	exp_param.max_determinant = params.max_determinant; // FIXME: Upgrade.
+	exp_param.Number_of_Variables = numOfVars;
+	exp_param.File_Name = fileName;
+	number_of_lattice_points
+	  = decomposeAndComputeExponentialResidue(cones, exp_param);
+	break;
+      }
+    default:
+      cerr << "Unknown BarvinokParameters::substitution" << endl;
+      abort();
+    }
+    cout << endl << "****  The number of lattice points is: "
+	 << number_of_lattice_points
+	 << "  ****" << endl << endl;
 
  if(rationalCone[0] == 'y') {
    strcpy(command, "mv ");
