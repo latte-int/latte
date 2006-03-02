@@ -7,9 +7,9 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 simple_count_SOURCES = simple-main.cpp
 
-LDADD = liblatte.a -lgmpxx
-AM_CXXFLAGS := $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(AM_CXXFLAGS)
-LIBS += $(NTL_LIBS) $(LIDIA_LIBS)
+LDADD = liblatte.a
+AM_CXXFLAGS := $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(GMP_CFLAGS) $(AM_CXXFLAGS)
+LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(GMP_LIBS)
 
 noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES = \
