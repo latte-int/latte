@@ -12,7 +12,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <math.h>
-#include <algorithm>
 #include <time.h>
 
 #include "Cone.h"
@@ -20,7 +19,7 @@
 #include "../myheader.h"
 #include "../ramon.h"
 #include "../RudyResNTL.h"
-#include "../print.h"
+#include "rational.h"
 
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
@@ -301,19 +300,15 @@ int barvinok_NO_LONGER_IN_USE(mat_ZZ & B, list< PtrCone > & Uni, int & numOfUniC
 
 
 
-int barvinok_Single(mat_ZZ & B, int & numOfUniCones, Single_Cone_Parameters *Parameters, rationalVector *vertex)
+int
+barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
+		rationalVector *vertex)
 {
 	//cout << "barvinok_Single Called." << endl;;
 	
 	long m, n;
   	m = B.NumRows();
-
-
   	n = B.NumCols();
-
-  	vec_ZZ v;
-   	v.SetLength(m);
-
 
    	if( m != n)
    	{	
@@ -329,9 +324,6 @@ int barvinok_Single(mat_ZZ & B, int & numOfUniCones, Single_Cone_Parameters *Par
        		exit(3);
    	}
 
-   	vec_ZZ Z, Z2;
-   	ZZ Det;
-
    	/* The following routine is to get the minimal
       	integral generators for the cone.  */
 
@@ -343,7 +335,7 @@ int barvinok_Single(mat_ZZ & B, int & numOfUniCones, Single_Cone_Parameters *Par
    	dummy->sign = 1;
 
 	int result;
-	result = barvinok_DFS(dummy, Parameters);
+	result = barvinok_DFS(dummy, Parameters, vertex);
 
 	dummy->generator.kill ();
 	delete dummy;
@@ -369,7 +361,7 @@ listCone* transformRudyListConeIntoRamonListCone_Single( PtrCone RudyCone,
 }
 
 
-int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
+int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters, rationalVector *vertex)
 {
        	
     	ZZ Det = abs(determinant(C->generator));
@@ -387,7 +379,7 @@ int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
 	   Parameters->Total_Uni_Cones += 1;
 
 		if ( Parameters->Total_Uni_Cones % 1000 == 0)
-			cout << Parameters->Total_Uni_Cones << " unimodular cones dones." << endl;
+			cout << Parameters->Total_Uni_Cones << " unimodular cones done." << endl;
 		 
 		listVector *L, *endL;
    		vec_ZZ v;
@@ -421,23 +413,10 @@ int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
 
 		//cout << "barvinok_DFS: Transforming Rudy list to Raymond list...";
 		Cone = transformRudyListConeIntoRamonListCone_Single (tmpPtrCone, Parameters->Number_of_Variables );
-		Cone->vertex = Parameters->Cone->vertex;
+		Cone->vertex = copyRationalVector(vertex);
 		//cout << "done." << endl;
 
 		result = Parameters->ConsumeCone(Cone);
-		
-		//clean up
-		//
-		
-		/*listVector *tempvector;
-		while (Cone->rays)
-		{
-			tempvector = Cone->rays;
-			Cone->rays = Cone->rays->rest;
-			delete tempvector;
-			
-		}*/
-		
 		return result;
   	} 		     
      
@@ -546,7 +525,7 @@ int barvinok_DFS(Cone *C, Single_Cone_Parameters *Parameters)
 
 	
 	//cout << "barvinok_DFS: current = " << current << "   Dets[current] = " << Dets[current] << endl;	
-   	if(barvinok_DFS(cones1[current], Parameters) == -1)
+   	if(barvinok_DFS(cones1[current], Parameters, vertex) == -1)
 		result = -1;
 	
       	cones1[current]->generator.kill();

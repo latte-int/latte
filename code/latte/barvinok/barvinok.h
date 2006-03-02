@@ -8,30 +8,26 @@
 ************************************************************************/
 #ifndef BARVINOK__H
 #define BARVINOK__H
-#include <list>
 
-#include <fstream>
-#include <cstdlib>
-#include <cstring>
-#include <math.h>
-#include <algorithm>
-#include <time.h>
-#include "../myheader.h"
-#include "../ramon.h"
+#include "myheader.h"
 #include "Cone.h"
-#include "../RudyResNTL.h"
-#include "../flags.h"
-using namespace std;
+#include "flags.h"
 
 /* Do a signed decomposition, modulo lower-dimensional cones, of the
-   cone spanned by B, until the determinants of all cones are at most
-   MAX_DETERMINANT.  Return the cones in UNI. */ 
-int barvinok(mat_ZZ &B, list< PtrCone > &Uni, int &numOfUniCones,
-	     int max_determinant = 1);
+   SIMPLICIAL cone spanned by the ROW VECTORS of B with apex at
+   VERTEX, until the determinants of all cones are at most
+   PARAMETERS->max_determinant.
 
-int barvinok_Single (mat_ZZ &, int &, Single_Cone_Parameters *, rationalVector *vertex);
+   Call PARAMETERS->ConsumeCone() for each of the small cones.
+*/ 
+int
+barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
+		rationalVector *vertex);
 
-int barvinok_DFS(Cone *, Single_Cone_Parameters *);
+/* Likewise, but the cone is given by an instance of class Cone. */
+int
+barvinok_DFS(Cone *cone, Single_Cone_Parameters *Parameters,
+	     rationalVector *vertex);
 
 
 #endif
