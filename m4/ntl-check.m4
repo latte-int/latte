@@ -60,8 +60,8 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	LIBS="${BACKUP_LIBS} ${NTL_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK(
-	[#include <NTL/ZZ.h>],
-	[NTL::ZZ a;],
+	[#include "code/latte/latte_ntl.h"],
+	[ZZ a;],
 	[
 	AC_TRY_RUN(
 	[#include <NTL/version.h>
@@ -109,13 +109,12 @@ if test "x$ntl_found" = "xyes" ; then
 elif test -n "$ntl_problem"; then
 	AC_MSG_RESULT(problem)
 	echo "Sorry, your NTL version is too old or not configured right.  
-LattE also requires the NTL namespace to be enabled.
 Please make sure NTL is compiled correctly."
 	ifelse([$3], , :, [$3])
 elif test   "x$ntl_found" = "xno";  then
 	AC_MSG_RESULT(not found)
 	if test "x$NTL_HOME" != "x/usr" -a "x$NTL_HOME" != "x/usr/local" ; then
-		AC_MSG_WARN(NTL >= $min_ntl_version was not found.  LattE also requires the NTL namespace to be enabled.  Please make sure NTL is compiled correctly.)
+		AC_MSG_WARN(NTL >= $min_ntl_version was not found.  Please make sure NTL is compiled correctly.)
 	fi
 	ifelse([$3], , :, [$3])	
 fi	
