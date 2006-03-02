@@ -1,3 +1,78 @@
+2006-03-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	This set of changes cleans up several interfaces (notably
+	barvinok.h and ConeDecom.h are now simple and useful) and
+	adds a memory-save mode for the exponential substitution.
+	
+	* simple-main.cpp: Use the "memory save" version of the polynomial
+	and exponential substitutions.
+
+	* ExponentialSubst.cpp, ExponentialSubst.h (Exponential_Single_Cone_Parameters):
+	New class.
+	(decomposeAndComputeExponentialResidue): New function.
+
+	* flags.h (BarvinokParameters): New slots File_Name,
+	Number_of_Variables.
+	(Single_Cone_Parameters): Remove slot Cone.
+
+	* barvinok/dec.cpp (decomposeCones, decomposeCones_Single): Change
+	call to barvinokDecomposition_Single.
+
+	* barvinok/dec.h, barvinok/dec.cpp (createConeDecMatrix): Move to
+	convert.h.
+
+	* barvinok/ConeDecom.cpp, barvinok/ConeDecom.h
+	(barvinokDecomposition_Single): Simplify the interface, overload
+	for listCone input data.
+
+	(transformArrayBigVectorToListVector): Move to convert.h.
+
+	* barvinok/barvinok.cpp, barvinok/barvinok.h (barvinok_DFS, barvinok_Single):
+	Simplify/unify the interface.
+
+	* ramon.cpp, ramon.h (freeListVector): New.
+
+	* rational.cpp, rational.h (copyRationalVector): New.
+
+	* dual.cpp (transformArrayBigVectorToListVector2, createConeDecMatrix2):
+	Unused, removed.
+
+	* cone.cpp, cone.h (freeListCone): New.
+
+	* convert.cpp, convert.h: New files.
+
+	* ResSingle.cpp: Fix references to members in
+	Single_Cone_Parameters (ZZ instead of ZZ*).
+
+	* barvinok/dec.cpp
+	(Collecting_Single_Cone_Parameters::ConsumeCone): New, implement
+	the traditional LattE behavior of collecting all decomposed cones.
+
+	(decomposeCones): Use Collecting_Single_Cone_Parameters together with
+	barvinokDecomposition_Single instead of barvinokDecomposition.
+
+	Simplify some references to members in Single_Cone_Parameters (ZZ
+	instead of ZZ*); the indirection is no longer necessary now that we
+	don't convert between "Barvinok_Parameters" and
+	"Single_Cone_Parameters" any more.
+
+	* barvinok/barvinok.cpp (barvinok_DFS): Respect
+	Parameters->max_determinant.
+
+	* barvinok/ConeDecom.cpp, barvinok/ConeDecom.h
+	(transformRudyListConeIntoRamonListCone): Removed.
+	(barvinokDecomposition): Removed; we now use
+	barvinokDecomposition_Single.
+
+	* dual.cpp (transformRudyListConeIntoRamonListCone2): Unused, removed.
+
+	* RudyResNTL.h, flags.h (Single_Cone_Parameters,
+	Standard_Single_Cone_Parameters): Moved from RudyResNTL.h to
+	flags.h (temporary location).
+	* flags.h (Collecting_Single_Cone_Parameters): New class.
+
+	* genFunction/piped.cpp: Fix last change.
+
 2006-02-28  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/count.cpp, code/latte/simple-main.cpp:
