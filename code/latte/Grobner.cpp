@@ -15,6 +15,7 @@ I modified Raymond's code.
 #include "ramon.h"
 #include "ReadingFile.h"
 #include "preprocess.h"
+#include "Residue.h"
 
 /* ---------------------------------------------------------------------- */
 void CheckGrobner(char* filename, char * cdd){

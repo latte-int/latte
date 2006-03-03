@@ -27,6 +27,7 @@
 #include "convert.h"
 #include "dual.h"
 #include "genFunction/piped.h"
+#include "Residue.h"
 
 #define MODULUS 1000000000
 #define Exponent_Ten_Power 10

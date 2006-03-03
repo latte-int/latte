@@ -25,6 +25,7 @@
 #include "cone.h"
 #include "dual.h"
 #include "RudyResNTL.h"
+#include "Residue.h"
 #include "Grobner.h"
 //  #include "jesus.h"
 #include "preprocess.h"

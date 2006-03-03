@@ -26,6 +26,7 @@
 #include "cone.h"
 #include "dual.h"
 #include "RudyResNTL.h"
+#include "Residue.h"
 #include "Grobner.h"
 //  #include "jesus.h"
 #include "preprocess.h"
@@ -77,7 +78,7 @@ int main(int argc, char *argv[]) {
     removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   struct BarvinokParameters params;
-  listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
+  listVector *matrix, *equations, *inequalities, *matrixTmp;
   vec_ZZ cost;
   listVector *templistVec;
   listCone *cones, *tmpcones;
