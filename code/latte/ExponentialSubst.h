@@ -18,6 +18,27 @@ public:
   virtual int ConsumeCone(listCone *cone);
 };
 
+/* Guess a generic vector; this is simply a random vector. */
+vec_ZZ
+guess_generic_vector(int numOfVars);
+
+/* Functions can throw this exception when they discover the
+   passed vector was not generic. */
+struct NotGenericException {};
+
+/* Compute the weights w_k for the contribution of CONE
+   in the counting formula
+   
+           \sum_{k=0}^d w_k \sum_{x\in P} <c, x>^k
+
+   where c is the GENERIC_VECTOR, P is the set of the
+   integer points in the fundament parallelepiped of CONE,
+   and d is the dimension of CONE (<= NUMOFVARS). */
+mpq_vector
+computeExponentialResidueWeights(const vec_ZZ &generic_vector,
+				 const listCone *cone, int numOfVars)
+  throw(NotGenericException);
+
 /* Compute the limit of the generating function for the integer points
    in CONE, whose "latticePoints" (in the fundamental parallelepiped)
    are already computed, for z -> 1, by making an exponential
@@ -27,12 +48,12 @@ public:
 */
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &lambda,
-				 listCone *cone, int numOfVars);
+				 const listCone *cone, int numOfVars);
 
 /* Likewise, but for the whole list of CONES, summing up the
    results. */
 Integer
-computeExponentialResidue(listCone *cones, int numOfVars);
+computeExponentialResidue(const listCone *cones, int numOfVars);
 
 /* Likewise, but do simplicial triangulation and Barvinok
    decomposition, then perform it on the summands. */

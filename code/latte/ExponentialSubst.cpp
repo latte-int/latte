@@ -33,7 +33,7 @@ sum_of_scalar_powers(const vec_ZZ &generic_vector,
 }
 
 #define MODULUS 1000000000
-static vec_ZZ
+vec_ZZ
 guess_generic_vector(int numOfVars)
 {
   vec_ZZ result;
@@ -44,12 +44,10 @@ guess_generic_vector(int numOfVars)
   return result;
 }
 
-struct NotGenericException {};
-NotGenericException not_generic;
-
-mpq_class
-computeExponentialResidue_Single(const vec_ZZ &generic_vector,
-				 listCone *cone, int numOfVars)
+mpq_vector
+computeExponentialResidueWeights(const vec_ZZ &generic_vector,
+				 const listCone *cone, int numOfVars)
+  throw(NotGenericException)
 {
   // Compute dimension; can be smaller than numOfVars
   int dimension = 0;
@@ -65,22 +63,38 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
       ZZ inner;
       InnerProduct(inner, generic_vector, ray->first);
       ray_scalar_products[k] = convert_ZZ_to_mpz(inner);
-      if (ray_scalar_products[k] == 0)
+      if (ray_scalar_products[k] == 0) {
+	static NotGenericException not_generic;
 	throw not_generic;
+      }
       prod_ray_scalar_products *= ray_scalar_products[k];
     }
   }
   int k;
   mpz_class k_factorial;
-  mpq_class result;
+  mpq_vector weights(dimension + 1);
   mpq_vector todds = evaluate_todd(ray_scalar_products);
-  result = 0;
   for (k = 0, k_factorial = 1; k<=dimension; k++, k_factorial *= k) {
-    Integer sum = sum_of_scalar_powers(generic_vector,
-				       cone->latticePoints, k);
     mpq_class td = todds[dimension - k];
     td /= prod_ray_scalar_products;
-    result += convert_ZZ_to_mpz(sum) * td / k_factorial;
+    weights[k] = td / k_factorial;
+  }
+  return weights;
+}
+
+mpq_class
+computeExponentialResidue_Single(const vec_ZZ &generic_vector,
+				 const listCone *cone, int numOfVars)
+{
+  mpq_vector weights
+    = computeExponentialResidueWeights(generic_vector, cone, numOfVars);
+  int dimension = weights.size() - 1;
+  int k;
+  mpq_class result = 0;
+  for (k = 0; k<=dimension; k++) {
+    Integer sum = sum_of_scalar_powers(generic_vector,
+				       cone->latticePoints, k);
+    result += convert_ZZ_to_mpz(sum) * weights[k];
   }
 //   cout << "Cone contributes: "
 //        << cone->coefficient << " * " << result << endl;
@@ -88,9 +102,9 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 }
 
 Integer
-computeExponentialResidue(listCone *cones, int numOfVars)
+computeExponentialResidue(const listCone *cones, int numOfVars)
 {
-  listCone *cone;
+  const listCone *cone;
   do {
     vec_ZZ generic_vector = guess_generic_vector(numOfVars);
     mpq_class result;
@@ -118,6 +132,10 @@ int Exponential_Single_Cone_Parameters::ConsumeCone(listCone *cone)
   } catch (NotGenericException) {
     status = -1;
   }
+  if (Total_Uni_Cones % 1000 == 0) {
+    gmp_printf("Fun fact: Number of lattice points currently %g\n",
+	       result.get_d());
+  }
   freeListCone(cone);
   return status;
 }
@@ -135,9 +153,11 @@ decomposeAndComputeExponentialResidue(listCone *cones,
       for (cone = cones; cone != NULL; cone = cone->rest) {
 	int status;
 	status = barvinokDecomposition_Single(cone, &param);
-	if (status < 0)
+	if (status < 0) {
+	  static NotGenericException not_generic;
 	  throw not_generic;  // FIXME: Later replace this return
 			      // value handling by exception.
+	}
       }
       //cout << "Result: " << param.result << endl;
       assert(param.result.get_den()==1);
