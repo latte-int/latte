@@ -10,6 +10,59 @@ It requires the following programs and libraries:
   * (optional) LiDIA
 
 
+Building and installing LattE
+-----------------------------
+
+The following instructions assume you want to install all LattE and
+all its prerequisites into your home directory, namely into a
+hierarchy rooted at the directory $HOME/latte.
+
+1. Install the GNU Multiple Precision Library
+
+   Download it from http://www.swox.com/gmp/
+   Unpack it, then in the source directory do:
+
+   ./configure --prefix=$HOME/latte --enable-cxx
+   make
+   make install
+
+2. Install Victor Shoup's Number Theoretic Library
+
+   Obtain it from http://www.shoup.net/ntl/ 
+   Unpack it, then in the source directory do:
+   
+   cd src
+   ./configure PREFIX=$HOME/latte GMP_PREFIX=$HOME/latte
+   make
+   make install
+
+3. Install Komei Fukuda's packages CDD+ and cddlib
+
+   Obtain then from http://www.ifor.math.ethz.ch/~fukuda/cdd_home
+   
+4. Put $HOME/latte/bin into your $PATH
+   and $HOME/latte/lib into your LD_LIBRARY_PATH.
+
+N. Build and install LattE
+
+   From the source directory of LattE:
+
+   ./configure --prefix=$HOME/latte --with-default=$HOME/latte
+   make
+   make install
+
+Now the LattE executables (count, ehrhart, minimize, maximize)
+should be available in $HOME/latte/bin.
 
 
+More information
+----------------
+
+ * License: see gpl.txt
+
+ * Authors: see AUTHORS
+
+ * Documentation: see manual_v1.1.pdf
+
+ * Changes since the official release 1.2: see NEWS and ChangeLog
 

@@ -9,8 +9,6 @@ Code clean-up:
    - Factor out construction of generic vector.
 
 * Data structures:
-   - Get rid of duplications & conversions.
-     (e.g. listCone vs. PtrCone)
    - ZZ vs. Integer
      We will use Integer (typedefed to ZZ).
 
@@ -20,3 +18,26 @@ Code clean-up:
 * Remove:
    - CreateExample.cpp (or move to test-suite generators)
 
+* Reading CDD-style input files currently segfaults
+  because CheckEmpty is not prepared to deal with CDD files.
+  (what is CheckEmpty good for?)
+
+* Replace the broken CDD-style parser
+  with a call to cddlib functions.
+
+
+Documentation:
+
+ Describe configuration & build.
+
+
+Configuration:
+
+ Figure out how to use fast compiler switches by default.
+ (-O2 for gcc, -fast for Forte)
+
+
+
+
+  
+  

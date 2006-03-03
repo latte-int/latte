@@ -4,7 +4,7 @@
 AC_PREREQ(2.59)
 AC_INIT(latte, 1.2-mk-0.2)
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
-AM_INIT_AUTOMAKE(foreign)
+AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
 AC_CONFIG_FILES([Makefile EXAMPLES/Makefile code/Makefile code/latte/Makefile])
 AC_PROG_RANLIB

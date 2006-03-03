@@ -1,5 +1,21 @@
 2006-03-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
+	* code/latte/barvinok/barvinok.cpp (PtrCone): Removed.
+	(barvinok): Removed.
+	(barvinok_Single, barvinok_DFS): Restructured to get rid of use of
+	PtrCone and Cone in favor of listCone.  Avoid some repeated determinant
+	computations.  Avoid generating cones with determinant 0.
+
+	* code/latte/barvinok/Cone.cpp, code/latte/barvinok/Cone.h (Cone):
+	Removed.
+
+	* code/latte/myheader.h (GIVETIME, listRationalVector, inputFile):
+	Unused, removed.
+
+	* code/latte/convert.cpp, code/latte/convert.h: "const" fix.
+
+2006-03-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
 	Version 1.2-mk-0.2
 	
 	* code/latte/dual.cpp (dualizeBackCones): Special case

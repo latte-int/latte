@@ -1,0 +1,7 @@
+Changes since the official release 1.2:
+
+ * Use GNU Autoconf and Automake.
+ * Code clean-up.
+ * New exponential substitution.
+
+
