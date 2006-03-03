@@ -1,9 +1,7 @@
 Code clean-up:
 
 * Residue calculations:
-   - "Re-implement" Residue (print.cpp) 
-      in terms of Residue_Single_Cone (print-single.cpp).
-      (and move them to a separate file, residue.cpp).
+   - "Re-implement" Residue in terms of Residue_Single_Cone (Residue.cpp).
    - Likewise, consolidate ResidueFunction (RudyResNTL.cpp) and
       ResidueFunction_Single_Cone (ResSingle.cpp)
    - Factor out construction of generic vector.
