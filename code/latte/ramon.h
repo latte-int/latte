@@ -1,6 +1,7 @@
 #ifndef RAMON__H
 #define RAMON__H
-#include "myheader.h"
+
+#include "cone.h"
 
 listVector* appendVectorToListVector(vec_ZZ, listVector*);
 vec_ZZ createVector(int);

@@ -9,7 +9,7 @@
 #ifndef BARVINOK__H
 #define BARVINOK__H
 
-#include "myheader.h"
+#include "cone.h"
 
 struct BarvinokParameters {
   // FIXME: Following does not really belong here.

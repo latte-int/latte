@@ -3,6 +3,8 @@
 #ifndef PRINT_H
 #define PRINT_H
 
+#include "cone.h"
+
 void printVector(vec_ZZ, int);
 void printListVector(listVector*, int);
 listVector* Changeproj(listVector* basis, listVector* equ, int numOfVars);
