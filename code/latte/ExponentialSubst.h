@@ -26,9 +26,14 @@ public:
 
    where c is the GENERIC_VECTOR, P is the set of the
    integer points in the fundament parallelepiped of CONE,
-   and d is the dimension of CONE (<= NUMOFVARS). */
+   and d is the dimension of CONE (<= NUMOFVARS).
+
+   Also return the prod_ray_scalar_products, which might
+   be useful for scaling purposes.
+*/
 mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
+				 mpz_class &prod_ray_scalar_products,
 				 const listCone *cone, int numOfVars)
   throw(NotGenericException);
 

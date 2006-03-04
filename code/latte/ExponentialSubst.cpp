@@ -34,6 +34,7 @@ sum_of_scalar_powers(const vec_ZZ &generic_vector,
 
 mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
+				 mpz_class &prod_ray_scalar_products,
 				 const listCone *cone, int numOfVars)
   throw(NotGenericException)
 {
@@ -43,7 +44,7 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
   for (ray = cone->rays; ray != NULL; ray = ray->rest)
     dimension++;
   vector<mpz_class> ray_scalar_products(dimension);
-  mpz_class prod_ray_scalar_products;
+  //mpz_class prod_ray_scalar_products;
   prod_ray_scalar_products = 1;
   {
     int k;
@@ -68,6 +69,18 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
     weights[k] = td / k_factorial;
   }
   return weights;
+}
+
+mpq_vector
+computeExponentialResidueWeights(const vec_ZZ &generic_vector,
+				 const listCone *cone, int numOfVars)
+  throw(NotGenericException)
+{
+  mpz_class prod_ray_scalar_products;
+  return computeExponentialResidueWeights(generic_vector,
+					  prod_ray_scalar_products,
+					  cone,
+					  numOfVars);
 }
 
 mpq_class

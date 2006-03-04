@@ -43,7 +43,8 @@
 
 #include "banner.h"
 #include "convert.h"
-#include "ExponentialSubst.cpp"
+#include "ExponentialSubst.h"
+#include "ExponentialApprox.h"
 
 ZZ computeNumberOfLatticePoints(listCone *cones, int numOfVars,
 				const BarvinokParameters &param)
@@ -303,6 +304,13 @@ int main(int argc, char *argv[]) {
       break;
     case BarvinokParameters::ExponentialSubstitution:
       {
+	if (Print[0] == 'y') {
+	  Write_Exponential_Sample_Formula_Single_Cone_Parameters
+	    write_param("Exponential_Sample_Formula",
+			params.max_determinant);
+	  write_param.Number_of_Variables = numOfVars;
+	  decomposeAndWriteExponentialSampleFormula(cones, write_param);
+	}
 	Exponential_Single_Cone_Parameters exp_param;
 	exp_param.max_determinant = params.max_determinant; // FIXME: Upgrade.
 	exp_param.Number_of_Variables = numOfVars;
