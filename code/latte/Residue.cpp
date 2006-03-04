@@ -548,7 +548,10 @@ ZZ Residue(listCone* cones, int numOfVars) {
 /* ----------------------------------------------------------------- */
 
 
-int Residue_Single_Cone(listCone* cones, int numOfVars, ZZ *Random_Lambda, ZZ *Total_Lattice_Points, ZZ *Ten_Power) 
+int
+Residue_Single_Cone(listCone* cones, int numOfVars,
+		    const vec_ZZ &Random_Lambda,
+		    ZZ *Total_Lattice_Points, ZZ *Ten_Power) 
 {
 
   int numOfTerms;
