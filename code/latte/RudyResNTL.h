@@ -1,10 +1,9 @@
 #ifndef RUDYRESNTL__H
 #define RUDYRESNTL__H
-#include "PolyTree.h"
+
 #include "myheader.h"
 #include "cone.h"
-#include "ramon.h"
-#include "flags.h"
+#include "barvinok/dec.h" // for Standard_Single_Cone_Parameters
 
 void ResidueFunction(listCone* cones, int numOfVars, int print_flag, int degree, int output_cone);
 

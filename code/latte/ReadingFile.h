@@ -1,29 +1,8 @@
 #ifndef READINGFILE__H
 #define READINGFILE__H
-#include <list>
 
 #include "myheader.h"
-#include "barvinok/dec.h"
-#include "barvinok/barvinok.h"
-#include "barvinok/ConeDecom.h"
-#include "barvinok/Triangulation.h"
-#include "vertices/cdd.h"
-#include "genFunction/maple.h"
-#include "genFunction/piped.h"
-#include "cone.h"
-#include "dual.h"
-#include "RudyResNTL.h"
-//  #include "jesus.h"
-#include "preprocess.h"
-#include "print.h"
-#include "ramon.h"
-#include "rational.h"
-#include "timing.h"
-#include "flags.h"
-//#include "testing.h"
-#include "IntegralHull.h"
-
-using namespace std;
+#include "latte_ntl.h"
 
 void CheckRed(char* Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation);
 void IntVector(listVector* basis, int numOfVars);

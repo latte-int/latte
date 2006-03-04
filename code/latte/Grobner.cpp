@@ -16,6 +16,11 @@ I modified Raymond's code.
 #include "ReadingFile.h"
 #include "preprocess.h"
 #include "Residue.h"
+#include "vertices/cdd.h"
+#include "dual.h"
+#include "genFunction/piped.h"
+#include "genFunction/maple.h"
+#include "barvinok/dec.h"
 
 /* ---------------------------------------------------------------------- */
 void CheckGrobner(char* filename, char * cdd){

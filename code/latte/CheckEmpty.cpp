@@ -28,7 +28,6 @@
 #include "ramon.h"
 #include "rational.h"
 #include "timing.h"
-#include "flags.h"
 
 #include "IntegralHull.h"
 #include "ReadingFile.h"
