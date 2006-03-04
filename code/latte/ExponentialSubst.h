@@ -5,26 +5,19 @@
 
 #include "myheader.h"
 #include "latte_gmp.h"
-#include "flags.h" // for Single_Cone_Parameters
+#include "barvinok/dec.h"
 
 // The exponential "Memory save" mode: A class of
 // Single_Cone_Parameters that immediately performs exponential
 // residue calculations at each subdivided cone in the tree, don't
 // store the cones.
-class Exponential_Single_Cone_Parameters : public Single_Cone_Parameters {
+class Exponential_Single_Cone_Parameters
+  : public Generic_Vector_Single_Cone_Parameters {
 public:
-  vec_ZZ generic_vector;
   mpq_class result;
+  virtual void InitializeComputation();
   virtual int ConsumeCone(listCone *cone);
 };
-
-/* Guess a generic vector; this is simply a random vector. */
-vec_ZZ
-guess_generic_vector(int numOfVars);
-
-/* Functions can throw this exception when they discover the
-   passed vector was not generic. */
-struct NotGenericException {};
 
 /* Compute the weights w_k for the contribution of CONE
    in the counting formula

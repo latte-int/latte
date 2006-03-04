@@ -32,18 +32,6 @@ sum_of_scalar_powers(const vec_ZZ &generic_vector,
   return result;
 }
 
-#define MODULUS 1000000000
-vec_ZZ
-guess_generic_vector(int numOfVars)
-{
-  vec_ZZ result;
-  result.SetLength(numOfVars);
-  int i;
-  for (i = 0;  i < numOfVars; i++)
-    result[i] = (rand () % MODULUS) * ((rand() % 2) * 2 - 1);
-  return result;
-}
-
 mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 const listCone *cone, int numOfVars)
@@ -140,29 +128,17 @@ int Exponential_Single_Cone_Parameters::ConsumeCone(listCone *cone)
   return status;
 }
 
+void Exponential_Single_Cone_Parameters::InitializeComputation()
+{
+  Generic_Vector_Single_Cone_Parameters::InitializeComputation();
+  result = 0;
+}
+
 Integer
 decomposeAndComputeExponentialResidue(listCone *cones, 
 				      Exponential_Single_Cone_Parameters &param)
 {
-  listCone *cone;
-  do {
-    param.generic_vector
-      = guess_generic_vector(param.Number_of_Variables);
-    param.result = 0;
-    try {
-      for (cone = cones; cone != NULL; cone = cone->rest) {
-	int status;
-	status = barvinokDecomposition_Single(cone, &param);
-	if (status < 0) {
-	  static NotGenericException not_generic;
-	  throw not_generic;  // FIXME: Later replace this return
-			      // value handling by exception.
-	}
-      }
-      //cout << "Result: " << param.result << endl;
-      assert(param.result.get_den()==1);
-      return convert_mpz_to_ZZ(param.result.get_num());
-    }
-    catch (NotGenericException) {};
-  } while (1);
+  barvinokDecomposition_List(cones, param);
+  assert(param.result.get_den()==1);
+  return convert_mpz_to_ZZ(param.result.get_num());
 }
