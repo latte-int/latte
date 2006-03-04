@@ -10,7 +10,7 @@
 #define CONEDECOM__H
 
 #include "myheader.h"
-#include "flags.h"
+#include "barvinok.h"
 
 /* Do a signed decomposition, modulo lower-dimensional cones, of the
    polyhedral cone spanned by the ROW VECTORS of B with apex at
