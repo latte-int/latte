@@ -38,63 +38,22 @@ RR norm2(const vec_RR& x, long m){
   return normal;
 }
 
-vec_ZZ ComputeOmega( const mat_ZZ & B, long m, int l, int y)
+vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
+		    long m, int l, int y)
 {
    mat_ZZ U; 
-   mat_ZZ W;
    
-   ZZ cm;
-   set(cm);
- 
    U.SetDims(m, m);
-   W.SetDims(m, m);
 
   ZZ D = determinant(B);
-  W = B;
-  /*   for(int i = 1; i <= m; i++){
-     for(int j = 1; j <= m; j++){
-       if(W(i, j) != 0)
-        cm = lcm( cm,  W(i, j));
-        }
-      }*/
-
 
   ZZ det2;
 
-//     long lc;
+  mat_ZZ L = -transpose(Dual);
+  vec_ZZ Z;
 
-   mat_RR R, R5;
-   R.SetDims(m, m);
-   R5.SetDims(m, m);
- 
-   for(int i = 1; i <= m; i++){
-     for(int j = 1; j <= m; j++){
-          conv(R(i, j), W(i, j));
-          }
-     }
-  
-   R5 = determinant(R) * inv(R);
-   
-   for(int i = 1; i <= m; i++){
-     for(int j = 1; j <= m; j++){
-            R5(i, j) = round(R5(i, j));
-     }
-   }
-
- 
-  mat_ZZ L, Z1;
-   vec_ZZ Z;
-
-   L.SetDims(m, m);
-   Z1.SetDims(m, m);
-   for(int i = 1; i <= m; i++){
-     for(int j = 1; j <= m; j++){
-            conv(L(i, j), R5(i, j));
-     }
-   }
-   
-   mat_ZZ LL;
-   LL = L;
+  mat_ZZ LL;
+  LL = L;
   LLL( det2, L, U, 1, 1);
   //cout << U << endl << L << endl;
   int index = 1;
@@ -203,11 +162,7 @@ vec_ZZ ComputeOmega( const mat_ZZ & B, long m, int l, int y)
   	}
   
   U.kill();
-  W.kill();
-  R.kill();
-  R5.kill();
   L.kill();
-  Z1.kill();
   LL.kill();
   return Z;
  }
