@@ -397,7 +397,7 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
-  if (cone->determinant != 1) {
+  if (abs(cone->determinant) != 1) {
     cout << "Processing cone with determinant " << cone->determinant << endl;
     cone->latticePoints=pointsInParallelepiped(cone->vertex,cone->rays,0,numOfVars);
   }
