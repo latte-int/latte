@@ -40,3 +40,20 @@ createConeDecMatrix(const listCone *cone, int numOfRays, int numOfVars)
   return (mat);
 }
 
+mat_ZZ
+createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars)
+{
+  int i;
+  mat_ZZ mat;
+  listVector *tmp;
+
+  mat.SetDims(numOfFacets, numOfVars);
+
+  tmp=cone->facets;
+  for (i=0; i<numOfFacets; i++) {
+    mat[i]=copyVector(tmp->first,numOfVars);
+    tmp=tmp->rest;
+  }
+  return (mat);
+}
+

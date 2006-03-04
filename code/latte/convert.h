@@ -5,7 +5,7 @@
 #ifndef CONVERT_H
 #define CONVERT_H
 
-#include "myheader.h"
+#include "cone.h"
 
 listVector *
 transformArrayBigVectorToListVector(const mat_ZZ &A,
@@ -14,5 +14,8 @@ transformArrayBigVectorToListVector(const mat_ZZ &A,
 
 mat_ZZ
 createConeDecMatrix(const listCone *cone, int numOfRays, int numOfVars);
+
+mat_ZZ
+createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars);
 
 #endif
