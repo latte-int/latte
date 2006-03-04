@@ -1,11 +1,9 @@
-bin_PROGRAMS = maximize minimize count ehrhart \
-	test-todd simple-count
+bin_PROGRAMS = maximize minimize count ehrhart
 
 maximize_SOURCES = maximize.cpp
 minimize_SOURCES = minimize.cpp
 count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
-simple_count_SOURCES = simple-main.cpp
 
 LDADD = liblatte.a
 AM_CXXFLAGS := $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(GMP_CFLAGS) $(AM_CXXFLAGS)
@@ -39,6 +37,15 @@ noinst_HEADERS =							\
 	latte_gmp.h latte_ntl.h						\
 	ExponentialSubst.h
 
-test_todd_SOURCES = todd/test-todd.cpp
+if MAINTAINER_MODE
+# Experimental stuff
+bin_PROGRAMS += test-todd simple-count	
+nodist_liblatte_a_SOURCES = \
+	ExponentialApprox.cpp
+nodist_noinst_HEADERS = \
+	ExponentialApprox.h
 
+nodist_simple_count_SOURCES = simple-main.cpp
+nodist_test_todd_SOURCES = todd/test-todd.cpp
 
+endif
