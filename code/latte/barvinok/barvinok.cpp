@@ -22,6 +22,7 @@
 #include "../RudyResNTL.h"
 #include "rational.h"
 #include "convert.h"
+#include "dual.h"
 
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
@@ -118,6 +119,8 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	dummy->vertex = copyRationalVector(vertex);
 	dummy->rays = transformArrayBigVectorToListVector(B, m, n);
 
+	computeDetAndFacetsOfSimplicialCone(dummy, n);
+	
 	int result;
 	result = barvinok_DFS(dummy, Parameters);
 
@@ -165,9 +168,10 @@ barvinokStep(const listCone *Cone,
 	     int m)
 {
   mat_ZZ generator = createConeDecMatrix(Cone, m, m);
+  mat_ZZ dual = createFacetMatrix(Cone, m, m);
   /* ComputeOmega(const mat_ZZ &, long& ) computes
      an integral vector in the parallelogram. */
-  vec_ZZ Z = ComputeOmega(generator, m, 0, 0);
+  vec_ZZ Z = ComputeOmega(generator, dual, m, 0, 0);
   Z = CheckOmega(generator, Z);
      
   mat_ZZ mat = generator;
@@ -176,7 +180,7 @@ barvinokStep(const listCone *Cone,
 				  m, mat, Dets);
   if (!success) {
     cout << "Second loop... " << endl;
-    Z = ComputeOmega(generator, m, 2, 2);
+    Z = ComputeOmega(generator, dual, m, 2, 2);
     Z = CheckOmega(generator, Z);
     success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
 					  m, mat, Dets);
@@ -207,6 +211,7 @@ barvinokStep(const listCone *Cone,
 	Cones[i]->coefficient = Cone->coefficient * signDet * signDeti;
       }
       Cones[i]->vertex = copyRationalVector(Cone->vertex);
+      computeDetAndFacetsOfSimplicialCone(Cones[i], m);
     }
   }
 }
@@ -232,7 +237,6 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
      
   int result = 1;
   long m = Parameters->Number_of_Variables;
-  mat_ZZ generator = createConeDecMatrix(C, m, m);
 
   ZZ Dets[m];	     
   listCone *cones1 [m];
