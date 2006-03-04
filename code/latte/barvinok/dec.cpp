@@ -135,24 +135,69 @@ decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
 
 /* ----------------------------------------------------------------- */
 
+
+
+vec_ZZ
+guess_generic_vector(int numOfVars)
+{
+  vec_ZZ result;
+  result.SetLength(numOfVars);
+  int i;
+  for (i = 0;  i < numOfVars; i++)
+    result[i] = (rand () % MODULUS) * ((rand() % 2) * 2 - 1);
+  return result;
+}
+
+void
+Generic_Vector_Single_Cone_Parameters::InitializeComputation()
+{
+  generic_vector = guess_generic_vector(Number_of_Variables);
+}
+
+void
+barvinokDecomposition_List(listCone *cones,
+			   Generic_Vector_Single_Cone_Parameters &Parameters)
+{
+  do {
+    Parameters.InitializeComputation();
+    try {
+      listCone *cone;
+      for (cone = cones; cone != NULL; cone = cone->rest) {
+	int status;
+	status = barvinokDecomposition_Single(cone, &Parameters);
+	if (status < 0) {
+	  static NotGenericException not_generic;
+	  throw not_generic;  // FIXME: Later replace this return
+			      // value handling by exception.
+	}
+      }
+      return;
+    }
+    catch (NotGenericException) {};
+  } while (1);
+}
+
+
+
 int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 {
-  Cone = dualizeBackCones (Cone, this->Number_of_Variables );   	
+  Cone = dualizeBackCones (Cone, Number_of_Variables);   	
   //cout << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
-  if ( (this->Flags & DUAL_APPROACH) == 0)
-    computePointsInParallelepiped(Cone, this->Number_of_Variables);
+  if ( (Flags & DUAL_APPROACH) == 0)
+    computePointsInParallelepiped(Cone, Number_of_Variables);
 		
-  if (this->Flags & DUAL_APPROACH)	
+  if (Flags & DUAL_APPROACH)	
     {
       //cout << "barvinok_DFS: Calling ResidueFunction_Single_Cone" << endl;
-      return ResidueFunction_Single_Cone (Cone, (Standard_Single_Cone_Parameters *) this);
+      return ResidueFunction_Single_Cone (Cone, this);
     }	
   else
     {
-      return Residue_Single_Cone (Cone, this->Number_of_Variables, this->Random_Lambda, &this->Total_Lattice_Points, &this->Ten_Power);
+      return Residue_Single_Cone (Cone, Number_of_Variables, generic_vector, &Total_Lattice_Points, &Ten_Power);
     }	
 }
 
+// FIXME: Reimplement in terms of barvinokDecomposition_List.
 void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned int flags, char *File_Name) 
 {
 	int numOfConesDecomposed,numOfAllCones,numOfRays;
@@ -181,7 +226,6 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 	Barvinok_Parameters->Flags = flags;
 	Barvinok_Parameters->Number_of_Variables = numOfVars;
 	Barvinok_Parameters->max_determinant = 1;
-	Barvinok_Parameters->Random_Lambda = new ZZ [numOfVars];
 	Barvinok_Parameters->File_Name = File_Name;
 	Barvinok_Parameters->Controller = new Node_Controller(numOfVars + 1, degree);			
 	
@@ -197,12 +241,10 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 		Barvinok_Parameters->Max_Simplicial_Cones_Total = 0;
 
 		//Compute Random lambda
+		Barvinok_Parameters->InitializeComputation();
 		cout << "decomposeCone_Single: Random Lambda = ";
 		for (int i = 0;  i < numOfVars; i++)
-		{
-			Barvinok_Parameters->Random_Lambda[i] = (rand () % MODULUS) * ((rand() % 2) * 2 - 1);
-			cout << Barvinok_Parameters->Random_Lambda[i] << " ";
-		}
+		    cout << Barvinok_Parameters->generic_vector[i] << " ";
 		cout << endl;
 			
 		for (int i = 0; i <= degree; i++)
@@ -282,9 +324,9 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
   	//cout << lengthListCone(newCones->rest) << " cones in total.\n";
 
 	delete Barvinok_Parameters->Controller;
-	delete [] Barvinok_Parameters->Random_Lambda;
 	delete [] Barvinok_Parameters->Taylor_Expansion_Result;
 	delete Barvinok_Parameters;
 	
 }
 /* ----------------------------------------------------------------- */
+
