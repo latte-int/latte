@@ -1,4 +1,5 @@
-/*
+/* This is a -*- C++ -*- header file.
+   
   Author: Ruriko Yoshida
   Date: December 3rd, 2002
   Update: December 4th, 2002
@@ -21,6 +22,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+using namespace std;
 
 class HugInt{
 public:
@@ -54,6 +56,11 @@ public:
    }
 };
 int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator);
+
+typedef struct rationalVector {
+  vec_ZZ enumerator;
+  vec_ZZ denominator;
+} rationalVector;
 
 rationalVector* createRationalVector(int);
 rationalVector** createArrayRationalVector(int);
