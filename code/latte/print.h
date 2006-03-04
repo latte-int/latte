@@ -9,14 +9,14 @@ listVector* Changeproj(listVector* basis, listVector* equ, int numOfVars);
 void printRationalVector(rationalVector*, int);
 void printCone(listCone*, int);
 void printListCone(listCone*, int);
-void printVectorToFile(ofstream &, vec_ZZ, int);
-void printListVectorToFile(ofstream &, listVector*, int);
-void printVectorToFileWithoutBrackets(ofstream &, vec_ZZ, int);
-void printListVectorToFileWithoutBrackets(ofstream &, listVector*, int);
-void printRationalVectorToFile(ofstream &, rationalVector*, int);
-void printRationalVectorToFileWithoutBrackets(ofstream &, rationalVector*, 
+void printVectorToFile(ostream &, vec_ZZ, int);
+void printListVectorToFile(ostream &, listVector*, int);
+void printVectorToFileWithoutBrackets(ostream &, vec_ZZ, int);
+void printListVectorToFileWithoutBrackets(ostream &, listVector*, int);
+void printRationalVectorToFile(ostream &, rationalVector*, int);
+void printRationalVectorToFileWithoutBrackets(ostream &, rationalVector*, 
 					      int);
-void printConeToFile(ofstream &out, listCone* cones, int numOfVars);
+void printConeToFile(ostream &out, listCone* cones, int numOfVars);
 void printListConeToFile(char*, listCone*, int); 
 void printResidueFile(char*, listCone*, int);
 

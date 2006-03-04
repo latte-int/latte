@@ -9,6 +9,7 @@
 #include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
+#include "print.h"
 
 /* ----------------------------------------------------------------- */
 void printVector(vec_ZZ v, int numOfVars) {
@@ -60,24 +61,7 @@ void printRationalVector(rationalVector *v, int numOfVars) {
 }
 /* ----------------------------------------------------------------- */
 void printCone(listCone* cones, int numOfVars) {
-  cout << "==========\n";
-  cout << "Cone.\n";
-
-  cout << "Coefficient: " << cones->coefficient << endl;
-
-  cout << "Vertex: ";
-  printRationalVector(cones->vertex,numOfVars);
-
-  cout << "Extreme rays:\n";  
-  printListVector(cones->rays,numOfVars);
-
-  cout << "Facets:\n";  
-  printListVector(cones->facets,numOfVars);
-
-  cout << "Lattice points in parallelepiped:\n";
-  printListVector(cones->latticePoints,numOfVars);
-  cout << "==========\n\n";
-  return ;
+  printConeToFile(cout, cones, numOfVars);
 }
 /* ----------------------------------------------------------------- */
 void printListCone(listCone* cones, int numOfVars) {
@@ -90,7 +74,7 @@ void printListCone(listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printVectorToFile(ofstream & out, vec_ZZ v, int numOfVars) {
+void printVectorToFile(ostream & out, vec_ZZ v, int numOfVars) {
   int i;
 
 //    if (v==0) {
@@ -105,7 +89,7 @@ void printVectorToFile(ofstream & out, vec_ZZ v, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printListVectorToFile(ofstream & out, listVector* basis, int numOfVars) {
+void printListVectorToFile(ostream & out, listVector* basis, int numOfVars) {
   if (basis==0) {
     out << "[]\n";
     return;
@@ -118,7 +102,7 @@ void printListVectorToFile(ofstream & out, listVector* basis, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printVectorToFileWithoutBrackets(ofstream & out, vec_ZZ v, 
+void printVectorToFileWithoutBrackets(ostream & out, vec_ZZ v, 
 				      int numOfVars) {
   int i;
 
@@ -131,7 +115,7 @@ void printVectorToFileWithoutBrackets(ofstream & out, vec_ZZ v,
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printListVectorToFileWithoutBrackets(ofstream & out, listVector* basis, 
+void printListVectorToFileWithoutBrackets(ostream & out, listVector* basis, 
 					  int numOfVars) {
   if (basis==0) {
     out << numOfVars << " 0\n";
@@ -145,7 +129,7 @@ void printListVectorToFileWithoutBrackets(ofstream & out, listVector* basis,
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printRationalVectorToFile(ofstream & out, rationalVector *v, 
+void printRationalVectorToFile(ostream & out, rationalVector *v, 
 			       int numOfVars) {
   int i;
 
@@ -168,7 +152,7 @@ void printRationalVectorToFile(ofstream & out, rationalVector *v,
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printRationalVectorToFileWithoutBrackets(ofstream & out, 
+void printRationalVectorToFileWithoutBrackets(ostream & out, 
 					      rationalVector *v, 
 					      int numOfVars) {
   int i;
@@ -187,7 +171,7 @@ void printRationalVectorToFileWithoutBrackets(ofstream & out,
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printConeToFile(ofstream & out,listCone* cones, int numOfVars) {
+void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
   out << "==========\n";
   out << "Cone.\n";
 
@@ -198,6 +182,11 @@ void printConeToFile(ofstream & out,listCone* cones, int numOfVars) {
 
   out << "Extreme rays:\n";  
   printListVectorToFile(out,cones->rays,numOfVars);
+
+  cout << "Determinant:" << cones->determinant << endl;
+  
+  cout << "Facets:\n";  
+  printListVector(cones->facets,numOfVars);
 
   out << "Lattice points in parallelepiped:\n";
   printListVectorToFile(out,cones->latticePoints,numOfVars);
