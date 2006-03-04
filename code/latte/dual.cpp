@@ -22,6 +22,7 @@
 #include "vertices/cdd.h"
 #include "barvinok/ConeDecom.h"
 #include "barvinok/dec.h"
+#include "convert.h"
 #include <list>
 using namespace std;
 
@@ -230,101 +231,78 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 }
 /* ----------------------------------------------------------------- */
 
-static mat_ZZ
-scaled_inverse(const mat_ZZ &W)
+void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
 {
-  // FIXME: The code below is a computation with arbitary-length
-  // floats.  Should use rationals instead!
-  mat_RR R, R5;
-  int m;
-  m = W.NumRows();
-  assert(m == W.NumCols());
-  R.SetDims(m, m);
-  R5.SetDims(m, m);
+  int i;
+  listVector *rays;
+  mat_ZZ Mat, Inverse;
  
-  for(int i = 1; i <= m; i++){
-    for(int j = 1; j <= m; j++){
-      conv(R(i, j), W(i, j));
-    }
+  Mat.SetDims(numOfVars, numOfVars);
+
+  rays=cone->rays;
+  for(i = 0; i < numOfVars; i++) {
+    Mat[i] = rays->first;
+    rays = rays -> rest;
   }
-  R5 = abs(determinant(R)) * inv(R);
-  for(int i = 1; i <= m; i++){
-    for(int j = 1; j <= m; j++){
-      R5(i, j) = round(R5(i, j));
-    }
+
+  ZZ det;
+  // computes d = det A and solves X*A = I*d if d != 0.
+  // thus X = det A * A^{-1}, det X = (det A)^{n-1}.
+  inv(det, Inverse, Mat);
+  cone->determinant = det;
+  if (det < 0) {
+    // Fix the sign.
+    Inverse = -Inverse;
   }
-  mat_ZZ L;
-  L.SetDims(m, m);
-  for(int i = 1; i <= m; i++){
-    for(int j = 1; j <= m; j++){
-      conv(L(i, j), R5(i, j));
-    }
-  }
-  return L;
+  Inverse = - transpose(Inverse);
+  // Don't cancel gcds here.
+  cone->dual_determinant = determinant(Inverse);
+  cone->facets
+    = transformArrayBigVectorToListVector(Inverse,
+					  numOfVars, numOfVars);
 }
 
 listCone* dualizeBackCones(listCone *cones, int numOfVars) 
 {
-  int i,len,numOfConesDualized,numOfAllCones;
-  ZZ x,y;
-  listVector *rays, *rays2;
+  int numOfConesDualized,numOfAllCones;
   listCone *tmp;
 
-  mat_ZZ Inverse;
-  Inverse.SetDims(numOfVars, numOfVars);
   numOfConesDualized=0;
   numOfAllCones=lengthListCone(cones);
 
   tmp=cones;
   while (tmp) {
-    rays=tmp->rays;
-    rays2=rays;
-    len=lengthListVector(rays);
-
-    for(i = 0; i < numOfVars; i++) {
-      Inverse[i] = rays->first;
-      rays = rays -> rest;
-    }
-    ZZ det = tmp->determinant;
-    ZZ new_det;
-    // assert(abs(determinant(Inverse)) == det);
-    if (abs(det) == 1) {
-      Inverse = - transpose(inv(Inverse));
-      new_det = 1;
-    }
-    else {
-      Inverse = - transpose(scaled_inverse(Inverse));
-      for (i = 0; i < numOfVars; i++) {
+    if (tmp->facets == NULL) 
+      computeDetAndFacetsOfSimplicialCone(tmp, numOfVars);
+    swap(tmp->determinant, tmp->dual_determinant);
+    swap(tmp->rays, tmp->facets);
+    listVector *ray;
+    if (abs(tmp->determinant) != 1) {
+      for (ray = tmp->rays; ray != NULL; ray = ray->rest) {
 	/* Cancel GCD: */
 	ZZ gcd;
 	int j;
 	for (j = 0; j<numOfVars; j++)
-	  gcd = GCD(gcd, Inverse[i][j]);
+	  gcd = GCD(gcd, ray->first[j]);
 	if (gcd != 0 && gcd != 1) {
 	  for (j = 0; j<numOfVars; j++)
-	    Inverse[i][j] /= gcd;
+	    ray->first[j] /= gcd;
+	  tmp->determinant /= gcd;
 	}
       }
-      new_det = determinant(Inverse);
-      if (abs(det) > 1) 
-	cout << "Determinant of dual: " << det
-	     << ", primal: " <<  new_det << endl;
+      cout << "Determinant of dual: " << tmp->dual_determinant
+	   << ", primal: " <<  tmp->determinant << endl;
     }
-    tmp->determinant = abs(new_det);
-    for(i = 0; i < numOfVars; i++) {
-      rays2->first = Inverse[i];
-      rays2 = rays2 -> rest;
-    }
-
+    freeListVector(tmp->facets);
+    tmp->facets = NULL;
     tmp=tmp->rest;
     numOfConesDualized++;
     if (numOfConesDualized==50*(numOfConesDualized/50)) {
       printf("%d / %d done.\n",numOfConesDualized,numOfAllCones);
     }
   }
-
-  // removeListVector(cones->facets);
   return (cones);
 }
+
 /* ----------------------------------------------------------------- */
 
