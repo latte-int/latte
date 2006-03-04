@@ -16,7 +16,7 @@ void printListVectorToFileWithoutBrackets(ofstream &, listVector*, int);
 void printRationalVectorToFile(ofstream &, rationalVector*, int);
 void printRationalVectorToFileWithoutBrackets(ofstream &, rationalVector*, 
 					      int);
-void printConeToFile(ofstream &,listCone*, int);
+void printConeToFile(ofstream &out, listCone* cones, int numOfVars);
 void printListConeToFile(char*, listCone*, int); 
 void printResidueFile(char*, listCone*, int);
 
