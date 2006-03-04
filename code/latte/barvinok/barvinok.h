@@ -10,7 +10,43 @@
 #define BARVINOK__H
 
 #include "myheader.h"
-#include "flags.h"
+
+struct BarvinokParameters {
+  // FIXME: Following does not really belong here.
+  // Whether we use the
+  //   - traditional LattE monomial substitution z_i |-> (1 + s)^(lambda_i) 
+  //   - or the exponential substitution         z_i |-> exp(t lambda_i)
+  enum { PolynomialSubstitution, ExponentialSubstitution } substitution;
+  // The maximum determinant of cones that we do not subdivide
+  // further.  Set to 1 to subdivide until we reach unimodular cones
+  // only.
+  int max_determinant;
+  // A file name that is used for constructing file names for
+  // temporary and semi-temporary files.
+  char *File_Name;
+  // Ambient dimension.
+  int Number_of_Variables;
+};
+
+class Single_Cone_Parameters : public BarvinokParameters {
+public:
+  // Parameters that control the computation.
+  unsigned int	Flags;
+public:
+  // Data that are used during the computation.
+  //listCone	*Cone;		// The master cone to be decomposed.
+  int		Cone_Index;	/* Its index in the list of all master
+				   cones; only used for naming
+				   triangulation caches. */
+public:
+  // Statistics collected during the computation.
+  ZZ		Total_Uni_Cones;
+  ZZ		Current_Simplicial_Cones_Total;
+  ZZ		Max_Simplicial_Cones_Total;
+public:
+  virtual int ConsumeCone(listCone *cone) = 0;
+  virtual ~Single_Cone_Parameters() {}
+};
 
 /* Do a signed decomposition, modulo lower-dimensional cones, of the
    SIMPLICIAL cone spanned by the ROW VECTORS of B with apex at
@@ -22,7 +58,5 @@
 int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 		rationalVector *vertex);
-
-
 
 #endif
