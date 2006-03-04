@@ -89,8 +89,8 @@ int ResidueFunction_Single_Cone(listCone *cones,
     					//cout << "ResidueFunction_Single: Random Lambda = ";
 					for(k = 0; k < dim - 1; k++)
 					{
-    						Cones_Array[i].Generators_of_Cone[j].R_Exponent += basis->first[k] * Residue_Parameters->Random_Lambda[k];
-      						//cout << Residue_Parameters->Random_Lambda[k] << " ";
+    						Cones_Array[i].Generators_of_Cone[j].R_Exponent += basis->first[k] * Residue_Parameters->generic_vector[k];
+      						//cout << Residue_Parameters->generic_vector[k] << " ";
 					}
 					//cout << endl;
 
