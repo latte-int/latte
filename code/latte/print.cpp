@@ -183,10 +183,10 @@ void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
   out << "Extreme rays:\n";  
   printListVectorToFile(out,cones->rays,numOfVars);
 
-  cout << "Determinant:" << cones->determinant << endl;
+  out << "Determinant:" << cones->determinant << endl;
   
-  cout << "Facets:\n";  
-  printListVector(cones->facets,numOfVars);
+  out << "Facets:\n";  
+  printListVectorToFile(out,cones->facets,numOfVars);
 
   out << "Lattice points in parallelepiped:\n";
   printListVectorToFile(out,cones->latticePoints,numOfVars);
