@@ -17,6 +17,10 @@ struct BarvinokParameters {
   //   - traditional LattE monomial substitution z_i |-> (1 + s)^(lambda_i) 
   //   - or the exponential substitution         z_i |-> exp(t lambda_i)
   enum { PolynomialSubstitution, ExponentialSubstitution } substitution;
+  // Whether to use
+  //  - traditional dual decomposition
+  //  - irrational primal decomposition
+  enum { DualDecomposition, IrrationalPrimalDecomposition } decomposition; 
   // The maximum determinant of cones that we do not subdivide
   // further.  Set to 1 to subdivide until we reach unimodular cones
   // only.
