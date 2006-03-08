@@ -45,6 +45,7 @@
 #include "convert.h"
 #include "ExponentialSubst.h"
 #include "ExponentialApprox.h"
+#include "Irrational.h"
 
 ZZ computeNumberOfLatticePoints(listCone *cones, int numOfVars,
 				const BarvinokParameters &param)
@@ -118,6 +119,7 @@ int main(int argc, char *argv[]) {
   strcpy(cddstyle, "no");
   strcpy(LRS, "no");
   params.substitution = BarvinokParameters::PolynomialSubstitution;
+  params.decomposition = BarvinokParameters::DualDecomposition;
   params.max_determinant = 1;
 
   int last_command_index = argc - 2;
@@ -152,6 +154,8 @@ int main(int argc, char *argv[]) {
       params.substitution = BarvinokParameters::ExponentialSubstitution;
     else if (strncmp(argv[i], "--maxdet=", 9) == 0)
       params.max_determinant = atoi(argv[i] + 9);
+    else if (strncmp(argv[i], "--irr", 5) == 0)
+      params.decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     else {
       cerr << "Unknown command/option " << argv[i] << endl;
       exit(1);
@@ -173,7 +177,6 @@ int main(int argc, char *argv[]) {
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
   cout << invocation;
-  char costFile[127];
   strcpy(fileName,argv[argc-1]);
   //  cout << fileName << " " << costFile << endl;
   //strcpy (fileName,"stdin");
@@ -280,7 +283,6 @@ int main(int argc, char *argv[]) {
     tmp_den.SetLength(numOfVars);
     tmp_num.SetLength(numOfVars);
 /* Compute vertices and edges. */
-    rationalVector* LP_vertex;
     if (Vrepresentation[0] == 'n') {
     if(LRS[0] == 'n')
     tmpcones=computeVertexCones(fileName,matrix,numOfVars);
@@ -294,12 +296,23 @@ int main(int argc, char *argv[]) {
 
     /* Compute triangulation or decomposition of each vertex cone. */
 
-    cones=dualizeCones(cones,numOfVars);
-
+    switch (params.decomposition) {
+    case BarvinokParameters::DualDecomposition:
+      cones=dualizeCones(cones,numOfVars);
+      break;
+    case BarvinokParameters::IrrationalPrimalDecomposition:
+      irrationalizeCones(cones, numOfVars);
+      break;
+    default:
+      cerr << "Unknown BarvinokParameters::decomposition";
+      abort();
+    }
     Integer number_of_lattice_points;
     switch (params.substitution) {
     case BarvinokParameters::PolynomialSubstitution:
-      decomposeCones_Single(cones,numOfVars, degree, flags, fileName);
+      decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
+			    params.max_determinant,
+			    params.decomposition == BarvinokParameters::DualDecomposition);
       // FIXME: This outputs the number of lattice points itself.
       break;
     case BarvinokParameters::ExponentialSubstitution:
