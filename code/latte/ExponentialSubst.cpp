@@ -124,7 +124,8 @@ computeExponentialResidue(const listCone *cones, int numOfVars)
 int Exponential_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 {
   assert(cone->rest == NULL);
-  cone = dualizeBackCones (cone, Number_of_Variables);   	
+  if (decomposition == BarvinokParameters::DualDecomposition) 
+    cone = dualizeBackCones (cone, Number_of_Variables);
   computePointsInParallelepiped(cone, Number_of_Variables);
   int status = 1;
   try {
