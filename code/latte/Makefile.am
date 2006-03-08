@@ -41,9 +41,9 @@ if MAINTAINER_MODE
 # Experimental stuff
 bin_PROGRAMS += test-todd simple-count	
 nodist_liblatte_a_SOURCES = \
-	ExponentialApprox.cpp
+	ExponentialApprox.cpp Irrational.cpp
 nodist_noinst_HEADERS = \
-	ExponentialApprox.h
+	ExponentialApprox.h Irrational.h
 
 nodist_simple_count_SOURCES = simple-main.cpp
 nodist_test_todd_SOURCES = todd/test-todd.cpp
