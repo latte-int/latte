@@ -1,3 +1,109 @@
+2006-03-08  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Add infrastructure for irrational primal decompositions.
+	
+	* code/latte/barvinok/barvinok.h (BarvinokParameters): New slot
+	"decomposition".
+
+	* code/latte/barvinok/dec.h, code/latte/barvinok/dec.cpp
+	(decomposeCones_Single): Change interface.
+
+	* code/latte/barvinok/dec.cpp 
+	(Standard_Single_Cone_Parameters::ConsumeCone): Don't dualize back
+	in the primal case.
+	* code/latte/ExponentialSubst.cpp
+	(Exponential_Single_Cone_Parameters::ConsumeCone): Don't dualize
+	back in the primal case.
+	* code/latte/ExponentialApprox.cpp
+	(Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone):
+	Don't dualize back in the primal case.
+
+	* code/latte/simple-main.cpp:
+	New switch --irr, irrational decomposition.
+
+	* code/latte/Irrational.cpp, code/latte/Irrational.h: New files.
+
+2006-03-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Compute and store the data of the polar cones during the Barvinok
+	decomposition.
+	
+	* code/latte/genFunction/piped.cpp
+	(computePointsInParallelepiped): The stored determinant is now
+	signed, so discriminate on its absolute value.
+
+	* code/latte/barvinok/barvinok.cpp (barvinok_Single):
+	Call computeDetAndFacetsOfSimplicialCone for the
+	to-be-decomposed cone.
+	(barvinokStep): Pass precomputed dual to ComputeOmega; call
+	computeDetAndFacetsOfSimplicialCone for the subcones.
+
+	* code/latte/dual.cpp, code/latte/dual.h (computeDetAndFacetsOfSimplicialCone):
+	New.
+	(dualizeBackCones): Use it here.
+
+	* code/latte/barvinok/Cone.cpp, code/latte/barvinok/Cone.h (ComputeOmega):
+	Change interface to make use of precomputed dual (-transpose(inv(B))).
+
+	* code/latte/convert.cpp, code/latte/convert.h (createFacetMatrix):
+	New.
+
+2006-03-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	More code clean up.
+	
+	* code/latte/myheader.h (listVector, rationalVector, listCone):
+	Moved to cone.h, rational.h
+
+	* code/latte/rational.h (rationalVector): Moved here from myheader.h
+
+	* code/latte/cone.h (listVector, listCone): Move here from myheader.h
+
+	* code/latte/Makefile.am: Build experimental stuff only in
+	"maintainer mode".
+
+	* code/latte/Residue.cpp, code/latte/Residue.h (Residue_Single_Cone):
+	Change interface slightly.
+
+	* code/latte/ExponentialSubst.cpp, code/latte/ExponentialSubst.h:
+	Use Generic_Vector_Single_Cone_Parameters to simplify the code.
+
+	* code/latte/ResSingle.cpp: Rename the Random_Lambda slot to
+	generic_vector.
+
+	* code/latte/flags.h: Moved class definitions elsewhere,
+	now only contains flags again.
+
+	* code/latte/barvinok/barvinok.h (BarvinokParameters, Single_Cone_Parameters):
+	Move here from flags.h
+
+	* code/latte/barvinok/dec.cpp, code/latte/barvinok/dec.h (Collecting_Single_Cone_Parameters):
+	Move here from flags.h
+	(Standard_Single_Cone_Parameters): Move here from flags.h
+	(NotGenericException): Move here from ExponentialSubst.h
+	(guess_generic_vector): Move here from ExponentialSubst.h
+
+	(Generic_Vector_Single_Cone_Parameters): New class.
+	(barvinokDecomposition_List): New function.
+
+2006-03-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ExponentialSubst.cpp, code/latte/ExponentialSubst.h
+	(computeExponentialResidueWeights): New, factored out from
+	computeExponentialResidue_Single.
+
+	* code/latte/dual.h: Add preprocessor magic.
+
+	* code/latte/Grobner.cpp, code/latte/Makefile.am,
+	code/latte/Residue.cpp, code/latte/Residue.h,
+	code/latte/count.cpp, code/latte/ehrhart.cpp,
+	code/latte/maximize.cpp, code/latte/minimize.cpp,
+	code/latte/print.cpp, code/latte/print.h,
+	code/latte/printsingle.cpp, code/latte/barvinok/dec.cpp,
+	code/latte/simple-main.cpp: 
+	Move residue calculations from print.cpp, print.h, printsingle.cpp to
+	Residue.cpp, Residue.h.
+
 2006-03-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/barvinok/barvinok.cpp (PtrCone): Removed.
