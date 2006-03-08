@@ -69,7 +69,10 @@ class Standard_Single_Cone_Parameters
 	virtual int ConsumeCone(listCone *cone);
 };
 
+// FIXME: Interface wants to be nicer.
 void decomposeCones_Single (listCone *, int, int degree,
-			    unsigned int flags, char *File_Name);
+			    unsigned int flags, char *File_Name,
+			    int max_determinant = 1,
+			    bool dualizeBack = true);
 
 #endif
