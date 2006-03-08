@@ -181,7 +181,8 @@ barvinokDecomposition_List(listCone *cones,
 
 int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 {
-  Cone = dualizeBackCones (Cone, Number_of_Variables);   	
+  if (decomposition == BarvinokParameters::DualDecomposition) 
+    Cone = dualizeBackCones (Cone, Number_of_Variables);
   //cout << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
   if ( (Flags & DUAL_APPROACH) == 0)
     computePointsInParallelepiped(Cone, Number_of_Variables);
@@ -198,7 +199,9 @@ int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 }
 
 // FIXME: Reimplement in terms of barvinokDecomposition_List.
-void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned int flags, char *File_Name) 
+void decomposeCones_Single (listCone *cones, int numOfVars, int degree,
+			    unsigned int flags, char *File_Name, int max_determinant,
+			    bool dualizeBack) 
 {
 	int numOfConesDecomposed,numOfAllCones,numOfRays;
   	mat_ZZ mat;
@@ -214,6 +217,7 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 
 	
 	//Set Ten_Power to 100 billion
+	// FIXME: What is magic about this number? --mkoeppe, Sat Mar  4 21:21:45 PST 2006
 	Barvinok_Parameters->Ten_Power = 1;
 	for (int i = 0; i < Exponent_Ten_Power; i++)	
 	  Barvinok_Parameters->Ten_Power *= 10;
@@ -225,9 +229,14 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree, unsigned
 	Barvinok_Parameters->Degree_of_Taylor_Expansion = degree;
 	Barvinok_Parameters->Flags = flags;
 	Barvinok_Parameters->Number_of_Variables = numOfVars;
-	Barvinok_Parameters->max_determinant = 1;
+	Barvinok_Parameters->max_determinant = max_determinant;
 	Barvinok_Parameters->File_Name = File_Name;
 	Barvinok_Parameters->Controller = new Node_Controller(numOfVars + 1, degree);			
+	//FIXME: Ugly.
+	Barvinok_Parameters->decomposition
+	  = (dualizeBack
+	     ? BarvinokParameters::DualDecomposition
+	     : BarvinokParameters::IrrationalPrimalDecomposition);
 	
 	cout << "Number of cones: " << numOfAllCones << endl;
 	
