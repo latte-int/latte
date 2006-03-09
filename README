@@ -1,4 +1,4 @@
-This is a version of LattE, derived from Release 1.2
+This is LattE Macchiato, a version of LattE derived from the official Release 1.2.
 
 It requires the following programs and libraries: 
 
@@ -13,7 +13,7 @@ It requires the following programs and libraries:
 Building and installing LattE
 -----------------------------
 
-The following instructions assume you want to install all LattE and
+The following instructions assume you want to install LattE and
 all its prerequisites into your home directory, namely into a
 hierarchy rooted at the directory $HOME/latte.
 
