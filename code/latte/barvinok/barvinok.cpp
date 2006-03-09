@@ -23,6 +23,7 @@
 #include "rational.h"
 #include "convert.h"
 #include "dual.h"
+#include "Irrational.h"
 
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
@@ -119,6 +120,20 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	dummy->vertex = copyRationalVector(vertex);
 	dummy->rays = transformArrayBigVectorToListVector(B, m, n);
 
+	switch (Parameters->decomposition) {
+	case BarvinokParameters::DualDecomposition:
+	  // Keep the dual cones during Barvinok decomposition
+	  break;
+	case BarvinokParameters::IrrationalPrimalDecomposition:
+	  // Do Barvinok decomposition on the primal cones.
+	  dualizeBackCones(dummy, Parameters->Number_of_Variables);
+	  irrationalizeCone(dummy, Parameters->Number_of_Variables);
+	  break;
+	default:
+	  cerr << "Unknown BarvinokParameters::decomposition";
+	  abort();
+	}
+	
 	computeDetAndFacetsOfSimplicialCone(dummy, n);
 	
 	int result;
@@ -230,8 +245,17 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     if ( Parameters->Total_Uni_Cones % 1000 == 0)
       cout << Parameters->Total_Uni_Cones
 	   << " unimodular cones done." << endl;
-    return Parameters->ConsumeCone(C);
-  } 		     
+    switch (Parameters->decomposition) {
+    case BarvinokParameters::DualDecomposition:
+      C = dualizeBackCones(C, Parameters->Number_of_Variables);
+      return Parameters->ConsumeCone(C);
+    case BarvinokParameters::IrrationalPrimalDecomposition:
+      return Parameters->ConsumeCone(C);
+    default:
+      cerr << "Unknown BarvinokParameters::decomposition";
+      abort();
+    }
+  }	     
   
   //cout << "barvinok_DFS: non-uni cone." << endl;
      
