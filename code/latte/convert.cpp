@@ -7,19 +7,16 @@ transformArrayBigVectorToListVector(const mat_ZZ &A, int numOfVectors,
 {
   int i;
   vec_ZZ v;
-  listVector *L, *endL;
+  listVector *L = NULL, **endL;
 
-  v=createVector(numOfVars);
-  L=createListVector(v);
-  endL=L;
-
+  endL = &L;
   for (i=0; i<numOfVectors; i++) {
     v=A[i];
-    endL->rest = createListVector(v);
-    endL = endL->rest;
+    *endL = createListVector(v);
+    endL = &(*endL)->rest;
   }
 
-  return (L->rest);
+  return L;
 }
 
 mat_ZZ
