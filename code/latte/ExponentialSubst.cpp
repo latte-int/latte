@@ -7,6 +7,7 @@
 #include "dual.h"
 #include "cone.h"
 #include "barvinok/ConeDecom.h"
+#include "print.h"
 
 Integer
 scalar_power(const vec_ZZ &generic_vector,
@@ -124,8 +125,6 @@ computeExponentialResidue(const listCone *cones, int numOfVars)
 int Exponential_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 {
   assert(cone->rest == NULL);
-  if (decomposition == BarvinokParameters::DualDecomposition) 
-    cone = dualizeBackCones (cone, Number_of_Variables);
   computePointsInParallelepiped(cone, Number_of_Variables);
   int status = 1;
   try {
@@ -152,6 +151,7 @@ Integer
 decomposeAndComputeExponentialResidue(listCone *cones, 
 				      Exponential_Single_Cone_Parameters &param)
 {
+  //printListCone(cones, param.Number_of_Variables);
   barvinokDecomposition_List(cones, param);
   assert(param.result.get_den()==1);
   return convert_mpz_to_ZZ(param.result.get_num());
