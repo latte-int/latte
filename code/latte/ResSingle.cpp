@@ -66,7 +66,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	
   	Integer tmp_A;
 
-  	listVector *basis, *listtmp1;//, *listtmp2;
+  	listVector *basis;
   	listCone *listtmp3;
   	cones1 = cones;
   	i = 0;
@@ -117,10 +117,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 					if (basis->first[dim - 1] == 0)  //if the exponent of t is zero, increment the order for this cone
 					Cones_Array[i].order++;
       
-    					listtmp1 = basis;
     					basis = basis->rest;
-    					listtmp1->first.kill ();
-					delete listtmp1;
     				}
   			}
     			//listtmp2 = tmp;
@@ -129,7 +126,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
     		//}
     		listtmp3 = cones1;
     		cones1 = cones1->rest;
-    		delete listtmp3;
+    		freeCone(listtmp3);
   	}
 	//cout << "ResidueFunction_Single: Done reading input." << endl;  
 	
