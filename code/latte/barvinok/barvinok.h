@@ -20,7 +20,8 @@ struct BarvinokParameters {
   // Whether to use
   //  - traditional dual decomposition
   //  - irrational primal decomposition
-  enum { DualDecomposition, IrrationalPrimalDecomposition } decomposition; 
+  typedef enum { DualDecomposition, IrrationalPrimalDecomposition } DecompositionType;
+  DecompositionType decomposition; 
   // The maximum determinant of cones that we do not subdivide
   // further.  Set to 1 to subdivide until we reach unimodular cones
   // only.
