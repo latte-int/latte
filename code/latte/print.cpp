@@ -188,6 +188,8 @@ void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
   out << "Facets:\n";  
   printListVectorToFile(out,cones->facets,numOfVars);
 
+  out << "Dual determinant:" << cones->dual_determinant << endl;
+  
   out << "Lattice points in parallelepiped:\n";
   printListVectorToFile(out,cones->latticePoints,numOfVars);
   out << "==========\n\n";
