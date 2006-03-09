@@ -123,6 +123,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	switch (Parameters->decomposition) {
 	case BarvinokParameters::DualDecomposition:
 	  // Keep the dual cones during Barvinok decomposition
+	  computeDetAndFacetsOfSimplicialCone(dummy, n);
 	  break;
 	case BarvinokParameters::IrrationalPrimalDecomposition:
 	  // Do Barvinok decomposition on the primal cones.
@@ -133,8 +134,6 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	  cerr << "Unknown BarvinokParameters::decomposition";
 	  abort();
 	}
-	
-	computeDetAndFacetsOfSimplicialCone(dummy, n);
 	
 	int result;
 	result = barvinok_DFS(dummy, Parameters);
