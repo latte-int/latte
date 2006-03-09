@@ -1,9 +1,9 @@
-This is LattE Macchiato, a version of LattE derived from the official Release 1.2.
+-This is LattE Macchiato, a version of LattE derived from the official Release 1.2.
 
 It requires the following programs and libraries: 
 
   * GMP, compiled with --enable-cxx
-  * NTL
+  * NTL, version 5.4 or newer
   * CDD+
   * cddlib
   * (optional) LRS

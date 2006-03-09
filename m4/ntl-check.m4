@@ -34,7 +34,7 @@ AC_ARG_WITH(ntl,
 	     fi],
 	     [])
 
-min_ntl_version=ifelse([$1], ,5.0,$1)
+min_ntl_version=ifelse([$1], ,5.4,$1)
 
 
 dnl Check for existence
@@ -67,6 +67,7 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	[#include <NTL/version.h>
 	 #include <NTL/config.h>
 	int main () { if (NTL_MAJOR_VERSION < 5) return -1; 
+	  if (NTL_MAJOR_VERSION == 5 && NTL_MINOR_VERSION < 4) return -1;
 	return 0;
 	}	
 	],[

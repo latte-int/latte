@@ -34,7 +34,7 @@ make sure GMP is installed and specify its location with the option
 --with-gmp=<prefix> when running configure.])
 ])
 LB_CHECK_NTL(,,[AC_MSG_ERROR([NTL not found!
-NTL version 5.0 or greater is required for LattE to compile. Please
+NTL version 5.4 or greater is required for LattE to compile. Please
 make sure NTL is installed and specify its location with the option
 --with-ntl=<prefix> when running configure.])
 ])
