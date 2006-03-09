@@ -290,8 +290,8 @@ listCone* dualizeBackCones(listCone *cones, int numOfVars)
 	  tmp->determinant /= gcd;
 	}
       }
-      cout << "Determinant of dual: " << tmp->dual_determinant
-	   << ", primal: " <<  tmp->determinant << endl;
+///       cout << "Determinant of dual: " << tmp->dual_determinant
+/// 	   << ", primal: " <<  tmp->determinant << endl;
     }
     freeListVector(tmp->facets);
     tmp->facets = NULL;
