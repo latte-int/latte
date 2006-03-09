@@ -155,7 +155,7 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 			
 		}
 
-		delete Temp_Parameters->Result;
+		delete[] Temp_Parameters->Result;
 		delete Temp_Parameters;
 
 		
@@ -213,7 +213,7 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		}
 		//cout << "Done smushing" << endl;
 
-		delete Temp_Parameters->Result;
+		delete[] Temp_Parameters->Result;
 		delete Temp_Parameters;
 
 		
@@ -361,7 +361,7 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		  	}
 		
 
-		delete Temp_Parameters->Result;
+		delete[] Temp_Parameters->Result;
 		delete Temp_Parameters;
 		
 		
