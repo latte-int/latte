@@ -600,7 +600,7 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 
   vector<Integer> dotProducts(totalNoGs);
   
-  listVector* basis, *listtmp1, *listtmp2;
+  listVector* basis;
   listCone *listtmp3;
   cones1 = cones;
   i = 0;
@@ -636,24 +636,18 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 					if(dotProducts[i*noGsPerC + j] == 0)
 						result = -1;
 	
- 	   				listtmp1 = basis;
     					basis = basis->rest;
-					listtmp1->first.kill ();  
-					delete listtmp1;
     				}
   				// i++;
   			}
     		//  out << endl;
-    		listtmp2 = tmp;
       		tmp=tmp->rest; 
 		i++;
-      		delete listtmp2;
     		}
 	listtmp3 = cones1;
     	cones1 = cones1->rest;
-    	delete listtmp3;
+	freeCone(listtmp3);
   }
-	
 
 if(result == -1)
 	return result;
