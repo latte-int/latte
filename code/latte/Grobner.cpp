@@ -655,11 +655,8 @@ void SolveGrobner(char * filename, char * nonneg, char * dualApproach,
   if(CheckFeas == 0){
   cones=computeVertexConesViaLrs(File,matrix,numOfVars);
 
-  cones=dualizeCones(cones,numOfVars);
-
-  cones=decomposeCones(cones,numOfVars, flags, File);
-
-  cones=dualizeBackCones(cones,numOfVars);
+  cones=decomposeCones(cones,numOfVars, flags, File, 1, true,
+		       BarvinokParameters::DualDecomposition);
   
   tmp=cones;
 

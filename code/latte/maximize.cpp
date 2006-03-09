@@ -376,13 +376,15 @@ int main(int argc, char *argv[]) {
 
 	if (Memory_Save[0] == 'n' )
 	{
-    		cones=decomposeCones(cones,numOfVars, flags, fileName); 
-    		cones=dualizeBackCones(cones,numOfVars);
+	  cones=decomposeCones(cones,numOfVars, flags, fileName,
+			       1, false,
+			       BarvinokParameters::DualDecomposition); 
   	}
-
 	else
-	{
-		decomposeCones_Single(cones, numOfVars, degree, flags, fileName);
+	  {
+	    decomposeCones_Single(cones, numOfVars, degree, flags, fileName,
+				  1, false,
+				  BarvinokParameters::DualDecomposition);
 	}
 
  } 
@@ -391,21 +393,18 @@ int main(int argc, char *argv[]) {
    {
 
     if (assumeUnimodularCones[0]=='n') {
-
-
-      cones=dualizeCones(cones,numOfVars);
-      
       if (decompose[0]=='y') 
       {
 	if(Memory_Save[0] == 'n')      
-     	 	cones=decomposeCones(cones,numOfVars, flags, fileName);
+	  cones=decomposeCones(cones,numOfVars, flags, fileName,
+			       1, true,
+			       BarvinokParameters::DualDecomposition);
 	// Iterator through simplicial cones, DFS
 	else
-		decomposeCones_Single(cones,numOfVars, degree, flags, fileName);	
+	  decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
+				1, true,
+				BarvinokParameters::DualDecomposition);	
       }
-      
-      if(Memory_Save[0] == 'n')
-      	cones=dualizeBackCones(cones,numOfVars);
     }
    }
 

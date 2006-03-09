@@ -295,24 +295,12 @@ int main(int argc, char *argv[]) {
   } 
 
     /* Compute triangulation or decomposition of each vertex cone. */
-
-    switch (params.decomposition) {
-    case BarvinokParameters::DualDecomposition:
-      cones=dualizeCones(cones,numOfVars);
-      break;
-    case BarvinokParameters::IrrationalPrimalDecomposition:
-      irrationalizeCones(cones, numOfVars);
-      break;
-    default:
-      cerr << "Unknown BarvinokParameters::decomposition";
-      abort();
-    }
     Integer number_of_lattice_points;
     switch (params.substitution) {
     case BarvinokParameters::PolynomialSubstitution:
       decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
 			    params.max_determinant,
-			    params.decomposition == BarvinokParameters::DualDecomposition);
+			    true, params.decomposition);
       // FIXME: This outputs the number of lattice points itself.
       break;
     case BarvinokParameters::ExponentialSubstitution:
