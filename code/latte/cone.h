@@ -26,6 +26,9 @@ typedef struct listCone {
 listCone* createListCone();
 int lengthListCone(listCone*);
 
+/* Free the first cone, not the whole list. */
+void freeCone(listCone *cone);
+
 /* Free the whole list of cones. */
 void freeListCone(listCone *list);
 

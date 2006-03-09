@@ -27,15 +27,20 @@ int lengthListCone(listCone* LIST) {
   return (len);
 }
 /* ----------------------------------------------------------------- */
+void freeCone(listCone *cone)
+{
+  delete cone->vertex;
+  freeListVector(cone->rays);
+  freeListVector(cone->facets);
+  freeListVector(cone->latticePoints);
+  delete cone;
+}
+
 void freeListCone(listCone *list)
 {
   while (list != NULL) {
     listCone *rest = list->rest;
-    delete list->vertex;
-    freeListVector(list->rays);
-    freeListVector(list->facets);
-    freeListVector(list->latticePoints);
-    delete list;
+    freeCone(list);
     list = rest;
   }
 }
