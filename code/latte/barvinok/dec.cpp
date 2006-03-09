@@ -96,7 +96,9 @@ int Collecting_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 
 listCone*
 decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
-	       char *File_Name, int max_determinant)
+	       char *File_Name, int max_determinant,
+	       bool dualize,
+	       BarvinokParameters::DecompositionType decomposition)
 {
   int numOfConesDecomposed,numOfAllCones;
   listCone *tmp;
@@ -106,7 +108,11 @@ decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
   parameters.Number_of_Variables = numOfVars;
   parameters.max_determinant = max_determinant;
   parameters.File_Name = File_Name;
+  parameters.decomposition = decomposition;
 
+  if (dualize) 
+    cones=dualizeCones(cones,numOfVars);
+    
   cout << "Decomposing all cones.\n";
   numOfConesDecomposed=0;
   numOfAllCones=lengthListCone(cones);
@@ -181,11 +187,10 @@ barvinokDecomposition_List(listCone *cones,
 
 int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 {
-  if (decomposition == BarvinokParameters::DualDecomposition) 
-    Cone = dualizeBackCones (Cone, Number_of_Variables);
   //cout << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
   if ( (Flags & DUAL_APPROACH) == 0)
     computePointsInParallelepiped(Cone, Number_of_Variables);
+  //printListCone(Cone, Number_of_Variables);
 		
   if (Flags & DUAL_APPROACH)	
     {
@@ -201,7 +206,8 @@ int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 // FIXME: Reimplement in terms of barvinokDecomposition_List.
 void decomposeCones_Single (listCone *cones, int numOfVars, int degree,
 			    unsigned int flags, char *File_Name, int max_determinant,
-			    bool dualizeBack) 
+			    bool dualize,
+			    BarvinokParameters::DecompositionType decomposition) 
 {
 	int numOfConesDecomposed,numOfAllCones,numOfRays;
   	mat_ZZ mat;
@@ -233,11 +239,11 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree,
 	Barvinok_Parameters->File_Name = File_Name;
 	Barvinok_Parameters->Controller = new Node_Controller(numOfVars + 1, degree);			
 	//FIXME: Ugly.
-	Barvinok_Parameters->decomposition
-	  = (dualizeBack
-	     ? BarvinokParameters::DualDecomposition
-	     : BarvinokParameters::IrrationalPrimalDecomposition);
-	
+	Barvinok_Parameters->decomposition = decomposition;
+
+	if (dualize)
+	  cones=dualizeCones(cones,numOfVars);
+
 	cout << "Number of cones: " << numOfAllCones << endl;
 	
 	while (Success == 0)

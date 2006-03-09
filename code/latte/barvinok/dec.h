@@ -19,9 +19,12 @@ public:
   virtual int ConsumeCone(listCone *cone);
 };
 
+// FIXME: Interface wants to be nicer.
 listCone*
-decomposeCones(listCone*, int, unsigned int Flags,
-	       char *File_Name, int max_determinant = 1);
+decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
+	       char *File_Name, int max_determinant,
+	       bool dualize,
+	       BarvinokParameters::DecompositionType decomposition);
 
 
 /* Guess a generic vector; this is simply a random vector. */
@@ -69,10 +72,14 @@ class Standard_Single_Cone_Parameters
 	virtual int ConsumeCone(listCone *cone);
 };
 
-// FIXME: Interface wants to be nicer.
-void decomposeCones_Single (listCone *, int, int degree,
+// Decompose the polyhedral CONES down to MAX_DETERMINANT.  When
+// DUALIZE is true, the CONES are given in primal space, so dualize
+// before triangulating; otherwise CONES must be given in dual space
+// already.  
+void decomposeCones_Single (listCone *cones, int numOfVars, int degree,
 			    unsigned int flags, char *File_Name,
-			    int max_determinant = 1,
-			    bool dualizeBack = true);
+			    int max_determinant,
+			    bool dualize,
+			    BarvinokParameters::DecompositionType decomposition);
 
 #endif
