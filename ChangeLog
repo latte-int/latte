@@ -1,3 +1,68 @@
+2006-03-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Fix some memory problems.
+	
+	* code/latte/rational.cpp:
+	Use abort() instead of exit(0) to indicate memory allocation error.
+
+	* code/latte/convert.cpp (transformArrayBigVectorToListVector):
+	Fix memory leak shown by valgrind.
+
+	* code/latte/cone.cpp, code/latte/cone.h (freeCone): New.
+	(freeListCone): Use it here.
+
+	* code/latte/Residue.cpp (Residue_Single_Cone):
+	Use freeCone() to delete all data of the cone.
+
+	* code/latte/PolyTree.cpp:
+	Fix delete/delete[] problem shown by valgrind.
+
+	* code/latte/barvinok/barvinok.cpp (barvinok_Single):
+	Don't computeDetAndFacetsOfSimplicialCone in the
+	IrrationalPrimalDecomposition case, where it is already computed.
+
+2006-03-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Implement irrational primal decompositions.
+	
+	* code/latte/count.cpp: Change calls to decomposeCones_Single,
+	decomposeCones.  New command-line options --irr, --maxdet=N.
+
+	* code/latte/Irrational.cpp (irrationalizeCone): Implement.
+
+	* code/latte/ExponentialSubst.cpp:
+	(Exponential_Single_Cone_Parameters::ConsumeCone): No need to
+	dualizeBack() anymore.
+
+	* code/latte/ExponentialApprox.cpp:
+	(Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone):
+	No need to dualizeBack() anymore.
+
+	* code/latte/Grobner.cpp, code/latte/ehrhart.cpp,
+	code/latte/maximize.cpp, code/latte/minimize.cpp,
+	code/latte/simple-main.cpp: Change calls to decomposeCones_Single,
+	decomposeCones.
+
+	* code/latte/barvinok/dec.cpp, code/latte/barvinok/dec.h
+	(decomposeCones, decomposeCones_Single): Change interface.
+
+	* code/latte/barvinok/barvinok.cpp (barvinokSingle):
+	In IrrationalPrimalDecomposition, polarize back and
+	irrationalize cones after triangulation.
+	(barvinok_DFS): In DualDecomposition, polarize back cones after
+	Barvinok decomposition; pass the polarized-back cone to ConsumeCone().
+
+	* code/latte/barvinok/barvinok.h
+	(BarvinokParameters::DecompositionType): New typedef.
+
+	* code/latte/print.cpp (printConeToFile): Also print dual determinant.
+
+	* code/latte/rational.cpp, code/latte/rational.h
+	(createRationalVector): Create a vector of length numOfVars, not
+	numOfVars+1.
+	(addRationalVector, scaleRationalVectorToInteger,
+	canonicalizeRationalVector): New.
+
 2006-03-08  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Add infrastructure for irrational primal decompositions.
