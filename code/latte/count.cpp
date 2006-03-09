@@ -13,6 +13,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <cassert>
 
 #include "myheader.h"
 #include "barvinok/dec.h"
@@ -63,7 +64,8 @@ int main(int argc, char *argv[]) {
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
   vec_ZZ cost;
   listVector *templistVec;
-  listCone *cones, *tmp, *tmpcones;
+  listCone *cones, *tmpcones;
+  struct BarvinokParameters params;
 
   latte_banner(cout);
 
@@ -101,36 +103,53 @@ int main(int argc, char *argv[]) {
   strcpy(inthull, "no");
   strcpy(cddstyle, "no");
   strcpy(LRS, "no");
+  params.substitution = BarvinokParameters::PolynomialSubstitution;
+  params.decomposition = BarvinokParameters::DualDecomposition;
+  params.max_determinant = 1;
 
-  for (i=1; i<argc-1; i++) {
+  int last_command_index = argc - 2;
+  for (i=1; i<=last_command_index; i++) {
     strcat(invocation,argv[i]);
     strcat(invocation," ");
     if (strncmp(argv[i],"vrep",3)==0) strcpy(Vrepresentation,"yes"); 
-    // if (strncmp(argv[i],"bbs",3)==0) strcpy(binary,"yes");
-    if (strncmp(argv[i],"int",3)==0) strcpy(interior,"yes");
-    //if (strncmp(argv[i],"min",3)==0) strcpy(minimize,"yes");
-    //if (strncmp(argv[i],"gro",3)==0) strcpy(grobner,"yes");
-    //if (strncmp(argv[i],"nodecom",3)==0) strcpy(decompose,"no");
-    if (strncmp(argv[i],"homog",3)==0) {strcpy(dualApproach,"yes"); flags |= DUAL_APPROACH;}
-    if (strncmp(argv[i],"equ",3)==0) strcpy(equationsPresent,"yes");
-    if (strncmp(argv[i],"uni",3)==0) strcpy(assumeUnimodularCones,"yes");
-    //if (strncmp(argv[i],"simp",4)==0) {strcpy(printfile,"yes"); flags |= PRINT;}
-    if(strncmp(argv[i],"file",4)==0) strcpy(Memory_Save, "no");
-    //if (strncmp(argv[i],"single",6)==0) strcpy(Singlecone,"yes");
-    //if (strncmp(argv[i],"tay",3)==0) strcpy(taylor,"yes");
-    //if (strncmp(argv[i],"ehrhartsimp",3)==0) strcpy(rationalCone,"yes");
-    if (strncmp(argv[i],"+", 1) ==0) strcpy(nonneg,"yes");
-    if (strncmp(argv[i],"memsave",7)==0) strcpy (Memory_Save, "yes");
-    if (strncmp(argv[i],"printcones",3)==0) strcpy (Print, "yes");
-    if (strncmp(argv[i],"cdd",3)==0) strcpy (cddstyle, "yes");
-    //if (strncmp(argv[i],"hull",3)==0) strcpy (inthull, "yes");
-    // if (strncmp(argv[i],"max",3)==0) strcpy (maximum, "yes");
-    if (strncmp(argv[i],"lrs",3)==0) strcpy (LRS, "yes");
-    if (strncmp(argv[i],"dil",3)==0) strcpy (dilation, "yes");
-    if (strncmp(argv[i],"rem",3)==0) strcpy (removeFiles, "no");
-    if (strncmp(argv[i],"rem",3)==0) strcpy (Memory_Save, "no");
-    if (strncmp(argv[i],"trisave",7)==0) {strcpy (Save_Tri, "yes"); flags |= SAVE;}
-    if (strncmp(argv[i],"triload",7)==0) {strcpy (Load_Tri, "yes"); flags |= LOAD;}
+    // else if(strncmp(argv[i],"bbs",3)==0) strcpy(binary,"yes");
+    else if(strncmp(argv[i],"int",3)==0) strcpy(interior,"yes");
+    //else if(strncmp(argv[i],"min",3)==0) strcpy(minimize,"yes");
+    //else if(strncmp(argv[i],"gro",3)==0) strcpy(grobner,"yes");
+    //else if(strncmp(argv[i],"nodecom",3)==0) strcpy(decompose,"no");
+    else if(strncmp(argv[i],"homog",3)==0) {strcpy(dualApproach,"yes"); flags |= DUAL_APPROACH;}
+    else if(strncmp(argv[i],"equ",3)==0) strcpy(equationsPresent,"yes");
+    else if(strncmp(argv[i],"uni",3)==0) strcpy(assumeUnimodularCones,"yes");
+    //else if(strncmp(argv[i],"simp",4)==0) {strcpy(printfile,"yes"); flags |= PRINT;}
+    else if(strncmp(argv[i],"file",4)==0) strcpy(Memory_Save, "no");
+    //else if(strncmp(argv[i],"single",6)==0) strcpy(Singlecone,"yes");
+    //else if(strncmp(argv[i],"tay",3)==0) strcpy(taylor,"yes");
+    //else if(strncmp(argv[i],"ehrhartsimp",3)==0) strcpy(rationalCone,"yes");
+    else if(strncmp(argv[i],"+", 1) ==0) strcpy(nonneg,"yes");
+    else if(strncmp(argv[i],"memsave",7)==0) strcpy (Memory_Save, "yes");
+    else if(strncmp(argv[i],"printcones",3)==0) strcpy (Print, "yes");
+    else if(strncmp(argv[i],"cdd",3)==0) strcpy (cddstyle, "yes");
+    //else if(strncmp(argv[i],"hull",3)==0) strcpy (inthull, "yes");
+    // else if(strncmp(argv[i],"max",3)==0) strcpy (maximum, "yes");
+    else if(strncmp(argv[i],"lrs",3)==0) strcpy (LRS, "yes");
+    else if(strncmp(argv[i],"dil",3)==0) {
+      strcpy (dilation, "yes");
+      last_command_index--;
+    }
+    else if(strncmp(argv[i],"rem",3)==0) strcpy (removeFiles, "no");
+    else if(strncmp(argv[i],"rem",3)==0) strcpy (Memory_Save, "no");
+    else if(strncmp(argv[i],"trisave",7)==0) {strcpy (Save_Tri, "yes"); flags |= SAVE;}
+    else if(strncmp(argv[i],"triload",7)==0) {strcpy (Load_Tri, "yes"); flags |= LOAD;}
+    else if (strncmp(argv[i], "--exp", 5) == 0)
+      params.substitution = BarvinokParameters::ExponentialSubstitution;
+    else if (strncmp(argv[i], "--maxdet=", 9) == 0)
+      params.max_determinant = atoi(argv[i] + 9);
+    else if (strncmp(argv[i], "--irr", 5) == 0)
+      params.decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
+    else {
+      cerr << "Unknown command/option " << argv[i] << endl;
+      exit(1);
+    }
   }
   if(minimize[0] == 'y') strcpy(maximum, "yes");
   if(grobner[0] == 'y') strcpy(equationsPresent,"yes");
@@ -374,7 +393,8 @@ int main(int argc, char *argv[]) {
      cones=computeVertexConesFromVrep(fileName,matrix,numOfVars); 
 
 /* Compute triangulation or decomposition of each vertex cone. */
-
+  assert(params.substitution == BarvinokParameters::PolynomialSubstitution);
+  
   if (dualApproach[0]=='y') {
     cones=createListCone();
     cones->vertex=createRationalVector(numOfVars);
@@ -393,13 +413,16 @@ int main(int argc, char *argv[]) {
 
 	if (Memory_Save[0] == 'n' )
 	{
-    		cones=decomposeCones(cones,numOfVars, flags, fileName); 
-    		cones=dualizeBackCones(cones,numOfVars);
+	  cones=decomposeCones(cones,numOfVars, flags, fileName,
+			       params.max_determinant, false,
+			       params.decomposition); 
   	}
 
 	else
-	{
-		decomposeCones_Single(cones, numOfVars, degree, flags, fileName);
+	  {
+	    decomposeCones_Single(cones, numOfVars, degree, flags, fileName,
+				  params.max_determinant, false,
+				  params.decomposition);
 	}
 
  } 
@@ -409,20 +432,18 @@ int main(int argc, char *argv[]) {
 
     if (assumeUnimodularCones[0]=='n') {
 
-
-      cones=dualizeCones(cones,numOfVars);
-      
       if (decompose[0]=='y') 
       {
 	if(Memory_Save[0] == 'n')      
-     	 	cones=decomposeCones(cones,numOfVars, flags, fileName);
+	  cones=decomposeCones(cones,numOfVars, flags, fileName,
+			       params.max_determinant, true,
+			       params.decomposition);
 	// Iterator through simplicial cones, DFS
 	else
-		decomposeCones_Single(cones,numOfVars, degree, flags, fileName);	
+	  decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
+				params.max_determinant, true,
+				params.decomposition);	
       }
-      
-      if(Memory_Save[0] == 'n')
-      	cones=dualizeBackCones(cones,numOfVars);
     }
    }
 
@@ -430,33 +451,8 @@ int main(int argc, char *argv[]) {
 
 
  if(Memory_Save[0] == 'n')
- {
-	 cout << "Computing the points in the Parallelepiped of the unimodular Cones." << endl;
-  	tmp=cones;
-	int	Cones_Processed_Count = 0;
- 	while (tmp) 
-	{
-    		if (decompose[0]=='n') 
-		{
-      			tmp->latticePoints=pointsInParallelepiped(tmp->vertex,tmp->rays,0,numOfVars);
-    		} 
-		else 
-		{
-      			tmp->latticePoints=pointsInParallelepipedOfUnimodularCone(tmp->vertex,tmp->rays,numOfVars);
-    		}
-		
-    		tmp=tmp->rest;
-
-		Cones_Processed_Count++;
-
-		if ((Cones_Processed_Count % 1000) == 0 )
-			cout << Cones_Processed_Count << " cones processed." << endl;
-  	}
-}
-  
-
-
-
+   computePointsInParallelepipeds(cones, numOfVars);
+ 
   if(grobner[0] == 'y'){
 
  cones = ProjectUp(cones, oldnumofvars, numOfVars, templistVec);
@@ -565,56 +561,6 @@ int main(int argc, char *argv[]) {
 	exit(1);
    }
  }else{
-   /* 
- if(maximum[0] == 'y') {
-   listCone * Opt_cones;
-   if(Singlecone[0] == 'n'){
-   Opt_cones = CopyListCones(cones, numOfVars);
-   ZZ NumOfLatticePoints; //printListCone(Opt_cones, numOfVars);
-   NumOfLatticePoints = Residue(Opt_cones, numOfVars);
-   cout <<"Finished computing a rational function. " << endl;
-   cout <<"Time: " << GetTime() << " sec." << endl;
-   if(IsZero(NumOfLatticePoints) == 1){
-     cerr<<"Integrally empty polytope.  Check the right hand side."<< endl;
-     exit(0);}
-      else{
-	int singleCone = 0;
-	if(Singlecone[0] == 'y') singleCone = 1;
-	vec_ZZ Opt_solution; 
-	if(minimize[0] == 'y') holdCost = -holdCost;
-	Opt_solution = SolveIP(cones, inequalities, equations, cost, numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
-	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
-	RR tmp_RR;
-	conv(tmp_RR, IP_OPT);
-	// cout << cost * Opt_solution << endl;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
-	exit(1);
-      }
-   }
-   else{
-	int singleCone = 0;
-	if(Singlecone[0] == 'y') singleCone = 1;
-	vec_ZZ Opt_solution; 
-	if(minimize[0] == 'y') holdCost = -holdCost;
-	Opt_solution = SolveIP(cones, inequalities, equations,  cost, numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
-	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
-	RR tmp_RR;
-	conv(tmp_RR, IP_OPT);
-	// cout << cost * Opt_solution << endl;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
-	exit(1);
-   }
-   }else{*/
 if(Memory_Save[0] == 'n')
 {
 
