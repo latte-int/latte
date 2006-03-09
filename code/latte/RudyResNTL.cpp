@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <list>
 #include <vector>
+#include <cassert>
 #include "PolyTree.h"
 #include "myheader.h"
 #include "cone.h"
@@ -13,15 +14,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 
-//#define DEGREE 1
-
 using namespace std;
-
-// BOTH CAN NOT BE SET
-//#define	COMPUTE_SUM_MAPLE 0
-//#define OUTPUT_S_T_FUNCTION 0
-//#define OUTPUT_CONE 1
-
 
 /***********************************************************************************
  Rudy is messing around Jeremy's code in order to update it.
@@ -86,6 +79,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
   C=cones;
   while (C) {
+    assert(IsZero(C->vertex->enumerator));
     numOfTerms=numOfTerms+lengthListVector(C->latticePoints);
     C=C->rest;
   }

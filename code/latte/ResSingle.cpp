@@ -4,7 +4,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <list>
-//#include <vector>
+#include <cassert>
 #include "PolyTree.h"
 #include "myheader.h"
 #include "cone.h"
@@ -38,6 +38,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
   	C=cones;
   	while (C) 
 	{
+	  assert(IsZero(C->vertex->enumerator));
     		numOfTerms++;
     		C=C->rest;
   	}
