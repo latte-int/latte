@@ -51,7 +51,7 @@ rationalVector** createArrayRationalVector(int numOfVectors) {
   w = new rationalVector*[numOfVectors+1];
 
 //    w = (rationalVector**)calloc(sizeof(rationalVector*),(numOfVectors+1));
-  if (w==0) exit(0);
+  if (w==0) abort();
   return (w);
 }
 /* ----------------------------------------------------------------- */
