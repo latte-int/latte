@@ -14,7 +14,7 @@
 #include "myheader.h"
 #include "print.h"
 #include "ramon.h"
-
+#include <cassert>
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
@@ -26,15 +26,15 @@ rationalVector* createRationalVector(int numOfVars) {
   vec_ZZ x,y;
   rationalVector* z;
 
-  x = createVector(numOfVars+1);
+  x = createVector(numOfVars);
 //    if (x==0) exit(0);
-  y = createVector(numOfVars+1);
+  y = createVector(numOfVars);
 //    if (y==0) exit(0);
   z = new rationalVector;
 //    z = (rationalVector*)malloc(sizeof(rationalVector));
 //    if (z==0) exit(0);
 
-  for (i=0; i<numOfVars+1; i++) {
+  for (i=0; i<numOfVars; i++) {
     x[i]=0;
     y[i]=1;
   }
@@ -176,6 +176,58 @@ rationalVector* subRationalVector(rationalVector *x, rationalVector *y,
 
   return (z);
 }
+/* ----------------------------------------------------------------- */
+rationalVector* addRationalVector(rationalVector *x, rationalVector *y, 
+				  int numOfVars) {
+  int i;
+  ZZ a,b,c,d,g,m,n,s,t;
+  rationalVector *z;
+
+/* Returns x+y. */
+
+  z=createRationalVector(numOfVars);
+
+  if (x==0) {
+    for (i=0; i<numOfVars; i++) {
+      z->enumerator[i]=-y->enumerator[i];
+      z->denominator[i]=y->denominator[i];
+    }
+    return (z);
+  }
+
+  if (y==0) {
+    for (i=0; i<numOfVars; i++) {
+      z->enumerator[i]=x->enumerator[i];
+      z->denominator[i]=x->denominator[i];
+    }
+    return (z);
+  }
+
+  for (i=0; i<numOfVars;i++) {
+    a=x->enumerator[i];
+    b=x->denominator[i];
+    c=y->enumerator[i];
+    d=y->denominator[i];
+/* Compute m/n = a/b + c/d. */
+    g=abs(lcm(b,d));
+    s=g/b;
+    t=g/d;
+
+    m=s*a + t*c;
+    n=g;
+
+    g=abs(GCD(m,n));
+    if (g!=1) {
+      m=m/g;
+      n=n/g;
+    }
+    z->enumerator[i]=m;
+    z->denominator[i]=n;
+  }
+
+  return (z);
+}
+
 /* ----------------------------------------------------------------- */
 vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars) {
   int i;
@@ -398,4 +450,35 @@ rationalVector* copyRationalVector(const rationalVector *v)
   w->enumerator = v->enumerator;
   w->denominator = v->denominator;
   return w;
+}
+/* ----------------------------------------------------------------- */
+vec_ZZ scaleRationalVectorToInteger(const rationalVector *vec,
+				    int numOfVars,
+				    ZZ &scale_factor)
+{
+  assert(numOfVars == vec->denominator.length()
+	 && numOfVars == vec->enumerator.length());
+  scale_factor = 1;
+  int i;
+  vec_ZZ result = createVector(numOfVars);
+  for (i = 0; i<numOfVars; i++)
+    scale_factor = lcm(scale_factor, vec->denominator[i]);
+  for (i = 0; i<numOfVars; i++)
+    result[i] = vec->enumerator[i] * (scale_factor / vec->denominator[i]);
+  return result;
+}
+/* ----------------------------------------------------------------- */
+void canonicalizeRationalVector(rationalVector *vec,
+				int numOfVars)
+{
+  int i;
+  assert(numOfVars == vec->denominator.length()
+	 && numOfVars == vec->enumerator.length());
+  for (i = 0; i<numOfVars; i++) {
+    ZZ g = GCD(vec->enumerator[i], vec->denominator[i]);
+    if (g != 1) {
+      vec->enumerator[i] /= g;
+      vec->denominator[i] /= g;
+    }
+  }
 }

@@ -68,9 +68,22 @@ rationalVector* normalizeRationalVector(rationalVector*, int);
 rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector*, 
 						    rationalVector*, int);
 rationalVector* subRationalVector(rationalVector*, rationalVector*, int);
+rationalVector* addRationalVector(rationalVector*, rationalVector*, int);
 vec_ZZ constructRay(rationalVector*, rationalVector*, int);
 vec_ZZ* subtractRowFromRow(vec_ZZ*, int, int, int, vec_ZZ*, int);
 rationalVector* solveLinearSystem(vec_ZZ*, vec_ZZ, int, int);
 rationalVector* copyRationalVector(const rationalVector *);
+
+/* Compute an integer vector RESULT and a SCALE_FACTOR such that
+   VEC = RESULT/SCALE_FACTOR.  Return RESULT.
+*/
+vec_ZZ scaleRationalVectorToInteger(const rationalVector *vec,
+				    int numOfVars,
+				    ZZ &scale_factor);
+
+/* Bring each coordinate in VEC to canonicalized form, i.e.,
+   gcd(numerator, denominator) = 1. */
+void canonicalizeRationalVector(rationalVector *vec,
+				int numOfVars);
 
 #endif
