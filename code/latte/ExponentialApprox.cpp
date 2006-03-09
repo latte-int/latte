@@ -16,8 +16,6 @@ int
 Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 {
   assert(cone->rest == NULL);
-  if (decomposition == BarvinokParameters::DualDecomposition) 
-    cone = dualizeBackCones (cone, Number_of_Variables);
 
   printConeToFile(stream, cone, Number_of_Variables);
   try {
