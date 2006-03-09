@@ -286,10 +286,10 @@ void PolyTree_Node::Taylor_Expansion (Taylor_Parameters *Parameters)
 		//cout << "Expansion: DIV END" << endl;
 		
 		
-		
+		delete[] Temp_Numerator_Parameters->Result;
 		delete Temp_Numerator_Parameters;
 		
-	      
+		delete[] Temp_Denominator_Parameters->Result;
 		delete Temp_Denominator_Parameters;
 		
 	}
