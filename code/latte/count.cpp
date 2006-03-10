@@ -394,6 +394,8 @@ int main(int argc, char *argv[]) {
      cones=computeVertexConesFromVrep(fileName,matrix,numOfVars); 
 
   /* Compute triangulation or decomposition of each vertex cone. */
+
+  bool already_dualized = false;
   
   if (dualApproach[0]=='y') {
     cones=createListCone();
@@ -409,6 +411,7 @@ int main(int argc, char *argv[]) {
       tmpRays=tmpRays->rest;
     }
     cones->rays=rays->rest;
+    already_dualized = true;
   }
 
   switch (params.substitution) {
@@ -418,7 +421,7 @@ int main(int argc, char *argv[]) {
 	if (Memory_Save[0] == 'n') {
 	  cones=decomposeCones(cones,numOfVars, flags, fileName,
 			       params.max_determinant,
-			       dualApproach[0] == 'n',
+			       not already_dualized,
 			       params.decomposition);
 	  /* Compute points in parallelepipeds */
 	  computePointsInParallelepipeds(cones, numOfVars);
@@ -427,25 +430,32 @@ int main(int argc, char *argv[]) {
 	else
 	  decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
 				params.max_determinant,
-				dualApproach[0] == 'n',
+				not already_dualized,
 				params.decomposition);	
       }
     }
     break;
   case BarvinokParameters::ExponentialSubstitution:
-    {
+    if (dualApproach[0] == 'y') {
+      cerr << "Exponential substitution is not yet implemented for the homogenized version."
+	   << endl;
+      exit(1);
+    }
+    else {
       Exponential_Single_Cone_Parameters exp_param;
       // FIXME: Upgrade should be more automatical.
       exp_param.max_determinant = params.max_determinant; 
       exp_param.decomposition = params.decomposition;
       exp_param.Number_of_Variables = numOfVars;
       exp_param.File_Name = fileName;
+      if (not already_dualized)
+	cones = dualizeCones(cones, numOfVars);
       Integer number_of_lattice_points
 	= decomposeAndComputeExponentialResidue(cones, exp_param);
       cout << endl << "****  The number of lattice points is: "
 	   << number_of_lattice_points << "  ****" << endl << endl;
-      break;
     }
+    break;
   default:
     cerr << "Unknown BarvinokParameters::substitution" << endl;
     abort();
