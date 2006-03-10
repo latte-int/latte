@@ -1,5 +1,5 @@
 #!/bin/sh
-aclocal
+aclocal -I m4
 autoheader
 autoconf
 automake --add-missing
