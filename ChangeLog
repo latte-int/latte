@@ -1,5 +1,19 @@
 2006-03-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
+	* simple-main.cpp: In the --exp case, don't forget to set the
+	decomposition type.
+
+	* count.cpp: Support --exp.  Signal that "homog --exp" is not implemented.
+
+	* code/latte/ResSingle.cpp (ResidueFunction_Single_Cone): 
+	* code/latte/RudyResNTL.cpp (ResidueFunction): These functions
+	assume that the vertex of each cone is 0, thus the irrational
+	decomposition does not currently work in the homogenized Barvinok
+	algorithm.  They also assume that the cones are unimodular.  Put
+	in an assert() for that.
+
+2006-03-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
 	Fix some memory problems.
 	
 	* code/latte/rational.cpp:
