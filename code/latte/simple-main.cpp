@@ -310,10 +310,12 @@ int main(int argc, char *argv[]) {
 	    write_param("Exponential_Sample_Formula",
 			params.max_determinant);
 	  write_param.Number_of_Variables = numOfVars;
+	  write_param.decomposition = params.decomposition;
 	  decomposeAndWriteExponentialSampleFormula(cones, write_param);
 	}
 	Exponential_Single_Cone_Parameters exp_param;
 	exp_param.max_determinant = params.max_determinant; // FIXME: Upgrade.
+	exp_param.decomposition = params.decomposition;
 	exp_param.Number_of_Variables = numOfVars;
 	exp_param.File_Name = fileName;
 	number_of_lattice_points
