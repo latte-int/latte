@@ -39,7 +39,8 @@
 #include "IntegralHull.h"
 #include "ReadingFile.h"
 #include "binarySearchIP.h"
-#include "CheckEmpty.h" 
+#include "CheckEmpty.h"
+#include "ExponentialSubst.h"
 
 #include "banner.h"
 #include "convert.h"
@@ -392,8 +393,7 @@ int main(int argc, char *argv[]) {
   if(Vrepresentation[0] == 'y')
      cones=computeVertexConesFromVrep(fileName,matrix,numOfVars); 
 
-/* Compute triangulation or decomposition of each vertex cone. */
-  assert(params.substitution == BarvinokParameters::PolynomialSubstitution);
+  /* Compute triangulation or decomposition of each vertex cone. */
   
   if (dualApproach[0]=='y') {
     cones=createListCone();
@@ -409,50 +409,48 @@ int main(int argc, char *argv[]) {
       tmpRays=tmpRays->rest;
     }
     cones->rays=rays->rest;
+  }
 
-
-	if (Memory_Save[0] == 'n' )
-	{
-	  cones=decomposeCones(cones,numOfVars, flags, fileName,
-			       params.max_determinant, false,
-			       params.decomposition); 
-  	}
-
-	else
-	  {
-	    decomposeCones_Single(cones, numOfVars, degree, flags, fileName,
-				  params.max_determinant, false,
-				  params.decomposition);
-	}
-
- } 
-  
-   else 
-   {
-
+  switch (params.substitution) {
+  case BarvinokParameters::PolynomialSubstitution:
     if (assumeUnimodularCones[0]=='n') {
-
-      if (decompose[0]=='y') 
-      {
-	if(Memory_Save[0] == 'n')      
+      if (decompose[0]=='y') {
+	if (Memory_Save[0] == 'n') {
 	  cones=decomposeCones(cones,numOfVars, flags, fileName,
-			       params.max_determinant, true,
+			       params.max_determinant,
+			       dualApproach[0] == 'n',
 			       params.decomposition);
+	  /* Compute points in parallelepipeds */
+	  computePointsInParallelepipeds(cones, numOfVars);
+	}
 	// Iterator through simplicial cones, DFS
 	else
 	  decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
-				params.max_determinant, true,
+				params.max_determinant,
+				dualApproach[0] == 'n',
 				params.decomposition);	
       }
     }
-   }
+    break;
+  case BarvinokParameters::ExponentialSubstitution:
+    {
+      Exponential_Single_Cone_Parameters exp_param;
+      // FIXME: Upgrade should be more automatical.
+      exp_param.max_determinant = params.max_determinant; 
+      exp_param.decomposition = params.decomposition;
+      exp_param.Number_of_Variables = numOfVars;
+      exp_param.File_Name = fileName;
+      Integer number_of_lattice_points
+	= decomposeAndComputeExponentialResidue(cones, exp_param);
+      cout << endl << "****  The number of lattice points is: "
+	   << number_of_lattice_points << "  ****" << endl << endl;
+      break;
+    }
+  default:
+    cerr << "Unknown BarvinokParameters::substitution" << endl;
+    abort();
+  }
 
-/* Compute points in parallelepipeds, unless we already did using memsave version!  */
-
-
- if(Memory_Save[0] == 'n')
-   computePointsInParallelepipeds(cones, numOfVars);
- 
   if(grobner[0] == 'y'){
 
  cones = ProjectUp(cones, oldnumofvars, numOfVars, templistVec);
