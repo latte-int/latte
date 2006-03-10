@@ -1,3 +1,13 @@
+Algorithmic TODO:
+
+* Implement irrational decomposition for the homogenized case.
+   Currently ResidueFunction_Single_Cone and ResidueFunction assume
+   unshifted cones (vertex == 0), so irrational decomposition does not
+   work currently.
+
+* Implement exponential substitution for the homogenized case.
+
+
 Code clean-up:
 
 * Residue calculations:
@@ -34,8 +44,3 @@ Configuration:
  Figure out how to use fast compiler switches by default.
  (-O2 for gcc, -fast for Forte)
 
-
-
-
-  
-  
