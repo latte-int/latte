@@ -3,6 +3,6 @@ Changes since the official release 1.2:
  * Use GNU Autoconf and Automake.
  * Code clean-up.
  * Some performance improvements.
- * New exponential substitution (simple-count --exp).
+ * New exponential substitution (count --exp).
  * New primal irrational decomposition (count --irr).
 
