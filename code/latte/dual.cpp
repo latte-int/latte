@@ -255,11 +255,29 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
     Inverse = -Inverse;
   }
   Inverse = - transpose(Inverse);
-  // Don't cancel gcds here.
-  cone->dual_determinant = determinant(Inverse);
+  cone->dual_determinant
+    = determinant(Inverse); // FIXME: Easier to compute
+  cone->facet_divisors.SetLength(numOfVars);
   cone->facets
     = transformArrayBigVectorToListVector(Inverse,
 					  numOfVars, numOfVars);
+  listVector *facet;
+  for (i = 0, facet = cone->facets; i<numOfVars;
+       i++, facet = facet->rest) {
+    /* Cancel GCD: */
+    ZZ gcd;
+    int j;
+    for (j = 0; j<numOfVars; j++)
+      gcd = GCD(gcd, facet->first[j]);
+    if (gcd != 0 && gcd != 1) {
+      for (j = 0; j<numOfVars; j++)
+	facet->first[j] /= gcd;
+      cone->dual_determinant /= gcd;
+    }
+    ZZ remainder;
+    DivRem(cone->facet_divisors[i], remainder, cone->determinant, gcd);
+    assert(IsZero(remainder));
+  }
 }
 
 listCone* dualizeBackCones(listCone *cones, int numOfVars) 
@@ -272,34 +290,16 @@ listCone* dualizeBackCones(listCone *cones, int numOfVars)
 
   tmp=cones;
   while (tmp) {
-    if (tmp->facets == NULL) 
+    if (tmp->facets == NULL) {
       computeDetAndFacetsOfSimplicialCone(tmp, numOfVars);
+      numOfConesDualized++;
+      if (numOfConesDualized==50*(numOfConesDualized/50)) {
+	printf("%d / %d done.\n",numOfConesDualized,numOfAllCones);
+      }
+    }
     swap(tmp->determinant, tmp->dual_determinant);
     swap(tmp->rays, tmp->facets);
-    listVector *ray;
-    if (abs(tmp->determinant) != 1) {
-      for (ray = tmp->rays; ray != NULL; ray = ray->rest) {
-	/* Cancel GCD: */
-	ZZ gcd;
-	int j;
-	for (j = 0; j<numOfVars; j++)
-	  gcd = GCD(gcd, ray->first[j]);
-	if (gcd != 0 && gcd != 1) {
-	  for (j = 0; j<numOfVars; j++)
-	    ray->first[j] /= gcd;
-	  tmp->determinant /= gcd;
-	}
-      }
-///       cout << "Determinant of dual: " << tmp->dual_determinant
-/// 	   << ", primal: " <<  tmp->determinant << endl;
-    }
-    freeListVector(tmp->facets);
-    tmp->facets = NULL;
     tmp=tmp->rest;
-    numOfConesDualized++;
-    if (numOfConesDualized==50*(numOfConesDualized/50)) {
-      printf("%d / %d done.\n",numOfConesDualized,numOfAllCones);
-    }
   }
   return (cones);
 }
