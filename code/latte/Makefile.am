@@ -21,6 +21,9 @@ liblatte_a_SOURCES = \
 	banner.cpp convert.cpp \
 	todd/gmp_pow.cpp todd/todd-expansion.cpp \
 	latte_gmp.cpp		\
+	genFunction/IntCombEnum.cpp		\
+	genFunction/NTL_to_LiDIA.cpp		\
+	genFunction/matrix_ops.cpp		\
 	ExponentialSubst.cpp 
 
 noinst_HEADERS =							\
@@ -35,6 +38,8 @@ noinst_HEADERS =							\
 	todd/gmp_pow.h todd/todd-expansion.h				\
 	convert.h							\
 	latte_gmp.h latte_ntl.h						\
+	genFunction/IntCombEnum.h genFunction/NTL_to_LiDIA.h    \
+	genFunction/matrix_ops.h    \
 	ExponentialSubst.h
 
 if MAINTAINER_MODE
