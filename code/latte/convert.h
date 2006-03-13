@@ -16,7 +16,11 @@ transformArrayBigVectorToListVector(const mat_ZZ &A,
 mat_ZZ
 createConeDecMatrix(const listCone *cone, int numOfRays, int numOfVars);
 
-/* Create a matrix whose ROWS are the facet vectors of CONE. */
+/* Create a matrix whose ROWS are the facet vectors of CONE,
+   scaled in a way such that
+   
+   < RAY_i, SCALED_FACET_j > = -DET(RAYS) * DELTA_{i,j}.
+*/
 mat_ZZ
 createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars);
 

@@ -1,3 +1,4 @@
+#include <cassert>
 #include "convert.h"
 #include "ramon.h"
 
@@ -48,7 +49,11 @@ createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars)
 
   tmp=cone->facets;
   for (i=0; i<numOfFacets; i++) {
-    mat[i]=copyVector(tmp->first,numOfVars);
+    ZZ multiplier, remainder;
+    DivRem(multiplier, remainder,
+	   cone->determinant, cone->facet_divisors[i]);
+    assert(IsZero(remainder));
+    mat[i] = copyVector(tmp->first,numOfVars) * multiplier;
     tmp=tmp->rest;
   }
   return (mat);
