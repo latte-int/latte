@@ -313,6 +313,7 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
+/*
    int p1, p2;
    listVector *tmp;
    tmp = pointsInParallelepiped(cone->vertex,cone->rays,0,numOfVars);
@@ -323,7 +324,7 @@ void computePointsInParallelepiped(listCone *cone, int numOfVars)
    cout << "p2 = " << p2 << "\n";
    assert(p1 == p2);
    //assert(isEqual(tmp, cone->latticePoints));
-/*
+*/
    if (abs(cone->determinant) != 1) {
       cout << "Processing cone with determinant " << cone->determinant << endl;
       cone->latticePoints = pointsInParallelepiped(cone->vertex, cone->rays, 0,
@@ -332,7 +333,6 @@ void computePointsInParallelepiped(listCone *cone, int numOfVars)
       cone->latticePoints = pointsInParallelepipedOfUnimodularCone(
          cone->vertex, cone->rays, numOfVars);
    }
-*/
 }
 
 void computePointsInParallelepipeds(listCone *cones, int numOfVars)
