@@ -1,3 +1,27 @@
+2006-03-13  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/dual.h, code/latte/dual.cpp
+	(computeDetAndFacetsOfSimplicialCone): Cancel gcds of the facet
+	vectors, and also fill the new face_divisors slot.
+	(dualizeBackCones): Now dualizing is an involution, even for our
+	datastructure, so don't cancel gcds here; no scaling tricks
+	needed.
+
+	* code/latte/convert.cpp, code/latte/convert.h
+	(createFacetMatrix): The stored facet vectors are no longer scaled
+	by the full determinant, so do the scaling here for creating the
+	matrix.
+
+	* code/latte/cone.h (listCone): New slot facet_divisors.
+
+	* code/latte/Irrational.cpp (irrationalizeCone):
+	computeDetAndFacetsOfSimplicialCone only if not computed yet.
+
+2006-03-10  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* Makefile.am, acinclude.m4, autogen.sh:
+	Remove acinclude.m4 in favor of ACLOCAL_AMFLAGS = -I m4
+
 2006-03-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* simple-main.cpp: In the --exp case, don't forget to set the
