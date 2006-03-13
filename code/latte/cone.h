@@ -19,6 +19,9 @@ typedef struct listCone {
   ZZ dual_determinant;		// determinant of the matrix formed by
 				// the FACETS, with sign
   listVector *facets;
+  // For simplicial cones where RAYS and FACETS are both computed, we
+  // guarantee that < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}.
+  vec_ZZ facet_divisors;	
   listVector *latticePoints;
   struct listCone *rest;
 } listCone;
