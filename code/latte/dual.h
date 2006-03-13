@@ -8,9 +8,8 @@
 /* Dualize the polyhedral cones in the list. */
 listCone* dualizeCones(listCone*, int);
 
-/* Fill the slots `determinant' and `facets' of CONE.  The facet
-   vectors are *not* made primitive.  The facet matrix is
-   an nonnegative integer multiple of -transpose(inverse(rays)).
+/* Fill the slots `determinant', `facets', and `facet_divisors' of
+   CONE.  The facet vectors are made primitive.  
 */
 void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars);
 
