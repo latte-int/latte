@@ -19,7 +19,20 @@
 #include "../vertices/cdd.h"
 #include <string>
 
+#include "IntCombEnum.h"
+#include "NTL_to_LiDIA.h" 
+#include "matrix_ops.h" 
+#include <NTL/mat_ZZ.h>
+#include <assert.h>
+
 using namespace std;
+
+/* Forward declare functions internal to this module */
+vec_ZZ get_integer_comb(const mat_ZZ &, int *);
+void get_multipliers_from_snf(const mat_ZZ &, int *);
+vec_ZZ translate_lattice_point(const vec_ZZ &, const mat_ZZ &,
+   const rationalVector *);  
+
 /* ----------------------------------------------------------------- */
 vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX, 
 		 rationalVector *coeffsVertex, vec_ZZ *matrix, 
@@ -53,241 +66,144 @@ vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX,
 
   return (z);
 }
-/* ----------------------------------------------------------------- */
-listVector* pointsInParallelepiped(rationalVector *vertex, listVector *rays, 
-				   listVector *facets, int numOfVars) {
-  int i,j,k,ii,counter,numOfVertices,numOfRays,nextIndex,tmpInt;
-  rationalVector *c, *w, *coeffsVertex;
-  rationalVector **coeffs;
-  vec_ZZ z;
-  vec_ZZ *points, *matrix, *originalMatrix;
-  listVector *tmp, *endFacets, *hilbertBasis, *interiorHilbertBasis,
-      *listOfPoints, *endListOfPoints;
-  char cddInFileName[127],mlpInFileName[127];
-  string tmpString;
-  ZZ x,y;
 
-  setbuf(stdout,0);
+/*
+ * Description:
+ * pointsInParallelepiped: 1) Find Smith Normal form of cone basis. In other
+ * words, find a basis v and w such that v_i = n_i*w_i. 2) Ennumerate all
+ * lattice points in fund||piped by taking all (bounded: 0 <= k <= n_{i-1})
+ * integer combinations of w_i, and translating them accordingly
+ *
+ * Parameters:
+ * rationalVector *vertex: vertex of cone
+ * listVector *rays: cone is defined by non-negative linear combinations of
+ *    these rays.
+ * listVector *facets: not applicable
+ * int numOfVars: dimension of cone
+ *
+ * Return: listVector* of lattice points
+ */
+listVector* pointsInParallelepiped(rationalVector *vertex, listVector *rays,
+   listVector *facets, int numOfVars) {
 
-  if (facets==0) {
-    strcpy(cddInFileName,"latte_cdd.ine");
-    ofstream out(cddInFileName);
-    if(!out){
-      cerr << "Cannot open output file latte_cdd.ine in pointsInParallelepiped." << endl;
-      exit(1);
-    }
+   mat_ZZ U;
+   mat_ZZ snf_U;
+   mat_ZZ B;
+   mat_ZZ B_inv;
+   mat_ZZ C;
+   int rows;
+   int *n;
+   IntCombEnum *iter_comb;
+   int *next;
+   vec_ZZ lat_pt;
+   vec_ZZ trans_lat_pt;
+   listVector *lat_points = NULL;
 
-    out << "H-representation\n";
-    out << "begin\n";
-    out << lengthListVector(rays) << " " << numOfVars+1 << " integer\n";  
-    
-    tmp=rays;  
-    while (tmp) {
-      out << "0 ";
-      for (i=0; i<(numOfVars); i++) out << (tmp->first)[i] << " ";
-      out << endl;
-      tmp=tmp->rest;
-    }
+   //cout << "Computing Smith-Normal form...\n";
+   /* get Smith Normal form of matrix, Smith(A) = BAC */
+   U = convert_listVector_to_mat_ZZ(rays);
+   //snf_U = SmithNormalForm(U, B, C);
+   snf_U = SmithNormalForm(rays, B, C);
+   rows = snf_U.NumRows();
 
-    out << "end\n";
-    out.close();
+   /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
+   n = new int[rows]; 
+   get_multipliers_from_snf(snf_U, n);
 
-//      printf("Computing facets with cdd...");
-    system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
-//      printf("done.\n");
+   /*
+    * Smith(A) = BAC, and the diagonal entries of Smith(A) are the multipliers
+    * n_i such that w_i*n_i= v_i. Therefore, AC = V, and B^-1 = W. Since we
+    * must take the integer combinations of W, we must calculate B^-1.
+    */
+   B_inv = inv(B);
+   
+   /*
+    * enumerate lattice points by taking all integer combinations
+    * 0 <= k <= (n_i - 1) of each vector.
+    */
+   //cout << "Enumerating lattice points...\n";
+   iter_comb = new IntCombEnum(n, rows);
+   iter_comb->decrementUpperBound();
+   while((next = iter_comb->getNext())) {
+      lat_pt = get_integer_comb(B_inv, next);
+      /*trans_lat_pt = translate_lattice_point(lat_pt, U, vertex); */ 
+      lat_points = appendVectorToListVector(lat_pt, lat_points);
+   }
 
-    strcpy(cddInFileName,"latte_cdd.ext");
-    ifstream in(cddInFileName);
-    if(!in){
-      cerr << "Cannot open input file in pointsInParallelepiped." << endl;
-      exit(1);
-    }
+   /* cleanup */
+   delete iter_comb;
+   delete [] n;
 
-    while (tmpString!="begin") getline(in,tmpString);
-
-    in >> numOfVertices >> tmpInt >> tmpString;
-
-    z=createVector(numOfVars);
-    facets=createListVector(z);
-    endFacets=facets;
-
-    for (i=0; i<numOfVertices; i++) {
-      w=createRationalVector(numOfVars);
-      for (j=0; j<numOfVars+1; j++) {
-	x=0;
-	y=0;
-	ReadCDD(in,x,y);
-	if (j>0) {
-	  w->enumerator[j-1]=x;
-	  w->denominator[j-1]=y;
-	}
-      }
-      w=normalizeRationalVector(w,numOfVars);
-      endFacets->rest=createListVector(w->enumerator);
-      endFacets=endFacets->rest;
-    }
-
-    facets=facets->rest;
-    in.close();
-    system("rm latte_cdd.*");
-  }
-
-/* Facets are all known at this points. */
-
-  strcpy(mlpInFileName,"latte_mlp");
-  ofstream out(cddInFileName);
-  if (!out) {
-    printf("Cannot open output file latte_mlp in pointsInParallelepiped!");
-    exit(0);
-  }
-
-  out << numOfVars << " " << lengthListVector(facets) << endl;
-  printListVectorToFileWithoutBrackets(out,facets,numOfVars);
-  out.close();
-
-  printf("Computing Hilbert basis with mlp...");
-  system("./mlp dual latte_mlp >latte_mlp.out");
-  printf("done.\n");
-
-  strcpy(mlpInFileName,"latte_mlp.dual.hil");
-  printf("Reading Hilbert basis from file...");
-  hilbertBasis=readListVectorMLP(mlpInFileName,&ii);
-  printf("done.\n");
-/*   rays=readListVector("latte_mlp.dual.ray"); */
-
-/*    system("rm latte_mlp*"); */
-
-  numOfRays=lengthListVector(rays);
-
-  matrix=createArrayVector(numOfRays);
-  for (i=0; i<numOfVars; i++) matrix[i]=createVector(numOfRays);
-
-  k=0;
-  tmp=rays;
-  while (tmp) {
-    for (i=0; i<numOfVars; i++) matrix[i][k]=(tmp->first)[i];
-    k++;
-    tmp=tmp->rest;
-  }
-
-  points=createArrayVector(2000000);
-  coeffs=createArrayRationalVector(2000000);
-
-  tmp=hilbertBasis;
-  counter=0;
-
-  printf("rays:\n");
-  printListVector(rays,numOfVars);
-
-  while (tmp) {
-    if (isVectorInListVector(tmp->first,rays,numOfVars)==0) {
-      points[counter]=tmp->first;
-      coeffs[counter]=solveLinearSystem(matrix,tmp->first,numOfVars,numOfRays);
-      counter++;
-    }
-    tmp=tmp->rest;
-  }
-
-  originalMatrix=createArrayVector(numOfVars);
-  for (i=0; i<numOfRays; i++) 
-    originalMatrix[i]=copyVector(matrix[i],numOfRays);
-
-  for (i=0; i<numOfVars; i++) {
-    for (j=0; j<numOfRays; j++) {
-      matrix[i][j]=matrix[i][j]*(vertex->denominator[i]);
-    }
-  }
-
-  coeffsVertex=solveLinearSystem(matrix,vertex->enumerator,numOfVars,
-				 numOfRays);
-
-  if (counter==0) {
-/* No interior HB element -> move origin as unique single point. */
-    z=createVector(numOfVars);
-    for (i=0;i<numOfVars;i++) z[i]=0;
-    return(createListVector(movePoint(z,0,coeffsVertex,originalMatrix,
-				      numOfRays,numOfVars)));
-  }
-
-  printf("Enumerating lattice points...");
-
-/* Compute all interior points. */
-  listOfPoints=transformArrayVectorToListVector(points,counter);
-  interiorHilbertBasis=transformArrayVectorToListVector(points,counter);
-  tmp=listOfPoints;
-  while (tmp->rest) tmp=tmp->rest;
-  endListOfPoints=tmp;
-
-  printf("interior HB elements = %d / %d\n",lengthListVector(interiorHilbertBasis),lengthListVector(hilbertBasis));
-
-/* Counter gives the number of interior HB elements. */
-
-  nextIndex=counter;
-  counter=0;
-
-  printf("\nStart while loop.\n");
-/*    printf("\nRays.\n"); */
-/*    printListVector(rays,numOfVars); */
-/*    printf("\nHilbert basis.\n"); */
-/*    printListVector(hilbertBasis,numOfVars); */
-
-  while (counter<nextIndex) {
-    tmp=interiorHilbertBasis;
-    k=0;
-    while (tmp) {
-      z=copyVector(tmp->first,numOfVars);
-      z=addVector(z,points[counter],numOfVars);
-      if (isVectorInListVector(z,listOfPoints,numOfVars)==0) {
-	c=addRationalVectorsWithUpperBoundOne(coeffs[k],coeffs[counter],
-					      numOfRays);
-	if (c!=0) {
-	  points[nextIndex]=z;
-	  coeffs[nextIndex]=c;
-	  endListOfPoints->rest=createListVector(z);
-	  endListOfPoints=endListOfPoints->rest;
-	  nextIndex++;
-	  if (nextIndex==500*(nextIndex/500)) {
-	    printf("counter = %d / %d.\n",counter,nextIndex);
-	  }
-	}
-      }else z.kill();
-      k++;
-      tmp=tmp->rest;
-    }
-    counter++;
-    if (counter==10*(counter/10)) {
-      printf("counter = %d / %d.\n",counter,nextIndex);
-    }
-  }
-
-/* Add the origin to list of points in parallelepiped. */
-  z=createVector(numOfVars);
-  for (i=0;i<numOfVars;i++) z[i]=0;
-  points[nextIndex]=z;
-  coeffs[nextIndex]=0;
-  endListOfPoints->rest=createListVector(z);
-  endListOfPoints=endListOfPoints->rest;
-
-  printf("done.\n");
-
-/* Schon mal nicht schlecht, aber jetzt muessen die Punkte noch 
-   verschoben werden... */
-
-  printf("Moving lattive points...");
-
-  k=0;
-  tmp=listOfPoints;
-  while (tmp) {
-      tmp->first=movePoint(tmp->first,coeffs[k],coeffsVertex,
-			   originalMatrix,numOfRays,numOfVars);
-      k++;
-      tmp=tmp->rest;
-  }
-
-  printf("done.\n");
-
-  return(listOfPoints);
+   return lat_points;
 }
+
+/*
+ * calculates a integer combination of the specified lattice basis
+ * and stores the result in the vector v. Because of incompatible datatypes,
+ * it is easiest to simply do this directly.
+ */
+vec_ZZ get_integer_comb(const mat_ZZ & lat_basis, int *scalar) {
+   int i,j;
+   long conv_l;
+   int row = lat_basis.NumRows();
+   int col = lat_basis.NumCols();
+   vec_ZZ v = createVector(col);
+
+   for (i = 0; i < row; i++) {
+      v[i] = 0;
+      for (j = 0; j < col; j++) {
+         conv_l = to_long(lat_basis[i][j]);
+         v[i] += conv_l*scalar[j]; 
+      }
+   }
+   return (v);
+}
+
+/*
+ * Translate point m using the following formula:
+ * m' = v + sum {<m - v, u_i*>}u_i, where {} means the factional part 
+ * U* has the property u_i* . u_i = delta_ij. Thus (U^-1)^T has this
+ * property.
+ */
+vec_ZZ translate_lattice_point(const vec_ZZ& m, const mat_ZZ & U,
+   const rationalVector *vertex) {
+   vec_ZZ trans_m;
+   int cols = U.NumCols();
+   mat_ZZ U_trans = transpose(U);
+   ZZ dot_prod;
+   /* default constructor is zero */
+   ZZ sum;
+
+   /*
+    * NOTE: we will NOT take the transponse. Rather, we will deal with
+    * row vectors instead of column vectors because M[i] returns a row
+    */ 
+   mat_ZZ U_star = inv(U);
+   for (int i = 0; i < cols; i++) {
+      InnerProduct(dot_prod, m, U_star[i]);
+      /*trans_m[i] = multiply(U_tran[i], frac(dot_prod));*/ 
+
+      /* translate back into cone ||piped */
+      /*trans_m[i] += vertex.enumerator[i] / vertex.denominator[i];*/
+   }
+   return (trans_m);
+}  
+/*
+ * If S is the Smith Normal Form of A, then the multipliers n_i such that
+ * v_i = n_iw_i are on the diagonal
+ */
+void get_multipliers_from_snf(const mat_ZZ & snf, int *n) {
+   int j;
+   int row = snf.NumRows();
+
+   for (j = 0; j < row; j++) {
+      //cout << "get_multipliers_from_snf:: snf[" << j << "," << j << "] = " << snf[j][j] << "\n"; 
+      n[j] = to_int(snf[j][j]);
+   }
+   return;
+}
+
+
 /* ----------------------------------------------------------------- */
 listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex, 
 						  listVector *rays, 
@@ -397,12 +313,26 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
-  if (abs(cone->determinant) != 1) {
-    cout << "Processing cone with determinant " << cone->determinant << endl;
-    cone->latticePoints=pointsInParallelepiped(cone->vertex,cone->rays,0,numOfVars);
-  }
-  else 
-    cone->latticePoints=pointsInParallelepipedOfUnimodularCone(cone->vertex,cone->rays,numOfVars);
+   int p1, p2;
+   listVector *tmp;
+   tmp = pointsInParallelepiped(cone->vertex,cone->rays,0,numOfVars);
+   p1 = lengthListVector(tmp);
+   cout << "p1 = " << p1 << "\n";
+   cone->latticePoints = pointsInParallelepipedOfUnimodularCone(cone->vertex,cone->rays,numOfVars);
+   p2 = lengthListVector(cone->latticePoints);
+   cout << "p2 = " << p2 << "\n";
+   assert(p1 == p2);
+   //assert(isEqual(tmp, cone->latticePoints));
+/*
+   if (abs(cone->determinant) != 1) {
+      cout << "Processing cone with determinant " << cone->determinant << endl;
+      cone->latticePoints = pointsInParallelepiped(cone->vertex, cone->rays, 0,
+         numOfVars);
+   } else {
+      cone->latticePoints = pointsInParallelepipedOfUnimodularCone(
+         cone->vertex, cone->rays, numOfVars);
+   }
+*/
 }
 
 void computePointsInParallelepipeds(listCone *cones, int numOfVars)
