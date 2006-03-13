@@ -15,7 +15,8 @@ lcm(const ZZ& a, const ZZ& b)
 void
 irrationalizeCone(listCone *cone, int numOfVars)
 {
-  computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
+  if (cone->facets == NULL)
+    computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
 #ifdef DEBUG_IRRATIONAL
   printCone(cone, numOfVars);
 #endif
