@@ -16,10 +16,6 @@ Code clean-up:
       ResidueFunction_Single_Cone (ResSingle.cpp)
    - Factor out construction of generic vector.
 
-* Data structures:
-   - ZZ vs. Integer
-     We will use Integer (typedefed to ZZ).
-
 * Main programs:
    Factor out code.
 
@@ -36,11 +32,14 @@ Code clean-up:
 
 Documentation:
 
- Describe configuration & build.
+* Describe configuration & build.
 
 
 Configuration:
 
- Figure out how to use fast compiler switches by default.
- (-O2 for gcc, -fast for Forte)
+* Figure out how to use fast compiler switches by default, so that
+   novice users do not complain about poor performance
+   (-O2 for gcc, -fast for Forte)
+
+* Make compile and run with compilers other than g++
 
