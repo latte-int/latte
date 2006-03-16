@@ -17,6 +17,12 @@ irrationalizeCone(listCone *cone, int numOfVars)
 {
   if (cone->facets == NULL)
     computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
+  cerr << "irrationalizeCone: Warning: This code is based on the irrationalization"
+       << endl
+       << "described in math.CO/0603308v1, which is WRONG."
+       << endl
+       << "Code needs to be fixed according to math.CO/0603308v2."
+       << endl;
 #ifdef DEBUG_IRRATIONAL
   printCone(cone, numOfVars);
 #endif
