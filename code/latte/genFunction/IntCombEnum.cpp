@@ -8,30 +8,24 @@ using namespace std;
 /*
  * use initialization list which is faster to set len = l
  */
-IntCombEnum::IntCombEnum(int *u, int l) : len(l) {
-   /* initialize cur_col to the last column */ 
-   cur_col = len - 1;
-
+IntCombEnum::IntCombEnum(int *u, int l) : len(l), cur_col(l - 1),
+   upper_bound(u) {
    /*
     * initialize memory for the start position and "next" position
-    * set start and end position to be the zero vector. Store the
-    * upper bound of the integer combination
+    * set start and end position to be the zero vector.
     */
    prev = new int[len];
    next = new int[len];
-   upper_bound = new int[len];
+   memset(prev, 0, len*sizeof(int));
+   memset(next, 0, len);
 
-   /* initialize both combinations to 0 */
-   for (int i = 0; i < len; i++) {
-      prev[i] = 0; next[i] = 0; upper_bound[i] = u[i];
-   }
-   //print_debug();
+   print_debug();
 }
 
 IntCombEnum::~IntCombEnum() {
-   /* upper bound is deleted by creator */
    delete [] prev;
    delete [] next;
+   delete [] upper_bound;
 }
 
 /* sets zeros from column lower_col to column upper_col */    
@@ -42,6 +36,11 @@ void IntCombEnum::set_zero(int *v, int lower_col, int upper_col) {
 } 
 
 int *IntCombEnum::getNext() {
+   /* check if there are any more integer combinations */
+   if (is_last()) {
+      cout << "IntCombEnum::getNext -- found last integer combination.\n";
+      return NULL;
+   }
    /* set next initially equal to the prev iteration */
    copy_comb(next, prev);
    if (prev[cur_col] == upper_bound[cur_col]) {
@@ -60,12 +59,8 @@ int *IntCombEnum::getNext() {
       next[cur_col]++;
    }
    copy_comb(prev, next);
-   /* we exclude the 0...0 integer combination */
-   //print_debug();
-   if (is_last()) {
-      //cout << "IntCombEnum::getNext -- found last integer combination.\n";
-      return NULL;
-   }
+   print_debug();
+
    return next;
 }
 
