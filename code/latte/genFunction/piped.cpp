@@ -86,24 +86,19 @@ vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX,
 listVector* pointsInParallelepiped(rationalVector *vertex, listVector *rays,
    listVector *facets, int numOfVars) {
 
-   mat_ZZ U;
-   mat_ZZ snf_U;
-   mat_ZZ B;
-   mat_ZZ B_inv;
-   mat_ZZ C;
+   mat_ZZ snf_U, B, B_inv, C;
+   mat_ZZ U = convert_listVector_to_mat_ZZ(rays);
+   vec_ZZ lat_pt, trans_lat_pt;
    int rows;
    int *n;
    IntCombEnum *iter_comb;
    int *next;
-   vec_ZZ lat_pt;
-   vec_ZZ trans_lat_pt;
    listVector *lat_points = NULL;
 
-   //cout << "Computing Smith-Normal form...\n";
+   cout << "Computing Smith-Normal form...\n";
    /* get Smith Normal form of matrix, Smith(A) = BAC */
-   U = convert_listVector_to_mat_ZZ(rays);
-   //snf_U = SmithNormalForm(U, B, C);
-   snf_U = SmithNormalForm(rays, B, C);
+   snf_U = SmithNormalForm(U, B, C);
+   /*snf_U = SmithNormalForm(rays, B, C);*/
    rows = snf_U.NumRows();
 
    /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
@@ -121,20 +116,25 @@ listVector* pointsInParallelepiped(rationalVector *vertex, listVector *rays,
     * enumerate lattice points by taking all integer combinations
     * 0 <= k <= (n_i - 1) of each vector.
     */
-   //cout << "Enumerating lattice points...\n";
+   cout << "Enumerating lattice points...\n";
    iter_comb = new IntCombEnum(n, rows);
    iter_comb->decrementUpperBound();
    while((next = iter_comb->getNext())) {
+   cout << "Calculating integer combination ...\n";
       lat_pt = get_integer_comb(B_inv, next);
+   cout << "Finished calculating, adding lattice point...\n";
       /*trans_lat_pt = translate_lattice_point(lat_pt, U, vertex); */ 
       lat_points = appendVectorToListVector(lat_pt, lat_points);
+   cout << "Sucessfully added lattice points...\n";
    }
 
+   cout << "Cleanup...\n";
    /* cleanup */
    delete iter_comb;
-   delete [] n;
+   cout << "deleted iter_comb...\n";
+   /*delete [] n; */
 
-   return lat_points;
+   return (lat_points);
 }
 
 /*
