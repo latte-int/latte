@@ -275,7 +275,7 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
       cone->dual_determinant /= gcd;
     }
     ZZ remainder;
-    DivRem(cone->facet_divisors[i], remainder, cone->determinant, gcd);
+    DivRem(cone->facet_divisors[i], remainder, abs(cone->determinant), gcd);
     assert(IsZero(remainder));
   }
 }
