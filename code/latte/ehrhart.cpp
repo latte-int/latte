@@ -478,7 +478,7 @@ int main(int argc, char *argv[]) {
 	{
     		if (decompose[0]=='n') 
 		{
-      			tmp->latticePoints=pointsInParallelepiped(tmp->vertex,tmp->rays,0,numOfVars);
+      			tmp->latticePoints=pointsInParallelepiped(tmp, numOfVars);
     		} 
 		else 
 		{
