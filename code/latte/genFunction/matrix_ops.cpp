@@ -1,5 +1,8 @@
+#include "matrix_ops.h"
+
+#ifdef WITH_LIDIA
+
 #include "NTL_to_LiDIA.h"
-#include "matrix_ops.h"  
 #include <LiDIA/bigint_matrix.h>
 #include <LiDIA/bigint.h>
 
@@ -51,3 +54,19 @@ SmithNormalForm(listVector *list, mat_ZZ & B, mat_ZZ & C) {
 
    return (snf_U);
 }
+
+#else
+
+mat_ZZ SmithNormalForm(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
+  cerr << "SmithNormalForm: This build is configured without LiDIA, " << endl
+       << "which we require for computing the Smith normal form." << endl;
+  abort();
+}
+mat_ZZ
+SmithNormalForm(listVector *list, mat_ZZ & B, mat_ZZ & C) {
+  cerr << "SmithNormalForm: This build is configured without LiDIA, " << endl
+       << "which we require for computing the Smith normal form." << endl;
+  abort();
+}
+
+#endif
