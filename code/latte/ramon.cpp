@@ -2,11 +2,9 @@
 #include "ramon.h"
 
 /* ----------------------------------------------------------------- */
-listVector* appendVectorToListVector(vec_ZZ v, listVector *REST) {
+listVector* appendVectorToListVector(const vec_ZZ &v, listVector *REST) {
   // listVector *LIST;
-  listVector * LIST = new listVector;  
-  // LIST=(listVector *)malloc(sizeof(listVector));
-  LIST->first = v;
+  listVector * LIST = new listVector(v);  
   LIST->rest = REST;
   return (LIST);
 }
@@ -97,37 +95,6 @@ listVector* updateBasis(listVector *v, listVector *endBasis) {
   return (endBasis);
 }
 /* ----------------------------------------------------------------- */
-vec_ZZ* transformListVectorToArrayVector(listVector *L, vec_ZZ* A) {
-  int i;
-  listVector *tmp;
-
-  i=0;
-
-  tmp=L;
-  while (tmp) {
-    A[i]=tmp->first;
-    tmp=tmp->rest;
-    i++;
-  }
-
-  return (A);
-}
-/* ----------------------------------------------------------------- */
-listVector* transformArrayVectorToListVector(vec_ZZ *A, int numOfVectors) {
-  int i;
-  listVector *L, *endL;
-
-  L=createListVector(createVector(1));
-  endL=L;
-
-  for (i=0; i<numOfVectors; i++) {
-    endL->rest = createListVector(A[i]);
-    endL = endL->rest;
-  }
-
-  return (L->rest);
-}
-/* ----------------------------------------------------------------- */
 int isVectorEqualToVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
   int i;
 
@@ -201,41 +168,6 @@ listVector* readListVector(char *fileName, int* numOfVars) {
   return(basis->rest);
 }
 /* ----------------------------------------------------------------- */
-listVector* readListVectorMLP(char *fileName, int* numOfVars) {
-  int i,j,numOfVectors;
-  listVector *basis, *endBasis;
-  vec_ZZ b;
-
-  /* Reads numOfVars, numOfVectors, list of vectors. */
-
-  setbuf(stdout,0);
-
-  ifstream in(fileName);
-  if(!in){
-    cerr << "Cannot open input file in readListVectorMLP." << endl;
-    exit(1);
-  }
-
-  in >> (*numOfVars);
-  in >> numOfVectors;
-
-  basis = createListVector(createVector(*numOfVars));
-  endBasis = basis;
-
-  for (i=0; i<numOfVectors; i++) {
-    b=createVector(*numOfVars);
-    for (j=0; j<(*numOfVars); j++) in >> b[j];
-    b=negativeVector(b,*numOfVars);
-    endBasis->rest = createListVector(b);
-    endBasis=endBasis->rest;
-  }
-
-/*  printf("List of vectors:\n");
-  printf("================\n");
-  printListVector(basis->rest,numOfVars); */
-
-  return(basis->rest);
-}
 /*
  * Testing whether or not two lists contain exactly the same
  * points. This is a debugging diagnostic function.
