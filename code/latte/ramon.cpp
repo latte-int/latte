@@ -135,6 +135,7 @@ int isVectorEqualToVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
   for (i=0; i<numOfVars; i++) if (!(v[i]==w[i])) return (0);
   return (1);
 }
+/* NOTE: This function changes the LIST pointer. */ 
 /* ----------------------------------------------------------------- */
 int isVectorInListVector(vec_ZZ v, listVector* LIST, int numOfVars) {
   vec_ZZ w;
@@ -146,6 +147,25 @@ int isVectorInListVector(vec_ZZ v, listVector* LIST, int numOfVars) {
   }
   return (0);
 }
+
+/*
+ * This function does NOT change the LIST pointer 
+ */
+int
+isVectorInListVector(const vec_ZZ & v, listVector *list) {
+   int len = lengthListVector(list);
+   int numOfVars = v.length();
+   listVector *tmp_list = list;
+
+   while (tmp_list) {
+      if (!isVectorEqualToVector(v, tmp_list->first, numOfVars)) {
+         return (0);
+      }
+      tmp_list = tmp_list->rest;
+   }
+   return (1);
+}
+
 /* ----------------------------------------------------------------- */
 listVector* readListVector(char *fileName, int* numOfVars) {
   int i,j,numOfVectors;
@@ -216,4 +236,30 @@ listVector* readListVectorMLP(char *fileName, int* numOfVars) {
 
   return(basis->rest);
 }
-/* ----------------------------------------------------------------- */
+/*
+ * Testing whether or not two lists contain exactly the same
+ * points. This is a debugging diagnostic function.
+ */
+int
+isEqual(listVector *first, listVector *second) {
+   int first_len = lengthListVector(first);
+   int second_len = lengthListVector(second);
+   int numOfVars = first->first.length();
+   listVector *tmp_list = first;
+    
+   if (first_len != second_len) {
+      return (0);
+   }
+  
+   /*
+    * since the two lists have the same length, if every point in one list
+    * is contained in the other list, the two lists must be equal.
+    */ 
+   while (tmp_list) {
+      if (!isVectorInListVector(tmp_list->first, second)) {
+         return (0);
+      }
+      tmp_list = tmp_list->rest;
+   }
+   return (1);
+}

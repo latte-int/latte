@@ -23,7 +23,9 @@ listVector* updateBasis(listVector*, listVector*);
 vec_ZZ* transformListVectorToArrayVector(listVector*, vec_ZZ*);
 listVector* transformArrayVectorToListVector(vec_ZZ*, int);
 int isVectorEqualToVector(vec_ZZ, vec_ZZ, int);
+int isEqual(listVector *, listVector*);
 int isVectorInListVector(vec_ZZ, listVector*, int);
+int isVectorInListVector(const vec_ZZ &, listVector *);
 listVector* readListVector(char*,int*);
 listVector* readListVectorMLP(char*,int*);
 
