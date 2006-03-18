@@ -2,8 +2,7 @@
 #define GENFUNCTION_PIPED_H
 
 vec_ZZ movePoint(vec_ZZ, rationalVector*, rationalVector*, vec_ZZ*, int, int);
-listVector* pointsInParallelepiped(rationalVector*, listVector*, listVector*,
-				   int);
+listVector* pointsInParallelepiped(listCone *cones, int numOfVars);
 listVector* pointsInParallelepipedOfUnimodularCone(rationalVector*, 
 						   listVector*, int);
 
