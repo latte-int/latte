@@ -1,6 +1,7 @@
 #include "matrix_ops.h"
+#include "config.h"
 
-#ifdef WITH_LIDIA
+#ifdef HAVE_LIDIA
 
 #include "NTL_to_LiDIA.h"
 #include <LiDIA/bigint_matrix.h>
