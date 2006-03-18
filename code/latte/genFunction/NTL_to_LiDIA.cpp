@@ -11,10 +11,8 @@ using namespace std;
 /* converts an NTL mat_ZZ matrix to a bigint_matrix */
 bigint_matrix
 convert_mat_ZZ_to_bigint_matrix(const mat_ZZ & ntl_m) {
-cout << "convert_mat_ZZ_to_bigint_matrix...\n";
    int rows = ntl_m.NumRows();
    int cols = ntl_m.NumCols();
-cout << "convert_mat_ZZ_to_bigint_matrix: dimensions [" << rows << ", " << cols << "]\n";
    bigint *lidia_v;
    bigint_matrix lidia_m;
    lidia_m.set_no_of_rows(rows);
@@ -23,7 +21,11 @@ cout << "convert_mat_ZZ_to_bigint_matrix: dimensions [" << rows << ", " << cols 
    for(int i = 0; i < rows; i++) {
       /* add vector to lattice basis */
       lidia_v = convert_vec_ZZ_to_bigint_array(ntl_m[i]);
-      lidia_m.sto_row(lidia_v, cols, i);
+      //print_debug_vector(lidia_v, ntl_m[i].length());
+      /* LiDIA calls don't seem to work here...simply copy in by hand */        
+      for (int j = 0; j < cols; j++) {
+         lidia_m.sto(i,j, lidia_v[j]);
+      }
       delete [] lidia_v;
    }
    return (lidia_m);
@@ -119,4 +121,56 @@ convert_listVector_to_mat_ZZ(listVector *list) {
       tmp_list = tmp_list->rest;
    }
    return (transpose(m));
+}
+
+void
+print_debug_vector(const vec_ZZ & v) {
+   int len = v.length(); 
+
+   cout << "Begin vector: ["; 
+   for (int i = 0; i < len; i++) {
+      cout << v[i] << ","; 
+   }
+   cout << "]: End vector\n"; 
+}
+
+void
+print_debug_vector(const bigint * v, int len) {
+   cout << "Begin vector: ["; 
+   for (int i = 0; i < len; i++) {
+      cout << v[i] << ","; 
+   }
+   cout << "]: End vector\n"; 
+}
+
+void
+print_debug_matrix(const bigint_matrix & m) {
+   int rows = m.get_no_of_rows(); 
+   int cols = m.get_no_of_columns(); 
+
+   cout << "Begin matrix:\n"; 
+   for (int i = 0; i < rows; i++) {
+   cout << "["; 
+      for (int j = 0; j < cols; j++) {
+         cout << m.member(i,j) << ","; 
+      }
+      cout << "]\n"; 
+   }
+   cout << ":End matrix\n"; 
+}
+
+void
+print_debug_matrix(const mat_ZZ & m) {
+   int rows = m.NumRows(); 
+   int cols = m.NumCols(); 
+
+   cout << "Begin matrix:\n"; 
+   for (int i = 0; i < rows; i++) {
+      cout << "["; 
+      for (int j = 0; j < cols; j++) {
+         cout << m[i][j] << ","; 
+      }
+      cout << "]\n"; 
+   }
+   cout << ":End matrix\n"; 
 }

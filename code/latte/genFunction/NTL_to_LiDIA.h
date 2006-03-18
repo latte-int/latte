@@ -25,6 +25,16 @@ convert_bigint_matrix_to_mat_ZZ(const bigint_matrix &);
 /* latte to NTL conversions */
 mat_ZZ
 convert_listVector_to_mat_ZZ(listVector *);
- 
+
+/* debug/diagnostic functions */
+void
+print_debug_matrix(const bigint_matrix &); 
+void
+print_debug_matrix(const mat_ZZ &);
+void
+print_debug_vector(const bigint *, int);
+void
+print_debug_vector(const vec_ZZ &);
+
 #endif
 

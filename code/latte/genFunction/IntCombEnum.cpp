@@ -17,15 +17,15 @@ IntCombEnum::IntCombEnum(int *u, int l) : len(l), cur_col(l - 1),
    prev = new int[len];
    next = new int[len];
    memset(prev, 0, len*sizeof(int));
-   memset(next, 0, len);
+   memset(next, 0, len*sizeof(int));
 
    print_debug();
 }
 
 IntCombEnum::~IntCombEnum() {
+   /* upper_bound is deleted by creator */ 
    delete [] prev;
    delete [] next;
-   delete [] upper_bound;
 }
 
 /* sets zeros from column lower_col to column upper_col */    
