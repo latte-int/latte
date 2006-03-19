@@ -454,6 +454,9 @@ int main(int argc, char *argv[]) {
 	= decomposeAndComputeExponentialResidue(cones, exp_param);
       cout << endl << "****  The number of lattice points is: "
 	   << number_of_lattice_points << "  ****" << endl << endl;
+      // FIXME: Centralize this output stuff.
+      ofstream out("numOfLatticePoints");
+      out << number_of_lattice_points << endl;
     }
     break;
   default:
