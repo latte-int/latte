@@ -1,7 +1,6 @@
 #ifndef MATRIX_OPS_H 
 #define MATRIX_OPS_H 
 
-#include "latte_ntl.h"
 #include "cone.h"
 
 mat_ZZ

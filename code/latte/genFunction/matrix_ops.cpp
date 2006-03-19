@@ -14,22 +14,22 @@ using namespace LiDIA;
  * and accompanying matrices such that Smith(A) = BAC. Converts all matrices
  * back to NTL matrices. This will eventually be overwritten.
  */
-mat_ZZ SmithNormalForm(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
+mat_ZZ
+SmithNormalForm(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
    bigint_matrix lidia_U;
    bigint_matrix lidia_snf_U;
    bigint_matrix lidia_B;
    bigint_matrix lidia_C;
    mat_ZZ snf_U;
 
-cout << "SmithNormalForm(const mat_ZZ& ...)\n"; 
    lidia_U = convert_mat_ZZ_to_bigint_matrix(U);
-cout << "SmithNormalForm:: convert_mat_ZZ_to_bigint_matrix\n";
    lidia_snf_U = snf(lidia_U, lidia_B, lidia_C);
-cout << "SmithNormalForm:: snf\n"; 
    snf_U = convert_bigint_matrix_to_mat_ZZ(lidia_snf_U);
-cout << "SmithNormalForm:: convert_bigint_matrix_to_mat_ZZ\n"; 
    B = convert_bigint_matrix_to_mat_ZZ(lidia_B);
    C = convert_bigint_matrix_to_mat_ZZ(lidia_C);
+
+   //print_debug_matrix(lidia_U);
+   //print_debug_matrix(snf_U);
 
    return (snf_U);
 }
@@ -53,11 +53,13 @@ SmithNormalForm(listVector *list, mat_ZZ & B, mat_ZZ & C) {
    B = convert_bigint_matrix_to_mat_ZZ(lidia_B);
    C = convert_bigint_matrix_to_mat_ZZ(lidia_C);
 
+   //print_debug_matrix(lidia_U);
+   //print_debug_matrix(snf_U);
+
    return (snf_U);
 }
 
 #else
-
 mat_ZZ SmithNormalForm(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
   cerr << "SmithNormalForm: This build is configured without LiDIA, " << endl
        << "which we require for computing the Smith normal form." << endl;
@@ -69,5 +71,5 @@ SmithNormalForm(listVector *list, mat_ZZ & B, mat_ZZ & C) {
        << "which we require for computing the Smith normal form." << endl;
   abort();
 }
-
 #endif
+

@@ -76,10 +76,7 @@ vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX,
  * integer combinations of w_i, and translating them accordingly
  *
  * Parameters:
- * rationalVector *vertex: vertex of cone
- * listVector *rays: cone is defined by non-negative linear combinations of
- *    these rays.
- * listVector *facets: not applicable
+ * listCone *cone : data pertaining to the cone
  * int numOfVars: dimension of cone
  *
  * Return: listVector* of lattice points
@@ -87,17 +84,15 @@ vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX,
 listVector* pointsInParallelepiped(listCone *cone, int numOfVars) {
    mat_ZZ snf_U, B, B_inv, C, U_star;
    mat_ZZ U = convert_listVector_to_mat_ZZ(cone->rays);
-   rationalVector *vertex = cone->vertex;
    vec_ZZ lat_pt, trans_lat_pt;
    int rows;
    int *n, *next;
    IntCombEnum *iter_comb;
    listVector *lat_points = NULL;
 
-   cout << "Computing Smith-Normal form...\n";
+   //cout << "Computing Smith-Normal form...\n";
    /* get Smith Normal form of matrix, Smith(A) = BAC */
    snf_U = SmithNormalForm(U, B, C);
-   /*snf_U = SmithNormalForm(cone->rays, B, C);*/
    rows = snf_U.NumRows();
 
    /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
@@ -118,25 +113,18 @@ listVector* pointsInParallelepiped(listCone *cone, int numOfVars) {
     * enumerate lattice points by taking all integer combinations
     * 0 <= k <= (n_i - 1) of each vector.
     */
-   cout << "Enumerating lattice points...\n";
+   //cout << "Enumerating lattice points...\n";
    iter_comb = new IntCombEnum(n, rows);
    iter_comb->decrementUpperBound();
    while((next = iter_comb->getNext())) {
-   cout << "Calculating integer combination ...\n";
       lat_pt = get_integer_comb(B_inv, next);
-   cout << "Finished calculating, translating lattice point...\n";
       trans_lat_pt = translate_lattice_point(lat_pt, U, U_star, cone);
-   cout << "Finished translating, adding lattice point...\n";
       lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
-   cout << "Sucessfully added lattice points...\n";
    }
 
-   cout << "Cleanup...\n";
    /* cleanup */
    delete iter_comb;
-   cout << "deleted iter_comb...\n";
    delete [] n;
-   cout << "deleted n[]...\n";
 
    return (lat_points);
 }
@@ -179,15 +167,9 @@ vec_ZZ translate_lattice_point(const vec_ZZ& m, const mat_ZZ & U,
    int cols = U.NumCols();
    int len = m.length();
    mat_ZZ U_trans = transpose(U);
-   mat_ZZ U_star_trans = transpose(U_star);
    rationalVector *v = cone->vertex;
-   rationalVector w;
-
-   /* intialized to one */
-   ZZ dot_prod_enum = to_ZZ(0);
-   ZZ dot_prod_denom = to_ZZ(1);
-
    /* initialized to zero */
+   ZZ dot_prod_enum, dot_prod_denom;
    ZZ frac_enum, frac_denom, q, r, neg;
    vec_ZZ scaled_u_i, m_trans;
    vec_ZZ offset_enum, sum_enum, m_trans_enum;
@@ -196,36 +178,22 @@ vec_ZZ translate_lattice_point(const vec_ZZ& m, const mat_ZZ & U,
    /* allocate memory for intermediate calculation vectors */
    offset_enum.SetLength(len);
    offset_denom.SetLength(len);
-   m_trans_enum.SetLength(len);
-   m_trans_denom.SetLength(len);
    sum_enum.SetLength(len);
    sum_denom.SetLength(len);
    m_trans.SetLength(len);
-
-cout << "translate_lattice_point: U\n";
-print_debug_matrix(U);
-cout << "translate_lattice_point: U_star\n";
-print_debug_matrix(U_star);
 
    /* initialize sum */
    sum_enum = v->enumerator;
    sum_denom = v->denominator;
 
    /* w = m - v */
-cout << "translate_lattice_point: m - v\n";
    for (int j = 0; j < len; j++) {
       /* m - x/y = (my - x)/y */
-cout << "translate_lattice_point: m[" << j << "] = " << m[j] << "\n";
-cout << "translate_lattice_point: v->denom[" << j << "] = " << v->denominator[j] << "\n";
-cout << "translate_lattice_point: v->enum[" << j << "] = " << v->enumerator[j] << "\n";
       offset_enum[j] = (m[j] * v->denominator[j]) - v->enumerator[j];
       offset_denom[j] = v->denominator[j];
-cout << "translate_lattice_point: offset_enum[" << j << "] = " << offset_enum[j] << "\n";
-cout << "translate_lattice_point: offset_denom[" << j << "] = " << offset_denom[j] << "\n";
    }
 
    for (int i = 0; i < cols; i++) {
-cout << "translate_lattice_point: < m - v, u_" << i << "* >\n";
       /* reset/initialize variables */
       dot_prod_enum = to_ZZ(0);
       dot_prod_denom = to_ZZ(1);
@@ -233,29 +201,22 @@ cout << "translate_lattice_point: < m - v, u_" << i << "* >\n";
       /* < m - v, u_i* > */
       for (int j = 0; j < len; j++) {
          /* neg = - U_star[j][i] */
-         //NTL::negate(neg, U_star[j][i]);
+         NTL::negate(neg, U_star[j][i]);
          /* x/y + r/s*z = x/y + rz/s = xs + rzy/ys */
          dot_prod_enum = (dot_prod_enum * offset_denom[j]) +
-            (dot_prod_denom * offset_enum[j] * U_star[j][i]);
+            (dot_prod_denom * offset_enum[j] * neg);
          dot_prod_denom *= (offset_denom[j]);
-cout << "translate_lattice_point: facet_divisor[" << j << "] = " << cone->facet_divisors[j] << "\n";
       }
-cout << "translate_lattice_point: before dot_prod_denom = " << dot_prod_denom << "\n";
       dot_prod_denom *= cone->facet_divisors[i];
-cout << "translate_lattice_point: dot_prod_enum = " << dot_prod_enum << "\n";
-cout << "translate_lattice_point: dot_prod_denom = " << dot_prod_denom << "\n";
    
       /*
        * {<m - v, u_i*>} : take the fractional part of this quantity
        * q = floor(dot_prod_nume/dot_prod_denom)
        * r = dot_prod_enum - dot_prod_denom*q
        */
-cout << "translate_lattice_point: {< m - v, u_" << i << "* >}\n";
       DivRem(q, r, dot_prod_enum, dot_prod_denom);
       frac_enum = r;
       frac_denom = dot_prod_denom;
-cout << "translate_lattice_point: frac_enum = " << frac_enum << "\n";
-cout << "translate_lattice_point: frac_denom = " << frac_denom << "\n";
 
       /* {<m - v, u_i*>}u_i */
       scaled_u_i = U_trans[i] * frac_enum;
@@ -266,8 +227,6 @@ cout << "translate_lattice_point: frac_denom = " << frac_denom << "\n";
          sum_enum[j] = (sum_enum[j] * frac_denom) +
             (sum_denom[j] * scaled_u_i[j]);
          sum_denom[j] *= frac_denom;
-cout << "translate_lattice_point: sum_enum[" << j << "] = " << sum_enum[j] << "\n";
-cout << "translate_lattice_point: sum_denom[" << j << "] = " << sum_denom[j] << "\n";
       }
    }
 
@@ -277,13 +236,10 @@ cout << "translate_lattice_point: sum_denom[" << j << "] = " << sum_denom[j] << 
        * m_trans = floor(sum_enum/sum_denom)
        * r = sum_enum - sum_denom*q
        */
-cout << "translate_lattice_point: sum_enum[" << j << "] = " << sum_enum[j] << "\n";
-cout << "translate_lattice_point: sum_denom[" << j << "] = " << sum_denom[j] << "\n";
       DivRem(m_trans[j], r, sum_enum[j], sum_denom[j]);
-cout << "translate_lattice_point: m_trans[" << j << "] = " << m_trans[j] << "\n";
       assert(IsZero(r));
    }
-cout << "translate_lattice_point: EXITING!!!!!";
+
    return (m_trans);
 }
   
@@ -412,24 +368,9 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
-/*
-   int p1, p2;
-   listVector *tmp;
-   tmp = pointsInParallelepiped(cone,numOfVars);
-   p1 = lengthListVector(tmp);
-   printListVector(tmp, numOfVars);
-   cout << "p1 = " << p1 << "\n";
-   cone->latticePoints = pointsInParallelepipedOfUnimodularCone(cone->vertex,cone->rays,numOfVars);
-   p2 = lengthListVector(cone->latticePoints);
-   printListVector(cone->latticePoints, numOfVars);
-   cout << "p2 = " << p2 << "\n";
-   assert(p1 == p2);
-   assert(isEqual(tmp, cone->latticePoints));
-*/
    if (abs(cone->determinant) != 1) {
-      cout << "Processing cone with determinant " << cone->determinant << endl;
+      //cout << "Processing cone with determinant " << cone->determinant << endl;
       cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
-      cout << "Finished processing cone..." ;
    } else {
       cone->latticePoints = pointsInParallelepipedOfUnimodularCone(
          cone->vertex, cone->rays, numOfVars);
