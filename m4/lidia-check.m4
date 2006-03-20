@@ -112,7 +112,7 @@ elif test "x$lidia_found" = "xno" ; then
 fi	
 
 
-AM_CONDITIONAL(LINBOX_HAVE_LIDIA, test "x$HAVE_LIDIA" = "xyes")
+AM_CONDITIONAL(HAVE_LIDIA, test "x$HAVE_LIDIA" = "xyes")
 
 CXXFLAGS=${BACKUP_CXXFLAGS}
 LIBS=${BACKUP_LIBS}
