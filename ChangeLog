@@ -1,3 +1,69 @@
+2006-03-20  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Residue.cpp (Residue, Residue_Single_Cone): This code
+	silently assumes unimodular cones; put in an assertion.
+
+2006-03-19  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: Write file "numOfLatticePoints" in --exp
+	mode too.
+
+2006-03-19  Susan Margulies <smargulies@ucdavis.edu>
+
+	* code/latte/genFunction/piped.cpp,
+	code/latte/genFunction/IntCombEnum.cpp,
+	code/latte/genFunction/matrix_ops.cpp,
+	code/latte/genFunction/matrix_ops.h: Fixed up enumeration code.
+
+2006-03-18  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/genFunction/matrix_ops.cpp: Fix conditionalization.
+
+	* code/latte/genFunction/matrix_ops.h: Fix #include
+
+	* code/latte/cone.h (listVector): Add constructors.
+
+	* code/latte/ramon.cpp, code/latte/ramon.h (appendVectorToListVector):
+	Change interface.
+	(transformListVectorToArrayVector, transformArrayVectorToListVector,
+	readListVectorMLP): Unused, removed.
+
+2006-03-18  Susan Margulies <smargulies@ucdavis.edu>
+
+	* code/latte/genFunction/piped.cpp, code/latte/genFunction/piped.h
+	(pointsInParallelepiped): Changed interface.
+
+	* code/latte/ehrhart.cpp, code/latte/maximize.cpp,
+	code/latte/minimize.cpp: Change all callers of pointsInParallelepiped.
+
+	* code/latte/ramon.cpp, code/latte/ramon.h (isEqual,
+	isVectorInListVector): New.
+
+2006-03-18  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/dual.cpp (computeDetAndFacetsOfSimplicialCone):
+	Facet divisors are always positive.
+
+2006-03-17  Susan Margulies <smargulies@ucdavis.edu>
+
+	* code/latte/genFunction/IntCombEnum.cpp: Fixed enumeration code
+	to include origin, and optimized code.
+
+2006-03-16  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Irrational.cpp: Put in warning about implementation flaw.
+
+2006-03-13  Susan Margulies <smargulies@ucdavis.edu>
+
+	* code/latte/Makefile.am, code/latte/genFunction/IntCombEnum.cpp,
+	code/latte/genFunction/IntCombEnum.h,
+	code/latte/genFunction/NTL_to_LiDIA.cpp,
+	code/latte/genFunction/NTL_to_LiDIA.h,
+	code/latte/genFunction/matrix_ops.cpp,
+	code/latte/genFunction/matrix_ops.h,
+	code/latte/genFunction/piped.cpp: Added files and functions
+	related to non-unimodular lattice point enumeration.
+
 2006-03-13  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/dual.h, code/latte/dual.cpp
