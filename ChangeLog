@@ -1,5 +1,17 @@
 2006-03-20  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
+	* code/latte/Makefile.am: Fix for non-LiDIA build.
+	
+	* m4/lidia-check.m4: Fix HAVE_LIDIA conditional.
+
+	* code/latte/genFunction/piped.cpp: Fix #includes.
+
+	* code/latte/genFunction/NTL_to_LiDIA.h,
+	code/latte/genFunction/NTL_to_LiDIA.cpp
+	(print_debug_vector, print_debug_matrix): Move mat_ZZ versions to
+	print.h, print.cpp.
+	(convert_listVector_to_mat_ZZ): Move to convert.h, convert.cpp.
+
 	* code/latte/Residue.cpp (Residue, Residue_Single_Cone): This code
 	silently assumes unimodular cones; put in an assertion.
 

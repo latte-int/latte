@@ -7,6 +7,9 @@
 (defconst gmp-types
   '("mpz_class" "mpq_class"))
 
+(defconst lidia-types
+  '("bigint" "bigint_matrix"))
+
 (defconst latte-types
   '("listCone" "listVector"
     "vector" "rationalVector"
@@ -15,7 +18,7 @@
     "mpq_vector" "mpz_vector"))
 
 (setq c++-font-lock-extra-types
-      (cons (regexp-opt (append ntl-types latte-types gmp-types))
+      (cons (regexp-opt (append ntl-types latte-types gmp-types lidia-types))
 	    c++-font-lock-extra-types))
 
 (if load-file-name

@@ -17,13 +17,13 @@
 #include "../ramon.h"
 #include "../rational.h"
 #include "../vertices/cdd.h"
+#include <cassert>
 #include <string>
 
 #include "IntCombEnum.h"
-#include "NTL_to_LiDIA.h" 
 #include "matrix_ops.h" 
 #include <NTL/mat_ZZ.h>
-#include <assert.h>
+#include "convert.h"
 
 using namespace std;
 

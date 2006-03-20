@@ -59,3 +59,25 @@ createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars)
   return (mat);
 }
 
+/* latte to NTL conversions */
+
+/* converts a latte listVector to a mat_ZZ */ 
+mat_ZZ
+convert_listVector_to_mat_ZZ(listVector *list) {
+   listVector *tmp_list = list;
+   int rows = tmp_list->first.length();
+   int cols = lengthListVector(tmp_list);
+   int cur_col = 0;
+   mat_ZZ m;
+                                                                                
+   m.SetDims(cols, rows);
+                                                                                
+   /* add columns as rows and then take the transpose */
+   while (tmp_list) {
+      m[cur_col] = copyVector(tmp_list->first, rows);
+      cur_col++;
+      tmp_list = tmp_list->rest;
+   }
+   return (transpose(m));
+}
+

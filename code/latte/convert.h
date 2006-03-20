@@ -24,4 +24,8 @@ createConeDecMatrix(const listCone *cone, int numOfRays, int numOfVars);
 mat_ZZ
 createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars);
 
+/* latte to NTL conversions */
+mat_ZZ
+convert_listVector_to_mat_ZZ(listVector *);
+
 #endif
