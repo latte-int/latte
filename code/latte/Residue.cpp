@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cassert>
 #include <time.h>
 #include <list>
 #include <vector>
@@ -13,7 +14,9 @@ using namespace std;
 /* From here, Rudy edited ----------------------------------------- */
 /* ----------------------------------------------------------------- */
 
-ZZ Residue(listCone* cones, int numOfVars) {
+ZZ
+Residue(listCone* cones, int numOfVars)
+{
   int numOfTerms;
 //  char outFileName[127];
   listVector *tmp;
@@ -74,6 +77,9 @@ ZZ Residue(listCone* cones, int numOfVars) {
   i = 0;
   while (cones1) {
     tmp=cones1->latticePoints;
+    /* The code is not prepared for non-unimodular cones (segfault) --
+       check this out later! --mkoeppe */
+    assert(tmp != NULL && tmp->rest == NULL);
     while (tmp) {
       E[i] = cones1->coefficient;
      // printVectorToFileWithoutBrackets(out,tmp->first,numOfVars);
@@ -556,7 +562,6 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 
   int numOfTerms;
 //  char outFileName[127];
-  listVector *tmp;
   listCone *C, * cones1;
   int dim, noGsPerC,noCones; //noGsPerC is number of generators per cone
   clock_t t,sc=0,sc2=0;
@@ -606,7 +611,12 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
   i = 0;
  	while (cones1) 
 	{
-    		tmp=cones1->latticePoints;
+	  listVector *tmp = cones1->latticePoints;
+
+	  /* The code is not prepared for non-unimodular cones (segfault) --
+	     check this out later! --mkoeppe */
+	  assert(tmp != NULL && tmp->rest == NULL);
+
     		while (tmp) 
 		{
       			E[i] = cones1->coefficient;
