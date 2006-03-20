@@ -261,3 +261,29 @@ void printResidueFile(char* fileName, listCone* cones, int numOfVars) {
   return ;
 }
 
+void
+print_debug_vector(const vec_ZZ & v) {
+   int len = v.length(); 
+
+   cout << "Begin vector: ["; 
+   for (int i = 0; i < len; i++) {
+      cout << v[i] << ","; 
+   }
+   cout << "]: End vector\n"; 
+}
+
+void
+print_debug_matrix(const mat_ZZ & m) {
+   int rows = m.NumRows(); 
+   int cols = m.NumCols(); 
+
+   cout << "Begin matrix:\n"; 
+   for (int i = 0; i < rows; i++) {
+      cout << "["; 
+      for (int j = 0; j < cols; j++) {
+         cout << m[i][j] << ","; 
+      }
+      cout << "]\n"; 
+   }
+   cout << ":End matrix\n"; 
+}

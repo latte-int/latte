@@ -22,4 +22,9 @@ void printConeToFile(ostream &out, listCone* cones, int numOfVars);
 void printListConeToFile(char*, listCone*, int); 
 void printResidueFile(char*, listCone*, int);
 
+void
+print_debug_matrix(const mat_ZZ &);
+void
+print_debug_vector(const vec_ZZ &);
+
 #endif
