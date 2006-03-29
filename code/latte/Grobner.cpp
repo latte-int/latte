@@ -157,7 +157,7 @@ void readLatteGrobProblem(char *fileName, listVector **equations,
 
   cout << "Reading problem.\n";
 
-  setbuf(stdout,0);
+  //setbuf(stdout,0);
 
   ifstream in(fileName);
   if(!in){

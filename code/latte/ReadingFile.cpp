@@ -800,7 +800,7 @@ void readLatteProblem(char *fileName, listVector **equations,
 
   cout << "Reading problem.\n";
 
-  setbuf(stdout,0);
+  //setbuf(stdout,0);
 
   ifstream in(fileName);
   if(!in){
@@ -1108,7 +1108,7 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
     // int length = 0;
   cout << "Reading problem.\n";
   //  cout << degree << endl;
-  setbuf(stdout,0);
+  //setbuf(stdout,0);
   ZZ bignum;
   ifstream in(fileName);
   if(!in){

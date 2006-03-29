@@ -141,7 +141,7 @@ listVector* readListVector(char *fileName, int* numOfVars) {
 
   /* Reads numOfVars, numOfVectors, list of vectors. */
 
-  setbuf(stdout,0);
+  //setbuf(stdout,0);
   ifstream in(fileName);
   if(!in){
     cerr << "Cannot open input file in readListVector." << endl;
