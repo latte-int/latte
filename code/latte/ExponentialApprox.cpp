@@ -16,27 +16,130 @@ int
 Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 {
   assert(cone->rest == NULL);
-
-  printConeToFile(stream, cone, Number_of_Variables);
   try {
-    mpz_class prod;
     mpq_vector weights
       = computeExponentialResidueWeights(generic_vector,
-					 prod,
 					 cone,
 					 Number_of_Variables);
     int dimension = weights.size();
-    stream << "Approximate Weights: ";
-    double d_root_prod = pow(abs(prod.get_d()), 1.0/dimension);
-    mpq_vector::const_iterator i;
-    int k;
-    for (k = 0, i = weights.begin(); i!=weights.end(); ++i, k++) {
-      double weight = (*i).get_d();
-      // scale
-      double scaled_weight = weight * pow(d_root_prod, k);
-      stream << scaled_weight << " ";
+
+    /*** Compute bounds for the phi function. ***/
+
+    /* Scalar products of the rays. */
+    vec_ZZ ray_scalar_products(INIT_SIZE, Number_of_Variables);
+    {
+      int j;
+      listVector *ray;
+      for (j = 0, ray = cone->rays; ray != NULL; j++, ray = ray->rest) {
+	ZZ inner;
+	InnerProduct(inner, generic_vector, ray->first);
+	ray_scalar_products[j] = inner;
+      }
+      assert(j == Number_of_Variables);
     }
-    stream << endl << endl;
+
+    /* Scalar product of the vertex. */
+    ZZ vertex_divisor;
+    vec_ZZ scaled_vertex
+      = scaleRationalVectorToInteger(cone->vertex, Number_of_Variables,
+				     vertex_divisor);
+    ZZ scaled_vertex_scalar_product;
+    ZZ vertex_scalar_product_lower, vertex_scalar_product_upper;
+    InnerProduct(scaled_vertex_scalar_product,
+		 generic_vector, scaled_vertex);
+    ZZ remainder;
+    DivRem(vertex_scalar_product_lower, remainder,
+	   scaled_vertex_scalar_product, vertex_divisor);
+    if (IsZero(remainder))
+      vertex_scalar_product_upper = vertex_scalar_product_lower;
+    else
+      vertex_scalar_product_upper = vertex_scalar_product_lower + 1;
+
+    /* Bounds for <c,x> on v+Pi */
+    ZZ lower_bound, upper_bound;
+    lower_bound = vertex_scalar_product_lower;
+    upper_bound = vertex_scalar_product_upper;
+    {
+      int j;
+      for (j = 0; j<Number_of_Variables; j++) {
+	switch (sign(ray_scalar_products[j])) {
+	case -1:
+	  lower_bound += ray_scalar_products[j];
+	  break;
+	case +1:
+	  upper_bound += ray_scalar_products[j];
+	  break;
+	}
+      }
+    }
+
+    /* Bounds for <c,x>^k on v+Pi */
+    vec_ZZ lower_bounds(INIT_SIZE, Number_of_Variables + 1);
+    vec_ZZ upper_bounds(INIT_SIZE, Number_of_Variables + 1);
+    {
+      int k;
+      ZZ lower_k, upper_k;
+      lower_k = 1;
+      upper_k = 1;
+      for (k = 0; k<=Number_of_Variables; /*EMPTY*/) {
+	if (k % 2 == 0) {
+	  /* even case */
+	  if (sign(upper_bound) == -1) {
+	    lower_bounds[k] = upper_k;
+	    upper_bounds[k] = lower_k;
+	  }
+	  else if (sign(lower_bound) == +1) {
+	    lower_bounds[k] = lower_k;
+	    upper_bounds[k] = upper_k;
+	  }
+	  else {
+	    lower_bounds[k] = 0;
+	    upper_bounds[k] = (lower_k > upper_k) ? lower_k : upper_k;
+	  }
+	}
+	else {
+	  /* odd case */
+	  lower_bounds[k] = lower_k;
+	  upper_bounds[k] = upper_k;
+	}
+	k++;
+	lower_k *= lower_bound;
+	upper_k *= upper_bound;
+      }
+    }
+
+    printConeToFile(stream, cone, Number_of_Variables);
+    stream << "Approximate Weights: ";
+    mpq_vector::const_iterator i;
+    for (i = weights.begin(); i!=weights.end(); ++i) {
+      double weight = (*i).get_d();
+      stream << weight << " ";
+    }
+    stream << endl;
+    stream << "Lower bounds of k! phi_k: " << endl;
+    int k;
+    for (k = 0; k<=Number_of_Variables; k++)
+      stream << lower_bounds[k] << " ";
+    stream << endl;
+    stream << "Upper bounds of k! phi_k: " << endl;
+    for (k = 0; k<=Number_of_Variables; k++)
+      stream << upper_bounds[k] << " ";
+    stream << endl;
+    stream << "Lower bounds of contributions: " << endl;
+    for (k = 0; k<=Number_of_Variables; k++) {
+      ZZ l = lower_bounds[k] * abs(cone->determinant);
+      double lower_contrib = convert_ZZ_to_mpz(l).get_d() * weights[k].get_d();
+      stream << lower_contrib << " ";
+      if (cone->determinant
+    }
+    stream << endl;
+    stream << "Upper bounds of contributions: " << endl;
+    for (k = 0; k<=Number_of_Variables; k++) {
+      ZZ l = upper_bounds[k] * abs(cone->determinant);
+      double upper_contrib = convert_ZZ_to_mpz(l).get_d() * weights[k].get_d();
+      stream << upper_contrib << " ";
+    }
+    stream << endl;
     return 1;
   }
   catch (NotGenericException) {
