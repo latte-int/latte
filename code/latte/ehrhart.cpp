@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
   latte_banner(cout);
 
   z=0;
-  setbuf(stdout,0);
+  //setbuf(stdout,0);
 
   strcpy(invocation,"Invocation: ");
   strcat(invocation,argv[0]);
