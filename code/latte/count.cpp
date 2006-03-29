@@ -41,6 +41,7 @@
 #include "binarySearchIP.h"
 #include "CheckEmpty.h"
 #include "ExponentialSubst.h"
+#include "ExponentialApprox.h"
 
 #include "banner.h"
 #include "convert.h"
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
   latte_banner(cout);
 
   z=0;
-  setbuf(stdout,0);
+  //setbuf(stdout,0);
 
   strcpy(invocation,"Invocation: ");
   strcat(invocation,argv[0]);
@@ -442,6 +443,15 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
     else {
+      if (Print[0] == 'y') {
+	Write_Exponential_Sample_Formula_Single_Cone_Parameters
+	  write_param("Exponential_Sample_Formula",
+		      params.max_determinant);
+	write_param.Number_of_Variables = numOfVars;
+	write_param.decomposition = params.decomposition;
+	decomposeAndWriteExponentialSampleFormula(cones, write_param);
+      }
+
       Exponential_Single_Cone_Parameters exp_param;
       // FIXME: Upgrade should be more automatical.
       exp_param.max_determinant = params.max_determinant; 
