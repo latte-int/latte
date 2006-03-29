@@ -66,4 +66,11 @@ fi
 AC_PATH_PROG(MAPLEBIN, maple)
 AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != x )
 
+AC_ARG_ENABLE(experiments, AS_HELP_STRING([--enable-experiments],
+	[use experimental code]))
+AM_CONDITIONAL(HAVE_EXPERIMENTS, test x$enable_experiments = xyes)
+if test x$enable_experiments = xyes ; then
+   AC_DEFINE(HAVE_EXPERIMENTS, 1, [Define if experimental code is enabled])
+fi
+
 AC_OUTPUT
