@@ -31,9 +31,14 @@ public:
    Also return the prod_ray_scalar_products, which might
    be useful for scaling purposes.
 */
-mpq_vector
+mpq_vector /* FIXME: This version can probably go away */
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 mpz_class &prod_ray_scalar_products,
+				 const listCone *cone, int numOfVars)
+  throw(NotGenericException);
+
+mpq_vector
+computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 const listCone *cone, int numOfVars)
   throw(NotGenericException);
 

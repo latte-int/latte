@@ -108,6 +108,31 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
       }
     }
 
+    /* Total bounds */
+    vector<double> total_lower_bounds(Number_of_Variables + 1);
+    vector<double> total_upper_bounds(Number_of_Variables + 1);
+
+    int k;
+    for (k = 0; k<=Number_of_Variables; k++) {
+      ZZ l = lower_bounds[k] * abs(cone->determinant);
+      double lower_contrib = convert_ZZ_to_mpz(l).get_d() * weights[k].get_d();
+      ZZ u = upper_bounds[k] * abs(cone->determinant);
+      double upper_contrib = convert_ZZ_to_mpz(u).get_d() * weights[k].get_d();
+
+      if (l < u) {
+	total_lower_bounds[k] += lower_contrib;
+	total_upper_bounds[k] += upper_contrib;
+      }
+      else {
+	total_lower_bounds[k] += upper_contrib;
+	total_upper_bounds[k] += lower_contrib;
+      }
+      total_lower_bound += total_lower_bounds[k];
+      total_upper_bound += total_upper_bounds[k];
+    }
+
+    /* Output */
+    
     printConeToFile(stream, cone, Number_of_Variables);
     stream << "Approximate Weights: ";
     mpq_vector::const_iterator i;
@@ -117,7 +142,6 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     }
     stream << endl;
     stream << "Lower bounds of k! phi_k: " << endl;
-    int k;
     for (k = 0; k<=Number_of_Variables; k++)
       stream << lower_bounds[k] << " ";
     stream << endl;
@@ -126,19 +150,12 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
       stream << upper_bounds[k] << " ";
     stream << endl;
     stream << "Lower bounds of contributions: " << endl;
-    for (k = 0; k<=Number_of_Variables; k++) {
-      ZZ l = lower_bounds[k] * abs(cone->determinant);
-      double lower_contrib = convert_ZZ_to_mpz(l).get_d() * weights[k].get_d();
-      stream << lower_contrib << " ";
-      if (cone->determinant
-    }
+    for (k = 0; k<=Number_of_Variables; k++)
+      stream << total_lower_bounds[k] << " ";
     stream << endl;
     stream << "Upper bounds of contributions: " << endl;
-    for (k = 0; k<=Number_of_Variables; k++) {
-      ZZ l = upper_bounds[k] * abs(cone->determinant);
-      double upper_contrib = convert_ZZ_to_mpz(l).get_d() * weights[k].get_d();
-      stream << upper_contrib << " ";
-    }
+    for (k = 0; k<=Number_of_Variables; k++)
+      stream << total_upper_bounds[k] << " ";
     stream << endl;
     return 1;
   }
@@ -152,4 +169,6 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
 					  Write_Exponential_Sample_Formula_Single_Cone_Parameters &param)
 {
   barvinokDecomposition_List(cones, param);
+  cout << endl << "*** Lower bound: " << param.total_lower_bound << endl;
+  cout << endl << "*** Upper bound: " << param.total_upper_bound << endl;
 }
