@@ -24,54 +24,14 @@
 #include "matrix_ops.h" 
 #include <NTL/mat_ZZ.h>
 #include "convert.h"
+#include "piped.h"
 
 using namespace std;
-
-/* Forward declare functions internal to this module */
-vec_ZZ get_integer_comb(const mat_ZZ &, int *);
-void get_multipliers_from_snf(const mat_ZZ &, int *);
-mat_ZZ get_U_star(listCone *);
-vec_ZZ translate_lattice_point(const vec_ZZ &, const mat_ZZ &, const mat_ZZ &,
-   listCone *);  
-
-/* ----------------------------------------------------------------- */
-vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX, 
-		 rationalVector *coeffsVertex, vec_ZZ *matrix, 
-		 int numOfRays, int numOfVars) {
-  int i,j;
-  vec_ZZ z, movement;
-  rationalVector *difference;
-
-  difference=subRationalVector(coeffsX,coeffsVertex,numOfVars);
-
-  movement=createVector(numOfRays);
-  for (i=0; i<numOfRays; i++) {
-    if (difference->denominator[i]==1) 
-      movement[i]=-difference->enumerator[i];
-    else {
-      movement[i]=-(difference->enumerator[i]/difference->denominator[i]);
-      if (difference->enumerator[i]<0) movement[i]=movement[i]+1;
-    }
-  }
-
-  z=copyVector(x,numOfVars);
-
-  for (i=0; i<numOfRays; i++) {
-    if (movement[i]!=0) {
-      for (j=0; j<numOfVars; j++) 
-/* Note that each COLUMN of matrix constitutes an extreme ray, not
-   each row! */
-	z[j]=z[j]+movement[i]*matrix[j][i];
-    }
-  }
-
-  return (z);
-}
 
 /*
  * Description:
  * pointsInParallelepiped: 1) Find Smith Normal form of cone basis. In other
- * words, find a basis v and w such that v_i = n_i*w_i. 2) Ennumerate all
+ * words, find a basis v and w such that v_i = n_i*w_i. 2) Enumerate all
  * lattice points in fund||piped by taking all (bounded: 0 <= k <= n_{i-1})
  * integer combinations of w_i, and translating them accordingly
  *
@@ -81,60 +41,16 @@ vec_ZZ movePoint(vec_ZZ x, rationalVector *coeffsX,
  *
  * Return: listVector* of lattice points
  */
-listVector* pointsInParallelepiped(listCone *cone, int numOfVars) {
-   mat_ZZ snf_U, B, B_inv, C, U_star;
-   mat_ZZ U = convert_listVector_to_mat_ZZ(cone->rays);
-   vec_ZZ lat_pt, trans_lat_pt;
-   int rows;
-   int *n, *next;
-   IntCombEnum *iter_comb;
-   listVector *lat_points = NULL;
 
-   //cout << "Computing Smith-Normal form...\n";
-   /* get Smith Normal form of matrix, Smith(A) = BAC */
-   snf_U = SmithNormalForm(U, B, C);
-   rows = snf_U.NumRows();
-
-   /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
-   n = new int[rows]; 
-   get_multipliers_from_snf(snf_U, n);
-
-   /*
-    * Smith(A) = BAC, and the diagonal entries of Smith(A) are the multipliers
-    * n_i such that w_i*n_i= v_i. Therefore, AC = V, and B^-1 = W. Since we
-    * must take the integer combinations of W, we must calculate B^-1.
-    */
-   B_inv = inv(B);
-
-   /* U* = (U^-1)^T. Thus, we can calculate U* from the facets */
-   U_star = get_U_star(cone);
-   
-   /*
-    * enumerate lattice points by taking all integer combinations
-    * 0 <= k <= (n_i - 1) of each vector.
-    */
-   //cout << "Enumerating lattice points...\n";
-   iter_comb = new IntCombEnum(n, rows);
-   iter_comb->decrementUpperBound();
-   while((next = iter_comb->getNext())) {
-      lat_pt = get_integer_comb(B_inv, next);
-      trans_lat_pt = translate_lattice_point(lat_pt, U, U_star, cone);
-      lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
-   }
-
-   /* cleanup */
-   delete iter_comb;
-   delete [] n;
-
-   return (lat_points);
-}
 
 /*
  * calculates a integer combination of the specified lattice basis
  * and stores the result in the vector v. Because of incompatible datatypes,
  * it is easiest to simply do this directly.
  */
-vec_ZZ get_integer_comb(const mat_ZZ & lat_basis, int *scalar) {
+static vec_ZZ
+get_integer_comb(const mat_ZZ & lat_basis, int *scalar)
+{
    int i,j;
    long conv_l;
    int row = lat_basis.NumRows();
@@ -151,7 +67,9 @@ vec_ZZ get_integer_comb(const mat_ZZ & lat_basis, int *scalar) {
    return (v);
 }
 
-mat_ZZ get_U_star(listCone *cone) {
+static mat_ZZ
+get_U_star(const listCone *cone)
+{
    /* Note that < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}. */
    mat_ZZ U_star = convert_listVector_to_mat_ZZ(cone->facets);
 
@@ -162,8 +80,10 @@ mat_ZZ get_U_star(listCone *cone) {
  * Translate point m using the following formula:
  * m' = v + sum {<m - v, u_i*>}u_i, where {} means the factional part 
  */
-vec_ZZ translate_lattice_point(const vec_ZZ& m, const mat_ZZ & U,
-   const mat_ZZ & U_star, listCone * cone) {
+static vec_ZZ
+translate_lattice_point(const vec_ZZ& m, const mat_ZZ & U,
+   const mat_ZZ & U_star, const listCone * cone)
+{
    int cols = U.NumCols();
    int len = m.length();
    mat_ZZ U_trans = transpose(U);
@@ -245,19 +165,85 @@ vec_ZZ translate_lattice_point(const vec_ZZ& m, const mat_ZZ & U,
   
 /*
  * If S is the Smith Normal Form of A, then the multipliers n_i such that
- * v_i = n_iw_i are on the diagonal
+ * v_i = n_i w_i are on the diagonal
  */
-void get_multipliers_from_snf(const mat_ZZ & snf, int *n) {
+static vector<int>
+get_multipliers_from_snf(const mat_ZZ & snf)
+{
    int j;
    int row = snf.NumRows();
+   vector<int> n(row);
 
    for (j = 0; j < row; j++) {
       //cout << "get_multipliers_from_snf:: snf[" << j << "," << j << "] = " << snf[j][j] << "\n"; 
       n[j] = to_int(snf[j][j]);
    }
-   return;
+   return n;
 }
 
+PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars) :
+  cone(a_cone)
+{
+   mat_ZZ snf_U, B, C;
+   U = convert_listVector_to_mat_ZZ(cone->rays);
+
+   //cout << "Computing Smith-Normal form...\n";
+   /* get Smith Normal form of matrix, Smith(A) = BAC */
+   snf_U = SmithNormalForm(U, B, C);
+
+   /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
+   max_multipliers = get_multipliers_from_snf(snf_U);
+
+   /*
+    * Smith(A) = BAC, and the diagonal entries of Smith(A) are the multipliers
+    * n_i such that w_i*n_i= v_i. Therefore, AC = V, and B^-1 = W. Since we
+    * must take the integer combinations of W, we must calculate B^-1.
+    */
+   B_inv = inv(B);
+
+   /* U* = (U^-1)^T. Thus, we can calculate U* from the facets */
+   U_star = get_U_star(cone);
+}
+
+const vector<int> &
+PointsInParallelepipedGenerator::GetMaxMultipliers()
+{
+  return max_multipliers;
+}
+
+vec_ZZ
+PointsInParallelepipedGenerator::GeneratePoint(int *multipliers)
+{
+  vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
+  return translate_lattice_point(lat_pt, U, U_star, cone);
+}
+
+listVector*
+pointsInParallelepiped(listCone *cone, int numOfVars)
+{
+  PointsInParallelepipedGenerator generator(cone, numOfVars);
+  vector<int> max_multipliers = generator.GetMaxMultipliers();
+  /*
+   * enumerate lattice points by taking all integer combinations
+   * 0 <= k <= (n_i - 1) of each vector.
+   */
+  int length = max_multipliers.size();
+  int *n = new int[length];
+  int i;
+  for (i = 0; i<length; i++)
+    n[i] = max_multipliers[i];
+  IntCombEnum iter_comb(n, length);
+  //cout << "Enumerating lattice points...\n";
+  iter_comb.decrementUpperBound();
+  listVector *lat_points = NULL;
+  int *next;
+  while((next = iter_comb.getNext())) {
+    vec_ZZ trans_lat_pt = generator.GeneratePoint(next);
+    lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
+  }
+  delete n;
+  return (lat_points);
+}
 
 /* ----------------------------------------------------------------- */
 listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex, 
@@ -369,7 +355,7 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
    if (abs(cone->determinant) != 1) {
-      //cout << "Processing cone with determinant " << cone->determinant << endl;
+     cout << "Processing cone with determinant " << cone->determinant << endl;
       cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
    } else {
       cone->latticePoints = pointsInParallelepipedOfUnimodularCone(

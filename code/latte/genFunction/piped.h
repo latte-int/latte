@@ -1,8 +1,30 @@
+// This is a -*- C++ -*- header file.
+
 #ifndef GENFUNCTION_PIPED_H
 #define GENFUNCTION_PIPED_H
 
-vec_ZZ movePoint(vec_ZZ, rationalVector*, rationalVector*, vec_ZZ*, int, int);
-listVector* pointsInParallelepiped(listCone *cones, int numOfVars);
+#include "cone.h"
+#include <vector>
+using namespace std;
+
+class PointsInParallelepipedGenerator {
+  const listCone *cone;
+  vector<int> max_multipliers;
+  mat_ZZ B_inv;
+  mat_ZZ U;
+  mat_ZZ U_star;
+public:
+  PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars);
+  const vector<int> &GetMaxMultipliers();
+  /* Let n be the vector obtained from GetMaxMultipliers().
+     Then all points in the fundamental parallelepiped can be obtained
+     by calling GeneratePoint for all integer multiplier vectors m
+     such that 0 <= m_i < n_i. */
+  vec_ZZ GeneratePoint(int *multipliers);
+  vec_ZZ GeneratePoint(const vec_ZZ &multipliers);
+};
+
+listVector* pointsInParallelepiped(listCone *cone, int numOfVars);
 listVector* pointsInParallelepipedOfUnimodularCone(rationalVector*, 
 						   listVector*, int);
 
