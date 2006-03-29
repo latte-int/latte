@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <cassert>
 
+#include "config.h"
 #include "myheader.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
@@ -41,7 +42,9 @@
 #include "binarySearchIP.h"
 #include "CheckEmpty.h"
 #include "ExponentialSubst.h"
+#ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
+#endif
 
 #include "banner.h"
 #include "convert.h"
@@ -63,6 +66,7 @@ int main(int argc, char *argv[]) {
     Load_Tri[127], Print[127], inthull[127], cddstyle[127], grobner[127],
     removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
+  bool approx;
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
   vec_ZZ cost;
   listVector *templistVec;
@@ -90,7 +94,6 @@ int main(int argc, char *argv[]) {
   strcpy(grobner,"no");
   strcpy(maximum,"no");
   strcpy(minimize,"no");
-  strcpy(decompose,"yes");
   strcpy(dualApproach,"no");
   strcpy(equationsPresent,"no");
   strcpy(assumeUnimodularCones,"no");
@@ -105,6 +108,7 @@ int main(int argc, char *argv[]) {
   strcpy(inthull, "no");
   strcpy(cddstyle, "no");
   strcpy(LRS, "no");
+  approx = false;
   params.substitution = BarvinokParameters::PolynomialSubstitution;
   params.decomposition = BarvinokParameters::DualDecomposition;
   params.max_determinant = 1;
@@ -118,7 +122,10 @@ int main(int argc, char *argv[]) {
     else if(strncmp(argv[i],"int",3)==0) strcpy(interior,"yes");
     //else if(strncmp(argv[i],"min",3)==0) strcpy(minimize,"yes");
     //else if(strncmp(argv[i],"gro",3)==0) strcpy(grobner,"yes");
-    //else if(strncmp(argv[i],"nodecom",3)==0) strcpy(decompose,"no");
+    else if(strncmp(argv[i],"nodecom",3)==0
+	    || strncmp(argv[i], "--nodecomposition", 5) == 0
+	    || strncmp(argv[i], "--no-decomposition", 7) == 0)
+      params.max_determinant = 0;
     else if(strncmp(argv[i],"homog",3)==0) {strcpy(dualApproach,"yes"); flags |= DUAL_APPROACH;}
     else if(strncmp(argv[i],"equ",3)==0) strcpy(equationsPresent,"yes");
     else if(strncmp(argv[i],"uni",3)==0) strcpy(assumeUnimodularCones,"yes");
@@ -142,12 +149,14 @@ int main(int argc, char *argv[]) {
     else if(strncmp(argv[i],"rem",3)==0) strcpy (Memory_Save, "no");
     else if(strncmp(argv[i],"trisave",7)==0) {strcpy (Save_Tri, "yes"); flags |= SAVE;}
     else if(strncmp(argv[i],"triload",7)==0) {strcpy (Load_Tri, "yes"); flags |= LOAD;}
-    else if (strncmp(argv[i], "--exp", 5) == 0)
+    else if (strncmp(argv[i], "--exponential", 5) == 0)
       params.substitution = BarvinokParameters::ExponentialSubstitution;
     else if (strncmp(argv[i], "--maxdet=", 9) == 0)
       params.max_determinant = atoi(argv[i] + 9);
-    else if (strncmp(argv[i], "--irr", 5) == 0)
+    else if (strncmp(argv[i], "--irrational-primal", 5) == 0)
       params.decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
+    else if (strncmp(argv[i], "--approximate", 7) == 0)
+      approx = true;
     else {
       cerr << "Unknown command/option " << argv[i] << endl;
       exit(1);
@@ -418,22 +427,20 @@ int main(int argc, char *argv[]) {
   switch (params.substitution) {
   case BarvinokParameters::PolynomialSubstitution:
     if (assumeUnimodularCones[0]=='n') {
-      if (decompose[0]=='y') {
-	if (Memory_Save[0] == 'n') {
-	  cones=decomposeCones(cones,numOfVars, flags, fileName,
-			       params.max_determinant,
-			       not already_dualized,
-			       params.decomposition);
-	  /* Compute points in parallelepipeds */
-	  computePointsInParallelepipeds(cones, numOfVars);
-	}
-	// Iterator through simplicial cones, DFS
-	else
-	  decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
-				params.max_determinant,
-				not already_dualized,
-				params.decomposition);	
+      if (Memory_Save[0] == 'n') {
+	cones=decomposeCones(cones,numOfVars, flags, fileName,
+			     params.max_determinant,
+			     not already_dualized,
+			     params.decomposition);
+	/* Compute points in parallelepipeds */
+	computePointsInParallelepipeds(cones, numOfVars);
       }
+      // Iterator through simplicial cones, DFS
+      else
+	decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
+			      params.max_determinant,
+			      not already_dualized,
+			      params.decomposition);	
     }
     break;
   case BarvinokParameters::ExponentialSubstitution:
@@ -446,30 +453,36 @@ int main(int argc, char *argv[]) {
       if (not already_dualized)
 	cones = dualizeCones(cones, numOfVars);
 
-      if (Print[0] == 'y') {
+      if (approx) {
 	// FIXME: This wants to be factory-ized out.
+#ifdef HAVE_EXPERIMENTS
 	Write_Exponential_Sample_Formula_Single_Cone_Parameters
 	  write_param("Exponential_Sample_Formula",
 		      params.max_determinant);
 	write_param.Number_of_Variables = numOfVars;
 	write_param.decomposition = params.decomposition;
 	decomposeAndWriteExponentialSampleFormula(cones, write_param);
+#else
+	cerr << "Approximation code is not compiled in, sorry." << endl;
+	exit(1);
+#endif
       }
+      else {
+	Exponential_Single_Cone_Parameters exp_param;
+	// FIXME: Upgrade should be more automatical.
+	exp_param.max_determinant = params.max_determinant; 
+	exp_param.decomposition = params.decomposition;
+	exp_param.Number_of_Variables = numOfVars;
+	exp_param.File_Name = fileName;
 
-      Exponential_Single_Cone_Parameters exp_param;
-      // FIXME: Upgrade should be more automatical.
-      exp_param.max_determinant = params.max_determinant; 
-      exp_param.decomposition = params.decomposition;
-      exp_param.Number_of_Variables = numOfVars;
-      exp_param.File_Name = fileName;
-
-      Integer number_of_lattice_points
-	= decomposeAndComputeExponentialResidue(cones, exp_param);
-      cout << endl << "****  The number of lattice points is: "
-	   << number_of_lattice_points << "  ****" << endl << endl;
-      // FIXME: Centralize this output stuff.
-      ofstream out("numOfLatticePoints");
-      out << number_of_lattice_points << endl;
+	Integer number_of_lattice_points
+	  = decomposeAndComputeExponentialResidue(cones, exp_param);
+	cout << endl << "****  The number of lattice points is: "
+	     << number_of_lattice_points << "  ****" << endl << endl;
+	// FIXME: Centralize this output stuff.
+	ofstream out("numOfLatticePoints");
+	out << number_of_lattice_points << endl;
+      }
     }
     break;
   default:
