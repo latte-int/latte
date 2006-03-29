@@ -6,8 +6,9 @@
 using namespace std;
 
 /* use initialization list which is faster */
-IntCombEnum::IntCombEnum(int *u, int l) : len(l), cur_col(l - 1),
-   upper_bound(u) {
+IntCombEnum::IntCombEnum(int *u, int l) :
+  upper_bound(u), cur_col(l - 1), len(l)
+{
    /*
     * initialize memory for the start position and "next" position
     * set start and end position to be the zero vector.
