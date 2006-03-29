@@ -46,10 +46,10 @@ liblatte_a_SOURCES += 	genFunction/NTL_to_LiDIA.cpp
 noinst_HEADERS += genFunction/NTL_to_LiDIA.h
 endif
 
-if MAINTAINER_MODE
+if HAVE_EXPERIMENTS
 # Experimental stuff
 bin_PROGRAMS += test-todd 
-	#simple-count	
+
 nodist_liblatte_a_SOURCES = \
 	ExponentialApprox.cpp Irrational.cpp
 nodist_noinst_HEADERS = \
