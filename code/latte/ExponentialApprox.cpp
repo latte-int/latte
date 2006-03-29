@@ -133,30 +133,32 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
 
     /* Output */
     
-    printConeToFile(stream, cone, Number_of_Variables);
-    stream << "Approximate Weights: ";
+    //printConeToFile(stream, cone, Number_of_Variables);
+    
+    stream << "*** Cone with index " << cone->determinant << endl;
+    stream << "Approximate Weights: " << endl << "  ";
     mpq_vector::const_iterator i;
     for (i = weights.begin(); i!=weights.end(); ++i) {
       double weight = (*i).get_d();
       stream << weight << " ";
     }
     stream << endl;
-    stream << "Lower bounds of k! phi_k: " << endl;
+    stream << "Lower bounds of k! phi_k: " << endl << "  ";
     for (k = 0; k<=Number_of_Variables; k++)
-      stream << lower_bounds[k] << " ";
+      stream << convert_ZZ_to_mpz(lower_bounds[k]).get_d() << " ";
     stream << endl;
-    stream << "Upper bounds of k! phi_k: " << endl;
+    stream << "Upper bounds of k! phi_k: " << endl << "  ";
     for (k = 0; k<=Number_of_Variables; k++)
-      stream << upper_bounds[k] << " ";
+      stream << convert_ZZ_to_mpz(upper_bounds[k]).get_d() << " ";
     stream << endl;
-    stream << "Lower bounds of contributions: " << endl;
+    stream << "Lower bounds of contributions: " << endl << "  ";
     for (k = 0; k<=Number_of_Variables; k++)
       stream << total_lower_bounds[k] << " ";
     stream << endl;
-    stream << "Upper bounds of contributions: " << endl;
+    stream << "Upper bounds of contributions: " << endl << "  ";
     for (k = 0; k<=Number_of_Variables; k++)
       stream << total_upper_bounds[k] << " ";
-    stream << endl;
+    stream << endl << endl;
     return 1;
   }
   catch (NotGenericException) {
