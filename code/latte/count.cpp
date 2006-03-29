@@ -443,7 +443,11 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
     else {
+      if (not already_dualized)
+	cones = dualizeCones(cones, numOfVars);
+
       if (Print[0] == 'y') {
+	// FIXME: This wants to be factory-ized out.
 	Write_Exponential_Sample_Formula_Single_Cone_Parameters
 	  write_param("Exponential_Sample_Formula",
 		      params.max_determinant);
@@ -458,8 +462,7 @@ int main(int argc, char *argv[]) {
       exp_param.decomposition = params.decomposition;
       exp_param.Number_of_Variables = numOfVars;
       exp_param.File_Name = fileName;
-      if (not already_dualized)
-	cones = dualizeCones(cones, numOfVars);
+
       Integer number_of_lattice_points
 	= decomposeAndComputeExponentialResidue(cones, exp_param);
       cout << endl << "****  The number of lattice points is: "
