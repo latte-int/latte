@@ -24,7 +24,7 @@ struct BarvinokParameters {
   DecompositionType decomposition; 
   // The maximum determinant of cones that we do not subdivide
   // further.  Set to 1 to subdivide until we reach unimodular cones
-  // only.
+  // only.  Set to 0 (special case) to not subdivide at all. 
   int max_determinant;
   // A file name that is used for constructing file names for
   // temporary and semi-temporary files.

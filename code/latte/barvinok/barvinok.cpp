@@ -232,18 +232,34 @@ barvinokStep(const listCone *Cone,
 
 int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 {
-       	
-  ZZ absDet = abs(C->determinant);
+  ZZ absDet;
+  switch (Parameters->decomposition) {
+  case BarvinokParameters::DualDecomposition:
+    absDet = abs(C->dual_determinant);
+    break;
+  case BarvinokParameters::IrrationalPrimalDecomposition:
+    absDet = abs(C->determinant);
+    break;
+  default:
+    cerr << "Unknown BarvinokParameters::decomposition";
+    abort();
+  }
        	
   if (absDet == 0) {
     //cout << "barvinok_DFS: Det = 0." << endl;
     return 1;	
   }		     
-  else if (absDet <= Parameters->max_determinant) {
+  else if (Parameters->max_determinant == 0
+	   || absDet <= Parameters->max_determinant) {
     Parameters->Total_Uni_Cones += 1;
     if ( Parameters->Total_Uni_Cones % 1000 == 0)
       cout << Parameters->Total_Uni_Cones
-	   << " unimodular cones done." << endl;
+	   << (Parameters->max_determinant == 0
+	       ? " simplicial cones done."
+	       : (Parameters->max_determinant == 1
+		  ? " unimodular cones done."
+		  : " low-index cones done."))
+	   << endl;
     switch (Parameters->decomposition) {
     case BarvinokParameters::DualDecomposition:
       C = dualizeBackCones(C, Parameters->Number_of_Variables);
