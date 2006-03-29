@@ -1,3 +1,4 @@
+// This is a -*- C++ -*- header file.
 #ifndef INT_COMB_ENUM_H
 #define INT_COMB_ENUM_H
 
