@@ -636,6 +636,7 @@ listCone* computeVertexCones(char* fileName, listVector* matrix,
   inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices and edges with cdd...";
+  cout.flush();
   system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
   cout << "done.\n\n";
 
