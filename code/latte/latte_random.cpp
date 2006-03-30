@@ -1,6 +1,12 @@
 #include <stdlib.h>
 #include "latte_random.h"
 
+void
+seed_random_generator(unsigned int seed)
+{
+  srand(seed);
+}
+
 int
 uniform_random_number(int from, int to)
 {
