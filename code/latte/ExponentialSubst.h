@@ -15,6 +15,8 @@ class Exponential_Single_Cone_Parameters
   : public Generic_Vector_Single_Cone_Parameters {
 public:
   mpq_class result;
+  Exponential_Single_Cone_Parameters() :
+    result(0) {};
   virtual void InitializeComputation();
   virtual int ConsumeCone(listCone *cone);
 };
@@ -42,7 +44,12 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 const listCone *cone, int numOfVars)
   throw(NotGenericException);
 
-/* Compute the limit of the generating function for the integer points
+Integer
+scalar_power(const vec_ZZ &generic_vector,
+	     const vec_ZZ &point,
+	     int exponent);
+
+  /* Compute the limit of the generating function for the integer points
    in CONE, whose "latticePoints" (in the fundamental parallelepiped)
    are already computed, for z -> 1, by making an exponential
    substitution z |-> exp(t lambda) where lambda is a generic vector,
