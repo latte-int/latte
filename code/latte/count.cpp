@@ -42,6 +42,7 @@
 #include "binarySearchIP.h"
 #include "CheckEmpty.h"
 #include "ExponentialSubst.h"
+#include "latte_random.h"
 #ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
 #endif
@@ -157,6 +158,10 @@ int main(int argc, char *argv[]) {
       params.decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
+    else if (strncmp(argv[i], "--random-seed=", 14) == 0) {
+      unsigned int seed = atoi(argv[i] + 14);
+      seed_random_generator(seed);
+    }
     else {
       cerr << "Unknown command/option " << argv[i] << endl;
       exit(1);
@@ -461,6 +466,7 @@ int main(int argc, char *argv[]) {
 		      params.max_determinant);
 	write_param.Number_of_Variables = numOfVars;
 	write_param.decomposition = params.decomposition;
+	write_param.File_Name = fileName;
 	decomposeAndWriteExponentialSampleFormula(cones, write_param);
 #else
 	cerr << "Approximation code is not compiled in, sorry." << endl;
