@@ -245,7 +245,7 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
     vec_ZZ trans_lat_pt = generator.GeneratePoint(next);
     lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
   }
-  delete n;
+  delete[] n;
   return (lat_points);
 }
 
