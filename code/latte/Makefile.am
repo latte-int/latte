@@ -51,9 +51,9 @@ if HAVE_EXPERIMENTS
 bin_PROGRAMS += test-todd 
 
 nodist_liblatte_a_SOURCES = \
-	ExponentialApprox.cpp Irrational.cpp
+	ExponentialApprox.cpp Irrational.cpp latte_random.cpp
 nodist_noinst_HEADERS = \
-	ExponentialApprox.h Irrational.h
+	ExponentialApprox.h Irrational.h latte_random.h
 
 #nodist_simple_count_SOURCES = simple-main.cpp
 nodist_test_todd_SOURCES = todd/test-todd.cpp
