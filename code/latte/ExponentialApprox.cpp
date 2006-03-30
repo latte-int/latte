@@ -5,10 +5,12 @@
 #include "print.h"
 #include "ExponentialSubst.h"
 #include "ExponentialApprox.h"
+#include "latte_random.h"
+#include "genFunction/piped.h"
 
 void Write_Exponential_Sample_Formula_Single_Cone_Parameters::InitializeComputation()
 {
-  Generic_Vector_Single_Cone_Parameters::InitializeComputation();
+  Exponential_Single_Cone_Parameters::InitializeComputation();
   stream << "*** Computation with new generic vector " << endl;
 }
 
@@ -21,8 +23,8 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
       = computeExponentialResidueWeights(generic_vector,
 					 cone,
 					 Number_of_Variables);
-    int dimension = weights.size();
-
+    int dimension = weights.size() - 1;
+  
     /*** Compute bounds for the phi function. ***/
 
     /* Scalar products of the rays. */
@@ -159,6 +161,43 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     for (k = 0; k<=Number_of_Variables; k++)
       stream << total_upper_bounds[k] << " ";
     stream << endl << endl;
+
+    /* Sample */
+
+    {
+      int i;
+#define SAMPLE_LIMIT 1000000
+      if (abs(cone->determinant) > SAMPLE_LIMIT) {
+	cerr << "Refusing to handle a cone with index more than "
+	     << SAMPLE_LIMIT << ". Sorry." << endl;
+	exit(1);
+      }
+      PointsInParallelepipedGenerator generator(cone, Number_of_Variables);
+      vector<int> max_multipliers = generator.GetMaxMultipliers();
+      
+      // For the beginning, see what kind of approximate we get when
+      // we sample as many points as the parallelepiped has.
+      // If this is already bad... 
+      int num_samples = to_int(cone->determinant);
+      int length = max_multipliers.size();
+      int *multipliers = new int[length];
+      mpq_class sum = 0;
+      for (i = 0; i<num_samples; i++) {
+	unsigned int j;
+	for (j = 0; j<max_multipliers.size(); j++)
+	  multipliers[j] = uniform_random_number(0, max_multipliers[j] - 1);
+	vec_ZZ lattice_point = generator.GeneratePoint(multipliers);
+	for (k = 0; k<=dimension; k++) {
+	  sum += convert_ZZ_to_mpz(scalar_power(generic_vector,
+						lattice_point, k))
+	    * weights[k];
+	}
+      }
+      result += cone->coefficient * mpq_class(convert_ZZ_to_mpz(abs(cone->determinant)),
+					      num_samples)
+	* sum;
+      delete[] multipliers;
+    }
     return 1;
   }
   catch (NotGenericException) {
@@ -173,4 +212,6 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
   barvinokDecomposition_List(cones, param);
   cout << endl << "*** Lower bound: " << param.total_lower_bound << endl;
   cout << endl << "*** Upper bound: " << param.total_upper_bound << endl;
+  cout << endl << "*** Estimate obtained by sampling: "
+       << param.result.get_d() << endl;
 }

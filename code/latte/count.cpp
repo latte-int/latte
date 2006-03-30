@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
   vec_ZZ dim, v, w;
   int oldnumofvars;
   vec_ZZ *generators;
-  char fileName[127], invocation[127], decompose[10], equationsPresent[10],
+  char fileName[127], invocation[127], equationsPresent[10],
     assumeUnimodularCones[127], dualApproach[127], taylor[127], printfile[127],
     rationalCone[127], nonneg[127], Memory_Save[127], Save_Tri[127],
     Load_Tri[127], Print[127], inthull[127], cddstyle[127], grobner[127],
