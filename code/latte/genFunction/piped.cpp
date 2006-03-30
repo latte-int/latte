@@ -176,6 +176,10 @@ get_multipliers_from_snf(const mat_ZZ & snf)
 
    for (j = 0; j < row; j++) {
       //cout << "get_multipliers_from_snf:: snf[" << j << "," << j << "] = " << snf[j][j] << "\n"; 
+     if (snf[j][j] > INT_MAX) {
+       cerr << "Implementation restriction hit:  Smith normal form has entries larger than INT_MAX\n";
+       abort();
+     }
       n[j] = to_int(snf[j][j]);
    }
    return n;
