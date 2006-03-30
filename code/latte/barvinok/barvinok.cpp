@@ -23,7 +23,9 @@
 #include "rational.h"
 #include "convert.h"
 #include "dual.h"
+#ifdef HAVE_EXPERIMENTS
 #include "Irrational.h"
+#endif
 
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
@@ -128,7 +130,12 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	case BarvinokParameters::IrrationalPrimalDecomposition:
 	  // Do Barvinok decomposition on the primal cones.
 	  dualizeBackCones(dummy, Parameters->Number_of_Variables);
+#ifdef HAVE_EXPERIMENTS
 	  irrationalizeCone(dummy, Parameters->Number_of_Variables);
+#else
+	  cerr << "Irrationalization not configured in this build."
+	       << endl;
+#endif
 	  break;
 	default:
 	  cerr << "Unknown BarvinokParameters::decomposition";
