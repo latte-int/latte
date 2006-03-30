@@ -121,7 +121,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
       ZZ u = upper_bounds[k] * abs(cone->determinant);
       double upper_contrib = convert_ZZ_to_mpz(u).get_d() * weights[k].get_d();
 
-      if (l < u) {
+      if (lower_contrib < upper_contrib) {
 	total_lower_bounds[k] += lower_contrib;
 	total_upper_bounds[k] += upper_contrib;
       }
@@ -137,7 +137,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     
     //printConeToFile(stream, cone, Number_of_Variables);
     
-    stream << "*** Cone with index " << cone->determinant << endl;
+    stream << "*** Cone with index " << abs(cone->determinant) << endl;
     stream << "Approximate Weights: " << endl << "  ";
     mpq_vector::const_iterator i;
     for (i = weights.begin(); i!=weights.end(); ++i) {
@@ -178,7 +178,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
       // For the beginning, see what kind of approximate we get when
       // we sample as many points as the parallelepiped has.
       // If this is already bad... 
-      int num_samples = to_int(cone->determinant);
+      int num_samples = to_int(abs(cone->determinant));
       int length = max_multipliers.size();
       int *multipliers = new int[length];
       mpq_class sum = 0;
@@ -193,9 +193,10 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
 	    * weights[k];
 	}
       }
-      result += cone->coefficient * mpq_class(convert_ZZ_to_mpz(abs(cone->determinant)),
-					      num_samples)
-	* sum;
+      mpq_class scale_factor(convert_ZZ_to_mpz(abs(cone->determinant)),
+			     num_samples);
+      scale_factor.canonicalize();
+      result += cone->coefficient * scale_factor * sum;
       delete[] multipliers;
     }
     return 1;
