@@ -46,6 +46,7 @@ public:
 public:
   // Statistics collected during the computation.
   ZZ		Total_Uni_Cones;
+  ZZ		Total_Simplicial_Cones;
   ZZ		Current_Simplicial_Cones_Total;
   ZZ		Max_Simplicial_Cones_Total;
 public:

@@ -111,6 +111,8 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
        		exit(3);
    	}
 
+	 Parameters->Total_Simplicial_Cones++;
+	 
    	/* The following routine is to get the minimal
       	integral generators for the cone.  */
 
