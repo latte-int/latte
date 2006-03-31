@@ -68,6 +68,8 @@ int main(int argc, char *argv[]) {
     removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   bool approx;
+  double sampling_factor = 1.0;
+  
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
   vec_ZZ cost;
   listVector *templistVec;
@@ -158,6 +160,8 @@ int main(int argc, char *argv[]) {
       params.decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
+    else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
+      sampling_factor = atof(argv[i] + 18);
     else if (strncmp(argv[i], "--random-seed=", 14) == 0) {
       unsigned int seed = atoi(argv[i] + 14);
       seed_random_generator(seed);
@@ -206,7 +210,9 @@ int main(int argc, char *argv[]) {
 
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
+#ifdef VERBOSE_LATTE
   cout << invocation;
+#endif
   char costFile[127];
   if(maximum[0] == 'y'){
     strcpy(fileName,argv[argc-1]);
@@ -361,7 +367,7 @@ int main(int argc, char *argv[]) {
     matrix = matrixTmp;}
 /* Now matrix contains the new inequalities. */
   RR LP_OPT;
-    cout << "\nTime: " << GetTime() << " sec\n\n";
+  cout << "*** Preprocessing time: " << GetTime() << " sec" << endl;
     //   cout << "Project down cost function: " << cost << endl;
     vec_RR Rat_solution, tmp_den, tmp_num;
     mat_RR ProjU_RR;
@@ -398,15 +404,18 @@ int main(int argc, char *argv[]) {
        LP_OPT = Rat_cost*Rat_solution; //cout << cost << endl;
       cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       }else {cones = tmpcones;
-    cout << "\nThe polytope has " << lengthListCone(cones) << " vertices.\n";
+      cout << "The polytope has " << lengthListCone(cones) << " vertices." << endl;
     //system("rm numOfLatticePoints");
-    cout << endl;}
+    }
   } 
 
   /* Reading from the vertex representation. */
 
   if(Vrepresentation[0] == 'y')
      cones=computeVertexConesFromVrep(fileName,matrix,numOfVars); 
+
+  cout << "*** Vertex and cone computation time: " << GetTime()
+       << " sec" << endl;
 
   /* Compute triangulation or decomposition of each vertex cone. */
 
@@ -463,11 +472,23 @@ int main(int argc, char *argv[]) {
 #ifdef HAVE_EXPERIMENTS
 	Write_Exponential_Sample_Formula_Single_Cone_Parameters
 	  write_param("Exponential_Sample_Formula",
-		      params.max_determinant);
+		      params.max_determinant,
+		      sampling_factor);
 	write_param.Number_of_Variables = numOfVars;
 	write_param.decomposition = params.decomposition;
 	write_param.File_Name = fileName;
 	decomposeAndWriteExponentialSampleFormula(cones, write_param);
+	// FIXME: Make a write-stats method
+	cout << "*** Total number of simplicial cones: " <<
+	  write_param.Total_Simplicial_Cones << endl;
+	if (write_param.max_determinant != 0) {
+	  cout << "*** Total number of "
+	       << (write_param.max_determinant == 1
+		   ? "unimodular"
+		   : "low-index")
+	       << " cones: "
+	       << write_param.Total_Uni_Cones << endl;
+	}
 #else
 	cerr << "Approximation code is not compiled in, sorry." << endl;
 	exit(1);
@@ -686,8 +707,8 @@ if(Memory_Save[0] == 'n')
     system(command);
 
   }
- cout << "Computation done. " << endl;
- cout << "Time: " << GetTime() << " sec\n\n";
+  //cout << "Computation done. " << endl;
+  cout << "*** Total time: " << GetTime() << " sec" << endl;
  
  return(0);
 }

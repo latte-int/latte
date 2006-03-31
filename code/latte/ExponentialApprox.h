@@ -15,12 +15,13 @@ class Write_Exponential_Sample_Formula_Single_Cone_Parameters :
 {
 public:
   ofstream stream;
+  double sampling_factor;
   double total_lower_bound;
   double total_upper_bound;
+  mpq_class approximate_result;
   Write_Exponential_Sample_Formula_Single_Cone_Parameters
-  (const char *filename, int a_max_determinant) :
-    Exponential_Single_Cone_Parameters(),
-    stream(filename), total_lower_bound(0.0), total_upper_bound(0.0)
+  (const char *filename, int a_max_determinant, double a_sampling_factor) :
+    stream(filename), sampling_factor(a_sampling_factor)
   {
     max_determinant = a_max_determinant;
   }

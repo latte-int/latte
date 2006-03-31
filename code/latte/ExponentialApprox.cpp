@@ -7,10 +7,14 @@
 #include "ExponentialApprox.h"
 #include "latte_random.h"
 #include "genFunction/piped.h"
+#include "genFunction/IntCombEnum.h"
 
 void Write_Exponential_Sample_Formula_Single_Cone_Parameters::InitializeComputation()
 {
   Exponential_Single_Cone_Parameters::InitializeComputation();
+  approximate_result = 0;
+  total_lower_bound = 0.0;
+  total_upper_bound = 0.0;
   stream << "*** Computation with new generic vector " << endl;
 }
 
@@ -115,10 +119,12 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     vector<double> total_upper_bounds(Number_of_Variables + 1);
 
     int k;
+    double this_total_lower_bound = 0.0;
+    double this_total_upper_bound = 0.0;
     for (k = 0; k<=Number_of_Variables; k++) {
-      ZZ l = lower_bounds[k] * abs(cone->determinant);
+      ZZ l = cone->coefficient * lower_bounds[k] * abs(cone->determinant);
       double lower_contrib = convert_ZZ_to_mpz(l).get_d() * weights[k].get_d();
-      ZZ u = upper_bounds[k] * abs(cone->determinant);
+      ZZ u = cone->coefficient * upper_bounds[k] * abs(cone->determinant);
       double upper_contrib = convert_ZZ_to_mpz(u).get_d() * weights[k].get_d();
 
       if (lower_contrib < upper_contrib) {
@@ -129,9 +135,11 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
 	total_lower_bounds[k] += upper_contrib;
 	total_upper_bounds[k] += lower_contrib;
       }
-      total_lower_bound += total_lower_bounds[k];
-      total_upper_bound += total_upper_bounds[k];
+      this_total_lower_bound += total_lower_bounds[k];
+      this_total_upper_bound += total_upper_bounds[k];
     }
+    total_lower_bound += this_total_lower_bound;
+    total_upper_bound += this_total_upper_bound;
 
     /* Output */
     
@@ -160,12 +168,13 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     stream << "Upper bounds of contributions: " << endl << "  ";
     for (k = 0; k<=Number_of_Variables; k++)
       stream << total_upper_bounds[k] << " ";
-    stream << endl << endl;
+    stream << endl;
+    stream << "Total lower bound: " << this_total_lower_bound << endl;
+    stream << "Total upper bound: " << this_total_upper_bound << endl;
 
     /* Sample */
 
     {
-      int i;
 #define SAMPLE_LIMIT 1000000
       if (abs(cone->determinant) > SAMPLE_LIMIT) {
 	cerr << "Refusing to handle a cone with index more than "
@@ -178,10 +187,20 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
       // For the beginning, see what kind of approximate we get when
       // we sample as many points as the parallelepiped has.
       // If this is already bad... 
-      int num_samples = to_int(abs(cone->determinant));
+      int num_samples;
+      if (abs(cone->determinant) == 1) {
+	/* don't bother with unimodular cones */
+	num_samples = 1;
+      }
+      else {
+	num_samples = (int) (sampling_factor * to_int(abs(cone->determinant)));
+	if (num_samples == 0) num_samples = 1;
+      }
       int length = max_multipliers.size();
       int *multipliers = new int[length];
       mpq_class sum = 0;
+      // Sampling
+      int i;
       for (i = 0; i<num_samples; i++) {
 	unsigned int j;
 	for (j = 0; j<max_multipliers.size(); j++)
@@ -196,7 +215,35 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
       mpq_class scale_factor(convert_ZZ_to_mpz(abs(cone->determinant)),
 			     num_samples);
       scale_factor.canonicalize();
-      result += cone->coefficient * scale_factor * sum;
+      mpq_class contribution = cone->coefficient * scale_factor * sum;
+      approximate_result += contribution;
+      stream << "Sampled " << num_samples << " points, contribution: "
+	     << contribution.get_d() << endl << "  ";
+#if 1
+      // Exact computation, for comparison
+      {
+	sum = 0;
+	int *n = new int[length];
+	int i;
+	for (i = 0; i<length; i++)
+	  n[i] = max_multipliers[i];
+	IntCombEnum iter_comb(n, length);
+	iter_comb.decrementUpperBound();
+	int *next;
+	while((next = iter_comb.getNext())) {
+	  vec_ZZ lattice_point = generator.GeneratePoint(next);
+	  for (k = 0; k<=dimension; k++) {
+	    sum += convert_ZZ_to_mpz(scalar_power(generic_vector,
+						  lattice_point, k))
+	      * weights[k];
+	  }
+	}
+	delete[] n;
+	mpq_class contribution = cone->coefficient * sum;
+	result += contribution;
+	stream << "Exact contribution: " << contribution.get_d() << endl << endl;
+      }
+#endif
       delete[] multipliers;
     }
     return 1;
@@ -211,8 +258,10 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
 					  Write_Exponential_Sample_Formula_Single_Cone_Parameters &param)
 {
   barvinokDecomposition_List(cones, param);
-  cout << endl << "*** Lower bound: " << param.total_lower_bound << endl;
-  cout << endl << "*** Upper bound: " << param.total_upper_bound << endl;
-  cout << endl << "*** Estimate obtained by sampling: "
+  cout << "*** Lower bound: " << param.total_lower_bound << endl;
+  cout << "*** Upper bound: " << param.total_upper_bound << endl;
+  cout << "*** Estimate obtained by sampling: "
+       << param.approximate_result.get_d() << endl;
+  cout << "*** Exact answer: "
        << param.result.get_d() << endl;
 }
