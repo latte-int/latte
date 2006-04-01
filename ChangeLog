@@ -1,3 +1,78 @@
+2006-04-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* CheckEmpty.cpp, banner.cpp, dual.cpp, vertices/cdd.cpp:
+	Remove excess whitespace.
+
+	* count.cpp: Write out the total time.
+
+	* barvinok/dec.cpp (decomposeCones_Single): Write the
+	numOfLatticePoints file also in the "homog" case.
+
+	* CheckEmpty.cpp, Grobner.cpp, IntegralHull.cpp, Makefile.am,
+	ReadingFile.cpp, ResSingle.cpp, Residue.cpp, RudyResNTL.cpp,
+	binarySearchIP.cpp, cone.cpp, count.cpp, dual.cpp, ehrhart.cpp,
+	latte_system.cpp, latte_system.h, maximize.cpp, minimize.cpp,
+	barvinok/Triangulation.cpp, genFunction/maple.cpp,
+	genFunction/piped.cpp, print.cpp, ramon.cpp, rational.cpp,
+	tmpIP.cpp, vertices/cdd.cpp: Handle the exit status of all
+	subprocesses.  When an error occurs, exit with a nonzero exit
+	status.
+
+2006-03-31  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* barvinok/barvinok.cpp, barvinok/barvinok.h (Single_Cone_Parameters):
+	New slot Total_Simplicial_Cones.
+
+2006-03-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* count.cpp: New command-line argument --random-seed=N.
+
+	* latte_random.cpp, latte_random.h (seed_random_generator): New.
+
+	* genFunction/piped.cpp (pointsInParallelepiped):
+	Fix delete/delete[] issue.
+
+	* vertices/cdd.cpp: flush stdout to show progress
+
+	* barvinok/barvinok.cpp: Conditionalize irrationalization.
+
+	* ExponentialSubst.h (scalar_power): Export.
+
+	* Makefile.am, latte_random.cpp, latte_random.h:
+	New files, latte_random.h, .cpp
+
+	* genFunction/piped.cpp (get_multipliers_from_snf):
+	Check implementation restriction.
+
+	* genFunction/NTL_to_LiDIA.cpp (convert_bigint_matrix_to_mat_ZZ):
+	Don't convert via longs.
+	(convert_vec_ZZ_to_bigint_array): Abort when numbers are too large.
+
+2006-03-29  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* barvinok/barvinok.cpp, barvinok/barvinok.h (barvinok_DFS):
+	Special-case max_determinant == 0 to mean "no decomposition".  In
+	dual decomposition, observe the dual determinant rather than the
+	primal determinant.
+
+	* count.cpp: Enable option "nodecom" in all modes; can also be spelt
+	"--no-decomposition".
+
+	* Makefile.am: Conditionalize on HAVE_EXPERIMENTS rather than
+	MAINTAINER_MODE.
+
+	* simple-main.cpp: Removed (currently broken)
+
+	* genFunction/piped.cpp, genFunction/piped.h
+	(PointsInParallelepipedGenerator): New class.
+	(pointsInParallelepiped): Use PointsInParallelepipedGenerator.
+	(movePoint): Unused, removed.
+
+	* genFunction/IntCombEnum.cpp: Fix gcc warning
+
+	* Grobner.cpp, ReadingFile.cpp, ramon.cpp, ehrhart.cpp,
+	maximize.cpp, minimize.cpp: Don't make cout unbuffered.
+
 2006-03-20  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/Makefile.am: Fix for non-LiDIA build.
