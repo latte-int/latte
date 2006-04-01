@@ -710,6 +710,12 @@ if(Memory_Save[0] == 'n')
   }
   //cout << "Computation done. " << endl;
   cout << "*** Total time: " << GetTime() << " sec" << endl;
+
+  {
+    // until we have a more sophisticated test script --mkoeppe
+    ofstream totalTime("totalTime");
+    totalTime << GetTime() << endl;
+  }
  
  return(0);
 }
