@@ -576,93 +576,63 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
   }
   if (cones==0) out << "No cones in list.\n";     */
 
-  numOfTerms=0;
-
+  // Here we implicitly decompose each cone of index k into k "cones"
+  // with just one lattice point.  --mkoeppe, Fri Mar 31 23:37:30 PST 2006
+  noCones = 0;
   C=cones;
   while (C) {
-    numOfTerms++;
+    noCones += lengthListVector(cones->latticePoints);
     C=C->rest;
   }
 
-
- /* out << numOfVars << " " << lengthListVector(cones->rays) << " " <<
-    numOfTerms << "\n\n";  */
-
   dim=numOfVars;
   noGsPerC=lengthListVector(cones->rays);
-  noCones=numOfTerms;
-  int i,j; // index or loop vars
-  long int k, m;//n=0,p; // extra vars to use as needed
-  int E[noCones];  // E is the vector of epsilons, each 1 or -1
-  long int totalNoGs=noGsPerC*noCones; //total no. of generators,ie,rowdim of B
-  list<Integer> A[noCones];  // A is the numerator vectors
-  // long int B[totalNoGs][dim];  // B is the denominator vectors
-  //  cout<<"tNG: "<<totalNoGs<<endl;
-
+  int i,j;			// index or loop vars
+  long int k, m;	       //n=0,p; // extra vars to use as needed
+  vector<int> E(noCones);	  // E is the vector of epsilons, each 1 or -1
+  vector<list<Integer> > A(noCones);	// A is the numerator vectors
 
   Integer tmp_A;
   int result = 1;
 
+  long int totalNoGs=noGsPerC*noCones; //total no. of generators,ie,rowdim of B
   vector<Integer> dotProducts(totalNoGs);
   
   listVector* basis;
   listCone *listtmp3;
   cones1 = cones;
   i = 0;
- 	while (cones1) 
-	{
-	  listVector *tmp = cones1->latticePoints;
 
-	  /* The code is not prepared for non-unimodular cones (segfault) --
-	     check this out later! --mkoeppe */
-	  assert(tmp != NULL && tmp->rest == NULL);
-
-    		while (tmp) 
-		{
-      			E[i] = cones1->coefficient;
-     			// printVectorToFileWithoutBrackets(out,tmp->first,numOfVars);
-    			for (j=0; j<(numOfVars); j++) 
-			{  
-				tmp_A = tmp->first[j];  
-				A[i].push_back(tmp_A);
-				//cout << tmp_A << " ";
-			}
-			//cout << endl;
-     			// printListVectorToFileWithoutBrackets(out,cones->rays,numOfVars);
-     			basis = cones1->rays;
-     			while(basis) 	
-			{
-    				//printVectorToFileWithoutBrackets(out,basis->first,numOfVars);
-    				for (j=0; j<noGsPerC; j++) 
-    				{
-					dotProducts[i*noGsPerC + j] = 0;
-	    
-    					for(k = 0; k < dim; k++)
-    					{
-    						dotProducts[i*noGsPerC + j] += basis->first[k] * Random_Lambda[k];
-     					}
-	
-					// if the dot product is zero in the denominator, then barf
-					if(dotProducts[i*noGsPerC + j] == 0)
-						result = -1;
-	
-    					basis = basis->rest;
-    				}
-  				// i++;
-  			}
-    		//  out << endl;
-      		tmp=tmp->rest; 
-		i++;
-    		}
-	listtmp3 = cones1;
-    	cones1 = cones1->rest;
-	freeCone(listtmp3);
+  while (cones1) {
+    listVector *tmp = cones1->latticePoints;
+    while (tmp) {
+      E[i] = cones1->coefficient;
+      for (j=0; j<(numOfVars); j++) {  
+	tmp_A = tmp->first[j];  
+	A[i].push_back(tmp_A);
+      }
+      for (j=0, basis = cones1->rays; j<noGsPerC; j++, basis = basis->rest) {
+	dotProducts[i*noGsPerC + j] = 0;
+	for(k = 0; k < dim; k++) {
+	  dotProducts[i*noGsPerC + j] += basis->first[k] * Random_Lambda[k];
+	}
+	// if the dot product is zero in the denominator, then barf
+	if(dotProducts[i*noGsPerC + j] == 0)
+	  result = -1;
+      }
+      assert(basis == NULL);
+      tmp=tmp->rest; 
+      i++;
+    }
+    listtmp3 = cones1;
+    cones1 = cones1->rest;
+    freeCone(listtmp3);
   }
+  assert(i == noCones);
 
-if(result == -1)
-	return result;
+  if(result == -1)
+    return result;
 
- // out << endl;
   i = 0;
  /* denom * Bitr=B;
   for(i=0;i<noCones;i++) {
