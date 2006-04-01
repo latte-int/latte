@@ -21,6 +21,7 @@ I modified Raymond's code.
 #include "genFunction/piped.h"
 #include "genFunction/maple.h"
 #include "barvinok/dec.h"
+#include "latte_system.h"
 
 /* ---------------------------------------------------------------------- */
 void CheckGrobner(char* filename, char * cdd){
@@ -46,7 +47,7 @@ void CheckGrobner(char* filename, char * cdd){
   }
   if(counter != correct){
     cerr <<"Wrong input file!!" << endl;
-    exit(0);}
+    exit(1);}
   }
   else {
     ;
@@ -674,10 +675,10 @@ void SolveGrobner(char * filename, char * nonneg, char * dualApproach,
 
   TotalNumLattice += Residue(cones, numOfVars);
 
-  system("rm Gro.latte*"); 
+  system_with_error_check("rm -f Gro.latte*"); 
   }
  }
- //  system("rm Gro.latte*"); 
+ //  system_with_error_check("rm Gro.latte*"); 
   out << "0;" << endl;
   cout << "*******************************************************" << endl;
   cout <<"\nThe total number of lattice points is: " << TotalNumLattice << "." << endl << endl;

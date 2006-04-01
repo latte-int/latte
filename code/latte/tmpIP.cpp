@@ -574,7 +574,7 @@ listVector* GetHRepresentation(listVector* vertices, int numOfVars){
   OUT << "hull" << endl;
   OUT.close();
 
-  system(LRS_PATH " IH.ext > IH.ine");
+  system_with_error_check(LRS_PATH " IH.ext > IH.ine");
 
  ifstream in("IH.ine");
   if(!in){

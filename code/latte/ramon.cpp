@@ -20,9 +20,10 @@ vec_ZZ* createArrayVector(int numOfVectors) {
   vec_ZZ* w;
 
   w = new vec_ZZ[numOfVectors+1];
-
-//    w = (vec_ZZ*)calloc(sizeof(vec_ZZ*),(numOfVectors+1));
-  if (w==0) exit(0);
+  if (w==0) {
+    cerr << "Memory exhausted?" << endl;
+    exit(1);
+  }
   return (w);
 }
 /* ----------------------------------------------------------------- */

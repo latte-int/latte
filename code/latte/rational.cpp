@@ -27,12 +27,8 @@ rationalVector* createRationalVector(int numOfVars) {
   rationalVector* z;
 
   x = createVector(numOfVars);
-//    if (x==0) exit(0);
   y = createVector(numOfVars);
-//    if (y==0) exit(0);
   z = new rationalVector;
-//    z = (rationalVector*)malloc(sizeof(rationalVector));
-//    if (z==0) exit(0);
 
   for (i=0; i<numOfVars; i++) {
     x[i]=0;

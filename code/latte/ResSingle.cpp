@@ -13,6 +13,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include "flags.h"
+#include "latte_system.h"
 
 int ResidueFunction_Single_Cone(listCone *cones,
 				Standard_Single_Cone_Parameters *Residue_Parameters)
@@ -296,7 +297,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 		
 	if(Residue_Parameters->Flags & PRINT	== 1)
 		 {
-		   // system ("rm func.rat");
+		   // system_with_error_check("rm func.rat");
 	 		 //cout << "Outputing rational functions to file" << endl;
 		   // char File[200];
 		   // strcpy(File, fileName);
@@ -310,7 +311,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	
 	if (COMPUTE_SUM_MAPLE == 1)
 	{
-		//system ("rm simplify.sum");
+		//system_with_error_check("rm simplify.sum");
 		
 		//Create initial sum file simplify.sum
 		Simplify_Sum.open ("simplify.sum");
@@ -726,7 +727,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 
 			Simplify_Term.close ();
 
-			system ("maple <simplify3.add >out.simplify");
+			system_with_error_check ("maple <simplify3.add >out.simplify");
 		
 			cout << "%";	
 		}
@@ -766,7 +767,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 				
 				Rational_Function_S_T.close ();	
 
-				system ("maple < simplify2.add >out.simplify");
+				system_with_error_check ("maple < simplify2.add >out.simplify");
 			}
 
 		//Now we have all the N_k's up to N_(order)
@@ -801,7 +802,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 		
 		if (COMPUTE_SUM_MAPLE == 1)
 		{
-			//system ("rm simplify.term");
+			//system_with_error_check("rm simplify.term");
 			cout << "%";
 			
 			Simplify_Term.open ("simplify.term");
@@ -812,7 +813,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 			
 			Simplify_Term.close ();
 
-			system ("maple <simplify.add >out.simplify");
+			system_with_error_check ("maple <simplify.add >out.simplify");
 			
 		}
 		

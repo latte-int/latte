@@ -32,6 +32,7 @@
 #include "IntegralHull.h"
 #include "ReadingFile.h"
 #include "binarySearchIP.h"
+#include "latte_system.h"
 
 void CheckEmpty(char * Filename){
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
@@ -45,7 +46,7 @@ void CheckEmpty(char * Filename){
   ifstream IN(Filename);
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
-    exit(0);
+    exit(1);
   }
   while(IN >> tmpString){
     if(tmpString == "linearity"){
@@ -98,7 +99,7 @@ void CheckEmpty(char * Filename){
   ofstream out("Check_emp.lp");
   if(!out){
     cerr << "Cannot write Check_red file..." << endl;
-    exit(0);
+    exit(1);
   }
 
   out << "H-representation" << endl;
@@ -133,14 +134,14 @@ void CheckEmpty(char * Filename){
     out << entries[0][j] << " "; }
   out << endl;
 
-  system(CDD_PATH " Check_emp.lp > Check_emp.out");
+  system_with_error_check(CDD_PATH " Check_emp.lp > Check_emp.out");
 
   int FLAG = 0;
 
   ifstream IN3("Check_emp.lps");
   if(!IN3){
     cerr << "Check_emp.lps is missing!!  Please check input file." << endl;
-    exit(0);
+    exit(1);
   }
   while(IN3 >> tmpString){
     //  cout << tmpString << endl;
@@ -149,7 +150,7 @@ void CheckEmpty(char * Filename){
     }
   }
 
-  //  system("rm Check_emp.*");
+  //  system_with_error_check("rm Check_emp.*");
 
   if(FLAG == 0) {
     cerr << "Empty polytope or unbounded polytope!"<< endl;

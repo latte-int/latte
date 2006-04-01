@@ -6,8 +6,10 @@ listCone* createListCone() {
   listCone* z;
 
   z = new listCone;
-//    z = (listCone*)malloc(sizeof(listCone));
-  if (z==0) exit(0);
+  if (z==0) {
+    cerr << "Memory exhausted" << endl;
+    exit(1);
+  }
 
   z->coefficient=1;
   z->vertex=0;

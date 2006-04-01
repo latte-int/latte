@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <time.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <list>
 #include <vector>
 #include <cassert>
@@ -12,7 +12,7 @@
 #include "ramon.h"
 #include "RudyResNTL.h"
 #include <malloc.h>
-#include <stdlib.h>
+#include "latte_system.h"
 
 using namespace std;
 
@@ -71,7 +71,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
  /* ofstream out(outFileName);
   if (!out) {
     printf("Error opening output file for writing in printResidueFile!");
-    exit(0);
+    exit(1);
   }
   if (cones==0) out << "No cones in list.\n";     */
 
@@ -549,7 +549,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		
 	if(print_flag == 1)
 		 {
-		   //system ("rm func.rat");
+		   //system_with_error_check("rm func.rat");
 	 		 cout << "Outputing rational functions to file" << endl;
 			Rational_Function_Output_File.open ("func.rat");
 		 }
@@ -561,7 +561,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	if (COMPUTE_SUM_MAPLE == 1)
 	{
 		cout << "Compute maple called" << endl;
-		//system ("rm simplify.sum");
+		//system_with_error_check("rm simplify.sum");
 		
 		//Create initial sum file simplify.sum
 		Simplify_Sum.open ("simplify.sum");
@@ -660,7 +660,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		{
 			// Open to appendto simplify.term
 			if (Cones_File_Count == 0)
-				system ("rm simplify.term");
+				system_with_error_check ("rm -f simplify.term");
 
 			Simplify_Term.open ("simplify.term");
 			
@@ -1071,7 +1071,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 			Simplify_Term.close ();
 
-			system ("maple <simplify3.add >out.simplify");
+			system_with_error_check ("maple <simplify3.add >out.simplify");
 		
 			cout << "%";	
 		}
@@ -1084,7 +1084,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			{
 				Cones_File_Count = 0;
 
-				system ("maple <simplify4.add >out.simplify");
+				system_with_error_check ("maple <simplify4.add >out.simplify");
 
 			}	
 			
@@ -1126,7 +1126,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 				
 				Rational_Function_S_T.close ();	
 
-				system ("maple < simplify2.add >out.simplify");
+				system_with_error_check ("maple < simplify2.add >out.simplify");
 			}
 
 		//Now we have all the N_k's up to N_(order)
@@ -1161,7 +1161,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		
 		if (COMPUTE_SUM_MAPLE == 1)
 		{
-			//system ("rm simplify.term");
+			//system_with_error_check("rm simplify.term");
 			cout << "%";
 			
 			Simplify_Term.open ("simplify.term");
@@ -1172,7 +1172,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			
 			Simplify_Term.close ();
 
-			system ("maple <simplify.add >out.simplify");
+			system_with_error_check ("maple <simplify.add >out.simplify");
 			
 		}
 		

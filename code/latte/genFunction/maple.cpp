@@ -71,7 +71,7 @@ void createGeneratingFunctionAsMapleInput(char *fileName, listCone* cones,
   ofstream out(mapleInFileName);
   if (!out) {
     printf("Error opening output file in createGeneratingFunctionAsMapleInput!");
-    exit(0);
+    exit(1);
   }
 
   out << "gF:=";
@@ -96,7 +96,7 @@ void createGeneratingFunctionAsMapleInputGrob(listCone* cones,
 
   if (!out) {
     printf("Error opening output file in createGeneratingFunctionAsMapleInput!");
-    exit(0);
+    exit(1);
   }
 
 

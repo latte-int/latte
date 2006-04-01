@@ -13,6 +13,7 @@
 #include "cone.h"
 #include "rational.h"
 #include "ConeInfo.h"
+#include "latte_system.h"
 
 using namespace std;
 int IntegralHull_Flag = 1;
@@ -53,7 +54,7 @@ listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOf
 		{
       
 		/*      if(((tmpVector -> first)*cost) == 0){
-		cout <<"Zero dot product." << endl; exit (0);
+		cout <<"Zero dot product." << endl; exit (1);
 		}*/
       		if(((tmpVector -> first)*cost) > 0)
 		{ 
@@ -312,7 +313,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 					{
 						if (SINGLE_CONE != 1)
 						{
-							cout << "Not in SINGLE_CONE mode, coefficient is non zero but no feasibible solutions" << endl;
+							cout << "Not in SINGLE_CONE mode, coefficient is non zero but no feasible solutions" << endl;
 							exit (1);
 						}
 						// solution set is empty, so make them dig!
@@ -426,7 +427,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 		{
 			cout << "\n OH NO!!!!###########################################################";
   			cout << "\nCost:  " << cost << "\t\tVertex:  " << OptVertex << "\n";
-			exit (0);
+			exit (1);
 		}
 	}
 	*/
@@ -564,7 +565,7 @@ listVector* GetHRepresentation(listVector* vertices, int numOfVars){
   OUT << "hull" << endl;
   OUT.close();
 
-  system(LRS_PATH " IH.ext > IH.ine");
+  system_with_error_check(LRS_PATH " IH.ext > IH.ine");
 
  ifstream in("IH.ine");
   if(!in){

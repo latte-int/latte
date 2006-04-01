@@ -49,6 +49,7 @@
 
 #include "banner.h"
 #include "convert.h"
+#include "latte_system.h"
 
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
@@ -210,7 +211,7 @@ int main(int argc, char *argv[]) {
 
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
-#ifdef VERBOSE_LATTE
+#if 1
   cout << invocation;
 #endif
   char costFile[127];
@@ -405,7 +406,7 @@ int main(int argc, char *argv[]) {
       cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       }else {cones = tmpcones;
       cout << "The polytope has " << lengthListCone(cones) << " vertices." << endl;
-    //system("rm numOfLatticePoints");
+    //system_with_error_check("rm -f numOfLatticePoints");
     }
   } 
 
@@ -559,28 +560,28 @@ int main(int argc, char *argv[]) {
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ext");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".cdd");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ead");
-        system(command);
+        system_with_error_check(command);
 
 	if(cddstyle[0] == 'n'){
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
-        system(command);
+        system_with_error_check(command);
 	}
 
-	exit(1);
+	exit(0);
       }
    }
    else{
@@ -601,28 +602,28 @@ int main(int argc, char *argv[]) {
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ext");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".cdd");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ead");
-        system(command);
+        system_with_error_check(command);
 
 	if(cddstyle[0] == 'n'){
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
-        system(command);
+        system_with_error_check(command);
 	}
 
-	exit(1);
+	exit(0);
    }
  }else{
 if(Memory_Save[0] == 'n')
@@ -657,7 +658,7 @@ if(Memory_Save[0] == 'n')
    strcat(command, "simplify.sum ");
    strcat(command, argv[argc - 1]);
    strcat(command, ".rat");
-   system(command);
+   system_with_error_check(command);
  }
 
  if(printfile[0] == 'y'){
@@ -665,36 +666,36 @@ if(Memory_Save[0] == 'n')
    strcat(command, "func.rat ");
    strcat(command, argv[argc - 1]);
    strcat(command, ".rat");
-   system(command);
+   system_with_error_check(command);
  }
  if((removeFiles[0] == 'y') && (dualApproach[0] == 'n')){
    
-  strcpy(command,"rm ");
+  strcpy(command,"rm -f ");
   strcat(command,fileName);
   strcat(command,".ext");
-  system(command);
+  system_with_error_check(command);
   
-  strcpy(command,"rm ");
+  strcpy(command,"rm -f ");
   strcat(command,fileName);
   strcat(command,".cdd");
-  system(command); 
+  system_with_error_check(command); 
   
   if(Memory_Save[0] == 'n'){
-    strcpy(command,"rm ");
+    strcpy(command,"rm -f ");
     strcat(command,fileName);
     strcat(command,".maple");
-    system(command); 
+    system_with_error_check(command); 
   }
 
-  strcpy(command,"rm ");
+  strcpy(command,"rm -f ");
   strcat(command,fileName);
   strcat(command,".ead");
-  system(command); 
+  system_with_error_check(command); 
   
   if(cddstyle[0] == 'n'){
-    strcpy(command,"rm ");
+    strcpy(command,"rm -f ");
     strcat(command,fileName);
-    system(command);
+    system_with_error_check(command);
   }
  }
   }
@@ -702,9 +703,9 @@ if(Memory_Save[0] == 'n')
 
   if((dualApproach[0] == 'y') && (cddstyle[0] == 'n')){
 
-    strcpy(command,"rm ");
+    strcpy(command,"rm -f ");
     strcat(command,fileName);
-    system(command);
+    system_with_error_check(command);
 
   }
   //cout << "Computation done. " << endl;

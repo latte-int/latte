@@ -20,6 +20,7 @@
 #include "timing.h"
 #include "flags.h"
 #include "binarySearchIP.h"
+#include "latte_system.h"
 
 #include "../config.h"
 
@@ -105,11 +106,11 @@ rationalVector* LP2(listVector* matrix, listVector* ineq, vec_ZZ& cost, int numO
   rationalVector* Opt_vector;
    createCddIneLPFile2(matrix, ineq, numOfVars+1, cost);
    cout << "Computing LP...";
-  system(CDD_PATH " LP.ine > LP.out");
+  system_with_error_check(CDD_PATH " LP.ine > LP.out");
   cout << "done.\n\n";
   Opt_vector = ReadLpsFile2(numOfVars);
   //  cout << Opt_vector->enumerator << " " << Opt_vector -> denominator << endl;
-  system("rm LP.*");
+  system_with_error_check("rm -f LP.*");
 
   return(Opt_vector);
 }
@@ -153,13 +154,13 @@ ZZ OptimalCheckEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, 
 {
   ZZ NumOfLatticePoints;
 
-  //system("rm numOfLatticePoints");
+  //system_with_error_check("rm numOfLatticePoints");
   createLatteFileEqu(matrix, ineq, numOfVars + 1, rhs, lhs);
-  system("./count latte_BS > latte_BS.out");
+  system_with_error_check("./count latte_BS > latte_BS.out");
 
   ifstream in("numOfLatticePoints");
   in >> NumOfLatticePoints;
-  system("rm latte_BS*");
+  system_with_error_check("rm -f latte_BS*");
 
   return NumOfLatticePoints;
 
@@ -205,12 +206,12 @@ ZZ OptimalCheck(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec
 {
   ZZ NumOfLatticePoints;
 
-  //system("rm numOfLatticePoints");
+  //system_with_error_check("rm -f numOfLatticePoints");
   createLatteFile(matrix, ineq, numOfVars + 1, rhs, lhs);
   if(lengthListVector(matrix) != 0)
-  system("time ./count latte_BS > latte_BS.out");
+  system_with_error_check("time ./count latte_BS > latte_BS.out");
   else
-  system("time ./count latte_BS > latte_BS.out");
+  system_with_error_check("time ./count latte_BS > latte_BS.out");
 
   ifstream in("numOfLatticePoints");
   in >> NumOfLatticePoints;
@@ -221,7 +222,7 @@ ZZ OptimalCheck(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec
   TotalNumOfUniCones += numOfUniCones;
   cout << "Number of Unimodular cones: " << numOfUniCones << endl;
 
-  system("rm latte_BS*");
+  system_with_error_check("rm -f latte_BS*");
 
   return NumOfLatticePoints;
 
@@ -243,7 +244,7 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
       //  printListVector(matrix, numOfVars); exit(0);
       ofstream tmpFile("numOfLatticePoints");
       tmpFile << "Junk." << endl;
-      system("rm numOfLatticePoints");
+      system_with_error_check("rm -f numOfLatticePoints");
       Low_opt =  LP2(matrix, ineq, low_cost, numOfVars);
       High_opt =  LP2(matrix, ineq, cost, numOfVars);
 

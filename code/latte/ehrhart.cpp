@@ -42,6 +42,7 @@
 
 #include "banner.h"
 #include "convert.h"
+#include "latte_system.h"
 
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
@@ -143,7 +144,7 @@ int main(int argc, char *argv[]) {
       else strcpy(taylor,"yes");
     }else{
       cerr << "Too many arguments.  Check the manual for command line." << endl;
-      exit(0);
+      exit(1);
     }
   }
 
@@ -156,7 +157,7 @@ int main(int argc, char *argv[]) {
       if (rationalCone[0] == 'n') strcpy(taylor,"yes");
     }else{
       cerr << "Too many arguments.  Check the manual for command line." << endl;
-      exit(0);
+      exit(1);
     }
   }
   
@@ -170,7 +171,7 @@ int main(int argc, char *argv[]) {
       if (rationalCone[0] == 'n') strcpy(taylor,"yes");
     }else{
       cerr << "Too many arguments.  Check the manual for command line." << endl;
-      exit(0);
+      exit(1);
     }
   }
 
@@ -184,7 +185,7 @@ int main(int argc, char *argv[]) {
       if (rationalCone[0] == 'n')  strcpy(taylor,"yes");
     }else{
       cerr << "Too many arguments.  Check the manual for command line." << endl;
-      exit(0);
+      exit(1);
     }
   }
 
@@ -405,7 +406,7 @@ int main(int argc, char *argv[]) {
       cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       }else {cones = tmpcones;
     cout << "\nThe polytope has " << lengthListCone(cones) << " vertices.\n";
-    //system("rm numOfLatticePoints");
+    //system_with_error_check("rm -f numOfLatticePoints");
     cout << endl;}
   } 
 
@@ -540,28 +541,28 @@ int main(int argc, char *argv[]) {
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ext");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".cdd");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ead");
-        system(command);
+        system_with_error_check(command);
 
 	if(cddstyle[0] == 'n'){
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
-        system(command);
+        system_with_error_check(command);
 	}
 
-	exit(1);
+	exit(0);
       }
    }
    else{
@@ -582,28 +583,28 @@ int main(int argc, char *argv[]) {
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ext");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".cdd");
-        system(command);
+        system_with_error_check(command);
 
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ead");
-        system(command);
+        system_with_error_check(command);
 
 	if(cddstyle[0] == 'n'){
-        strcpy(command,"rm ");
+        strcpy(command,"rm -f ");
         strcat(command,fileName);
-        system(command);
+        system_with_error_check(command);
 	}
 
-	exit(1);
+	exit(0);
    }
  }else{
    /* if(maximum[0] == 'y') {
@@ -633,7 +634,7 @@ int main(int argc, char *argv[]) {
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;
-	exit(1);
+	exit(0);
       }
    }
    else{
@@ -652,7 +653,7 @@ int main(int argc, char *argv[]) {
 	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cout << "Computation done." << endl;
 	cout <<"Time: " << GetTime() << " sec." << endl;
-	exit(1);
+	exit(0);
    }
    }else{*/
 if(Memory_Save[0] == 'n')
@@ -688,7 +689,7 @@ if(Memory_Save[0] == 'n')
    strcat(command, "simplify.sum ");
    strcat(command, argv[argc - 1]);
    strcat(command, ".rat");
-   system(command);
+   system_with_error_check(command);
  }
 
  if(printfile[0] == 'y'){
@@ -697,40 +698,40 @@ if(Memory_Save[0] == 'n')
    strcat(command, "func.rat ");
    strcat(command, argv[argc - 1]);
    strcat(command, ".rat");
-   system(command);
+   system_with_error_check(command);
  }
  if(removeFiles[0] == 'y'){
    
-  strcpy(command,"rm ");
+  strcpy(command,"rm -f ");
   strcat(command,fileName);
   strcat(command,".ext");
-  system(command);
+  system_with_error_check(command);
   
-  strcpy(command,"rm ");
+  strcpy(command,"rm -f ");
   strcat(command,fileName);
   strcat(command,".cdd");
-  system(command); 
+  system_with_error_check(command); 
   
   if(Memory_Save[0] == 'n'){
-    strcpy(command,"rm ");
+    strcpy(command,"rm -f ");
     strcat(command,fileName);
     strcat(command,".maple");
-    system(command); 
+    system_with_error_check(command); 
   }
 
   if(cddstyle[0] == 'n'){
-  strcpy(command,"rm ");
+  strcpy(command,"rm -f ");
   strcat(command,fileName);
   strcat(command,".ead");
-  system(command); 
+  system_with_error_check(command); 
   }
  }
   }
 
   if(cddstyle[0] == 'n'){
-    strcpy(command,"rm ");
+    strcpy(command,"rm -f ");
     strcat(command,fileName);
-    system(command);
+    system_with_error_check(command);
   }
 
  cout << "Computation done. " << endl;

@@ -201,7 +201,7 @@ void printListConeToFile(char *fileName, listCone* cones, int numOfVars) {
   ofstream out(fileName);
   if (!out) {
     printf("Error opening output file for writing in printListConeToFile!");
-    exit(0);
+    exit(1);
   }
 
   if (cones==0) out << "No cones in list.\n";
@@ -228,7 +228,7 @@ void printResidueFile(char* fileName, listCone* cones, int numOfVars) {
   ofstream out(outFileName);
   if (!out) {
     printf("Error opening output file for writing in printResidueFile!");
-    exit(0);
+    exit(1);
   }
   if (cones==0) out << "No cones in list.\n";
 

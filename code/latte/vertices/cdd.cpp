@@ -17,6 +17,7 @@
 #include "../ramon.h"
 #include "../rational.h"
 #include <list>
+#include "latte_system.h"
 
 using namespace std;
 /* ----------------------------------------------------------------- */
@@ -504,8 +505,8 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
     in >> k;
     if (i!=(k-1)) {
       cout << "Vertex numbering in file latte_cdd.ead is not increasing!\n";
-      system("rm latte_cdd.*"); 
-      exit(0);
+      system_with_error_check("rm -f latte_cdd.*"); 
+      exit(1);
     }
 
     in >> numOfRays;
@@ -579,7 +580,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
     exit(1);
   }
 
-  while (tmpString!="begin") {getline(in,tmpString); counter++;  if(counter > 10) {cerr << "Redundant vertices!" << endl; exit(0);}}
+  while (tmpString!="begin") {getline(in,tmpString); counter++;  if(counter > 10) {cerr << "Redundant vertices!" << endl; exit(1);}}
 
   in >> numOfVertices >> tmp_int;
 
@@ -595,8 +596,8 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
     in >> k;
     if (i!=(k-1)) {
       cout << "Vertex numbering in file latte_cdd.ead is not increasing!\n";
-      system("rm latte_cdd.*"); 
-      exit(0);
+      system_with_error_check("rm -f latte_cdd.*"); 
+      exit(1);
     }
 
     in >> numOfRays;
@@ -637,22 +638,22 @@ listCone* computeVertexCones(char* fileName, listVector* matrix,
 
   cout << "Computing vertices and edges with cdd...";
   cout.flush();
-  system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
+  system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
   cout << "done.\n\n";
 
   strcpy(command,"cp latte_cdd.ext ");
   strcat(command,fileName);
   strcat(command,".ext");
-  system(command);
+  system_with_error_check(command);
 
   strcpy(command,"cp latte_cdd.ead ");
   strcat(command,fileName);
   strcat(command,".ead");
-  system(command);
+  system_with_error_check(command);
 
   cones=readCddExtFile();
   cones=readCddEadFile(cones,numOfVars+1);
-  system("rm latte_cdd.*"); 
+  system_with_error_check("rm -f latte_cdd.*"); 
 
   strcpy(cddOutFileName,fileName);
   strcat(cddOutFileName,".cdd");
@@ -676,29 +677,29 @@ listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix,
   inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices with lrs...";
-  system(LRS_PATH " latte_lrs.ine > latte_lrs.ext");
+  system_with_error_check(LRS_PATH " latte_lrs.ine > latte_lrs.ext");
   cout << "done.\n\n";
 
   createLrsIneFileToPostAnalysys(matrix, numOfVars + 1);
   createLrsExtFileToPostAnalysys(matrix, numOfVars + 1);
 
   cout << "Computing edges with cdd...";
-  system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
+  system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
   cout << "done.\n\n";
 
   strcpy(command,"cp latte_cdd.ext ");
   strcat(command,fileName);
   strcat(command,".ext");
-  system(command);
+  system_with_error_check(command);
 
   strcpy(command,"cp latte_cdd.ead ");
   strcat(command,fileName);
   strcat(command,".ead");
-  system(command);
+  system_with_error_check(command);
 
   cones=readCddExtFile();
   cones=readCddEadFile(cones,numOfVars+1);
-  system("rm latte_cdd.* latte_lrs.*"); 
+  system_with_error_check("rm -f latte_cdd.* latte_lrs.*"); 
 
   strcpy(cddOutFileName,fileName);
   strcat(cddOutFileName,".cdd");
@@ -720,22 +721,22 @@ listCone* computeVertexConesFromVrep(char* fileName, listVector* matrix,
  // inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices and edges with cdd...";
-  system("./ComputeAdjacency latte_cdd.ext > latte_cdd.jnk 2>&1");
+  system_with_error_check("./ComputeAdjacency latte_cdd.ext > latte_cdd.jnk 2>&1");
   cout << "done.\n\n";
   //  CreatExtEadFile();
    strcpy(command,"cp latte_cdd.ext ");
   strcat(command,fileName);
   strcat(command,".ext");
-  system(command);
+  system_with_error_check(command);
 
   strcpy(command,"cp latte_cdd.ead ");
   strcat(command,fileName);
   strcat(command,".ead");
-  system(command);
+  system_with_error_check(command);
 
   cones=readCddExtFile();
   cones=readCddEadFileFromVrep(cones,numOfVars+1);
-  system("rm latte_cdd.*"); 
+  system_with_error_check("rm -f latte_cdd.*"); 
 
   strcpy(cddOutFileName,fileName);
   strcat(cddOutFileName,".cdd");
@@ -750,11 +751,11 @@ rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars) {
   rationalVector* Opt_vector;
    createCddIneLPFile(matrix,numOfVars+1,cost);
    cout << "Computing LP...";
-  system(CDD_PATH " LP.ine > LP.out");
+  system_with_error_check(CDD_PATH " LP.ine > LP.out");
   cout << "done.\n\n";
   Opt_vector = ReadLpsFile(numOfVars);
   //  cout << Opt_vector->enumerator << " " << Opt_vector -> denominator << endl;
-  system("rm LP.*"); 
+  system_with_error_check("rm -f LP.*"); 
 
   return(Opt_vector);
 }

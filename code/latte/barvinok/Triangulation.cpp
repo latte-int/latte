@@ -23,6 +23,8 @@
 #include <string.h>
 #include <stdio.h>
 #include "config.h"
+#include "latte_system.h"
+
 using namespace std;
 
 /*
@@ -176,8 +178,8 @@ int Triangulation(const mat_ZZ & Mat, const int & m, const int & n,
   vec_ZZ neg;
   
   writeCDDextFileRudy(m,n,Mat);
-  system(CDD_PATH " tri.ext > tri.out");
-  system("rm -f tri.out");
+  system_with_error_check(CDD_PATH " tri.ext > tri.out");
+  system_with_error_check("rm -f tri.out");
   
   int face3 = 0, dim3 = 0;
   neg = readCDDineFileRudy(face3, dim3);
@@ -212,7 +214,7 @@ int Triangulation(const mat_ZZ & Mat, const int & m, const int & n,
       }
     }
 
-  //system("rm -f tri.*");
+  //system_with_error_check("rm -f tri.*");
 
   return count;
 }
@@ -264,8 +266,8 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 
 			cout << "Triangulation_Load_Save: File not present.  Calculation triangulation." << endl;
   			writeCDDextFileRudy(m,n,Mat);
-  			system(CDD_PATH "tri.ext > tri.out");
-  			system("rm -f tri.out");
+  			system_with_error_check(CDD_PATH "tri.ext > tri.out");
+  			system_with_error_check("rm -f tri.out");
 		}	
 		else
 		{
@@ -275,15 +277,15 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 
 			cout << "Triangulation_Load_Save: File present.  Unziping using command: " << System_Command << endl;
 	
-			system (System_Command);
+			system_with_error_check (System_Command);
 		}		
 	}
 	else // NOT LOADING
 	{
 
   			writeCDDextFileRudy(m,n,Mat);
-  			system(CDD_PATH " tri.ext > tri.out");
-  			system("rm -f tri.out");
+  			system_with_error_check(CDD_PATH " tri.ext > tri.out");
+  			system_with_error_check("rm -f tri.out");
 	}	
   
   int face3 = 0, dim3 = 0;
@@ -331,11 +333,11 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 
 		cout << "Triangulation_Load_Save: Save mode.  Creating archive of tri.ine tri.icd with command: " << System_Command << endl;
 
-		system (System_Command);
+		system_with_error_check (System_Command);
 		
 	}
   
-  system("rm -f tri.*");
+  system_with_error_check("rm -f tri.*");
 
 
   delete [] Integer_String_Original;

@@ -269,7 +269,7 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
   numOfRays=lengthListVector(rays);
   if (numOfRays!=numOfVars) {
     printf("Cone is NOT simplicial!\n");
-    exit(0);
+    exit(1);
   }
 
 /*  printf("numOfRays = %d, numOfVars = %d\n", numOfRays, numOfVars); */

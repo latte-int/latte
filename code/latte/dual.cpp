@@ -24,6 +24,7 @@
 #include "barvinok/dec.h"
 #include "convert.h"
 #include <list>
+#include "latte_system.h"
 using namespace std;
 
 /* ----------------------------------------------------------------- */
@@ -166,7 +167,7 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
       out.close();
 
 /*      printf("Computing facets with cdd..."); */
-      system(CDD_PATH " latte_cdd.ine > latte_cdd.out");
+      system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
 /*      printf("done.\n"); */
 
       strcpy(cddInFileName,"latte_cdd.ext");
@@ -201,7 +202,7 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
       }
       in.close();
 #if 0
-      system("rm latte_cdd.*");
+      system_with_error_check("rm -f latte_cdd.*");
 #endif
       tmp->facets=tmp->rays;    
       tmp->rays=facets->rest;

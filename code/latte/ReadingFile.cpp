@@ -35,6 +35,7 @@
 #include "flags.h"
 //#include "testing.h"
 #include "IntegralHull.h"
+#include "latte_system.h"
 
 void IntVector(listVector* basis, int numOfVars) {
 
@@ -76,7 +77,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   ifstream IN(Filename);
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
-    exit(0);
+    exit(1);
   }
   while(IN >> tmpString){
     if(tmpString == "linearity"){
@@ -141,7 +142,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   ofstream out("Check_red");
   if(!out){
     cerr << "Cannot write Check_red file..." << endl;
-    exit(0);
+    exit(1);
   }
   out << "H-representation" << endl;
   out << "begin" << endl;
@@ -168,12 +169,12 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   }
  
   int * NewIndex;
-  system(REDCHECK_PATH " Check_red > Check_red.out 2>&1");
+  system_with_error_check(REDCHECK_PATH " Check_red > Check_red.out 2>&1");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
   if(!in2){
     cerr << "Missing Check_red.out file..." << endl;
-    exit(0);
+    exit(1);
   }
   while(tmpString != "H-representation")
     in2 >> tmpString;
@@ -197,7 +198,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
   ifstream in3("Check_red.out");
   if(!in3){
     cerr << "Missing Check_red.out file..." << endl;
-    exit(0);
+    exit(1);
   }
   while (tmpString!="begin") getline(in3,tmpString);
 
@@ -228,7 +229,7 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
     /*    if(max[0] == 'y') 
       for(int i = 0; i < numOfDims - 1; i++) out2 << cost[i] << " ";
       out2 << endl; */
-    system("rm Check_red*");
+    system_with_error_check("rm -f Check_red*");
     cout << "done." << endl;
 }
 
@@ -310,7 +311,7 @@ void CheckInputFileCDDRep1(char *InputFile){
     ofstream out("Error");
     out << "Your input file CDD version is not correct!" << endl;
     cerr << "Your input file CDD version is not correct!" << endl;
-    exit (0);
+    exit (1);
   }
   //  delete [] tmp;
   return ;
@@ -508,7 +509,7 @@ void CheckInputFileCDDRep(char *InputFile){
 	    ofstream out("Error");
 	    out << "Your input file must be integer!" << endl;
 	    cerr << "Your input file must be integer!" << endl;
-	    exit (0);
+	    exit (1);
 	    }*/
           else ;
      
@@ -521,7 +522,7 @@ void CheckInputFileCDDRep(char *InputFile){
     out << "Must be H-representation with integer!" << endl;
     cerr << "Your input file is not correct!" << endl;
     cerr << "Must be H-representation with integer!" << endl;
-    exit (0);
+    exit (1);
   }
   //  delete [] tmpString;
   return ;
@@ -556,7 +557,7 @@ void CheckInputFileCDDRep3(char *InputFile){
     ofstream out("Error");
     out << "Your input file has wrong number of elements!" << endl;
     cerr << "Your input file has wrong number of elements!" << endl;
-    exit (0);
+    exit (1);
   }
 
   return ;
@@ -610,7 +611,7 @@ void CheckInputFileCDDRep4(char *InputFile){
     ofstream out("Error");
     out << "Your input file contains non-number!" << endl;
     cerr << "Your input file contains non-number!" << endl;
-    exit (0);
+    exit (1);
   }
   delete [] tmpString;
   return ;
@@ -655,7 +656,7 @@ void CheckInputFile(char *InputFile){
     ofstream out("Error");
     out << "Your input file contains non-number!" << endl;
     cerr << "Your input file contains non-number!" << endl;
-    exit (0);
+    exit (1);
   }
   delete [] tmpString;
   return ;
@@ -697,7 +698,7 @@ void CheckInputFileVrep(char *InputFile){
     ofstream out("Error");
     out << "Your input file contains non-number!" << endl;
     cerr << "Your input file contains non-number!" << endl;
-    exit (0);
+    exit (1);
   }
   delete [] tmpString;
   return ;
@@ -726,13 +727,13 @@ void CheckLength(char * filename, char * equ)
      ofstream out("Error");
      out << "The wrong number of elements in the file.  The number of elements are less than you indicated" << endl;
      cerr <<"The wrong number of elements in the file.  The number of elements are less than you indicated." << endl;
-     exit (0);
+     exit (1);
    }
    /*   else if(Total < counts){
      ofstream out("Error");
      out << "The number of elements are more than you indicated. " << endl;
      cerr << "The number of elements are more than you indicated. " << endl;
-     exit (0);
+     exit (1);
   
      }*/
 }
@@ -758,13 +759,13 @@ void CheckLength2(char * filename, char * equ)
      ofstream out("Error");
      out << "The wrong number of elements in the file.  The number of elments are less than you indicated" << endl;
      cerr <<"The wrong number of elements in the file.  The number of elments are less than you indicated." << endl;
-     exit (0);
+     exit (1);
    }
    /*   else if(Total < counts){
      ofstream out("Error");
      out << "The number of elements are more than you indicated. " << endl;
      cerr << "The number of elements are more than you indicated. " << endl;
-     exit (0);
+     exit (1);
   
      }*/
 }
