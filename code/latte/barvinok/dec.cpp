@@ -321,9 +321,12 @@ void decomposeCones_Single (listCone *cones, int numOfVars, int degree,
 	      }
 	  }
 	  else if(degree == 1){
-	    cout << "\n****  Total number of lattice points is: " << ( Barvinok_Parameters->Taylor_Expansion_Result[1] + Barvinok_Parameters->Ten_Power/2)/Barvinok_Parameters->Ten_Power  << "  ****" << endl << endl;
+	    Integer numOfLatticePoints
+	      = ( Barvinok_Parameters->Taylor_Expansion_Result[1] + Barvinok_Parameters->Ten_Power/2)/Barvinok_Parameters->Ten_Power;
+	    cout << "\n****  Total number of lattice points is: " << numOfLatticePoints << "  ****" << endl << endl;
+	    ofstream out("numOfLatticePoints");
+	    out << numOfLatticePoints;
 	  }
-	  
 	}
 	else 
 	{
