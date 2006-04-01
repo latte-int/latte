@@ -42,7 +42,8 @@ void CheckEmpty(char * Filename){
   nonneg[0] = 'n';
   int numOfNonneg = 0, hold = 0;
   vec_ZZ Index, Index2;
-  cout << "Checking whether the input polytope is empty or not..." << endl;
+  cout << "Checking whether the input polytope is empty or not...";
+  cout.flush();
   ifstream IN(Filename);
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;

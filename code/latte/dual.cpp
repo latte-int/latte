@@ -132,7 +132,8 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
   char cddInFileName[127];
   string tmpString;
 
-  printf("Dualizing all cones.\n");
+  cout << "Dualizing all cones...";
+  cout.flush();
 
   numOfConesDualized=0;
   numOfAllCones=lengthListCone(cones);
@@ -226,8 +227,8 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
     }
   }
 
-  printf("All cones are now dualized.\n");
-   removeListVector(cones->facets);
+  cout << "All cones are now dualized." << endl;
+  removeListVector(cones->facets);
   return (cones);
 }
 /* ----------------------------------------------------------------- */

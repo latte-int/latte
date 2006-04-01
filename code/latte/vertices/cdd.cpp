@@ -639,7 +639,7 @@ listCone* computeVertexCones(char* fileName, listVector* matrix,
   cout << "Computing vertices and edges with cdd...";
   cout.flush();
   system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
-  cout << "done.\n\n";
+  cout << "done." << endl;
 
   strcpy(command,"cp latte_cdd.ext ");
   strcat(command,fileName);
