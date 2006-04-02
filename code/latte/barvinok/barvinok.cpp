@@ -23,6 +23,7 @@
 #include "rational.h"
 #include "convert.h"
 #include "dual.h"
+#include "config.h"
 #ifdef HAVE_EXPERIMENTS
 #include "Irrational.h"
 #endif
@@ -137,6 +138,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 #else
 	  cerr << "Irrationalization not configured in this build."
 	       << endl;
+	  exit(1);
 #endif
 	  break;
 	default:
