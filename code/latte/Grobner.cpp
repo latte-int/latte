@@ -162,7 +162,7 @@ void readLatteGrobProblem(char *fileName, listVector **equations,
 
   ifstream in(fileName);
   if(!in){
-    cerr << "Cannot open input file in readLatteProblem." << endl;
+    cerr << "Cannot open input file " << fileName << " in readLatteGrobProblem." << endl;
     exit(1);
   }
 
