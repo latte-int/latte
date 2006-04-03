@@ -9,39 +9,44 @@ use File::Basename;
 $OUTPUT_FILE_NAME = "numOfLatticePoints";
 
 # add file names and lattice points to an array
+# We obtained the results marked "non-authoritative" ourselves, 
+# using various flavors of the algorithm; we hope they are correct.
+# The other ones are obtained from other sources; we believe 
+# they are correct. 
 my @files_nums = (
+   # FILENAME::CORRECT-ANSWER::TIME-LIMIT
    "example1::3",
    "example2::2",
    "example3::2",
    "24_cell::33",
    "cuww1::1",
    "magic4x4::8",
-   "magic5x5",
+   "magic5x5::::86400",
    "hickerson/hickerson-7::8",
    "hickerson/hickerson-8::22",
    "hickerson/hickerson-9::9",
    "hickerson/hickerson-10::24",
    "hickerson/hickerson-11::12",
    "hickerson/hickerson-12::38",
-   "hickerson/hickerson-13::14",
-   "hickerson/hickerson-14::32",
-   "hickerson/hickerson-15::20",
-   "hickerson/hickerson-16::54",
-   "hickerson/hickerson-17::18",
-   "hickerson/hickerson-18::44",
-   "hickerson/hickerson-19::20",
-   "hickerson/hickerson-20::74",
-   "hickerson/hickerson-24::96",
-   "hickerson/hickerson-28::92",
-   "hickerson/hickerson-32::122",
-   "hickerson/hickerson-36::138",
-   "mcallister/HivePolytopeImpossible",
-    "mcallister/HivePolytopeMinutes1",
-    "mcallister/HivePolytopeMinutes2",
-    "mcallister/HivePolytopeMinutes3",
-    "mcallister/HivePolytopeMinutes4",
-    "mcallister/HivePolytopeMinutes5",
-    "mcallister/HivePolytopeSeconds",
+   "hickerson/hickerson-13::14::1800",
+   "hickerson/hickerson-14::32::86400",
+   "hickerson/hickerson-15::20::1800",
+   "hickerson/hickerson-16::54::86400",
+   "hickerson/hickerson-17::18::86400",
+   "hickerson/hickerson-18::44::86400",
+   "hickerson/hickerson-19::20::86400",
+   "hickerson/hickerson-20::74::86400",
+   "hickerson/hickerson-24::96::86400",
+   "hickerson/hickerson-28::92::86400",
+   "hickerson/hickerson-32::122::86400",
+   "hickerson/hickerson-36::138::86400",
+   "mcallister/HivePolytopeImpossible::86400",
+    "mcallister/HivePolytopeMinutes1::14438636", #not-authoritative
+    "mcallister/HivePolytopeMinutes2::4890291",  #not-authoritative
+    "mcallister/HivePolytopeMinutes3::1990152",  #not-authoritative
+    "mcallister/HivePolytopeMinutes4::0",        #not-authoritative
+    "mcallister/HivePolytopeMinutes5::2129924",	 #not-authoritative
+    "mcallister/HivePolytopeSeconds::5231",      #not-authoritative
     "yoshida/24_cell_latte::33",
     "yoshida/3x3x3_semi_10.equ::1273125",
     "yoshida/3x3x3_semi_11.equ::2467302",
@@ -128,33 +133,35 @@ my @files_nums = (
     "yoshida/knapsackbaby2.equ::2",
     "yoshida/mountExample1::35353",
     "yoshida/mountExample2::3187528",
-    "yoshida/mountExample3::97080796",
-    "yoshida/mountExample4::1326849651",
+    "yoshida/mountExample3::97080796::360",
+    "yoshida/mountExample4::1326849651::360",
+    "yoshida/mountExample5::::86400",
     "yoshida/test4x4_1::665711555567792389878908993624629379187969880179721169068827951",
     "yoshida/test4x4_2::63292704423941655080293971395348848807454253204720526472462015",
     "yoshida/test4x4_3::43075357146173570492117291685601604830544643769252831337342557",
     "yoshida/tru_cube_latte::0",
     "yoshida/tru_simplex_latte::0",
     "yoshida/3x3x4_1.equ",
-    "yoshida/HD",
-    "yoshida/HD1",
-    "yoshida/HD10",
-    "yoshida/HD11",
-    "yoshida/HD12",
-    "yoshida/HD13",
-    "yoshida/HD14",
-    "yoshida/HD15",
-    "yoshida/HD16",
-    "yoshida/HD17",
-    "yoshida/HD18",
-    "yoshida/HD2",
-    "yoshida/HD3",
-    "yoshida/HD4",
-    "yoshida/HD5",
-    "yoshida/HD6",
-    "yoshida/HD7",
-    "yoshida/HD8",
-    "yoshida/HD9",
+### Following are identical to hickerson/*
+##     "yoshida/HD::::86400",
+##     "yoshida/HD1",
+##     "yoshida/HD10::::86400",
+##     "yoshida/HD11::::86400",
+##     "yoshida/HD12::::86400",
+##     "yoshida/HD13::::86400",
+##     "yoshida/HD14::::86400",
+##     "yoshida/HD15::::86400",
+##     "yoshida/HD16::::86400",
+##     "yoshida/HD17::::86400",
+##     "yoshida/HD18::::86400",
+##     "yoshida/HD2",
+##     "yoshida/HD3",
+##     "yoshida/HD4",
+##     "yoshida/HD5",
+##     "yoshida/HD6",
+##     "yoshida/HD7::::1800",
+##     "yoshida/HD8::::86400",
+##     "yoshida/HD9::::1800",
     "yoshida/cube_test1",
     "yoshida/cube_test1.ine",
     "yoshida/cuww1_1.equ",
@@ -163,20 +170,21 @@ my @files_nums = (
     "yoshida/cuww4_1.equ",
     "yoshida/cuww5_1.equ",
     "yoshida/dean1",
-    "yoshida/dean2",
-    "yoshida/dean3",
-    "yoshida/prob10_1.equ",
-    "yoshida/mountExample5",
-    "yoshida/prob1_1.equ",
-    "yoshida/prob2_1.equ",
-    "yoshida/prob3_1.equ",
-    "yoshida/prob4_1.equ",
-    "yoshida/prob5_1.equ",
-    "yoshida/prob6_1.equ",
-    "yoshida/prob7_1.equ"
+    "yoshida/dean2::::86400",
+    "yoshida/dean3::::86400",
+    "yoshida/prob10_1.equ::::86400",
+    "yoshida/prob1_1.equ::::720",
+    "yoshida/prob2_1.equ::::720",
+    "yoshida/prob3_1.equ::::720",
+    "yoshida/prob4_1.equ::::720",
+    "yoshida/prob5_1.equ::::720",
+    "yoshida/prob6_1.equ::::1800",
+    "yoshida/prob7_1.equ::::1800"
 );
 
-$MAXRUNTIME = 1800;
+#$MAXRUNTIME = 1800;
+$MAXRUNTIME = 60;
+
 chop($LATTEDIR = `cd \`dirname $0\`; cd ../..; pwd`);
 $PARAMETERS = $ARGV[0];
 $COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; env LD_LIBRARY_PATH=/localapp/imosoft/sparc-sun-solaris2.7/alpha/gmp-4.1.4-gcc33/lib:\$LD_LIBRARY_PATH $LATTEDIR/code/latte/count $PARAMETERS";
@@ -191,6 +199,7 @@ mkdir($LOGDIR);
 chdir($LOGDIR);
 
 open SUMMARY, ">summary" or die;
+print SUMMARY "Running with time limit ", $MAXRUNTIME, "\n";
 
 foreach $file_num (@files_nums)
 {
@@ -198,53 +207,60 @@ foreach $file_num (@files_nums)
    @tmp = split('::', $file_num);
    $file_name = $tmp[0];
    $num_lattice_pts = $tmp[1];
+   $time_limit = $tmp[2];
 
    unlink($OUTPUT_FILE_NAME);
    print "$file_name: \t";
    print SUMMARY "$file_name: \t";
-   $ret_val = system( "$COMMAND $EXAMPLESDIR/$file_name >> log 2>&1 ");
-   if ($ret_val != 0) {
-      print "ERROR STATUS $ret_val";
-      print SUMMARY "ERROR STATUS $ret_val";
-   } else {
-      open IN, "<$OUTPUT_FILE_NAME";
-      if (!IN) {
-	  print "Can't open $OUTPUT_FILE_NAME";
-	  print SUMMARY "Can't open $OUTPUT_FILE_NAME";
-      }
-      else {
-	  while ($line = <IN>) {
-	      chomp $line;
-	      # line should contain the number of lattice points
-	      #print "Found numOfLatticePoints = $line\n";
-	      print "Result: $line  ";
-	      print SUMMARY "Result: $line  ";
-	      if ($num_lattice_pts) {
-		  if ($line != $num_lattice_pts) {
-		      print "WRONG";
-		      print SUMMARY "WRONG";
-		  } else {
-		      print "GOOD";
-		      print SUMMARY "GOOD";
-		      if (open IN, "<totalTime") {
-			  $time = <IN>;
-			  chomp $time;
-			  print " Time: $time sec";
-			  print SUMMARY " Time: $time sec";
-		      }
-		  }
-	      }
-	      else {
-		  if (open IN, "<totalTime") {
-		      $time = <IN>;
-		      chomp $time;
-		      print " Time: $time sec";
-		      print SUMMARY " Time: $time sec";
-		  }
-	      }
-	  }
-	  close(IN);
-      }
+   if ($time_limit && ($time_limit > $MAXRUNTIME)) {
+       print "Skipped.";
+       #print SUMMARY "Skipped.";
+   }
+   else {
+       $ret_val = system( "$COMMAND $EXAMPLESDIR/$file_name >> log 2>&1 ");
+       if ($ret_val != 0) {
+	   print "ERROR STATUS $ret_val";
+	   print SUMMARY "ERROR STATUS $ret_val";
+       } else {
+	   open IN, "<$OUTPUT_FILE_NAME";
+	   if (!IN) {
+	       print "Can't open $OUTPUT_FILE_NAME";
+	       print SUMMARY "Can't open $OUTPUT_FILE_NAME";
+	   }
+	   else {
+	       while ($line = <IN>) {
+		   chomp $line;
+		   # line should contain the number of lattice points
+		   #print "Found numOfLatticePoints = $line\n";
+		   print "Result: $line  ";
+		   print SUMMARY "Result: $line  ";
+		   if ($num_lattice_pts) {
+		       if ($line != $num_lattice_pts) {
+			   print "WRONG";
+			   print SUMMARY "WRONG";
+		       } else {
+			   print "GOOD";
+			   print SUMMARY "GOOD";
+			   if (open IN, "<totalTime") {
+			       $time = <IN>;
+			       chomp $time;
+			       print " Time: $time sec";
+			       print SUMMARY " Time: $time sec";
+			   }
+		       }
+		   }
+		   else {
+		       if (open IN, "<totalTime") {
+			   $time = <IN>;
+			   chomp $time;
+			   print " Time: $time sec";
+			   print SUMMARY " Time: $time sec";
+		       }
+		   }
+	       }
+	       close(IN);
+	   }
+       }
    }
    print "\n";
    print SUMMARY "\n";
