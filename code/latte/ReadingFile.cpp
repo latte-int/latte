@@ -68,7 +68,9 @@ listCone* IntCone2(listCone* cones, int numOfVars) {
 
 /* ----------------------------------------------------------------- */
 
-void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, char* dil, int dilation){
+void
+CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, char* dil, int dilation)
+{
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
   string tmpString;
   int numOfNonneg = 0, hold = 0;
@@ -208,8 +210,13 @@ void CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interio
     for(int i = 0; i < numOfConsts2; i++)
       for(int j = 0; j < numOfDims; j++){
 	in3 >> newEnt[i][j]; }
-   
-    strcat(Filename, ".latte");
+
+    // Don't mess around in the directory of the input files.
+    // Put temporary files in the current directory.
+    // Then we can safely parallelize tests simply by changing into fresh
+    // directories. (Temporary solution.) --mkoeppe
+    //strcat(Filename, ".latte");
+    strcpy(Filename, "latte_nonredundant_input");
 
     ofstream out2(Filename);
 
@@ -805,7 +812,7 @@ void readLatteProblem(char *fileName, listVector **equations,
 
   ifstream in(fileName);
   if(!in){
-    cerr << "Cannot open input file in readLatteProblem." << endl;
+    cerr << "Cannot open input file " << fileName << " in readLatteProblem." << endl;
     exit(1);
   }
 
@@ -1076,7 +1083,7 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
 
   ifstream in2(fileName);
   if(!in2){
-    cerr << "Cannot open input file in readLatteProblem." << endl;
+    cerr << "Cannot open input file " << fileName << " in CDDstylereadLatteProblem." << endl;
     exit(1);
   }
 
@@ -1113,7 +1120,7 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
   ZZ bignum;
   ifstream in(fileName);
   if(!in){
-    cerr << "Cannot open input file in readLatteProblem." << endl;
+    cerr << "Cannot open input file " << fileName << " in CDDstylereadLatteProblem." << endl;
     exit(1);
   }
     while (tmpString!="begin"){
