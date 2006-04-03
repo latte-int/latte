@@ -1,4 +1,21 @@
+2006-04-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ReadingFile.cpp (CheckRed): Don't put FILENAME.latte
+	files into the directory of the example; put them into the current
+	directory.  This enables parallel testing, if the current
+	directory is unique.
+
+	* EXAMPLES/*: Add missing "linearity" keyword in many examples.
+
+2006-04-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/barvinok/barvinok.cpp:
+	Fix conditional inclusion of irrational code.
+
 2006-04-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Residue.cpp (Residue_Single_Cone):
+	Handle non-unimodular cones.
 
 	* CheckEmpty.cpp, banner.cpp, dual.cpp, vertices/cdd.cpp:
 	Remove excess whitespace.
