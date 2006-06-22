@@ -297,7 +297,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   max = -1;
 
 #ifdef SHOWDETS
-  cout << "Determinant " << Det << " -> ";
+  cout << "Index " << absDet << " -> ";
 #endif
   for(int i = 0; i < m; i++)
     {
