@@ -15,7 +15,9 @@
     "vector" "rationalVector"
     "PtrCone" "Cone"
     "Integer"
-    "mpq_vector" "mpz_vector"))
+    "mpq_vector" "mpz_vector"
+    "PointsInParallelepipedGenerator" "IntCombEnum"
+    "NotGenericException"))
 
 (setq c++-font-lock-extra-types
       (cons (regexp-opt (append ntl-types latte-types gmp-types lidia-types))

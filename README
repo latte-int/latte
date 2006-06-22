@@ -4,7 +4,7 @@ It requires the following programs and libraries:
 
   * GMP, compiled with --enable-cxx
   * NTL, version 5.4 or newer
-  * CDD+
+  * CDD+ 0.77 or newer
   * cddlib
   * (optional) LRS
   * (optional) LiDIA
@@ -32,7 +32,7 @@ hierarchy rooted at the directory $HOME/latte.
    Unpack it, then in the source directory do:
    
    cd src
-   ./configure PREFIX=$HOME/latte GMP_PREFIX=$HOME/latte
+   ./configure PREFIX=$HOME/latte GMP_PREFIX=$HOME/latte NTL_GMP_LIP=on
    make
    make install
 
@@ -43,16 +43,18 @@ hierarchy rooted at the directory $HOME/latte.
 4. Put $HOME/latte/bin into your $PATH
    and $HOME/latte/lib into your LD_LIBRARY_PATH.
 
+5. Optionally, install the non-free library LiDIA.
+
 N. Build and install LattE
 
    From the source directory of LattE:
 
-   ./configure --prefix=$HOME/latte --with-default=$HOME/latte
+   ./configure --prefix=$HOME/latte --with-default=$HOME/latte --program-prefix=latte-
    make
    make install
 
-Now the LattE executables (count, ehrhart, minimize, maximize)
-should be available in $HOME/latte/bin.
+Now the LattE executables (latte-count, latte-ehrhart, latte-minimize,
+latte-maximize) should be available in $HOME/latte/bin.
 
 
 More information
