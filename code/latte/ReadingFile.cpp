@@ -75,7 +75,8 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
   string tmpString;
   int numOfNonneg = 0, hold = 0;
   vec_ZZ Index, Index2;
-  cout << "Removing redundant inequalities and finding hidden equalities...." << endl;
+  cout << "Removing redundant inequalities and finding hidden equalities....";
+  cout.flush();
   ifstream IN(Filename);
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
@@ -999,8 +1000,10 @@ void readLatteProblem(char *fileName, listVector **equations,
     indexEquations=createVector(numOfEquations);
 
     for (i=0; i<numOfEquations; i++) in >> indexEquations[i];
+#if 0
     cout << "\nEquation indices: ";
     printVector(indexEquations,numOfEquations);
+#endif
 
     tmpVector=createVector(*numOfVars);
     createListVector(tmpVector);
@@ -1036,6 +1039,7 @@ void readLatteProblem(char *fileName, listVector **equations,
   }
   //if(max[0] == 'y') for(i = 0; i < (*numOfVars-1); i++) in >> cost[i];
   if(Vrep[0] == 'n'){
+#if 0
   cout << endl;
   cout << "Ax <= b, given as (b|-A):\n";
   cout << "=========================\n";
@@ -1047,7 +1051,9 @@ void readLatteProblem(char *fileName, listVector **equations,
   cout << "========================\n";
   printListVector(*equations,*numOfVars);
 
-  cout << endl;}
+  cout << endl;
+#endif
+  }
 
   else{
   cout << endl;
