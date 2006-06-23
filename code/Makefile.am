@@ -1,1 +1,2 @@
-SUBDIRS = latte
+SUBDIRS = latte test-suite
+

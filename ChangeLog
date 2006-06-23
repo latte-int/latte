@@ -1,3 +1,12 @@
+2006-06-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Irrational.cpp (irrationalizeCone): Check that
+	irrationalization is OK.
+
+	* code/latte/Irrational.cpp, code/latte/Irrational.h 
+	(isConeIrrational, checkConeIrrational): New.
+	(assertConesIntegerEquivalent):  New.
+
 2006-04-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/ReadingFile.cpp (CheckRed): Don't put FILENAME.latte
