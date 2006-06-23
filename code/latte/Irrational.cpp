@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+#include <cassert>
+
 #include "Irrational.h"
 #include "dual.h"
 #include "convert.h"
@@ -79,21 +81,27 @@ irrationalizeCone(listCone *cone, int numOfVars)
   irrationalizer_denominator = 2 * TwoM_power;
   ZZ common_denominator = lcm(center_denominator, irrationalizer_denominator);
   // Store the new vertex
+  rationalVector *new_vertex = createRationalVector(numOfVars);
   for (i = 0; i<numOfVars; i++) {
-    cone->vertex->enumerator[i]
+    new_vertex->enumerator[i]
       = center_numerator[i] * (common_denominator / center_denominator)
       + irrationalizer_numerator[i] * (common_denominator / irrationalizer_denominator);
-    cone->vertex->denominator[i] = common_denominator;
+    new_vertex->denominator[i] = common_denominator;
   }
 #ifdef DEBUG_IRRATIONAL
   cout << "--irrationalize--> ";
-  printRationalVector(cone->vertex, numOfVars);
+  printRationalVector(new_vertex, numOfVars);
 #endif
-  canonicalizeRationalVector(cone->vertex, numOfVars);
+  canonicalizeRationalVector(new_vertex, numOfVars);
 #ifdef DEBUG_IRRATIONAL
   cout << "--canonicalize---> ";
-  printRationalVector(cone->vertex, numOfVars);
+  printRationalVector(new_vertex, numOfVars);
 #endif
+  assertConesIntegerEquivalent(cone, cone->vertex, numOfVars);
+  assertConesIntegerEquivalent(cone, new_vertex, numOfVars);
+  delete cone->vertex;
+  cone->vertex = new_vertex;
+  assert(isConeIrrational(cone, numOfVars));
 }
 
 void
@@ -102,5 +110,59 @@ irrationalizeCones(listCone *cones, int numOfVars)
   listCone *cone;
   for (cone = cones; cone != NULL; cone=cone->rest)
     irrationalizeCone(cone, numOfVars);
+}
+
+bool
+isConeIrrational(listCone *cone, int numOfVars)
+{
+  /* The affine hulls of the proper faces do not contain any integer
+     points if and only if the scalar product of the integrally
+     scaled, primitive dual basis vectors with the rational vertex is
+     non-integral. */
+  ZZ vertex_denominator;
+  vec_ZZ vertex_numerator
+    = scaleRationalVectorToInteger(cone->vertex, numOfVars,
+				   vertex_denominator);
+  ZZ scaled_sp;
+  listVector *facet;
+  for (facet = cone->facets; facet; facet = facet->rest) {
+    InnerProduct(scaled_sp, vertex_numerator, facet->first);
+    if (divide(scaled_sp, vertex_denominator))
+      return false;
+  }
+  return true;
+}
+
+void
+checkConeIrrational(listCone *cone, int numOfVars)
+{
+  if (not isConeIrrational(cone, numOfVars)) {
+    static NotIrrationalException notirrational;
+    throw notirrational;
+  }
+}
+
+void
+assertConesIntegerEquivalent(listCone *cone1, rationalVector *new_vertex,
+			     int numOfVars)
+{
+  ZZ vertex1_denominator;
+  vec_ZZ vertex1_numerator
+    = scaleRationalVectorToInteger(cone1->vertex, numOfVars,
+				   vertex1_denominator);
+  ZZ vertex2_denominator;
+  vec_ZZ vertex2_numerator
+    = scaleRationalVectorToInteger(new_vertex, numOfVars,
+				   vertex2_denominator);
+  ZZ scaled_sp_1, scaled_sp_2;
+  ZZ interval_1, interval_2;
+  listVector *facet1, *facet2;
+  for (facet1 = cone1->facets; facet1; facet1 = facet1->rest) {
+    InnerProduct(scaled_sp_1, vertex1_numerator, facet1->first);
+    InnerProduct(scaled_sp_2, vertex2_numerator, facet1->first);
+    div(interval_1, scaled_sp_1, vertex1_denominator);
+    div(interval_2, scaled_sp_2, vertex2_denominator);
+    assert(interval_1 == interval_2);
+  }
 }
 

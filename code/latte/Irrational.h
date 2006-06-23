@@ -18,5 +18,25 @@ irrationalizeCone(listCone *cone, int numOfVars);
 void
 irrationalizeCones(listCone *cones, int numOfVars);
 
+/* Return whether CONE does not contain any integer points on (the
+   affine hulls of) its proper faces.
+*/
+bool
+isConeIrrational(listCone *cone, int numOfVars);
+
+/* Functions can throw this exception when they discover the passed
+   cone was not irrational. */
+struct NotIrrationalException {};
+
+/* Check that CONE is irrational; otherwise throw a
+   NotIrrationalException exception. */
+void
+checkConeIrrational(listCone *cone, int numOfVars);
+
+/* Check that CONE1 and CONE1 with NEW_VERTEX contain the same integer points. */
+void
+assertConesIntegerEquivalent(listCone *cone1, rationalVector *new_vertex,
+			     int numOfVars);
+
 #endif
 
