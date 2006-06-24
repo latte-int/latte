@@ -307,13 +307,20 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 #endif
       if(Dets[i] > max)
 	max = Dets[i];
-      else if (Dets[i] == 0)
+      
+      if (Dets[i] > 0) {
 	Parameters->Current_Simplicial_Cones_Total ++;
+
+#ifdef HAVE_EXPERIMENTS
+	if (Parameters->decomposition == BarvinokParameters::IrrationalPrimalDecomposition)
+	  checkConeIrrational(cones1[i], Parameters->Number_of_Variables);
+#endif
+      }
     }
 #ifdef SHOWDETS
   cout << endl;
 #endif
-     
+
   int current;
   ZZ min;
 
