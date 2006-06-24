@@ -1,3 +1,8 @@
+2006-06-24  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/barvinok/barvinok.cpp (barvinok_DFS): Fix counting
+	of current simplicial cones.  Use checkConeIrrational.
+
 2006-06-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/Irrational.cpp (irrationalizeCone): Check that
