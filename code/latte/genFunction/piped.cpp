@@ -78,7 +78,7 @@ get_U_star(const listCone *cone)
 
 /*
  * Translate point m using the following formula:
- * m' = v + sum {<m - v, u_i*>}u_i, where {} means the factional part 
+ * m' = v + sum {<m - v, u_i*>}u_i, where {} means the fractional part 
  */
 static vec_ZZ
 translate_lattice_point(const vec_ZZ& m, const mat_ZZ & U,
@@ -188,25 +188,53 @@ get_multipliers_from_snf(const mat_ZZ & snf)
 PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars) :
   cone(a_cone)
 {
-   mat_ZZ snf_U, B, C;
-   U = convert_listVector_to_mat_ZZ(cone->rays);
+  U = convert_listVector_to_mat_ZZ(cone->rays);
+  /* U* = (U^-1)^T. Thus, we can calculate U* from the facets */
+  U_star = get_U_star(cone);
 
-   //cout << "Computing Smith-Normal form...\n";
-   /* get Smith Normal form of matrix, Smith(A) = BAC */
-   snf_U = SmithNormalForm(U, B, C);
+  if (abs(cone->determinant) == 1) {
+    /* Unimodular case: Id = Smith(U) = B U C.
+       Thus, for instance, B = det U * U^{-1}, C = Id.
+     */
+    max_multipliers = vector<int>(numOfVars);
+    int i;
+    for (i = 0; i<numOfVars; i++)
+      max_multipliers[i] = 1;
+    B_inv = cone->determinant * U;
+  }
+  else {
+    /* General case: */
+    mat_ZZ snf_U, B, C;
 
-   /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
-   max_multipliers = get_multipliers_from_snf(snf_U);
+    //cout << "Computing Smith-Normal form...\n";
+    /* get Smith Normal form of matrix, Smith(U) = BUC */
+    snf_U = SmithNormalForm(U, B, C);
 
-   /*
-    * Smith(A) = BAC, and the diagonal entries of Smith(A) are the multipliers
-    * n_i such that w_i*n_i= v_i. Therefore, AC = V, and B^-1 = W. Since we
-    * must take the integer combinations of W, we must calculate B^-1.
-    */
-   B_inv = inv(B);
+    /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
+    max_multipliers = get_multipliers_from_snf(snf_U);
 
-   /* U* = (U^-1)^T. Thus, we can calculate U* from the facets */
-   U_star = get_U_star(cone);
+    /*
+     * Smith(U) = BUC, and the diagonal entries of Smith(U) are the multipliers
+     * n_i such that w_i*n_i= v_i. Therefore, UC = V, and B^-1 = W. Since we
+     * must take the integer combinations of W, we must calculate B^-1.
+     */
+
+    /* However, this is expensive. --mkoeppe */
+    /* B_inv = inv(B); */
+
+    /* We also have B^-1 = UC Smith(U)^{-1}; this is faster to
+       compute because Smith(U) is diagonal. --mkoeppe */
+    B_inv = U * C;
+    int i, j;
+    ZZ q, r;
+    for (i = 0; i<B_inv.NumRows(); i++) {
+      for (j = 0; j<B_inv.NumCols(); j++) {
+	DivRem(q, r, B_inv[i][j], snf_U[j][j]);
+	assert(IsZero(r));
+	B_inv[i][j] = q;
+      }
+    }
+  }
 }
 
 const vector<int> &
@@ -358,13 +386,17 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
-   if (abs(cone->determinant) != 1) {
+#if 1
+  cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
+#else  
+  if (abs(cone->determinant) != 1) {
      cout << "Processing cone with determinant " << cone->determinant << endl;
       cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
    } else {
       cone->latticePoints = pointsInParallelepipedOfUnimodularCone(
          cone->vertex, cone->rays, numOfVars);
    }
+#endif
 }
 
 void computePointsInParallelepipeds(listCone *cones, int numOfVars)
