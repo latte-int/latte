@@ -45,6 +45,7 @@
 #include "latte_random.h"
 #ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
+#include "Irrational.h"
 #endif
 
 #include "banner.h"
@@ -439,6 +440,8 @@ int main(int argc, char *argv[]) {
     already_dualized = true;
   }
 
+  try {
+  
   switch (params.substitution) {
   case BarvinokParameters::PolynomialSubstitution:
     if (assumeUnimodularCones[0]=='n') {
@@ -652,6 +655,11 @@ if(Memory_Save[0] == 'n')
 
 }
  }
+  } catch (NotIrrationalException) {
+    cerr << "Bug: Irrationalization failed" << endl;
+    exit(1);
+  };
+    
 
  if(rationalCone[0] == 'y') {
    strcpy(command, "mv ");
