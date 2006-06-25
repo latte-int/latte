@@ -59,6 +59,27 @@ createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars)
   return (mat);
 }
 
+mat_ZZ
+createFacetMatrix2(const listCone *cone, int numOfFacets, int numOfVars)
+{
+  int i;
+  mat_ZZ mat;
+  listVector *tmp;
+
+  mat.SetDims(numOfFacets, numOfVars);
+
+  tmp=cone->facets;
+  for (i=0; i<numOfFacets; i++) {
+    ZZ multiplier, remainder;
+    DivRem(multiplier, remainder,
+	   abs(cone->determinant), cone->facet_divisors[i]);
+    assert(IsZero(remainder));
+    mat[i] = copyVector(tmp->first,numOfVars) * multiplier;
+    tmp=tmp->rest;
+  }
+  return (mat);
+}
+
 /* latte to NTL conversions */
 
 /* converts a latte listVector to a mat_ZZ */ 

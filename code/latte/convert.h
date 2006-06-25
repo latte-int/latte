@@ -24,6 +24,13 @@ createConeDecMatrix(const listCone *cone, int numOfRays, int numOfVars);
 mat_ZZ
 createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars);
 
+
+/* Likewise, but
+   < RAY_i, SCALED_FACET_j > = - |DET(RAYS)| * DELTA_{i,j}.
+*/
+mat_ZZ
+createFacetMatrix2(const listCone *cone, int numOfFacets, int numOfVars);
+
 /* latte to NTL conversions */
 mat_ZZ
 convert_listVector_to_mat_ZZ(listVector *);
