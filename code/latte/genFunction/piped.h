@@ -12,7 +12,7 @@ class PointsInParallelepipedGenerator {
   vector<int> max_multipliers;
   mat_ZZ B_inv;
   mat_ZZ U;
-  mat_ZZ U_star;
+  vec_ZZ beta;
 public:
   PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars);
   const vector<int> &GetMaxMultipliers();
@@ -22,6 +22,8 @@ public:
      such that 0 <= m_i < n_i. */
   vec_ZZ GeneratePoint(int *multipliers);
   vec_ZZ GeneratePoint(const vec_ZZ &multipliers);
+private:
+  vec_ZZ translate_lattice_point(const vec_ZZ& m);
 };
 
 listVector* pointsInParallelepiped(listCone *cone, int numOfVars);
