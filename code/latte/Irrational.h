@@ -36,7 +36,7 @@ checkConeIrrational(listCone *cone, int numOfVars);
 /* Check that CONE1 and CONE1 with NEW_VERTEX contain the same integer points. */
 void
 assertConesIntegerEquivalent(listCone *cone1, rationalVector *new_vertex,
-			     int numOfVars);
+			     int numOfVars, const char *message);
 
 #endif
 
