@@ -1,3 +1,26 @@
+2006-06-25  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/genFunction/piped.cpp (translate_lattice_point):
+	Reimplement for speed.
+
+	* m4/ntl-check.m4: Enable out-of-sourcedir compiles.
+
+	* code/latte/count.cpp: Catch NotIrrationalException.
+
+	* code/latte/Irrational.cpp, code/latte/Irrational.h
+	(irrationalizeCone): Fix code and put in assertions for
+	irrationality and integer equivalence.
+
+	* code/latte/convert.cpp, code/latte/convert.h (createFacetMatrix2):
+	New function.
+
+	* code/latte/genFunction/piped.cpp (PointsInParallelepipedGenerator): 
+	Special-case unimodular cones (for speed).  In the non-unimodular
+	case, avoid matrix inversion.
+	(computePointsInParallelepiped): Always use
+	pointsInParallelepiped; we will make it faster than
+	pointsInParallelepipedOfUnimodularCone. 
+
 2006-06-24  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/barvinok/barvinok.cpp (barvinok_DFS): Fix counting
