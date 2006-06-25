@@ -59,6 +59,8 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	CXXFLAGS="${BACKUP_CXXFLAGS} ${NTL_CFLAGS} ${GMP_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${NTL_LIBS} ${GMP_LIBS}"
 
+	CXXFLAGS="-I${srcdir} ${CXXFLAGS}"
+
 	AC_TRY_LINK(
 	[#include "code/latte/latte_ntl.h"],
 	[ZZ a;],
