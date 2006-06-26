@@ -1,0 +1,4 @@
+#!/bin/sh
+DATE=2006-06-26
+for a in log-$DATE-*; do (echo; echo; echo $a:; cat "$a/summary"; echo; echo "^L") ; done > summary-$DATE
+
