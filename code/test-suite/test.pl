@@ -40,7 +40,7 @@ my @files_nums = (
    "hickerson/hickerson-28::92::86400",
    "hickerson/hickerson-32::122::86400",
    "hickerson/hickerson-36::138::86400",
-   "mcallister/HivePolytopeImpossible::86400",
+   "mcallister/HivePolytopeImpossible::::86400",
     "mcallister/HivePolytopeMinutes1::14438636", #not-authoritative
     "mcallister/HivePolytopeMinutes2::4890291",  #not-authoritative
     "mcallister/HivePolytopeMinutes3::1990152",  #not-authoritative
@@ -214,7 +214,7 @@ foreach $file_num (@files_nums)
    print SUMMARY "$file_name: \t";
    if ($time_limit && ($time_limit > $MAXRUNTIME)) {
        print "Skipped.";
-       #print SUMMARY "Skipped.";
+       print SUMMARY "Skipped.";
    }
    else {
        $ret_val = system( "$COMMAND $EXAMPLESDIR/$file_name >> log 2>&1 ");

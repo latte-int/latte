@@ -145,6 +145,7 @@ code/latte/vertices/SunWS_cache
 code/latte/vertices/redcheck
 code/stamp-h.in
 code/stamp-h1
+code/test-suite/.deps
 code/test-suite/log-*
 /config.h.in
 /config.log
