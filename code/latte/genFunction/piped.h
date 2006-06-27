@@ -13,6 +13,8 @@ class PointsInParallelepipedGenerator {
   mat_ZZ B_inv;
   mat_ZZ U;
   vec_ZZ beta;
+  ZZ facet_divisor_common_multiple;
+  vec_ZZ facet_scale_factors;
 public:
   PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars);
   const vector<int> &GetMaxMultipliers();

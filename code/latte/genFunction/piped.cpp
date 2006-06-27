@@ -80,8 +80,6 @@ PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
   int i;
   listVector *facet;
   listVector *ray;
-  ZZ common_multiple;
-  common_multiple = abs(cone->determinant);
   for (i = 0, facet = cone->facets, ray = cone->rays;
        i<dim;
        i++, facet=facet->rest, ray=ray->rest) {
@@ -90,13 +88,11 @@ PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
     multiplier = beta[i] - multiplier;
     multiplier %= cone->facet_divisors[i];
     multiplier -= beta[i];
-    ZZ scale_factor;
-    scale_factor = common_multiple / cone->facet_divisors[i];
-    result += multiplier * scale_factor * ray->first;
+    result += multiplier * facet_scale_factors[i] * ray->first;
   }
   for (i = 0; i<dim; i++) {
     ZZ q, r;
-    DivRem(q, r, result[i], common_multiple);
+    DivRem(q, r, result[i], facet_divisor_common_multiple);
     assert(IsZero(r));
     result[i] = q;
   }
@@ -187,6 +183,13 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
       div(beta[i], sp, v_scale_factor);
       assert(beta[i] * v_scale_factor <= sp);
     }
+  }
+  facet_scale_factors.SetLength(numOfVars);
+  facet_divisor_common_multiple = abs(cone->determinant);
+  {
+    int i;
+    for (i = 0; i<numOfVars; i++)
+      facet_scale_factors[i] = facet_divisor_common_multiple / cone->facet_divisors[i];
   }
 }
 
@@ -340,8 +343,10 @@ listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex,
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
 #if 1
+#if 0
   if (abs(cone->determinant) != 1)
     cout << "Processing cone with determinant " << cone->determinant << endl;
+#endif
   cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
 #else  
   if (abs(cone->determinant) != 1) {
