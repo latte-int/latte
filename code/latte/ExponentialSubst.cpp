@@ -93,11 +93,30 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
   int dimension = weights.size() - 1;
   int k;
   mpq_class result = 0;
+#if 1
+  /* Equivalent, but faster code: */
+  listVector *point;
+  vec_ZZ sum;
+  sum.SetLength(dimension + 1);
+  for (point = cone->latticePoints; point != NULL; point = point->rest) {
+    Integer inner;
+    InnerProduct(inner, generic_vector, point->first);
+    Integer scalar_power;
+    scalar_power = 1;
+    for (k = 0; k<=dimension; k++) {
+      sum[k] += scalar_power;
+      scalar_power *= inner;
+    }
+  }
+  for (k = 0; k<=dimension; k++)
+    result += convert_ZZ_to_mpz(sum[k]) * weights[k];
+#else
   for (k = 0; k<=dimension; k++) {
     Integer sum = sum_of_scalar_powers(generic_vector,
 				       cone->latticePoints, k);
     result += convert_ZZ_to_mpz(sum) * weights[k];
   }
+#endif
 //   cout << "Cone contributes: "
 //        << cone->coefficient << " * " << result << endl;
   return cone->coefficient * result;
