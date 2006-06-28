@@ -25,6 +25,7 @@ typedef struct listCone {
   // guarantee that < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}.
   vec_ZZ facet_divisors;	
   listVector *latticePoints;
+  vec_ZZ lattice_points_scalar_products; 
   struct listCone *rest;
 } listCone;
 
