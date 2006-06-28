@@ -58,12 +58,12 @@ scalar_power(const vec_ZZ &generic_vector,
 */
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &lambda,
-				 const listCone *cone, int numOfVars);
+				 listCone *cone, int numOfVars);
 
 /* Likewise, but for the whole list of CONES, summing up the
    results. */
 Integer
-computeExponentialResidue(const listCone *cones, int numOfVars);
+computeExponentialResidue(listCone *cones, int numOfVars);
 
 /* Likewise, but do simplicial triangulation and Barvinok
    decomposition, then perform it on the summands. */

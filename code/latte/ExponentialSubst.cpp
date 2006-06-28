@@ -86,7 +86,7 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &generic_vector,
-				 const listCone *cone, int numOfVars)
+				 listCone *cone, int numOfVars)
 {
   mpq_vector weights
     = computeExponentialResidueWeights(generic_vector, cone, numOfVars);
@@ -95,12 +95,14 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
   mpq_class result = 0;
 #if 1
   /* Equivalent, but faster code: */
+  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector);
   listVector *point;
   vec_ZZ sum;
   sum.SetLength(dimension + 1);
-  for (point = cone->latticePoints; point != NULL; point = point->rest) {
-    Integer inner;
-    InnerProduct(inner, generic_vector, point->first);
+  int i;
+  int num_points = cone->lattice_points_scalar_products.length();
+  for (i = 0; i<num_points; i++) {
+    Integer inner = cone->lattice_points_scalar_products[i];
     Integer scalar_power;
     scalar_power = 1;
     for (k = 0; k<=dimension; k++) {
@@ -111,6 +113,7 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
   for (k = 0; k<=dimension; k++)
     result += convert_ZZ_to_mpz(sum[k]) * weights[k];
 #else
+  computePointsInParallelepiped(cone, numOfVars);
   for (k = 0; k<=dimension; k++) {
     Integer sum = sum_of_scalar_powers(generic_vector,
 				       cone->latticePoints, k);
@@ -123,9 +126,9 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 }
 
 Integer
-computeExponentialResidue(const listCone *cones, int numOfVars)
+computeExponentialResidue(listCone *cones, int numOfVars)
 {
-  const listCone *cone;
+  listCone *cone;
   do {
     vec_ZZ generic_vector = guess_generic_vector(numOfVars);
     mpq_class result;
@@ -144,7 +147,6 @@ computeExponentialResidue(const listCone *cones, int numOfVars)
 int Exponential_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 {
   assert(cone->rest == NULL);
-  computePointsInParallelepiped(cone, Number_of_Variables);
   int status = 1;
   try {
     result += computeExponentialResidue_Single(generic_vector,
