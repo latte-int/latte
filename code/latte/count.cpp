@@ -440,8 +440,10 @@ int main(int argc, char *argv[]) {
     already_dualized = true;
   }
 
+#ifdef HAVE_EXPERIMENTS
   try {
-  
+#endif
+    
   switch (params.substitution) {
   case BarvinokParameters::PolynomialSubstitution:
     if (assumeUnimodularCones[0]=='n') {
@@ -655,11 +657,12 @@ if(Memory_Save[0] == 'n')
 
 }
  }
+#ifdef HAVE_EXPERIMENTS
   } catch (NotIrrationalException) {
     cerr << "Bug: Irrationalization failed" << endl;
     exit(1);
   };
-    
+#endif
 
  if(rationalCone[0] == 'y') {
    strcpy(command, "mv ");

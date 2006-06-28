@@ -1,5 +1,7 @@
 2006-06-28  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
+	Version 1.2-mk-0.3
+	
 	* code/latte/cone.h (listCone): New slot
 	lattice_points_scalar_products.
 

@@ -1,1 +1,1 @@
-noinst_PROGRAMS = set-max-cpu-time
+#noinst_PROGRAMS = set-max-cpu-time
