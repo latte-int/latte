@@ -108,6 +108,7 @@ EXAMPLES/yoshida/latte_mlp.out
 EXAMPLES/yoshida/numOfLatticePoints
 EXAMPLES/yoshida/numOfUnimodularCones
 /Error
+/INSTALL
 /Makefile
 /Makefile.in
 /aclocal.m4
@@ -168,6 +169,10 @@ code/test-suite/totalTime
 /config.log
 /config.status
 /configure
+/depcomp
+/install-sh
+/missing
+/mkinstalldirs
 /numOfLatticePoints
 /numOfUnimodularCones
 /stamp-h1
