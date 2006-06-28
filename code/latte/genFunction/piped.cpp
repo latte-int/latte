@@ -67,6 +67,16 @@ get_integer_comb(const mat_ZZ & lat_basis, int *scalar)
    return (v);
 }
 
+void
+PointsInParallelepipedGenerator::compute_multiplier(ZZ &multiplier, const vec_ZZ &m,
+						    const vec_ZZ &facet, int facet_index)
+{
+  InnerProduct(multiplier, m, facet);
+  multiplier = beta[facet_index] - multiplier;
+  multiplier %= cone->facet_divisors[facet_index];
+  multiplier -= beta[facet_index];
+}
+
 /*
  * Translate point m using the following formula:
  * m' = v + sum {<m - v, u_i*>}u_i, where {} means the fractional part 
@@ -80,15 +90,12 @@ PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
   int i;
   listVector *facet;
   listVector *ray;
+  ZZ multiplier;
   for (i = 0, facet = cone->facets, ray = cone->rays;
        i<dim;
        i++, facet=facet->rest, ray=ray->rest) {
-    ZZ multiplier;
-    InnerProduct(multiplier, m, facet->first);
-    multiplier = beta[i] - multiplier;
-    multiplier %= cone->facet_divisors[i];
-    multiplier -= beta[i];
-    result += multiplier * facet_scale_factors[i] * ray->first;
+    compute_multiplier(multiplier, m, facet->first, i);
+    result += (multiplier * facet_scale_factors[i]) * ray->first;
   }
   for (i = 0; i<dim; i++) {
     ZZ q, r;
@@ -369,5 +376,99 @@ void computePointsInParallelepipeds(listCone *cones, int numOfVars)
     Cones_Processed_Count++;
     if ((Cones_Processed_Count % 1000) == 0 )
       cout << Cones_Processed_Count << " cones processed." << endl;
+  }
+}
+
+/* ----------------------------------------------------------------- */
+
+PointsScalarProductsGenerator::PointsScalarProductsGenerator
+(const listCone *a_cone, int numOfVars, const vec_ZZ &a_generic_vector) :
+  PointsInParallelepipedGenerator(a_cone, numOfVars),
+  generic_vector(a_generic_vector)
+{
+  scaled_ray_scalar_products.SetLength(numOfVars);
+  int i;
+  ZZ inner;
+  listVector *ray;
+  for (i = 0, ray = cone->rays; i<numOfVars; i++, ray=ray->rest) {
+    InnerProduct(inner, generic_vector, ray->first);
+    scaled_ray_scalar_products[i] = facet_scale_factors[i] * inner;
+  }
+}
+
+ZZ PointsScalarProductsGenerator::GeneratePointScalarProduct(int *multipliers)
+{
+  vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
+#if 0
+  vec_ZZ trans_pt = translate_lattice_point(lat_pt);
+  ZZ result;
+  InnerProduct(result, generic_vector, trans_pt);
+  return result;
+#else
+  /* Equivalent, but faster code. */
+  ZZ result;
+  result = 0;
+  int dim = beta.length();
+  int i;
+  listVector *facet;
+  listVector *ray;
+  ZZ multiplier;
+  for (i = 0, facet = cone->facets, ray = cone->rays;
+       i<dim;
+       i++, facet=facet->rest, ray=ray->rest) {
+    compute_multiplier(multiplier, lat_pt, facet->first, i);
+    result += multiplier * scaled_ray_scalar_products[i];
+  }
+  ZZ q, r;
+  DivRem(q, r, result, facet_divisor_common_multiple);
+  assert(IsZero(r));
+  return q;
+#endif  
+}
+
+void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
+					const vec_ZZ &generic_vector)
+{
+  ZZ index = abs(cone->determinant);
+  if (index > INT_MAX) {
+    cerr << "Implementation restriction hit:  Attempt to enumerate a fundamental parallelepiped of index greater than INT_MAX.  (Probably not a good idea anyway.)" << endl;
+    abort();
+  }
+  int num_lattice_points = to_long(index);
+  cone->lattice_points_scalar_products.SetLength(num_lattice_points);
+
+  if (cone->latticePoints) {
+    // Lattice points already computed.
+    listVector *point;
+    int i;
+    for (point = cone->latticePoints, i = 0; point != NULL; point = point->rest, i++) {
+      InnerProduct(cone->lattice_points_scalar_products[i],
+		   generic_vector, point->first);
+    }
+  }
+  else {
+    PointsScalarProductsGenerator generator(cone, numOfVars, generic_vector);
+    vector<int> max_multipliers = generator.GetMaxMultipliers();
+    /*
+     * enumerate lattice points by taking all integer combinations
+     * 0 <= k <= (n_i - 1) of each vector.
+     */
+    int length = max_multipliers.size();
+    int *n = new int[length];
+    int i;
+    for (i = 0; i<length; i++)
+      n[i] = max_multipliers[i];
+    IntCombEnum iter_comb(n, length);
+    //cout << "Enumerating lattice points...\n";
+    iter_comb.decrementUpperBound();
+    listVector *lat_points = NULL;
+    int *next;
+    int num_scalar = 0;
+    while((next = iter_comb.getNext())) {
+      cone->lattice_points_scalar_products[num_scalar]
+	= generator.GeneratePointScalarProduct(next);
+      num_scalar++;
+    }
+    delete[] n;
   }
 }
