@@ -266,7 +266,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 
 			cout << "Triangulation_Load_Save: File not present.  Calculation triangulation." << endl;
   			writeCDDextFileRudy(m,n,Mat);
-  			system_with_error_check(CDD_PATH "tri.ext > tri.out");
+  			system_with_error_check(CDD_PATH " tri.ext > tri.out");
   			system_with_error_check("rm -f tri.out");
 		}	
 		else
