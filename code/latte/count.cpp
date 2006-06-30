@@ -506,6 +506,7 @@ int main(int argc, char *argv[]) {
 	exp_param.max_determinant = params.max_determinant; 
 	exp_param.decomposition = params.decomposition;
 	exp_param.Number_of_Variables = numOfVars;
+	exp_param.Flags = flags;
 	exp_param.File_Name = fileName;
 
 	Integer number_of_lattice_points
