@@ -54,9 +54,6 @@
 
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
-#ifdef SUN
-  struct tms tms_buf;
-#endif
   float z;
   int i,numOfVars,numOfAllVars, degree = 1;
   unsigned int flags = 0, print_flag = 0, output_cone = 0;
@@ -76,7 +73,7 @@ int main(int argc, char *argv[]) {
   vec_ZZ cost;
   listVector *templistVec;
   listCone *cones, *tmpcones;
-  struct BarvinokParameters params;
+  struct BarvinokParameters *params = new BarvinokParameters;
 
   latte_banner(cout);
 
@@ -114,9 +111,9 @@ int main(int argc, char *argv[]) {
   strcpy(cddstyle, "no");
   strcpy(LRS, "no");
   approx = false;
-  params.substitution = BarvinokParameters::PolynomialSubstitution;
-  params.decomposition = BarvinokParameters::DualDecomposition;
-  params.max_determinant = 1;
+  params->substitution = BarvinokParameters::PolynomialSubstitution;
+  params->decomposition = BarvinokParameters::DualDecomposition;
+  params->max_determinant = 1;
 
   int last_command_index = argc - 2;
   for (i=1; i<=last_command_index; i++) {
@@ -130,7 +127,7 @@ int main(int argc, char *argv[]) {
     else if(strncmp(argv[i],"nodecom",3)==0
 	    || strncmp(argv[i], "--nodecomposition", 5) == 0
 	    || strncmp(argv[i], "--no-decomposition", 7) == 0)
-      params.max_determinant = 0;
+      params->max_determinant = 0;
     else if(strncmp(argv[i],"homog",3)==0) {strcpy(dualApproach,"yes"); flags |= DUAL_APPROACH;}
     else if(strncmp(argv[i],"equ",3)==0) strcpy(equationsPresent,"yes");
     else if(strncmp(argv[i],"uni",3)==0) strcpy(assumeUnimodularCones,"yes");
@@ -155,11 +152,11 @@ int main(int argc, char *argv[]) {
     else if(strncmp(argv[i],"trisave",7)==0) {strcpy (Save_Tri, "yes"); flags |= SAVE;}
     else if(strncmp(argv[i],"triload",7)==0) {strcpy (Load_Tri, "yes"); flags |= LOAD;}
     else if (strncmp(argv[i], "--exponential", 5) == 0)
-      params.substitution = BarvinokParameters::ExponentialSubstitution;
+      params->substitution = BarvinokParameters::ExponentialSubstitution;
     else if (strncmp(argv[i], "--maxdet=", 9) == 0)
-      params.max_determinant = atoi(argv[i] + 9);
+      params->max_determinant = atoi(argv[i] + 9);
     else if (strncmp(argv[i], "--irrational-primal", 5) == 0)
-      params.decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
+      params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
@@ -273,6 +270,8 @@ int main(int argc, char *argv[]) {
   }
   //vec_ZZ cost;
   /* Read problem data. */
+  params->read_time.start();
+  
   if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) CheckRed(fileName, equationsPresent, maximum, nonneg, interior, dilation, dilation_const); 
 
   dilation_const = 1;
@@ -369,7 +368,9 @@ int main(int argc, char *argv[]) {
     matrix = matrixTmp;}
 /* Now matrix contains the new inequalities. */
   RR LP_OPT;
-  cout << "*** Preprocessing time: " << GetTime() << " sec" << endl;
+  params->read_time.stop();
+  cout << params->read_time;
+  
     //   cout << "Project down cost function: " << cost << endl;
     vec_RR Rat_solution, tmp_den, tmp_num;
     mat_RR ProjU_RR;
@@ -382,6 +383,8 @@ int main(int argc, char *argv[]) {
     tmp_num.SetLength(numOfVars);
 /* Compute vertices and edges. */
     rationalVector* LP_vertex;
+    
+    params->vertices_time.start();
   if ((dualApproach[0]=='n') && (Vrepresentation[0] == 'n')) {
     if(LRS[0] == 'n')
     tmpcones=computeVertexCones(fileName,matrix,numOfVars);
@@ -416,8 +419,8 @@ int main(int argc, char *argv[]) {
   if(Vrepresentation[0] == 'y')
      cones=computeVertexConesFromVrep(fileName,matrix,numOfVars); 
 
-  cout << "*** Vertex and cone computation time: " << GetTime()
-       << " sec" << endl;
+  params->vertices_time.stop();
+  cout << params->vertices_time;
 
   /* Compute triangulation or decomposition of each vertex cone. */
 
@@ -440,27 +443,33 @@ int main(int argc, char *argv[]) {
     already_dualized = true;
   }
 
+  params->Flags = flags;
+  params->File_Name = fileName;
+  params->Number_of_Variables = numOfVars;
+  
 #ifdef HAVE_EXPERIMENTS
   try {
 #endif
     
-  switch (params.substitution) {
+  switch (params->substitution) {
   case BarvinokParameters::PolynomialSubstitution:
     if (assumeUnimodularCones[0]=='n') {
       if (Memory_Save[0] == 'n') {
 	cones=decomposeCones(cones,numOfVars, flags, fileName,
-			     params.max_determinant,
+			     params->max_determinant,
 			     not already_dualized,
-			     params.decomposition);
+			     params->decomposition);
 	/* Compute points in parallelepipeds */
 	computePointsInParallelepipeds(cones, numOfVars);
       }
       // Iterator through simplicial cones, DFS
-      else
-	decomposeCones_Single(cones,numOfVars, degree, flags, fileName,
-			      params.max_determinant,
-			      not already_dualized,
-			      params.decomposition);	
+      else {
+	Standard_Single_Cone_Parameters *standard_params
+	  = new Standard_Single_Cone_Parameters(*params);
+	delete params; params = standard_params;
+	decomposeAndComputeResidue(cones, degree, not already_dualized,
+				   *standard_params);
+      }
     }
     break;
   case BarvinokParameters::ExponentialSubstitution:
@@ -470,30 +479,22 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
     else {
-      if (not already_dualized)
+      if (not already_dualized) {
+	params->dualize_time.start();
 	cones = dualizeCones(cones, numOfVars);
-
+	params->dualize_time.stop();
+	cout << params->dualize_time;
+      }
+      params->decompose_time.start();
       if (approx) {
-	// FIXME: This wants to be factory-ized out.
 #ifdef HAVE_EXPERIMENTS
-	Write_Exponential_Sample_Formula_Single_Cone_Parameters
-	  write_param("Exponential_Sample_Formula",
-		      params.max_determinant,
-		      sampling_factor);
-	write_param.Number_of_Variables = numOfVars;
-	write_param.decomposition = params.decomposition;
-	write_param.File_Name = fileName;
-	decomposeAndWriteExponentialSampleFormula(cones, write_param);
-	// FIXME: Make a write-stats method
-	cout << "*** Total number of simplicial cones: " <<
-	  write_param.Total_Simplicial_Cones << endl;
-	if (write_param.max_determinant != 0) {
-	  cout << "*** Total number of "
-	       << (write_param.max_determinant == 1
-		   ? "unimodular"
-		   : "low-index")
-	       << " cones: "
-	       << write_param.Total_Uni_Cones << endl;
+	{
+	  Write_Exponential_Sample_Formula_Single_Cone_Parameters *write_param
+	    = new Write_Exponential_Sample_Formula_Single_Cone_Parameters
+	    (*params, "Exponential_Sample_Formula", sampling_factor);
+	  delete params;
+	  params = write_param;
+	  decomposeAndWriteExponentialSampleFormula(cones, *write_param);
 	}
 #else
 	cerr << "Approximation code is not compiled in, sorry." << endl;
@@ -501,22 +502,19 @@ int main(int argc, char *argv[]) {
 #endif
       }
       else {
-	Exponential_Single_Cone_Parameters exp_param;
-	// FIXME: Upgrade should be more automatical.
-	exp_param.max_determinant = params.max_determinant; 
-	exp_param.decomposition = params.decomposition;
-	exp_param.Number_of_Variables = numOfVars;
-	exp_param.Flags = flags;
-	exp_param.File_Name = fileName;
-
+	Exponential_Single_Cone_Parameters *exp_param
+	  = new Exponential_Single_Cone_Parameters(*params);
+	delete params;
+	params = exp_param;
 	Integer number_of_lattice_points
-	  = decomposeAndComputeExponentialResidue(cones, exp_param);
+	  = decomposeAndComputeExponentialResidue(cones, *exp_param);
 	cout << endl << "****  The number of lattice points is: "
 	     << number_of_lattice_points << "  ****" << endl << endl;
 	// FIXME: Centralize this output stuff.
 	ofstream out("numOfLatticePoints");
 	out << number_of_lattice_points << endl;
       }
+      params->decompose_time.stop();
     }
     break;
   default:
@@ -721,12 +719,22 @@ if(Memory_Save[0] == 'n')
 
   }
   //cout << "Computation done. " << endl;
-  cout << "*** Total time: " << GetTime() << " sec" << endl;
 
+  params->total_time.stop();
+  cout << params->total_time;
+  
   {
     // until we have a more sophisticated test script --mkoeppe
     ofstream totalTime("totalTime");
-    totalTime << GetTime() << endl;
+    totalTime << params->total_time.get_seconds()
+	      << " (" << params->read_time.get_seconds() << "r"
+	      << ", " << params->vertices_time.get_seconds() << "v"
+	      << ", " << params->dualize_time.get_seconds() << "d"
+	      << ", " << params->triangulate_time.get_seconds() << "t"
+	      << ", " << params->decompose_time.get_seconds() << "b"
+	      << ")" << endl;
+    ofstream stats("latte_stats");
+    params->print_statistics(stats);
   }
  
  return(0);
