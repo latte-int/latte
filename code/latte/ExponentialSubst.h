@@ -17,6 +17,9 @@ public:
   mpq_class result;
   Exponential_Single_Cone_Parameters() :
     result(0) {};
+  Exponential_Single_Cone_Parameters(const BarvinokParameters &params) :
+    Generic_Vector_Single_Cone_Parameters(params),
+    result(0) {};
   virtual void InitializeComputation();
   virtual int ConsumeCone(listCone *cone);
 };

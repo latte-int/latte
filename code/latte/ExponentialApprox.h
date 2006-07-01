@@ -20,11 +20,9 @@ public:
   double total_upper_bound;
   mpq_class approximate_result;
   Write_Exponential_Sample_Formula_Single_Cone_Parameters
-  (const char *filename, int a_max_determinant, double a_sampling_factor) :
-    stream(filename), sampling_factor(a_sampling_factor)
-  {
-    max_determinant = a_max_determinant;
-  }
+  (const BarvinokParameters &params,
+   const char *filename, double a_sampling_factor) :
+    stream(filename), sampling_factor(a_sampling_factor) {};
   virtual void InitializeComputation();
   virtual int ConsumeCone(listCone *cone);
 };
