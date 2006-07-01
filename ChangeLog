@@ -1,3 +1,41 @@
+2006-07-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: Use upgrade constructors to upgrade
+	BarvinokParameters to one of its subclasses.  Measure time for
+	subtasks using the new Timer class; take time for child processes
+	properly into account.
+
+	* code/latte/barvinok/ConeDecom.cpp (barvinokDecomposition_Single):
+	Take the triangulation time.
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h
+	(BarvinokParameters): Move slot Flags here from subclass
+	Single_Cone_Parameters.  New slots for timers.  New method
+	print_statistics.
+	(Single_Cone_Parameters): Create upgrade constructor.
+
+	* code/latte/barvinok/dec.cpp, code/latte/barvinok/dec.h
+	(Generic_Vector_Single_Cone_Parameters,
+	Standard_Single_Cone_Parameters): Create upgrade constructors.
+	(decomposeAndComputeResidue): New function, factored out from
+	decomposeCones_Single.
+	(decomposeCones_Single): Reimplement using
+	decomposeAndComputeResidue.
+
+	* code/latte/timing.cpp, code/latte/timing.h (getcputime): Unused,
+	removed.
+	(Timer): New class.
+
+	* code/latte/ExponentialApprox.h, code/latte/ExponentialSubst.h
+	(Exponential_Single_Cone_Parameters):
+	(Write_Exponential_Sample_Formula_Single_Cone_Parameters): Create
+	upgrade constructors.
+
+	* code/latte/Irrational.cpp, code/latte/Irrational.h
+	(computeConeStabilityCube): New.
+	(irrationalizeCone): Use it here.  Implement the irrationalization
+	from math.CO/0603308v2.
+
 2006-06-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/barvinok/Triangulation.cpp (Triangulation_Load_Save):
