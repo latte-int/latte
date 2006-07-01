@@ -46,7 +46,9 @@ int barvinokDecomposition_Single(const mat_ZZ &Mat, rationalVector *vertex,
   char* s1 = "latte_dec";
   list< int > List;
   if(m != n){
+    Parameters->triangulate_time.start();
     Face = Triangulation_Load_Save(Mat, m, n, s1, List, Parameters->File_Name, Parameters->Cone_Index, Parameters->Flags);
+    Parameters->triangulate_time.stop();
   } /*Call triangulation fun.*/
 
    /*
