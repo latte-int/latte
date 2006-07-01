@@ -30,6 +30,36 @@
 
 #undef SHOWDETS
 
+BarvinokParameters::BarvinokParameters() :
+  total_time("Total time", true),
+  read_time("Time for reading and preprocessing"),
+  vertices_time("Time for computing vertices and supporting cones"),
+  dualize_time("Time for dualizing general cones"),
+  triangulate_time("Time for triangulating cones into simplicial cones"),
+  decompose_time("Time for Barvinok decomposition and residue calculation")
+{}
+
+BarvinokParameters::~BarvinokParameters()
+{}
+
+void BarvinokParameters::print_statistics(ostream &s)
+{
+  s << read_time << vertices_time << dualize_time
+    << triangulate_time << decompose_time << total_time;
+}
+
+void Single_Cone_Parameters::print_statistics(ostream &s)
+{
+  BarvinokParameters::print_statistics(s);
+  s << "Total number of simplicial cones: " <<
+    Total_Simplicial_Cones << endl;
+  if (max_determinant != 0) {
+    s << "Total number of "
+      << (max_determinant == 1 ? "unimodular" : "low-index")
+      << " cones: " << Total_Uni_Cones << endl;
+  }
+}
+
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
 

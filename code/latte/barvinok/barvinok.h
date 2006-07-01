@@ -10,8 +10,10 @@
 #define BARVINOK__H
 
 #include "cone.h"
+#include "timing.h"
 
-struct BarvinokParameters {
+class BarvinokParameters {
+public:
   // FIXME: Following does not really belong here.
   // Whether we use the
   //   - traditional LattE monomial substitution z_i |-> (1 + s)^(lambda_i) 
@@ -31,12 +33,22 @@ struct BarvinokParameters {
   char *File_Name;
   // Ambient dimension.
   int Number_of_Variables;
+  // Parameters that control the computation.
+  unsigned int Flags;
+  // Timers.
+  Timer total_time;
+  Timer read_time;
+  Timer vertices_time;
+  Timer dualize_time;
+  Timer triangulate_time;
+  Timer decompose_time;
+  // Constructor & destructor.
+  BarvinokParameters();
+  virtual ~BarvinokParameters();
+  virtual void print_statistics(ostream &s);
 };
 
 class Single_Cone_Parameters : public BarvinokParameters {
-public:
-  // Parameters that control the computation.
-  unsigned int	Flags;
 public:
   // Data that are used during the computation.
   //listCone	*Cone;		// The master cone to be decomposed.
@@ -50,8 +62,12 @@ public:
   ZZ		Current_Simplicial_Cones_Total;
   ZZ		Max_Simplicial_Cones_Total;
 public:
+  Single_Cone_Parameters() {};
+  Single_Cone_Parameters(const BarvinokParameters &params) :
+    BarvinokParameters(params) {};
   virtual int ConsumeCone(listCone *cone) = 0;
   virtual ~Single_Cone_Parameters() {}
+  virtual void print_statistics(ostream &s);
 };
 
 /* Do a signed decomposition, modulo lower-dimensional cones, of the
