@@ -110,8 +110,12 @@ decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
   parameters.File_Name = File_Name;
   parameters.decomposition = decomposition;
 
-  if (dualize) 
-    cones=dualizeCones(cones,numOfVars);
+  if (dualize) {
+    parameters.dualize_time.start();
+    cones = dualizeCones(cones, numOfVars);
+    parameters.dualize_time.stop();
+    cout << parameters.dualize_time;
+  }
     
   cout << "Decomposing all cones.\n";
   numOfConesDecomposed=0;
@@ -179,13 +183,28 @@ barvinokDecomposition_List(listCone *cones,
       }
       return;
     }
-    catch (NotGenericException) {};
+    catch (NotGenericException) {
+      cout << "Generic vector chosen unsuccessfully, trying again." << endl;
+    };
   } while (1);
 }
 
 
 
-int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
+void
+Standard_Single_Cone_Parameters::InitializeComputation()
+{
+  Generic_Vector_Single_Cone_Parameters::InitializeComputation();
+  int i;
+  for (i = 0; i <= Degree_of_Taylor_Expansion; i++)
+    Taylor_Expansion_Result[i] = 0;
+  Total_Lattice_Points = 0;
+  Total_Uni_Cones = 0;
+  Cone_Index = 0; 
+}
+
+int
+Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 {
   //cout << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
   if ( (Flags & DUAL_APPROACH) == 0)
@@ -203,148 +222,107 @@ int Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
     }	
 }
 
-// FIXME: Reimplement in terms of barvinokDecomposition_List.
+void
+decomposeAndComputeResidue(listCone *cones, int degree, bool dualize, 
+			   Standard_Single_Cone_Parameters &param)
+{
+  int numOfConesDecomposed,numOfAllCones,numOfRays;
+  mat_ZZ mat;
+  listCone *tmp;
+  int	Success = 0;
+
+  if (dualize) {
+    param.dualize_time.start();
+    cones = dualizeCones(cones, param.Number_of_Variables);
+    param.dualize_time.stop();
+    cout << param.dualize_time;
+  }
+	
+  cout << "decomposeCones_Single: Decomposing all cones. (Memory Save on)\n";
+  numOfAllCones=lengthListCone(cones);
+  cout << numOfAllCones << " cones total to be done!";	
+	
+  //Set Ten_Power to 100 billion
+  // FIXME: What is magic about this number? --mkoeppe, Sat Mar  4 21:21:45 PST 2006
+  param.Ten_Power = 1;
+  for (int i = 0; i < Exponent_Ten_Power; i++)	
+    param.Ten_Power *= 10;
+
+  cout << "decomposeCones_Single: degree = " << degree << endl;
+  param.Taylor_Expansion_Result = new ZZ [degree + 1 ];
+	
+  param.Degree_of_Taylor_Expansion = degree;
+  param.Controller = new Node_Controller(param.Number_of_Variables + 1, degree);			
+
+  cout << "Number of cones: " << numOfAllCones << endl;
+
+  param.decompose_time.start();
+  barvinokDecomposition_List(cones, param);
+  param.decompose_time.stop();
+
+  cout << endl << "Total Unimodular Cones: " << param.Total_Uni_Cones << endl;
+  ofstream UniOut("numOfUnimodularCones");
+  UniOut << param.Total_Uni_Cones << endl;
+  cout << "Maximum number of simplicial cones in memory at once: " << param.Max_Simplicial_Cones_Total << endl;
+
+	
+  if ( param.Flags & DUAL_APPROACH)
+    {
+      cout << "Memory Save Mode: Taylor Expansion:" << endl;
+      if(degree > 1){		
+	for (int i = 0; i<= degree; i++)
+	  {
+	    cout <<	( param.Taylor_Expansion_Result[i] + param.Ten_Power/2)/(param.Ten_Power) ;
+	    if (i != 0)
+	      {
+		cout << "t^" << i;
+	      }
+	    cout << endl;
+	  }
+      }
+      else if(degree == 1){
+	Integer numOfLatticePoints
+	  = ( param.Taylor_Expansion_Result[1] + param.Ten_Power/2)/param.Ten_Power;
+	cout << "\n****  Total number of lattice points is: " << numOfLatticePoints << "  ****" << endl << endl;
+	ofstream out("numOfLatticePoints");
+	out << numOfLatticePoints;
+      }
+    }
+  else 
+    {
+      cout << "\n*****  Total number of lattice points: ";
+      ofstream out("numOfLatticePoints");
+      param.Total_Lattice_Points = abs( param.Total_Lattice_Points);
+		
+      cout <<	( param.Total_Lattice_Points + param.Ten_Power/2)/param.Ten_Power;
+      out <<	( param.Total_Lattice_Points + param.Ten_Power/2)/param.Ten_Power << endl;
+      cout << "  ****" << endl << endl;
+    }
+	
+  //cout << lengthListCone(newCones->rest) << " cones in total.\n";
+
+  delete param.Controller;
+  delete [] param.Taylor_Expansion_Result;
+	
+}
+
 void decomposeCones_Single (listCone *cones, int numOfVars, int degree,
 			    unsigned int flags, char *File_Name, int max_determinant,
 			    bool dualize,
 			    BarvinokParameters::DecompositionType decomposition) 
 {
-	int numOfConesDecomposed,numOfAllCones,numOfRays;
-  	mat_ZZ mat;
-  	listCone *tmp;
-	/*  char command[127]; */
-	Standard_Single_Cone_Parameters	*Barvinok_Parameters = new Standard_Single_Cone_Parameters;
+  Standard_Single_Cone_Parameters *Barvinok_Parameters
+    = new Standard_Single_Cone_Parameters;
 	
-	int	Success = 0;
-	
-  	cout << "decomposeCones_Single: Decomposing all cones. (Memory Save on)\n";
-  	numOfAllCones=lengthListCone(cones);
-	cout << numOfAllCones << " cones total to be done!";	
+  Barvinok_Parameters->Flags = flags;
+  Barvinok_Parameters->Number_of_Variables = numOfVars;
+  Barvinok_Parameters->max_determinant = max_determinant;
+  Barvinok_Parameters->File_Name = File_Name;
+  Barvinok_Parameters->decomposition = decomposition;
 
-	
-	//Set Ten_Power to 100 billion
-	// FIXME: What is magic about this number? --mkoeppe, Sat Mar  4 21:21:45 PST 2006
-	Barvinok_Parameters->Ten_Power = 1;
-	for (int i = 0; i < Exponent_Ten_Power; i++)	
-	  Barvinok_Parameters->Ten_Power *= 10;
+  decomposeAndComputeResidue(cones, degree, dualize, *Barvinok_Parameters);
 
-	cout << "decomposeCones_Single: degree = " << degree << endl;
-	Barvinok_Parameters->Taylor_Expansion_Result = new ZZ [degree + 1 ];
-	
-	
-	Barvinok_Parameters->Degree_of_Taylor_Expansion = degree;
-	Barvinok_Parameters->Flags = flags;
-	Barvinok_Parameters->Number_of_Variables = numOfVars;
-	Barvinok_Parameters->max_determinant = max_determinant;
-	Barvinok_Parameters->File_Name = File_Name;
-	Barvinok_Parameters->Controller = new Node_Controller(numOfVars + 1, degree);			
-	//FIXME: Ugly.
-	Barvinok_Parameters->decomposition = decomposition;
-
-	if (dualize)
-	  cones=dualizeCones(cones,numOfVars);
-
-	cout << "Number of cones: " << numOfAllCones << endl;
-	
-	while (Success == 0)
-	{
-		Success = 1;
-  		numOfConesDecomposed = 0;
-		tmp=cones;
-
-		Barvinok_Parameters->Current_Simplicial_Cones_Total = numOfAllCones;
-		Barvinok_Parameters->Max_Simplicial_Cones_Total = 0;
-
-		//Compute Random lambda
-		Barvinok_Parameters->InitializeComputation();
-		cout << "decomposeCone_Single: Random Lambda = ";
-		for (int i = 0;  i < numOfVars; i++)
-		    cout << Barvinok_Parameters->generic_vector[i] << " ";
-		cout << endl;
-			
-		for (int i = 0; i <= degree; i++)
-			Barvinok_Parameters->Taylor_Expansion_Result[i] = 0;
-		
-		Barvinok_Parameters->Total_Lattice_Points = 0;
-		Barvinok_Parameters->Total_Uni_Cones = 0;
-		Barvinok_Parameters->Cone_Index = 0; 
-		
-  		while (tmp) 
-		{
-    			numOfRays=lengthListVector(tmp->rays);
-    			mat=createConeDecMatrix(tmp,numOfRays,numOfVars);
-			//Barvinok_Parameters->Cone = tmp;
-				
-			// reminder, set vertex, pass vertex
-			if(barvinokDecomposition_Single(mat, tmp->vertex,Barvinok_Parameters) == -1)
-			{
-				Success = 0;		
-				break;
-			}
-    		
-			
-    			numOfConesDecomposed++;
-    			if (numOfConesDecomposed==50*(numOfConesDecomposed/50)) 
-			{	
-      				cout << numOfConesDecomposed << " / " << numOfAllCones << " done.\n";
-    			}
-			
-  			tmp = tmp->rest;
-			
-			Barvinok_Parameters->Cone_Index++;
-		}
-		
-		if (Success == 0)
-		{
-			cout << "Lambda Choosen unsuccessful, trying again." << endl;
-		}
-	}
-
-	cout << endl << "Total Unimodular Cones: " << Barvinok_Parameters->Total_Uni_Cones << endl;
-	ofstream UniOut("numOfUnimodularCones");
-	UniOut << Barvinok_Parameters->Total_Uni_Cones << endl;
-	cout << "Maximum number of simplicial cones in memory at once: " << Barvinok_Parameters->Max_Simplicial_Cones_Total << endl;
-
-	
-	if ( flags & DUAL_APPROACH)
-	{
-	  cout << "Memory Save Mode: Taylor Expansion:" << endl;
-	  if(degree > 1){		
-	    for (int i = 0; i<= degree; i++)
-	      {
-		cout <<	( Barvinok_Parameters->Taylor_Expansion_Result[i] + Barvinok_Parameters->Ten_Power/2)/(Barvinok_Parameters->Ten_Power) ;
-		if (i != 0)
-		  {
-		    cout << "t^" << i;
-		  }
-		cout << endl;
-	      }
-	  }
-	  else if(degree == 1){
-	    Integer numOfLatticePoints
-	      = ( Barvinok_Parameters->Taylor_Expansion_Result[1] + Barvinok_Parameters->Ten_Power/2)/Barvinok_Parameters->Ten_Power;
-	    cout << "\n****  Total number of lattice points is: " << numOfLatticePoints << "  ****" << endl << endl;
-	    ofstream out("numOfLatticePoints");
-	    out << numOfLatticePoints;
-	  }
-	}
-	else 
-	{
-	  cout << "\n*****  Total number of lattice points: ";
-	  ofstream out("numOfLatticePoints");
-	  Barvinok_Parameters->Total_Lattice_Points = abs( Barvinok_Parameters->Total_Lattice_Points);
-		
-		cout <<	( Barvinok_Parameters->Total_Lattice_Points + Barvinok_Parameters->Ten_Power/2)/Barvinok_Parameters->Ten_Power;
-		out <<	( Barvinok_Parameters->Total_Lattice_Points + Barvinok_Parameters->Ten_Power/2)/Barvinok_Parameters->Ten_Power << endl;
-		cout << "  ****" << endl << endl;
-	}
-	
-  	//cout << lengthListCone(newCones->rest) << " cones in total.\n";
-
-	delete Barvinok_Parameters->Controller;
-	delete [] Barvinok_Parameters->Taylor_Expansion_Result;
-	delete Barvinok_Parameters;
-	
+  delete Barvinok_Parameters;
 }
 /* ----------------------------------------------------------------- */
 

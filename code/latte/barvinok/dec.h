@@ -39,6 +39,9 @@ class Generic_Vector_Single_Cone_Parameters : public Single_Cone_Parameters {
 public:
   vec_ZZ generic_vector;
   virtual void InitializeComputation();
+  Generic_Vector_Single_Cone_Parameters() {};
+  Generic_Vector_Single_Cone_Parameters(const BarvinokParameters &params) :
+    Single_Cone_Parameters(params) {};
 };
 
 /* Pick a tentative generic vector by calling InitializeComputation().
@@ -69,13 +72,22 @@ class Standard_Single_Cone_Parameters
 
 	Node_Controller *Controller;
  public:
-	virtual int ConsumeCone(listCone *cone);
+  Standard_Single_Cone_Parameters() {};
+  Standard_Single_Cone_Parameters(const BarvinokParameters &params) :
+    Generic_Vector_Single_Cone_Parameters(params) {};
+  virtual void InitializeComputation();
+  virtual int ConsumeCone(listCone *cone);
 };
 
-// Decompose the polyhedral CONES down to MAX_DETERMINANT.  When
-// DUALIZE is true, the CONES are given in primal space, so dualize
-// before triangulating; otherwise CONES must be given in dual space
-// already.  
+// Decompose the polyhedral CONES down to MAX_DETERMINANT.  Then
+// perform residue calculations and print results.  When DUALIZE is
+// true, the CONES are given in primal space, so dualize before
+// triangulating; otherwise CONES must be given in dual space already.
+void
+decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
+			   Standard_Single_Cone_Parameters &param);
+
+// Likewise, deprecated interface.  
 void decomposeCones_Single (listCone *cones, int numOfVars, int degree,
 			    unsigned int flags, char *File_Name,
 			    int max_determinant,
