@@ -28,6 +28,8 @@
 #include "Irrational.h"
 #endif
 
+#undef SHOWDETS
+
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
 
