@@ -1,33 +1,52 @@
-#include <stdio.h>
 #include <sys/times.h>
-#include <time.h>
+#include <cassert>
+#include <unistd.h>
+#include "timing.h"
+#include <iostream>
+
 using namespace std;
 
-extern float getcputime(void);
+clock_t Timer::ticks_per_second;
 
-float getcputime (void) {
-  struct tms now;
-  int sec, hun;
-  float total;
-
-  /* returns cpu-time in seconds */
-
-#ifndef CLK_TCK
-  long clocks_per_second = 0;
-  
-//  clocks_per_second = sysconf( _SC_CLK_TCK );
-  times( &now );
-  
-  hun  = ((now.tms_utime % clocks_per_second)*100)/clocks_per_second;
-  sec = (now.tms_utime / clocks_per_second);
-#else
-  times( &now );
-  
-  hun  = ( ( now.tms_utime % CLK_TCK ) * 100 ) / CLK_TCK;
-  sec = ( now.tms_utime / CLK_TCK );
-#endif
-  
-  total = (double)sec + ( (double)(hun) / 100.0 );
-  
-  return (total); 
+Timer::Timer(const std::string &a_name, bool start_timer) :
+  name(a_name), ticks_elapsed(0), started(false)
+{
+  ticks_per_second = sysconf(_SC_CLK_TCK);
+  if (start_timer) start();
 }
+
+void Timer::start()
+{
+  assert(!started);
+  struct tms buf;
+  clock_t t = times(&buf);
+  assert(t != -1);
+  start_time = buf.tms_utime + buf.tms_stime
+    + buf.tms_cutime + buf.tms_cstime;
+  started = true;
+}
+
+void Timer::stop()
+{
+  assert(started);
+  struct tms buf;
+  clock_t t = times(&buf);
+  assert(t != -1);
+  ticks_elapsed += (buf.tms_utime + buf.tms_stime
+		    + buf.tms_cutime + buf.tms_cstime)
+    - start_time;
+  started = false;
+}
+
+float Timer::get_seconds() const
+{
+  assert(!started);
+  return ticks_elapsed / (1.0 * ticks_per_second);
+}
+
+ostream &operator<< (ostream &s, const Timer &timer)
+{
+  s << timer.name << ": " << timer.get_seconds() << " sec" << endl;
+  return s;
+}
+
