@@ -5,6 +5,19 @@
 
 #include "cone.h"
 
+/* Compute a new VERTEX for the simplicial CONE without changing the
+   set of integer points in CONE, such that all these points are in
+   the interior of CONE.  Also compute a rational number LENGTH such
+   that all points X in the open cube with
+
+                 || X - VERTEX ||_infty < LENGTH
+
+   have the same property as VERTEX.  Return VERTEX. */	 
+
+rationalVector *
+computeConeStabilityCube(listCone *cone, int numOfVars, bool simplicial,
+			 ZZ &length_numerator, ZZ &length_denominator);
+
 /* Move the vertex of the simplicial CONE without changing the set of
    integer points in CONE, such that all these points are in the
    relative interior of CONE.  More strongly, every CONE_2 whose apex

@@ -10,28 +10,17 @@ using namespace std;
 #include "convert.h"
 #include "print.h"
 
-static ZZ
-lcm(const ZZ& a, const ZZ& b)
+rationalVector *
+computeConeStabilityCube(listCone *cone, int numOfVars, bool simplicial,
+			 ZZ &length_numerator, ZZ &length_denominator)
 {
-  return a * ( b / GCD(a, b));
-}
-
-void
-irrationalizeCone(listCone *cone, int numOfVars)
-{
+  if (!simplicial) {
+    cerr << "Computing stability region for non-simplicial cones is not implemented yet.";
+    abort();
+  }
   if (cone->facets == NULL)
     computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
-#if 0
-  cerr << "irrationalizeCone: Warning: This code is based on the irrationalization"
-       << endl
-       << "described in math.CO/0603308v1, which is WRONG."
-       << endl
-       << "Code needs to be fixed according to math.CO/0603308v2."
-       << endl;
-#endif
-#ifdef DEBUG_IRRATIONAL
-  printCone(cone, numOfVars);
-#endif
+
   ZZ vertex_denominator;
   vec_ZZ vertex_numerator
     = scaleRationalVectorToInteger(cone->vertex, numOfVars,
@@ -72,34 +61,96 @@ irrationalizeCone(listCone *cone, int numOfVars)
   cout << "--center--> " << center_numerator << " / "
        << center_denominator << endl; 
 #endif
-  {
-    rationalVector *v = createRationalVector(numOfVars);
-    for (i = 0; i<numOfVars; i++) {
-      v->enumerator[i] = center_numerator[i];
-      v->denominator[i] = center_denominator;
-    }
-    assertConesIntegerEquivalent(cone, v, numOfVars,
-				 "Not integer equivalent with center");
+  // Compute stability length
+  length_numerator = 1;
+  ZZ dual_1_norm, max_dual_1_norm;
+  max_dual_1_norm = 0;
+  for (i = 0; i<numOfVars; i++) {
+    int j;
+    dual_1_norm = 0;
+    for (j = 0; j<numOfVars; j++)
+      dual_1_norm += abs(dual[i][j]);
+    if (dual_1_norm > max_dual_1_norm)
+      max_dual_1_norm = dual_1_norm;
   }
+  length_denominator = 2 * max_dual_1_norm;
+  // Check whether at least the new vertex is OK.
+  // (We do not check the length.)
+  rationalVector *v = createRationalVector(numOfVars);
+  for (i = 0; i<numOfVars; i++) {
+    v->enumerator[i] = center_numerator[i];
+    v->denominator[i] = center_denominator;
+  }
+  assertConesIntegerEquivalent(cone, v, numOfVars,
+			       "Not integer equivalent with center");
   
+  return v;
+}
+
+static ZZ
+lcm(const ZZ& a, const ZZ& b)
+{
+  return a * ( b / GCD(a, b));
+}
+
+void
+irrationalizeCone(listCone *cone, int numOfVars)
+{
+  ZZ center_denominator;
+  vec_ZZ center_numerator;
+  ZZ stability_length_numerator, stability_length_denominator;
+  {
+    rationalVector *stability_center
+      = computeConeStabilityCube(cone, numOfVars, true,
+				 stability_length_numerator,
+				 stability_length_denominator);
+    center_numerator =
+      scaleRationalVectorToInteger(stability_center, numOfVars,
+				   center_denominator);
+    delete stability_center;
+  }
   // The actual irrationalization.
-  ZZ M = 2 * power(D, numOfVars + 1);
+  ZZ M;
+  // Value from math.CO/0603308 v1 (wrong):
+  //M = 2 * power(D, numOfVars + 1);
+  // Value from v2:
+  {
+    int barvinok_depth
+      = 1 + (int) ceil(log((double) NumBits(cone->determinant))
+		       / log(1 + 1.0 / (numOfVars - 1)));
+#ifdef DEBUG_IRRATIONAL
+    cout << "Estimated tree depth " << barvinok_depth << endl;
+#endif
+    ZZ C;
+    C = 0;
+    int i;
+    listVector *facet;
+    for (facet = cone->facets; facet; facet = facet->rest) {
+      for (i = 0; i<numOfVars; i++) {
+	if (abs(facet->first[i]) > C)
+	  C = abs(facet->first[i]);
+      }
+    }
+    ZZ factorial;
+    factorial = 1;
+    for (i = 2; i<=numOfVars - 1; i++)
+      factorial *= i;
+    ZZ d;
+    d = numOfVars;
+    M = 2 * power(power(d, barvinok_depth) * C,
+		  numOfVars - 1);
+  }
   vec_ZZ irrationalizer_numerator;
   irrationalizer_numerator.SetLength(numOfVars);
   ZZ irrationalizer_denominator;
   ZZ TwoM_power;
   TwoM_power = 1;
+  int i;
   for (i = numOfVars-1; i>=0; i--) {
-    irrationalizer_numerator[i] = TwoM_power;
+    irrationalizer_numerator[i] = TwoM_power * stability_length_numerator;
     TwoM_power *= (2 * M);
   }
-  irrationalizer_denominator = 2 * TwoM_power;
-
-  /// Testing...
-//   for (i = numOfVars-1; i>=0; i--) {
-//     irrationalizer_numerator[i] = 0;
-//   }
-//   irrationalizer_denominator = 1;
+  irrationalizer_denominator = 2 * (TwoM_power / M) * stability_length_denominator;
 
   ZZ common_denominator = lcm(center_denominator, irrationalizer_denominator);
   // Store the new vertex
