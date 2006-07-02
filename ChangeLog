@@ -1,3 +1,43 @@
+2006-07-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: Measure time for irrationalization.
+
+	* code/latte/Irrational.cpp (computeConeStabilityCube_general):
+	Implement.
+	(estimate_barvinok_depth): New, factored out from
+	irrationalizeCone; implement for non-simplicial case.
+	(irrationalizeCone): Use it here.
+
+	* code/latte/vertices/cdd.cpp, code/latte/vertices/cdd.h
+	(ReadLpsFile, LP): Extend interface.
+
+	* code/latte/barvinok/barvinok.cpp,
+	code/latte/barvinok/barvinok.h: New timer.
+
+	* code/latte/Irrational.h (computeConeStabilityCube): Change
+	interface, split implementation into two functions.
+
+	* code/latte/Irrational.cpp (irrationalizeCone): Estimates are
+	based on maximum entry of rays, not facets.
+	(computeConeStabilityCube): Change interface, split implementation
+	into two functions.
+
+	* code/latte/cone.h (listVector::listVector): New optional
+	argument for rest.
+
+	* code/latte/count.cpp: Handle new option --irrational-all-primal
+	(--all-primal).
+
+	* code/latte/dual.cpp, code/latte/dual.h
+	(computeTightInequalitiesOfCones): New.
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h:
+	New decomposition type, IrrationalAllPrimalDecomposition.
+
+	* code/latte/vertices/cdd.cpp (computeVertexCones,
+	computeVertexConesViaLrs): Remove unnecessary call to
+	createListOfInequalities.
+
 2006-07-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/count.cpp: Use upgrade constructors to upgrade
