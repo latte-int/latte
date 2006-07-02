@@ -155,6 +155,9 @@ int main(int argc, char *argv[]) {
       params->substitution = BarvinokParameters::ExponentialSubstitution;
     else if (strncmp(argv[i], "--maxdet=", 9) == 0)
       params->max_determinant = atoi(argv[i] + 9);
+    else if (strncmp(argv[i], "--irrational-all-primal", 14) == 0
+	     || strncmp(argv[i], "--all-primal", 5) == 0)
+      params->decomposition = BarvinokParameters::IrrationalAllPrimalDecomposition;
     else if (strncmp(argv[i], "--irrational-primal", 5) == 0)
       params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     else if (strncmp(argv[i], "--approximate", 7) == 0)
@@ -427,6 +430,7 @@ int main(int argc, char *argv[]) {
   bool already_dualized = false;
   
   if (dualApproach[0]=='y') {
+
     cones=createListCone();
     cones->vertex=createRationalVector(numOfVars);
     rays=createListVector(createVector(numOfVars));
@@ -446,7 +450,35 @@ int main(int argc, char *argv[]) {
   params->Flags = flags;
   params->File_Name = fileName;
   params->Number_of_Variables = numOfVars;
-  
+
+
+  switch (params->decomposition) {
+  case BarvinokParameters::DualDecomposition:
+  case BarvinokParameters::IrrationalPrimalDecomposition:
+    if (not already_dualized) {
+      params->dualize_time.start();
+      cones = dualizeCones(cones, numOfVars);
+      params->dualize_time.stop();
+      cout << params->dualize_time;
+    }
+    break;
+  case BarvinokParameters::IrrationalAllPrimalDecomposition:
+    if (already_dualized) {
+      cerr << "You cannot use `homog' and `--all-primal' at the same time." << endl;
+      exit(3);
+    }
+    /* Fill in the facets of all cones; we determine them by
+       taking all inequalities tight at the respective vertex. */
+    computeTightInequalitiesOfCones(cones, matrix, numOfVars);
+    {
+      listCone *cone;
+      for (cone = cones; cone; cone=cone->rest)
+	assert(lengthListVector(cone->facets) >= numOfVars);
+    }
+    irrationalizeCones(cones, numOfVars);
+    break;
+  }
+
 #ifdef HAVE_EXPERIMENTS
   try {
 #endif
@@ -467,7 +499,7 @@ int main(int argc, char *argv[]) {
 	Standard_Single_Cone_Parameters *standard_params
 	  = new Standard_Single_Cone_Parameters(*params);
 	delete params; params = standard_params;
-	decomposeAndComputeResidue(cones, degree, not already_dualized,
+	decomposeAndComputeResidue(cones, degree, false,
 				   *standard_params);
       }
     }
@@ -479,12 +511,6 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
     else {
-      if (not already_dualized) {
-	params->dualize_time.start();
-	cones = dualizeCones(cones, numOfVars);
-	params->dualize_time.stop();
-	cout << params->dualize_time;
-      }
       params->decompose_time.start();
       if (approx) {
 #ifdef HAVE_EXPERIMENTS
