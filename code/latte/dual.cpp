@@ -317,19 +317,25 @@ void computeTightInequalitiesOfCones(listCone *cones,
     assert(cone->facets == NULL);
     listVector *inequality;
     listVector *tight_inequalities = NULL;
+    ZZ vertex_scale_factor;
+    vec_ZZ scaled_vertex
+      = scaleRationalVectorToInteger(cone->vertex, numOfVars,
+				     vertex_scale_factor);
     for (inequality = inequalities; inequality; inequality = inequality->rest) {
-      ZZ vertex_scale_factor;
-      vec_ZZ scaled_vertex
-	= scaleRationalVectorToInteger(cone->vertex, numOfVars,
-				       vertex_scale_factor);
       int i;
       ZZ sp;
-      sp = vertex_scale_factor * inequality->first[0];
+      vec_ZZ &ineq = inequality->first;
+      sp = vertex_scale_factor * ineq[0];
       for (i = 0; i<numOfVars; i++)
-	sp += scaled_vertex[i] * inequality->first[i + 1];
-      if (IsZero(sp))
-	tight_inequalities = new listVector(inequality->first,
+	sp += scaled_vertex[i] * ineq[i + 1];
+      if (IsZero(sp)) {
+	vec_ZZ vec;
+	vec.SetLength(numOfVars);
+	for (i = 0; i<numOfVars; i++)
+	  vec[i] = -ineq[i+1];
+	tight_inequalities = new listVector(vec,
 					    tight_inequalities);
+      }
     }
     cone->facets = tight_inequalities;
   }
