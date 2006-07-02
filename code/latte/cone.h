@@ -9,7 +9,8 @@ struct listVector {
   vec_ZZ first;
   struct listVector *rest;
   listVector() : first(), rest(0) {}
-  listVector(const vec_ZZ a_first) : first(a_first), rest(0) {}
+  listVector(const vec_ZZ &a_first, struct listVector *a_rest = 0) :
+    first(a_first), rest(a_rest) {}
 };
 
 typedef struct listCone {
