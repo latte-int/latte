@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-#undef DEBUG_IRRATIONAL
+// #define DEBUG_IRRATIONAL
 
 #include <cassert>
 
@@ -9,6 +9,8 @@ using namespace std;
 #include "dual.h"
 #include "convert.h"
 #include "print.h"
+#include "vertices/cdd.h"
+#include "ramon.h"
 
 static rationalVector *
 computeConeStabilityCube_simplicial(listCone *cone, int numOfVars, 
@@ -86,8 +88,53 @@ computeConeStabilityCube_general(listCone *cone, int numOfVars,
 				 ZZ &length_numerator,
 				 ZZ &length_denominator)
 {
-  cerr << "computeConeStabilityCube_general: Not implemented." << endl;
-  abort();
+  ZZ vertex_scale_factor;
+  vec_ZZ scaled_vertex
+    = scaleRationalVectorToInteger(cone->vertex, numOfVars,
+				   vertex_scale_factor);
+  listVector *matrix = NULL;
+  listVector *facet;
+  int i;
+  for (facet = cone->facets; facet; facet = facet->rest) {
+      ZZ sp;
+      InnerProduct(sp, facet->first, scaled_vertex);
+      ZZ floor;
+      div(floor, sp, vertex_scale_factor);
+      ZZ abs_sum;
+      for (i = 0; i<numOfVars; i++)
+	abs_sum += abs(facet->first[i]);
+      vec_ZZ ineq;
+      ineq.SetLength(numOfVars + 2);
+      // First inequality:
+      //   <f,x> + ||f||_1 lambda <= floor(<f,v>) + 1.
+      ineq[0] = floor + 1;
+      for (i = 0; i<numOfVars; i++)
+	ineq[i+1] = -facet->first[i];
+      ineq[numOfVars + 1] = -abs_sum;
+      matrix = new listVector(ineq, matrix);
+      // Second inequality:
+      //  -<f,x> + ||f||_1 lambda <= -floor(<f,v>).
+      ineq[0] = -floor;
+      for (i = 0; i<numOfVars; i++)
+	ineq[i+1] = facet->first[i];
+      ineq[numOfVars + 1] = -abs_sum;
+      matrix = new listVector(ineq, matrix);
+  }
+  vec_ZZ cost;
+  cost.SetLength(numOfVars + 1);
+  cost[numOfVars] = 1;
+  rationalVector *optimal_solution
+    = LP(matrix, cost, numOfVars + 1, false); //maximizes
+  freeListVector(matrix);
+  length_numerator = optimal_solution->enumerator[numOfVars];
+  length_denominator = optimal_solution->denominator[numOfVars];
+  rationalVector *center = createRationalVector(numOfVars);
+  for (i = 0; i<numOfVars; i++) {
+    center->enumerator[i] = optimal_solution->enumerator[i];
+    center->denominator[i] = optimal_solution->denominator[i];
+  }
+  delete optimal_solution;
+  return center;
 }
 
 rationalVector *
@@ -122,6 +169,30 @@ lcm(const ZZ& a, const ZZ& b)
   return a * ( b / GCD(a, b));
 }
 
+int
+estimate_barvinok_depth(listCone *cone, int numOfVars)
+{
+  ZZ det_estimate;
+  if (IsZero(cone->determinant)) {
+    ZZ max_norm_square;
+    listVector *ray;
+    for (ray = cone->rays; ray; ray = ray->rest) {
+      ZZ norm_square;
+      int j;
+      for (j = 0; j<numOfVars; j++)
+	norm_square += ray->first[j] * ray->first[j];
+      if (norm_square > max_norm_square)
+	max_norm_square = norm_square;
+    }
+    det_estimate = power(max_norm_square, (numOfVars + 1) / 2);
+  }
+  else
+    det_estimate = abs(cone->determinant);
+
+  return 1 + (int) ceil(log((double) NumBits(det_estimate))
+			/ log(1 + 1.0 / (numOfVars - 1)));
+}
+
 void
 irrationalizeCone(listCone *cone, int numOfVars)
 {
@@ -136,6 +207,12 @@ irrationalizeCone(listCone *cone, int numOfVars)
     center_numerator =
       scaleRationalVectorToInteger(stability_center, numOfVars,
 				   center_denominator);
+#ifdef DEBUG_IRRATIONAL
+    cout << "stability center: ";
+    printRationalVector(stability_center, numOfVars);
+    cout << "stability length: " << stability_length_numerator
+	 << "/" << stability_length_denominator << endl;
+#endif
     delete stability_center;
   }
   // The actual irrationalization.
@@ -145,8 +222,7 @@ irrationalizeCone(listCone *cone, int numOfVars)
   // Value from v2:
   {
     int barvinok_depth
-      = 1 + (int) ceil(log((double) NumBits(cone->determinant))
-		       / log(1 + 1.0 / (numOfVars - 1)));
+      = estimate_barvinok_depth(cone, numOfVars);
 #ifdef DEBUG_IRRATIONAL
     cout << "Estimated tree depth " << barvinok_depth << endl;
 #endif
