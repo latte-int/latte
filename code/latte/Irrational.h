@@ -15,7 +15,7 @@
    have the same property as VERTEX.  Return VERTEX. */	 
 
 rationalVector *
-computeConeStabilityCube(listCone *cone, int numOfVars, bool simplicial,
+computeConeStabilityCube(listCone *cone, int numOfVars,
 			 ZZ &length_numerator, ZZ &length_denominator);
 
 /* Move the vertex of the simplicial CONE without changing the set of
