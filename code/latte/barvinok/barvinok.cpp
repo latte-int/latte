@@ -174,7 +174,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 #endif
 	  break;
 	default:
-	  cerr << "Unknown BarvinokParameters::decomposition";
+	  cerr << "Unknown BarvinokParameters::decomposition" << endl;
 	  abort();
 	}
 	
@@ -284,7 +284,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     absDet = abs(C->determinant);
     break;
   default:
-    cerr << "Unknown BarvinokParameters::decomposition";
+    cerr << "Unknown BarvinokParameters::decomposition" << endl;
     abort();
   }
        	
@@ -310,7 +310,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     case BarvinokParameters::IrrationalPrimalDecomposition:
       return Parameters->ConsumeCone(C);
     default:
-      cerr << "Unknown BarvinokParameters::decomposition";
+      cerr << "Unknown BarvinokParameters::decomposition" << endl;
       abort();
     }
   }	     
@@ -344,8 +344,17 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 	Parameters->Current_Simplicial_Cones_Total ++;
 
 #ifdef HAVE_EXPERIMENTS
-	if (Parameters->decomposition == BarvinokParameters::IrrationalPrimalDecomposition)
+	switch (Parameters->decomposition) {
+	case BarvinokParameters::DualDecomposition:
+	  break;
+	case BarvinokParameters::IrrationalPrimalDecomposition:
+	case BarvinokParameters::IrrationalAllPrimalDecomposition:
 	  checkConeIrrational(cones1[i], Parameters->Number_of_Variables);
+	  break;
+	default:
+	  cerr << "Unknown BarvinokParameters::decomposition";
+	  abort();
+	}
 #endif
       }
     }

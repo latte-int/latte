@@ -22,7 +22,13 @@ public:
   // Whether to use
   //  - traditional dual decomposition
   //  - irrational primal decomposition
-  typedef enum { DualDecomposition, IrrationalPrimalDecomposition } DecompositionType;
+  //  - irrational all-primal decomposition
+  //    (i.e., both triangulation and Barvinok decomposition in primal space)
+  typedef enum {
+    DualDecomposition,
+    IrrationalPrimalDecomposition,
+    IrrationalAllPrimalDecomposition
+  } DecompositionType;
   DecompositionType decomposition; 
   // The maximum determinant of cones that we do not subdivide
   // further.  Set to 1 to subdivide until we reach unimodular cones
