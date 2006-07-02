@@ -634,7 +634,7 @@ listCone* computeVertexCones(char* fileName, listVector* matrix,
 /* Compute vertices and edges with cdd. */
 
   createCddIneFile(matrix,numOfVars+1);
-  inequalities=createListOfInequalities(matrix,numOfVars);
+  //inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices and edges with cdd...";
   cout.flush();
@@ -674,7 +674,7 @@ listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix,
 /* Compute vertices with lrs. */
 
   createLrsIneFile(matrix,numOfVars+1);
-  inequalities=createListOfInequalities(matrix,numOfVars);
+  //inequalities=createListOfInequalities(matrix,numOfVars);
 
   cout << "Computing vertices with lrs...";
   system_with_error_check(LRS_PATH " latte_lrs.ine > latte_lrs.ext");
