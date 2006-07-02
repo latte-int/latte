@@ -467,6 +467,9 @@ int main(int argc, char *argv[]) {
       cerr << "You cannot use `homog' and `--all-primal' at the same time." << endl;
       exit(3);
     }
+    cout << "Irrationalizing polyhedral cones... ";
+    cout.flush();
+    params->irrationalize_time.start();
     /* Fill in the facets of all cones; we determine them by
        taking all inequalities tight at the respective vertex. */
     computeTightInequalitiesOfCones(cones, matrix, numOfVars);
@@ -476,7 +479,12 @@ int main(int argc, char *argv[]) {
 	assert(lengthListVector(cone->facets) >= numOfVars);
     }
     irrationalizeCones(cones, numOfVars);
+    params->irrationalize_time.stop();
+    cout << params->irrationalize_time;
     break;
+  default:
+    cerr << "Unknown BarvinokParameters::decomposition" << endl;
+    abort();
   }
 
 #ifdef HAVE_EXPERIMENTS
@@ -755,6 +763,7 @@ if(Memory_Save[0] == 'n')
     totalTime << params->total_time.get_seconds()
 	      << " (" << params->read_time.get_seconds() << "r"
 	      << ", " << params->vertices_time.get_seconds() << "v"
+	      << ", " << params->irrationalize_time.get_seconds() << "i"
 	      << ", " << params->dualize_time.get_seconds() << "d"
 	      << ", " << params->triangulate_time.get_seconds() << "t"
 	      << ", " << params->decompose_time.get_seconds() << "b"
