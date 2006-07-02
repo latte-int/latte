@@ -45,6 +45,7 @@ public:
   Timer total_time;
   Timer read_time;
   Timer vertices_time;
+  Timer irrationalize_time;
   Timer dualize_time;
   Timer triangulate_time;
   Timer decompose_time;

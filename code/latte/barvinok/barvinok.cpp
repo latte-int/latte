@@ -34,6 +34,7 @@ BarvinokParameters::BarvinokParameters() :
   total_time("Total time", true),
   read_time("Time for reading and preprocessing"),
   vertices_time("Time for computing vertices and supporting cones"),
+  irrationalize_time("Time for irrationalizing general cones"),
   dualize_time("Time for dualizing general cones"),
   triangulate_time("Time for triangulating cones into simplicial cones"),
   decompose_time("Time for Barvinok decomposition and residue calculation")
@@ -173,6 +174,11 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	  exit(1);
 #endif
 	  break;
+	case BarvinokParameters::IrrationalAllPrimalDecomposition:
+	  // We already have primal cones; do Barvinok decomposition
+	  // on them.
+	  computeDetAndFacetsOfSimplicialCone(dummy, n);
+	  break;
 	default:
 	  cerr << "Unknown BarvinokParameters::decomposition" << endl;
 	  abort();
@@ -281,6 +287,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     absDet = abs(C->dual_determinant);
     break;
   case BarvinokParameters::IrrationalPrimalDecomposition:
+  case BarvinokParameters::IrrationalAllPrimalDecomposition:
     absDet = abs(C->determinant);
     break;
   default:
@@ -292,28 +299,44 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     //cout << "barvinok_DFS: Det = 0." << endl;
     return 1;	
   }		     
-  else if (Parameters->max_determinant == 0
-	   || absDet <= Parameters->max_determinant) {
-    Parameters->Total_Uni_Cones += 1;
-    if ( Parameters->Total_Uni_Cones % 1000 == 0)
-      cout << Parameters->Total_Uni_Cones
-	   << (Parameters->max_determinant == 0
-	       ? " simplicial cones done."
-	       : (Parameters->max_determinant == 1
-		  ? " unimodular cones done."
-		  : " low-index cones done."))
-	   << endl;
+  else {
+#ifdef HAVE_EXPERIMENTS
     switch (Parameters->decomposition) {
     case BarvinokParameters::DualDecomposition:
-      C = dualizeBackCones(C, Parameters->Number_of_Variables);
-      return Parameters->ConsumeCone(C);
+      break;
     case BarvinokParameters::IrrationalPrimalDecomposition:
-      return Parameters->ConsumeCone(C);
+    case BarvinokParameters::IrrationalAllPrimalDecomposition:
+      checkConeIrrational(C, Parameters->Number_of_Variables);
+      break;
     default:
-      cerr << "Unknown BarvinokParameters::decomposition" << endl;
+      cerr << "Unknown BarvinokParameters::decomposition";
       abort();
     }
-  }	     
+#endif
+    if (Parameters->max_determinant == 0
+	   || absDet <= Parameters->max_determinant) {
+      Parameters->Total_Uni_Cones += 1;
+      if ( Parameters->Total_Uni_Cones % 1000 == 0)
+	cout << Parameters->Total_Uni_Cones
+	     << (Parameters->max_determinant == 0
+		 ? " simplicial cones done."
+		 : (Parameters->max_determinant == 1
+		    ? " unimodular cones done."
+		    : " low-index cones done."))
+	     << endl;
+      switch (Parameters->decomposition) {
+      case BarvinokParameters::DualDecomposition:
+	C = dualizeBackCones(C, Parameters->Number_of_Variables);
+	return Parameters->ConsumeCone(C);
+      case BarvinokParameters::IrrationalPrimalDecomposition:
+      case BarvinokParameters::IrrationalAllPrimalDecomposition:
+	return Parameters->ConsumeCone(C);
+      default:
+	cerr << "Unknown BarvinokParameters::decomposition" << endl;
+	abort();
+      }
+    }
+  }
   
   //cout << "barvinok_DFS: non-uni cone." << endl;
      
