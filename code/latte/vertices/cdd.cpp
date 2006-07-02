@@ -290,12 +290,15 @@ void createCddIneLPFile(listVector* matrix, int numOfVars, vec_ZZ & cost) {
 
 /* ----------------------------------------------------------------- */
 
-rationalVector* ReadLpsFile(int numOfVars)
+rationalVector* ReadLpsFile(int numOfVars, bool verbose = true)
 {
   ifstream in("LP.lps");
   string tmpString;
   ZZ x, y;
-  cout << "Reading .lps file...";
+  if (verbose) {
+    cout << "Reading .lps file...";
+    cout.flush();
+  }
   rationalVector* OptVector;
   OptVector = createRationalVector(numOfVars);
   if(!in){
@@ -316,7 +319,9 @@ rationalVector* ReadLpsFile(int numOfVars)
       OptVector->denominator[i]=y;
       
     }
-  cout <<"done." << endl;
+  if (verbose) {
+    cout <<"done." << endl;
+  }
   return OptVector;
 }
 
@@ -746,14 +751,19 @@ listCone* computeVertexConesFromVrep(char* fileName, listVector* matrix,
 }
 
 /* ----------------------------------------------------------------- */
-rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars) {
-
+rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
+		   bool verbose = true)
+{
   rationalVector* Opt_vector;
-   createCddIneLPFile(matrix,numOfVars+1,cost);
-   cout << "Computing LP...";
+  createCddIneLPFile(matrix,numOfVars+1,cost);
+  if (verbose) {
+    cout << "Computing LP... "; cout.flush();
+  }
   system_with_error_check(CDD_PATH " LP.ine > LP.out");
-  cout << "done.\n\n";
-  Opt_vector = ReadLpsFile(numOfVars);
+  if (verbose) {
+    cout << "done."; cout.flush();
+  }
+  Opt_vector = ReadLpsFile(numOfVars, verbose);
   //  cout << Opt_vector->enumerator << " " << Opt_vector -> denominator << endl;
   system_with_error_check("rm -f LP.*"); 
 
