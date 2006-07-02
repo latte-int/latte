@@ -308,3 +308,29 @@ listCone* dualizeBackCones(listCone *cones, int numOfVars)
 
 /* ----------------------------------------------------------------- */
 
+void computeTightInequalitiesOfCones(listCone *cones,
+				     listVector *inequalities,
+				     int numOfVars)
+{
+  listCone *cone;
+  for (cone = cones; cone; cone = cone->rest) {
+    assert(cone->facets == NULL);
+    listVector *inequality;
+    listVector *tight_inequalities = NULL;
+    for (inequality = inequalities; inequality; inequality = inequality->rest) {
+      ZZ vertex_scale_factor;
+      vec_ZZ scaled_vertex
+	= scaleRationalVectorToInteger(cone->vertex, numOfVars,
+				       vertex_scale_factor);
+      int i;
+      ZZ sp;
+      sp = vertex_scale_factor * inequality->first[0];
+      for (i = 0; i<numOfVars; i++)
+	sp += scaled_vertex[i] * inequality->first[i + 1];
+      if (IsZero(sp))
+	tight_inequalities = new listVector(inequality->first,
+					    tight_inequalities);
+    }
+    cone->facets = tight_inequalities;
+  }
+}

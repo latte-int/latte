@@ -18,4 +18,10 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars);
 */
 listCone* dualizeBackCones(listCone*, int);
 
+/* Fill the slot `facet' of all CONES by determining which of the
+   INEQUALITIES are tight at the respective vertex. */
+void computeTightInequalitiesOfCones(listCone *cones,
+				     listVector *inequalities,
+				     int numOfVars);
+
 #endif
