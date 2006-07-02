@@ -10,17 +10,11 @@ using namespace std;
 #include "convert.h"
 #include "print.h"
 
-rationalVector *
-computeConeStabilityCube(listCone *cone, int numOfVars, bool simplicial,
-			 ZZ &length_numerator, ZZ &length_denominator)
+static rationalVector *
+computeConeStabilityCube_simplicial(listCone *cone, int numOfVars, 
+				    ZZ &length_numerator,
+				    ZZ &length_denominator)
 {
-  if (!simplicial) {
-    cerr << "Computing stability region for non-simplicial cones is not implemented yet.";
-    abort();
-  }
-  if (cone->facets == NULL)
-    computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
-
   ZZ vertex_denominator;
   vec_ZZ vertex_numerator
     = scaleRationalVectorToInteger(cone->vertex, numOfVars,
@@ -87,6 +81,41 @@ computeConeStabilityCube(listCone *cone, int numOfVars, bool simplicial,
   return v;
 }
 
+static rationalVector *
+computeConeStabilityCube_general(listCone *cone, int numOfVars, 
+				 ZZ &length_numerator,
+				 ZZ &length_denominator)
+{
+  cerr << "computeConeStabilityCube_general: Not implemented." << endl;
+  abort();
+}
+
+rationalVector *
+computeConeStabilityCube(listCone *cone, int numOfVars, 
+			 ZZ &length_numerator, ZZ &length_denominator)
+{
+  if (cone->facets == NULL)
+    computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
+  bool our_simplicial_facets
+    = (cone->facet_divisors.length() == numOfVars);
+  if (our_simplicial_facets) {
+    // Here we use the order and the properties of the facet vectors
+    // that we have computed:
+    // < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}.
+    return computeConeStabilityCube_simplicial(cone, numOfVars,
+					       length_numerator,
+					       length_denominator);
+  }
+  else {
+    assert(cone->facet_divisors.length() == 0);
+    // In this case, there is no order of the facet vectors,
+    // even if the cone happens to be simplicial.
+    return computeConeStabilityCube_general(cone, numOfVars,
+					    length_numerator,
+					    length_denominator);
+  }
+}
+
 static ZZ
 lcm(const ZZ& a, const ZZ& b)
 {
@@ -101,7 +130,7 @@ irrationalizeCone(listCone *cone, int numOfVars)
   ZZ stability_length_numerator, stability_length_denominator;
   {
     rationalVector *stability_center
-      = computeConeStabilityCube(cone, numOfVars, true,
+      = computeConeStabilityCube(cone, numOfVars,
 				 stability_length_numerator,
 				 stability_length_denominator);
     center_numerator =
@@ -124,11 +153,11 @@ irrationalizeCone(listCone *cone, int numOfVars)
     ZZ C;
     C = 0;
     int i;
-    listVector *facet;
-    for (facet = cone->facets; facet; facet = facet->rest) {
+    listVector *ray;
+    for (ray = cone->rays; ray; ray = ray->rest) {
       for (i = 0; i<numOfVars; i++) {
-	if (abs(facet->first[i]) > C)
-	  C = abs(facet->first[i]);
+	if (abs(ray->first[i]) > C)
+	  C = abs(ray->first[i]);
       }
     }
     ZZ factorial;
@@ -140,6 +169,7 @@ irrationalizeCone(listCone *cone, int numOfVars)
     M = 2 * power(power(d, barvinok_depth) * C,
 		  numOfVars - 1);
   }
+  // Now use this value of M to compute the irrationalization.
   vec_ZZ irrationalizer_numerator;
   irrationalizer_numerator.SetLength(numOfVars);
   ZZ irrationalizer_denominator;
