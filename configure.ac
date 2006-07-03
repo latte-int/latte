@@ -12,6 +12,7 @@ AC_PROG_CC
 AC_PROG_CXX
 
 AC_LANG(C++)
+AX_CXX_MAXOPT
 
 # Checks for header files.
 AC_HEADER_STDC
