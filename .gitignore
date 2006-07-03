@@ -130,6 +130,7 @@ code/latte/Makefile
 code/latte/Makefile.in
 code/latte/SunWS_cache
 code/latte/adjacency/ComputeAdjacency
+code/latte/adjacency/Makefile.in
 code/latte/adjacency/redcheck
 code/latte/barvinok/SunWS_cache
 code/latte/count

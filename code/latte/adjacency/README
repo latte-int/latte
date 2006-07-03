@@ -2,8 +2,4 @@ This is a readme for redcheck and CompAdjacency.
 
 I edited all files from cddlib.  
 
-In order to compile this you need modify Makefile.  This Makefile is for 
-Ruriko Yoshida's math account.  So you need to write your directory into 
-Makefile to compile it.
-
 Ruriko Yoshida
