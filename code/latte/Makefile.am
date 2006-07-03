@@ -59,3 +59,5 @@ nodist_noinst_HEADERS = \
 nodist_test_todd_SOURCES = todd/test-todd.cpp
 
 endif
+
+SUBDIRS = adjacency
