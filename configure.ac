@@ -63,16 +63,10 @@ if test -z "$REDCHECK"; then
   AC_MSG_ERROR([The `redcheck' binary from cddlib is required for LattE.])			
 fi
 
-AC_CHECK_LIB(cddgmp, dd_CreateMatrix)
-AC_CHECK_HEADERS([cdd.h], [], [], 
-[
-#define GMPRATIONAL
-#include <setoper.h>
-#include <cddmp.h>
+LB_CHECK_CDDLIB(,,[AC_MSG_WARN([cddlib not found!
+LattE needs it for building the CheckAdjacency program, which is
+needed for the "vrep" mode.])
 ])
-dnl if test "${ac_cv_lib_cddgmp_dd_CreateMatrix}" != "yes" -o "${ac_cv_header_cdd_h}" != "yes"; then 
-dnl   AC_MSG_WARN([The cddlib (header files and/or library) is missing; LattE needs it for the irrational all-primal decomposition.])
-dnl fi
 AC_CACHE_SAVE
 	  
 # From LRS
