@@ -1,5 +1,21 @@
+2006-07-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Revive the "vrep" code.
+	
+	* code/latte/adjacency/Makefile.am, code/latte/Makefile.am:
+	New subdir "adjacency".
+
+	* configure.ac: Check for cddlib, so we can build the
+	ComputeAdjacency binary.  Compute and define
+	COMPUTEADJACENCY_PATH.
+
+	* m4/define_dir.m4: New file.
+
 2006-07-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
+	Implement the irrational all-primal method, where
+	triangulation is also done in primal space.
+	
 	* code/latte/count.cpp: Measure time for irrationalization.
 
 	* code/latte/Irrational.cpp (computeConeStabilityCube_general):
