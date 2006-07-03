@@ -58,6 +58,7 @@ if test -r "$CDDLIB_HOME/include/cdd.h"; then
   dd_init(a);
 ],
 [	cddlib_found="yes"
+	break
 ]
 )
 else
