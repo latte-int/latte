@@ -43,9 +43,9 @@
 #include "CheckEmpty.h"
 #include "ExponentialSubst.h"
 #include "latte_random.h"
+#include "Irrational.h"
 #ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
-#include "Irrational.h"
 #endif
 
 #include "banner.h"
@@ -467,6 +467,7 @@ int main(int argc, char *argv[]) {
       cerr << "You cannot use `homog' and `--all-primal' at the same time." << endl;
       exit(3);
     }
+#if 1
     cout << "Irrationalizing polyhedral cones... ";
     cout.flush();
     params->irrationalize_time.start();
@@ -481,15 +482,14 @@ int main(int argc, char *argv[]) {
     irrationalizeCones(cones, numOfVars);
     params->irrationalize_time.stop();
     cout << params->irrationalize_time;
+#endif
     break;
   default:
     cerr << "Unknown BarvinokParameters::decomposition" << endl;
     abort();
   }
 
-#ifdef HAVE_EXPERIMENTS
   try {
-#endif
     
   switch (params->substitution) {
   case BarvinokParameters::PolynomialSubstitution:
@@ -690,12 +690,10 @@ if(Memory_Save[0] == 'n')
 
 }
  }
-#ifdef HAVE_EXPERIMENTS
   } catch (NotIrrationalException) {
     cerr << "Bug: Irrationalization failed" << endl;
     exit(1);
   };
-#endif
 
  if(rationalCone[0] == 'y') {
    strcpy(command, "mv ");

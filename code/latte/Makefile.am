@@ -23,7 +23,8 @@ liblatte_a_SOURCES = \
 	latte_gmp.cpp latte_random.cpp latte_system.cpp		\
 	genFunction/IntCombEnum.cpp		\
 	genFunction/matrix_ops.cpp		\
-	ExponentialSubst.cpp 
+	ExponentialSubst.cpp \
+	Irrational.cpp
 
 noinst_HEADERS =							\
 	CheckEmpty.h 		 					\
@@ -39,7 +40,8 @@ noinst_HEADERS =							\
 	latte_gmp.h latte_ntl.h	latte_random.h latte_system.h		\
 	genFunction/IntCombEnum.h     \
 	genFunction/matrix_ops.h    \
-	ExponentialSubst.h 
+	ExponentialSubst.h \
+	Irrational.h
 
 if HAVE_LIDIA
 liblatte_a_SOURCES += 	genFunction/NTL_to_LiDIA.cpp
@@ -51,9 +53,9 @@ if HAVE_EXPERIMENTS
 bin_PROGRAMS += test-todd 
 
 nodist_liblatte_a_SOURCES = \
-	ExponentialApprox.cpp Irrational.cpp
+	ExponentialApprox.cpp
 nodist_noinst_HEADERS = \
-	ExponentialApprox.h Irrational.h 
+	ExponentialApprox.h
 
 #nodist_simple_count_SOURCES = simple-main.cpp
 nodist_test_todd_SOURCES = todd/test-todd.cpp

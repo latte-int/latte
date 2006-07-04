@@ -317,10 +317,12 @@ isConeIrrational(listCone *cone, int numOfVars)
 void
 checkConeIrrational(listCone *cone, int numOfVars)
 {
+#if 1
   if (not isConeIrrational(cone, numOfVars)) {
     static NotIrrationalException notirrational;
     throw notirrational;
   }
+#endif
 }
 
 void

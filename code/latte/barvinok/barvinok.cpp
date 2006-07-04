@@ -24,9 +24,7 @@
 #include "convert.h"
 #include "dual.h"
 #include "config.h"
-#ifdef HAVE_EXPERIMENTS
 #include "Irrational.h"
-#endif
 
 #undef SHOWDETS
 
@@ -166,13 +164,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	case BarvinokParameters::IrrationalPrimalDecomposition:
 	  // Do Barvinok decomposition on the primal cones.
 	  dualizeBackCones(dummy, Parameters->Number_of_Variables);
-#ifdef HAVE_EXPERIMENTS
 	  irrationalizeCone(dummy, Parameters->Number_of_Variables);
-#else
-	  cerr << "Irrationalization not configured in this build."
-	       << endl;
-	  exit(1);
-#endif
 	  break;
 	case BarvinokParameters::IrrationalAllPrimalDecomposition:
 	  // We already have primal cones; do Barvinok decomposition
@@ -300,7 +292,6 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     return 1;	
   }		     
   else {
-#ifdef HAVE_EXPERIMENTS
     switch (Parameters->decomposition) {
     case BarvinokParameters::DualDecomposition:
       break;
@@ -312,7 +303,6 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
       cerr << "Unknown BarvinokParameters::decomposition";
       abort();
     }
-#endif
     if (Parameters->max_determinant == 0
 	   || absDet <= Parameters->max_determinant) {
       Parameters->Total_Uni_Cones += 1;
@@ -366,7 +356,6 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
       if (Dets[i] > 0) {
 	Parameters->Current_Simplicial_Cones_Total ++;
 
-#ifdef HAVE_EXPERIMENTS
 	switch (Parameters->decomposition) {
 	case BarvinokParameters::DualDecomposition:
 	  break;
@@ -378,7 +367,6 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 	  cerr << "Unknown BarvinokParameters::decomposition";
 	  abort();
 	}
-#endif
       }
     }
 #ifdef SHOWDETS
