@@ -1,3 +1,13 @@
+2006-07-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Version 1.2-mk-0.4
+	
+	* code/latte/Irrational.cpp, code/latte/Makefile.am,
+	code/latte/barvinok/barvinok.cpp, code/latte/count.cpp: Include
+	the irrationalization code in the distribution.
+
+	* configure.ac: Try to determine "fast" compiler flags.
+
 2006-07-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Revive the "vrep" code.
