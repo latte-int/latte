@@ -45,6 +45,10 @@ if test -n "$LIDIA_HOME_PATH" ; then
 AC_MSG_CHECKING(for LIDIA >= $min_lidia_version)
 fi
 
+# Old LiDIA uses LiDIA/ for include files;
+# new LiDIA (>= 2.2.0) uses lidia/.
+LIDIA_INCDIR=LiDIA
+
 for LIDIA_HOME in ${LIDIA_HOME_PATH} 
  do	
 if test -r "$LIDIA_HOME/include/LiDIA/LiDIA.h"; then
@@ -84,6 +88,45 @@ if test -r "$LIDIA_HOME/include/LiDIA/LiDIA.h"; then
 	unset LIDIA_CFLAGS
 	unset LIDIA_LIBS	
 	])
+elif test -r "$LIDIA_HOME/include/lidia/LiDIA.h"; then
+	if test "x$LIDIA_HOME" != "x/usr" -a "x$LIDIA_HOME" != "x/usr/local"; then
+		LIDIA_CFLAGS="-I${LIDIA_HOME}/include"
+		LIDIA_LIBS="-L${LIDIA_HOME}/lib -lLiDIA"
+	else
+		LIDIA_CFLAGS=
+		LIDIA_LIBS="-lLiDIA"		
+	fi	
+	CXXFLAGS="${BACKUP_CXXFLAGS} ${LIDIA_CFLAGS} ${GMP_CFLAGS}" 
+	LIBS="${BACKUP_LIBS} ${LIDIA_LIBS} ${GMP_LIBS}"
+
+	AC_TRY_LINK(
+	[#include <lidia/bigint.h>],
+	[LiDIA::bigint a;],
+	[
+	AC_TRY_RUN(
+	[#include <lidia/LiDIA.h>
+	int main () {  if (LIDIA_MAJOR_VERSION < 2) return -1; else return 0; }
+	],[
+	lidia_found="yes"
+	LIDIA_INCDIR=lidia
+	break
+	],[	
+	lidia_problem="$problem $LIDIA_HOME"	
+	unset LIDIA_CFLAGS
+	unset LIDIA_LIBS
+	],[
+	lidia_found="yes"
+	lidia_cross="yes"
+	LIDIA_INCDIR=lidia
+	break
+	])	
+	],
+	[
+	lidia_found="no"
+	lidia_checked="$checked $LIDIA_HOME"
+	unset LIDIA_CFLAGS
+	unset LIDIA_LIBS	
+	])
 else
 	lidia_found="no"
 fi
@@ -113,6 +156,7 @@ fi
 
 
 AM_CONDITIONAL(HAVE_LIDIA, test "x$HAVE_LIDIA" = "xyes")
+AC_SUBST(LIDIA_INCDIR)
 
 CXXFLAGS=${BACKUP_CXXFLAGS}
 LIBS=${BACKUP_LIBS}
