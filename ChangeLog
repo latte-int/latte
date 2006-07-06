@@ -1,3 +1,19 @@
+2006-07-06  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Version 1.2-mk-0.5
+
+	* configure.ac: New release.
+
+	* code/latte/count.cpp: Make the "--all-primal vrep" case work.
+
+	* m4/lidia-check.m4: Fix for LiDIA 2.2.0.
+
+	* code/latte/genFunction/NTL_to_LiDIA.cpp,
+	code/latte/genFunction/matrix_ops.cpp: Fix LiDIA includes.
+
+	* code/latte/dual.cpp (dualizeCones): Don't delete the facets of
+	the first cone.
+
 2006-07-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Version 1.2-mk-0.4
