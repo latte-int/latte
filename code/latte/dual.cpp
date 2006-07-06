@@ -228,7 +228,7 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
   }
 
   cout << "All cones are now dualized." << endl;
-  removeListVector(cones->facets);
+  //removeListVector(cones->facets);
   return (cones);
 }
 /* ----------------------------------------------------------------- */
