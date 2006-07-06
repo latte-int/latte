@@ -4,8 +4,7 @@
 #ifdef HAVE_LIDIA
 
 #include "NTL_to_LiDIA.h"
-#include <LiDIA/bigint_matrix.h>
-#include <LiDIA/bigint.h>
+#include "lidia-include.h"
 
 using namespace LiDIA;
 

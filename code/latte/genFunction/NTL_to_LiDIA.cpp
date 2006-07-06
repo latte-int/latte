@@ -1,8 +1,7 @@
 #include "NTL_to_LiDIA.h"
 #include <NTL/vec_ZZ.h>
 #include <NTL/mat_ZZ.h>
-#include <LiDIA/bigint.h>
-#include <LiDIA/bigint_matrix.h>
+#include "lidia-include.h"
 #include "latte_gmp.h"
 
 using namespace std;
