@@ -470,10 +470,20 @@ int main(int argc, char *argv[]) {
 #if 1
     cout << "Irrationalizing polyhedral cones... ";
     cout.flush();
+    params->dualize_time.start();
+    if (Vrepresentation[0] == 'y') {
+      cout << "(First computing facets for them... "; cout.flush();
+      cones = dualizeCones(cones, numOfVars);
+      cones = dualizeBackCones(cones, numOfVars); // just swaps
+      cout << "done; sorry for the interruption.) "; cout.flush();
+    }      
+    else {
+      /* Fill in the facets of all cones; we determine them by
+	 taking all inequalities tight at the respective vertex. */
+      computeTightInequalitiesOfCones(cones, matrix, numOfVars);
+    }
+    params->dualize_time.stop(); cout << params->dualize_time;
     params->irrationalize_time.start();
-    /* Fill in the facets of all cones; we determine them by
-       taking all inequalities tight at the respective vertex. */
-    computeTightInequalitiesOfCones(cones, matrix, numOfVars);
     {
       listCone *cone;
       for (cone = cones; cone; cone=cone->rest)
