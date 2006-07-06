@@ -1,0 +1,2 @@
+#include <@LIDIA_INCDIR@/bigint.h>
+#include <@LIDIA_INCDIR@/bigint_matrix.h>
