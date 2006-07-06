@@ -1,4 +1,5 @@
-This is LattE Macchiato, a version of LattE derived from the official Release 1.2.
+This is LattE macchiato, an improved version of LattE derived from the
+official Release 1.2.
 
 It requires the following programs and libraries: 
 
@@ -45,6 +46,10 @@ hierarchy rooted at the directory $HOME/latte.
 
 5. Optionally, install the non-free library LiDIA.
 
+   If you are using LiDIA 2.2.0, note that it installs the directory
+   include/lidia but expects its header files in include/LiDIA.  We
+   advise to put a symbolic link after installation of LiDIA.
+
 N. Build and install LattE
 
    From the source directory of LattE:
@@ -67,4 +72,6 @@ More information
  * Documentation: see manual_v1.1.pdf
 
  * Changes since the official release 1.2: see NEWS and ChangeLog
+
+ * Website: http://www.math.uni-magdeburg.de/~mkoeppe/latte
 
