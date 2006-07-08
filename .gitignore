@@ -171,6 +171,17 @@ code/test-suite/totalTime
 /config.status
 /configure
 /depcomp
+distro/.built_*
+distro/.unpacked_*
+distro/Makefile
+distro/Makefile.in
+distro/aclocal.m4
+distro/autom4te.cache
+distro/config.log
+distro/config.status
+distro/configure
+distro/configure.lineno
+distro/dest
 /install-sh
 /missing
 /mkinstalldirs
