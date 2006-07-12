@@ -76,7 +76,7 @@ for GMP_HOME in ${GMP_HOME_PATH}
 					],[
 						AC_MSG_RESULT(yes)
 						GMP_VERSION=""
-						GMP_LIBS="$GMP_LIBS -lgmpxx"
+						GMP_LIBS="$GMP_LIBS -lgmpxx -lgmp"
 						AC_SUBST(GMP_VERSION)
 					],[
 						AC_MSG_RESULT(no)
