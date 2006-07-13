@@ -382,9 +382,12 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
   int *next;
   while((next = iter_comb.getNext())) {
     vec_ZZ trans_lat_pt = generator.GeneratePoint(next);
+#ifdef CHECK_ENUM
     check_point_in_parallelepiped(cone, trans_lat_pt);
+#endif CHECK_ENUM
     lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
   }
+#ifdef CHECK_ENUM
   assert(lengthListVector(lat_points) == abs(cone->determinant));
   if (!are_points_unique(lat_points)) {
     printListCone(cone, numOfVars);
@@ -419,6 +422,7 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
     }
     abort();
   };
+#endif
   delete[] n;
   return (lat_points);
 }
