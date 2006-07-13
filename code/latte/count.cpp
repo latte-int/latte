@@ -623,7 +623,7 @@ int main(int argc, char *argv[]) {
         strcat(command,".ead");
         system_with_error_check(command);
 
-	if(cddstyle[0] == 'n'){
+	if(cddstyle[0] == 'n' && Vrepresentation[0] == 'n'){
         strcpy(command,"rm -f ");
         strcat(command,fileName);
         system_with_error_check(command);
@@ -665,7 +665,7 @@ int main(int argc, char *argv[]) {
         strcat(command,".ead");
         system_with_error_check(command);
 
-	if(cddstyle[0] == 'n'){
+	if(cddstyle[0] == 'n' && Vrepresentation[0] == 'n'){
         strcpy(command,"rm -f ");
         strcat(command,fileName);
         system_with_error_check(command);
@@ -744,7 +744,7 @@ if(Memory_Save[0] == 'n')
   strcat(command,".ead");
   system_with_error_check(command); 
   
-  if(cddstyle[0] == 'n'){
+  if(cddstyle[0] == 'n' && Vrepresentation[0] == 'n'){
     strcpy(command,"rm -f ");
     strcat(command,fileName);
     system_with_error_check(command);
@@ -753,7 +753,7 @@ if(Memory_Save[0] == 'n')
   }
 
 
-  if((dualApproach[0] == 'y') && (cddstyle[0] == 'n')){
+  if((dualApproach[0] == 'y') && (cddstyle[0] == 'n') && Vrepresentation[0] == 'n'){
 
     strcpy(command,"rm -f ");
     strcat(command,fileName);
