@@ -22,6 +22,7 @@ public:
   Write_Exponential_Sample_Formula_Single_Cone_Parameters
   (const BarvinokParameters &params,
    const char *filename, double a_sampling_factor) :
+    Exponential_Single_Cone_Parameters(params),
     stream(filename), sampling_factor(a_sampling_factor) {};
   virtual void InitializeComputation();
   virtual int ConsumeCone(listCone *cone);
