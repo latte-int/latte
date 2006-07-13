@@ -28,10 +28,10 @@ my @files_nums = (
    "hickerson/hickerson-10::24",
    "hickerson/hickerson-11::12",
    "hickerson/hickerson-12::38",
-   "hickerson/hickerson-13::14::1800",
-   "hickerson/hickerson-14::32::86400",
-   "hickerson/hickerson-15::20::1800",
-   "hickerson/hickerson-16::54::86400",
+   "hickerson/hickerson-13::14::60",
+   "hickerson/hickerson-14::32::60",
+   "hickerson/hickerson-15::20::60",
+   "hickerson/hickerson-16::54::600",
    "hickerson/hickerson-17::18::86400",
    "hickerson/hickerson-18::44::86400",
    "hickerson/hickerson-19::20::86400",
@@ -142,7 +142,7 @@ my @files_nums = (
     "yoshida/tru_cube_latte::0",
     "yoshida/tru_simplex_latte::0",
     "yoshida/3x3x4_1.equ",
-### Following are identical to hickerson/*
+## Following are identical to hickerson/*
 ##     "yoshida/HD::::86400",
 ##     "yoshida/HD1",
 ##     "yoshida/HD10::::86400",
@@ -179,24 +179,58 @@ my @files_nums = (
     "yoshida/prob4_1.equ::::720",
     "yoshida/prob5_1.equ::::720",
     "yoshida/prob6_1.equ::::1800",
-    "yoshida/prob7_1.equ::::1800"
+    "yoshida/prob7_1.equ::::1800",
+    "crosspolytope/cross-polytope-2.vrep",
+    "crosspolytope/cross-polytope-3.vrep",
+    "crosspolytope/cross-polytope-4.vrep",
+    "crosspolytope/cross-polytope-5.vrep",
+    "crosspolytope/cross-polytope-6.vrep",
+    "crosspolytope/cross-polytope-7.vrep",
+    "crosspolytope/cross-polytope-8.vrep",
+    "crosspolytope/cross-polytope-9.vrep",
+    "crosspolytope/cross-polytope-10.vrep",
+    "crosspolytope/cross-polytope-11.vrep",
+    "crosspolytope/cross-polytope-12.vrep",
+    "crosspolytope/cross-polytope-13.vrep",
+    "crosspolytope/cross-polytope-14.vrep",
+    "crosspolytope/cross-polytope-15.vrep",
+    "crosspolytope/cross-polytope-16.vrep",
+    "crosspolytope/cross-polytope-17.vrep",
+    "crosspolytope/cross-polytope-18.vrep",
+    "crosspolytope/cross-polytope-19.vrep",
+    "crosspolytope/cross-polytope-20.vrep",
+    "crosspolytope/cross-polytope-21.vrep",
+    "crosspolytope/cross-polytope-22.vrep",
+    "crosspolytope/cross-polytope-23.vrep",
+    "crosspolytope/cross-polytope-24.vrep",
+    "crosspolytope/cross-polytope-25.vrep",
+    "crosspolytope/cross-polytope-26.vrep",
+    "crosspolytope/cross-polytope-27.vrep",
+    "crosspolytope/cross-polytope-28.vrep",
+    "crosspolytope/cross-polytope-29.vrep",
+    "crosspolytope/cross-polytope-30.vrep"
 );
 
+#$MAXRUNTIME = 86400;
 #$MAXRUNTIME = 1800;
-$MAXRUNTIME = 60;
+$MAXRUNTIME = 720;
+#$MAXRUNTIME = 60;
 
 chop($LATTEDIR = `cd \`dirname $0\`; cd ../..; pwd`);
 $PARAMETERS = $ARGV[0];
-$COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; env LD_LIBRARY_PATH=/localapp/imosoft/sparc-sun-solaris2.7/alpha/gmp-4.1.4-gcc33/lib:\$LD_LIBRARY_PATH $LATTEDIR/code/latte/count $PARAMETERS";
+$COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; env LD_LIBRARY_PATH=/localapp/imosoft/sparc-sun-solaris2.7/alpha/gmp-4.1.4-gcc33/lib:\$LD_LIBRARY_PATH ./count $PARAMETERS";
 
-$EXAMPLESDIR = "$LATTEDIR/EXAMPLES";
+#$EXAMPLESDIR = "$LATTEDIR/EXAMPLES";
+$EXAMPLESDIR = "/home/mkoeppe/cvs/latte-src/EXAMPLES";
 chop($DATE = `/bin/date +%Y-%m-%d`);
 chop($HOSTNAME = `hostname`);
-$LOGDIR = "log-$DATE-count $PARAMETERS-pid$$\@$HOSTNAME";
+$LOGDIR = "/home/mkoeppe/w/latte/results/log-$DATE-count $PARAMETERS-pid$$\@$HOSTNAME";
 
 print "Logging to '$LOGDIR/log'\n";
 mkdir($LOGDIR);
 chdir($LOGDIR);
+# We hard-link the executable here and execute it from here, so long-running tests are not disturbed by recompiles.
+system("ln $LATTEDIR/code/latte/count .");
 
 open SUMMARY, ">summary" or die;
 print SUMMARY "Running with time limit ", $MAXRUNTIME, "\n";
@@ -217,7 +251,12 @@ foreach $file_num (@files_nums)
        print SUMMARY "Skipped.";
    }
    else {
-       $ret_val = system( "$COMMAND $EXAMPLESDIR/$file_name >> log 2>&1 ");
+       if ($file_name =~ m/.*[.]vrep$/) {
+	   $ret_val = system( "$COMMAND vrep $EXAMPLESDIR/$file_name >> log 2>&1 ");
+       }
+       else {
+	   $ret_val = system( "$COMMAND $EXAMPLESDIR/$file_name >> log 2>&1 ");
+       }
        if ($ret_val != 0) {
 	   print "ERROR STATUS $ret_val";
 	   print SUMMARY "ERROR STATUS $ret_val";

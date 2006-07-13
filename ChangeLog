@@ -1,3 +1,16 @@
+2006-07-13  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/genFunction/piped.cpp (get_integer_comb): Fix a bug
+	caused by integer overflow for `count vrep --exp --maxdet=1000
+	random-simplex/random-simplex-dim4-digits2-9.vrep'.  
+
+	* code/latte/count.cpp: Don't delete the input file in vrep mode.
+
+2006-07-12  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* m4/gmp-check.m4: Use "-lgmpxx -lgmp"; the Solaris linker needs
+	this order!
+
 2006-07-06  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Version 1.2-mk-0.5

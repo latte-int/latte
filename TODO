@@ -29,6 +29,9 @@ Code clean-up:
 * Replace the broken CDD-style parser
   with a call to cddlib functions.
 
+* dualize & dualizeback want to be one function, dispatching over
+  simplicial/non-simplicial case.
+
 
 Documentation:
 
