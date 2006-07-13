@@ -290,6 +290,10 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
     }
   else 
     {
+#if 0
+      cout << "Result: " << param.Total_Lattice_Points << " / "
+	   << param.Ten_Power << endl;
+#endif
       cout << "\n*****  Total number of lattice points: ";
       ofstream out("numOfLatticePoints");
       param.Total_Lattice_Points = abs( param.Total_Lattice_Points);

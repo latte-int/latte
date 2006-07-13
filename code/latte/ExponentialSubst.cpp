@@ -141,6 +141,7 @@ computeExponentialResidue(listCone *cones, int numOfVars)
       return convert_mpz_to_ZZ(result.get_num());
     }
     catch (NotGenericException) {};
+    cout << "New generic vector..." << endl;
   } while (1);
 }
 
@@ -174,6 +175,10 @@ decomposeAndComputeExponentialResidue(listCone *cones,
 {
   //printListCone(cones, param.Number_of_Variables);
   barvinokDecomposition_List(cones, param);
+#if 0
+  gmp_printf("Fun fact: Number of lattice points %Qd = %g\n",
+	     param.result.get_mpq_t(), param.result.get_d());
+#endif
   assert(param.result.get_den()==1);
   return convert_mpz_to_ZZ(param.result.get_num());
 }

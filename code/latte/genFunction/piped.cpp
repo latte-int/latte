@@ -52,7 +52,7 @@ static vec_ZZ
 get_integer_comb(const mat_ZZ & lat_basis, int *scalar)
 {
    int i,j;
-   long conv_l;
+   ZZ conv_l;
    int row = lat_basis.NumRows();
    int col = lat_basis.NumCols();
    vec_ZZ v = createVector(col);
@@ -60,8 +60,7 @@ get_integer_comb(const mat_ZZ & lat_basis, int *scalar)
    for (i = 0; i < row; i++) {
       v[i] = 0;
       for (j = 0; j < col; j++) {
-         conv_l = to_long(lat_basis[i][j]);
-         v[i] += conv_l*scalar[j]; 
+         v[i] += lat_basis[i][j] * scalar[j]; 
       }
    }
    return (v);
@@ -81,6 +80,7 @@ PointsInParallelepipedGenerator::compute_multiplier(ZZ &multiplier, const vec_ZZ
  * Translate point m using the following formula:
  * m' = v + sum {<m - v, u_i*>}u_i, where {} means the fractional part 
  */
+#if 1
 vec_ZZ
 PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
 {
@@ -105,7 +105,102 @@ PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
   }
   return result;
 }
-  
+#else
+
+static mat_ZZ
+get_U_star(const listCone *cone)
+{
+   /* Note that < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}. */
+   mat_ZZ U_star = convert_listVector_to_mat_ZZ(cone->facets);
+
+   return (U_star);
+}
+
+vec_ZZ
+PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
+{
+  mat_ZZ U_star = get_U_star(cone);
+   int cols = U.NumCols();
+   int len = m.length();
+   mat_ZZ U_trans = transpose(U);
+   rationalVector *v = cone->vertex;
+   /* initialized to zero */
+   ZZ dot_prod_enum, dot_prod_denom;
+   ZZ frac_enum, frac_denom, q, r, neg;
+   vec_ZZ scaled_u_i, m_trans;
+   vec_ZZ offset_enum, sum_enum, m_trans_enum;
+   vec_ZZ offset_denom, sum_denom, m_trans_denom;
+
+   /* allocate memory for intermediate calculation vectors */
+   offset_enum.SetLength(len);
+   offset_denom.SetLength(len);
+   sum_enum.SetLength(len);
+   sum_denom.SetLength(len);
+   m_trans.SetLength(len);
+
+   /* initialize sum */
+   sum_enum = v->enumerator;
+   sum_denom = v->denominator;
+
+   /* w = m - v */
+   for (int j = 0; j < len; j++) {
+      /* m - x/y = (my - x)/y */
+      offset_enum[j] = (m[j] * v->denominator[j]) - v->enumerator[j];
+      offset_denom[j] = v->denominator[j];
+   }
+
+   for (int i = 0; i < cols; i++) {
+      /* reset/initialize variables */
+      dot_prod_enum = to_ZZ(0);
+      dot_prod_denom = to_ZZ(1);
+
+      /* < m - v, u_i* > */
+      for (int j = 0; j < len; j++) {
+         /* neg = - U_star[j][i] */
+         NTL::negate(neg, U_star[j][i]);
+         /* x/y + r/s*z = x/y + rz/s = xs + rzy/ys */
+         dot_prod_enum = (dot_prod_enum * offset_denom[j]) +
+            (dot_prod_denom * offset_enum[j] * neg);
+         dot_prod_denom *= (offset_denom[j]);
+      }
+      dot_prod_denom *= cone->facet_divisors[i];
+   
+      /*
+       * {<m - v, u_i*>} : take the fractional part of this quantity
+       * q = floor(dot_prod_nume/dot_prod_denom)
+       * r = dot_prod_enum - dot_prod_denom*q
+       */
+      DivRem(q, r, dot_prod_enum, dot_prod_denom);
+      frac_enum = r;
+      frac_denom = dot_prod_denom;
+
+      /* {<m - v, u_i*>}u_i */
+      scaled_u_i = U_trans[i] * frac_enum;
+
+      /* sum {<m - v, u_i*>}u_i */
+      for (int j = 0; j < len; j++) {
+         /* w/z + x/y = (wy + xz)/zy */
+         sum_enum[j] = (sum_enum[j] * frac_denom) +
+            (sum_denom[j] * scaled_u_i[j]);
+         sum_denom[j] *= frac_denom;
+      }
+   }
+
+   for (int j = 0; j < len; j++) {
+      /*
+       * This MUST be an integer point!! This MUST divide evenly!
+       * m_trans = floor(sum_enum/sum_denom)
+       * r = sum_enum - sum_denom*q
+       */
+      DivRem(m_trans[j], r, sum_enum[j], sum_denom[j]);
+      assert(IsZero(r));
+   }
+
+   return (m_trans);
+}
+#endif
+
+
 /*
  * If S is the Smith Normal Form of A, then the multipliers n_i such that
  * v_i = n_i w_i are on the diagonal
@@ -143,7 +238,8 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
       max_multipliers[i] = 1;
     B_inv = cone->determinant * U;
   }
-  else {
+  else
+    {
     /* General case: */
     mat_ZZ snf_U, B, C;
 
@@ -151,6 +247,19 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
     /* get Smith Normal form of matrix, Smith(U) = BUC */
     snf_U = SmithNormalForm(U, B, C);
 
+#ifdef CHECK_SNF
+    {
+      mat_ZZ SU = B * U * C;
+      assert(SU == snf_U);
+      int i, j;
+      for (i = 0; i<numOfVars; i++) {
+	for (j = 0; j<numOfVars; j++)
+	  if (i != j) assert(IsZero(snf_U[i][j]));
+      }
+      assert(abs(determinant(B)) == 1);
+      assert(abs(determinant(C)) == 1);
+    }
+#endif
     /* extract n_i such that v_i = n_i*w_i from Smith Normal form */
     max_multipliers = get_multipliers_from_snf(snf_U);
 
@@ -159,10 +268,10 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
      * n_i such that w_i*n_i= v_i. Therefore, UC = V, and B^-1 = W. Since we
      * must take the integer combinations of W, we must calculate B^-1.
      */
-
+#if 0
     /* However, this is expensive. --mkoeppe */
-    /* B_inv = inv(B); */
-
+    B_inv = inv(B);
+#else
     /* We also have B^-1 = UC Smith(U)^{-1}; this is faster to
        compute because Smith(U) is diagonal. --mkoeppe */
     B_inv = U * C;
@@ -175,6 +284,7 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
 	B_inv[i][j] = q;
       }
     }
+#endif
   }
   /* We compute beta_i = floor(<v, facet_i>) modulo facet_divisor_i. */
   {
@@ -213,6 +323,44 @@ PointsInParallelepipedGenerator::GeneratePoint(int *multipliers)
   return translate_lattice_point(lat_pt);
 }
 
+static void
+check_point_in_parallelepiped(listCone *cone, const vec_ZZ &point)
+{
+  int numOfVars = point.length();
+  ZZ v_scale_factor;
+  vec_ZZ v_scaled = scaleRationalVectorToInteger(cone->vertex,
+						 numOfVars, v_scale_factor);
+  listVector *facet, *ray;
+  for (facet = cone->facets, ray = cone->rays;
+       facet;
+       facet = facet->rest, ray = ray->rest) {
+    vec_ZZ &f = facet->first;
+    vec_ZZ &r = ray->first;
+    ZZ psp;
+    InnerProduct(psp, f, point);
+    psp *= v_scale_factor;
+    ZZ vsp;
+    InnerProduct(vsp, f, v_scaled);
+    ZZ rsp;
+    InnerProduct(rsp, f, r);
+    rsp *= v_scale_factor;
+    assert(psp <= vsp);
+    assert(psp > vsp + rsp);
+  }
+}
+
+static bool
+are_points_unique(listVector *points)
+{
+  listVector *a, *b;
+  for (a = points; a; a = a->rest) {
+    for (b = a->rest; b; b = b->rest) {
+      if (a->first == b->first) return false;
+    }
+  }
+  return true;
+}
+
 listVector*
 pointsInParallelepiped(listCone *cone, int numOfVars)
 {
@@ -234,8 +382,43 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
   int *next;
   while((next = iter_comb.getNext())) {
     vec_ZZ trans_lat_pt = generator.GeneratePoint(next);
+    check_point_in_parallelepiped(cone, trans_lat_pt);
     lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
   }
+  assert(lengthListVector(lat_points) == abs(cone->determinant));
+  if (!are_points_unique(lat_points)) {
+    printListCone(cone, numOfVars);
+    cerr << "Smith: ";
+    for (i = 0; i<length; i++) {
+      cerr << max_multipliers[i] << "; ";
+    }
+    for (i = 0; i<length; i++) {
+      cerr << n[i] << " ";
+    }
+    cerr << endl;
+    printListVector(lat_points, numOfVars);
+    // Enumerate again
+    for (i = 0; i<length; i++)
+      n[i] = max_multipliers[i];
+    IntCombEnum iter_comb(n, length);
+    //cout << "Enumerating lattice points...\n";
+    iter_comb.decrementUpperBound();
+    int *next;
+    while((next = iter_comb.getNext())) {
+      vec_ZZ lat_pt = get_integer_comb(generator.B_inv, next);
+      for (i = 0; i<length; i++) {
+	cerr << lat_pt[i] << " ";
+      }
+      cerr << "--> ";
+      vec_ZZ trans_lat_pt = generator.translate_lattice_point(lat_pt);
+      check_point_in_parallelepiped(cone, trans_lat_pt);
+      for (i = 0; i<length; i++) {
+	cerr << trans_lat_pt[i] << " ";
+      }
+      cerr << endl;
+    }
+    abort();
+  };
   delete[] n;
   return (lat_points);
 }
