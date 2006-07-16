@@ -10,7 +10,7 @@ using namespace std;
 class PointsInParallelepipedGenerator {
 protected:
   const listCone *cone;
-  vector<int> max_multipliers;
+  vec_ZZ max_multipliers;
   mat_ZZ B_inv;
   mat_ZZ U;
   vec_ZZ beta;
@@ -18,7 +18,8 @@ protected:
   vec_ZZ facet_scale_factors;
 public:
   PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars);
-  const vector<int> &GetMaxMultipliers();
+  const vec_ZZ &GetMaxMultipliers();
+  int *GetMaxMultipliers_int();
   /* Let n be the vector obtained from GetMaxMultipliers().
      Then all points in the fundamental parallelepiped can be obtained
      by calling GeneratePoint for all integer multiplier vectors m

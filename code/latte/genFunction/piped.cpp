@@ -66,6 +66,12 @@ get_integer_comb(const mat_ZZ & lat_basis, int *scalar)
    return (v);
 }
 
+static vec_ZZ
+get_integer_comb(const mat_ZZ & lat_basis, const vec_ZZ &scalar)
+{
+  return lat_basis * scalar;
+}
+
 void
 PointsInParallelepipedGenerator::compute_multiplier(ZZ &multiplier, const vec_ZZ &m,
 						    const vec_ZZ &facet, int facet_index)
@@ -205,20 +211,16 @@ PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
  * If S is the Smith Normal Form of A, then the multipliers n_i such that
  * v_i = n_i w_i are on the diagonal
  */
-static vector<int>
+static vec_ZZ
 get_multipliers_from_snf(const mat_ZZ & snf)
 {
    int j;
    int row = snf.NumRows();
-   vector<int> n(row);
-
+   vec_ZZ n;
+   n.SetLength(row);
    for (j = 0; j < row; j++) {
-      //cout << "get_multipliers_from_snf:: snf[" << j << "," << j << "] = " << snf[j][j] << "\n"; 
-     if (snf[j][j] > INT_MAX) {
-       cerr << "Implementation restriction hit:  Smith normal form has entries larger than INT_MAX\n";
-       abort();
-     }
-      n[j] = to_int(snf[j][j]);
+     //cout << "get_multipliers_from_snf:: snf[" << j << "," << j << "] = " << snf[j][j] << "\n"; 
+     n[j] = snf[j][j];
    }
    return n;
 }
@@ -232,7 +234,7 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
     /* Unimodular case: Id = Smith(U) = B U C.
        Thus, for instance, B = det U * U^{-1}, C = Id.
      */
-    max_multipliers = vector<int>(numOfVars);
+    max_multipliers.SetLength(numOfVars);
     int i;
     for (i = 0; i<numOfVars; i++)
       max_multipliers[i] = 1;
@@ -310,14 +312,37 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
   }
 }
 
-const vector<int> &
+const vec_ZZ &
 PointsInParallelepipedGenerator::GetMaxMultipliers()
 {
   return max_multipliers;
 }
 
+int *
+PointsInParallelepipedGenerator::GetMaxMultipliers_int()
+{
+  int length = max_multipliers.length();
+  int *n = new int[length];
+  int i;
+  for (i = 0; i<length; i++) {
+     if (max_multipliers[i] > INT_MAX) {
+       cerr << "Implementation restriction hit:  Smith normal form has entries larger than INT_MAX\n";
+       abort();
+     }
+     n[i] = to_int(max_multipliers[i]);
+  }
+  return n;
+}
+
 vec_ZZ
 PointsInParallelepipedGenerator::GeneratePoint(int *multipliers)
+{
+  vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
+  return translate_lattice_point(lat_pt);
+}
+
+vec_ZZ
+PointsInParallelepipedGenerator::GeneratePoint(const vec_ZZ &multipliers)
 {
   vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
   return translate_lattice_point(lat_pt);
@@ -365,17 +390,12 @@ listVector*
 pointsInParallelepiped(listCone *cone, int numOfVars)
 {
   PointsInParallelepipedGenerator generator(cone, numOfVars);
-  vector<int> max_multipliers = generator.GetMaxMultipliers();
+  int *n = generator.GetMaxMultipliers_int();
   /*
    * enumerate lattice points by taking all integer combinations
    * 0 <= k <= (n_i - 1) of each vector.
    */
-  int length = max_multipliers.size();
-  int *n = new int[length];
-  int i;
-  for (i = 0; i<length; i++)
-    n[i] = max_multipliers[i];
-  IntCombEnum iter_comb(n, length);
+  IntCombEnum iter_comb(n, numOfVars);
   //cout << "Enumerating lattice points...\n";
   iter_comb.decrementUpperBound();
   listVector *lat_points = NULL;
@@ -384,7 +404,7 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
     vec_ZZ trans_lat_pt = generator.GeneratePoint(next);
 #ifdef CHECK_ENUM
     check_point_in_parallelepiped(cone, trans_lat_pt);
-#endif CHECK_ENUM
+#endif
     lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
   }
 #ifdef CHECK_ENUM
@@ -635,17 +655,12 @@ void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
   }
   else {
     PointsScalarProductsGenerator generator(cone, numOfVars, generic_vector);
-    vector<int> max_multipliers = generator.GetMaxMultipliers();
+    int *n = generator.GetMaxMultipliers_int();
     /*
      * enumerate lattice points by taking all integer combinations
      * 0 <= k <= (n_i - 1) of each vector.
      */
-    int length = max_multipliers.size();
-    int *n = new int[length];
-    int i;
-    for (i = 0; i<length; i++)
-      n[i] = max_multipliers[i];
-    IntCombEnum iter_comb(n, length);
+    IntCombEnum iter_comb(n, numOfVars);
     //cout << "Enumerating lattice points...\n";
     iter_comb.decrementUpperBound();
     listVector *lat_points = NULL;
