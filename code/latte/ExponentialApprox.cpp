@@ -175,36 +175,42 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     /* Sample */
 
     {
-#define SAMPLE_LIMIT 1000000
-      if (abs(cone->determinant) > SAMPLE_LIMIT) {
-	cerr << "Refusing to handle a cone with index more than "
-	     << SAMPLE_LIMIT << ". Sorry." << endl;
-	exit(1);
-      }
       PointsInParallelepipedGenerator generator(cone, Number_of_Variables);
-      vector<int> max_multipliers = generator.GetMaxMultipliers();
+      const vec_ZZ &max_multipliers = generator.GetMaxMultipliers();
       
       // For the beginning, see what kind of approximate we get when
       // we sample as many points as the parallelepiped has.
       // If this is already bad... 
-      int num_samples;
+      int actual_num_samples;
       if (abs(cone->determinant) == 1) {
 	/* don't bother with unimodular cones */
-	num_samples = 1;
+	actual_num_samples = 1;
       }
       else {
-	num_samples = (int) (sampling_factor * to_int(abs(cone->determinant)));
-	if (num_samples == 0) num_samples = 1;
+	if (num_samples >= 1) {
+	  actual_num_samples = num_samples;
+	}
+	else {
+	  actual_num_samples = (int) (sampling_factor * to_int(abs(cone->determinant)));
+	  if (actual_num_samples == 0) actual_num_samples = 1;
+#define SAMPLE_LIMIT 1000000
+	  if (actual_num_samples > SAMPLE_LIMIT) {
+	    cerr << "Refusing to sample more than "
+		 << SAMPLE_LIMIT << "points. Sorry." << endl;
+	    exit(1);
+	  }
+	}
       }
-      int length = max_multipliers.size();
-      int *multipliers = new int[length];
+      int length = max_multipliers.length();
+      vec_ZZ multipliers;
+      multipliers.SetLength(length);
       mpq_class sum = 0;
       // Sampling
       int i;
-      for (i = 0; i<num_samples; i++) {
+      for (i = 0; i<actual_num_samples; i++) {
 	unsigned int j;
-	for (j = 0; j<max_multipliers.size(); j++)
-	  multipliers[j] = uniform_random_number(0, max_multipliers[j] - 1);
+	for (j = 0; j<length; j++)
+	  multipliers[j] = uniform_random_number(ZZ::zero(), max_multipliers[j] - 1);
 	vec_ZZ lattice_point = generator.GeneratePoint(multipliers);
 	for (k = 0; k<=dimension; k++) {
 	  sum += convert_ZZ_to_mpz(scalar_power(generic_vector,
@@ -213,13 +219,13 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
 	}
       }
       mpq_class scale_factor(convert_ZZ_to_mpz(abs(cone->determinant)),
-			     num_samples);
+			     actual_num_samples);
       scale_factor.canonicalize();
       mpq_class contribution = cone->coefficient * scale_factor * sum;
       approximate_result += contribution;
-      stream << "Sampled " << num_samples << " points, contribution: "
+      stream << "Sampled " << actual_num_samples << " points, contribution: "
 	     << contribution.get_d() << endl << "  ";
-#if 1
+#ifdef DO_EXACT_COMPUTATION_TOO
       // Exact computation, for comparison
       {
 	sum = 0;
@@ -244,7 +250,6 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
 	stream << "Exact contribution: " << contribution.get_d() << endl << endl;
       }
 #endif
-      delete[] multipliers;
     }
     return 1;
   }
@@ -262,6 +267,8 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
   cout << "*** Upper bound: " << param.total_upper_bound << endl;
   cout << "*** Estimate obtained by sampling: "
        << param.approximate_result.get_d() << endl;
+#ifdef DO_EXACT_COMPUTATION_TOO
   cout << "*** Exact answer: "
        << param.result.get_d() << endl;
+#endif
 }
