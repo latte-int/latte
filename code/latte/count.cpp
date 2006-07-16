@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   bool approx;
   double sampling_factor = 1.0;
+  long int num_samples = -1;
   
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
   vec_ZZ cost;
@@ -164,6 +165,8 @@ int main(int argc, char *argv[]) {
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
       sampling_factor = atof(argv[i] + 18);
+    else if (strncmp(argv[i], "--num-samples=", 14) == 0)
+      num_samples = atol(argv[i] + 14);
     else if (strncmp(argv[i], "--random-seed=", 14) == 0) {
       unsigned int seed = atoi(argv[i] + 14);
       seed_random_generator(seed);
@@ -535,7 +538,8 @@ int main(int argc, char *argv[]) {
 	{
 	  Write_Exponential_Sample_Formula_Single_Cone_Parameters *write_param
 	    = new Write_Exponential_Sample_Formula_Single_Cone_Parameters
-	    (*params, "Exponential_Sample_Formula", sampling_factor);
+	    (*params, "Exponential_Sample_Formula", sampling_factor,
+	     num_samples);
 	  delete params;
 	  params = write_param;
 	  decomposeAndWriteExponentialSampleFormula(cones, *write_param);
