@@ -32,8 +32,14 @@ Code clean-up:
 
 Documentation:
 
+* Describe configuration & build.
+
 
 Configuration:
+
+* Figure out how to use fast compiler switches by default, so that
+   novice users do not complain about poor performance
+   (-O2 for gcc, -fast for Forte)
 
 * Make compile and run with compilers other than g++
 
