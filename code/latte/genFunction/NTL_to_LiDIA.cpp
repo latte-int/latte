@@ -62,15 +62,7 @@ convert_vec_ZZ_to_bigint_array(const vec_ZZ& ntl_v)
   bigint element;
   /* allocate memory for the bigint array */
   bigint *lidia_v = new bigint[ntl_v.length()];
-  for (int i = 0; i < ntl_v.length(); i++) {
-    /* copy from ZZ to bigint */
-    if (abs(ntl_v[i]) > LONG_MAX) {
-      cerr << "copy_vec_ZZ_to_bigint_array: Hit implementation restriction" << endl;
-      abort();
-    }
-    element.assign(to_long(ntl_v[i]));
-    lidia_v[i] = element;
-  }
+  copy_vec_ZZ_to_bigint_array(lidia_v, ntl_v);
   return lidia_v;
 }
 
@@ -78,16 +70,10 @@ convert_vec_ZZ_to_bigint_array(const vec_ZZ& ntl_v)
 void
 copy_vec_ZZ_to_bigint_array(bigint *lidia_v, const vec_ZZ& ntl_v)
 {
-  bigint vec_comp;
-
   for (int i = 0; i < ntl_v.length(); i++) {
     /* copy from vector to bigint */
-    if (abs(ntl_v[i]) > LONG_MAX) {
-      cerr << "copy_vec_ZZ_to_bigint_array: Hit implementation restriction" << endl;
-      abort();
-    }
-    vec_comp.assign(to_long(ntl_v[i]));
-    lidia_v[i] = vec_comp;
+    mpz_class mpz = convert_ZZ_to_mpz(ntl_v[i]);
+    lidia_v[i].assign(*mpz.get_mpz_t());
   }
 }
 
