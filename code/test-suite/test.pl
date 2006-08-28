@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
 
+## usage: ./test.pl "COUNT-PARAMS" ["PROBLEMS..."]
+
 use File::Basename;
 
 # count always prints the number of lattice points in the file
@@ -33,7 +35,7 @@ my @files_nums = (
    "hickerson/hickerson-15::20::60",
    "hickerson/hickerson-16::54::600",
    "hickerson/hickerson-17::18::86400",
-   "hickerson/hickerson-18::44::86400",
+   "hickerson/hickerson-18::44::5400",
    "hickerson/hickerson-19::20::86400",
    "hickerson/hickerson-20::74::86400",
    "hickerson/hickerson-24::96::86400",
@@ -189,28 +191,29 @@ my @files_nums = (
     "crosspolytope/cross-polytope-8.vrep",
     "crosspolytope/cross-polytope-9.vrep",
     "crosspolytope/cross-polytope-10.vrep",
-    "crosspolytope/cross-polytope-11.vrep",
-    "crosspolytope/cross-polytope-12.vrep",
-    "crosspolytope/cross-polytope-13.vrep",
-    "crosspolytope/cross-polytope-14.vrep",
-    "crosspolytope/cross-polytope-15.vrep",
-    "crosspolytope/cross-polytope-16.vrep",
-    "crosspolytope/cross-polytope-17.vrep",
-    "crosspolytope/cross-polytope-18.vrep",
-    "crosspolytope/cross-polytope-19.vrep",
-    "crosspolytope/cross-polytope-20.vrep",
-    "crosspolytope/cross-polytope-21.vrep",
-    "crosspolytope/cross-polytope-22.vrep",
-    "crosspolytope/cross-polytope-23.vrep",
-    "crosspolytope/cross-polytope-24.vrep",
-    "crosspolytope/cross-polytope-25.vrep",
-    "crosspolytope/cross-polytope-26.vrep",
-    "crosspolytope/cross-polytope-27.vrep",
-    "crosspolytope/cross-polytope-28.vrep",
-    "crosspolytope/cross-polytope-29.vrep",
-    "crosspolytope/cross-polytope-30.vrep"
+    "crosspolytope/cross-polytope-11.vrep::::200",
+    "crosspolytope/cross-polytope-12.vrep::::720",
+    "crosspolytope/cross-polytope-13.vrep::::1800",
+    "crosspolytope/cross-polytope-14.vrep::::8000",
+    "crosspolytope/cross-polytope-15.vrep::::86400",
+    "crosspolytope/cross-polytope-16.vrep::::86400",
+    "crosspolytope/cross-polytope-17.vrep::::86400",
+    "crosspolytope/cross-polytope-18.vrep::::86400",
+    "crosspolytope/cross-polytope-19.vrep::::86400",
+    "crosspolytope/cross-polytope-20.vrep::::86400",
+    "crosspolytope/cross-polytope-21.vrep::::86400",
+    "crosspolytope/cross-polytope-22.vrep::::86400",
+    "crosspolytope/cross-polytope-23.vrep::::86400",
+    "crosspolytope/cross-polytope-24.vrep::::86400",
+    "crosspolytope/cross-polytope-25.vrep::::86400",
+    "crosspolytope/cross-polytope-26.vrep::::86400",
+    "crosspolytope/cross-polytope-27.vrep::::86400",
+    "crosspolytope/cross-polytope-28.vrep::::86400",
+    "crosspolytope/cross-polytope-29.vrep::::86400",
+    "crosspolytope/cross-polytope-30.vrep::::86400"
 );
 
+#$MAXRUNTIME = 864000;
 #$MAXRUNTIME = 86400;
 #$MAXRUNTIME = 1800;
 $MAXRUNTIME = 720;
@@ -218,7 +221,7 @@ $MAXRUNTIME = 720;
 
 chop($LATTEDIR = `cd \`dirname $0\`; cd ../..; pwd`);
 $PARAMETERS = $ARGV[0];
-$COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; env LD_LIBRARY_PATH=/localapp/imosoft/sparc-sun-solaris2.7/alpha/gmp-4.1.4-gcc33/lib:\$LD_LIBRARY_PATH ./count $PARAMETERS";
+$COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; ./count $PARAMETERS";
 
 #$EXAMPLESDIR = "$LATTEDIR/EXAMPLES";
 $EXAMPLESDIR = "/home/mkoeppe/cvs/latte-src/EXAMPLES";
@@ -234,6 +237,10 @@ system("ln $LATTEDIR/code/latte/count .");
 
 open SUMMARY, ">summary" or die;
 print SUMMARY "Running with time limit ", $MAXRUNTIME, "\n";
+
+if ($ARGV[1]) {
+    @files_nums = split(' ', $ARGV[1]);
+}
 
 foreach $file_num (@files_nums)
 {
