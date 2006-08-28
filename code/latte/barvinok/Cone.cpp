@@ -11,11 +11,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <vector>
 
 #include "Cone.h"
 using namespace std;
 
-int Test_Points(int level, RR (*Min_Max)[2], int dim, mat_RR *A_inverse, vec_RR *point);
+int Test_Points(int level, vector<RR> &Mins, vector<RR> &Maxs, int dim, mat_RR *A_inverse, vec_RR *point);
 
 ZZ norm(const vec_ZZ& x, long m){
   ZZ normal;
@@ -73,7 +74,8 @@ vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
      
 	if(l != 0)
 	{
-  		ZZ Array[m];
+	  vec_ZZ Array;
+	  Array.SetLength(m);
   		/*for(int i = 0; i < m; i++)
     		Array[i] = 0; */
 
@@ -92,7 +94,8 @@ vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
   		//dummyV = L(index);
   		ZZ norm2;
  		// norm2 = norm(dummyV, m);
-  		ZZ number[m];
+  		vec_ZZ number;
+		number.SetLength(m);
 
   		/*  for(int i = 0; i < m; i++)
       		number[i] = 0; */
@@ -233,7 +236,8 @@ vec_ZZ ComputeOmega_2(mat_ZZ & B, long m)
     
 	transpose (R,R);
 
-	RR	Min_Max [m][2];
+	vector<RR> Mins(m);
+	vector<RR> Maxs(m);
 
 	RR	Min,Max;
 
@@ -260,8 +264,8 @@ vec_ZZ ComputeOmega_2(mat_ZZ & B, long m)
 		
 		trunc (Min,Min);
 		trunc (Max,Max);
-		Min_Max[i-1][0] = Min;
-		Min_Max[i-1][1] = Max;
+		Mins[i-1] = Min;
+		Maxs[i-1] = Max;
     	}
 	
 	
@@ -271,7 +275,7 @@ vec_ZZ ComputeOmega_2(mat_ZZ & B, long m)
 
 	int result = 1;
      
-   	if( Test_Points(0, Min_Max, m, &R_inverse, &point) == -1)   
+   	if( Test_Points(0, Mins, Maxs, m, &R_inverse, &point) == -1)   
     	{
 		cout << "NOoooooo!  :(" << endl;
 		result = -1;
@@ -313,7 +317,7 @@ else
 }
 
 
-int Test_Points(int level, RR (*Min_Max)[2], int dim, mat_RR *A_inverse, vec_RR *point)
+int Test_Points(int level, vector<RR> &Mins, vector<RR> &Maxs, int dim, mat_RR *A_inverse, vec_RR *point)
 {
 
 	
@@ -356,12 +360,12 @@ int Test_Points(int level, RR (*Min_Max)[2], int dim, mat_RR *A_inverse, vec_RR 
 		RR current;
 
 		//cout << "Test_Points:  Min = " << Min_Max[level][0] << "  Max = " << Min_Max[level][1] << endl;
-		current = Min_Max[level][0];
+		current = Mins[level];
 
-		while(current <= ( Min_Max[level][1] + 0.5))
+		while(current <= ( Maxs[level] + 0.5))
 		{
 			(*point)(level+1) = current;
-			if(Test_Points(level + 1, Min_Max, dim, A_inverse, point) == 1)
+			if(Test_Points(level + 1, Mins, Maxs, dim, A_inverse, point) == 1)
 				return 1;
 
 			current = current + 1;

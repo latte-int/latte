@@ -93,7 +93,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   noGsPerC=lengthListVector(cones->rays);
   noCones=numOfTerms;
 
-  Cone_Data	Cones_Array[noCones];  // Create structure to hold all the information of the cones.
+  vector<Cone_Data> Cones_Array(noCones);  // Create structure to hold all the information of the cones.
   
   for (int q = 0;q < noCones; q++)  // Do some initialization
   {
@@ -104,9 +104,9 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   int i,j; // index or loop vars
   long int k, m;//n=0,p; // extra vars to use as needed
   long int p, n;
-  int E[noCones];  // E is the vector of epsilons, each 1 or -1
+  vector<int> E(noCones);  // E is the vector of epsilons, each 1 or -1
   long int totalNoGs=noGsPerC*noCones; //total no. of generators,ie,rowdim of B
-  list<Integer> A[noCones];  // A is the numerator vectors
+  vector<list<Integer> > A(noCones);  // A is the numerator vectors
   // long int B[totalNoGs][dim];  // B is the denominator vectors
   //  cout<<"tNG: "<<totalNoGs<<endl;
 
@@ -215,9 +215,9 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   //VARS:
   //Integer k;
   Integer tmp_lambda;
-  Integer lambda[dim];
+  vector<Integer> lambda(dim);
   //lambda[0] = 327;
-  Integer dlambda[dim]; // dlambda tracks change in 2 successive test-lambdas
+  vector<Integer> dlambda(dim); // dlambda tracks change in 2 successive test-lambdas
   //for(i=0;i<dim;i++) lambda[i]=0;  // lambda starts at 0
   vector<Integer> dotProducts(totalNoGs); // ith entry tracks lambda dot row i of B
   //  dotProducts and dlambda used to try to improve calculational efficiency
@@ -491,10 +491,10 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 	// Create all the variables we are going to use in our big loop
 	
-	PolyTree_Node	*Numerator_Vector[noGsPerC + 1]; // [i] - coefficient of s^i
-	PolyTree_Node 	*Denominator_Result[noGsPerC + 1];   // Used to store the running total of generators
-	PolyTree_Node 	*Denominator_Current_Generator[noGsPerC + 1];  //For each generatore as we iterate through them
-	PolyTree_Node	*Quotient_Coefficient[noGsPerC + 1];  // holds the coefficients for calculting residue
+	vector<PolyTree_Node *> Numerator_Vector(noGsPerC + 1); // [i] - coefficient of s^i
+	vector<PolyTree_Node *> Denominator_Result(noGsPerC + 1);   // Used to store the running total of generators
+	vector<PolyTree_Node *> Denominator_Current_Generator(noGsPerC + 1);  //For each generatore as we iterate through them
+	vector<PolyTree_Node *>	Quotient_Coefficient(noGsPerC + 1);  // holds the coefficients for calculting residue
 							      // This structure does explicitly hold the value of the
 							      // b_0 denominator.  It is implied by its index b_0^i+1	
 	
@@ -524,7 +524,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	
 	Node_Controller	Controller (noGsPerC, DEGREE);
 
-	ZZ	Final_Taylor_Result[DEGREE + 1];
+	vector<ZZ>	Final_Taylor_Result(DEGREE + 1);
 	
 	for (int i = 0; i <= DEGREE; i++)
 	{

@@ -7,6 +7,7 @@
 
 *********************************************************************/
 #include <list>
+#include <vector>
 
 #include <fstream>
 #include <cstdlib>
@@ -101,7 +102,8 @@ vec_ZZ CheckOmega( const mat_ZZ & U, vec_ZZ & Z){
 /**********************************************************************/
  
 void MatrixGCD(mat_ZZ & B, long & m){
-  ZZ gcds[m];
+  vec_ZZ gcds;
+  gcds.SetLength(m);
   for(int i = 1; i <= m; i++)
     for(int j = 1; j <= m; j++)
       if(B(i, j) != 0)
@@ -192,7 +194,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 static bool
 computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
 			    const vec_ZZ &Z, int m, 
-			    mat_ZZ &mat, ZZ Dets[])
+			    mat_ZZ &mat, vec_ZZ &Dets)
 {
   ZZ absDet = abs(Det);
   for (int i = 1; i <= m; i++) {
@@ -219,7 +221,7 @@ computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
 */
 static void
 barvinokStep(const listCone *Cone, 
-	     listCone *Cones[], ZZ Dets[],
+	     vector <listCone *> &Cones, vec_ZZ &Dets,
 	     int m)
 {
   mat_ZZ generator = createConeDecMatrix(Cone, m, m);
@@ -333,8 +335,9 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   int result = 1;
   long m = Parameters->Number_of_Variables;
 
-  ZZ Dets[m];	     
-  listCone *cones1 [m];
+  vec_ZZ Dets;
+  Dets.SetLength(m);	     
+  vector<listCone *> cones1(m);
 
   barvinokStep(C, cones1, Dets, m);
   

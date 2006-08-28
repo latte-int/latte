@@ -4,6 +4,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <list>
+#include <vector>
 #include <cassert>
 #include "PolyTree.h"
 #include "myheader.h"
@@ -51,7 +52,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
   	noGsPerC=lengthListVector(cones->rays);
   	noCones=numOfTerms;
 
-  	Cone_Data	Cones_Array[noCones];  // Create structure to hold all the information of the cones.
+  	vector<Cone_Data> Cones_Array(noCones);  // Create structure to hold all the information of the cones.
   
   	for (int q = 0;q < noCones; q++)  // Do some initialization
   	{
@@ -246,10 +247,10 @@ int ResidueFunction_Single_Cone(listCone *cones,
 
 	// Create all the variables we are going to use in our big loop
 	
-	PolyTree_Node	*Numerator_Vector[noGsPerC + 1]; // [i] - coefficient of s^i
-	PolyTree_Node 	*Denominator_Result[noGsPerC + 1];   // Used to store the running total of generators
-	PolyTree_Node 	*Denominator_Current_Generator[noGsPerC + 1];  //For each generatore as we iterate through them
-	PolyTree_Node	*Quotient_Coefficient[noGsPerC + 1];  // holds the coefficients for calculting residue
+	vector<PolyTree_Node *> Numerator_Vector(noGsPerC + 1); // [i] - coefficient of s^i
+	vector<PolyTree_Node *> Denominator_Result(noGsPerC + 1);   // Used to store the running total of generators
+	vector<PolyTree_Node *> Denominator_Current_Generator(noGsPerC + 1);  //For each generatore as we iterate through them
+	vector<PolyTree_Node *> Quotient_Coefficient(noGsPerC + 1);  // holds the coefficients for calculting residue
 							      // This structure does explicitly hold the value of the
 							      // b_0 denominator.  It is implied by its index b_0^i+1	
 	

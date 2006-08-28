@@ -8,6 +8,7 @@
 **************************************************************/
 
 #include <list>
+#include <vector>
 #include <fstream>
 #include <cstdlib>
 #include <cstring>
@@ -55,7 +56,7 @@ int barvinokDecomposition_Single(const mat_ZZ &Mat, rationalVector *vertex,
      In this fun, a cone is decomposed into simplicial cones.
    */
   Faces = Face;
-  mat_ZZ B[Faces];
+  vector<mat_ZZ> B(Faces);
 
   for(int i = 0; i < Faces; i++)
     B[i].SetDims(n, n);
