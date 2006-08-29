@@ -164,8 +164,6 @@ my @files_nums = (
 ##     "yoshida/HD7::::1800",
 ##     "yoshida/HD8::::86400",
 ##     "yoshida/HD9::::1800",
-    "yoshida/cube_test1",
-    "yoshida/cube_test1.ine",
     "yoshida/cuww1_1.equ",
     "yoshida/cuww2_1.equ",
     "yoshida/cuww3_1.equ",
