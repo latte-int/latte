@@ -1,3 +1,41 @@
+2006-09-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp (main): Don't segfault when invoked without
+	arguments.
+
+	* code/latte/Irrational.cpp (computeConeStabilityCube_simplicial):
+	Fix computation of center (always round down!).  Fixes test cases
+	aardallenstra.equ, tru_cube_latte, tru_simplex_latte with "--irr
+	--exp --maxdet=500" (Assertion failed, not integer equivalent with
+	center).
+
+2006-08-28  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/genFunction/NTL_to_LiDIA.cpp
+	(convert_vec_ZZ_to_bigint_array): Remove implementation
+	restriction; arbitrarily large numbers can now be copied.
+
+	* code/latte/barvinok/barvinok.cpp,
+	code/latte/barvinok/ConeDecom.cpp, code/latte/barvinok/Cone.cpp,
+	code/latte/ResSingle.cpp, code/latte/RudyResNTL.cpp: Remove
+	g++-isms.
+
+2006-07-16  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/genFunction/piped.cpp,
+	code/latte/genFunction/piped.h: Remove arbitrary limitation of the
+	Smith normal form elements to machine integers.
+
+	* code/latte/latte_random.cpp,
+	code/latte/latte_random.h (uniform_random_number): Overload to
+	handle NTL integers.
+	(seed_random_generator): Also seed the NTL random generator.
+
+2006-07-15  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/banner.cpp (latte_banner):
+	Show web address of LattE macchiato.
+
 2006-07-13  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/genFunction/piped.cpp (get_integer_comb): Fix a bug
