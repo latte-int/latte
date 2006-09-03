@@ -52,6 +52,11 @@
 #include "convert.h"
 #include "latte_system.h"
 
+static void usage(const char *progname)
+{
+  cerr << "usage: " << progname << " [OPTIONS...] " << "INPUTFILE" << endl;
+}
+
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
   float z;
@@ -78,6 +83,11 @@ int main(int argc, char *argv[]) {
 
   latte_banner(cout);
 
+  if (argc < 2) {
+    usage(argv[0]);
+    exit(1);
+  }
+  
   z=0;
   //setbuf(stdout,0);
 
