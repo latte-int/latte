@@ -28,18 +28,14 @@ computeConeStabilityCube_simplicial(listCone *cone, int numOfVars,
   // Compute vertex multipliers, multiplied by the determinant
   mat_ZZ dual = createFacetMatrix2(cone, numOfVars, numOfVars);
 #ifdef DEBUG_IRRATIONAL
-  cout << "dual (-B^{-1}) = " << dual;
+  cout << "dual (-B^{-1}) = " << dual << endl;
 #endif
   vec_ZZ scaled_D_lambda = dual * vertex_numerator;
   // Round down to go to the bottom of the known stability region
   int i;
   for (i = 0; i<numOfVars; i++) {
     ZZ l = scaled_D_lambda[i];
-    if (l > 0)
-      l = l / vertex_denominator;
-    else
-      l = - ((-l) / vertex_denominator);
-    scaled_D_lambda[i] = l;
+    div(scaled_D_lambda[i], l, vertex_denominator);
   }
 
 #ifdef DEBUG_IRRATIONAL
