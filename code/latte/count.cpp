@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
   double sampling_factor = 1.0;
   long int num_samples = -1;
   
-  listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
+  listVector *matrix = NULL, *equations = NULL, *inequalities = NULL, *rays = NULL, *endRays, *tmpRays, *matrixTmp;
   vec_ZZ cost;
   listVector *templistVec;
   listCone *cones, *tmpcones;
@@ -432,8 +432,13 @@ int main(int argc, char *argv[]) {
 
   /* Reading from the vertex representation. */
 
-  if(Vrepresentation[0] == 'y')
-     cones=computeVertexConesFromVrep(fileName,matrix,numOfVars); 
+  if(Vrepresentation[0] == 'y') {
+    if (dilation_const != 1) {
+      cerr << "Dilation unimplemented for `vrep' input" << endl;
+      exit(1);
+    }
+    cones=computeVertexConesFromVrep(fileName, numOfVars);
+  }
 
   params->vertices_time.stop();
   cout << params->vertices_time;
