@@ -663,7 +663,6 @@ void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
     IntCombEnum iter_comb(n, numOfVars);
     //cout << "Enumerating lattice points...\n";
     iter_comb.decrementUpperBound();
-    listVector *lat_points = NULL;
     int *next;
     int num_scalar = 0;
     while((next = iter_comb.getNext())) {

@@ -226,10 +226,8 @@ void
 decomposeAndComputeResidue(listCone *cones, int degree, bool dualize, 
 			   Standard_Single_Cone_Parameters &param)
 {
-  int numOfConesDecomposed,numOfAllCones,numOfRays;
+  int numOfAllCones;
   mat_ZZ mat;
-  listCone *tmp;
-  int	Success = 0;
 
   if (dualize) {
     param.dualize_time.start();
