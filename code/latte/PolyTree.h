@@ -30,6 +30,7 @@ class PolyTree_Node
 {
 	public:
 		PolyTree_Node () { Taylor_Expansion_Result_Dirty = 1; };
+		virtual ~PolyTree_Node () {};
 		
 		PolyTree_Node **Children;
 		
