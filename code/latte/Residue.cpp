@@ -560,7 +560,6 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 		    ZZ *Total_Lattice_Points, ZZ *Ten_Power) 
 {
 
-  int numOfTerms;
 //  char outFileName[127];
   listCone *C, * cones1;
   int dim, noGsPerC,noCones; //noGsPerC is number of generators per cone
