@@ -121,7 +121,6 @@ int isVectorInListVector(vec_ZZ v, listVector* LIST, int numOfVars) {
  */
 int
 isVectorInListVector(const vec_ZZ & v, listVector *list) {
-   int len = lengthListVector(list);
    int numOfVars = v.length();
    listVector *tmp_list = list;
 
@@ -177,7 +176,6 @@ int
 isEqual(listVector *first, listVector *second) {
    int first_len = lengthListVector(first);
    int second_len = lengthListVector(second);
-   int numOfVars = first->first.length();
    listVector *tmp_list = first;
     
    if (first_len != second_len) {

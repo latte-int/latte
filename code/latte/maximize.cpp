@@ -355,7 +355,7 @@ int main(int argc, char *argv[]) {
   /* Reading from the vertex representation. */
 
   if(Vrepresentation[0] == 'y')
-     cones=computeVertexConesFromVrep(fileName,matrix,numOfVars); 
+     cones=computeVertexConesFromVrep(fileName,numOfVars); 
 
 /* Compute triangulation or decomposition of each vertex cone. */
 
