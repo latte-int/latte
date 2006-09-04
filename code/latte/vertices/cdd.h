@@ -17,8 +17,7 @@ rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
 listCone* CopyListCones(listCone* RudyCones, int numOfVars, 
 			rationalVector* Opt_vertex);
 listCone* CopyListCones(listCone* RudyCones, int numOfVars); 
-listCone* computeVertexConesFromVrep(char* fileName, listVector* matrix, 
-				     int numOfVars);
+listCone* computeVertexConesFromVrep(char* fileName, int numOfVars);
 listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix, 
 				   int numOfVars);
 void CreatExtEadFile();
