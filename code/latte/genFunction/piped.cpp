@@ -87,8 +87,14 @@ PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier_from_mult
 (ZZ &scaled_fundamental_multiplier, const vec_ZZ &multipliers,
  const vec_ZZ &facet, int facet_index)
 {
-  vec_ZZ m = get_integer_comb(B_inv, multipliers);
-  compute_scaled_fundamental_multiplier(scaled_fundamental_multiplier, m, facet, facet_index);
+  int dim = facet.length();
+  scaled_fundamental_multiplier = beta_mod_facet_divisors[facet_index];
+  int j;
+  for (j = 0; j<dim; j++) {
+    scaled_fundamental_multiplier -= multipliers[j] * Tau[facet_index][j];
+  }
+  scaled_fundamental_multiplier %= cone->facet_divisors[facet_index];
+  scaled_fundamental_multiplier -= beta[facet_index];
 }
 
 void
@@ -96,8 +102,14 @@ PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier_from_mult
 (ZZ &scaled_fundamental_multiplier, const int *multipliers,
  const vec_ZZ &facet, int facet_index)
 {
-  vec_ZZ m = get_integer_comb(B_inv, multipliers);
-  compute_scaled_fundamental_multiplier(scaled_fundamental_multiplier, m, facet, facet_index);
+  int dim = facet.length();
+  scaled_fundamental_multiplier = beta_mod_facet_divisors[facet_index];
+  int j;
+  for (j = 0; j<dim; j++) {
+    scaled_fundamental_multiplier -= multipliers[j] * Tau[facet_index][j];
+  }
+  scaled_fundamental_multiplier %= cone->facet_divisors[facet_index];
+  scaled_fundamental_multiplier -= beta[facet_index];
 }
 
 /*
@@ -181,27 +193,49 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
     }
 #endif
   }
-  /* We compute beta_i = floor(<v, facet_i>) modulo facet_divisor_i. */
+  /* We compute beta_i = floor(<v, facet_i>) and beta_i modulo facet_divisor_i. */
   {
     ZZ v_scale_factor;
     vec_ZZ v_scaled = scaleRationalVectorToInteger(cone->vertex,
 						   numOfVars, v_scale_factor);
     beta.SetLength(numOfVars);
+    beta_mod_facet_divisors.SetLength(numOfVars);
     int i;
     listVector *facet;
     ZZ sp;
     for (i = 0, facet = cone->facets; i<numOfVars; i++, facet=facet->rest) {
       InnerProduct(sp, v_scaled, facet->first);
       div(beta[i], sp, v_scale_factor);
-      assert(beta[i] * v_scale_factor <= sp);
+      /* assert(beta[i] * v_scale_factor <= sp); */
+      beta_mod_facet_divisors[i] = beta[i] % cone->facet_divisors[i];
     }
   }
+  /* Precompute facet_scale_factors. */
   facet_scale_factors.SetLength(numOfVars);
   facet_divisor_common_multiple = abs(cone->determinant);
   {
     int i;
     for (i = 0; i<numOfVars; i++)
       facet_scale_factors[i] = facet_divisor_common_multiple / cone->facet_divisors[i];
+  }
+  /* Precompute Tau_{i,j} = < j-th column of B_inv, facet_i > modulo facet_divisor_i. */
+  Tau.SetDims(numOfVars, numOfVars);
+  {
+    int i;
+    listVector *facet;
+    for (i = 0, facet = cone->facets; i<numOfVars; i++, facet=facet->rest) {
+      int j;
+      for (j = 0; j<numOfVars; j++) {
+	ZZ tau;
+	/* Scalar multiplication modulo facet_divisors[i]. */
+	int k;
+	for (k = 0; k<numOfVars; k++) {
+	  tau += B_inv[k][j] * facet->first[k];
+	}
+	tau %= cone->facet_divisors[i];
+	Tau[i][j] = tau;
+      }
+    }
   }
 }
 
