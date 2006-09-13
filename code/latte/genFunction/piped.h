@@ -16,6 +16,8 @@ protected:
   vec_ZZ beta;
   ZZ facet_divisor_common_multiple;
   vec_ZZ facet_scale_factors;
+  mat_ZZ Tau;
+  vec_ZZ beta_mod_facet_divisors;
 public:
   PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars);
   const vec_ZZ &GetMaxMultipliers();
