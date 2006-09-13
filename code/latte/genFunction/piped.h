@@ -43,8 +43,6 @@ protected:
 };
 
 listVector* pointsInParallelepiped(listCone *cone, int numOfVars);
-listVector* pointsInParallelepipedOfUnimodularCone(rationalVector*, 
-						   listVector*, int);
 
 /* Compute the latticePoints slot of CONE. */
 void computePointsInParallelepiped(listCone *cone, int numOfVars);

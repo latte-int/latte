@@ -364,129 +364,14 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
 }
 
 /* ----------------------------------------------------------------- */
-listVector* pointsInParallelepipedOfUnimodularCone(rationalVector *vertex, 
-						  listVector *rays, 
-						  int numOfVars) {
-  int i,j,k,numOfRays;
-  ZZ a,b;
-  vec_ZZ lambda,w,z;
-  vec_ZZ *matrix, *originalMatrix;
-  listVector *points, *tmp;
-  rationalVector *coeffs;
-
-/*  printf("Computing point in parallelepiped of unimodular cone.\n"); */
-
-/*  printRationalVector(vertex,numOfVars); */
-
-  //points=createListVector(createVector(numOfVars));
-
-  numOfRays=lengthListVector(rays);
-  if (numOfRays!=numOfVars) {
-    printf("Cone is NOT simplicial!\n");
-    exit(1);
-  }
-
-/*  printf("numOfRays = %d, numOfVars = %d\n", numOfRays, numOfVars); */
-
-  matrix=createArrayVector(numOfVars);
-  originalMatrix=createArrayVector(numOfVars);
-
-  for (i=0; i<numOfVars; i++) matrix[i]=createVector(numOfRays);
-
-  k=0;
-  tmp=rays;
-  while (tmp) {
-    for (i=0; i<numOfVars; i++) matrix[i][k]=(tmp->first)[i];
-    k++;
-    tmp=tmp->rest;
-  }
-
- for (i=0; i<numOfRays; i++) 
-    originalMatrix[i]=copyVector(matrix[i],numOfRays);
-
-  for (i=0; i<numOfVars; i++) {
-    for (j=0; j<numOfRays; j++) {
-      matrix[i][j]=matrix[i][j]*(vertex->denominator[i]);
-    }
-  }
-  w=copyVector(vertex->enumerator,numOfVars);
-
-  /* Now we have to solve: matrix * x = w */
-
-  coeffs=solveLinearSystem(matrix,w,numOfVars,numOfRays);
-
-  lambda=createVector(numOfRays);
-
-/* Note that we make heavy use of numOfVars=numOfRays! That is, we
-   assume the cone to be simplicial! */
-
-  for (i=0; i<numOfVars; i++) {
-    a=coeffs->denominator[i];
-    b=coeffs->enumerator[i];
-
-    if (((b/a)*a)==b) {
-      lambda[i]=b/a;
-    } else {
-      if (((b<0) && (a>0)) || ((b>0) && (a<0))) {
-//          lambda[i]=-abs(b)/abs(a); 
-         lambda[i]=abs(b)/abs(a); 
-         lambda[i]=-lambda[i]; 
-     } else 
-	lambda[i]=b/a;
-      if (b>0) lambda[i]=lambda[i]+1;
-    }
-  }
-
-//  cout << "lambda = ";
-//  printVector(lambda,numOfVars);
-
-  z=createVector(numOfVars);
-  for (i=0; i<numOfVars; i++) z[i]=0;
-
-  for (i=0; i<numOfRays; i++) {
-    for (j=0; j<numOfVars; j++) {
-      z[j]=z[j]+lambda[i]*originalMatrix[j][i];
-    }
-  }
-
-//  cout << "point = ";
-//  printVector(z,numOfVars);
-
-  //points->rest=createListVector(z);
-  
-  coeffs->denominator.kill ();
-  coeffs->enumerator.kill ();
-
-  delete coeffs;
-  
-  points=createListVector(z);
-  delete [] matrix;
-  delete [] originalMatrix;
-  w.kill();
-  z.kill();
-  lambda.kill();
-
-  return(points);
-}
-/* ----------------------------------------------------------------- */
 
 void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
-#if 1
 #if 0
   if (abs(cone->determinant) != 1)
     cout << "Processing cone with determinant " << cone->determinant << endl;
 #endif
   cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
-#else  
-  if (abs(cone->determinant) != 1) {
-     cout << "Processing cone with determinant " << cone->determinant << endl;
-      cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
-   } else {
-      cone->latticePoints = pointsInParallelepipedOfUnimodularCone(
-         cone->vertex, cone->rays, numOfVars);
-   }
-#endif
 }
 
 void computePointsInParallelepipeds(listCone *cones, int numOfVars)
