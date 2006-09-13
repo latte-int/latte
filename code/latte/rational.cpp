@@ -192,34 +192,39 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
 }
 /* ----------------------------------------------------------------- */
 
-rationalVector::rationalVector(const rationalVector &v)
-{
-  enumerator = v.enumerator;
-  denominator = v.denominator;
-  computed_integer_scale = v.computed_integer_scale;
-}
-
 rationalVector* copyRationalVector(const rationalVector *v)
 {
   return new rationalVector(*v);
 }
 
 /* ----------------------------------------------------------------- */
-vec_ZZ scaleRationalVectorToInteger(const rationalVector *vec,
-				    int numOfVars,
-				    ZZ &scale_factor)
+
+void rationalVector::compute_integer_scale()
+{
+    integer_scale_factor = 1;
+    int i;
+    int numOfVars = numerators().length();
+    integer_scale.SetLength(numOfVars);
+    for (i = 0; i<numOfVars; i++)
+      integer_scale_factor = lcm(integer_scale_factor, denominators()[i]);
+    for (i = 0; i<numOfVars; i++)
+      integer_scale[i] = numerators()[i] * (integer_scale_factor / denominators()[i]);
+    computed_integer_scale = true;
+}
+
+const vec_ZZ &scaleRationalVectorToInteger(rationalVector *vec,
+					   int numOfVars,
+					   ZZ &scale_factor)
 {
   assert(numOfVars == vec->denominators().length()
 	 && numOfVars == vec->numerators().length());
-  scale_factor = 1;
-  int i;
-  vec_ZZ result = createVector(numOfVars);
-  for (i = 0; i<numOfVars; i++)
-    scale_factor = lcm(scale_factor, vec->denominators()[i]);
-  for (i = 0; i<numOfVars; i++)
-    result[i] = vec->numerators()[i] * (scale_factor / vec->denominators()[i]);
-  return result;
+  if (!vec->computed_integer_scale) {
+    vec->compute_integer_scale();
+  }
+  scale_factor = vec->integer_scale_factor;
+  return vec->integer_scale;
 }
+
 /* ----------------------------------------------------------------- */
 void canonicalizeRationalVector(rationalVector *vec,
 				int numOfVars)

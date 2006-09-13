@@ -62,39 +62,39 @@ private:
   vec_ZZ enumerator;
   vec_ZZ denominator;
   bool computed_integer_scale;
-  
+  vec_ZZ integer_scale;
+  ZZ integer_scale_factor;
+  void compute_integer_scale();
 public:
   rationalVector(int dimension = 0);
-  rationalVector(const rationalVector &);
   const vec_ZZ &numerators() const { return enumerator; }
   const vec_ZZ &denominators() const { return denominator; }
   void set_entry(int i, const ZZ &numer, const ZZ &denom) {
     enumerator[i] = numer;
     denominator[i] = denom;
-    computed_integer_scale = false;
+    compute_integer_scale();
   }
   void set_numerator(int i, const ZZ &numer) {
     enumerator[i] = numer;
-    computed_integer_scale = false;
+    compute_integer_scale();
   }
   void set_denominator(int i, const ZZ &denom) {
     denominator[i] = denom;
-    computed_integer_scale = false;
+    compute_integer_scale();
   }
   friend rationalVector* normalizeRationalVector(rationalVector*, int);
+  /* Compute an integer vector RESULT and a SCALE_FACTOR such that
+     VEC = RESULT/SCALE_FACTOR.  Return RESULT.
+  */
+  friend const vec_ZZ &scaleRationalVectorToInteger(rationalVector *vec,
+						    int numOfVars,
+						    ZZ &scale_factor);
 };
 
 rationalVector* createRationalVector(int);
 rationalVector** createArrayRationalVector(int);
 vec_ZZ constructRay(rationalVector*, rationalVector*, int);
 rationalVector* copyRationalVector(const rationalVector *);
-
-/* Compute an integer vector RESULT and a SCALE_FACTOR such that
-   VEC = RESULT/SCALE_FACTOR.  Return RESULT.
-*/
-vec_ZZ scaleRationalVectorToInteger(const rationalVector *vec,
-				    int numOfVars,
-				    ZZ &scale_factor);
 
 /* Bring each coordinate in VEC to canonicalized form, i.e.,
    gcd(numerator, denominator) = 1. */
