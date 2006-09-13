@@ -47,16 +47,16 @@ void printRationalVector(rationalVector *v, int numOfVars) {
 
   cout << "[";
   for (i=0; i<(numOfVars-1); i++) {
-    if ((v->denominator)[i]==1)
-      cout << (v->enumerator)[i] << " ";
+    if ((v->denominators())[i]==1)
+      cout << (v->numerators())[i] << " ";
     else
-      cout << (v->enumerator)[i] << "/" << (v->denominator)[i] << " ";
+      cout << (v->numerators())[i] << "/" << (v->denominators())[i] << " ";
   }
 
-  if ((v->denominator)[i]==1)
-    cout << (v->enumerator)[i] << "]" << endl;
+  if ((v->denominators())[i]==1)
+    cout << (v->numerators())[i] << "]" << endl;
   else
-    cout << (v->enumerator)[i] << "/" << (v->denominator)[i] << "]" << endl;
+    cout << (v->numerators())[i] << "/" << (v->denominators())[i] << "]" << endl;
   return ;
 }
 /* ----------------------------------------------------------------- */
@@ -139,16 +139,16 @@ void printRationalVectorToFile(ostream & out, rationalVector *v,
   }
   out << "[";
   for (i=0; i<(numOfVars-1); i++) {
-    if ((v->denominator)[i]==1)
-      out << (v->enumerator)[i] << " ";
+    if ((v->denominators())[i]==1)
+      out << (v->numerators())[i] << " ";
     else
-      out << (v->enumerator)[i] << "/" << (v->denominator)[i] << " ";
+      out << (v->numerators())[i] << "/" << (v->denominators())[i] << " ";
   }
   
-  if ((v->denominator)[i]==1)
-    out << (v->enumerator)[i] << "]\n";
+  if ((v->denominators())[i]==1)
+    out << (v->numerators())[i] << "]\n";
   else
-    out << (v->enumerator)[i] << "/" << (v->denominator)[i] << "]\n";
+    out << (v->numerators())[i] << "/" << (v->denominators())[i] << "]\n";
   return ;
 }
 /* ----------------------------------------------------------------- */
@@ -161,10 +161,10 @@ void printRationalVectorToFileWithoutBrackets(ostream & out,
     return ;
   }
   for (i=0; i<(numOfVars); i++) {
-    if ((v->denominator)[i]==1)
-      out << (v->enumerator)[i] << " "; 
+    if ((v->denominators())[i]==1)
+      out << (v->numerators())[i] << " "; 
     else
-      out << (v->enumerator)[i] << "/" << (v->denominator)[i] << " ";
+      out << (v->numerators())[i] << "/" << (v->denominators())[i] << " ";
   }
 
   out << endl;

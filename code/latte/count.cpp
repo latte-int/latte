@@ -410,8 +410,8 @@ int main(int argc, char *argv[]) {
      LP_vertex = LP(matrix, cost, numOfVars);
      vec_RR Rat_cost;  Rat_cost.SetLength(numOfVars);
      for (i = 0; i < numOfVars; i++){
-       conv(tmp_num[i], LP_vertex->enumerator[i]);
-       conv(tmp_den[i], LP_vertex->denominator[i]);
+       conv(tmp_num[i], LP_vertex->numerators()[i]);
+       conv(tmp_den[i], LP_vertex->denominators()[i]);
        Rat_solution[i] = tmp_num[i]/tmp_den[i];
        conv(Rat_cost[i], cost[i]);
      }

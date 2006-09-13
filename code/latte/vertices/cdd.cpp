@@ -21,17 +21,6 @@
 
 using namespace std;
 /* ----------------------------------------------------------------- */
-int CmpRationalVector(rationalVector *v, rationalVector *w, int numOfVars) {
-  int i, flag = 0;
-
-  for (i=0; i<(numOfVars); i++) {
-    if ((v->enumerator)[i] != (w->enumerator)[i]) flag = 1;
-    if ((v->denominator)[i] != (w->denominator)[i]) flag = 1;
-  }
-
-  return flag;
-}
-/* ----------------------------------------------------------------- */
 
 
 listVector* CopyListVector(listVector* A, int numOfVars) {
@@ -64,15 +53,14 @@ listCone* CopyListCones(listCone* RudyCones, int numOfVars,
   tmp = RudyCones;
   while (tmp) {
 
-    if((tmp->vertex->enumerator==Opt_vertex->enumerator) && (tmp->vertex->denominator==Opt_vertex->denominator)){ 
+    if((tmp->vertex->numerators()==Opt_vertex->numerators())
+       && (tmp->vertex->denominators()==Opt_vertex->denominators())){ 
       newCone=createListCone();
       s = tmp->coefficient;
       newCone->coefficient=s;
       newCone->rays = CopyListVector(tmp->rays, numOfVars);
       newCone->facets = CopyListVector(tmp->facets, numOfVars);
-      newCone->vertex=createRationalVector(numOfVars);
-      newCone->vertex->denominator = tmp->vertex->denominator;
-      newCone->vertex->enumerator = tmp->vertex->enumerator;
+      newCone->vertex=copyRationalVector(tmp->vertex);
       endCones->rest=newCone;
       endCones=endCones->rest;
     }
@@ -92,8 +80,8 @@ listCone* CopyListCones(listCone* RudyCones, int numOfVars) {
   tmp = RudyCones;
   while (tmp) {
 
-//    if((tmp->vertex->enumerator==Opt_vertex->enumerator) && 
-//(tmp->vertex->denominator==Opt_vertex->denominator)){ 
+//    if((tmp->vertex->numerators()==Opt_vertex->numerators()) && 
+//(tmp->vertex->denominators()==Opt_vertex->denominators())){ 
       newCone=createListCone();
       latticepoint = createListVector(tmp->latticePoints->first);
       newCone->latticePoints = latticepoint;
@@ -101,9 +89,7 @@ listCone* CopyListCones(listCone* RudyCones, int numOfVars) {
       newCone->coefficient=s;
       newCone->rays = CopyListVector(tmp->rays, numOfVars);
       newCone->facets = CopyListVector(tmp->facets, numOfVars);
-      newCone->vertex=createRationalVector(numOfVars);
-      newCone->vertex->denominator = tmp->vertex->denominator;
-      newCone->vertex->enumerator = tmp->vertex->enumerator;
+      newCone->vertex=copyRationalVector(tmp->vertex);
       endCones->rest=newCone;
       endCones=endCones->rest;
     
@@ -315,8 +301,7 @@ rationalVector* ReadLpsFile(int numOfVars, bool verbose = true)
       x=0;
       y=0;
       ReadCDD(in,x,y);
-      OptVector->enumerator[i]=x;
-      OptVector->denominator[i]=y;
+      OptVector->set_entry(i, x, y);
       
     }
   if (verbose) {
@@ -451,8 +436,7 @@ listCone* readCddExtFile() {
       y=0;
       ReadCDD(in,x,y);
       if (j>0) {
-	v->enumerator[j-1]=x;
-        v->denominator[j-1]=y;
+	v->set_entry(j-1, x, y);
       } else {
 	if (x==0) {
 	  cout << "\n\nGiven polyhedron is unbounded!!!\n\n";
@@ -757,7 +741,7 @@ rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
     cout << "done."; cout.flush();
   }
   Opt_vector = ReadLpsFile(numOfVars, verbose);
-  //  cout << Opt_vector->enumerator << " " << Opt_vector -> denominator << endl;
+  //  cout << Opt_vector->numerators() << " " << Opt_vector -> denominator << endl;
   system_with_error_check("rm -f LP.*"); 
 
   return(Opt_vector);

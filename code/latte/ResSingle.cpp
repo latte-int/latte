@@ -40,7 +40,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
   	C=cones;
   	while (C) 
 	{
-	  assert(IsZero(C->vertex->enumerator));
+	  assert(IsZero(C->vertex->numerators()));
 	  assert(abs(C->determinant) == 1);
     		numOfTerms++;
     		C=C->rest;

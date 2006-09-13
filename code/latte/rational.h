@@ -57,21 +57,39 @@ public:
 };
 int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator);
 
-typedef struct rationalVector {
+class rationalVector {
+private:
   vec_ZZ enumerator;
   vec_ZZ denominator;
-} rationalVector;
+  bool computed_integer_scale;
+  
+public:
+  rationalVector(int dimension = 0);
+  const vec_ZZ &numerators() { return enumerator; }
+  const vec_ZZ &denominators() { return denominator; }
+  void set_entry(int i, const ZZ &numer, const ZZ &denom) {
+    enumerator[i] = numer;
+    denominator[i] = denom;
+    computed_integer_scale = false;
+  }
+  void set_numerator(int i, const ZZ &numer) {
+    enumerator[i] = numer;
+    computed_integer_scale = false;
+  }
+  void set_denominator(int i, const ZZ &denom) {
+    denominator[i] = denom;
+    computed_integer_scale = false;
+  }
+  friend rationalVector* normalizeRationalVector(rationalVector*, int);
+};
 
 rationalVector* createRationalVector(int);
 rationalVector** createArrayRationalVector(int);
-rationalVector* normalizeRationalVector(rationalVector*, int);
 rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector*, 
 						    rationalVector*, int);
 rationalVector* subRationalVector(rationalVector*, rationalVector*, int);
 rationalVector* addRationalVector(rationalVector*, rationalVector*, int);
 vec_ZZ constructRay(rationalVector*, rationalVector*, int);
-vec_ZZ* subtractRowFromRow(vec_ZZ*, int, int, int, vec_ZZ*, int);
-rationalVector* solveLinearSystem(vec_ZZ*, vec_ZZ, int, int);
 rationalVector* copyRationalVector(const rationalVector *);
 
 /* Compute an integer vector RESULT and a SCALE_FACTOR such that

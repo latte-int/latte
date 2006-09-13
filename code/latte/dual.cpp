@@ -193,12 +193,11 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 	  y=0;
 	  ReadCDD(in,x,y);
 	  if (j>0) {
-	    w->enumerator[j-1]=x;
-	    w->denominator[j-1]=y;
+	    w->set_entry(j-1, x, y);
 	  }
 	}
 	w=normalizeRationalVector(w,numOfVars);
-	endFacets->rest=createListVector(w->enumerator);
+	endFacets->rest=createListVector(w->numerators());
 	endFacets=endFacets->rest;
       }
       in.close();

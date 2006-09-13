@@ -70,8 +70,7 @@ computeConeStabilityCube_simplicial(listCone *cone, int numOfVars,
   // (We do not check the length.)
   rationalVector *v = createRationalVector(numOfVars);
   for (i = 0; i<numOfVars; i++) {
-    v->enumerator[i] = center_numerator[i];
-    v->denominator[i] = center_denominator;
+    v->set_entry(i, center_numerator[i], center_denominator);
   }
   assertConesIntegerEquivalent(cone, v, numOfVars,
 			       "Not integer equivalent with center");
@@ -122,12 +121,12 @@ computeConeStabilityCube_general(listCone *cone, int numOfVars,
   rationalVector *optimal_solution
     = LP(matrix, cost, numOfVars + 1, false); //maximizes
   freeListVector(matrix);
-  length_numerator = optimal_solution->enumerator[numOfVars];
-  length_denominator = optimal_solution->denominator[numOfVars];
+  length_numerator = optimal_solution->numerators()[numOfVars];
+  length_denominator = optimal_solution->denominators()[numOfVars];
   rationalVector *center = createRationalVector(numOfVars);
   for (i = 0; i<numOfVars; i++) {
-    center->enumerator[i] = optimal_solution->enumerator[i];
-    center->denominator[i] = optimal_solution->denominator[i];
+    center->set_entry(i, optimal_solution->numerators()[i],
+		      optimal_solution->denominators()[i]);
   }
   delete optimal_solution;
   return center;
@@ -258,10 +257,10 @@ irrationalizeCone(listCone *cone, int numOfVars)
   // Store the new vertex
   rationalVector *new_vertex = createRationalVector(numOfVars);
   for (i = 0; i<numOfVars; i++) {
-    new_vertex->enumerator[i]
-      = center_numerator[i] * (common_denominator / center_denominator)
-      + irrationalizer_numerator[i] * (common_denominator / irrationalizer_denominator);
-    new_vertex->denominator[i] = common_denominator;
+    new_vertex->set_entry(i, 
+			  center_numerator[i] * (common_denominator / center_denominator)
+			  + irrationalizer_numerator[i] * (common_denominator / irrationalizer_denominator),
+			  common_denominator);
   }
 #ifdef DEBUG_IRRATIONAL
   cout << "--irrationalize--> ";

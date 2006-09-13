@@ -21,32 +21,29 @@
 #include <string>
 #include "rational.h"
 /* ----------------------------------------------------------------- */
-rationalVector* createRationalVector(int numOfVars) {
+rationalVector::rationalVector(int dimension)
+{
+  enumerator.SetLength(dimension);
+  denominator.SetLength(dimension);
   int i;
-  vec_ZZ x,y;
-  rationalVector* z;
-
-  x = createVector(numOfVars);
-  y = createVector(numOfVars);
-  z = new rationalVector;
-
-  for (i=0; i<numOfVars; i++) {
-    x[i]=0;
-    y[i]=1;
+  for (i=0; i<dimension; i++) {
+    enumerator[i]=0;
+    denominator[i]=1;
   }
-
-  z->enumerator=x;
-  z->denominator=y;
-
-  return (z);
+  computed_integer_scale = false;
 }
+
+rationalVector* createRationalVector(int numOfVars)
+{
+  return new rationalVector(numOfVars);
+}
+
 /* ----------------------------------------------------------------- */
 rationalVector** createArrayRationalVector(int numOfVectors) {
   rationalVector** w;
 
   w = new rationalVector*[numOfVectors+1];
 
-//    w = (rationalVector**)calloc(sizeof(rationalVector*),(numOfVectors+1));
   if (w==0) abort();
   return (w);
 }
@@ -56,13 +53,13 @@ rationalVector* normalizeRationalVector(rationalVector *z, int numOfVars) {
   ZZ d,g;
 
   for(i=0; i<numOfVars; i++) {
-    d=z->denominator[i];
+    d=z->denominators()[i];
     if (d>1) {
       for(j=0; j<numOfVars; j++) {
-	g=GCD(d,z->denominator[j]);
-	z->denominator[j]=z->denominator[j]/g;
+	g=GCD(d,z->denominators()[j]);
+	z->set_denominator(j, z->denominators()[j]/g);
 	g=d/g;
-	z->enumerator[j]=z->enumerator[j]*g;
+	z->set_numerator(j, z->numerators()[j]*g);
       } 
     }
   }
@@ -93,10 +90,10 @@ rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector *x,
   z=createRationalVector(numOfVars);
 
   for (i=0; i<numOfVars;i++) {
-    a=x->enumerator[i];
-    b=x->denominator[i];
-    c=y->enumerator[i];
-    d=y->denominator[i];
+    a=x->numerators()[i];
+    b=x->denominators()[i];
+    c=y->numerators()[i];
+    d=y->denominators()[i];
 /* Compute m/n = a/b + c/d. */
     g=lcm(b,d);
     s=g/b;
@@ -115,8 +112,7 @@ rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector *x,
       m=m/g;
       n=n/g;
     }
-    z->enumerator[i]=m;
-    z->denominator[i]=n;
+    z->set_entry(i, m, n);
   }
 
   return (z);
@@ -134,25 +130,23 @@ rationalVector* subRationalVector(rationalVector *x, rationalVector *y,
 
   if (x==0) {
     for (i=0; i<numOfVars; i++) {
-      z->enumerator[i]=-y->enumerator[i];
-      z->denominator[i]=y->denominator[i];
+      z->set_entry(i, -y->numerators()[i], y->denominators()[i]);
     }
     return (z);
   }
 
   if (y==0) {
     for (i=0; i<numOfVars; i++) {
-      z->enumerator[i]=x->enumerator[i];
-      z->denominator[i]=x->denominator[i];
+      z->set_entry(i, x->numerators()[i], x->denominators()[i]);
     }
     return (z);
   }
 
   for (i=0; i<numOfVars;i++) {
-    a=x->enumerator[i];
-    b=x->denominator[i];
-    c=y->enumerator[i];
-    d=y->denominator[i];
+    a=x->numerators()[i];
+    b=x->denominators()[i];
+    c=y->numerators()[i];
+    d=y->denominators()[i];
 /* Compute m/n = a/b - c/d. */
     g=abs(lcm(b,d));
     s=g/b;
@@ -166,8 +160,7 @@ rationalVector* subRationalVector(rationalVector *x, rationalVector *y,
       m=m/g;
       n=n/g;
     }
-    z->enumerator[i]=m;
-    z->denominator[i]=n;
+    z->set_entry(i, m, n);
   }
 
   return (z);
@@ -185,25 +178,23 @@ rationalVector* addRationalVector(rationalVector *x, rationalVector *y,
 
   if (x==0) {
     for (i=0; i<numOfVars; i++) {
-      z->enumerator[i]=-y->enumerator[i];
-      z->denominator[i]=y->denominator[i];
+      z->set_entry(i, y->numerators()[i], y->denominators()[i]);
     }
     return (z);
   }
 
   if (y==0) {
     for (i=0; i<numOfVars; i++) {
-      z->enumerator[i]=x->enumerator[i];
-      z->denominator[i]=x->denominator[i];
+      z->set_entry(i, x->numerators()[i], x->denominators()[i]);
     }
     return (z);
   }
 
   for (i=0; i<numOfVars;i++) {
-    a=x->enumerator[i];
-    b=x->denominator[i];
-    c=y->enumerator[i];
-    d=y->denominator[i];
+    a=x->numerators()[i];
+    b=x->denominators()[i];
+    c=y->numerators()[i];
+    d=y->denominators()[i];
 /* Compute m/n = a/b + c/d. */
     g=abs(lcm(b,d));
     s=g/b;
@@ -217,8 +208,7 @@ rationalVector* addRationalVector(rationalVector *x, rationalVector *y,
       m=m/g;
       n=n/g;
     }
-    z->enumerator[i]=m;
-    z->denominator[i]=n;
+    z->set_entry(i, m, n);
   }
 
   return (z);
@@ -235,140 +225,41 @@ vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars) {
   /* Constructing z=w-v. */
 
   for(i=0; i<numOfVars; i++) {
-    g=lcm(v->denominator[i],w->denominator[i]);
-    factorV=g/(v->denominator[i]);
-    factorW=g/(w->denominator[i]);
-    z->enumerator[i]=(w->enumerator[i])*factorW-(v->enumerator[i])*factorV;
-    z->denominator[i]=g;
+    g=lcm(v->denominators()[i],w->denominators()[i]);
+    factorV=g/(v->denominators()[i]);
+    factorW=g/(w->denominators()[i]);
+    z->set_entry(i, (w->numerators()[i])*factorW-(v->numerators()[i])*factorV, g);
 
-    d=GCD(z->enumerator[i],z->denominator[i]);
+    d=GCD(z->numerators()[i],z->denominators()[i]);
     if (d!=1) {
-      z->enumerator[i]=(z->enumerator[i])/d;
-      z->denominator[i]=(z->denominator[i])/d;
+      z->set_entry(i, (z->numerators()[i])/d, (z->denominators()[i])/d);
     }
-    if (z->denominator[i]<0) {
-      z->enumerator[i]=-(z->enumerator[i]);
-      z->denominator[i]=-(z->denominator[i]);
+    if (z->denominators()[i]<0) {
+      z->set_entry(i, -(z->numerators()[i]), -(z->denominators()[i]));
     }
   }
 
   /* Removing common factors from enumerators of z. */
 
-  g=z->enumerator[0];
-  for(i=1; i<numOfVars; i++) g=GCD(g,z->enumerator[i]);
+  g=z->numerators()[0];
+  for(i=1; i<numOfVars; i++) g=GCD(g,z->numerators()[i]);
   g=abs(g);
 
   if (g!=1) {
     for (i=0; i<numOfVars; i++) 
-      z->enumerator[i]=(z->enumerator[i])/g;
+      z->set_numerator(i, (z->numerators()[i])/g);
   }
 
   /* Normalizing rational vector z to integer vector. */
 
   z=normalizeRationalVector(z,numOfVars);
-  z->denominator.kill();
-  return (z->enumerator);
+
+  vec_ZZ result = z->numerators();
+  delete z;
+  return result;
 }
-/* ----------------------------------------------------------------- */
-vec_ZZ* subtractRowFromRow(vec_ZZ* M, int x, int y, int k, vec_ZZ* w, 
-			   int numOfVars) {
-  int i;
-  ZZ g,factorX,factorY;
 
-/* Subtract row x from row y using column k. */
 
-  g=lcm(M[x][k],M[y][k]);
-  factorX=g/(M[x][k]);
-  factorY=g/(M[y][k]);
-
-  for (i=0; i<numOfVars; i++) {
-    M[y][i]=factorY*M[y][i]-factorX*M[x][i];
-  }
-  (*w)[y]=factorY*((*w)[y])-factorX*((*w)[x]);
-
-  g=(*w)[y];
-  for (i=0; i<numOfVars; i++) {
-    g=GCD(g,M[y][i]);
-  }
-  g=abs(g);
-
-  if (g>1) {
-    for (i=0; i<numOfVars; i++)
-      M[y][i]=M[y][i]/g;
-    (*w)[y]=(*w)[y]/g;
-  }
-
-  return (M);
-}
-/* ----------------------------------------------------------------- */
-rationalVector* solveLinearSystem(vec_ZZ* A, vec_ZZ rhs, int numOfEquations, 
-				  int numOfVars) {
-  int i,j,m;
-  ZZ k;
-  vec_ZZ w,z;
-  vec_ZZ *matrix;
-  rationalVector *lambda;
-
-/* This function assumes that the system of linear equations has
-   a unique solution! */
-
-/*    printf("Matrix: (%d x %d)\n",numOfEquations,numOfVars); */
-/*    for (i=0; i<numOfEquations; i++) printVector(A[i],numOfVars); */
-
-/*    printf("rhs: "); */
-/*    printVector(rhs,numOfEquations); */
-
-  matrix=createArrayVector(numOfEquations);
-  for (i=0; i<numOfEquations; i++) {
-    matrix[i]=copyVector(A[i],numOfVars);
-  }
-  w=copyVector(rhs,numOfEquations);
-
-  for (i=0; i<numOfVars; i++) {
-    m=i;
-    while ((m<numOfEquations) && (matrix[m][i]==0)) m++;
-    if (m!=i) {
-      /* Swap rows. */
-      z=matrix[i];
-      matrix[i]=matrix[m];
-      matrix[m]=z;
-      k=w[i];
-      w[i]=w[m];
-      w[m]=k;
-    }
-
-    for (j=0; j<numOfEquations; j++) {
-      if ((j!=i) && ((matrix[j][i])!=0)) {
-        matrix=subtractRowFromRow(matrix,i,j,i,&w,numOfVars);
-      }
-    }
-  }
-
-  for (i=0; i<numOfEquations; i++) {
-    if (matrix[i][i]<0) {
-      for (j=0; j<numOfEquations; j++) {
-	matrix[i][j]=-matrix[i][j];
-      }
-      w[i]=-w[i];
-    }
-  }
-
-  lambda=createRationalVector(numOfVars);
-  for (i=0; i<numOfEquations; i++) {
-    if ((matrix[i][i])>=0) {
-      lambda->enumerator[i]=w[i];
-      lambda->denominator[i]=matrix[i][i];
-    } else {
-      lambda->enumerator[i]=-w[i];
-      lambda->denominator[i]=-matrix[i][i];
-    }
-    if (w[i]==0) lambda->denominator[i]=1;
-  }
-  w.kill();
-  z.kill();
-  delete [] matrix;
-  return (lambda);
-}
 /* ----------------------------------------------------------------- */
 int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
 /*

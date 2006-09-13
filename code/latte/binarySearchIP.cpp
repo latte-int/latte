@@ -92,8 +92,7 @@ rationalVector* ReadLpsFile2(int numOfVars)
       x=0;
       y=0;
       ReadCDD(in,x,y);
-      OptVector->enumerator[i]=x;
-      OptVector->denominator[i]=y;
+      OptVector->set_entry(i, x, y);
 
     }
   cout <<"done." << endl;
@@ -109,7 +108,7 @@ rationalVector* LP2(listVector* matrix, listVector* ineq, vec_ZZ& cost, int numO
   system_with_error_check(CDD_PATH " LP.ine > LP.out");
   cout << "done.\n\n";
   Opt_vector = ReadLpsFile2(numOfVars);
-  //  cout << Opt_vector->enumerator << " " << Opt_vector -> denominator << endl;
+  //  cout << Opt_vector->numerators() << " " << Opt_vector -> denominator << endl;
   system_with_error_check("rm -f LP.*");
 
   return(Opt_vector);
@@ -248,8 +247,8 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
       Low_opt =  LP2(matrix, ineq, low_cost, numOfVars);
       High_opt =  LP2(matrix, ineq, cost, numOfVars);
 
-      //cout << Low_opt ->enumerator << " " << High_opt->enumerator << endl;
-      //cout << Low_opt ->denominator << " " << High_opt->denominator<< endl;
+      //cout << Low_opt ->numerators() << " " << High_opt->numerators() << endl;
+      //cout << Low_opt ->denominators() << " " << High_opt->denominators()<< endl;
       cout << "A optimal solution for LP relax.: ";
       printRationalVector(High_opt, numOfVars);
       Low_solution.SetLength(numOfVars);
@@ -260,15 +259,15 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
       Rat_cost2.SetLength(numOfVars);
 
       for (i = 0; i < numOfVars; i++){
-      	 conv(tmp_num[i], High_opt->enumerator[i]);
-	 conv(tmp_den[i], High_opt->denominator[i]);
+      	 conv(tmp_num[i], High_opt->numerators()[i]);
+	 conv(tmp_den[i], High_opt->denominators()[i]);
        	 High_solution[i] = tmp_num[i]/tmp_den[i];
 	 conv(Rat_cost[i], cost[i]);
      		}
 
       for (i = 0; i < numOfVars; i++){
-      	 conv(tmp_num[i], Low_opt->enumerator[i]);
-          conv(tmp_den[i], Low_opt->denominator[i]);
+      	 conv(tmp_num[i], Low_opt->numerators()[i]);
+          conv(tmp_den[i], Low_opt->denominators()[i]);
        	 Low_solution[i] = tmp_num[i]/tmp_den[i];
      		}
 
