@@ -49,7 +49,7 @@ using namespace std;
  * it is easiest to simply do this directly.
  */
 static vec_ZZ
-get_integer_comb(const mat_ZZ & lat_basis, int *scalar)
+get_integer_comb(const mat_ZZ & lat_basis, const int *scalar)
 {
    int i,j;
    ZZ conv_l;
@@ -73,139 +73,32 @@ get_integer_comb(const mat_ZZ & lat_basis, const vec_ZZ &scalar)
 }
 
 void
-PointsInParallelepipedGenerator::compute_multiplier(ZZ &multiplier, const vec_ZZ &m,
-						    const vec_ZZ &facet, int facet_index)
+PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier(ZZ &scaled_fundamental_multiplier, const vec_ZZ &m,
+								       const vec_ZZ &facet, int facet_index)
 {
-  InnerProduct(multiplier, m, facet);
-  multiplier = beta[facet_index] - multiplier;
-  multiplier %= cone->facet_divisors[facet_index];
-  multiplier -= beta[facet_index];
+  InnerProduct(scaled_fundamental_multiplier, m, facet);
+  scaled_fundamental_multiplier = beta[facet_index] - scaled_fundamental_multiplier;
+  scaled_fundamental_multiplier %= cone->facet_divisors[facet_index];
+  scaled_fundamental_multiplier -= beta[facet_index];
 }
 
-/*
- * Translate point m using the following formula:
- * m' = v + sum {<m - v, u_i*>}u_i, where {} means the fractional part 
- */
-#if 1
-vec_ZZ
-PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
+void
+PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier_from_multipliers
+(ZZ &scaled_fundamental_multiplier, const vec_ZZ &multipliers,
+ const vec_ZZ &facet, int facet_index)
 {
-  vec_ZZ result;
-  int dim = beta.length();
-  result.SetLength(dim);
-  int i;
-  listVector *facet;
-  listVector *ray;
-  ZZ multiplier;
-  for (i = 0, facet = cone->facets, ray = cone->rays;
-       i<dim;
-       i++, facet=facet->rest, ray=ray->rest) {
-    compute_multiplier(multiplier, m, facet->first, i);
-    result += (multiplier * facet_scale_factors[i]) * ray->first;
-  }
-  for (i = 0; i<dim; i++) {
-    ZZ q, r;
-    DivRem(q, r, result[i], facet_divisor_common_multiple);
-    assert(IsZero(r));
-    result[i] = q;
-  }
-  return result;
-}
-#else
-
-static mat_ZZ
-get_U_star(const listCone *cone)
-{
-   /* Note that < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}. */
-   mat_ZZ U_star = convert_listVector_to_mat_ZZ(cone->facets);
-
-   return (U_star);
+  vec_ZZ m = get_integer_comb(B_inv, multipliers);
+  compute_scaled_fundamental_multiplier(scaled_fundamental_multiplier, m, facet, facet_index);
 }
 
-vec_ZZ
-PointsInParallelepipedGenerator::translate_lattice_point(const vec_ZZ& m)
+void
+PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier_from_multipliers
+(ZZ &scaled_fundamental_multiplier, const int *multipliers,
+ const vec_ZZ &facet, int facet_index)
 {
-  mat_ZZ U_star = get_U_star(cone);
-   int cols = U.NumCols();
-   int len = m.length();
-   mat_ZZ U_trans = transpose(U);
-   rationalVector *v = cone->vertex;
-   /* initialized to zero */
-   ZZ dot_prod_enum, dot_prod_denom;
-   ZZ frac_enum, frac_denom, q, r, neg;
-   vec_ZZ scaled_u_i, m_trans;
-   vec_ZZ offset_enum, sum_enum, m_trans_enum;
-   vec_ZZ offset_denom, sum_denom, m_trans_denom;
-
-   /* allocate memory for intermediate calculation vectors */
-   offset_enum.SetLength(len);
-   offset_denom.SetLength(len);
-   sum_enum.SetLength(len);
-   sum_denom.SetLength(len);
-   m_trans.SetLength(len);
-
-   /* initialize sum */
-   sum_enum = v->enumerator;
-   sum_denom = v->denominator;
-
-   /* w = m - v */
-   for (int j = 0; j < len; j++) {
-      /* m - x/y = (my - x)/y */
-      offset_enum[j] = (m[j] * v->denominator[j]) - v->enumerator[j];
-      offset_denom[j] = v->denominator[j];
-   }
-
-   for (int i = 0; i < cols; i++) {
-      /* reset/initialize variables */
-      dot_prod_enum = to_ZZ(0);
-      dot_prod_denom = to_ZZ(1);
-
-      /* < m - v, u_i* > */
-      for (int j = 0; j < len; j++) {
-         /* neg = - U_star[j][i] */
-         NTL::negate(neg, U_star[j][i]);
-         /* x/y + r/s*z = x/y + rz/s = xs + rzy/ys */
-         dot_prod_enum = (dot_prod_enum * offset_denom[j]) +
-            (dot_prod_denom * offset_enum[j] * neg);
-         dot_prod_denom *= (offset_denom[j]);
-      }
-      dot_prod_denom *= cone->facet_divisors[i];
-   
-      /*
-       * {<m - v, u_i*>} : take the fractional part of this quantity
-       * q = floor(dot_prod_nume/dot_prod_denom)
-       * r = dot_prod_enum - dot_prod_denom*q
-       */
-      DivRem(q, r, dot_prod_enum, dot_prod_denom);
-      frac_enum = r;
-      frac_denom = dot_prod_denom;
-
-      /* {<m - v, u_i*>}u_i */
-      scaled_u_i = U_trans[i] * frac_enum;
-
-      /* sum {<m - v, u_i*>}u_i */
-      for (int j = 0; j < len; j++) {
-         /* w/z + x/y = (wy + xz)/zy */
-         sum_enum[j] = (sum_enum[j] * frac_denom) +
-            (sum_denom[j] * scaled_u_i[j]);
-         sum_denom[j] *= frac_denom;
-      }
-   }
-
-   for (int j = 0; j < len; j++) {
-      /*
-       * This MUST be an integer point!! This MUST divide evenly!
-       * m_trans = floor(sum_enum/sum_denom)
-       * r = sum_enum - sum_denom*q
-       */
-      DivRem(m_trans[j], r, sum_enum[j], sum_denom[j]);
-      assert(IsZero(r));
-   }
-
-   return (m_trans);
+  vec_ZZ m = get_integer_comb(B_inv, multipliers);
+  compute_scaled_fundamental_multiplier(scaled_fundamental_multiplier, m, facet, facet_index);
 }
-#endif
-
 
 /*
  * If S is the Smith Normal Form of A, then the multipliers n_i such that
@@ -335,17 +228,45 @@ PointsInParallelepipedGenerator::GetMaxMultipliers_int()
 }
 
 vec_ZZ
-PointsInParallelepipedGenerator::GeneratePoint(int *multipliers)
+PointsInParallelepipedGenerator::GeneratePoint(const int *multipliers)
 {
-  vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
-  return translate_lattice_point(lat_pt);
+  int dimension = max_multipliers.length();
+  int i;
+  listVector *facet, *ray;
+  vec_ZZ result;
+  result.SetLength(dimension);
+  for (i = 0, facet = cone->facets, ray = cone->rays;
+       i<dimension;
+       i++, facet=facet->rest, ray=ray->rest) {
+    ZZ scaled_fundamental_multiplier;
+    compute_scaled_fundamental_multiplier_from_multipliers
+      (scaled_fundamental_multiplier, multipliers, facet->first, i);
+    result += scaled_fundamental_multiplier * ray->first;
+  }
+  for (i = 0; i<dimension; i++)
+    result[i] /= facet_divisor_common_multiple;
+  return result;
 }
 
 vec_ZZ
 PointsInParallelepipedGenerator::GeneratePoint(const vec_ZZ &multipliers)
 {
-  vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
-  return translate_lattice_point(lat_pt);
+  int dimension = max_multipliers.length();
+  int i;
+  listVector *facet, *ray;
+  vec_ZZ result;
+  result.SetLength(dimension);
+  for (i = 0, facet = cone->facets, ray = cone->rays;
+       i<dimension;
+       i++, facet=facet->rest, ray=ray->rest) {
+    ZZ scaled_fundamental_multiplier;
+    compute_scaled_fundamental_multiplier_from_multipliers
+      (scaled_fundamental_multiplier, multipliers, facet->first, i);
+    result += scaled_fundamental_multiplier * ray->first;
+  }
+  for (i = 0; i<dimension; i++)
+    result[i] /= facet_divisor_common_multiple;
+  return result;
 }
 
 static void
@@ -402,47 +323,8 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
   int *next;
   while((next = iter_comb.getNext())) {
     vec_ZZ trans_lat_pt = generator.GeneratePoint(next);
-#ifdef CHECK_ENUM
-    check_point_in_parallelepiped(cone, trans_lat_pt);
-#endif
     lat_points = appendVectorToListVector(trans_lat_pt, lat_points);
   }
-#ifdef CHECK_ENUM
-  assert(lengthListVector(lat_points) == abs(cone->determinant));
-  if (!are_points_unique(lat_points)) {
-    printListCone(cone, numOfVars);
-    cerr << "Smith: ";
-    for (i = 0; i<length; i++) {
-      cerr << max_multipliers[i] << "; ";
-    }
-    for (i = 0; i<length; i++) {
-      cerr << n[i] << " ";
-    }
-    cerr << endl;
-    printListVector(lat_points, numOfVars);
-    // Enumerate again
-    for (i = 0; i<length; i++)
-      n[i] = max_multipliers[i];
-    IntCombEnum iter_comb(n, length);
-    //cout << "Enumerating lattice points...\n";
-    iter_comb.decrementUpperBound();
-    int *next;
-    while((next = iter_comb.getNext())) {
-      vec_ZZ lat_pt = get_integer_comb(generator.B_inv, next);
-      for (i = 0; i<length; i++) {
-	cerr << lat_pt[i] << " ";
-      }
-      cerr << "--> ";
-      vec_ZZ trans_lat_pt = generator.translate_lattice_point(lat_pt);
-      check_point_in_parallelepiped(cone, trans_lat_pt);
-      for (i = 0; i<length; i++) {
-	cerr << trans_lat_pt[i] << " ";
-      }
-      cerr << endl;
-    }
-    abort();
-  };
-#endif
   delete[] n;
   return (lat_points);
 }
@@ -606,12 +488,6 @@ PointsScalarProductsGenerator::PointsScalarProductsGenerator
 ZZ PointsScalarProductsGenerator::GeneratePointScalarProduct(int *multipliers)
 {
   vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
-#if 0
-  vec_ZZ trans_pt = translate_lattice_point(lat_pt);
-  ZZ result;
-  InnerProduct(result, generic_vector, trans_pt);
-  return result;
-#else
   /* Equivalent, but faster code. */
   ZZ result;
   result = 0;
@@ -623,14 +499,13 @@ ZZ PointsScalarProductsGenerator::GeneratePointScalarProduct(int *multipliers)
   for (i = 0, facet = cone->facets, ray = cone->rays;
        i<dim;
        i++, facet=facet->rest, ray=ray->rest) {
-    compute_multiplier(multiplier, lat_pt, facet->first, i);
+    compute_scaled_fundamental_multiplier(multiplier, lat_pt, facet->first, i);
     result += multiplier * scaled_ray_scalar_products[i];
   }
   ZZ q, r;
   DivRem(q, r, result, facet_divisor_common_multiple);
   assert(IsZero(r));
   return q;
-#endif  
 }
 
 void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
