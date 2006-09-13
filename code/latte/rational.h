@@ -65,8 +65,9 @@ private:
   
 public:
   rationalVector(int dimension = 0);
-  const vec_ZZ &numerators() { return enumerator; }
-  const vec_ZZ &denominators() { return denominator; }
+  rationalVector(const rationalVector &);
+  const vec_ZZ &numerators() const { return enumerator; }
+  const vec_ZZ &denominators() const { return denominator; }
   void set_entry(int i, const ZZ &numer, const ZZ &denom) {
     enumerator[i] = numer;
     denominator[i] = denom;
@@ -85,10 +86,6 @@ public:
 
 rationalVector* createRationalVector(int);
 rationalVector** createArrayRationalVector(int);
-rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector*, 
-						    rationalVector*, int);
-rationalVector* subRationalVector(rationalVector*, rationalVector*, int);
-rationalVector* addRationalVector(rationalVector*, rationalVector*, int);
 vec_ZZ constructRay(rationalVector*, rationalVector*, int);
 rationalVector* copyRationalVector(const rationalVector *);
 

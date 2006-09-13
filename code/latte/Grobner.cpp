@@ -663,7 +663,7 @@ void SolveGrobner(char * filename, char * nonneg, char * dualApproach,
 
   while(tmp) 
     { 
-      tmp->latticePoints=pointsInParallelepipedOfUnimodularCone(tmp->vertex,tmp->rays,numOfVars);    
+      tmp->latticePoints=pointsInParallelepiped(tmp,numOfVars);    
       tmp=tmp->rest;  
     }
   

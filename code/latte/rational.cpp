@@ -74,147 +74,7 @@ lcm(const ZZ& a, const ZZ& b)
 }
 
 /* ----------------------------------------------------------------- */
-rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector *x, 
-						    rationalVector *y, 
-						    int numOfVars) {
-  int i;
-  ZZ a,b,c,d,g,m,n,s,t;
-  rationalVector *z;
 
-/* Returns x+y if x+y<1 in every component. Otherwise 0 is returned. */
-
-/*  printf("x and y are:\n");
-  printRationalVector(x,numOfVars);
-  printRationalVector(y,numOfVars); */
-
-  z=createRationalVector(numOfVars);
-
-  for (i=0; i<numOfVars;i++) {
-    a=x->numerators()[i];
-    b=x->denominators()[i];
-    c=y->numerators()[i];
-    d=y->denominators()[i];
-/* Compute m/n = a/b + c/d. */
-    g=lcm(b,d);
-    s=g/b;
-    t=g/d;
-
-    m=s*a+t*c;
-    n=g;
-
-    if (m>=n) {
-      free(z);
-      return (0);
-    } 
-
-    g=GCD(m,n);
-    if (g!=1) {
-      m=m/g;
-      n=n/g;
-    }
-    z->set_entry(i, m, n);
-  }
-
-  return (z);
-}
-/* ----------------------------------------------------------------- */
-rationalVector* subRationalVector(rationalVector *x, rationalVector *y, 
-				  int numOfVars) {
-  int i;
-  ZZ a,b,c,d,g,m,n,s,t;
-  rationalVector *z;
-
-/* Returns x-y. */
-
-  z=createRationalVector(numOfVars);
-
-  if (x==0) {
-    for (i=0; i<numOfVars; i++) {
-      z->set_entry(i, -y->numerators()[i], y->denominators()[i]);
-    }
-    return (z);
-  }
-
-  if (y==0) {
-    for (i=0; i<numOfVars; i++) {
-      z->set_entry(i, x->numerators()[i], x->denominators()[i]);
-    }
-    return (z);
-  }
-
-  for (i=0; i<numOfVars;i++) {
-    a=x->numerators()[i];
-    b=x->denominators()[i];
-    c=y->numerators()[i];
-    d=y->denominators()[i];
-/* Compute m/n = a/b - c/d. */
-    g=abs(lcm(b,d));
-    s=g/b;
-    t=g/d;
-
-    m=s*a-t*c;
-    n=g;
-
-    g=abs(GCD(m,n));
-    if (g!=1) {
-      m=m/g;
-      n=n/g;
-    }
-    z->set_entry(i, m, n);
-  }
-
-  return (z);
-}
-/* ----------------------------------------------------------------- */
-rationalVector* addRationalVector(rationalVector *x, rationalVector *y, 
-				  int numOfVars) {
-  int i;
-  ZZ a,b,c,d,g,m,n,s,t;
-  rationalVector *z;
-
-/* Returns x+y. */
-
-  z=createRationalVector(numOfVars);
-
-  if (x==0) {
-    for (i=0; i<numOfVars; i++) {
-      z->set_entry(i, y->numerators()[i], y->denominators()[i]);
-    }
-    return (z);
-  }
-
-  if (y==0) {
-    for (i=0; i<numOfVars; i++) {
-      z->set_entry(i, x->numerators()[i], x->denominators()[i]);
-    }
-    return (z);
-  }
-
-  for (i=0; i<numOfVars;i++) {
-    a=x->numerators()[i];
-    b=x->denominators()[i];
-    c=y->numerators()[i];
-    d=y->denominators()[i];
-/* Compute m/n = a/b + c/d. */
-    g=abs(lcm(b,d));
-    s=g/b;
-    t=g/d;
-
-    m=s*a + t*c;
-    n=g;
-
-    g=abs(GCD(m,n));
-    if (g!=1) {
-      m=m/g;
-      n=n/g;
-    }
-    z->set_entry(i, m, n);
-  }
-
-  return (z);
-}
-
-/* ----------------------------------------------------------------- */
 vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars) {
   int i;
   ZZ d,g,factorV,factorW;
@@ -331,27 +191,33 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
   return 1;
 }
 /* ----------------------------------------------------------------- */
+
+rationalVector::rationalVector(const rationalVector &v)
+{
+  enumerator = v.enumerator;
+  denominator = v.denominator;
+  computed_integer_scale = v.computed_integer_scale;
+}
+
 rationalVector* copyRationalVector(const rationalVector *v)
 {
-  rationalVector *w = new rationalVector;
-  w->enumerator = v->enumerator;
-  w->denominator = v->denominator;
-  return w;
+  return new rationalVector(*v);
 }
+
 /* ----------------------------------------------------------------- */
 vec_ZZ scaleRationalVectorToInteger(const rationalVector *vec,
 				    int numOfVars,
 				    ZZ &scale_factor)
 {
-  assert(numOfVars == vec->denominator.length()
-	 && numOfVars == vec->enumerator.length());
+  assert(numOfVars == vec->denominators().length()
+	 && numOfVars == vec->numerators().length());
   scale_factor = 1;
   int i;
   vec_ZZ result = createVector(numOfVars);
   for (i = 0; i<numOfVars; i++)
-    scale_factor = lcm(scale_factor, vec->denominator[i]);
+    scale_factor = lcm(scale_factor, vec->denominators()[i]);
   for (i = 0; i<numOfVars; i++)
-    result[i] = vec->enumerator[i] * (scale_factor / vec->denominator[i]);
+    result[i] = vec->numerators()[i] * (scale_factor / vec->denominators()[i]);
   return result;
 }
 /* ----------------------------------------------------------------- */
@@ -359,13 +225,12 @@ void canonicalizeRationalVector(rationalVector *vec,
 				int numOfVars)
 {
   int i;
-  assert(numOfVars == vec->denominator.length()
-	 && numOfVars == vec->enumerator.length());
+  assert(numOfVars == vec->denominators().length()
+	 && numOfVars == vec->numerators().length());
   for (i = 0; i<numOfVars; i++) {
-    ZZ g = GCD(vec->enumerator[i], vec->denominator[i]);
+    ZZ g = GCD(vec->numerators()[i], vec->denominators()[i]);
     if (g != 1) {
-      vec->enumerator[i] /= g;
-      vec->denominator[i] /= g;
+      vec->set_entry(i, vec->numerators()[i] / g, vec->denominators()[i] / g);
     }
   }
 }

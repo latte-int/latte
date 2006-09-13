@@ -22,7 +22,7 @@ void Grobner(){
   tmp=cones;
   while (tmp) 
     { 
-      tmp->latticePoints=pointsInParallelepipedOfUnimodularCone(tmp->vertex,tmp->rays,numOfVars);     
+      tmp->latticePoints=pointsInParallelepiped(tmp,tmp,numOfVars);     
       tmp=tmp->rest;
     }
   

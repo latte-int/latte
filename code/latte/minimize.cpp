@@ -421,14 +421,7 @@ int main(int argc, char *argv[]) {
 	int	Cones_Processed_Count = 0;
  	while (tmp) 
 	{
-    		if (decompose[0]=='n') 
-		{
-      			tmp->latticePoints = pointsInParallelepiped(tmp, numOfVars);
-    		} 
-		else 
-		{
-      			tmp->latticePoints=pointsInParallelepipedOfUnimodularCone(tmp->vertex,tmp->rays,numOfVars);
-    		}
+	  tmp->latticePoints = pointsInParallelepiped(tmp, numOfVars);
 		
     		tmp=tmp->rest;
 

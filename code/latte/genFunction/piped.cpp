@@ -42,36 +42,6 @@ using namespace std;
  * Return: listVector* of lattice points
  */
 
-
-/*
- * calculates a integer combination of the specified lattice basis
- * and stores the result in the vector v. Because of incompatible datatypes,
- * it is easiest to simply do this directly.
- */
-static vec_ZZ
-get_integer_comb(const mat_ZZ & lat_basis, const int *scalar)
-{
-   int i,j;
-   ZZ conv_l;
-   int row = lat_basis.NumRows();
-   int col = lat_basis.NumCols();
-   vec_ZZ v = createVector(col);
-
-   for (i = 0; i < row; i++) {
-      v[i] = 0;
-      for (j = 0; j < col; j++) {
-         v[i] += lat_basis[i][j] * scalar[j]; 
-      }
-   }
-   return (v);
-}
-
-static vec_ZZ
-get_integer_comb(const mat_ZZ & lat_basis, const vec_ZZ &scalar)
-{
-  return lat_basis * scalar;
-}
-
 void
 PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier(ZZ &scaled_fundamental_multiplier, const vec_ZZ &m,
 								       const vec_ZZ &facet, int facet_index)
