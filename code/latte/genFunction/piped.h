@@ -24,11 +24,19 @@ public:
      Then all points in the fundamental parallelepiped can be obtained
      by calling GeneratePoint for all integer multiplier vectors m
      such that 0 <= m_i < n_i. */
-  vec_ZZ GeneratePoint(int *multipliers);
+  vec_ZZ GeneratePoint(const int *multipliers);
   vec_ZZ GeneratePoint(const vec_ZZ &multipliers);
 protected:
-  void compute_multiplier(ZZ &multiplier, const vec_ZZ &m,
-			  const vec_ZZ &facet, int facet_index);
+  void compute_scaled_fundamental_multiplier
+  (ZZ &multiplier, const vec_ZZ &m,
+   const vec_ZZ &facet, int facet_index);
+  void compute_scaled_fundamental_multiplier_from_multipliers
+  (ZZ &multiplier, const vec_ZZ &multipliers,
+   const vec_ZZ &facet, int facet_index);
+  void compute_scaled_fundamental_multiplier_from_multipliers
+  (ZZ &multiplier, const int *multipliers,
+   const vec_ZZ &facet, int facet_index);
+  void generate_point_aux(const vec_ZZ &scaled_fundamental_multipliers);
   vec_ZZ translate_lattice_point(const vec_ZZ& m);
 };
 

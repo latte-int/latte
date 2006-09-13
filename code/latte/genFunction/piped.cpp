@@ -487,8 +487,6 @@ PointsScalarProductsGenerator::PointsScalarProductsGenerator
 
 ZZ PointsScalarProductsGenerator::GeneratePointScalarProduct(int *multipliers)
 {
-  vec_ZZ lat_pt = get_integer_comb(B_inv, multipliers);
-  /* Equivalent, but faster code. */
   ZZ result;
   result = 0;
   int dim = beta.length();
@@ -499,7 +497,7 @@ ZZ PointsScalarProductsGenerator::GeneratePointScalarProduct(int *multipliers)
   for (i = 0, facet = cone->facets, ray = cone->rays;
        i<dim;
        i++, facet=facet->rest, ray=ray->rest) {
-    compute_scaled_fundamental_multiplier(multiplier, lat_pt, facet->first, i);
+    compute_scaled_fundamental_multiplier_from_multipliers(multiplier, multipliers, facet->first, i);
     result += multiplier * scaled_ray_scalar_products[i];
   }
   ZZ q, r;
