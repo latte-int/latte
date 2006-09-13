@@ -96,7 +96,6 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 #if 1
   /* Equivalent, but faster code: */
   computeLatticePointsScalarProducts(cone, numOfVars, generic_vector);
-  listVector *point;
   vec_ZZ sum;
   sum.SetLength(dimension + 1);
   int i;
