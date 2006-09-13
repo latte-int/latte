@@ -59,9 +59,11 @@ PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier_from_mult
 {
   int dim = facet.length();
   scaled_fundamental_multiplier = beta_mod_facet_divisors[facet_index];
+  ZZ t;
   int j;
   for (j = 0; j<dim; j++) {
-    scaled_fundamental_multiplier -= multipliers[j] * Tau[facet_index][j];
+    mul(t, Tau[facet_index][j], multipliers[j]);
+    scaled_fundamental_multiplier -= t;
   }
   scaled_fundamental_multiplier %= cone->facet_divisors[facet_index];
   scaled_fundamental_multiplier -= beta[facet_index];
@@ -74,9 +76,11 @@ PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier_from_mult
 {
   int dim = facet.length();
   scaled_fundamental_multiplier = beta_mod_facet_divisors[facet_index];
+  ZZ t;
   int j;
   for (j = 0; j<dim; j++) {
-    scaled_fundamental_multiplier -= multipliers[j] * Tau[facet_index][j];
+    mul(t, Tau[facet_index][j], multipliers[j]);
+    scaled_fundamental_multiplier -= t;
   }
   scaled_fundamental_multiplier %= cone->facet_divisors[facet_index];
   scaled_fundamental_multiplier -= beta[facet_index];
