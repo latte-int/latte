@@ -43,16 +43,6 @@ using namespace std;
  */
 
 void
-PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier(ZZ &scaled_fundamental_multiplier, const vec_ZZ &m,
-								       const vec_ZZ &facet, int facet_index)
-{
-  InnerProduct(scaled_fundamental_multiplier, m, facet);
-  scaled_fundamental_multiplier = beta[facet_index] - scaled_fundamental_multiplier;
-  scaled_fundamental_multiplier %= cone->facet_divisors[facet_index];
-  scaled_fundamental_multiplier -= beta[facet_index];
-}
-
-void
 PointsInParallelepipedGenerator::compute_scaled_fundamental_multiplier_from_multipliers
 (ZZ &scaled_fundamental_multiplier, const vec_ZZ &multipliers,
  const vec_ZZ &facet, int facet_index)
@@ -249,7 +239,7 @@ PointsInParallelepipedGenerator::GeneratePoint(const int *multipliers)
     ZZ scaled_fundamental_multiplier;
     compute_scaled_fundamental_multiplier_from_multipliers
       (scaled_fundamental_multiplier, multipliers, facet->first, i);
-    result += scaled_fundamental_multiplier * ray->first;
+    result += scaled_fundamental_multiplier * facet_scale_factors[i] * ray->first;
   }
   for (i = 0; i<dimension; i++)
     result[i] /= facet_divisor_common_multiple;
@@ -270,7 +260,7 @@ PointsInParallelepipedGenerator::GeneratePoint(const vec_ZZ &multipliers)
     ZZ scaled_fundamental_multiplier;
     compute_scaled_fundamental_multiplier_from_multipliers
       (scaled_fundamental_multiplier, multipliers, facet->first, i);
-    result += scaled_fundamental_multiplier * ray->first;
+    result += scaled_fundamental_multiplier * facet_scale_factors[i] * ray->first;
   }
   for (i = 0; i<dimension; i++)
     result[i] /= facet_divisor_common_multiple;
@@ -409,7 +399,10 @@ void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
   }
   int num_lattice_points = to_long(index);
   cone->lattice_points_scalar_products.SetLength(num_lattice_points);
-
+#if 0
+  /* Slow method... */
+  computePointsInParallelepiped(cone, numOfVars);
+#endif
   if (cone->latticePoints) {
     // Lattice points already computed.
     listVector *point;
