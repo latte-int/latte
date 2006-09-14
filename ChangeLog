@@ -1,3 +1,54 @@
+2006-09-13  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Performance improvements.
+	
+	* code/latte/ExponentialSubst.cpp: Remove unused var.
+
+	* code/latte/Irrational.cpp, code/latte/ResSingle.cpp,
+	code/latte/RudyResNTL.cpp, code/latte/binarySearchIP.cpp,
+	code/latte/count.cpp, code/latte/dual.cpp, code/latte/ehrhart.cpp,
+	code/latte/maximize.cpp, code/latte/genFunction/maple.h,
+	code/latte/minimize.cpp, code/latte/print.cpp,
+	code/latte/rational.cpp, code/latte/rational.h,
+	code/latte/vertices/cdd.cpp, code/latte/genFunction/piped.cpp,
+	code/latte/genFunction/piped.h: Change the interface to rational
+	vectors, so the result of scaleRationalVectorToInteger can be
+	cached.
+
+	* code/latte/rational.cpp, code/latte/rational.h: Remove some
+	unused functions.
+
+	* code/latte/convert.cpp (transformArrayBigVectorToListVector):
+	Save some copying.
+
+	* code/latte/genFunction/piped.h,
+	code/latte/genFunction/piped.cpp: Avoid computing with large
+	numbers.  Precompute more data.
+	(pointsInParallelepipedOfUnimodularCone):  Removed.  The general
+	function is faster.
+	
+2006-09-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/genFunction/piped.cpp, code/latte/barvinok/dec.cpp:
+	Remove unused variables.
+
+	* code/latte/PolyTree.h (PolyTree_Node): Add virtual destructor to
+	fix warning from GCC.
+
+	* code/latte/Residue.cpp: Remove unused variable.
+
+	* code/latte/count.cpp: Change calls to computeVertexConesFromVrep.
+	Fix uninitialized-variable problem in "vrep" mode, which caused
+	segfaults in SPARC/64-bit compiles.
+
+	* code/latte/ehrhart.cpp, code/latte/maximize.cpp,
+	code/latte/minimize.cpp, code/latte/ramon.cpp: Change calls to
+	computeVertexConesFromVrep.
+
+	* code/latte/vertices/cdd.cpp, code/latte/vertices/cdd.h
+	(computeVertexConesFromVrep): Change interface to remove unused
+	argument.
+
 2006-09-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/count.cpp (main): Don't segfault when invoked without
