@@ -1,4 +1,6 @@
 #!/bin/sh
-DATE=2006-06-26
-for a in log-$DATE-*; do (echo; echo; echo $a:; cat "$a/summary"; echo; echo "^L") ; done > summary-$DATE
+DATE=2006-08-28
+HOST=theta
+cd /home/mkoeppe/w/latte/results
+for a in log-$DATE-*$HOST; do (echo; echo; echo $a:; cat "$a/summary"; echo; echo "^L") ; done > summary-$DATE$HOST
 

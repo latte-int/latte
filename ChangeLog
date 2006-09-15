@@ -1,3 +1,8 @@
+2006-09-14  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/genFunction/piped.cpp (PointsInParallelepipedGenerator::GeneratePoint):
+	Repair computation of points; fixes polynomial substitution.
+
 2006-09-13  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Performance improvements.
