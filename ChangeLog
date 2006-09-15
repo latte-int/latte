@@ -1,3 +1,9 @@
+2006-09-15  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ReadingFile.cpp (CheckRed): Handle errors of redcheck_gmp.
+
+	* code/latte/CheckEmpty.cpp (CheckEmpty): Handle errors of CDD+.
+
 2006-09-14  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/genFunction/piped.cpp (PointsInParallelepipedGenerator::GeneratePoint):
