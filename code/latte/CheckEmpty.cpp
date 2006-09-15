@@ -135,13 +135,18 @@ void CheckEmpty(char * Filename){
     out << entries[0][j] << " "; }
   out << endl;
 
+  /* CDD+ has a zero exit status even if an error occurs.  So make
+     sure the output file is not there before, then check for the
+     existence of the output file.
+  */
+  system_with_error_check("rm -f Check_emp.lps");
   system_with_error_check(CDD_PATH " Check_emp.lp > Check_emp.out");
 
   int FLAG = 0;
 
   ifstream IN3("Check_emp.lps");
   if(!IN3){
-    cerr << "Check_emp.lps is missing!!  Please check input file." << endl;
+    cerr << CDD_PATH << " failed to create the file `Check_emp.lps'.  See `Check_emp.out'." << endl;
     exit(1);
   }
   while(IN3 >> tmpString){
