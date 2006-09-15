@@ -179,8 +179,14 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
     cerr << "Missing Check_red.out file..." << endl;
     exit(1);
   }
-  while(tmpString != "H-representation")
+  while(tmpString != "H-representation") {
     in2 >> tmpString;
+    if (in2.eof()) {
+      cerr << REDCHECK_PATH << " failed to create a non-redundant H-representation; "
+	   << "see `Check_red.out' for details." << endl;
+      exit(1);
+    }
+  }
   in2 >> tmpString;
   if(tmpString == "linearity")
     { 
