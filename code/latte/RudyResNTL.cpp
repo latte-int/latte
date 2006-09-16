@@ -1,3 +1,25 @@
+/* RudyResNTL.cpp -- Polynomial substitution and residue calculations
+
+   Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
+      Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
+   Copyright 2006 Matthias Koeppe
+
+   This file is part of LattE.
+   
+   LattE is free software; you can redistribute it and/or modify it
+   under the terms of the version 2 of the GNU General Public License
+   as published by the Free Software Foundation.
+
+   LattE is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with LattE; if not, write to the Free Software Foundation,
+   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+*/
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -15,37 +37,6 @@
 #include "latte_system.h"
 
 using namespace std;
-
-/***********************************************************************************
- Rudy is messing around Jeremy's code in order to update it.
- Date: November 27th, 2002
- Update: Nobemver 29th, 2002
-
- Log:
- November 27th: I created a function "print" to print big integers in the big
-                loop.
-                Also, I wrote print out in bigloop for D[i][j], tempVec,
-                for each i.
- November 28th: Prints out denominators and numerators in the part of
-                simplification.
-
- November 29th: Updated this code for bigger examples such as 3x3x4 tables.
-                I modified this code for D[noCones][noGsPerC + 1] and
-                N[noCones][noGsPerC + 1] such that D[noGsPerC + 1] and
-                N[noGsPerC + 1].  Also, at the beginning of the big loop
-                for recursion, I initialized all eleents of D[i] and N[i],
-                so that it does not cause any duplications or adding extra
-                numbers.  We do not need double arrays for a big recursion
-                b/c we add all the coefficient of the constant term into a
-                variable noLattice.
-
- December 7th: Commenting out all prints out.
-
- December 8th: Include gmp big integer for verticies and cones.
-
- December 9th: Include list for the numerators.
-***********************************************************************************/
-
 
 /***********************************************************************************/
 void ResidueFunction(listCone* cones, int numOfVars, int print_flag, 

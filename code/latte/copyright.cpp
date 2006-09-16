@@ -1,8 +1,7 @@
-// This is a -*- C++ -*- header file.
+/* FILENAME -- DESCRIPTION
 
-/* Cone.cpp -- Barvinok's decomposition of a cone.
-
-   Copyright 2002 Ruriko Yoshida
+   Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
+      Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
    Copyright 2006 Matthias Koeppe
 
    This file is part of LattE.
@@ -21,13 +20,3 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
-#ifndef CONE__H
-#define CONE__H
-
-#include "latte_ntl.h"
-
-vec_ZZ ComputeOmega( const mat_ZZ & B, const mat_ZZ &Dual,
-		     long m, int x, int y);
-vec_ZZ ComputeOmega_2(mat_ZZ &B, long m);
-
-#endif

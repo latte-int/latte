@@ -1,3 +1,10 @@
+2006-09-16  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Add copyright and license notices to all source files.  Files
+	without any author notices are marked "Copyright 2002-2004 Jesus
+	A. De Loera, David Haws, Raymond Hemmecke, Peter Huggins, Jeremy
+	Tauzer, Ruriko Yoshida" (the original LattE team).
+
 2006-09-15  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/ReadingFile.cpp (CheckRed): Handle errors of redcheck_gmp.
