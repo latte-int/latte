@@ -1,7 +1,5 @@
 /* FILENAME -- DESCRIPTION
 
-   Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
-      Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
    Copyright 2006 Matthias Koeppe
 
    This file is part of LattE.
