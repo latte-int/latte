@@ -172,6 +172,8 @@ int main(int argc, char *argv[]) {
     else if(strncmp(argv[i],"triload",7)==0) {strcpy (Load_Tri, "yes"); flags |= LOAD;}
     else if (strncmp(argv[i], "--exponential", 5) == 0)
       params->substitution = BarvinokParameters::ExponentialSubstitution;
+    else if (strncmp(argv[i], "--polynomial", 6) == 0)
+      params->substitution = BarvinokParameters::PolynomialSubstitution;
     else if (strncmp(argv[i], "--maxdet=", 9) == 0)
       params->max_determinant = atoi(argv[i] + 9);
     else if (strncmp(argv[i], "--irrational-all-primal", 14) == 0
@@ -179,6 +181,8 @@ int main(int argc, char *argv[]) {
       params->decomposition = BarvinokParameters::IrrationalAllPrimalDecomposition;
     else if (strncmp(argv[i], "--irrational-primal", 5) == 0)
       params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
+    else if (strncmp(argv[i], "--dual", 6) == 0)
+      params->decomposition = BarvinokParameters::DualDecomposition;
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
