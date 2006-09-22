@@ -378,7 +378,7 @@ listCone* readCddExtFile() {
   listCone *cones,*endCones,*c;
   string tmpString;
 
-  cout << "Reading .ext file...";
+  cout << "Reading .ext file..."; cout.flush();
 
   strcpy(cddInFileName,"latte_cdd.ext");
 
@@ -477,7 +477,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
   listCone *tmp;
   string tmpString;
 
-  cout << "Reading .ead file...";
+  cout << "Reading .ead file..."; cout.flush();
 
   strcpy(cddInFileName,"latte_cdd.ead");
 
@@ -568,7 +568,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
   listCone *tmp;
   string tmpString;
 
-  cout << "Reading .ead file...";
+  cout << "Reading .ead file..."; cout.flush();
 
   strcpy(cddInFileName,"latte_cdd.ead");
   int tmp_int;
