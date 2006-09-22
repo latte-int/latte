@@ -107,7 +107,7 @@ vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars)
   w_int = scaleRationalVectorToInteger(w, numOfVars, w_scale);
   vec_ZZ result;
   ZZ common_scale = lcm(v_scale, w_scale);
-  result = (common_scale / v_scale) * v_int - (common_scale / w_scale) * w_int;
+  result = (common_scale / w_scale) * w_int - (common_scale / v_scale) * v_int;
   /* Removing common factors */
   ZZ g = result[0];
   int i;
