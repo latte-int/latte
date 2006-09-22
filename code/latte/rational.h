@@ -74,7 +74,10 @@ private:
   ZZ integer_scale_factor;
   void compute_integer_scale();
 public:
+  // Construct a zero vector.
   rationalVector(int dimension = 0);
+  // Construct a rational vector from an integer vector and a scalar denominator.
+  rationalVector(const vec_ZZ &numer, const ZZ &denom); 
   const vec_ZZ &numerators() const { return enumerator; }
   const vec_ZZ &denominators() const { return denominator; }
   void set_entry(int i, const ZZ &numer, const ZZ &denom) {
@@ -97,16 +100,15 @@ public:
   friend const vec_ZZ &scaleRationalVectorToInteger(rationalVector *vec,
 						    int numOfVars,
 						    ZZ &scale_factor);
+  /* Bring each coordinate in VEC to canonicalized form, i.e.,
+     gcd(numerator, denominator) = 1. */
+  friend void canonicalizeRationalVector(rationalVector *vec,
+					 int numOfVars);
 };
 
 rationalVector* createRationalVector(int);
 rationalVector** createArrayRationalVector(int);
 vec_ZZ constructRay(rationalVector*, rationalVector*, int);
 rationalVector* copyRationalVector(const rationalVector *);
-
-/* Bring each coordinate in VEC to canonicalized form, i.e.,
-   gcd(numerator, denominator) = 1. */
-void canonicalizeRationalVector(rationalVector *vec,
-				int numOfVars);
 
 #endif

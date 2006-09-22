@@ -42,6 +42,19 @@ rationalVector::rationalVector(int dimension)
   computed_integer_scale = false;
 }
 
+rationalVector::rationalVector(const vec_ZZ &numer, const ZZ &denom)
+{
+  int dimension = numer.length();
+  enumerator = numer;
+  denominator.SetLength(dimension);
+  int i;
+  for (i = 0; i<dimension; i++)
+    denominator[i] = denom;
+  integer_scale = numer;
+  integer_scale_factor = denom;
+  computed_integer_scale = true;
+}
+
 rationalVector* createRationalVector(int numOfVars)
 {
   return new rationalVector(numOfVars);
@@ -84,50 +97,28 @@ lcm(const ZZ& a, const ZZ& b)
 
 /* ----------------------------------------------------------------- */
 
-vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars) {
+vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars)
+{
+  ZZ v_scale;
+  vec_ZZ v_int;
+  v_int = scaleRationalVectorToInteger(v, numOfVars, v_scale);
+  ZZ w_scale;
+  vec_ZZ w_int;
+  w_int = scaleRationalVectorToInteger(w, numOfVars, w_scale);
+  vec_ZZ result;
+  ZZ common_scale = lcm(v_scale, w_scale);
+  result = (common_scale / v_scale) * v_int - (common_scale / w_scale) * w_int;
+  /* Removing common factors */
+  ZZ g = result[0];
   int i;
-  ZZ d,g,factorV,factorW;
-  rationalVector* z;
-
-  z=createRationalVector(numOfVars);
-
-  /* Constructing z=w-v. */
-
-  for(i=0; i<numOfVars; i++) {
-    g=lcm(v->denominators()[i],w->denominators()[i]);
-    factorV=g/(v->denominators()[i]);
-    factorW=g/(w->denominators()[i]);
-    z->set_entry(i, (w->numerators()[i])*factorW-(v->numerators()[i])*factorV, g);
-
-    d=GCD(z->numerators()[i],z->denominators()[i]);
-    if (d!=1) {
-      z->set_entry(i, (z->numerators()[i])/d, (z->denominators()[i])/d);
-    }
-    if (z->denominators()[i]<0) {
-      z->set_entry(i, -(z->numerators()[i]), -(z->denominators()[i]));
-    }
-  }
-
-  /* Removing common factors from enumerators of z. */
-
-  g=z->numerators()[0];
-  for(i=1; i<numOfVars; i++) g=GCD(g,z->numerators()[i]);
+  for (i=1; i<numOfVars; i++) g=GCD(g, result[i]);
   g=abs(g);
-
   if (g!=1) {
-    for (i=0; i<numOfVars; i++) 
-      z->set_numerator(i, (z->numerators()[i])/g);
+    for (i = 0; i<numOfVars; i++)
+      result[i] /= g;
   }
-
-  /* Normalizing rational vector z to integer vector. */
-
-  z=normalizeRationalVector(z,numOfVars);
-
-  vec_ZZ result = z->numerators();
-  delete z;
   return result;
 }
-
 
 /* ----------------------------------------------------------------- */
 int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
@@ -244,7 +235,11 @@ void canonicalizeRationalVector(rationalVector *vec,
   for (i = 0; i<numOfVars; i++) {
     ZZ g = GCD(vec->numerators()[i], vec->denominators()[i]);
     if (g != 1) {
-      vec->set_entry(i, vec->numerators()[i] / g, vec->denominators()[i] / g);
+      vec->enumerator[i] /= g;
+      vec->denominator[i] /= g;
+      vec->computed_integer_scale = false;
     }
   }
+  if (!vec->computed_integer_scale)
+    vec->compute_integer_scale();
 }
