@@ -1,3 +1,32 @@
+2006-10-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Some performance improvements, in particular for the all-primal
+	method. 
+	
+	* code/latte/dual.cpp (dualizeCones): Fix memory leak, improve
+	performance of rational vectors.
+
+	* code/latte/rational.h (rationalVector::set_entry): Extend interface.
+
+	* code/latte/Irrational.cpp (simplifyConeStabilityCube): New.
+	(computeConeStabilityCube): Use it here to return simpler rational
+	numbers, using powers of two.
+	(irrationalizeCone): Use powers of two.
+	(isConeIrrational): Use InnerProductModulo.
+
+	* code/latte/latte_ntl.cpp, code/latte/latte_ntl.h (InnerProductModulo):
+	New.
+
+	* code/latte/Makefile.am: New file latte_ntl.cpp.
+
+2006-09-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/rational.cpp: New constructor for initializing from
+	an integer vector and a common denominator.
+	(constructRay): Re-implement.
+	(canonicalizeRationalVector): Access data directly to avoid
+	repeated compute_integer_scale calls.
+
 2006-09-16  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Version 1.2-mk-0.6
