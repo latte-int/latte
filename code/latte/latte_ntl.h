@@ -41,4 +41,8 @@
 using namespace NTL_NAMESPACE;
 #endif
 
+// Additional functions.
+void
+InnerProductModulo(ZZ &result, const vec_ZZ &a, const vec_ZZ &b, const ZZ &module);
+
 #endif
