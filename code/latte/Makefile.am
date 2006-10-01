@@ -20,7 +20,7 @@ liblatte_a_SOURCES = \
 	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
 	banner.cpp convert.cpp \
 	todd/gmp_pow.cpp todd/todd-expansion.cpp \
-	latte_gmp.cpp latte_random.cpp latte_system.cpp		\
+	latte_gmp.cpp latte_ntl.cpp latte_random.cpp latte_system.cpp \
 	genFunction/IntCombEnum.cpp		\
 	genFunction/matrix_ops.cpp		\
 	ExponentialSubst.cpp \
