@@ -28,7 +28,6 @@
 #include <vector>
 #include <cassert>
 #include "PolyTree.h"
-#include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
 #include "RudyResNTL.h"

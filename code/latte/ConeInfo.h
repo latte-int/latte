@@ -22,7 +22,6 @@
 #ifndef CONEINFO_H
 #define CONEINFO_H
 
-#include "myheader.h"
 #include "ramon.h"
 
 #define HASH_TABLE_SIZE 1247677

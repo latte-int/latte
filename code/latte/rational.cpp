@@ -20,7 +20,6 @@
 */
 
 #include <stdlib.h>
-#include "myheader.h"
 #include "print.h"
 #include "ramon.h"
 #include <cassert>

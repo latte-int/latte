@@ -19,7 +19,6 @@
 */
 
 #include "config.h"
-#include "../myheader.h"
 #include "../cone.h"
 #include "../print.h"
 #include "../ramon.h"

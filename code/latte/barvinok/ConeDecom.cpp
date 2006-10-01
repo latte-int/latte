@@ -27,7 +27,6 @@
 #include <cassert>
 #include <string>
 
-#include "../myheader.h"
 #include "../ramon.h"
 #include "../print.h"
 #include "../cone.h"

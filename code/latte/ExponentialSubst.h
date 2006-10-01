@@ -23,7 +23,6 @@
 #ifndef EXPONENTIALSUBST_H
 #define EXPONENTIALSUBST_H
 
-#include "myheader.h"
 #include "latte_gmp.h"
 #include "barvinok/dec.h"
 

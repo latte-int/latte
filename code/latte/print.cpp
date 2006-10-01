@@ -28,7 +28,6 @@
 #include <list>
 #include <vector>
 
-#include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
 #include "print.h"

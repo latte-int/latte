@@ -24,7 +24,6 @@
 #ifndef CONEDECOM__H
 #define CONEDECOM__H
 
-#include "myheader.h"
 #include "barvinok.h"
 
 /* Do a signed decomposition, modulo lower-dimensional cones, of the

@@ -31,7 +31,6 @@
 
 #include "Cone.h"
 #include "barvinok.h"
-#include "../myheader.h"
 #include "../ramon.h"
 #include "../RudyResNTL.h"
 #include "rational.h"

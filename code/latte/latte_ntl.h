@@ -41,6 +41,8 @@
 using namespace NTL_NAMESPACE;
 #endif
 
+typedef ZZ Integer;
+
 // Additional functions.
 void
 InnerProductModulo(ZZ &result, const vec_ZZ &a, const vec_ZZ &b, const ZZ &module);

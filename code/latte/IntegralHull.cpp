@@ -28,7 +28,6 @@
 #include <ctype.h>
 
 #include "config.h"
-#include "myheader.h"
 #include "ramon.h"
 #include "print.h"
 #include "IntegralHull.h"

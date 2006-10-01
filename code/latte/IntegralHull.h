@@ -23,7 +23,6 @@
 #define INTEGRALHULL__H
 
 #include <stdarg.h>
-#include "myheader.h"
 #include "ramon.h"
 #include <list>
 

@@ -25,7 +25,6 @@
 #define EXPONENTIALAPPROX_H
 
 #include <fstream>
-#include "myheader.h"
 #include "latte_gmp.h"
 #include "barvinok/dec.h"
 

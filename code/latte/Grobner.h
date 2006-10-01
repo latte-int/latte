@@ -22,7 +22,6 @@
 #ifndef GROBNER__H
 #define GROBNER__H
 
-#include "myheader.h"
 #include "cone.h"
 #include "print.h"
 #include "ramon.h"

@@ -24,7 +24,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../myheader.h"
 #include "../cone.h"
 #include "../print.h"
 #include "../ramon.h"

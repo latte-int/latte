@@ -28,7 +28,6 @@
 #include <time.h>
 #include <list>
 #include <vector>
-#include "myheader.h"
 #include "cone.h"
 #include "ramon.h"
 using namespace std;

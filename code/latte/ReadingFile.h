@@ -21,7 +21,6 @@
 #ifndef READINGFILE__H
 #define READINGFILE__H
 
-#include "myheader.h"
 #include "latte_ntl.h"
 
 void CheckRed(char* Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation);

@@ -21,7 +21,6 @@
 */
 
 #include <stdlib.h>
-#include "myheader.h"
 #include "ramon.h"
 /* ----------------------------------------------------------------- */
 listCone* createListCone() {

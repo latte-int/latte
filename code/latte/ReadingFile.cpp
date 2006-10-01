@@ -23,7 +23,6 @@
 #include <stdio.h>
 
 #include "config.h"
-#include "myheader.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
 #include "barvinok/ConeDecom.h"

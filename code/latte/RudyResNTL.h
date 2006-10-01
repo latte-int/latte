@@ -23,7 +23,6 @@
 #ifndef RUDYRESNTL__H
 #define RUDYRESNTL__H
 
-#include "myheader.h"
 #include "cone.h"
 #include "barvinok/dec.h" // for Standard_Single_Cone_Parameters
 
