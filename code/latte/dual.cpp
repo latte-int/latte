@@ -34,102 +34,6 @@
 #include "latte_system.h"
 using namespace std;
 
-/* ----------------------------------------------------------------- */
-//  vec_ZZ computeFacet(vec_ZZ *mat, int numOfVars) {
-//    /* I assume that mat has numOfVars+1 rows and numOfVars columns. 
-//       It corresponds to the matrix formed by the extreme rays collected as
-//       columns. 
-//       Note that I permute the entries in mat! */
-//    int sign,i;
-//    vec_ZZ facet,tmp;
-//    vec_ZZ *localMat;
-
-//  /*  printf("Computing normal vector...\n"); */
-
-//    localMat=createArrayVector(numOfVars+1);
-//    for (i=0; i<numOfVars+1; i++) localMat[i]=copyVector(mat[i],numOfVars);
-
-//    facet=createVector(numOfVars+1);
-//    sign=1;
-//    /* Note that there the sign changes twice. (computing the overall
-//       facet, switching rows) 
-//       Thus, the overall sign is always +.*/
-
-//    for (i=0; i<numOfVars+1; i++) {
-//  /*      printVector(localMat[i],numOfVars); */
-//      tmp=localMat[i];
-//      localMat[i]=localMat[numOfVars];
-//      localMat[numOfVars]=tmp;
-//      facet[i]=computeDeterminant(localMat,numOfVars);
-//    }
-
-//    printf("Facet: ");
-//    printVector(facet,numOfVars+1);
-
-//    for (i=0; i<numOfVars+1; i++) free(localMat[i]);
-//    free(localMat);
-
-//    return (facet);
-//  }
-/* ----------------------------------------------------------------- */
-//  listVector* dualizeSimplicialCone(listVector* rays, int numOfVars) {
-//    /* I assume that the cone is simplicial! */
-//    int i,j;
-//    vec_ZZ tmp, facet;
-//    vec_ZZ *mat, *mat2;
-//    listVector *dual, *endDual;
-
-//  printf("Starting dualizing step...\n");
-//  printListVector(rays,numOfVars);
-//  printf("\n");
-//    mat=createArrayVector(numOfVars);
-//    for (i=0;i<numOfVars;i++)
-//      mat[i]=createVector(numOfVars);
-//    mat2=createArrayVector(numOfVars);
-//    mat2=transformListVectorToArrayVector(rays, mat2);
-
-//    for (i=0;i<numOfVars;i++)
-//      for (j=0;j<numOfVars;j++)
-//        mat[i][j]=mat2[j][i];
-//    free(mat2);
-
-//  printf("mat\n");
-//  for (j=0; j<numOfVars; j++)
-//    printVector(mat[j],numOfVars);
-
-//    /* Now the rays are given in the matrix mat. */
-
-//    dual=createListVector(0);
-//    endDual=dual;
-
-//    tmp=createVector(numOfVars);
-//    for (i=0; i<numOfVars; i++) {
-//  printf("tmp\n");
-//  printVector(tmp,numOfVars);
-//      for (j=0; j<numOfVars; j++) {
-//        tmp[j]=mat[j][i];
-//        mat[j][i]=mat[j][numOfVars-1];
-//        mat[j][numOfVars-1]=tmp[j];
-//      }
-//  printf("i = %d\n",i);
-//  for (j=0; j<numOfVars; j++)
-//    printVector(mat[j],numOfVars);
-
-//      facet=computeFacet(mat,numOfVars-1);
-
-//      /* We still have to test whether to use facet or
-//         -facet as normal vector. */
-
-//      endDual->rest=createListVector(facet);
-//      endDual=endDual->rest;
-//    }
-//  /*  printf("done.\n"); */
-
-//    return (dual->rest);
-//  }
-/* ----------------------------------------------------------------- */
-/* ----------------------------------------------------------------- */
-
 listCone* dualizeCones(listCone *cones, int numOfVars) {
   int i,j,tmpInt,len,numOfVertices,numOfConesDualized,numOfAllCones;
   ZZ x,y;
@@ -150,8 +54,6 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
     rays=tmp->rays;
     rays2=rays;
     len=lengthListVector(rays);
-/*      if (len!=numOfVars) { */
-/*      if (1>0) { */
 
       strcpy(cddInFileName,"latte_cdd.ine");
 
@@ -200,11 +102,13 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 	  y=0;
 	  ReadCDD(in,x,y);
 	  if (j>0) {
-	    w->set_entry(j-1, x, y);
+	    w->set_entry(j-1, x, y, true /* avoid recomputation of
+					    integer scale */);
 	  }
 	}
 	w=normalizeRationalVector(w,numOfVars);
 	endFacets->rest=createListVector(w->numerators());
+	delete w;
 	endFacets=endFacets->rest;
       }
       in.close();
@@ -213,22 +117,10 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 #endif
       tmp->facets=tmp->rays;    
       tmp->rays=facets->rest;
-/*      } else { */
-/*        tmp->facets=tmp->rays;     */
-/*        tmp->rays=dualizeSimplicialCone(rays,numOfVars); */
-
-/*      if (len==numOfVars) { */
-//      if (1<0) {
-//        printf("cdd\n");
-//        printListVector(tmp->rays,numOfVars);
-//        printf("dualize\n");
-//        printListVector(dualizeSimplicialCone(rays2,numOfVars),numOfVars);
-//      }
 
     tmp=tmp->rest;
     numOfConesDualized++;
     if (numOfConesDualized==50*(numOfConesDualized/50)) {
-/*        exit(0); */
       printf("%d / %d done.\n",numOfConesDualized,numOfAllCones);
     }
   }
