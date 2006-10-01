@@ -152,6 +152,32 @@ computeConeStabilityCube_general(listCone *cone, int numOfVars,
   return center;
 }
 
+/* Replace the given stability cube by some subcube whose CENTER and
+   LENGTH are represented by "simpler" numbers.
+   In particular, the LENGTH_NUMERATOR is 1.
+*/
+static void simplifyConeStabilityCube(rationalVector *center,
+				      ZZ &length_numerator,
+				      ZZ &length_denominator,
+				      int numOfVars)
+{
+  ZZ m;
+  div(m, length_denominator, length_numerator);
+  m = m + 1;
+  int k = NumBits(m);
+  int i;
+  ZZ c_denom;
+  power2(c_denom, k + 1);
+  ZZ c_numer;
+  for (i = 0; i<numOfVars; i++) {
+    LeftShift(c_numer, center->numerators()[i], k + 1);
+    c_numer /= center->denominators()[i];
+    center->set_entry(i, c_numer, c_denom);
+  }
+  length_numerator = 1;
+  power2(length_denominator, k);
+}
+
 rationalVector *
 computeConeStabilityCube(listCone *cone, int numOfVars, 
 			 ZZ &length_numerator, ZZ &length_denominator)
@@ -160,22 +186,26 @@ computeConeStabilityCube(listCone *cone, int numOfVars,
     computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
   bool our_simplicial_facets
     = (cone->facet_divisors.length() == numOfVars);
+  rationalVector *center;
   if (our_simplicial_facets) {
     // Here we use the order and the properties of the facet vectors
     // that we have computed:
     // < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}.
-    return computeConeStabilityCube_simplicial(cone, numOfVars,
-					       length_numerator,
-					       length_denominator);
+    center = computeConeStabilityCube_simplicial(cone, numOfVars,
+						 length_numerator,
+						 length_denominator);
   }
   else {
     assert(cone->facet_divisors.length() == 0);
     // In this case, there is no order of the facet vectors,
     // even if the cone happens to be simplicial.
-    return computeConeStabilityCube_general(cone, numOfVars,
-					    length_numerator,
-					    length_denominator);
+    center = computeConeStabilityCube_general(cone, numOfVars,
+					      length_numerator,
+					      length_denominator);
   }
+  simplifyConeStabilityCube(center, length_numerator, length_denominator,
+			    numOfVars);
+  return center;
 }
 
 static ZZ
@@ -232,6 +262,7 @@ irrationalizeCone(listCone *cone, int numOfVars)
   }
   // The actual irrationalization.
   ZZ M;
+  int k;
   // Value from math.CO/0603308 v1 (wrong):
   //M = 2 * power(D, numOfVars + 1);
   // Value from v2:
@@ -259,37 +290,46 @@ irrationalizeCone(listCone *cone, int numOfVars)
     d = numOfVars;
     M = 2 * power(power(d, barvinok_depth) * C,
 		  numOfVars - 1);
+    // Round up to next power of two
+    k = NumBits(M);
+    power2(M, k + 1);
   }
   // Now use this value of M to compute the irrationalization.
   vec_ZZ irrationalizer_numerator;
   irrationalizer_numerator.SetLength(numOfVars);
   ZZ irrationalizer_denominator;
-  ZZ TwoM_power;
-  TwoM_power = 1;
+//   ZZ TwoM_power;
+//   TwoM_power = 1;
+  int TwoM_exponent = 0;
   int i;
   for (i = numOfVars-1; i>=0; i--) {
-    irrationalizer_numerator[i] = TwoM_power * stability_length_numerator;
-    TwoM_power *= (2 * M);
+    irrationalizer_numerator[i] = stability_length_numerator << TwoM_exponent;
+    TwoM_exponent += (k + 2);
   }
-  irrationalizer_denominator = 2 * (TwoM_power / M) * stability_length_denominator;
+  irrationalizer_denominator = stability_length_denominator << (TwoM_exponent - (k+1) + 1);
 
   ZZ common_denominator = lcm(center_denominator, irrationalizer_denominator);
   // Store the new vertex
-  rationalVector *new_vertex = createRationalVector(numOfVars);
+  vec_ZZ new_vertex_numerator;
+  new_vertex_numerator.SetLength(numOfVars);
   for (i = 0; i<numOfVars; i++) {
-    new_vertex->set_entry(i, 
-			  center_numerator[i] * (common_denominator / center_denominator)
-			  + irrationalizer_numerator[i] * (common_denominator / irrationalizer_denominator),
-			  common_denominator);
+    new_vertex_numerator[i]
+      = center_numerator[i] * (common_denominator / center_denominator)
+      + irrationalizer_numerator[i] * (common_denominator / irrationalizer_denominator);
   }
+  rationalVector *new_vertex = new rationalVector(new_vertex_numerator,
+						  common_denominator);
 #ifdef DEBUG_IRRATIONAL
   cout << "--irrationalize--> ";
   printRationalVector(new_vertex, numOfVars);
 #endif
+  /* Canonicalizing is very expensive and unnecessary */
+#if 0
   canonicalizeRationalVector(new_vertex, numOfVars);
 #ifdef DEBUG_IRRATIONAL
   cout << "--canonicalize---> ";
   printRationalVector(new_vertex, numOfVars);
+#endif
 #endif
   assertConesIntegerEquivalent(cone, cone->vertex, numOfVars,
 			       "cone and cone not integer equivalent");
@@ -319,11 +359,11 @@ isConeIrrational(listCone *cone, int numOfVars)
   vec_ZZ vertex_numerator
     = scaleRationalVectorToInteger(cone->vertex, numOfVars,
 				   vertex_denominator);
-  ZZ scaled_sp;
   listVector *facet;
+  ZZ rem;
   for (facet = cone->facets; facet; facet = facet->rest) {
-    InnerProduct(scaled_sp, vertex_numerator, facet->first);
-    if (divide(scaled_sp, vertex_denominator))
+    InnerProductModulo(rem, vertex_numerator, facet->first, vertex_denominator);
+    if (IsZero(rem))
       return false;
   }
   return true;
