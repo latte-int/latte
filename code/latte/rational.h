@@ -80,10 +80,13 @@ public:
   rationalVector(const vec_ZZ &numer, const ZZ &denom); 
   const vec_ZZ &numerators() const { return enumerator; }
   const vec_ZZ &denominators() const { return denominator; }
-  void set_entry(int i, const ZZ &numer, const ZZ &denom) {
+  void set_entry(int i, const ZZ &numer, const ZZ &denom, bool lazy=false) {
     enumerator[i] = numer;
     denominator[i] = denom;
-    compute_integer_scale();
+    if (lazy)
+      computed_integer_scale = false;
+    else
+      compute_integer_scale();
   }
   void set_numerator(int i, const ZZ &numer) {
     enumerator[i] = numer;
