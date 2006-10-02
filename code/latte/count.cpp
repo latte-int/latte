@@ -51,6 +51,7 @@
 #include "ExponentialSubst.h"
 #include "latte_random.h"
 #include "Irrational.h"
+#include "ExponentialEhrhart.h"
 #ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
 #endif
@@ -79,6 +80,7 @@ int main(int argc, char *argv[]) {
     removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   bool approx;
+  bool ehrhart_polynomial;
   double sampling_factor = 1.0;
   long int num_samples = -1;
   
@@ -129,6 +131,7 @@ int main(int argc, char *argv[]) {
   strcpy(cddstyle, "no");
   strcpy(LRS, "no");
   approx = false;
+  ehrhart_polynomial = false;
   params->substitution = BarvinokParameters::PolynomialSubstitution;
   params->decomposition = BarvinokParameters::DualDecomposition;
   params->max_determinant = 1;
@@ -182,6 +185,8 @@ int main(int argc, char *argv[]) {
       params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     else if (strncmp(argv[i], "--dual", 6) == 0)
       params->decomposition = BarvinokParameters::DualDecomposition;
+    else if (strncmp(argv[i], "--ehrhart-polynomial", 5) == 0)
+      ehrhart_polynomial = true;
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
@@ -476,6 +481,26 @@ int main(int argc, char *argv[]) {
     already_dualized = true;
   }
 
+  if (ehrhart_polynomial) {
+    /* Translate all cones to the origin, saving the original vertex. */
+    listCone *cone;
+    for (cone = cones; cone; cone = cone->rest) {
+      ZZ scale_factor;
+      cone->vertex->ehrhart_vertex
+	= scaleRationalVectorToInteger(cone->vertex->vertex,
+				       numOfVars, scale_factor);
+      if (scale_factor != 1) {
+	cerr << "Computation of Ehrhart polynomials is only implemented "
+	     << "for integral polytopes." << endl
+	     << "Use `ehrhart' for computing the Ehrhart series "
+	     << "of rational polytopes." << endl;
+	exit(1);
+      }
+      delete cone->vertex->vertex;
+      cone->vertex->vertex = new rationalVector(numOfVars);
+    }
+  }
+    
   params->Flags = flags;
   params->File_Name = fileName;
   params->Number_of_Variables = numOfVars;
@@ -532,6 +557,11 @@ int main(int argc, char *argv[]) {
     
   switch (params->substitution) {
   case BarvinokParameters::PolynomialSubstitution:
+    if (ehrhart_polynomial) {
+      cerr << "Computational of Ehrhart polynomials is only implemented "
+	   << "for the exponential substitution." << endl;
+      exit(1);
+    }
     if (assumeUnimodularCones[0]=='n') {
       if (Memory_Save[0] == 'n') {
 	cones=decomposeCones(cones,numOfVars, flags, fileName,
@@ -574,6 +604,25 @@ int main(int argc, char *argv[]) {
 	cerr << "Approximation code is not compiled in, sorry." << endl;
 	exit(1);
 #endif
+      }
+      else if (ehrhart_polynomial) {
+	Exponential_Ehrhart_Parameters *exp_param
+	  = new Exponential_Ehrhart_Parameters(*params);
+	delete params;
+	params = exp_param;
+	mpq_vector ehrhart_coefficients
+	  = decomposeAndComputeEhrhartPolynomial(cones, *exp_param);
+	cout << endl << "Ehrhart polynomial: ";
+	{
+	  int i;
+	  for (i = 0; i<ehrhart_coefficients.size(); i++) {
+	    if (ehrhart_coefficients[i] > 0) 
+	      cout << " + " << ehrhart_coefficients[i] << " * t^" << i;
+	    else if (ehrhart_coefficients[i] < 0)
+	      cout << " - " << ehrhart_coefficients[i] << " * t^" << i;
+	  }
+	}
+	cout << endl << endl;
       }
       else {
 	Exponential_Single_Cone_Parameters *exp_param
