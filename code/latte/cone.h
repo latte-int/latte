@@ -35,11 +35,20 @@ struct listVector {
     first(a_first), rest(a_rest) {}
 };
 
-typedef struct listCone {
+struct Vertex {
+  rationalVector *vertex;
+  vec_ZZ ehrhart_vertex; // for exponential Ehrhart computation
+  Vertex(rationalVector *v) : vertex(v) {}
+  Vertex(const Vertex &v) : vertex(new rationalVector(*v.vertex)),
+			    ehrhart_vertex(v.ehrhart_vertex) {}
+  ~Vertex() { delete vertex; }
+};
+
+struct listCone {
   int coefficient;
+  Vertex *vertex;
   ZZ determinant;		// determinant of the matrix formed by
 				// the RAYS, with sign
-  rationalVector* vertex;
   listVector *rays;
   ZZ dual_determinant;		// determinant of the matrix formed by
 				// the FACETS, with sign
@@ -48,9 +57,9 @@ typedef struct listCone {
   // guarantee that < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}.
   vec_ZZ facet_divisors;	
   listVector *latticePoints;
-  vec_ZZ lattice_points_scalar_products; 
+  vec_ZZ lattice_points_scalar_products;
   struct listCone *rest;
-} listCone;
+};
 
 listCone* createListCone();
 int lengthListCone(listCone*);
