@@ -1,3 +1,33 @@
+2006-10-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Makefile.am, code/latte/ExponentialEhrhart.cpp,
+	code/latte/ExponentialEhrhart.h, code/latte/count.cpp: New code
+	for computing Ehrthart polynomials of integral polytopes
+	(count --ehrhart-polynomial).
+
+	* code/latte/ExponentialSubst.cpp,
+	code/latte/ExponentialSubst.h (compute_sums_of_scalar_powers,
+	compute_sums_of_scalar_powers_mpz): New, factored out from
+	computeExponentialResidue_Single.
+	(computeExponentialResidue_Single): Use it here.
+
+	* code/latte/count.cpp, code/latte/ExponentialApprox.cpp,
+	code/latte/IntegralHull.cpp, code/latte/Irrational.cpp,
+	code/latte/ResSingle.cpp, code/latte/RudyResNTL.cpp,
+	code/latte/barvinok/ConeDecom.cpp,
+	code/latte/barvinok/ConeDecom.h, code/latte/barvinok/barvinok.cpp,
+	code/latte/barvinok/barvinok.h, code/latte/barvinok/dec.cpp,
+	code/latte/barvinok/dec.h, code/latte/dual.cpp,
+	code/latte/ehrhart.cpp, code/latte/genFunction/piped.cpp,
+	code/latte/maximize.cpp, code/latte/minimize.cpp,
+	code/latte/print.cpp, code/latte/vertices/cdd.cpp: Adapt to change
+	of vertex representation.
+
+	* code/latte/cone.h (Vertex): New class.
+	(listCone): Change representation of the vertex.
+
+	* code/latte/myheader.h: Removed.
+
 2006-10-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Some performance improvements, in particular for the all-primal
