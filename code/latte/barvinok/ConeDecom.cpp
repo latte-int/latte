@@ -41,7 +41,8 @@
 */
 
 /* ----------------------------------------------------------------- */
-int barvinokDecomposition_Single(const mat_ZZ &Mat, rationalVector *vertex,
+int barvinokDecomposition_Single(const mat_ZZ &Mat,
+				 const Vertex *vertex,
 				 Single_Cone_Parameters *Parameters) 
 {
   /* m is the number of vectors and n is the number of dims. */

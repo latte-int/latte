@@ -41,7 +41,7 @@
 
 
 /* ----------------------------------------------------------------- */
-listCone* readListCone(rationalVector *vertex, int numOfVars) {
+listCone* readListCone(const Vertex &vertex, int numOfVars) {
   int i,j,k,numOfCones,coeff;
   vec_ZZ v;
   listVector *tmp, *endtmp;
@@ -78,7 +78,7 @@ listCone* readListCone(rationalVector *vertex, int numOfVars) {
     endCones=endCones->rest;
     if (coeff==1) endCones->coefficient=1;
     else endCones->coefficient=-1;
-    endCones->vertex=vertex;
+    endCones->vertex=new Vertex(vertex);
     endCones->rays=tmp->rest;
   }
 

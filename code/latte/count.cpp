@@ -24,7 +24,6 @@
 #include <cassert>
 
 #include "config.h"
-#include "myheader.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
 #include "barvinok/ConeDecom.h"
@@ -462,7 +461,7 @@ int main(int argc, char *argv[]) {
   if (dualApproach[0]=='y') {
 
     cones=createListCone();
-    cones->vertex=createRationalVector(numOfVars);
+    cones->vertex = new Vertex(createRationalVector(numOfVars));
     rays=createListVector(createVector(numOfVars));
     endRays=rays;
     tmpRays=matrix;

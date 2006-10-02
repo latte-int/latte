@@ -39,7 +39,7 @@ computeConeStabilityCube_simplicial(listCone *cone, int numOfVars,
 {
   ZZ vertex_denominator;
   vec_ZZ vertex_numerator
-    = scaleRationalVectorToInteger(cone->vertex, numOfVars,
+    = scaleRationalVectorToInteger(cone->vertex->vertex, numOfVars,
 				   vertex_denominator);
 #ifdef DEBUG_IRRATIONAL
   cout << "vertex = " << vertex_numerator << " / "
@@ -105,7 +105,7 @@ computeConeStabilityCube_general(listCone *cone, int numOfVars,
 {
   ZZ vertex_scale_factor;
   vec_ZZ scaled_vertex
-    = scaleRationalVectorToInteger(cone->vertex, numOfVars,
+    = scaleRationalVectorToInteger(cone->vertex->vertex, numOfVars,
 				   vertex_scale_factor);
   listVector *matrix = NULL;
   listVector *facet;
@@ -331,12 +331,12 @@ irrationalizeCone(listCone *cone, int numOfVars)
   printRationalVector(new_vertex, numOfVars);
 #endif
 #endif
-  assertConesIntegerEquivalent(cone, cone->vertex, numOfVars,
+  assertConesIntegerEquivalent(cone, cone->vertex->vertex, numOfVars,
 			       "cone and cone not integer equivalent");
   assertConesIntegerEquivalent(cone, new_vertex, numOfVars,
 			       "Not integer equivalent with new_vertex");
-  delete cone->vertex;
-  cone->vertex = new_vertex;
+  delete cone->vertex->vertex;
+  cone->vertex->vertex = new_vertex;
   assert(isConeIrrational(cone, numOfVars));
 }
 
@@ -357,7 +357,7 @@ isConeIrrational(listCone *cone, int numOfVars)
      non-integral. */
   ZZ vertex_denominator;
   vec_ZZ vertex_numerator
-    = scaleRationalVectorToInteger(cone->vertex, numOfVars,
+    = scaleRationalVectorToInteger(cone->vertex->vertex, numOfVars,
 				   vertex_denominator);
   listVector *facet;
   ZZ rem;
@@ -386,7 +386,7 @@ assertConesIntegerEquivalent(listCone *cone1, rationalVector *new_vertex,
 {
   ZZ vertex1_denominator;
   vec_ZZ vertex1_numerator
-    = scaleRationalVectorToInteger(cone1->vertex, numOfVars,
+    = scaleRationalVectorToInteger(cone1->vertex->vertex, numOfVars,
 				   vertex1_denominator);
   ZZ vertex2_denominator;
   vec_ZZ vertex2_numerator

@@ -48,7 +48,7 @@ ZZ	Polytope_Max_Width;
 listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOfVars)
 {
   	listVector * endRays, *rays, *tmpRays;
-  	vec_ZZ Vertex, OptVertex, numerator, v;
+  	vec_ZZ OptVertex, numerator, v;
   	numerator.SetLength(numOfVars);
   	ZZ Opt, tmpDotProd;
   	Opt = -10000000;
@@ -91,7 +91,6 @@ listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOf
 		{
   			tmp =createListCone();
 
-  			tmp->vertex=createRationalVector(numOfVars);
   			rays=createListVector(createVector(numOfVars));
   			tmp ->latticePoints=createListVector(createVector(numOfVars));
   			endRays=rays;
@@ -100,8 +99,8 @@ listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOf
    			tmp ->latticePoints -> first = a;
   
    			tmp -> coefficient = Coeff;
-   			tmp -> vertex = createRationalVector(numOfVars);
-   			tmp -> vertex = tmpcone -> vertex;
+   			tmp -> vertex
+			  = new Vertex(*tmpcone->vertex);
    			tmpRays=tmpcone -> rays;
      			while (tmpRays) 
 			{

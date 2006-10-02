@@ -216,7 +216,7 @@ void computeTightInequalitiesOfCones(listCone *cones,
     listVector *tight_inequalities = NULL;
     ZZ vertex_scale_factor;
     vec_ZZ scaled_vertex
-      = scaleRationalVectorToInteger(cone->vertex, numOfVars,
+      = scaleRationalVectorToInteger(cone->vertex->vertex, numOfVars,
 				     vertex_scale_factor);
     for (inequality = inequalities; inequality; inequality = inequality->rest) {
       int i;

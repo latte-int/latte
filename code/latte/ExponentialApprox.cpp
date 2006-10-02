@@ -66,7 +66,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     /* Scalar product of the vertex. */
     ZZ vertex_divisor;
     vec_ZZ scaled_vertex
-      = scaleRationalVectorToInteger(cone->vertex, Number_of_Variables,
+      = scaleRationalVectorToInteger(cone->vertex->vertex, Number_of_Variables,
 				     vertex_divisor);
     ZZ scaled_vertex_scalar_product;
     ZZ vertex_scalar_product_lower, vertex_scalar_product_upper;

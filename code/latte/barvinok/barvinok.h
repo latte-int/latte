@@ -101,6 +101,6 @@ public:
 */ 
 int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
-		rationalVector *vertex);
+		const Vertex *vertex);
 
 #endif

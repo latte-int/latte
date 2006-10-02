@@ -69,7 +69,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
   C=cones;
   while (C) {
-    assert(IsZero(C->vertex->numerators()));
+    assert(IsZero(C->vertex->vertex->numerators()));
     assert(abs(C->determinant) == 1);
     numOfTerms=numOfTerms+lengthListVector(C->latticePoints);
     C=C->rest;

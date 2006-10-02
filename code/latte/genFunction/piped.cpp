@@ -167,7 +167,7 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
   /* We compute beta_i = floor(<v, facet_i>) and beta_i modulo facet_divisor_i. */
   {
     ZZ v_scale_factor;
-    vec_ZZ v_scaled = scaleRationalVectorToInteger(cone->vertex,
+    vec_ZZ v_scaled = scaleRationalVectorToInteger(cone->vertex->vertex,
 						   numOfVars, v_scale_factor);
     beta.SetLength(numOfVars);
     beta_mod_facet_divisors.SetLength(numOfVars);
@@ -279,7 +279,7 @@ check_point_in_parallelepiped(listCone *cone, const vec_ZZ &point)
 {
   int numOfVars = point.length();
   ZZ v_scale_factor;
-  vec_ZZ v_scaled = scaleRationalVectorToInteger(cone->vertex,
+  vec_ZZ v_scaled = scaleRationalVectorToInteger(cone->vertex->vertex,
 						 numOfVars, v_scale_factor);
   listVector *facet, *ray;
   for (facet = cone->facets, ray = cone->rays;

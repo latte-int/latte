@@ -61,14 +61,14 @@ listCone* CopyListCones(listCone* RudyCones, int numOfVars,
   tmp = RudyCones;
   while (tmp) {
 
-    if((tmp->vertex->numerators()==Opt_vertex->numerators())
-       && (tmp->vertex->denominators()==Opt_vertex->denominators())){ 
+    if((tmp->vertex->vertex->numerators()==Opt_vertex->numerators())
+       && (tmp->vertex->vertex->denominators()==Opt_vertex->denominators())){ 
       newCone=createListCone();
       s = tmp->coefficient;
       newCone->coefficient=s;
       newCone->rays = CopyListVector(tmp->rays, numOfVars);
       newCone->facets = CopyListVector(tmp->facets, numOfVars);
-      newCone->vertex=copyRationalVector(tmp->vertex);
+      newCone->vertex = tmp->vertex;
       endCones->rest=newCone;
       endCones=endCones->rest;
     }
@@ -97,7 +97,7 @@ listCone* CopyListCones(listCone* RudyCones, int numOfVars) {
       newCone->coefficient=s;
       newCone->rays = CopyListVector(tmp->rays, numOfVars);
       newCone->facets = CopyListVector(tmp->facets, numOfVars);
-      newCone->vertex=copyRationalVector(tmp->vertex);
+      newCone->vertex = tmp->vertex;
       endCones->rest=newCone;
       endCones=endCones->rest;
     
@@ -455,7 +455,7 @@ listCone* readCddExtFile() {
       }
     }
     c=createListCone();
-    c->vertex=v;
+    c->vertex = new Vertex(v);
     endCones->rest=c;
     endCones=endCones->rest;
   }
@@ -494,7 +494,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
 
   tmp=cones;
   for (i=0; i<numOfVertices; i++) {
-    vertices[i]=tmp->vertex;
+    vertices[i]=tmp->vertex->vertex;
     tmp=tmp->rest;
   }
   tmp=cones;
@@ -585,7 +585,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
 
   tmp=cones;
   for (i=0; i<numOfVertices; i++) {
-    vertices[i]=tmp->vertex;
+    vertices[i]=tmp->vertex->vertex;
     tmp=tmp->rest;
   }
   tmp=cones;

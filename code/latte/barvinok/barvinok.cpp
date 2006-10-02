@@ -135,7 +135,7 @@ barvinok_DFS(listCone *cone, Single_Cone_Parameters *Parameters);
 
 int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
-		rationalVector *vertex)
+		const Vertex *vertex)
 {
 	//cout << "barvinok_Single Called." << endl;;
 	
@@ -167,7 +167,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
    	listCone *dummy = createListCone();
    	dummy->coefficient = 1;
 	dummy->determinant = D;
-	dummy->vertex = copyRationalVector(vertex);
+	dummy->vertex = new Vertex(*vertex);
 	dummy->rays = transformArrayBigVectorToListVector(B, m, n);
 
 	switch (Parameters->decomposition) {
@@ -279,7 +279,7 @@ barvinokStep(const listCone *Cone,
 	long signDeti = sign(Dets[i]);
 	Cones[i]->coefficient = Cone->coefficient * signDet * signDeti;
       }
-      Cones[i]->vertex = copyRationalVector(Cone->vertex);
+      Cones[i]->vertex = Cone->vertex;
       computeDetAndFacetsOfSimplicialCone(Cones[i], m);
     }
   }

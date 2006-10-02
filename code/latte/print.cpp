@@ -199,7 +199,7 @@ void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
   out << "Coefficient: " << cones->coefficient << endl;
 
   out << "Vertex: ";
-  printRationalVectorToFile(out,cones->vertex,numOfVars);
+  printRationalVectorToFile(out,cones->vertex->vertex,numOfVars);
 
   out << "Extreme rays:\n";  
   printListVectorToFile(out,cones->rays,numOfVars);

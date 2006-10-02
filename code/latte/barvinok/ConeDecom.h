@@ -35,7 +35,8 @@
    Call PARAMETERS->ConsumeCone() for each of the small cones.
 */ 
 int
-barvinokDecomposition_Single (const mat_ZZ &B, rationalVector *Cone_Vertex,
+barvinokDecomposition_Single (const mat_ZZ &B,
+			      const Vertex *Cone_Vertex,
 			      Single_Cone_Parameters *Parameters);
 
 /* Likewise, but the cone is given as a listCone (whose "rest" we

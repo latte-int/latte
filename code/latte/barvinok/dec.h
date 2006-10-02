@@ -29,7 +29,7 @@
 #include "barvinok.h"
 
 // FIXME: Move somewhere else
-listCone* readListCone(rationalVector*, int);
+listCone* readListCone(const Vertex &vertex, int);
 
 
 // The traditional LattE mode: Simply collect all subdivided cones
