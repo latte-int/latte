@@ -23,7 +23,7 @@ liblatte_a_SOURCES = \
 	latte_gmp.cpp latte_ntl.cpp latte_random.cpp latte_system.cpp \
 	genFunction/IntCombEnum.cpp		\
 	genFunction/matrix_ops.cpp		\
-	ExponentialSubst.cpp \
+	ExponentialSubst.cpp ExponentialEhrhart.cpp \
 	Irrational.cpp
 
 noinst_HEADERS =							\
@@ -40,7 +40,7 @@ noinst_HEADERS =							\
 	latte_gmp.h latte_ntl.h	latte_random.h latte_system.h		\
 	genFunction/IntCombEnum.h     \
 	genFunction/matrix_ops.h    \
-	ExponentialSubst.h \
+	ExponentialSubst.h ExponentialEhrhart.h \
 	Irrational.h
 
 if HAVE_LIDIA
