@@ -71,6 +71,16 @@ scalar_power(const vec_ZZ &generic_vector,
 	     const vec_ZZ &point,
 	     int exponent);
 
+/* Compute \sum_{x\in P} <c, x>^k for k = 0,...,d. */
+vec_ZZ
+compute_sums_of_scalar_powers(listCone *cone,
+			      int numOfVars,
+			      const vec_ZZ &generic_vector);
+mpz_vector
+compute_sums_of_scalar_powers_mpz(listCone *cone,
+				  int numOfVars,
+				  const vec_ZZ &generic_vector);
+
   /* Compute the limit of the generating function for the integer points
    in CONE, whose "latticePoints" (in the fundamental parallelepiped)
    are already computed, for z -> 1, by making an exponential

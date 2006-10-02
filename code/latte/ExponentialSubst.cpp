@@ -104,6 +104,47 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 					  numOfVars);
 }
 
+vec_ZZ
+compute_sums_of_scalar_powers(listCone *cone,
+			      int numOfVars,
+			      const vec_ZZ &generic_vector)
+{
+  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector);
+  vec_ZZ sum;
+  int dimension = numOfVars;
+  sum.SetLength(dimension + 1);
+  int i;
+  int num_points = cone->lattice_points_scalar_products.length();
+  for (i = 0; i<num_points; i++) {
+    Integer inner = cone->lattice_points_scalar_products[i];
+    Integer scalar_power;
+    scalar_power = 1;
+    int k;
+    for (k = 0; k<=dimension; k++) {
+      sum[k] += scalar_power;
+      scalar_power *= inner;
+    }
+  }
+  return sum;
+}
+
+mpz_vector
+compute_sums_of_scalar_powers_mpz(listCone *cone,
+				  int numOfVars,
+				  const vec_ZZ &generic_vector)
+{
+  vec_ZZ sums_of_scalar_powers_zz
+    = compute_sums_of_scalar_powers(cone, numOfVars, generic_vector);
+  mpz_vector sums_of_scalar_powers(numOfVars + 1);
+  {
+    int i;
+    for (i = 0; i<=numOfVars; i++)
+      sums_of_scalar_powers[i]
+	= convert_ZZ_to_mpz(sums_of_scalar_powers_zz[i]);
+  }
+  return sums_of_scalar_powers;
+}
+
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 				 listCone *cone, int numOfVars)
@@ -116,21 +157,9 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 #if 1
   /* Equivalent, but faster code: */
   computeLatticePointsScalarProducts(cone, numOfVars, generic_vector);
-  vec_ZZ sum;
-  sum.SetLength(dimension + 1);
-  int i;
-  int num_points = cone->lattice_points_scalar_products.length();
-  for (i = 0; i<num_points; i++) {
-    Integer inner = cone->lattice_points_scalar_products[i];
-    Integer scalar_power;
-    scalar_power = 1;
-    for (k = 0; k<=dimension; k++) {
-      sum[k] += scalar_power;
-      scalar_power *= inner;
-    }
-  }
+  mpz_vector sum = compute_sums_of_scalar_powers_mpz(cone, numOfVars, generic_vector);
   for (k = 0; k<=dimension; k++)
-    result += convert_ZZ_to_mpz(sum[k]) * weights[k];
+    result += sum[k] * weights[k];
 #else
   computePointsInParallelepiped(cone, numOfVars);
   for (k = 0; k<=dimension; k++) {
