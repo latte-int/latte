@@ -30,7 +30,7 @@ noinst_HEADERS =							\
 	CheckEmpty.h 		 					\
 	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
 	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
-	myheader.h preprocess.h print.h ramon.h rational.h timing.h	\
+	preprocess.h print.h ramon.h rational.h timing.h		\
 	Residue.h barvinok/Cone.h barvinok/ConeDecom.h			\
 	barvinok/Triangulation.h					\
 	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
