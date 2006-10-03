@@ -1,3 +1,7 @@
+2006-10-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Version 1.2-mk-0.7
+
 2006-10-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/Makefile.am, code/latte/ExponentialEhrhart.cpp,
