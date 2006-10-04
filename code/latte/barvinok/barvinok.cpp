@@ -279,7 +279,7 @@ barvinokStep(const listCone *Cone,
 	long signDeti = sign(Dets[i]);
 	Cones[i]->coefficient = Cone->coefficient * signDet * signDeti;
       }
-      Cones[i]->vertex = Cone->vertex;
+      Cones[i]->vertex = new Vertex(*Cone->vertex);
       computeDetAndFacetsOfSimplicialCone(Cones[i], m);
     }
   }
