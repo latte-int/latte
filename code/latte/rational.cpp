@@ -98,20 +98,28 @@ lcm(const ZZ& a, const ZZ& b)
 
 vec_ZZ constructRay(rationalVector* v, rationalVector* w, int numOfVars)
 {
-  ZZ v_scale;
-  vec_ZZ v_int;
-  v_int = scaleRationalVectorToInteger(v, numOfVars, v_scale);
-  ZZ w_scale;
-  vec_ZZ w_int;
-  w_int = scaleRationalVectorToInteger(w, numOfVars, w_scale);
+  ZZ v_scale, w_scale;
+  const vec_ZZ &v_int = scaleRationalVectorToInteger(v, numOfVars, v_scale);
+  const vec_ZZ &w_int = scaleRationalVectorToInteger(w, numOfVars, w_scale);
   vec_ZZ result;
+  result.SetLength(numOfVars);
   ZZ common_scale = lcm(v_scale, w_scale);
-  result = (common_scale / w_scale) * w_int - (common_scale / v_scale) * v_int;
+  // result = (common_scale / w_scale) * w_int - (common_scale / v_scale) * v_int;
+  ZZ w_factor, v_factor;
+  div(w_factor, common_scale, w_scale);
+  div(v_factor, common_scale, v_scale);
+  int i;
+  ZZ tw, tv;
+  for (i = 0; i<numOfVars; i++) {
+    mul(tw, w_factor, w_int[i]);
+    mul(tv, v_factor, v_int[i]);
+    sub(result[i], tw, tv);
+  }
   /* Removing common factors */
   ZZ g = result[0];
-  int i;
-  for (i=1; i<numOfVars; i++) g=GCD(g, result[i]);
-  g=abs(g);
+  for (i=1; i<numOfVars; i++)
+    GCD(g, g, result[i]);
+  abs(g, g);
   if (g!=1) {
     for (i = 0; i<numOfVars; i++)
       result[i] /= g;
