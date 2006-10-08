@@ -1,3 +1,14 @@
+2006-10-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/rational.cpp (constructRay): Speed up.
+
+	* code/latte/barvinok/Triangulation.cpp (writeCDDextFileRudy):
+	Don't request computation of input_adjacency (unused).
+	(Triangulation): Unused, removed.
+
+	* code/latte/barvinok/barvinok.cpp (barvinokStep): Fix copying of
+	vertex, fixes segmentation fault.
+
 2006-10-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Version 1.2-mk-0.7
