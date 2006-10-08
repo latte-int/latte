@@ -72,7 +72,7 @@ void writeCDDextFileRudy(const int & m, const int & n, const mat_ZZ & Mat) {
       }
    OUT << "end" << endl;
    OUT << "incidence" << endl;
-   OUT << "input_adjacency" << endl;
+   //OUT << "input_adjacency" << endl;
    OUT.close();
 
   return ;
@@ -185,56 +185,8 @@ void readCDDicdFileRudy(int & face2, vec_ZZ & numOfPoints, mat_ZZ & Result) {
   
   return ; 
 }
+
 /* ----------------------------------------------------------------- */
-int Triangulation(const mat_ZZ & Mat, const int & m, const int & n, 
-		  char* a, list< int >& List)
-{
-  vec_ZZ neg;
-  
-  writeCDDextFileRudy(m,n,Mat);
-  system_with_error_check(CDD_PATH " tri.ext > tri.out");
-  system_with_error_check("rm -f tri.out");
-  
-  int face3 = 0, dim3 = 0;
-  neg = readCDDineFileRudy(face3, dim3);
-  
-  vec_ZZ numOfPoints;
-  mat_ZZ Result;
-  int face2 = 0;
-
-  readCDDicdFileRudy(face2,numOfPoints,Result);
-
-  int count = 0;
-  int ZZToInt = 0;
-  for(int i = 0; i < face2; i++){
-    if(neg[i] == 1 ){
-      for(int j = 0; j < numOfPoints[i]; j++)
-        if(Result[i][j] != 0){
-          conv(ZZToInt, Result[i][j]);
-	  List.push_front(ZZToInt);
-	}
-      count++;
-    }
-  }
-  if( count == 0)
-    for(int i = 0; i < face2; i++){
-      if(neg[i] == 0 ){
-	for(int j = 0; j < numOfPoints[i]; j++)
-	  if(Result[i][j] != 0){
-            conv(ZZToInt, Result[i][j]);
-            List.push_front(ZZToInt);
-	  }
-	count++;
-      }
-    }
-
-  //system_with_error_check("rm -f tri.*");
-
-  return count;
-}
-/* ----------------------------------------------------------------- */
-
-
 
 // NEW TRIANGULATION FUNCTION TO REUSE PREVIOUSLY CALCULATED RESULTS
 
@@ -325,7 +277,8 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
       count++;
     }
   }
-  if( count == 0)
+  if( count == 0) {
+    cerr << "Triangulation: Interesting case..." << endl;
     for(int i = 0; i < face2; i++){
       if(neg[i] == 0 ){
 	for(int j = 0; j < numOfPoints[i]; j++)
@@ -336,6 +289,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 	count++;
       }
     }
+  }
 	
   	if ( (Flags & SAVE)  && ( !(Flags & LOAD) || File_Present == 0)  )
 	{
@@ -351,7 +305,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 		
 	}
   
-  system_with_error_check("rm -f tri.*");
+	//system_with_error_check("rm -f tri.*");
 
 
   delete [] Integer_String_Original;
