@@ -8,5 +8,5 @@ dist_doc_DATA = manual_v1.1.pdf
 
 
 cvstag:
-	cd $(top_srcdir) && cvs tag $(CVSTAGFLAGS) version_`echo $(VERSION) | sed 's/[-.]/_/'` 
+	cd $(top_srcdir) && cvs tag $(CVSTAGFLAGS) version_`echo $(VERSION) | sed 's/[-.]/_/g'` 
 
