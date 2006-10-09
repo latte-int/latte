@@ -1,3 +1,18 @@
+2006-10-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Version 1.2-mk-0.7.1
+	
+	* Makefile.am (cvstag): New target.
+
+2006-10-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/rational.cpp (constructRay): Speed up.
+
+	* code/latte/barvinok/Triangulation.h (Triangulation): Unused, removed.
+
+	* code/latte/barvinok/barvinok.cpp (barvinokStep):
+	Fix copying of vertex, fixes segmentation fault.
+
 2006-10-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/rational.cpp (constructRay): Speed up.
