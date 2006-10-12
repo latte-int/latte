@@ -20,11 +20,12 @@
 */
 
 #include "config.h"
-#include "../cone.h"
-#include "../print.h"
-#include "../ramon.h"
-#include "../rational.h"
+#include "cone.h"
+#include "print.h"
+#include "ramon.h"
+#include "rational.h"
 #include <list>
+#include <cassert>
 #include "latte_system.h"
 
 using namespace std;
@@ -232,7 +233,7 @@ void createCddExtFile(listVector* matrix, int numOfVars) {
 }
 
 /* ----------------------------------------------------------------- */
-void createCddExtFile2(char* filename) {
+void createCddExtFile2(const char* filename) {
   int i, numOfVec, numOfVars;
   string tmpString;
   // listVector* tmp;
@@ -369,8 +370,8 @@ listVector* createListOfInequalities(listVector* matrix, int numOfVars) {
   return(inequalities->rest);
 }
 /* ----------------------------------------------------------------- */
-listCone* readCddExtFile() {
-  int i,j,numOfVertices,numOfVars;
+listCone* readCddExtFile(int &numOfVars) {
+  int i,j,numOfVertices;
   ZZ x,y;
   char cddInFileName[127];
   rationalVector *v;
@@ -646,7 +647,11 @@ listCone* computeVertexCones(char* fileName, listVector* matrix,
   strcat(command,".ead");
   system_with_error_check(command);
 
-  cones=readCddExtFile();
+  {
+    int ext_numOfVars;
+    cones=readCddExtFile(ext_numOfVars);
+    assert(ext_numOfVars == numOfVars+1);
+  }
   cones=readCddEadFile(cones,numOfVars+1);
   system_with_error_check("rm -f latte_cdd.*"); 
 
@@ -690,7 +695,11 @@ listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix,
   strcat(command,".ead");
   system_with_error_check(command);
 
-  cones=readCddExtFile();
+  {
+    int ext_numOfVars;
+    cones=readCddExtFile(ext_numOfVars);
+    assert(ext_numOfVars == numOfVars+1);
+  }
   cones=readCddEadFile(cones,numOfVars+1);
   system_with_error_check("rm -f latte_cdd.* latte_lrs.*"); 
 
@@ -702,7 +711,7 @@ listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix,
 }
 
 /* ----------------------------------------------------------------- */
-listCone* computeVertexConesFromVrep(char* fileName, int numOfVars) {
+listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars) {
   char cddOutFileName[127], command[127];
   listCone *cones;
 
@@ -724,7 +733,11 @@ listCone* computeVertexConesFromVrep(char* fileName, int numOfVars) {
   strcat(command,".ead");
   system_with_error_check(command);
 
-  cones=readCddExtFile();
+  {
+    int ext_numOfVars;
+    cones=readCddExtFile(ext_numOfVars);
+    numOfVars = ext_numOfVars - 1;
+  }
   cones=readCddEadFileFromVrep(cones,numOfVars+1);
   system_with_error_check("rm -f latte_cdd.*"); 
 

@@ -28,7 +28,11 @@ void createCddIneFile(listVector*, int);
 void createCddExtFile(listVector*, int);
 void createCddIneLPFile(listVector* matrix, int numOfVars, vec_ZZ & cost);
 listVector* createListOfInequalities(listVector*, int);
-listCone* readCddExtFile();
+
+/* Read a CDD .ext file and return a list of cones with filled-in
+   VERTEX data.  Return the dimension in NUMOFVARS. */   
+listCone* readCddExtFile(int &numOfVars);
+
 rationalVector* ReadLpsFile(int numOfVars, bool verbose = true);
 listCone* readCddEadFile(listCone*, int);
 listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars);
@@ -38,7 +42,12 @@ rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
 listCone* CopyListCones(listCone* RudyCones, int numOfVars, 
 			rationalVector* Opt_vertex);
 listCone* CopyListCones(listCone* RudyCones, int numOfVars); 
-listCone* computeVertexConesFromVrep(char* fileName, int numOfVars);
+
+/* Read a LattE-style file containing a V-representation.
+   Return a list of the vertex cones.  Return the dimension in
+   NUMOFVARS. */
+listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars);
+
 listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix, 
 				   int numOfVars);
 void CreatExtEadFile();
