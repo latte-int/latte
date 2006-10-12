@@ -59,6 +59,8 @@
 #include "banner.h"
 #include "convert.h"
 #include "latte_system.h"
+#include "Polyhedron.h"
+#include "ReadLatteStyle.h"
 
 static void usage(const char *progname)
 {
@@ -68,7 +70,7 @@ static void usage(const char *progname)
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
   float z;
-  int i,numOfVars,numOfAllVars, degree = 1;
+  int i, degree = 1;
   unsigned int flags = 0, print_flag = 0, output_cone = 0;
   vec_ZZ dim, v, w;
   int oldnumofvars;
@@ -87,7 +89,12 @@ int main(int argc, char *argv[]) {
   listVector *matrix = NULL, *equations = NULL, *inequalities = NULL, *rays = NULL, *endRays, *tmpRays, *matrixTmp;
   vec_ZZ cost;
   listVector *templistVec;
-  listCone *cones, *tmpcones;
+  listCone *tmpcones;
+  mat_ZZ ProjU, ProjU2, AA;
+  vec_ZZ bb;
+  mat_ZZ AAA;
+  RR LP_OPT;
+  vec_ZZ holdCost;
   struct BarvinokParameters *params = new BarvinokParameters;
 
   latte_banner(cout);
@@ -223,27 +230,15 @@ int main(int argc, char *argv[]) {
 
   if(dilation[0] == 'y') dilation_const = atoi(argv[argc-2]);
 
-  if(output_cone > 3) output_cone = 0;
-  flags |= (output_cone << 1);
-  if((cddstyle[0] == 'y') && (Vrepresentation[0] == 'y')){
-    cerr << "Use not cdd style and v-representation." << endl;
-    exit(2);
-  }
-  if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
-    cerr<<"You cannot use + and dua at the same time." << endl;
-    exit(2);
-  }
-  
-  if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
-    cerr<<"You cannot use int and memsave at the same time." << endl;
-    exit(3);
-  }
-
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
 #if 1
   cout << invocation;
 #endif
+
+  if(output_cone > 3) output_cone = 0;
+  flags |= (output_cone << 1);
+
   char costFile[127];
   if(maximum[0] == 'y'){
     strcpy(fileName,argv[argc-1]);
@@ -271,6 +266,51 @@ int main(int argc, char *argv[]) {
       INCost >> cost[i]; 
   }
   //strcpy (fileName,"stdin");
+
+  /* INPUT HANDLING. */
+
+  Polyhedron *Poly = NULL;
+
+  if(grobner[0] == 'y'){
+    CheckGrobner(fileName, cddstyle);
+    SolveGrobner(fileName,  nonneg, dualApproach,
+		 grobner, equationsPresent, cddstyle);
+    exit(0);
+  }
+  
+  if (Vrepresentation[0] == 'y') {
+    /* The polyhedron is given by its V-representation in a
+       LattE-style input format. */
+    if (cddstyle[0] == 'y') {
+      cerr << "The command-line keyword `vrep' denotes the use of a LattE-style " << endl
+	   << "input format.  It is not compatible with using a CDD-style input format." << endl;
+      exit(2);
+    }
+    if(equationsPresent[0] == 'y') {
+      cerr<<"You cannot use vrep and equ at the same time." << endl;
+      exit(4);
+    }
+    if (dilation_const != 1) {
+      cerr << "Dilation unimplemented for `vrep' input" << endl;
+      exit(1);
+    }
+    Poly = ReadLatteStyleVrep(fileName, dualApproach[0] == 'y');
+  }
+  else {
+    /* Not VREP. */
+    Poly = new Polyhedron;
+    int numOfVars;
+  
+  if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
+    cerr<<"You cannot use + and dua at the same time." << endl;
+    exit(2);
+  }
+  
+  if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
+    cerr<<"You cannot use int and memsave at the same time." << endl;
+    exit(3);
+  }
+
   
   /* Check input file. */
   if(Vrepresentation[0] == 'n'){
@@ -325,7 +365,6 @@ int main(int argc, char *argv[]) {
   }
   
   // cout << grobner << endl;
-  vec_ZZ holdCost;
   if(minimize[0] == 'y') cost = - cost;
   holdCost = cost;
   //cout <<"Cost is: " << cost << endl;
@@ -334,12 +373,7 @@ int main(int argc, char *argv[]) {
   for(i = 0; i < holdCost.length(); i++) conv(holdcost_RR[i], holdCost[i]);
 
   if(minimize[0] == 'y') holdcost_RR = - holdcost_RR;
-  if(grobner[0] == 'y'){
 
-    CheckGrobner(fileName, cddstyle);
-    SolveGrobner(fileName,  nonneg, dualApproach,
-		 grobner, equationsPresent, cddstyle);}
-  else{
   if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
     cerr<<"You cannot use + and dua at the same time." << endl;
     exit(2);
@@ -350,11 +384,6 @@ int main(int argc, char *argv[]) {
     exit(3);
   }
   
-  if((Vrepresentation[0] == 'y') && (equationsPresent[0] == 'y')){
-    cerr<<"You cannot use vrep and equ at the same time." << endl;
-    exit(4);
-  }
-
   numOfVars--;
   /* Binary seach IP*/
 
@@ -363,11 +392,6 @@ int main(int argc, char *argv[]) {
     cout << "Time: " << GetTime() << endl;
     exit(0);
   }
-
-  numOfAllVars=numOfVars;
-  mat_ZZ ProjU, ProjU2, AA;
-  vec_ZZ bb;
-  mat_ZZ AAA;
 
   ProjU.SetDims(numOfVars, numOfVars);
   ProjU2.SetDims(numOfVars, numOfVars);
@@ -399,7 +423,6 @@ int main(int argc, char *argv[]) {
   else {
     matrix = matrixTmp;}
 /* Now matrix contains the new inequalities. */
-  RR LP_OPT;
   params->read_time.stop();
   cout << params->read_time;
   
@@ -432,41 +455,29 @@ int main(int argc, char *argv[]) {
        conv(Rat_cost[i], cost[i]);
      }
      if(Singlecone[0] == 'y')
-       cones = CopyListCones(tmpcones, numOfVars, LP_vertex);
-     else cones = tmpcones;
-       if(lengthListCone(cones) == 1) 
+       Poly->cones = CopyListCones(tmpcones, numOfVars, LP_vertex);
+     else Poly->cones = tmpcones;
+       if(lengthListCone(Poly->cones) == 1) 
 	cout <<"\nWe found a single vertex cone for IP.\n" << endl;
        cout <<"A vertex which we found via LP is: " << ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       //printRationalVector(LP_vertex, numOfVars);
        LP_OPT = Rat_cost*Rat_solution; //cout << cost << endl;
       cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
-      }else {cones = tmpcones;
-      cout << "The polytope has " << lengthListCone(cones) << " vertices." << endl;
+      }else {Poly->cones = tmpcones;
+      cout << "The polytope has " << lengthListCone(Poly->cones) << " vertices." << endl;
     //system_with_error_check("rm -f numOfLatticePoints");
     }
   } 
-
-  /* Reading from the vertex representation. */
-
-  if(Vrepresentation[0] == 'y') {
-    if (dilation_const != 1) {
-      cerr << "Dilation unimplemented for `vrep' input" << endl;
-      exit(1);
-    }
-    cones=computeVertexConesFromVrep(fileName, numOfVars);
-  }
 
   params->vertices_time.stop();
   cout << params->vertices_time;
 
   /* Compute triangulation or decomposition of each vertex cone. */
 
-  bool already_dualized = false;
-  
   if (dualApproach[0]=='y') {
 
-    cones=createListCone();
-    cones->vertex = new Vertex(createRationalVector(numOfVars));
+    Poly->cones=createListCone();
+    Poly->cones->vertex = new Vertex(createRationalVector(numOfVars));
     rays=createListVector(createVector(numOfVars));
     endRays=rays;
     tmpRays=matrix;
@@ -477,18 +488,23 @@ int main(int argc, char *argv[]) {
       endRays=endRays->rest;
       tmpRays=tmpRays->rest;
     }
-    cones->rays=rays->rest;
-    already_dualized = true;
+    Poly->numOfVars = numOfVars;
+    Poly->cones->rays = rays->rest;
+    Poly->dualized = true;
   }
 
+  } /* Not VREP */
+
+  
+  
   if (ehrhart_polynomial) {
     /* Translate all cones to the origin, saving the original vertex. */
     listCone *cone;
-    for (cone = cones; cone; cone = cone->rest) {
+    for (cone = Poly->cones; cone; cone = cone->rest) {
       ZZ scale_factor;
       cone->vertex->ehrhart_vertex
 	= scaleRationalVectorToInteger(cone->vertex->vertex,
-				       numOfVars, scale_factor);
+				       Poly->numOfVars, scale_factor);
       if (scale_factor != 1) {
 	cerr << "Computation of Ehrhart polynomials is only implemented "
 	     << "for integral polytopes." << endl
@@ -497,27 +513,28 @@ int main(int argc, char *argv[]) {
 	exit(1);
       }
       delete cone->vertex->vertex;
-      cone->vertex->vertex = new rationalVector(numOfVars);
+      cone->vertex->vertex = new rationalVector(Poly->numOfVars);
     }
   }
     
   params->Flags = flags;
   params->File_Name = fileName;
-  params->Number_of_Variables = numOfVars;
+  params->Number_of_Variables = Poly->numOfVars;
 
 
   switch (params->decomposition) {
   case BarvinokParameters::DualDecomposition:
   case BarvinokParameters::IrrationalPrimalDecomposition:
-    if (not already_dualized) {
+    if (not Poly->dualized) {
       params->dualize_time.start();
-      cones = dualizeCones(cones, numOfVars);
+      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars);
       params->dualize_time.stop();
       cout << params->dualize_time;
+      Poly->dualized = true;
     }
     break;
   case BarvinokParameters::IrrationalAllPrimalDecomposition:
-    if (already_dualized) {
+    if (Poly->dualized) {
       cerr << "You cannot use `homog' and `--all-primal' at the same time." << endl;
       exit(3);
     }
@@ -527,23 +544,23 @@ int main(int argc, char *argv[]) {
     params->dualize_time.start();
     if (Vrepresentation[0] == 'y') {
       cout << "(First computing facets for them... "; cout.flush();
-      cones = dualizeCones(cones, numOfVars);
-      cones = dualizeBackCones(cones, numOfVars); // just swaps
+      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars);
+      Poly->cones = dualizeBackCones(Poly->cones, Poly->numOfVars); // just swaps
       cout << "done; sorry for the interruption.) "; cout.flush();
     }      
     else {
       /* Fill in the facets of all cones; we determine them by
 	 taking all inequalities tight at the respective vertex. */
-      computeTightInequalitiesOfCones(cones, matrix, numOfVars);
+      computeTightInequalitiesOfCones(Poly->cones, matrix, Poly->numOfVars);
     }
     params->dualize_time.stop(); cout << params->dualize_time;
     params->irrationalize_time.start();
     {
       listCone *cone;
-      for (cone = cones; cone; cone=cone->rest)
-	assert(lengthListVector(cone->facets) >= numOfVars);
+      for (cone = Poly->cones; cone; cone=cone->rest)
+	assert(lengthListVector(cone->facets) >= Poly->numOfVars);
     }
-    irrationalizeCones(cones, numOfVars);
+    irrationalizeCones(Poly->cones, Poly->numOfVars);
     params->irrationalize_time.stop();
     cout << params->irrationalize_time;
 #endif
@@ -564,19 +581,19 @@ int main(int argc, char *argv[]) {
     }
     if (assumeUnimodularCones[0]=='n') {
       if (Memory_Save[0] == 'n') {
-	cones=decomposeCones(cones,numOfVars, flags, fileName,
+	Poly->cones=decomposeCones(Poly->cones,Poly->numOfVars, flags, fileName,
 			     params->max_determinant,
-			     not already_dualized,
+			     not Poly->dualized,
 			     params->decomposition);
 	/* Compute points in parallelepipeds */
-	computePointsInParallelepipeds(cones, numOfVars);
+	computePointsInParallelepipeds(Poly->cones, Poly->numOfVars);
       }
       // Iterator through simplicial cones, DFS
       else {
 	Standard_Single_Cone_Parameters *standard_params
 	  = new Standard_Single_Cone_Parameters(*params);
 	delete params; params = standard_params;
-	decomposeAndComputeResidue(cones, degree, false,
+	decomposeAndComputeResidue(Poly->cones, degree, false,
 				   *standard_params);
       }
     }
@@ -598,7 +615,7 @@ int main(int argc, char *argv[]) {
 	     num_samples);
 	  delete params;
 	  params = write_param;
-	  decomposeAndWriteExponentialSampleFormula(cones, *write_param);
+	  decomposeAndWriteExponentialSampleFormula(Poly->cones, *write_param);
 	}
 #else
 	cerr << "Approximation code is not compiled in, sorry." << endl;
@@ -611,7 +628,7 @@ int main(int argc, char *argv[]) {
 	delete params;
 	params = exp_param;
 	mpq_vector ehrhart_coefficients
-	  = decomposeAndComputeEhrhartPolynomial(cones, *exp_param);
+	  = decomposeAndComputeEhrhartPolynomial(Poly->cones, *exp_param);
 	cout << endl << "Ehrhart polynomial: ";
 	{
 	  int i;
@@ -630,7 +647,7 @@ int main(int argc, char *argv[]) {
 	delete params;
 	params = exp_param;
 	Integer number_of_lattice_points
-	  = decomposeAndComputeExponentialResidue(cones, *exp_param);
+	  = decomposeAndComputeExponentialResidue(Poly->cones, *exp_param);
 	cout << endl << "****  The number of lattice points is: "
 	     << number_of_lattice_points << "  ****" << endl << endl;
 	// FIXME: Centralize this output stuff.
@@ -647,22 +664,22 @@ int main(int argc, char *argv[]) {
 
   if(grobner[0] == 'y'){
 
- cones = ProjectUp(cones, oldnumofvars, numOfVars, templistVec);
- numOfVars = oldnumofvars;
+ Poly->cones = ProjectUp(Poly->cones, oldnumofvars, Poly->numOfVars, templistVec);
+ Poly->numOfVars = oldnumofvars;
 
   }
  if(Print[0] == 'y')
-  printListCone(cones,numOfVars);
+  printListCone(Poly->cones,Poly->numOfVars);
 
  if(inthull[0] == 'y')
    ;
- //   printListVector(IntegralHull(cones,  inequalities, equations, numOfVars), numOfVars);
+ //   printListVector(IntegralHull(Poly->cones,  inequalities, equations, Poly->numOfVars), Poly->numOfVars);
  if(maximum[0] == 'y') {
    listCone * Opt_cones;
    if(Singlecone[0] == 'n'){
-   Opt_cones = CopyListCones(cones, numOfVars);
-   ZZ NumOfLatticePoints; //printListCone(Opt_cones, numOfVars);
-   NumOfLatticePoints = Residue(Opt_cones, numOfVars);
+   Opt_cones = CopyListCones(Poly->cones, Poly->numOfVars);
+   ZZ NumOfLatticePoints; //printListCone(Opt_cones, Poly->numOfVars);
+   NumOfLatticePoints = Residue(Opt_cones, Poly->numOfVars);
    cout <<"Finished computing a rational function. " << endl;
    cout <<"Time: " << GetTime() << " sec." << endl;
    if(IsZero(NumOfLatticePoints) == 1){
@@ -673,11 +690,11 @@ int main(int argc, char *argv[]) {
 	if(Singlecone[0] == 'y') singleCone = 1;
 	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
-	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
+	Opt_solution = SolveIP(Poly->cones, matrix, cost, Poly->numOfVars, singleCone); 
         if(minimize[0] == 'y') cost = -cost;
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
 	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
 	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
 
@@ -716,11 +733,11 @@ int main(int argc, char *argv[]) {
 	if(Singlecone[0] == 'y') singleCone = 1;
 	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
-	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	Opt_solution = SolveIP(Poly->cones, matrix, cost, Poly->numOfVars, singleCone); 
+	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
         if(minimize[0] == 'y') cost = -cost;
 	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
 	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
 	conv(tmp_RR, IP_OPT);
@@ -759,21 +776,21 @@ if(Memory_Save[0] == 'n')
 	if(dualApproach[0] == 'n'){
 	  cout << "Creating generating function.\n"; 
 	  //printListVector(templistVec, oldnumofvars); cout << ProjU << endl;
-	if(equationsPresent[0] == 'y'){ cones = ProjectUp2(cones, oldnumofvars, numOfVars, AA, bb);
-	numOfVars = oldnumofvars;}
+	if(equationsPresent[0] == 'y'){ Poly->cones = ProjectUp2(Poly->cones, oldnumofvars, Poly->numOfVars, AA, bb);
+	Poly->numOfVars = oldnumofvars;}
 
-	  createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);  }
-        //printListCone(cones, numOfVars);
+	  createGeneratingFunctionAsMapleInput(fileName,Poly->cones,Poly->numOfVars);  }
+        //printListCone(cones, Poly->numOfVars);
 	if(dualApproach[0] == 'n'){
 	cout << "Starting final computation.\n";
-	cout << endl << "****  The number of lattice points is: " << Residue(cones,numOfVars) << "  ****" << endl << endl;}
+	cout << endl << "****  The number of lattice points is: " << Residue(Poly->cones,Poly->numOfVars) << "  ****" << endl << endl;}
 
 
 	if(dualApproach[0] == 'y')
 	{
 		cout << "Starting final computation.\n";
 		//cout << "output_cone: " << output_cone;
-  		ResidueFunction(cones,numOfVars, print_flag, degree, output_cone);
+  		ResidueFunction(Poly->cones,Poly->numOfVars, print_flag, degree, output_cone);
 	//  Else we have already computed the residue.
 	}
 
@@ -829,8 +846,6 @@ if(Memory_Save[0] == 'n')
     system_with_error_check(command);
   }
  }
-  }
-
 
   if((dualApproach[0] == 'y') && (cddstyle[0] == 'n') && Vrepresentation[0] == 'n'){
 
