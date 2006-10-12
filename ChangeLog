@@ -1,3 +1,21 @@
+2006-10-12  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* count.cpp: Support "homog vrep".
+
+	* vertices/cdd.cpp, vertices/cdd.h (createCddExtFile2, computeVertexConesFromVrep):
+	Const fixes.
+	(computeVertexConesFromVrep): Produce, not consume numOfVars.
+	(readCddExtFile): Produce numOfVars.
+
+	* ReadingFile.cpp, ReadingFile.h (IntVector, IntCone, IntCone2):
+	Unused, removed.
+
+	* ReadLatteStyle.cpp, ReadLatteStyle.h, Polyhedron.h,
+	latte_cddlib.cpp, latte_cddlib.h: New files. 
+
+	* cone.cpp, cone.h, ramon.cpp, ramon.h (appendVectorToListVector):
+	Move from ramon.[ch] to cone.[ch].
+
 2006-10-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Version 1.2-mk-0.7.1
