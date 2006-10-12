@@ -6,8 +6,8 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 
 LDADD = liblatte.a
-AM_CXXFLAGS := $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(GMP_CFLAGS) $(AM_CXXFLAGS)
-LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(GMP_LIBS)
+AM_CXXFLAGS := $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(CDDLIB_CFLAGS) $(GMP_CFLAGS) $(AM_CXXFLAGS)
+LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(CDDLIB_LIBS) $(GMP_LIBS)
 
 noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES = \
@@ -20,11 +20,12 @@ liblatte_a_SOURCES = \
 	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
 	banner.cpp convert.cpp \
 	todd/gmp_pow.cpp todd/todd-expansion.cpp \
-	latte_gmp.cpp latte_ntl.cpp latte_random.cpp latte_system.cpp \
+	latte_gmp.cpp latte_ntl.cpp latte_random.cpp latte_system.cpp latte_cddlib.cpp \
 	genFunction/IntCombEnum.cpp		\
 	genFunction/matrix_ops.cpp		\
 	ExponentialSubst.cpp ExponentialEhrhart.cpp \
-	Irrational.cpp
+	Irrational.cpp \
+	ReadLatteStyle.cpp
 
 noinst_HEADERS =							\
 	CheckEmpty.h 		 					\
@@ -37,11 +38,12 @@ noinst_HEADERS =							\
 	genFunction/piped.h vertices/cdd.h				\
 	todd/gmp_pow.h todd/todd-expansion.h				\
 	convert.h							\
-	latte_gmp.h latte_ntl.h	latte_random.h latte_system.h		\
+	latte_gmp.h latte_ntl.h	latte_random.h latte_system.h latte_cddlib.h		\
 	genFunction/IntCombEnum.h     \
 	genFunction/matrix_ops.h    \
 	ExponentialSubst.h ExponentialEhrhart.h \
-	Irrational.h
+	Irrational.h \
+	ReadLatteStyle.h Polyhedron.h
 
 if HAVE_LIDIA
 liblatte_a_SOURCES += 	genFunction/NTL_to_LiDIA.cpp
