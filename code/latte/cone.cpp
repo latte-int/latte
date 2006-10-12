@@ -22,6 +22,15 @@
 
 #include <stdlib.h>
 #include "ramon.h"
+
+/* ----------------------------------------------------------------- */
+listVector* appendVectorToListVector(const vec_ZZ &v, listVector *REST) {
+  // listVector *LIST;
+  listVector * LIST = new listVector(v);  
+  LIST->rest = REST;
+  return (LIST);
+}
+
 /* ----------------------------------------------------------------- */
 listCone* createListCone() {
   listCone* z;

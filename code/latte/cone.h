@@ -35,6 +35,8 @@ struct listVector {
     first(a_first), rest(a_rest) {}
 };
 
+listVector* appendVectorToListVector(const vec_ZZ &, listVector*);
+
 struct Vertex {
   rationalVector *vertex;
   vec_ZZ ehrhart_vertex; // for exponential Ehrhart computation
@@ -61,7 +63,10 @@ struct listCone {
   struct listCone *rest;
 };
 
+/* Allocate a single listCone element and initialize all members. */
 listCone* createListCone();
+
+/* Return the length of the linked list. */
 int lengthListCone(listCone*);
 
 /* Free the first cone, not the whole list. */

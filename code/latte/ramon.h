@@ -24,7 +24,6 @@
 
 #include "cone.h"
 
-listVector* appendVectorToListVector(const vec_ZZ &, listVector*);
 vec_ZZ createVector(int);
 vec_ZZ* createArrayVector(int);
 listVector* createListVector(vec_ZZ);
