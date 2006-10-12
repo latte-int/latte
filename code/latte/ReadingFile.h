@@ -24,9 +24,6 @@
 #include "latte_ntl.h"
 
 void CheckRed(char* Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation);
-void IntVector(listVector* basis, int numOfVars);
-void IntCone(listCone* cones, int numOfVars) ;
-listCone* IntCone2(listCone* cones, int numOfVars);
 void CheckInputFileCDDRep1(char *InputFile);
 listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars, 
 		    listVector *equations);

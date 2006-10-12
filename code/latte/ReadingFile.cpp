@@ -44,35 +44,6 @@
 #include "IntegralHull.h"
 #include "latte_system.h"
 
-void IntVector(listVector* basis, int numOfVars) {
-
-  while(basis) {
-    basis->first = -basis->first;
-    basis = basis->rest;
-  }
-/*  printf("\n"); */
-  return ;
-}
-/* ----------------------------------------------------------------- */
-void IntCone(listCone* cones, int numOfVars) {
-  IntVector(cones->rays,numOfVars);
-
-  return ;
-}
-
-/* ----------------------------------------------------------------- */
-listCone* IntCone2(listCone* cones, int numOfVars) {
- listCone* cone;
- cone = cones;
-  while(cone) {
-    IntCone(cone,numOfVars);
-    cone = cone->rest;
-  }
-  //cout << endl;
-  //cones = cone;
-  return cones;
-}
-
 /* ----------------------------------------------------------------- */
 
 void
