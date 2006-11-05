@@ -23,9 +23,23 @@
 #ifndef LATTE_SYSTEM_H
 #define LATTE_SYSTEM_H
 
+#include <string>
+
 // Execute COMMAND with the system shell.
 // When COMMAND returns with a nonzero error status,
 // report and exit the program.
 void system_with_error_check(const char *command);
+void system_with_error_check(const string &command);
+
+// Functions for storing intermediate data in a secure temporary
+// directory.  (More importantly, different runs of LattE are isolated
+// from each other.)  The  function `temporary_directory_name' returns
+// the directory name with a trailing slash.
+void create_temporary_directory();
+const std::string &temporary_directory_name();
+void remove_temporary_directory();
+
+// Return the pathname of the file NAME in the temporary directory.
+std::string temporary_file_name(const std::string &name);
 
 #endif
