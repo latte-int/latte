@@ -488,11 +488,11 @@ int main(int argc, char *argv[]) {
       endRays=endRays->rest;
       tmpRays=tmpRays->rest;
     }
-    Poly->numOfVars = numOfVars;
     Poly->cones->rays = rays->rest;
     Poly->dualized = true;
   }
 
+  Poly->numOfVars = numOfVars;
   } /* Not VREP */
 
   
