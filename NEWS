@@ -10,4 +10,5 @@ Changes since the official release 1.2:
  * New all-primal irrational decomposition (count --all-primal)
  * New method for computing Ehrhart polynomials of integral polytopes 
    in the primal space (count --all-primal --ehrhart-polynomial)
-
+ * The homogenized method now allows v-representation input 
+   (count homog vrep)
