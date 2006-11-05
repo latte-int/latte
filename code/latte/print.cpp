@@ -218,7 +218,7 @@ void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printListConeToFile(char *fileName, listCone* cones, int numOfVars) {
+void printListConeToFile(const char *fileName, listCone* cones, int numOfVars) {
   ofstream out(fileName);
   if (!out) {
     printf("Error opening output file for writing in printListConeToFile!");
@@ -237,7 +237,7 @@ void printListConeToFile(char *fileName, listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printResidueFile(char* fileName, listCone* cones, int numOfVars) {
+void printResidueFile(const char* fileName, listCone* cones, int numOfVars) {
   int numOfTerms;
   char outFileName[127];
   listVector *tmp;

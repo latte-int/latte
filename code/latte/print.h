@@ -41,8 +41,8 @@ void printRationalVectorToFile(ostream &, rationalVector*, int);
 void printRationalVectorToFileWithoutBrackets(ostream &, rationalVector*, 
 					      int);
 void printConeToFile(ostream &out, listCone* cones, int numOfVars);
-void printListConeToFile(char*, listCone*, int); 
-void printResidueFile(char*, listCone*, int);
+void printListConeToFile(const char*, listCone*, int); 
+void printResidueFile(const char*, listCone*, int);
 
 void
 print_debug_matrix(const mat_ZZ &);
