@@ -1,3 +1,5 @@
+// This is a -*- C++ -*- header file.
+
 /* Triangulation.cpp -- Triangulations of cones.
 
    Copyright 2002 Ruriko Yoshida
