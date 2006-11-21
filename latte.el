@@ -10,6 +10,9 @@
 (defconst lidia-types
   '("bigint" "bigint_matrix"))
 
+(defconst cddlib-types
+  '("dd_MatrixPtr" "dd_rowset" "dd_colset"))
+
 (defconst latte-types
   '("listCone" "listVector"
     "vector" "rationalVector"
@@ -17,10 +20,12 @@
     "Integer"
     "mpq_vector" "mpz_vector"
     "PointsInParallelepipedGenerator" "IntCombEnum"
-    "NotGenericException"))
+    "NotGenericException"
+    "BarvinokParameters"
+    "Vertex" "Polyhedron"))
 
 (setq c++-font-lock-extra-types
-      (cons (regexp-opt (append ntl-types latte-types gmp-types lidia-types))
+      (cons (regexp-opt (append ntl-types latte-types gmp-types lidia-types cddlib-types))
 	    c++-font-lock-extra-types))
 
 (if load-file-name
