@@ -636,7 +636,7 @@ int main(int argc, char *argv[]) {
 	    if (ehrhart_coefficients[i] > 0) 
 	      cout << " + " << ehrhart_coefficients[i] << " * t^" << i;
 	    else if (ehrhart_coefficients[i] < 0)
-	      cout << " - " << ehrhart_coefficients[i] << " * t^" << i;
+	      cout << " - " << abs(ehrhart_coefficients[i]) << " * t^" << i;
 	  }
 	}
 	cout << endl << endl;
