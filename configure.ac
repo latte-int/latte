@@ -32,6 +32,9 @@ AC_CHECK_HEADERS([sstream])
 computeadjacency_path=${libexecdir}/`echo ComputeAdjacency | sed "${program_transform_name}"`
 AC_DEFINE_DIR([COMPUTEADJACENCY_PATH], [computeadjacency_path], [The path to the ComputeAdjacency binary.])
 
+maple_script_dir=${datadir}/latte
+AC_DEFINE_DIR([MAPLE_SCRIPT_DIR], [maple_script_dir], [The directory where LattE's Maple scripts are installed.])
+
 LB_MISC
 LB_CHECK_GMP(,,[AC_MSG_ERROR([GMP not found!
 GMP version 3.1.1 or greater is required for LattE to compile. Please
@@ -78,9 +81,10 @@ if test -z "$LRS"; then
 fi
 AC_CACHE_SAVE
 
-# We need Maple to generate the code for evaluation of the Todd polynomial. 
+# We need Maple to simplify some rational functions. 
 AC_PATH_PROG(MAPLEBIN, maple)
 AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != x )
+AC_DEFINE_UNQUOTED(MAPLE_PATH, "${MAPLEBIN}", [The path to the Maple program.])
 
 AC_ARG_ENABLE(experiments, AS_HELP_STRING([--enable-experiments],
 	[use experimental code]))
