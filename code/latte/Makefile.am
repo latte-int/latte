@@ -65,3 +65,6 @@ nodist_test_todd_SOURCES = todd/test-todd.cpp
 endif
 
 SUBDIRS = adjacency
+
+# Maple code
+dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
