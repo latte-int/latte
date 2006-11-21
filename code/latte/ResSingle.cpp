@@ -33,6 +33,7 @@
 #include "RudyResNTL.h"
 #include <malloc.h>
 #include <stdlib.h>
+#include "config.h"
 #include "flags.h"
 #include "latte_system.h"
 
@@ -748,7 +749,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 
 			Simplify_Term.close ();
 
-			system_with_error_check ("maple <simplify3.add >out.simplify");
+			system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify3.add >out.simplify");
 		
 			cout << "%";	
 		}
@@ -788,7 +789,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 				
 				Rational_Function_S_T.close ();	
 
-				system_with_error_check ("maple < simplify2.add >out.simplify");
+				system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify2.add >out.simplify");
 			}
 
 		//Now we have all the N_k's up to N_(order)
@@ -834,7 +835,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 			
 			Simplify_Term.close ();
 
-			system_with_error_check ("maple <simplify.add >out.simplify");
+			system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify.add >out.simplify");
 			
 		}
 		

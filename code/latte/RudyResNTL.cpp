@@ -33,6 +33,7 @@
 #include "ramon.h"
 #include "RudyResNTL.h"
 #include <malloc.h>
+#include "config.h"
 #include "latte_system.h"
 
 using namespace std;
@@ -1061,7 +1062,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 			Simplify_Term.close ();
 
-			system_with_error_check ("maple <simplify3.add >out.simplify");
+			system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify3.add >out.simplify");
 		
 			cout << "%";	
 		}
@@ -1074,7 +1075,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			{
 				Cones_File_Count = 0;
 
-				system_with_error_check ("maple <simplify4.add >out.simplify");
+				system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify4.add >out.simplify");
 
 			}	
 			
@@ -1116,7 +1117,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 				
 				Rational_Function_S_T.close ();	
 
-				system_with_error_check ("maple < simplify2.add >out.simplify");
+				system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify2.add >out.simplify");
 			}
 
 		//Now we have all the N_k's up to N_(order)
@@ -1162,7 +1163,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			
 			Simplify_Term.close ();
 
-			system_with_error_check ("maple <simplify.add >out.simplify");
+			system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify.add >out.simplify");
 			
 		}
 		
