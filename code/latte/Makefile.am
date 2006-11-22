@@ -6,7 +6,7 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 
 LDADD = liblatte.a
-AM_CXXFLAGS := $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(CDDLIB_CFLAGS) $(GMP_CFLAGS) $(AM_CXXFLAGS)
+AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(CDDLIB_CFLAGS) $(GMP_CFLAGS)
 LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(CDDLIB_LIBS) $(GMP_LIBS)
 
 noinst_LIBRARIES = liblatte.a
@@ -20,12 +20,17 @@ liblatte_a_SOURCES = \
 	Grobner.cpp ConeInfo.cpp binarySearchIP.cpp CheckEmpty.cpp \
 	banner.cpp convert.cpp \
 	todd/gmp_pow.cpp todd/todd-expansion.cpp \
-	latte_gmp.cpp latte_ntl.cpp latte_random.cpp latte_system.cpp latte_cddlib.cpp \
+	latte_gmp.cpp latte_ntl.cpp latte_random.cpp latte_system.cpp \
 	genFunction/IntCombEnum.cpp		\
 	genFunction/matrix_ops.cpp		\
 	ExponentialSubst.cpp ExponentialEhrhart.cpp \
 	Irrational.cpp \
 	ReadLatteStyle.cpp
+
+if HAVE_CDDLIB
+liblatte_a_SOURCES += \
+	latte_cddlib.cpp
+endif
 
 noinst_HEADERS =							\
 	CheckEmpty.h 		 					\
