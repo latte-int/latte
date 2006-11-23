@@ -1,14 +1,52 @@
 Changes since the official release 1.2:
 
  * Use GNU Autoconf and Automake.
+
  * Portability fixes.
+
  * Code clean-up.
+
  * Some performance improvements.
- * New exponential substitution (count --exp).
- * New primal irrational decomposition (count --irr).
- * New non-unimodular enumeration (count --maxdet=N).
- * New all-primal irrational decomposition (count --all-primal)
+
+ * New exponential substitution 
+
+        count --exp
+
+ * New primal irrational decomposition 
+
+        count --irr
+
+ * New non-unimodular enumeration
+
+        count --maxdet=N
+
+ * New all-primal irrational decomposition 
+
+        count --all-primal
+
  * New method for computing Ehrhart polynomials of integral polytopes 
-   in the primal space (count --all-primal --ehrhart-polynomial)
- * The homogenized method now allows v-representation input 
-   (count homog vrep)
+   in the primal space 
+
+        count --all-primal --ehrhart-polynomial
+
+ * The homogenized method now allows V-representation input 
+
+        count homog vrep
+
+ * The functionality of `ehrhart' has been merged into `count':
+ 
+	count --ehrhart-series FILENAME
+
+	      (replaces: ehrhart FILENAME)
+
+	count --simplified-ehrhart-series FILENAME
+
+	      (replaces: ehrhart simplify FILENAME)
+
+	count --ehrhart-taylor=N FILENAME
+
+	      (replaces: ehrhart N FILENAME)
+
+   (The `ehrhart' program is still available, but it does not accept
+   the new command-line options of `count'.)
+

@@ -26,6 +26,7 @@ liblatte_a_SOURCES = \
 	ExponentialSubst.cpp ExponentialEhrhart.cpp \
 	Irrational.cpp \
 	ReadLatteStyle.cpp
+#	triangulation/triangulate.cpp
 
 if HAVE_CDDLIB
 liblatte_a_SOURCES += \
@@ -48,7 +49,8 @@ noinst_HEADERS =							\
 	genFunction/matrix_ops.h    \
 	ExponentialSubst.h ExponentialEhrhart.h \
 	Irrational.h \
-	ReadLatteStyle.h Polyhedron.h
+	ReadLatteStyle.h Polyhedron.h \
+	triangulation/triangulate.h
 
 if HAVE_LIDIA
 liblatte_a_SOURCES += 	genFunction/NTL_to_LiDIA.cpp
@@ -67,6 +69,11 @@ nodist_noinst_HEADERS = \
 #nodist_simple_count_SOURCES = simple-main.cpp
 nodist_test_todd_SOURCES = todd/test-todd.cpp
 
+endif
+
+if HAVE_EXPERIMENTS
+bin_PROGRAMS += aggregation
+nodist_aggregation_SOURCES = aggregation/aggregation.cpp
 endif
 
 SUBDIRS = adjacency
