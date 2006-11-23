@@ -39,23 +39,15 @@ dd_MatrixPtr KannanAggregation(dd_MatrixPtr matrix,
   int num_rows = matrix->rowsize;
   int num_cols = matrix->colsize;
   int num_aggrows = set_card(aggrows);
-  int new_num_rows = num_rows - num_aggrows + 1;
-  dd_MatrixPtr new_matrix
-    = dd_CreateMatrix(new_num_rows, num_cols);
-  matrix->numbtype = dd_Rational;
-  matrix->representation = dd_Inequality;
-  int aggrow_index = new_num_rows - 1; // 0-based
-  set_addelem(new_matrix->linset, aggrow_index + 1);
+  int num_slacks = 0;
   mpz_class b_max, A_max;
   int i, k;
-  for (i = 0, k = 0; i<num_rows; i++) {
+  for (i = 0; i<num_rows; i++) {
     if (set_member(i + 1, aggrows)) {
-      // Check that rows are equations with non-negative entries,
-      // and compute the maximum entry.
-      if (!set_member(i + 1, matrix->linset)) {
-	cerr << "Row " << i + 1 << " must be an equation." << endl;
-	exit(1);
-      }
+      // Check that rows are equations or inequalities with
+      // non-negative entries, and compute the maximum entry.
+      if (!set_member(i + 1, matrix->linset))
+	num_slacks++;
       mpq_class b_coeff(matrix->matrix[i][0]);
       if (b_coeff < 0) {
 	cerr << "RHS of row " << i + 1 << " must be non-negative." << endl;
@@ -84,22 +76,24 @@ dd_MatrixPtr KannanAggregation(dd_MatrixPtr matrix,
 	  A_max = -A_coeff_z;
       }
     }
-    else {
-      // Copy non-aggregated rows.
-      int j;
-      for (j = 0; j<num_cols; j++)
-	dd_set(new_matrix->matrix[k][j], matrix->matrix[i][j]);
-      if (set_member(i + 1, matrix->linset))
-	set_addelem(new_matrix->linset, k + 1);
-      k++;
-    }
   }
+  int new_num_rows = num_rows + num_slacks - num_aggrows + 1;
+  int new_num_cols = num_cols + num_slacks;
+  dd_MatrixPtr new_matrix = dd_CreateMatrix(new_num_rows, new_num_cols);
+  matrix->numbtype = dd_Rational;
+  matrix->representation = dd_Inequality;
+  int aggrow_index = new_num_rows - 1; // 0-based
+  set_addelem(new_matrix->linset, aggrow_index + 1);
   mpz_class lambda = 3 * num_aggrows * (num_cols - 1) * A_max * b_max;
   cerr << "Kannan aggregation: Using lambda = " << lambda << endl;
   mpz_class lmp1 = pow(lambda, num_aggrows + 1);
   mpz_class li = lambda;
+  int slack_var_index = num_cols;
+  int slack_row_index = num_rows - num_aggrows;
+  int dest_row_index = 0;
   for (i = 0; i<num_rows; i++) {
     if (set_member(i + 1, aggrows)) {
+      // Aggregated row.
       mpz_class multiplier = lmp1 + li;
       int j;
       for (j = 0; j<num_cols; j++) {
@@ -109,7 +103,27 @@ dd_MatrixPtr KannanAggregation(dd_MatrixPtr matrix,
 	dd_set(new_matrix->matrix[aggrow_index][j],
 	       coeff.get_mpq_t());
       }
+      if (!set_member(i + 1, matrix->linset)) {
+	// Introduce slack. 
+	mpq_class multiplier_q(multiplier);
+	mpq_class coeff = - multiplier_q;
+	dd_set(new_matrix->matrix[aggrow_index][slack_var_index],
+	       coeff.get_mpq_t());
+	// Non-negativity of the slack variable.
+	dd_set_si(new_matrix->matrix[slack_row_index][slack_var_index], 1);
+	slack_var_index++;
+	slack_row_index++;
+      }
       li *= lambda;
+    }
+    else {
+      // Copy non-aggregated rows.
+      int j;
+      for (j = 0; j<num_cols; j++)
+	dd_set(new_matrix->matrix[dest_row_index][j], matrix->matrix[i][j]);
+      if (set_member(i + 1, matrix->linset))
+	set_addelem(new_matrix->linset, dest_row_index + 1);
+      dest_row_index++;
     }
   }
   return new_matrix;
