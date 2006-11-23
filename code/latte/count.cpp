@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   bool approx;
-  bool ehrhart_polynomial;
+  bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
   double sampling_factor = 1.0;
   long int num_samples = -1;
   
@@ -162,7 +162,6 @@ int main(int argc, char *argv[]) {
     //else if(strncmp(argv[i],"simp",4)==0) {strcpy(printfile,"yes"); flags |= PRINT;}
     else if(strncmp(argv[i],"file",4)==0) strcpy(Memory_Save, "no");
     //else if(strncmp(argv[i],"single",6)==0) strcpy(Singlecone,"yes");
-    //else if(strncmp(argv[i],"tay",3)==0) strcpy(taylor,"yes");
     //else if(strncmp(argv[i],"ehrhartsimp",3)==0) strcpy(rationalCone,"yes");
     else if(strncmp(argv[i],"+", 1) ==0) strcpy(nonneg,"yes");
     else if(strncmp(argv[i],"memsave",7)==0) strcpy (Memory_Save, "yes");
@@ -192,8 +191,27 @@ int main(int argc, char *argv[]) {
       params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     else if (strncmp(argv[i], "--dual", 6) == 0)
       params->decomposition = BarvinokParameters::DualDecomposition;
-    else if (strncmp(argv[i], "--ehrhart-polynomial", 5) == 0)
+    else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0)
       ehrhart_polynomial = true;
+    else if (strncmp(argv[i], "--ehrhart-series", 11) == 0) {
+      ehrhart_series = true;
+      strcpy(dualApproach,"yes");
+      flags |= DUAL_APPROACH;
+      strcpy(printfile,"yes");
+      flags |= PRINT;
+    }
+    else if (strncmp(argv[i], "--simplified-ehrhart-series", 14) == 0) {
+      ehrhart_series = true;
+      strcpy(dualApproach,"yes");
+      flags |= DUAL_APPROACH;
+      strcpy(rationalCone, "yes");
+    }
+    else if (strncmp(argv[i], "--ehrhart-taylor=", 17) == 0) {
+      strcpy(taylor, "yes");
+      degree = atoi(argv[i] + 17);
+      strcpy(dualApproach,"yes");
+      flags |= DUAL_APPROACH;
+    }
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
@@ -209,6 +227,7 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
   }
+  
   if(minimize[0] == 'y') strcpy(maximum, "yes");
   if(grobner[0] == 'y') strcpy(equationsPresent,"yes");
   if(binary[0] == 'y') {strcpy(maximum,"yes"); strcpy(Memory_Save, "no");}
@@ -216,9 +235,7 @@ int main(int argc, char *argv[]) {
   if(printfile[0] == 'y') strcpy(Memory_Save, "no");
   if(rationalCone[0] == 'y') strcpy(Memory_Save, "no");
   if(printfile[0] == 'y') print_flag = 1;
-  if(taylor[0] == 'y'){
-    degree = atoi(argv[argc-2]);
-  }
+
   if(rationalCone[0] == 'y'){
     
     //HugInt digit(argv[1]);
@@ -781,6 +798,10 @@ if(Memory_Save[0] == 'n')
 
 	  createGeneratingFunctionAsMapleInput(fileName,Poly->cones,Poly->numOfVars);  }
         //printListCone(cones, Poly->numOfVars);
+
+	cout << "Printing decomposed cones to decomposed_cones." << endl;
+	printListConeToFile("decomposed_cones", Poly->cones, Poly->numOfVars);
+
 	if(dualApproach[0] == 'n'){
 	cout << "Starting final computation.\n";
 	cout << endl << "****  The number of lattice points is: " << Residue(Poly->cones,Poly->numOfVars) << "  ****" << endl << endl;}
@@ -802,6 +823,7 @@ if(Memory_Save[0] == 'n')
   };
 
  if(rationalCone[0] == 'y') {
+   cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
    strcpy(command, "mv ");
    strcat(command, "simplify.sum ");
    strcat(command, argv[argc - 1]);
@@ -810,6 +832,7 @@ if(Memory_Save[0] == 'n')
  }
 
  if(printfile[0] == 'y'){
+   cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
    strcpy(command, "mv ");
    strcat(command, "func.rat ");
    strcat(command, argv[argc - 1]);
