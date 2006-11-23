@@ -27,7 +27,7 @@
 #include "latte_cddlib.h"
 #include "vertices/cdd.h"
 
-static void check_stream(const ifstream &f, const char *fileName, const char *proc)
+static void check_stream(const istream &f, const char *fileName, const char *proc)
 {
   if (f.bad()) {
     cerr << "Read error on input file " << fileName << " in " << proc << "." << endl;
@@ -37,12 +37,18 @@ static void check_stream(const ifstream &f, const char *fileName, const char *pr
 
 dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep)
 {
-  dd_set_global_constants();
   ifstream f(fileName);
   if (!f) {
     cerr << "Cannot open input file " << fileName << " in ReadLatteStyleMatrix." << endl;
     exit(1);
   }
+  return ReadLatteStyleMatrix(f, vrep, fileName);
+}
+
+dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep,
+				  const char *fileName)
+{
+  dd_set_global_constants();
   int numOfVectors, numOfVars_hom;
   f >> numOfVectors >> numOfVars_hom;
   dd_MatrixPtr matrix = dd_CreateMatrix(numOfVectors, numOfVars_hom);
@@ -79,8 +85,38 @@ dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep)
 	set_addelem(matrix->linset, index /* 1-based */);
       }
     }
+    else if (strcmp(buffer, "nonnegative") == 0) {
+      if (vrep) {
+	cerr << "Keyword `" << buffer << "' not valid in vrep mode." << endl;
+	exit(1);
+      }
+      int num_nonnegative;
+      f >> num_nonnegative;
+      check_stream(f, fileName, "ReadLatteStyleMatrix");
+      // Create a new matrix that includes non-negativity
+      // inequalities. 
+      dd_MatrixPtr new_matrix
+	= dd_CreateMatrix(numOfVectors + num_nonnegative, numOfVars_hom);
+      new_matrix->numbtype = dd_Rational;
+      new_matrix->representation = dd_Inequality;
+      for (i = 0; i<numOfVectors; i++)
+	for (j = 0; j<numOfVars_hom; j++)
+	  dd_set(new_matrix->matrix[i][j], matrix->matrix[i][j]);
+      int k;
+      for (k = 0; k<num_nonnegative; k++, i++) {
+	int index; /* 1-based */
+	f >> index;
+	check_stream(f, fileName, "ReadLatteStyleMatrix");
+	for (j = 0; j<numOfVars_hom; j++)
+	  dd_set_si(new_matrix->matrix[i][j], 0);
+	dd_set_si(new_matrix->matrix[i][index], 1);
+      }
+      set_copy(new_matrix->linset, matrix->linset);
+      dd_FreeMatrix(matrix);
+      matrix = new_matrix;
+    }
     else {
-      cerr << "Unknown keyword " << buffer << " in input file " << fileName
+      cerr << "Unknown keyword `" << buffer << "' in input file " << fileName
 	   << " in ReadLatteStyleMatrix." << endl;
       exit(1);
     }
@@ -91,6 +127,32 @@ dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep)
     }
   }
   return matrix;	
+}
+
+void WriteLatteStyleMatrix(const char *fileName, dd_MatrixPtr matrix)
+{
+  ofstream f(fileName);
+  WriteLatteStyleMatrix(f, matrix);
+}
+
+void WriteLatteStyleMatrix(ostream &f, dd_MatrixPtr matrix)
+{
+  f << matrix->rowsize << " " << matrix->colsize << endl;
+  int i;
+  for (i = 0; i<matrix->rowsize; i++) {
+    int j;
+    for (j = 0; j < matrix->colsize; j++)
+      f << matrix->matrix[i][j] << " ";
+    f << endl;
+  }
+  int num_linearity = set_card(matrix->linset);
+  if (num_linearity > 0) {
+    f << "linearity " << num_linearity << " ";
+    for (i = 1; i<=matrix->rowsize; i++)
+      if (set_member(i, matrix->linset))
+	f << i << " ";
+    f << endl;
+  }
 }
 
 static void check_cddlib_error(dd_ErrorType error, const char *proc)
@@ -139,6 +201,7 @@ Polyhedron *ReadLatteStyleVrep(const char *filename, bool homogenize)
 	cone->vertex = new Vertex(createRationalVector(P->numOfVars));
       }
     }
+    dd_FreeMatrix(matrix);
     P->cones = cone;
     P->dualized = false;
     P->homogenized == true;

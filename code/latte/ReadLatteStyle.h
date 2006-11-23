@@ -23,11 +23,22 @@
 #ifndef READLATTESTYLE__H
 #define READLATTESTYLE__H
 
+#include <fstream>
+#include "latte_cddlib.h"
 #include "Polyhedron.h"
 
+/* Read a file in LattE format and return a cddlib matrix. */
+dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep,
+				  const char *file_description = "");
+dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep);
+
+/* Write a cddlib matrix to a file in LattE format. */
+void WriteLatteStyleMatrix(ostream &f, dd_MatrixPtr matrix);
+void WriteLatteStyleMatrix(const char *fileName, dd_MatrixPtr matrix);
+
+/* Read a VREP file in LattE format
+   and create a corresponding Polyhedron. */
 Polyhedron *ReadLatteStyleVrep(const char *filename, bool homogenize);
-
-
   
 #endif
 
