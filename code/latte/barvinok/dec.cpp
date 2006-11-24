@@ -39,57 +39,13 @@
 #define MODULUS 1000000000
 #define Exponent_Ten_Power 10
 
-
-/* ----------------------------------------------------------------- */
-listCone* readListCone(const Vertex &vertex, int numOfVars) {
-  int i,j,k,numOfCones,coeff;
-  vec_ZZ v;
-  listVector *tmp, *endtmp;
-  listCone *cones, *endCones;
-  char fileName[127];
-
-  cones=createListCone();
-  endCones=cones;
-
-  strcpy(fileName,"latte_dec.latte");
-
-  ifstream in(fileName);
-  if(!in){
-    cerr << "Cannot open input file in readListCone." << endl;
-    exit(1);
-  }
-
-  in >> numOfCones;
-
-  for (i=0; i<numOfCones; i++) {
-    in >> coeff;
-    v=createVector(numOfVars);
-    tmp=createListVector(v);
-    endtmp=tmp;
-    for (j=0; j<numOfVars; j++) {
-      v=createVector(numOfVars);
-      for (k=0; k<numOfVars; k++) {
-	in >> v[k];
-      }
-      endtmp->rest=createListVector(v);
-      endtmp=endtmp->rest;
-    }
-    endCones->rest=createListCone();
-    endCones=endCones->rest;
-    if (coeff==1) endCones->coefficient=1;
-    else endCones->coefficient=-1;
-    endCones->vertex=new Vertex(vertex);
-    endCones->rays=tmp->rest;
-  }
-
-  in.close();
-
-  return (cones->rest);
-}
-/* ----------------------------------------------------------------- */
-
 Collecting_Single_Cone_Parameters::Collecting_Single_Cone_Parameters()
   : Decomposed_Cones(NULL)
+{
+}
+
+Collecting_Single_Cone_Parameters::Collecting_Single_Cone_Parameters(const BarvinokParameters &params)
+  : Single_Cone_Parameters(params), Decomposed_Cones(NULL)
 {
 }
 
@@ -102,24 +58,17 @@ int Collecting_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 }
 
 listCone*
-decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
-	       char *File_Name, int max_determinant,
-	       bool dualize,
-	       BarvinokParameters::DecompositionType decomposition)
+decomposeCones(listCone *cones, bool dualize,
+	       BarvinokParameters &param)
 {
   int numOfConesDecomposed,numOfAllCones;
   listCone *tmp;
 
-  Collecting_Single_Cone_Parameters parameters;
-  parameters.Flags = Flags;
-  parameters.Number_of_Variables = numOfVars;
-  parameters.max_determinant = max_determinant;
-  parameters.File_Name = File_Name;
-  parameters.decomposition = decomposition;
+  Collecting_Single_Cone_Parameters parameters(param);
 
   if (dualize) {
     parameters.dualize_time.start();
-    cones = dualizeCones(cones, numOfVars);
+    cones = dualizeCones(cones, param.Number_of_Variables);
     parameters.dualize_time.stop();
     cout << parameters.dualize_time;
   }
@@ -148,6 +97,21 @@ decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
   cout << lengthListCone(parameters.Decomposed_Cones) << " cones in total.\n";
   
   return parameters.Decomposed_Cones;
+}
+
+listCone*
+decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
+	       char *File_Name, int max_determinant,
+	       bool dualize,
+	       BarvinokParameters::DecompositionType decomposition)
+{
+  Collecting_Single_Cone_Parameters parameters;
+  parameters.Flags = Flags;
+  parameters.Number_of_Variables = numOfVars;
+  parameters.max_determinant = max_determinant;
+  parameters.File_Name = File_Name;
+  parameters.decomposition = decomposition;
+  return decomposeCones(cones, dualize, parameters);
 }
 
 /* ----------------------------------------------------------------- */
@@ -179,7 +143,8 @@ barvinokDecomposition_List(listCone *cones,
     Parameters.InitializeComputation();
     try {
       listCone *cone;
-      for (cone = cones; cone != NULL; cone = cone->rest) {
+      int index;
+      for (cone = cones, index = 0; cone != NULL; cone = cone->rest, index++) {
 	int status;
 	status = barvinokDecomposition_Single(cone, &Parameters);
 	if (status < 0) {
@@ -187,6 +152,8 @@ barvinokDecomposition_List(listCone *cones,
 	  throw not_generic;  // FIXME: Later replace this return
 			      // value handling by exception.
 	}
+	if (index%1 == 0)
+	  cout << index << " vertex cones done. " << endl;
       }
       return;
     }
@@ -207,7 +174,9 @@ Standard_Single_Cone_Parameters::InitializeComputation()
     Taylor_Expansion_Result[i] = 0;
   Total_Lattice_Points = 0;
   Total_Uni_Cones = 0;
-  Cone_Index = 0; 
+  Cone_Index = 0;
+  Max_Depth = 0;
+  Current_Depth = 0;
 }
 
 int
