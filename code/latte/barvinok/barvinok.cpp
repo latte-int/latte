@@ -38,6 +38,9 @@
 #include "dual.h"
 #include "config.h"
 #include "Irrational.h"
+#ifdef HAVE_EXPERIMENTS
+#include "barvinok/SubspaceAvoidingDecomposition.h"
+#endif
 
 #define SHOWDETS
 
@@ -207,7 +210,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 static bool
 computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
 			    const vec_ZZ &Z, int m, 
-			    mat_ZZ &mat, vec_ZZ &Dets)
+			    mat_ZZ &mat, vec_ZZ &Dets, bool increase_ok = false)
 {
   ZZ absDet = abs(Det);
   for (int i = 1; i <= m; i++) {
@@ -219,7 +222,7 @@ computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
     /* Restore the original row */
     for(int j = 1; j <= m; j++)
       mat(i, j) = generator(i, j);
-    if (abs(Dets[i - 1]) >= absDet) 
+    if (!increase_ok && abs(Dets[i - 1]) >= absDet) 
       return false;
   }
   return true;
@@ -235,28 +238,50 @@ computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
 static void
 barvinokStep(const listCone *Cone, 
 	     vector <listCone *> &Cones, vec_ZZ &Dets,
-	     int m)
+	     int m, Single_Cone_Parameters *Parameters)
 {
   mat_ZZ generator = createConeDecMatrix(Cone, m, m);
   mat_ZZ dual = createFacetMatrix(Cone, m, m);
   /* ComputeOmega(const mat_ZZ &, long& ) computes
      an integral vector in the parallelogram. */
-  vec_ZZ Z = ComputeOmega(generator, dual, m, 0, 0);
-  Z = CheckOmega(generator, Z);
-     
-  mat_ZZ mat = generator;
-  bool success
-    = computeAndCheckDeterminants(generator, Cone->determinant, Z,
-				  m, mat, Dets);
-  if (!success) {
-    cout << "Second loop... " << endl;
-    Z = ComputeOmega(generator, dual, m, 2, 2);
+  mat_ZZ mat;
+  vec_ZZ Z;
+  switch (Parameters->shortvector) {
+  case BarvinokParameters::LatteLLL: {
+    Z = ComputeOmega(generator, dual, m, 0, 0);
     Z = CheckOmega(generator, Z);
-    success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
-					  m, mat, Dets);
-    assert(success);
+     
+    mat = generator;
+    bool success
+      = computeAndCheckDeterminants(generator, Cone->determinant, Z,
+				    m, mat, Dets);
+    if (!success) {
+      cout << "Second loop... " << endl;
+      Z = ComputeOmega(generator, dual, m, 2, 2);
+      Z = CheckOmega(generator, Z);
+      success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
+					    m, mat, Dets);
+      assert(success);
+    }
+    break;
   }
-
+  case BarvinokParameters::SubspaceAvoidingLLL: {
+#ifdef HAVE_EXPERIMENTS
+    Z = ComputeShortVectorAvoidingSubspace(generator, dual);
+    Z = CheckOmega(generator, Z);
+    mat = generator;
+    computeAndCheckDeterminants(generator, Cone->determinant, Z,
+				m, mat, Dets, true);
+#else
+    cerr << "SubspaceAvoidingLLL not compiled in, sorry." << endl;
+    exit(1);
+#endif
+    break;
+  }
+  default:
+    assert(0);
+  }
+  
   for(int i = 0; i < m; i++) {
     if (Dets[i] == 0)
       Cones[i] = NULL;
@@ -355,7 +380,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   Dets.SetLength(m);	     
   vector<listCone *> cones1(m);
 
-  barvinokStep(C, cones1, Dets, m);
+  barvinokStep(C, cones1, Dets, m, Parameters);
   
   ZZ max;
   max = -1;
