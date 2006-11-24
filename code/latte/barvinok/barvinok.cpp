@@ -204,14 +204,18 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
    Copy the vector Z into each row of the matrix (we are dealing with
    the row space) and compute the determinant of the resulting matrix;
    store the determinants in DETS[].  When any determinant is
-   larger-or-equal than DET in absolute value, stop the computation
-   and return false.  Otherwise return true.
+   larger-or-equal than DET in absolute value, return false;
+   otherwise return true.
+
+   If NONDECREASE_OK is false (the default), stop the computation
+   immediately when the result is known to be false.
 */
 static bool
 computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
 			    const vec_ZZ &Z, int m, 
-			    mat_ZZ &mat, vec_ZZ &Dets, bool increase_ok = false)
+			    mat_ZZ &mat, vec_ZZ &Dets, bool nondecrease_ok = false)
 {
+  bool decrease = true;
   ZZ absDet = abs(Det);
   for (int i = 1; i <= m; i++) {
     /* Copy in the row */
@@ -222,10 +226,12 @@ computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
     /* Restore the original row */
     for(int j = 1; j <= m; j++)
       mat(i, j) = generator(i, j);
-    if (!increase_ok && abs(Dets[i - 1]) >= absDet) 
-      return false;
+    if (abs(Dets[i - 1]) >= absDet) {
+      decrease = false;
+      if (!nondecrease_ok) return false;
+    }
   }
-  return true;
+  return decrease;
 }
 
 /* Decompose the cone spanned by GENERATOR (which has determinant DET)
@@ -235,7 +241,7 @@ computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
    Entries with Det[i] == 0 have Cones[i] == NULL (we don't generate
    lower-dimensional cones).
 */
-static void
+static bool
 barvinokStep(const listCone *Cone, 
 	     vector <listCone *> &Cones, vec_ZZ &Dets,
 	     int m, Single_Cone_Parameters *Parameters)
@@ -252,6 +258,9 @@ barvinokStep(const listCone *Cone,
     Z = CheckOmega(generator, Z);
      
     mat = generator;
+    // FIXME: The determinants actually do not need to be computed;
+    // they are given by the vector L(index) in ComputeOmega...
+    // --mkoeppe, Fri Nov 24 17:01:37 MET 2006
     bool success
       = computeAndCheckDeterminants(generator, Cone->determinant, Z,
 				    m, mat, Dets);
@@ -270,8 +279,11 @@ barvinokStep(const listCone *Cone,
     Z = ComputeShortVectorAvoidingSubspace(generator, dual);
     Z = CheckOmega(generator, Z);
     mat = generator;
-    computeAndCheckDeterminants(generator, Cone->determinant, Z,
-				m, mat, Dets, true);
+    bool decrease
+      = computeAndCheckDeterminants(generator, Cone->determinant, Z,
+				    m, mat, Dets, true);
+    if (!decrease)
+      return false;
 #else
     cerr << "SubspaceAvoidingLLL not compiled in, sorry." << endl;
     exit(1);
@@ -308,6 +320,32 @@ barvinokStep(const listCone *Cone,
       Cones[i]->vertex = new Vertex(*Cone->vertex);
       computeDetAndFacetsOfSimplicialCone(Cones[i], m);
     }
+  }
+  return true;
+}
+
+static int
+deliver_cone(listCone *C, Single_Cone_Parameters *Parameters)
+{
+  Parameters->Total_Uni_Cones += 1;
+  if ( Parameters->Total_Uni_Cones % 1000 == 0)
+    cout << Parameters->Total_Uni_Cones
+	 << (Parameters->max_determinant == 0
+	     ? " simplicial cones done."
+	     : (Parameters->max_determinant == 1
+		? " unimodular cones done."
+		: " low-index cones done."))
+	 << endl;
+  switch (Parameters->decomposition) {
+  case BarvinokParameters::DualDecomposition:
+    C = dualizeBackCones(C, Parameters->Number_of_Variables);
+    return Parameters->ConsumeCone(C);
+  case BarvinokParameters::IrrationalPrimalDecomposition:
+  case BarvinokParameters::IrrationalAllPrimalDecomposition:
+    return Parameters->ConsumeCone(C);
+  default:
+    cerr << "Unknown BarvinokParameters::decomposition" << endl;
+    abort();
   }
 }
 
@@ -347,28 +385,8 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
       abort();
     }
     if (Parameters->max_determinant == 0
-	   || absDet <= Parameters->max_determinant) {
-      Parameters->Total_Uni_Cones += 1;
-      if ( Parameters->Total_Uni_Cones % 1000 == 0)
-	cout << Parameters->Total_Uni_Cones
-	     << (Parameters->max_determinant == 0
-		 ? " simplicial cones done."
-		 : (Parameters->max_determinant == 1
-		    ? " unimodular cones done."
-		    : " low-index cones done."))
-	     << endl;
-      switch (Parameters->decomposition) {
-      case BarvinokParameters::DualDecomposition:
-	C = dualizeBackCones(C, Parameters->Number_of_Variables);
-	return Parameters->ConsumeCone(C);
-      case BarvinokParameters::IrrationalPrimalDecomposition:
-      case BarvinokParameters::IrrationalAllPrimalDecomposition:
-	return Parameters->ConsumeCone(C);
-      default:
-	cerr << "Unknown BarvinokParameters::decomposition" << endl;
-	abort();
-      }
-    }
+	   || absDet <= Parameters->max_determinant)
+      return deliver_cone(C, Parameters);
   }
   
   //cout << "barvinok_DFS: non-uni cone." << endl;
@@ -380,7 +398,18 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   Dets.SetLength(m);	     
   vector<listCone *> cones1(m);
 
-  barvinokStep(C, cones1, Dets, m, Parameters);
+  bool success = barvinokStep(C, cones1, Dets, m, Parameters);
+  if (!success) {
+    cerr << "Unable to decompose cone with index " << absDet;
+    if (absDet <= 200000) { // "Emergency" max-index
+      cerr << ", enumerating it." << endl;
+      return deliver_cone(C, Parameters);      
+    }
+    else {
+      cerr << ", giving up." << endl;
+      exit(1);
+    }
+  }
   
   ZZ max;
   max = -1;
