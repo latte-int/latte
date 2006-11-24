@@ -32,3 +32,71 @@
     (let ((directory (file-name-directory load-file-name)))
       (if (file-exists-p (concat directory "TAGS"))
 	  (visit-tags-table directory))))
+
+(add-to-list 'auto-insert-alist 
+	     '(("\\.\\([Hh]\\|hh\\|hpp\\)\\'" . "C++ header")
+	       "Short description: " 
+	       (progn (c++-mode) 
+		      "// This is a -*- C++ -*- header file.
+
+/* ") (file-name-nondirectory buffer-file-name) " -- " str "
+	       
+   Copyright " (substring (current-time-string) -4) " " (user-full-name) "
+
+   This file is part of LattE.
+   
+   LattE is free software; you can redistribute it and/or modify it
+   under the terms of the version 2 of the GNU General Public License
+   as published by the Free Software Foundation.
+
+   LattE is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with LattE; if not, write to the Free Software Foundation,
+   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+*/
+
+"
+	       "#ifndef " (upcase (concat (file-name-nondirectory (substring buffer-file-name 0 (match-beginning 0)))
+			       "_" 
+			       (substring buffer-file-name (1+ (match-beginning 0)))))
+	       "
+"
+	       "#define " (upcase (concat (file-name-nondirectory (substring buffer-file-name 0 (match-beginning 0)))
+			       "_" 
+			       (substring buffer-file-name (1+ (match-beginning 0)))))
+	       "
+
+" _ "
+
+#endif"))
+
+(add-to-list 'auto-insert-alist 
+	     '(("\\.\\(cpp\\)\\'" . "C++ source file")
+	       "Short description: " 
+	       "/* "
+	       (file-name-nondirectory buffer-file-name) " -- " str "
+	       
+   Copyright " (substring (current-time-string) -4) " " (user-full-name) "
+
+   This file is part of LattE.
+   
+   LattE is free software; you can redistribute it and/or modify it
+   under the terms of the version 2 of the GNU General Public License
+   as published by the Free Software Foundation.
+
+   LattE is distributed in the hope that it will be useful, but
+   WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public License
+   along with LattE; if not, write to the Free Software Foundation,
+   Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
+*/
+
+"))
+
