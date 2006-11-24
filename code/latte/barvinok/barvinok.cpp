@@ -39,7 +39,7 @@
 #include "config.h"
 #include "Irrational.h"
 
-#undef SHOWDETS
+#define SHOWDETS
 
 BarvinokParameters::BarvinokParameters() :
   total_time("Total time", true),
@@ -70,6 +70,7 @@ void Single_Cone_Parameters::print_statistics(ostream &s)
       << (max_determinant == 1 ? "unimodular" : "low-index")
       << " cones: " << Total_Uni_Cones << endl;
   }
+  s << "Maximum depth of the decomposition tree: " << Max_Depth  << endl;
 }
 
  /* Note:  We are dealing with the "Row space" of the
@@ -287,6 +288,9 @@ barvinokStep(const listCone *Cone,
 
 int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 {
+  if (Parameters->Current_Depth > Parameters->Max_Depth)
+    Parameters->Max_Depth = Parameters->Current_Depth;
+  
   ZZ absDet;
   switch (Parameters->decomposition) {
   case BarvinokParameters::DualDecomposition:
@@ -357,7 +361,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   max = -1;
 
 #ifdef SHOWDETS
-  cout << "Index " << absDet << " -> ";
+  cout << "Level " << Parameters->Current_Depth << ": Index " << absDet << " -> ";
 #endif
   for(int i = 0; i < m; i++)
     {
@@ -393,7 +397,9 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 
   if (Parameters->Current_Simplicial_Cones_Total > Parameters->Max_Simplicial_Cones_Total)
     Parameters->Max_Simplicial_Cones_Total = Parameters->Current_Simplicial_Cones_Total;
-	
+
+  Parameters->Current_Depth++;
+  
   do {
     min = max + 1;
     current = -1;
@@ -411,6 +417,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
       Parameters->Current_Simplicial_Cones_Total--;
     }
   } while (current >= 0 && result == 1);
+  Parameters->Current_Depth--;
   freeListCone(C);
   return result;
 }
