@@ -54,6 +54,7 @@
 #include "ExponentialEhrhart.h"
 #ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
+#include "TrivialSubst.h"
 #endif
 
 #include "banner.h"
@@ -247,6 +248,14 @@ int main(int argc, char *argv[]) {
 
   if(dilation[0] == 'y') dilation_const = atoi(argv[argc-2]);
 
+  if (ehrhart_series && 
+      (params->decomposition == BarvinokParameters::IrrationalPrimalDecomposition
+       || params->decomposition == BarvinokParameters::IrrationalAllPrimalDecomposition)) {
+    /* Standard substitution methods (as implemented) do not work, so
+       prepare use of Trivial Substitution. */
+    params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
+  }
+  
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
 #if 1
@@ -507,6 +516,9 @@ int main(int argc, char *argv[]) {
     }
     Poly->cones->rays = rays->rest;
     Poly->dualized = true;
+
+    cout << "Homogenization: " << endl;
+    printListCone(Poly->cones, numOfVars);
   }
 
   Poly->numOfVars = numOfVars;
@@ -592,16 +604,14 @@ int main(int argc, char *argv[]) {
   switch (params->substitution) {
   case BarvinokParameters::PolynomialSubstitution:
     if (ehrhart_polynomial) {
-      cerr << "Computational of Ehrhart polynomials is only implemented "
+      cerr << "Computation of Ehrhart polynomials is only implemented "
 	   << "for the exponential substitution." << endl;
       exit(1);
     }
     if (assumeUnimodularCones[0]=='n') {
       if (Memory_Save[0] == 'n') {
-	Poly->cones=decomposeCones(Poly->cones,Poly->numOfVars, flags, fileName,
-			     params->max_determinant,
-			     not Poly->dualized,
-			     params->decomposition);
+	Poly->cones=decomposeCones(Poly->cones, not Poly->dualized,
+				   *params);
 	/* Compute points in parallelepipeds */
 	computePointsInParallelepipeds(Poly->cones, Poly->numOfVars);
       }
@@ -809,9 +819,27 @@ if(Memory_Save[0] == 'n')
 
 	if(dualApproach[0] == 'y')
 	{
-		cout << "Starting final computation.\n";
-		//cout << "output_cone: " << output_cone;
-  		ResidueFunction(Poly->cones,Poly->numOfVars, print_flag, degree, output_cone);
+	  cout << "Starting final computation.\n";
+	  //cout << "output_cone: " << output_cone;
+	  switch (params->decomposition) {
+	  case BarvinokParameters::IrrationalPrimalDecomposition:
+	  case BarvinokParameters::IrrationalAllPrimalDecomposition: {
+#ifdef HAVE_EXPERIMENTS
+	    ofstream out("func.rat");
+	    out << "HS := ";
+	    TrivialMonomialSubstitutionMapleOutput(out, Poly->cones, Poly->numOfVars);
+	    out << ";";
+#else
+	    cerr << "Trivial monomial subtitution not compiled in, sorry." << endl;
+#endif
+	    break;
+	  }
+	  case BarvinokParameters::DualDecomposition:
+	    ResidueFunction(Poly->cones,Poly->numOfVars, print_flag, degree, output_cone);
+	    break;
+	  default:
+	    assert(0);
+	  }
 	//  Else we have already computed the residue.
 	}
 
