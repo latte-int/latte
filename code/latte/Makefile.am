@@ -62,9 +62,13 @@ if HAVE_EXPERIMENTS
 bin_PROGRAMS += test-todd 
 
 nodist_liblatte_a_SOURCES = \
-	ExponentialApprox.cpp
+	ExponentialApprox.cpp \
+	TrivialSubst.cpp \
+	barvinok/SubspaceAvoidingDecomposition.cpp
 nodist_noinst_HEADERS = \
-	ExponentialApprox.h
+	ExponentialApprox.h \
+	TrivialSubst.h \
+	barvinok/SubspaceAvoidingDecomposition.h
 
 #nodist_simple_count_SOURCES = simple-main.cpp
 nodist_test_todd_SOURCES = todd/test-todd.cpp
