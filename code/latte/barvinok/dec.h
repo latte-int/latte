@@ -28,25 +28,27 @@
 #include "PolyTree.h"
 #include "barvinok.h"
 
-// FIXME: Move somewhere else
-listCone* readListCone(const Vertex &vertex, int);
-
 
 // The traditional LattE mode: Simply collect all subdivided cones
 // into a list.
 class Collecting_Single_Cone_Parameters : public Single_Cone_Parameters {
 public:
   Collecting_Single_Cone_Parameters();
+  Collecting_Single_Cone_Parameters(const BarvinokParameters &params); 
   listCone *Decomposed_Cones;
   virtual int ConsumeCone(listCone *cone);
 };
 
-// FIXME: Interface wants to be nicer.
+// Obsolete:
 listCone*
 decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
 	       char *File_Name, int max_determinant,
 	       bool dualize,
 	       BarvinokParameters::DecompositionType decomposition);
+// Nicer, more general interface:
+listCone*
+decomposeCones(listCone *cones, bool dualize,
+	       BarvinokParameters &param);
 
 
 /* Guess a generic vector; this is simply a random vector. */
