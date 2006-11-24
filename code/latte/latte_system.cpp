@@ -49,6 +49,10 @@ void system_with_error_check(const string &command)
 static bool created_temp_dir = false;
 static string temp_dir;
 
+#ifndef HOST_NAME_MAX
+#define HOST_NAME_MAX 1023
+#endif
+
 void create_temporary_directory()
 {
   char hostname[HOST_NAME_MAX + 1];
