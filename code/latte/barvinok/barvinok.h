@@ -29,7 +29,6 @@
 
 class BarvinokParameters {
 public:
-  // FIXME: Following does not really belong here.
   // Whether we use the
   //   - traditional LattE monomial substitution z_i |-> (1 + s)^(lambda_i) 
   //   - or the exponential substitution         z_i |-> exp(t lambda_i)
@@ -45,6 +44,17 @@ public:
     IrrationalAllPrimalDecomposition
   } DecompositionType;
   DecompositionType decomposition; 
+  // The kind of triangulation to use.
+  typedef enum {
+    RegularTriangulationWithCdd
+  } TriangulationType;
+  TriangulationType triangulation;
+  // The kind of short vectors we use for decomposition
+  typedef enum {
+    LatteLLL,
+    SubspaceAvoidingLLL    
+  } ShortVectorType;
+  ShortVectorType shortvector;
   // The maximum determinant of cones that we do not subdivide
   // further.  Set to 1 to subdivide until we reach unimodular cones
   // only.  Set to 0 (special case) to not subdivide at all. 
@@ -83,10 +93,12 @@ public:
   ZZ		Total_Simplicial_Cones;
   ZZ		Current_Simplicial_Cones_Total;
   ZZ		Max_Simplicial_Cones_Total;
+  int		Current_Depth;
+  int		Max_Depth;
 public:
-  Single_Cone_Parameters() {};
+  Single_Cone_Parameters() : Current_Depth(0), Max_Depth(0) {};
   Single_Cone_Parameters(const BarvinokParameters &params) :
-    BarvinokParameters(params) {};
+    BarvinokParameters(params), Current_Depth(0), Max_Depth(0) {};
   virtual int ConsumeCone(listCone *cone) = 0;
   virtual ~Single_Cone_Parameters() {}
   virtual void print_statistics(ostream &s);
