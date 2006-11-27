@@ -24,6 +24,14 @@
 #include "ramon.h"
 
 /* ----------------------------------------------------------------- */
+int lengthListVector(listVector* LIST) {
+  int len=0;
+
+  while (LIST) {len++; LIST = LIST->rest;}
+  return (len);
+}
+
+/* ----------------------------------------------------------------- */
 listVector* appendVectorToListVector(const vec_ZZ &v, listVector *REST) {
   // listVector *LIST;
   listVector * LIST = new listVector(v);  
@@ -74,5 +82,16 @@ void freeListCone(listCone *list)
     listCone *rest = list->rest;
     freeCone(list);
     list = rest;
+  }
+}
+
+listCone *appendListCones(listCone *A, listCone *B)
+{
+  if (A == NULL) return B;
+  else {
+    listCone *C;
+    for (C = A; C->rest!=NULL; C = C->rest);
+    C->rest = B;
+    return A;
   }
 }

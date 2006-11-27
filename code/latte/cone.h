@@ -35,7 +35,10 @@ struct listVector {
     first(a_first), rest(a_rest) {}
 };
 
-listVector* appendVectorToListVector(const vec_ZZ &, listVector*);
+/* Return the length of the linked list of vectors. */
+int lengthListVector(listVector*);
+
+listVector *appendVectorToListVector(const vec_ZZ &, listVector*);
 
 struct Vertex {
   rationalVector *vertex;
@@ -74,5 +77,9 @@ void freeCone(listCone *cone);
 
 /* Free the whole list of cones. */
 void freeListCone(listCone *list);
+
+/* Destructively concatenate two linked lists of cones.  Return the
+   resulting list. */
+listCone *appendListCones(listCone *A, listCone *B);
 
 #endif
