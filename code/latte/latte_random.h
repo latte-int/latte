@@ -28,6 +28,8 @@
 void
 seed_random_generator(unsigned int seed);
 
+/* Return a random integer in the given range (including FROM and
+   TO). */
 int
 uniform_random_number(int from, int to);
 
