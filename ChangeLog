@@ -1,3 +1,78 @@
+2006-11-24  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/TrivialSubst.cpp, code/latte/TrivialSubst.h: New files.
+
+	* code/latte/barvinok/barvinok.cpp (barvinok_DFS): Allow the
+	decomposition method to fail; perform ``emergency enumeration'' in
+	this case.
+
+	* code/latte/barvinok/dec.cpp (readListCone): Removed.
+	(decomposeCones): New overload.
+
+	* code/latte/barvinok/barvinok.cpp,
+	code/latte/barvinok/barvinok.h (BarvinokParameters): New slots to
+	specify triangulation and short-vector method.
+
+	* code/latte/barvinok/SubspaceAvoidingDecomposition.cpp,
+	code/latte/barvinok/SubspaceAvoidingDecomposition.h,
+	code/latte/Makefile.am: New experimental files.
+
+	* code/latte/latte_system.cpp (HOST_NAME_MAX): Define if unknown.
+
+	* code/latte/count.cpp: Use new decomposeCones flavor.
+	Prepare TrivialMonomialSubstitution.
+
+	* code/latte/barvinok/dec.h (readListCone): Removed.
+	(decomposeCones): New overload.
+
+	* code/latte/barvinok/barvinok.cpp:
+	Keep track of maximum depth of the decomposition.
+
+2006-11-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: Merge functionality of ehrhart into count,
+	using commmand-line options --ehrhart-series,
+	--simplified-ehrhart-series, --ehrhart-taylor=N.
+
+	* code/latte/ReadLatteStyle.cpp,
+	code/latte/ReadLatteStyle.h (ReadLatteStyleMatrix): Export.
+	(WriteLatteStyleMatrix): New.
+
+2006-11-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Makefile.am, code/latte/adjacency/Makefile.am:
+	Remove use of := assignment, which Automake 1.10 does not like.
+
+	* code/latte/latte_system.cpp: Fix includes.
+
+2006-11-21  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* configure.ac: Make the Maple and script path available in config.h
+
+	* code/latte/Makefile.am: Install the Maple scripts.
+
+	* code/latte/ResSingle.cpp, code/latte/Residue.cpp, code/latte/RudyResNTL.cpp:
+	Use the configured Maple path, and also use the full paths of the
+	installed Maple scripts.  Fixes "ehrhart simplify".
+
+	* code/latte/count.cpp: Fix output of negative Ehrhart coefficients.
+	Thanks to Sven Verdoolaege.
+
+2006-11-12  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/aggregation/aggregation.cpp: New.
+	
+2006-11-05  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: Initialize Poly->numOfVars.
+
+	* code/latte/print.cpp, code/latte/print.h: Some const-ification.
+
+	* code/latte/latte_system.cpp,
+	code/latte/latte_system.h (create_temporary_directory,
+	temporary_directory_name, remove_temporary_directory,
+	temporary_file_name): New.
+
 2006-10-12  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* count.cpp: Support "homog vrep".
