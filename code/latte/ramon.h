@@ -38,7 +38,6 @@ void removeListVector( listVector* p );
 void freeListVector(listVector *p);
 
 vec_ZZ negativeVector(vec_ZZ, int);
-int lengthListVector(listVector*);
 listVector* updateBasis(listVector*, listVector*);
 int isVectorEqualToVector(vec_ZZ, vec_ZZ, int);
 int isEqual(listVector *, listVector*);

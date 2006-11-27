@@ -96,13 +96,6 @@ vec_ZZ negativeVector(vec_ZZ v, int numOfVars) {
   return (v);
 }
 /* ----------------------------------------------------------------- */
-int lengthListVector(listVector* LIST) {
-  int len=0;
-
-  while (LIST) {len++; LIST = LIST->rest;}
-  return (len);
-}
-/* ----------------------------------------------------------------- */
 listVector* updateBasis(listVector *v, listVector *endBasis) {
   endBasis->rest = v;
   v->rest=0;
