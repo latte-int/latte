@@ -142,6 +142,7 @@ int main(int argc, char *argv[]) {
   ehrhart_polynomial = false;
   params->substitution = BarvinokParameters::PolynomialSubstitution;
   params->decomposition = BarvinokParameters::DualDecomposition;
+  params->triangulation = BarvinokParameters::RegularTriangulationWithCdd;
   params->max_determinant = 1;
 
   int last_command_index = argc - 2;
@@ -213,6 +214,10 @@ int main(int argc, char *argv[]) {
       strcpy(dualApproach,"yes");
       flags |= DUAL_APPROACH;
     }
+    else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
+      params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
+      params->triangulation = BarvinokParameters::SubspaceAvoidingRecursiveTriangulation;
+    }
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
@@ -248,14 +253,6 @@ int main(int argc, char *argv[]) {
 
   if(dilation[0] == 'y') dilation_const = atoi(argv[argc-2]);
 
-  if (ehrhart_series && 
-      (params->decomposition == BarvinokParameters::IrrationalPrimalDecomposition
-       || params->decomposition == BarvinokParameters::IrrationalAllPrimalDecomposition)) {
-    /* Standard substitution methods (as implemented) do not work, so
-       prepare use of Trivial Substitution. */
-    params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
-  }
-  
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
 #if 1
