@@ -25,8 +25,8 @@ liblatte_a_SOURCES = \
 	genFunction/matrix_ops.cpp		\
 	ExponentialSubst.cpp ExponentialEhrhart.cpp \
 	Irrational.cpp \
-	ReadLatteStyle.cpp
-#	triangulation/triangulate.cpp
+	ReadLatteStyle.cpp \
+	triangulation/triangulate.cpp
 
 if HAVE_CDDLIB
 liblatte_a_SOURCES += \
@@ -64,11 +64,15 @@ bin_PROGRAMS += test-todd
 nodist_liblatte_a_SOURCES = \
 	ExponentialApprox.cpp \
 	TrivialSubst.cpp \
-	barvinok/SubspaceAvoidingDecomposition.cpp
+	barvinok/SubspaceAvoidingDecomposition.cpp \
+	triangulation/RecursiveTriangulation.cpp \
+	triangulation/RegularTriangulationWithCdd.cpp
 nodist_noinst_HEADERS = \
 	ExponentialApprox.h \
 	TrivialSubst.h \
-	barvinok/SubspaceAvoidingDecomposition.h
+	barvinok/SubspaceAvoidingDecomposition.h \
+	triangulation/RecursiveTriangulation.h \
+	triangulation/RegularTriangulationWithCdd.h
 
 #nodist_simple_count_SOURCES = simple-main.cpp
 nodist_test_todd_SOURCES = todd/test-todd.cpp
@@ -78,6 +82,11 @@ endif
 if HAVE_EXPERIMENTS
 bin_PROGRAMS += aggregation
 nodist_aggregation_SOURCES = aggregation/aggregation.cpp
+endif
+
+if HAVE_EXPERIMENTS
+bin_PROGRAMS += triangulate
+nodist_triangulate_SOURCES = triangulation/test-triangulation.cpp
 endif
 
 SUBDIRS = adjacency
