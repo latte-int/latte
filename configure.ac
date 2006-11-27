@@ -86,6 +86,10 @@ AC_PATH_PROG(MAPLEBIN, maple)
 AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != x )
 AC_DEFINE_UNQUOTED(MAPLE_PATH, "${MAPLEBIN}", [The path to the Maple program.])
 
+# TOPCOM for triangulations (optional)
+LB_CHECK_TOPCOM
+
+# Experimental, not release-ready code.
 AC_ARG_ENABLE(experiments, AS_HELP_STRING([--enable-experiments],
 	[use experimental code]))
 AM_CONDITIONAL(HAVE_EXPERIMENTS, test x$enable_experiments = xyes)
