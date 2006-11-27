@@ -46,7 +46,8 @@ public:
   DecompositionType decomposition; 
   // The kind of triangulation to use.
   typedef enum {
-    RegularTriangulationWithCdd
+    RegularTriangulationWithCdd,
+    SubspaceAvoidingRecursiveTriangulation
   } TriangulationType;
   TriangulationType triangulation;
   // The kind of short vectors we use for decomposition
@@ -66,6 +67,10 @@ public:
   int Number_of_Variables;
   // Parameters that control the computation.
   unsigned int Flags;
+  // Data that are used during the computation.
+  int		Cone_Index;	/* Its index in the list of all master
+				   cones; only used for naming
+				   triangulation caches. */
   // Timers.
   Timer total_time;
   Timer read_time;
@@ -81,12 +86,6 @@ public:
 };
 
 class Single_Cone_Parameters : public BarvinokParameters {
-public:
-  // Data that are used during the computation.
-  //listCone	*Cone;		// The master cone to be decomposed.
-  int		Cone_Index;	/* Its index in the list of all master
-				   cones; only used for naming
-				   triangulation caches. */
 public:
   // Statistics collected during the computation.
   ZZ		Total_Uni_Cones;
