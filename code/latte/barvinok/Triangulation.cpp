@@ -198,21 +198,23 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
  	int	File_Present = 1;	 
 	char		File_Path [256];
 	char		System_Command[256];
-	char		*Integer_String;
-	char 		*Integer_String_Original;  
+	char		*Integer_String = NULL;
+	char 		*Integer_String_Original = NULL;  
 	
-	Integer_String = new char [100];
-	Integer_String_Original = Integer_String;
+	if (Flags & (LOAD|SAVE)) {
+	  Integer_String = new char [100];
+	  Integer_String_Original = Integer_String;
 	
-	sprintf (Integer_String, " %d", Cone_Index ); 
+	  sprintf (Integer_String, " %d", Cone_Index ); 
 	
-	while (Integer_String[0] == ' ')
-		Integer_String += 1;		
+	  while (Integer_String[0] == ' ')
+	    Integer_String += 1;		
 	
-	strcpy		(File_Path, "triangulations/");
-	strcat		(File_Path, File_Name );
-	strcat		(File_Path, Integer_String ); 
-	strcat		(File_Path, ".tar.gz");
+	  strcpy		(File_Path, "triangulations/");
+	  strcat		(File_Path, File_Name );
+	  strcat		(File_Path, Integer_String ); 
+	  strcat		(File_Path, ".tar.gz");
+	}
 	
 	if ( Flags & LOAD)
 	{
@@ -307,7 +309,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
   
 	//system_with_error_check("rm -f tri.*");
 
-
-  delete [] Integer_String_Original;
+	if (Integer_String_Original!=NULL)
+	  delete [] Integer_String_Original;
   return count;
 }
