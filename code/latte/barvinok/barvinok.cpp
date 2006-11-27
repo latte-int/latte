@@ -45,6 +45,15 @@
 #define SHOWDETS
 
 BarvinokParameters::BarvinokParameters() :
+  substitution(PolynomialSubstitution),
+  decomposition(DualDecomposition),
+  triangulation(RegularTriangulationWithCdd),
+  shortvector(LatteLLL),
+  max_determinant(0),
+  File_Name(NULL),
+  Number_of_Variables(0),
+  Flags(0),
+  Cone_Index(0),
   total_time("Total time", true),
   read_time("Time for reading and preprocessing"),
   vertices_time("Time for computing vertices and supporting cones"),
