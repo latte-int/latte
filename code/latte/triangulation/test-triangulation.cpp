@@ -23,12 +23,13 @@
 #include <cctype>
 #include "print.h"
 #include "triangulate.h"
+#include "dual.h"
 
 using namespace std;
 
 // Read a cone in the format of `printListCone'.
 // However, this is NOT a general function; we only read the extreme
-// reays. 
+// rays. 
 listCone *
 read_cone(istream &in)
 {
@@ -80,9 +81,24 @@ int main(int argc, char **argv)
   BarvinokParameters params;
   params.Number_of_Variables = cone->rays->first.length();
   cone->vertex = new Vertex(new rationalVector(params.Number_of_Variables));
-  params.triangulation = BarvinokParameters::RegularTriangulationWithCdd;
+
+  // Compute facets.
+  cone = dualizeCones(cone, params.Number_of_Variables);
+  cone = dualizeBackCones(cone, params.Number_of_Variables);
+  
+  cout << "*** Input cone:" << endl;
+  printListCone(cone, params.Number_of_Variables);
+  
+  //   params.triangulation
+  //     = BarvinokParameters::RegularTriangulationWithCdd;
+  params.triangulation = BarvinokParameters::PlacingTriangulationWithTOPCOM;
   listCone *triang
     = triangulateCone(cone, params.Number_of_Variables, &params);
+  listCone *t;
+  for (t = triang; t!=NULL; t = t->rest) {
+    computeDetAndFacetsOfSimplicialCone(t, params.Number_of_Variables);
+  }
+  cout << "*** Triangulation:" << endl;
   printListCone(triang, params.Number_of_Variables);
   return 0;
 }
