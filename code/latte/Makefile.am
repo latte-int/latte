@@ -6,8 +6,8 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 
 LDADD = liblatte.a
-AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(CDDLIB_CFLAGS) $(GMP_CFLAGS)
-LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(CDDLIB_LIBS) $(GMP_LIBS)
+AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(TOPCOM_CXXFLAGS) $(CDDLIB_CFLAGS) $(GMP_CFLAGS)
+LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(TOPCOM_LIBS) $(CDDLIB_LIBS) $(GMP_LIBS)
 
 noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES = \
@@ -26,12 +26,8 @@ liblatte_a_SOURCES = \
 	ExponentialSubst.cpp ExponentialEhrhart.cpp \
 	Irrational.cpp \
 	ReadLatteStyle.cpp \
-	triangulation/triangulate.cpp
-
-if HAVE_CDDLIB
-liblatte_a_SOURCES += \
-	latte_cddlib.cpp
-endif
+	triangulation/triangulate.cpp \
+	triangulation/RegularTriangulationWithCdd.cpp
 
 noinst_HEADERS =							\
 	CheckEmpty.h 		 					\
@@ -44,47 +40,52 @@ noinst_HEADERS =							\
 	genFunction/piped.h vertices/cdd.h				\
 	todd/gmp_pow.h todd/todd-expansion.h				\
 	convert.h							\
-	latte_gmp.h latte_ntl.h	latte_random.h latte_system.h latte_cddlib.h		\
+	latte_gmp.h latte_ntl.h	latte_ntl_integer.h			\
+	latte_random.h latte_system.h latte_cddlib.h		\
 	genFunction/IntCombEnum.h     \
 	genFunction/matrix_ops.h    \
 	ExponentialSubst.h ExponentialEhrhart.h \
 	Irrational.h \
 	ReadLatteStyle.h Polyhedron.h \
-	triangulation/triangulate.h
+	triangulation/triangulate.h \
+	triangulation/RegularTriangulationWithCdd.h
+
+if HAVE_CDDLIB
+liblatte_a_SOURCES += \
+	latte_cddlib.cpp
+endif
 
 if HAVE_LIDIA
-liblatte_a_SOURCES += 	genFunction/NTL_to_LiDIA.cpp
+liblatte_a_SOURCES += genFunction/NTL_to_LiDIA.cpp
 noinst_HEADERS += genFunction/NTL_to_LiDIA.h
 endif
 
 if HAVE_EXPERIMENTS
 # Experimental stuff
+
+nodist_liblatte_a_SOURCES =				\
+	ExponentialApprox.cpp				\
+	TrivialSubst.cpp				\
+	barvinok/SubspaceAvoidingDecomposition.cpp	\
+	triangulation/RecursiveTriangulation.cpp
+
+nodist_noinst_HEADERS =					\
+	ExponentialApprox.h				\
+	TrivialSubst.h					\
+	barvinok/SubspaceAvoidingDecomposition.h	\
+	triangulation/RecursiveTriangulation.h
+
+if HAVE_TOPCOM
+nodist_liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
+nodist_noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
+endif
+
 bin_PROGRAMS += test-todd 
-
-nodist_liblatte_a_SOURCES = \
-	ExponentialApprox.cpp \
-	TrivialSubst.cpp \
-	barvinok/SubspaceAvoidingDecomposition.cpp \
-	triangulation/RecursiveTriangulation.cpp \
-	triangulation/RegularTriangulationWithCdd.cpp
-nodist_noinst_HEADERS = \
-	ExponentialApprox.h \
-	TrivialSubst.h \
-	barvinok/SubspaceAvoidingDecomposition.h \
-	triangulation/RecursiveTriangulation.h \
-	triangulation/RegularTriangulationWithCdd.h
-
-#nodist_simple_count_SOURCES = simple-main.cpp
 nodist_test_todd_SOURCES = todd/test-todd.cpp
 
-endif
-
-if HAVE_EXPERIMENTS
 bin_PROGRAMS += aggregation
 nodist_aggregation_SOURCES = aggregation/aggregation.cpp
-endif
 
-if HAVE_EXPERIMENTS
 bin_PROGRAMS += triangulate
 nodist_triangulate_SOURCES = triangulation/test-triangulation.cpp
 endif
