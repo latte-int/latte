@@ -66,7 +66,7 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 const listCone *cone, int numOfVars)
   throw(NotGenericException);
 
-Integer
+ZZ
 scalar_power(const vec_ZZ &generic_vector,
 	     const vec_ZZ &point,
 	     int exponent);
@@ -94,12 +94,12 @@ computeExponentialResidue_Single(const vec_ZZ &lambda,
 
 /* Likewise, but for the whole list of CONES, summing up the
    results. */
-Integer
+ZZ
 computeExponentialResidue(listCone *cones, int numOfVars);
 
 /* Likewise, but do simplicial triangulation and Barvinok
    decomposition, then perform it on the summands. */
-Integer
+ZZ
 decomposeAndComputeExponentialResidue(listCone *cones, 
 				      Exponential_Single_Cone_Parameters &param);
 

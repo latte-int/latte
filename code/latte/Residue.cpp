@@ -31,6 +31,8 @@
 #include "config.h"
 #include "cone.h"
 #include "ramon.h"
+#include "latte_ntl_integer.h"
+
 using namespace std;
 
 /* From here, Rudy edited ----------------------------------------- */

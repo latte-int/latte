@@ -32,9 +32,9 @@
 #include "cone.h"
 #include "ramon.h"
 #include "RudyResNTL.h"
-#include <malloc.h>
 #include "config.h"
 #include "latte_system.h"
+#include "latte_ntl_integer.h"
 
 using namespace std;
 

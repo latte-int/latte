@@ -24,6 +24,7 @@
 #include <cassert>
 
 #include "config.h"
+#include "latte_ntl_integer.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
 #include "barvinok/ConeDecom.h"

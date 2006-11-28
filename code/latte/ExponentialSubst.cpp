@@ -28,6 +28,7 @@
 #include "cone.h"
 #include "barvinok/ConeDecom.h"
 #include "print.h"
+#include "latte_ntl_integer.h"
 
 Integer
 scalar_power(const vec_ZZ &generic_vector,

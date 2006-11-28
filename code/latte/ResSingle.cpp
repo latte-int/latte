@@ -31,11 +31,10 @@
 #include "cone.h"
 #include "ramon.h"
 #include "RudyResNTL.h"
-#include <malloc.h>
-#include <stdlib.h>
 #include "config.h"
 #include "flags.h"
 #include "latte_system.h"
+#include "latte_ntl_integer.h"
 
 int ResidueFunction_Single_Cone(listCone *cones,
 				Standard_Single_Cone_Parameters *Residue_Parameters)

@@ -24,13 +24,14 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../cone.h"
-#include "../print.h"
-#include "../ramon.h"
+#include "cone.h"
+#include "print.h"
+#include "ramon.h"
+#include "latte_ntl_integer.h"
 #include "ConeDecom.h"
-#include "../RudyResNTL.h"
-#include "../PolyTree.h"
-#include "../flags.h"
+#include "RudyResNTL.h"
+#include "PolyTree.h"
+#include "flags.h"
 #include "convert.h"
 #include "dual.h"
 #include "genFunction/piped.h"
