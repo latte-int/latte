@@ -1,7 +1,7 @@
 // This is a -*- C++ -*- header file.
 
-/* latte_ntl.cpp -- Interface to NTL
-
+/* latte_ntl_integer.h -- Integer type definition using NTL
+	       
    Copyright 2006 Matthias Koeppe
 
    This file is part of LattE.
@@ -20,29 +20,11 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
-// Include all required header files from NTL,
-// and if NTL is configured to use C++ namespaces,
-// use the NTL namespace.
+#ifndef LATTE_NTL_INTEGER_H
+#define LATTE_NTL_INTEGER_H
 
-#ifndef LATTE_NTL_H
-#define LATTE_NTL_H
+#include "latte_ntl.h"
 
-#include <NTL/config.h>
-#include <NTL/ZZ.h>
-#include <NTL/vec_ZZ.h>
-#include <NTL/mat_ZZ.h>
-#include <NTL/RR.h>
-#include <NTL/mat_RR.h>
-#include <NTL/vec_RR.h>
-#include <NTL/HNF.h>
-#include <NTL/LLL.h>
-
-#if defined(NTL_STD_CXX) || defined(NTL_PSTD_NNS)
-using namespace NTL_NAMESPACE;
-#endif
-
-// Additional functions.
-void
-InnerProductModulo(ZZ &result, const vec_ZZ &a, const vec_ZZ &b, const ZZ &module);
+typedef ZZ Integer;
 
 #endif
