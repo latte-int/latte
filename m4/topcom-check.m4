@@ -38,10 +38,10 @@ for TOPCOM_HOME in ${TOPCOM_HOME_PATH}
 if test -r "$TOPCOM_HOME/include/PointConfiguration.hh"; then
 	if test "x$TOPCOM_HOME" != "x/usr" -a "x$TOPCOM_HOME" != "x/usr/local"; then
 		TOPCOM_CXXFLAGS="-I${TOPCOM_HOME}/include"
-		TOPCOM_LIBS="-L${TOPCOM_HOME}/lib -lTOPCOM -lwrapgmp-gcc4"
+		TOPCOM_LIBS="-L${TOPCOM_HOME}/lib -lTOPCOM -lCHECKREG -lwrapgmp-gcc4"
 	else
 		TOPCOM_CXXFLAGS=
-		TOPCOM_LIBS="-lTOPCOM -lwrapgmp-gcc4"
+		TOPCOM_LIBS="-lTOPCOM -lCHECKREG -lwrapgmp-gcc4"
 	fi	
 	CXXFLAGS="${BACKUP_CXXFLAGS} ${TOPCOM_CXXFLAGS} ${GMP_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${TOPCOM_LIBS} ${GMP_LIBS}"
