@@ -24,12 +24,17 @@
 #define LATTE_CDDLIB__H
 
 #include <gmp.h>
+#include "config.h"
 
+#ifdef HAVE_CDDLIB_C_LINKAGE
 extern "C" {
+#endif
 #define GMPRATIONAL
 #include <setoper.h>
 #include <cdd.h>
+#ifdef HAVE_CDDLIB_C_LINKAGE
 }
+#endif
 
 /* Ensure initialization of the library by having a global constructor
    called. */
