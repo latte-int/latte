@@ -41,6 +41,11 @@ GMP version 3.1.1 or greater is required for LattE to compile. Please
 make sure GMP is installed and specify its location with the option
 --with-gmp=<prefix> when running configure.])
 ])
+if test -z "GMP_HAVE_CXX" ; then 
+  AC_MSG_ERROR([Unable to use the GMP C++ library.  
+Please make sure that GMP was configured with "--enable-cxx".])
+fi
+
 AC_CACHE_SAVE
 LB_CHECK_NTL(,,[AC_MSG_ERROR([NTL not found!
 NTL version 5.4 or greater is required for LattE to compile. Please
@@ -67,10 +72,23 @@ if test -z "$REDCHECK"; then
   AC_MSG_ERROR([The `redcheck' binary from cddlib is required for LattE.])			
 fi
 
-LB_CHECK_CDDLIB(,,[AC_MSG_WARN([cddlib not found!
+# Cddlib library
+LB_CHECK_CDDLIB
+if test "x$cddlib_found" = "xno" ; then
+   # Older versions of cddlib are compiled with the C compiler;
+   # also some people compile newer versions with the C compiler instead of the C++ compiler.
+   AC_LANG(C)
+   LB_CHECK_CDDLIB
+   if test "x$cddlib_found" = "xyes" ; then
+      AC_DEFINE(HAVE_CDDLIB_C_LINKAGE, 1, [Define if the CDDLIB library has C linkage])
+   fi
+   AC_LANG(C++)
+fi   
+if test "x$cddlib_found" = "xno" ; then
+   AC_MSG_WARN([cddlib not found!
 LattE needs it for building the CheckAdjacency program, which is
 needed for the "vrep" mode.])
-])
+fi
 AC_CACHE_SAVE
 	  
 # From LRS
