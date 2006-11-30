@@ -68,7 +68,7 @@ BarvinokParameters::~BarvinokParameters()
 
 void BarvinokParameters::print_statistics(ostream &s)
 {
-  s << read_time << vertices_time << dualize_time
+  s << read_time << vertices_time << irrationalize_time << dualize_time
     << triangulate_time << decompose_time << total_time;
 }
 
