@@ -25,6 +25,9 @@
 #ifdef HAVE_EXPERIMENTS
 #include "triangulation/RecursiveTriangulation.h"
 #endif
+#ifdef HAVE_TOPCOM
+#include "triangulation/TriangulationWithTOPCOM.h"
+#endif
 
 listCone *
 triangulateCone(listCone *cone, int numOfVars,
@@ -42,6 +45,15 @@ triangulateCone(listCone *cone, int numOfVars,
       (cone, numOfVars);
 #else
     cerr << "SubspaceAvoidingRecursiveTriangulation not compiled in, sorry."
+	 << endl;
+    exit(1);
+#endif
+    break;
+  case BarvinokParameters::PlacingTriangulationWithTOPCOM:
+#ifdef HAVE_TOPCOM
+    result = triangulate_cone_with_TOPCOM(cone, numOfVars);
+#else
+    cerr << "PlacingTriangulationWithTOPCOM not compiled in, sorry."
 	 << endl;
     exit(1);
 #endif
