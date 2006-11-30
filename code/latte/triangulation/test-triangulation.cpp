@@ -101,7 +101,7 @@ int main(int argc, char **argv)
   cout << "*** Input cone:" << endl;
   printListCone(cone, params.Number_of_Variables);
 
-#if 1
+#if 0
   list<listCone *>all_triangulations
     = all_triangulations_of_cone_with_TOPCOM(cone, params.Number_of_Variables);
   for (list<listCone *>::iterator i = all_triangulations.begin();
