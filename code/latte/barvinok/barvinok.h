@@ -47,7 +47,8 @@ public:
   // The kind of triangulation to use.
   typedef enum {
     RegularTriangulationWithCdd,
-    SubspaceAvoidingRecursiveTriangulation
+    SubspaceAvoidingRecursiveTriangulation,
+    PlacingTriangulationWithTOPCOM
   } TriangulationType;
   TriangulationType triangulation;
   // The kind of short vectors we use for decomposition
