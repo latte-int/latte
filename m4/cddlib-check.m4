@@ -30,6 +30,7 @@ min_cddlib_version=ifelse([$1], , 093c,$1)
 dnl Check for existence
 
 BACKUP_CXXFLAGS=${CXXFLAGS}
+BACKUP_CFLAGS=${CFLAGS}
 BACKUP_LIBS=${LIBS}
 
 if test -n "$CDDLIB_HOME_PATH" ; then
@@ -47,15 +48,18 @@ if test -r "$CDDLIB_HOME/include/cdd.h"; then
 		CDDLIB_LIBS="-lcddgmp"		
 	fi	
 	CXXFLAGS="${BACKUP_CXXFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
+	CFLAGS="${BACKUP_CFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${CDDLIB_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK([
 #define GMPRATIONAL
 #include <setoper.h>
 #include <cddmp.h>
+#include <cdd.h>
 ],
 [ mytype a;
   dd_init(a);
+  dd_abs(a, a);
 ],
 [	cddlib_found="yes"
 	break
@@ -80,6 +84,7 @@ fi
 AM_CONDITIONAL(HAVE_CDDLIB, test "x$HAVE_CDDLIB" = "xyes")
 
 CXXFLAGS=${BACKUP_CXXFLAGS}
+CFLAGS=${BACKUP_CFLAGS}
 LIBS=${BACKUP_LIBS}
 #unset LD_LIBRARY_PATH
 
