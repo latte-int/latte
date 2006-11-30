@@ -219,6 +219,10 @@ int main(int argc, char *argv[]) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
       params->triangulation = BarvinokParameters::SubspaceAvoidingRecursiveTriangulation;
     }
+    else if (strncmp(argv[i], "--triangulation=topcom", 32) == 0
+	     || strncmp(argv[i], "--triangulation=TOPCOM", 32) == 0) {
+      params->triangulation = BarvinokParameters::PlacingTriangulationWithTOPCOM;
+    }
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
