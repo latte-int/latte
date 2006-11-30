@@ -23,10 +23,10 @@
 #include "triangulation/triangulate.h"
 #include "triangulation/RegularTriangulationWithCdd.h"
 #ifdef HAVE_EXPERIMENTS
-#include "triangulation/RecursiveTriangulation.h"
+#  include "triangulation/RecursiveTriangulation.h"
 #endif
-#ifdef HAVE_TOPCOM
-#include "triangulation/TriangulationWithTOPCOM.h"
+#if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
+#  include "triangulation/TriangulationWithTOPCOM.h"
 #endif
 
 listCone *
@@ -50,7 +50,7 @@ triangulateCone(listCone *cone, int numOfVars,
 #endif
     break;
   case BarvinokParameters::PlacingTriangulationWithTOPCOM:
-#ifdef HAVE_TOPCOM
+#if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
     result = triangulate_cone_with_TOPCOM(cone, numOfVars);
 #else
     cerr << "PlacingTriangulationWithTOPCOM not compiled in, sorry."
