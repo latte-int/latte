@@ -24,6 +24,7 @@
 #include "print.h"
 #include "triangulate.h"
 #include "dual.h"
+#include "TriangulationWithTOPCOM.h"
 
 using namespace std;
 
@@ -57,6 +58,17 @@ read_cone(istream &in)
   return cone;
 }
 
+static void
+print_triangulation(listCone *triang, int Number_of_Variables)
+{
+  listCone *t;
+  for (t = triang; t!=NULL; t = t->rest) {
+    computeDetAndFacetsOfSimplicialCone(t, Number_of_Variables);
+  }
+  cout << "*** Triangulation:" << endl;
+  printListCone(triang, Number_of_Variables);
+}
+
 int main(int argc, char **argv)
 {
   if (argc != 2) {
@@ -88,17 +100,21 @@ int main(int argc, char **argv)
   
   cout << "*** Input cone:" << endl;
   printListCone(cone, params.Number_of_Variables);
-  
+
+#if 1
+  list<listCone *>all_triangulations
+    = all_triangulations_of_cone_with_TOPCOM(cone, params.Number_of_Variables);
+  for (list<listCone *>::iterator i = all_triangulations.begin();
+       i != all_triangulations.end();
+       ++i)
+    print_triangulation(*i, params.Number_of_Variables);
+#else
   //   params.triangulation
   //     = BarvinokParameters::RegularTriangulationWithCdd;
   params.triangulation = BarvinokParameters::PlacingTriangulationWithTOPCOM;
   listCone *triang
     = triangulateCone(cone, params.Number_of_Variables, &params);
-  listCone *t;
-  for (t = triang; t!=NULL; t = t->rest) {
-    computeDetAndFacetsOfSimplicialCone(t, params.Number_of_Variables);
-  }
-  cout << "*** Triangulation:" << endl;
-  printListCone(triang, params.Number_of_Variables);
+  print_triangulation(triang, params.Number_of_Variables);
+#endif
   return 0;
 }
