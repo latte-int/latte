@@ -50,9 +50,18 @@ noinst_HEADERS =							\
 	triangulation/triangulate.h \
 	triangulation/RegularTriangulationWithCdd.h
 
+if HAVE_TOPCOM_LIB
+liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
+noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
+else
+if HAVE_TOPCOM_BIN
+liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
+noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
+endif
+endif
+
 if HAVE_CDDLIB
-liblatte_a_SOURCES += \
-	latte_cddlib.cpp
+liblatte_a_SOURCES += latte_cddlib.cpp
 endif
 
 if HAVE_LIDIA
@@ -74,11 +83,6 @@ nodist_noinst_HEADERS =					\
 	TrivialSubst.h					\
 	barvinok/SubspaceAvoidingDecomposition.h	\
 	triangulation/RecursiveTriangulation.h
-
-if HAVE_TOPCOM
-nodist_liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
-nodist_noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
-endif
 
 bin_PROGRAMS += test-todd 
 nodist_test_todd_SOURCES = todd/test-todd.cpp
