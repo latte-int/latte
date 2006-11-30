@@ -1,3 +1,105 @@
+2006-11-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	The new command-line option --triangulation=topcom allows to use
+	TOPCOM for computing triangulations, rather than cddlib.
+	
+	* code/latte/count.cpp: New command-line option --triangulation=topcom.
+
+	* code/latte/Makefile.am: Build TOPCOM-dependent objects if TOPCOM
+	lib or binaries are available.
+
+	* m4/topcom-check.m4: Also check for some TOPCOM binaries.
+
+	* code/latte/triangulation/TriangulationWithTOPCOM.cpp:
+	Use TOPCOM binaries if library is not available.
+
+	* code/latte/latte_system.cpp (temporary_directory_name):
+	Create directory if needed.
+
+	* code/latte/barvinok/barvinok.h (PlacingTriangulationWithTOPCOM):
+	New TriangulationType.
+
+	* code/latte/triangulation/triangulate.cpp (triangulateCone):
+	Handle PlacingTriangulationWithTOPCOM if TOPCOM library or
+	binaries are available.
+
+	* code/latte/triangulation/TriangulationWithTOPCOM.cpp,
+	code/latte/triangulation/TriangulationWithTOPCOM.h (all_triangulations_of_cone_with_TOPCOM):
+	New.
+
+2006-11-29  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* m4/topcom-check.m4: Use CHECKREG library from TOPCOM.
+
+	* m4/gmp-check.m4: Indicate whether GMP was built with --enable-cxx.
+
+	* code/latte/latte_cddlib.h: Use extern "C" only if cddlib was
+	built with a C compiler.
+
+	* configure.ac: Complain if GMP was built without --enable-cxx.
+	Check whether cddlib was built with a C or C++ compiler.
+	Reported by Sven Verdoolaege.
+
+	* code/latte/adjacency/ComputeAdjacency.cpp, code/latte/adjacency/Makefile.am:
+	Use the C++ compiler to build the ComputeAdjacency program, so we can
+	use a cddlib built with a C++ compiler.
+	Reported by Sven Verdoolaege.
+
+2006-11-28  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/TriangulationWithTOPCOM.cpp,
+	code/latte/triangulation/TriangulationWithTOPCOM.h: New files.
+
+	* code/latte/Makefile.am: New files RegularTriangulationWithCdd.h,
+	.cpp, TriangulationWithTOPCOM.h, .cpp, latte_ntl_integer.h
+
+	* code/latte/ExponentialSubst.cpp, code/latte/ExponentialSubst.h,
+	code/latte/ResSingle.cpp, code/latte/Residue.cpp,
+	code/latte/RudyResNTL.cpp, code/latte/barvinok/dec.cpp,
+	code/latte/count.cpp: Include latte_ntl_integer.h
+
+	* code/latte/latte_ntl.h, code/latte/latte_ntl_integer.h:
+	Move typedef "Integer" into a separate header file.
+
+2006-11-27  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* configure.ac, m4/topcom-check.m4: Check for TOPCOM.
+
+	* code/latte/count.cpp: New command-line option
+	"--avoid-singularities".
+
+	* code/latte/cone.cpp, code/latte/cone.h (lengthListVector):
+	Moved here from ramon.h, ramon.cpp
+	(appendListCones): New.
+
+	* code/latte/ramon.cpp, code/latte/ramon.h (lengthListVector):
+	Moved to cone.h, cone.cpp
+
+	* code/latte/latte_random.h: Add documentation.
+
+	* code/latte/barvinok/ConeDecom.cpp, code/latte/barvinok/ConeDecom.h:
+	Use new infrastructure in triangulation.h
+
+	* code/latte/barvinok/Triangulation.cpp (Triangulation_Load_Save):
+	Accept NULL filename if not loading/saving.
+
+	* code/latte/barvinok/barvinok.h (BarvinokParameters): Move
+	Cone_Index slot here from subclass Single_Cone_Parameters.  New
+	SubspaceAvoidingRecursiveTriangulation.
+
+	* code/latte/barvinok/barvinok.cpp (BarvinokParameters):
+	Initialize all slots in the constructor to default values.
+
+	* code/latte/Makefile.am: Use new files.
+
+	* code/latte/triangulation/RecursiveTriangulation.cpp,
+	code/latte/triangulation/RecursiveTriangulation.h,
+	code/latte/triangulation/RegularTriangulationWithCdd.cpp,
+	code/latte/triangulation/RegularTriangulationWithCdd.h,
+	code/latte/triangulation/test-triangulation.cpp,
+	code/latte/triangulation/triangulate.cpp,
+	code/latte/triangulation/triangulate.h: New files.
+
 2006-11-24  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/TrivialSubst.cpp, code/latte/TrivialSubst.h: New files.
