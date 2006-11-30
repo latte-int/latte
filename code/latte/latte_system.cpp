@@ -84,7 +84,8 @@ void create_temporary_directory()
   
 const string &temporary_directory_name()
 {
-  assert(created_temp_dir);
+  if (!created_temp_dir)
+    create_temporary_directory();
   return temp_dir;
 }
 
