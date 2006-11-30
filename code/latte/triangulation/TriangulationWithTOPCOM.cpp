@@ -1,8 +1,8 @@
 /* TriangulationWithTOPCOM.cpp -- Compute a triangulation using TOPCOM
 
    Copyright 2006 Matthias Koeppe
-   Derived from the TOPCOM source file points2placingtriang.cpp,
-     which is copyright 1999 Joerg Rambau  
+   Derived from the TOPCOM source files points2placingtriang.cc, ComputeTriangs.cc
+     which are copyright 1999 Joerg Rambau  
 
    This file is part of LattE.
    
@@ -25,55 +25,90 @@
 #include <Matrix.hh>
 #include <PointConfiguration.hh>
 #include <PlacingTriang.hh>
+#include <Symmetry.hh>
+#include <SymmetricBFS.hh>
+#include <list>
 
-listCone *
+static listCone *
 triangulation_to_cones(const SimplicialComplex &sc,
-		       const Vertex &vertex,
-		       const vector <listVector *> &rays)
+		       listCone *cone)
 {
+  // Copy rays into an array, so we can index them.
+  int num_rays = lengthListVector(cone->rays);
+  vector<listVector *> rays(num_rays);
+  size_type j;
+  listVector *ray;
+  for (j = 0, ray = cone->rays; ray!=NULL; j++, ray = ray->rest)
+    rays[j] = ray;
+  // Iterate through simplices and collect them.
   listCone *cones = NULL;
   for (SimplicialComplex::const_iterator i = sc.begin(); i!=sc.end(); ++i) {
     const Simplex &simplex = *i;
-    listCone *cone = createListCone();
-    cone->vertex = new Vertex(vertex);
+    listCone *c = createListCone();
+    c->vertex = new Vertex(*cone->vertex);
     for (Simplex::const_iterator j = simplex.begin(); j!=simplex.end(); ++j) {
       size_t index = *j;
-      cone->rays = new listVector(rays[index]->first, cone->rays);
+      c->rays = new listVector(rays[index]->first, c->rays);
     }
-    cone->rest = cones;
-    cones = cone;
+    c->rest = cones;
+    cones = c;
   }
   return cones;
 }
 
-listCone *
-triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars)
+static PointConfiguration
+cone_to_point_configuration(listCone *cone, int numOfVars)
 {
   int num_rays = lengthListVector(cone->rays);
-
-  Matrix matrix(numOfVars, num_rays); // for TOPCOM
-  vector<listVector *> rays(num_rays); // for us
+  Matrix matrix(numOfVars, num_rays);
   size_type i, j;
   listVector *ray;
   for (j = 0, ray = cone->rays; ray!=NULL; j++, ray = ray->rest) {
-    rays[j] = ray;
     for (i = 0; i<numOfVars; i++) {
       mpz_class mpz = convert_ZZ_to_mpz(ray->first[i]);
       matrix(i, j) = Rational(mpz.get_mpz_t());
     }
   }
   PointConfiguration points(matrix);
-  //std::cout << matrix << endl;
+  return points;
+}
+
+listCone *
+triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars)
+{
+  PointConfiguration points = cone_to_point_configuration(cone, numOfVars);
   if (points.rank() > points.no()) {
     std::cerr << "rank must not be larger than no of points." << std::endl;
     exit(1);
   }
-  bool preprocess = false;
-  Chirotope chiro(points, preprocess);
+  Chirotope chiro(points, /*preprocess:*/ false);
   PlacingTriang triang(chiro);
   std::cout << "Triangulation: " << triang << std::endl;
-//   for (i = 0; i<=numOfVars+1; i++) {
-//     std::cout << "Triangulation[" << i << "]: " << triang[i] << std::endl;
-//   }
-  return triangulation_to_cones(triang, *cone->vertex, rays);
+  return triangulation_to_cones(triang, cone);
+}
+
+list<listCone *>
+all_triangulations_of_cone_with_TOPCOM(listCone *cone, int numOfVars)
+{
+  PointConfiguration points = cone_to_point_configuration(cone, numOfVars);
+  if ((points.no() < 2) || (points.rank() < 2)) {
+    std::cerr << "no of points and rank must be at least two." << std::endl;
+    exit(1);
+  }
+  if (points.rank() > points.no()) {
+    std::cerr << "rank must not be larger than no of points." << std::endl;
+    exit(1);
+  }
+  Chirotope chiro(points, /*preprocess:*/ false);
+  size_type no(chiro.no());
+  size_type rank(chiro.rank());
+  SymmetryGroup symmetries(no);
+  SimplicialComplex seed = PlacingTriang(chiro);
+  const SymmetryGroup seed_symmetries(symmetries, seed);
+  
+  SymmetricBFS bfs(no, rank, points, chiro, 
+		   symmetries, seed, seed_symmetries, 
+		   /*output_triangs:*/ true, /*fine_only:*/ false);
+  
+  return list<listCone *>();
 }

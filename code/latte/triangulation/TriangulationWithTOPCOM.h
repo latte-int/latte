@@ -24,10 +24,15 @@
 #define TRIANGULATIONWITHTOPCOM_H
 
 #include "cone.h"
+#include <list>
 
 /* Return a triangulation of a full-dimensional CONE.
    CONE is consumed. */
 listCone *
 triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars);
+
+/* Return all triangulations. */
+std::list<listCone *>
+all_triangulations_of_cone_with_TOPCOM(listCone *cone, int numOfVars);
 
 #endif
