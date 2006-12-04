@@ -26,8 +26,11 @@
 
 #include "cone.h"
 
+/* Dualize the polyhedral CONE. */
+void dualizeCone(listCone *cone, int numOfVars);
+
 /* Dualize the polyhedral cones in the list. */
-listCone* dualizeCones(listCone*, int);
+listCone* dualizeCones(listCone *cones, int numOfVars);
 
 /* Fill the slots `determinant', `facets', and `facet_divisors' of
    CONE.  The facet vectors are made primitive.  

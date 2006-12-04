@@ -26,21 +26,92 @@
 #include "ramon.h"
 #include "rational.h"
 #include "vertices/cdd.h"
-#include "barvinok/ConeDecom.h"
 #include "barvinok/dec.h"
 #include "convert.h"
 #include <list>
 #include "latte_system.h"
 using namespace std;
 
-listCone* dualizeCones(listCone *cones, int numOfVars) {
-  int i,j,tmpInt,len,numOfVertices,numOfConesDualized,numOfAllCones;
+void dualizeCone(listCone *tmp, int numOfVars)
+{
+  char cddInFileName[127];
+  string tmpString;
+  int i,j,tmpInt,len,numOfVertices;
   ZZ x,y;
   rationalVector *w;
   listVector *rays, *rays2, *facets, *endFacets;
+
+  rays=tmp->rays;
+  rays2=rays;
+  len=lengthListVector(rays);
+
+  strcpy(cddInFileName,"latte_cdd.ine");
+
+  ofstream out(cddInFileName);
+  if(!out){
+    cerr << "Cannot open output file in dualizeCones." << endl;
+    exit(1);
+  }
+
+  out << "H-representation\n";
+  out << "begin\n";
+  out << lengthListVector(rays) << " " << numOfVars+1 << "integer" << endl;
+
+  while (rays) {
+    out << "0 ";
+    for (i=0; i<(numOfVars); i++) out << -(rays->first)[i] << " ";
+    out << endl;
+    rays=rays->rest;
+  }
+  out << "end\n";
+  out.close();
+
+  /*      printf("Computing facets with cdd..."); */
+  system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
+  /*      printf("done.\n"); */
+
+  strcpy(cddInFileName,"latte_cdd.ext");
+
+  ifstream in(cddInFileName);
+  if(!in){
+    cerr << "Cannot open input file in dualizeCones." << endl;
+    exit(1);
+  }
+
+  while (tmpString!="begin") getline(in,tmpString);
+
+  in >> numOfVertices >> tmpInt >> tmpString;
+
+  facets=createListVector(createVector(numOfVars));
+  endFacets=facets;
+      
+  for (i=0; i<numOfVertices; i++) {
+    w=createRationalVector(numOfVars);
+    for (j=0; j<numOfVars+1; j++) {
+      x=0;
+      y=0;
+      ReadCDD(in,x,y);
+      if (j>0) {
+	w->set_entry(j-1, x, y, true /* avoid recomputation of
+					integer scale */);
+      }
+    }
+    w=normalizeRationalVector(w,numOfVars);
+    endFacets->rest=createListVector(w->numerators());
+    delete w;
+    endFacets=endFacets->rest;
+  }
+  in.close();
+#if 0
+  system_with_error_check("rm -f latte_cdd.*");
+#endif
+  tmp->facets=tmp->rays;    
+  tmp->rays=facets->rest;
+}
+
+listCone* dualizeCones(listCone *cones, int numOfVars) {
+  int numOfConesDualized,numOfAllCones;
   listCone *tmp;
-  char cddInFileName[127];
-  string tmpString;
 
   cout << "Dualizing all cones...";
   cout.flush();
@@ -50,73 +121,7 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 
   tmp=cones;
   while (tmp) {
-    rays=tmp->rays;
-    rays2=rays;
-    len=lengthListVector(rays);
-
-      strcpy(cddInFileName,"latte_cdd.ine");
-
-      ofstream out(cddInFileName);
-      if(!out){
-	cerr << "Cannot open output file in dualizeCones." << endl;
-	exit(1);
-      }
-
-      out << "H-representation\n";
-      out << "begin\n";
-      out << lengthListVector(rays) << " " << numOfVars+1 << "integer" << endl;
-
-      while (rays) {
-	out << "0 ";
-	for (i=0; i<(numOfVars); i++) out << -(rays->first)[i] << " ";
-	out << endl;
-	rays=rays->rest;
-      }
-      out << "end\n";
-      out.close();
-
-/*      printf("Computing facets with cdd..."); */
-      system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
-/*      printf("done.\n"); */
-
-      strcpy(cddInFileName,"latte_cdd.ext");
-
-      ifstream in(cddInFileName);
-      if(!in){
-	cerr << "Cannot open input file in dualizeCones." << endl;
-	exit(1);
-      }
-
-      while (tmpString!="begin") getline(in,tmpString);
-
-      in >> numOfVertices >> tmpInt >> tmpString;
-
-      facets=createListVector(createVector(numOfVars));
-      endFacets=facets;
-      
-      for (i=0; i<numOfVertices; i++) {
-	w=createRationalVector(numOfVars);
-	for (j=0; j<numOfVars+1; j++) {
-	  x=0;
-	  y=0;
-	  ReadCDD(in,x,y);
-	  if (j>0) {
-	    w->set_entry(j-1, x, y, true /* avoid recomputation of
-					    integer scale */);
-	  }
-	}
-	w=normalizeRationalVector(w,numOfVars);
-	endFacets->rest=createListVector(w->numerators());
-	delete w;
-	endFacets=endFacets->rest;
-      }
-      in.close();
-#if 0
-      system_with_error_check("rm -f latte_cdd.*");
-#endif
-      tmp->facets=tmp->rays;    
-      tmp->rays=facets->rest;
-
+    dualizeCone(tmp, numOfVars);
     tmp=tmp->rest;
     numOfConesDualized++;
     if (numOfConesDualized==50*(numOfConesDualized/50)) {
