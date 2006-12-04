@@ -26,7 +26,6 @@
 #include "genFunction/piped.h"
 #include "dual.h"
 #include "cone.h"
-#include "barvinok/ConeDecom.h"
 #include "print.h"
 #include "latte_ntl_integer.h"
 

@@ -28,7 +28,6 @@
 #include "print.h"
 #include "ramon.h"
 #include "latte_ntl_integer.h"
-#include "ConeDecom.h"
 #include "RudyResNTL.h"
 #include "PolyTree.h"
 #include "flags.h"

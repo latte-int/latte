@@ -24,7 +24,6 @@
 
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
-#include "barvinok/ConeDecom.h"
 #include "barvinok/Triangulation.h"
 #include "vertices/cdd.h"
 #include "genFunction/maple.h"
@@ -666,6 +665,10 @@ if(Memory_Save[0] == 'n')
 
 	  createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);  }
         //printListCone(cones, numOfVars);
+
+	cout << "Printing decomposed cones to decomposed_cones." << endl;
+	printListConeToFile("decomposed_cones", cones, numOfVars);
+
 	if(dualApproach[0] == 'n'){
 	cout << "Starting final computation.\n";
 	cout << endl << "****  The number of lattice points is: " << Residue(cones,numOfVars) << "  ****" << endl << endl;}

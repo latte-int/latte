@@ -27,7 +27,6 @@
 #include "latte_ntl_integer.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
-#include "barvinok/ConeDecom.h"
 #include "barvinok/Triangulation.h"
 #include "vertices/cdd.h"
 #include "genFunction/maple.h"
