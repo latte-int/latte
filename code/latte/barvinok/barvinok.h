@@ -115,4 +115,15 @@ int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 		const Vertex *vertex);
 
+/* Do a signed decomposition, modulo lower-dimensional cones, of the
+   polyhedral CONE, until the determinants of all cones are at most
+   PARAMETERS->max_determinant.  (When the cone is not simplicial, we
+   triangulate it first.)
+
+   Call PARAMETERS->ConsumeCone() for each of the small cones.
+*/ 
+int
+barvinokDecomposition_Single (listCone *cone,
+			      Single_Cone_Parameters *Parameters);
+
 #endif

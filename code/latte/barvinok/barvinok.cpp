@@ -38,6 +38,7 @@
 #include "dual.h"
 #include "config.h"
 #include "Irrational.h"
+#include "triangulation/triangulate.h"
 #ifdef HAVE_EXPERIMENTS
 #include "barvinok/SubspaceAvoidingDecomposition.h"
 #endif
@@ -483,5 +484,29 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   Parameters->Current_Depth--;
   freeListCone(C);
   return result;
+}
+
+/*
+  The first step is to triangulate a cone into simplicial cones.
+  Then, by using Barvinok's decomposition, we decompose each
+  simplicial cone into unimodular cones.
+*/
+
+int
+barvinokDecomposition_Single (listCone *cone,
+			      Single_Cone_Parameters *Parameters)
+{
+  int status = 1;
+  listCone *triang = triangulateCone(cone, Parameters->Number_of_Variables, Parameters);
+  listCone *t;
+  for (t = triang; t!=NULL; t=t->rest) {
+    int num_rays = lengthListVector(t->rays);
+    mat_ZZ B = createConeDecMatrix(t, num_rays, Parameters->Number_of_Variables);
+    if ((status = barvinok_Single(B, Parameters, t->vertex)) == -1)
+      goto BAILOUT;
+  }
+ BAILOUT:
+  freeListCone(triang);
+  return status;
 }
 

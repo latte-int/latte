@@ -12,7 +12,7 @@ LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(TOPCOM_LIBS) $(CDDLIB_LIBS) $(GMP_LIBS)
 noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES = \
 	barvinok/dec.cpp barvinok/barvinok.cpp  barvinok/Cone.cpp \
-	barvinok/ConeDecom.cpp barvinok/Triangulation.cpp \
+	barvinok/Triangulation.cpp \
 	genFunction/piped.cpp genFunction/maple.cpp vertices/cdd.cpp \
 	preprocess.cpp rational.cpp cone.cpp print.cpp ramon.cpp \
 	timing.cpp dual.cpp PolyTree.cpp RudyResNTL.cpp \
@@ -34,7 +34,7 @@ noinst_HEADERS =							\
 	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
 	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
 	preprocess.h print.h ramon.h rational.h timing.h		\
-	Residue.h barvinok/Cone.h barvinok/ConeDecom.h			\
+	Residue.h barvinok/Cone.h 					\
 	barvinok/Triangulation.h					\
 	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
 	genFunction/piped.h vertices/cdd.h				\
