@@ -18,19 +18,25 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
+#include <cassert>
 #include <vector>
-#include "RecursiveTriangulation.h"
+#include "triangulation/RecursiveTriangulation.h"
 #include "latte_random.h"
+#include "dual.h"
+#include "triangulation/RegularTriangulationWithCdd.h"
+#include "Irrational.h"
 
 using namespace std;
 
 listCone *
 triangulate_cone_recursively_with_subspace_avoiding_facets
-(listCone *cone, int numOfVars)
+(listCone *cone, BarvinokParameters *Parameters)
 {
+  int numOfVars = Parameters->Number_of_Variables;
   int num_rays = lengthListVector(cone->rays);
   if (num_rays <= numOfVars) {
     /* FIXME: Check full-dimensional */
+    assert(num_rays == numOfVars);
     return cone;
   }
   /* We pick (numOfVars - 1) random rays that define
@@ -41,7 +47,9 @@ triangulate_cone_recursively_with_subspace_avoiding_facets
   cerr << "Cone with " << num_rays << " rays:  " << flush;
 #endif
   vector<listVector*> partition_rays(numOfVars - 1);
-  do {
+  int num_tries;
+  const int max_tries = 1000;
+  for (num_tries = 0; num_tries<max_tries; num_tries++) {
     vector<bool> taken(num_rays);
     int i;
     for (i = 0; i<num_rays; i++) taken[i] = false;
@@ -141,11 +149,17 @@ triangulate_cone_recursively_with_subspace_avoiding_facets
     /* Recurse. */
     listCone *left_triang
       = triangulate_cone_recursively_with_subspace_avoiding_facets(left_cone,
-								   numOfVars);
+								   Parameters);
     listCone *right_triang
       = triangulate_cone_recursively_with_subspace_avoiding_facets(right_cone,
-								   numOfVars);
+								   Parameters);
     return appendListCones(left_triang, right_triang);
-  } while (1);
+  };
+  cerr << "No success after " << num_tries << " tries, dualizing back and irrationalizing." << endl;
+  dualizeCone(cone, numOfVars);
+  irrationalizeCone(cone, numOfVars);
+  listCone *triang = triangulate_cone_with_cdd(cone, Parameters);
+  triang = dualizeBackCones(triang, numOfVars);
+  return triang;
 }
 

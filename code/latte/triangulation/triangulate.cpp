@@ -42,7 +42,7 @@ triangulateCone(listCone *cone, int numOfVars,
   case BarvinokParameters::SubspaceAvoidingRecursiveTriangulation:
 #ifdef HAVE_EXPERIMENTS
     result = triangulate_cone_recursively_with_subspace_avoiding_facets
-      (cone, numOfVars);
+      (cone, params);
 #else
     cerr << "SubspaceAvoidingRecursiveTriangulation not compiled in, sorry."
 	 << endl;
