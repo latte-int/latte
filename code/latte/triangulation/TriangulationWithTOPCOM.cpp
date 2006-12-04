@@ -52,7 +52,7 @@ ray_array(listCone *cone)
 //
 // Functions using the TOPCOM library.
 //
-#ifdef HAVE_TOPCOM
+#ifdef HAVE_TOPCOM_LIB
 static listCone *
 triangulation_to_cones(const SimplicialComplex &sc,
 		       listCone *cone)
