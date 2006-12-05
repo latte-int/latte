@@ -26,9 +26,12 @@
 #include "cone.h"
 #include "barvinok/dec.h" // for Standard_Single_Cone_Parameters
 
+/* Consumes CONES. */
 void ResidueFunction(listCone* cones, int numOfVars, int print_flag, int degree, int output_cone);
 
-// Returns -1 if a Dot Product is zero in the denominator, otherwise 1 if ok
+// Returns -1 if a Dot Product is zero in the denominator, otherwise 1
+// if ok
+/* Consumes CONES. */
 int
 ResidueFunction_Single_Cone (listCone *cones,
 			     Standard_Single_Cone_Parameters *Residue_Parameters); 

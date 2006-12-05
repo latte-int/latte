@@ -87,7 +87,7 @@ int main(int argc, char *argv[]) {
   double sampling_factor = 1.0;
   long int num_samples = -1;
   
-  listVector *matrix = NULL, *equations = NULL, *inequalities = NULL, *rays = NULL, *endRays, *tmpRays, *matrixTmp;
+  listVector *matrix = NULL, *equations = NULL, *inequalities = NULL, *rays = NULL, *endRays, *tmpRays;
   vec_ZZ cost;
   listVector *templistVec;
   listCone *tmpcones;
@@ -424,31 +424,38 @@ int main(int argc, char *argv[]) {
   ProjU2.SetDims(numOfVars, numOfVars);
   oldnumofvars = numOfVars;
   generators=createArrayVector(numOfVars);
-  if (equationsPresent[0]=='y') {
-    /*    if(grobner[0] == 'y')
-	  {  
-     matrixTmp=Grobner(equations,inequalities,&generators,&numOfVars, &templistVec, oldnumofvars);
+  {
+    listVector *matrixTmp;
+    if (equationsPresent[0]=='y') {
+      /*    if(grobner[0] == 'y')
+	    {  
+	    matrixTmp=Grobner(equations,inequalities,&generators,&numOfVars, &templistVec, oldnumofvars);
      
-     }*/
-    matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
-    ProjU2 = transpose(ProjU);
-    bb = ProjU2[0];
-    AAA.SetDims(ProjU2.NumRows() - 1, ProjU2.NumCols());
-    for(i = 1; i <= numOfVars; i++){
-      AAA[i - 1] = ProjU2[i];
-    }
-    AA = transpose(AAA);
-    // cout << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
+	    }*/
+      matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
+      freeListVector(equations);
+      freeListVector(inequalities);
+      ProjU2 = transpose(ProjU);
+      bb = ProjU2[0];
+      AAA.SetDims(ProjU2.NumRows() - 1, ProjU2.NumCols());
+      for(i = 1; i <= numOfVars; i++){
+	AAA[i - 1] = ProjU2[i];
+      }
+      AA = transpose(AAA);
+      // cout << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
       templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows()); 
-  } else {
-    dilateListVector(inequalities, numOfVars, dilation_const);
-    matrixTmp=inequalities;
+    } else {
+      dilateListVector(inequalities, numOfVars, dilation_const);
+      matrixTmp=inequalities;
+    }
+    if((dualApproach[0] == 'y')&&(equationsPresent[0]=='y')){
+      matrix = TransformToDualCone(matrixTmp,numOfVars);
+      freeListVector(matrixTmp);
+    }
+    else {
+      matrix = matrixTmp;
+    }
   }
-  if((dualApproach[0] == 'y')&&(equationsPresent[0]=='y')){
-   matrix = TransformToDualCone(matrixTmp,numOfVars);
-   }
-  else {
-    matrix = matrixTmp;}
 /* Now matrix contains the new inequalities. */
   params->read_time.stop();
   cout << params->read_time;
@@ -611,8 +618,11 @@ int main(int argc, char *argv[]) {
     }
     if (assumeUnimodularCones[0]=='n') {
       if (Memory_Save[0] == 'n') {
-	Poly->cones=decomposeCones(Poly->cones, not Poly->dualized,
-				   *params);
+	listCone *decomposed_cones
+	  = decomposeCones(Poly->cones, not Poly->dualized,
+			   *params);
+	freeListCone(Poly->cones);
+	Poly->cones = decomposed_cones;
 	/* Compute points in parallelepipeds */
 	computePointsInParallelepipeds(Poly->cones, Poly->numOfVars);
       }
@@ -837,6 +847,8 @@ if(Memory_Save[0] == 'n')
 	  }
 	  case BarvinokParameters::DualDecomposition:
 	    ResidueFunction(Poly->cones,Poly->numOfVars, print_flag, degree, output_cone);
+	    // ResidueFunction consumes cones.
+	    Poly->cones = NULL;
 	    break;
 	  default:
 	    assert(0);
@@ -850,6 +862,9 @@ if(Memory_Save[0] == 'n')
     cerr << "Bug: Irrationalization failed" << endl;
     exit(1);
   };
+
+  freeListVector(matrix);
+  delete Poly;
 
  if(rationalCone[0] == 'y') {
    cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
@@ -925,7 +940,8 @@ if(Memory_Save[0] == 'n')
     ofstream stats("latte_stats");
     params->print_statistics(stats);
   }
- 
+
+  delete params;
  return(0);
 }
 /* ----------------------------------------------------------------- */

@@ -28,6 +28,7 @@
 
 /* Triangulate CONE using some method specified in PARAMS, discarding
    lower-dimensional cones.  Return a linked list of cones.
+   CONE is not consumed.
 */
 listCone *
 triangulateCone(listCone *cone, int numOfVars,

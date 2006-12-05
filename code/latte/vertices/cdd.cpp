@@ -465,7 +465,9 @@ listCone* readCddExtFile(int &numOfVars) {
 
   cout << "done.\n";
 
-  return (cones->rest);
+  listCone *result = cones->rest;
+  freeCone(cones);
+  return result;
 }
 /* ----------------------------------------------------------------- */
 listCone* readCddEadFile(listCone* cones, int numOfVars) {
@@ -521,6 +523,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
     }
 
     tmp->rays=rays->rest;
+    delete rays; // only deletes the dummy head
     tmp=tmp->rest;
   }
 

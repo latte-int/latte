@@ -114,7 +114,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   denom * B=new denom(noGsPerC*dim);
 
   denom * Bitr=B;
-  listVector* basis, *listtmp1, *listtmp2;
+  listVector* basis;
   listCone *listtmp3;
   cones1 = cones;
   i = 0;
@@ -142,22 +142,18 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	if (Bitr->D[j*dim + dim - 1] == 0)  //if the exponent of t is zero, increment the order for this cone
 		Cones_Array[i].order++;
       
-    listtmp1 = basis;
     basis = basis->rest;
-    delete listtmp1;
     }
     Bitr->next=new denom(noGsPerC*dim);
     Bitr=Bitr->next;
   // i++;
   }
     //  out << endl;
-    listtmp2 = tmp;
       tmp=tmp->rest; i++;
-      delete listtmp2;
     }
     listtmp3 = cones1;
     cones1 = cones1->rest;
-    delete listtmp3;
+    freeCone(listtmp3);
   }
  // out << endl;
   i = 0;

@@ -107,6 +107,7 @@ void dualizeCone(listCone *tmp, int numOfVars)
 #endif
   tmp->facets=tmp->rays;    
   tmp->rays=facets->rest;
+  delete facets; // only delete the dummy head
 }
 
 listCone* dualizeCones(listCone *cones, int numOfVars) {
@@ -140,7 +141,9 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
   int i;
   listVector *rays;
   mat_ZZ Mat, Inverse;
- 
+
+  assert(cone->facets == NULL);
+  
   Mat.SetDims(numOfVars, numOfVars);
 
   rays=cone->rays;

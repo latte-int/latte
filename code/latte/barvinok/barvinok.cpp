@@ -157,10 +157,10 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
   	m = B.NumRows();
   	n = B.NumCols();
 
-   	if( m != n)
-   	{	
-       		cerr << "Input must be square. " << endl;
-       		exit(2);
+   	if (m != n) {
+	  cerr << "Input must be square (have " << m << " rows, "
+	       << n << " cols). " << endl;
+	  exit(2);
    	}
 
    	ZZ D = determinant(B);
@@ -379,7 +379,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   }
        	
   if (absDet == 0) {
-    //cout << "barvinok_DFS: Det = 0." << endl;
+    cerr << "barvinok_DFS: Det = 0." << endl;
     return 1;	
   }		     
   else {
@@ -482,7 +482,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     }
   } while (current >= 0 && result == 1);
   Parameters->Current_Depth--;
-  freeListCone(C);
+  freeCone(C);
   return result;
 }
 

@@ -26,8 +26,7 @@
 #include "cone.h"
 #include <list>
 
-/* Return a triangulation of a full-dimensional CONE.
-   CONE is consumed. */
+/* Return a triangulation of a full-dimensional CONE. */
 listCone *
 triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars);
 
