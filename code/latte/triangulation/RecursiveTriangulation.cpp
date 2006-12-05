@@ -49,7 +49,7 @@ triangulate_recursively
 #endif
   vector<listVector*> partition_rays(numOfVars - 1);
   int num_tries;
-  const int max_tries = 0; //1000;
+  const int max_tries = 1000;
   for (num_tries = 0; num_tries<max_tries; num_tries++) {
     vector<bool> taken(num_rays);
     int i;
