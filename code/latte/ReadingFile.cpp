@@ -148,7 +148,7 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
     out << endl;
   }
  
-  int * NewIndex;
+  int * NewIndex = NULL;
   system_with_error_check(REDCHECK_PATH " Check_red > Check_red.out 2>&1");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
@@ -222,6 +222,7 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
       out2 << endl; */
     system_with_error_check("rm -f Check_red*");
     cout << "done." << endl;
+    if (NewIndex) delete[] NewIndex;
 }
 
 /* ----------------------------------------------------------------- */
