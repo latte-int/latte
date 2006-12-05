@@ -40,6 +40,9 @@ int lengthListVector(listVector*);
 
 listVector *appendVectorToListVector(const vec_ZZ &, listVector*);
 
+/* Copy the linked list of vectors. */
+listVector *copyListVector(listVector *);
+
 struct Vertex {
   rationalVector *vertex;
   vec_ZZ ehrhart_vertex; // for exponential Ehrhart computation
@@ -81,5 +84,8 @@ void freeListCone(listCone *list);
 /* Destructively concatenate two linked lists of cones.  Return the
    resulting list. */
 listCone *appendListCones(listCone *A, listCone *B);
+
+/* Copy a single cone. */
+listCone *copyCone(listCone *cone);
 
 #endif

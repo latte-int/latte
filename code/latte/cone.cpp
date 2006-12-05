@@ -40,6 +40,19 @@ listVector* appendVectorToListVector(const vec_ZZ &v, listVector *REST) {
 }
 
 /* ----------------------------------------------------------------- */
+listVector *copyListVector(listVector *l)
+{
+  listVector *result = NULL;
+  listVector **rest_p = &result;
+  while (l != NULL) {
+    *rest_p = new listVector(l->first);
+    rest_p = &(*rest_p)->rest;
+    l = l->rest;
+  }
+  return result;
+}
+
+/* ----------------------------------------------------------------- */
 listCone* createListCone() {
   listCone* z;
 
@@ -94,4 +107,20 @@ listCone *appendListCones(listCone *A, listCone *B)
     C->rest = B;
     return A;
   }
+}
+
+listCone *copyCone(listCone *cone)
+{
+  listCone *copy = createListCone();
+  copy->coefficient = cone->coefficient;
+  copy->vertex = new Vertex(*cone->vertex);
+  copy->determinant = cone->determinant;
+  copy->rays = copyListVector(cone->rays);
+  copy->dual_determinant = cone->determinant;
+  copy->facets = copyListVector(cone->facets);
+  copy->facet_divisors = cone->facet_divisors;
+  copy->latticePoints = copyListVector(cone->latticePoints);
+  copy->lattice_points_scalar_products = cone->lattice_points_scalar_products;
+  copy->rest = NULL;
+  return copy;
 }
