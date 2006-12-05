@@ -28,8 +28,9 @@
 
 using namespace std;
 
-listCone *
-triangulate_cone_recursively_with_subspace_avoiding_facets
+/* Consume CONE. */
+static listCone *
+triangulate_recursively
 (listCone *cone, BarvinokParameters *Parameters)
 {
   int numOfVars = Parameters->Number_of_Variables;
@@ -48,7 +49,7 @@ triangulate_cone_recursively_with_subspace_avoiding_facets
 #endif
   vector<listVector*> partition_rays(numOfVars - 1);
   int num_tries;
-  const int max_tries = 1000;
+  const int max_tries = 0; //1000;
   for (num_tries = 0; num_tries<max_tries; num_tries++) {
     vector<bool> taken(num_rays);
     int i;
@@ -148,18 +149,24 @@ triangulate_cone_recursively_with_subspace_avoiding_facets
     freeCone(cone);
     /* Recurse. */
     listCone *left_triang
-      = triangulate_cone_recursively_with_subspace_avoiding_facets(left_cone,
-								   Parameters);
+      = triangulate_recursively(left_cone, Parameters);
     listCone *right_triang
-      = triangulate_cone_recursively_with_subspace_avoiding_facets(right_cone,
-								   Parameters);
+      = triangulate_recursively(right_cone, Parameters);
     return appendListCones(left_triang, right_triang);
   };
   cerr << "No success after " << num_tries << " tries, dualizing back and irrationalizing." << endl;
   dualizeCone(cone, numOfVars);
   irrationalizeCone(cone, numOfVars);
   listCone *triang = triangulate_cone_with_cdd(cone, Parameters);
+  freeCone(cone);
   triang = dualizeBackCones(triang, numOfVars);
   return triang;
 }
 
+/* Does not consume CONE. */
+listCone *
+triangulate_cone_recursively_with_subspace_avoiding_facets
+(listCone *cone, BarvinokParameters *Parameters)
+{
+  return triangulate_recursively(copyCone(cone), Parameters);
+}

@@ -67,6 +67,7 @@ listCone* createListCone() {
   z->rays=0;
   z->facets=0;
   z->determinant = 0;
+  z->dual_determinant = 0;
   z->latticePoints=0;
   z->rest=0;
 

@@ -27,8 +27,7 @@
 #include "barvinok/barvinok.h"
 
 /* Return a triangulation of a full-dimensional CONE, such that the
-   resulting facets avoid the subspace where the last coordinate is 0.
-   CONE is consumed. */
+   resulting facets avoid the subspace where the last coordinate is 0. */
 listCone *
 triangulate_cone_recursively_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters);
