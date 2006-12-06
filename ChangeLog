@@ -1,3 +1,77 @@
+2006-12-06  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/latte_gmp.cpp (convert_mpz_to_ZZ): Allocate the
+	memory with new[], rather than letting GMP use its allocator
+	function.  Fixes segfault when TOPCOM is used; it installs a
+	custom allocator!
+
+	* code/latte/Grobner.cpp, code/latte/cone.cpp, code/latte/cone.h,
+	code/latte/preprocess.cpp, code/latte/ramon.cpp,
+	code/latte/ramon.h (addVector, subVector, negativeVector):
+	Removed.
+	(freeListVector): Moved from ramon.h,.cpp to cone.h,.cpp
+
+	* code/latte/Grobner.cpp, code/latte/ReadingFile.cpp,
+	code/latte/convert.cpp, code/latte/count.cpp,
+	code/latte/preprocess.cpp, code/latte/ramon.cpp,
+	code/latte/ramon.h, code/latte/vertices/cdd.cpp (copyVector):
+	Removed.
+
+	* code/latte/Grobner.cpp, code/latte/ReadingFile.cpp,
+	code/latte/convert.cpp, code/latte/count.cpp,
+	code/latte/preprocess.cpp, code/latte/vertices/cdd.cpp: Fix
+	several memory leaks.
+
+2006-12-05  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ReadingFile.cpp: Fix memory leak.
+
+	* code/latte/RudyResNTL.cpp, code/latte/RudyResNTL.h,
+	code/latte/barvinok/barvinok.cpp, code/latte/count.cpp,
+	code/latte/dual.cpp,
+	code/latte/triangulation/TriangulationWithTOPCOM.h,
+	code/latte/triangulation/triangulate.h,
+	code/latte/vertices/cdd.cpp: Fix memory leaks.
+
+	* code/latte/cone.cpp, code/latte/cone.h (copyListVector, copyCone):
+	New.
+
+2006-12-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/RecursiveTriangulation.cpp,
+	code/latte/triangulation/RecursiveTriangulation.h,
+	code/latte/triangulation/triangulate.cpp (triangulate_cone_recursively_with_subspace_avoiding_facets):
+	Change interface.
+
+	* code/latte/CheckEmpty.cpp, code/latte/ExponentialSubst.cpp,
+	code/latte/ReadingFile.cpp, code/latte/barvinok/dec.cpp,
+	code/latte/count.cpp, code/latte/ehrhart.cpp,
+	code/latte/maximize.cpp, code/latte/minimize.cpp: Remove use of
+	ConeDecom.h
+
+	* code/latte/dual.cpp, code/latte/dual.h (dualizeCone):
+	New, factored out from dualizeCones.
+
+	* code/latte/triangulation/TriangulationWithTOPCOM.cpp:
+	Fix conditionalization.
+
+	* code/latte/Makefile.am, code/latte/barvinok/ConeDecom.cpp,
+	code/latte/barvinok/ConeDecom.h, code/latte/barvinok/barvinok.cpp,
+	code/latte/barvinok/barvinok.h: Merged ConeDecom.cpp, ConeDecom.h
+	into barvinok.cpp, barvinok.h
+
+2006-11-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* m4/cddlib-check.m4: Fix last change.
+
+	* code/latte/adjacency/ComputeAdjacency.c,
+	code/latte/adjacency/ComputeAdjacency.cpp,
+	code/latte/adjacency/Makefile.am: Use latte_cddlib.h, so linkage
+	configuration works.
+
+	* code/latte/barvinok/barvinok.cpp (BarvinokParameters::print_statistics):
+	Print irrationalize_time too.
+
 2006-11-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	The new command-line option --triangulation=topcom allows to use
