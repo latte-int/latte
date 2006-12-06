@@ -251,7 +251,7 @@ listVector* preprocessProblem(listVector *equations,
     tmp=tmp->rest;
   }
   H=negativeVector(H,lenOfMatrix);
-  A=copyVector(H,lenOfMatrix);
+  A=H;
 
   H=transpose(H,*numOfVars,numOfRows);
 
@@ -273,7 +273,12 @@ listVector* preprocessProblem(listVector *equations,
     ind+=(*numOfVars);
   }
 
-  basis=basis->rest;
+  {
+    // Drop the dummy head.
+    listVector *b = basis->rest;
+    delete basis;
+    basis=b;
+  }
 
   H=transpose(H,numOfRows,*numOfVars);
   U=transpose(U,*numOfVars,*numOfVars);
@@ -377,7 +382,7 @@ listVector* preprocessProblem(listVector *equations,
   (*generators)=createArrayVector(newNumOfVars-1);
   tmp=basis;
   for (i=0;i<newNumOfVars-1;i++) {
-    (*generators)[i]=copyVector(tmp->first,*numOfVars);
+    (*generators)[i]=tmp->first;
     tmp=tmp->rest;
   }
 
@@ -475,7 +480,13 @@ listVector* preprocessProblem(listVector *equations,
       }
     tmp=tmp->rest;
   }
-  newInequalities=newInequalities->rest;
+  {
+    // Drop the dummy head.
+    listVector *t = newInequalities->rest;
+    delete newInequalities;
+    newInequalities = t;
+  }
+  freeListVector(basis);
 /*    printf("OriginalInequalities:\n"); */
 /*    printListVector(inequalities,(*numOfVars)+1); */
   cout << "New inequalities:\n";

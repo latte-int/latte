@@ -27,7 +27,6 @@
 vec_ZZ createVector(int);
 vec_ZZ* createArrayVector(int);
 listVector* createListVector(vec_ZZ);
-vec_ZZ copyVector(vec_ZZ, int);
 vec_ZZ addVector(vec_ZZ, vec_ZZ, int);
 vec_ZZ subVector(vec_ZZ, vec_ZZ, int);
 

@@ -526,6 +526,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
     delete rays; // only deletes the dummy head
     tmp=tmp->rest;
   }
+  delete[] vertices;
 
   in.close();
   cout << "done.\n";

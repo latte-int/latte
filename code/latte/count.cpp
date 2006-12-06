@@ -75,7 +75,6 @@ int main(int argc, char *argv[]) {
   unsigned int flags = 0, print_flag = 0, output_cone = 0;
   vec_ZZ dim, v, w;
   int oldnumofvars;
-  vec_ZZ *generators;
   char fileName[127], invocation[127], equationsPresent[10],
     assumeUnimodularCones[127], dualApproach[127], taylor[127], printfile[127],
     rationalCone[127], nonneg[127], Memory_Save[127], Save_Tri[127],
@@ -89,7 +88,7 @@ int main(int argc, char *argv[]) {
   
   listVector *matrix = NULL, *equations = NULL, *inequalities = NULL, *rays = NULL, *endRays, *tmpRays;
   vec_ZZ cost;
-  listVector *templistVec;
+  listVector *templistVec = NULL;
   listCone *tmpcones;
   mat_ZZ ProjU, ProjU2, AA;
   vec_ZZ bb;
@@ -423,7 +422,6 @@ int main(int argc, char *argv[]) {
   ProjU.SetDims(numOfVars, numOfVars);
   ProjU2.SetDims(numOfVars, numOfVars);
   oldnumofvars = numOfVars;
-  generators=createArrayVector(numOfVars);
   {
     listVector *matrixTmp;
     if (equationsPresent[0]=='y') {
@@ -432,7 +430,11 @@ int main(int argc, char *argv[]) {
 	    matrixTmp=Grobner(equations,inequalities,&generators,&numOfVars, &templistVec, oldnumofvars);
      
 	    }*/
-      matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
+      {
+	vec_ZZ *generators = NULL;
+	matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
+	if (generators) delete[] generators;
+      }
       freeListVector(equations);
       freeListVector(inequalities);
       ProjU2 = transpose(ProjU);
@@ -863,6 +865,7 @@ if(Memory_Save[0] == 'n')
     exit(1);
   };
 
+  freeListVector(templistVec);
   freeListVector(matrix);
   delete Poly;
 

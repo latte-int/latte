@@ -51,7 +51,7 @@ createConeDecMatrix(const listCone *cone, int numOfRays, int numOfVars)
 
   tmp=cone->rays;
   for (i=0; i<numOfRays; i++) {
-    mat[i]=copyVector(tmp->first,numOfVars);
+    mat[i] = tmp->first;
     tmp=tmp->rest;
   }
   //removeListVector(cone->rays);
@@ -73,7 +73,7 @@ createFacetMatrix(const listCone *cone, int numOfFacets, int numOfVars)
     DivRem(multiplier, remainder,
 	   cone->determinant, cone->facet_divisors[i]);
     assert(IsZero(remainder));
-    mat[i] = copyVector(tmp->first,numOfVars) * multiplier;
+    mat[i] = tmp->first * multiplier;
     tmp=tmp->rest;
   }
   return (mat);
@@ -94,7 +94,7 @@ createFacetMatrix2(const listCone *cone, int numOfFacets, int numOfVars)
     DivRem(multiplier, remainder,
 	   abs(cone->determinant), cone->facet_divisors[i]);
     assert(IsZero(remainder));
-    mat[i] = copyVector(tmp->first,numOfVars) * multiplier;
+    mat[i] = tmp->first * multiplier;
     tmp=tmp->rest;
   }
   return (mat);
@@ -115,7 +115,7 @@ convert_listVector_to_mat_ZZ(listVector *list) {
                                                                                 
    /* add columns as rows and then take the transpose */
    while (tmp_list) {
-      m[cur_col] = copyVector(tmp_list->first, rows);
+      m[cur_col] = tmp_list->first;
       cur_col++;
       tmp_list = tmp_list->rest;
    }

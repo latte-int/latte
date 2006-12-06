@@ -445,7 +445,7 @@ listVector* Grobner(listVector *equations,
     tmp=tmp->rest;
   }
   H=negativeVector(H,lenOfMatrix);
-  A=copyVector(H,lenOfMatrix);
+  A=H;
 
   H=transpose(H,*numOfVars,numOfRows);
 
@@ -529,7 +529,7 @@ listVector* Grobner(listVector *equations,
   (*generators)=createArrayVector(newNumOfVars-1);
   tmp=basis;
   for (i=0;i<newNumOfVars-1;i++) {
-    (*generators)[i]=copyVector(tmp->first,*numOfVars);
+    (*generators)[i]=tmp->first;
     tmp=tmp->rest;
   }
 

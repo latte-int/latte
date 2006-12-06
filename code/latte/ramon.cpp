@@ -66,15 +66,6 @@ void freeListVector( listVector* p )
 }
 
 /* ----------------------------------------------------------------- */
-vec_ZZ copyVector(vec_ZZ v, int numOfVars) {
-  int i;
-  vec_ZZ w;
-
-  w = createVector(numOfVars);
-  for (i=0; i<numOfVars; i++) w[i] = v[i];
-  return (w);
-}
-/* ----------------------------------------------------------------- */
 vec_ZZ addVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
   int i;
 

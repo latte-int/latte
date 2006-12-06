@@ -784,7 +784,7 @@ void readLatteProblem(char *fileName, listVector **equations,
                       int *numOfVars, char *nonneg, char* dual,
 		      char* grobner, char* max, vec_ZZ & cost, char * Vrep) {
   int i,j,eq,ind,numOfVectors,numOfEquations;
-  vec_ZZ indexEquations, tmpVector;
+  vec_ZZ indexEquations;
   listVector *basis, *endBasis, *tmp, *endEquations, *endInequalities;
   vec_ZZ b;
   ZZ bignum;
@@ -989,10 +989,7 @@ void readLatteProblem(char *fileName, listVector **equations,
     printVector(indexEquations,numOfEquations);
 #endif
 
-    tmpVector=createVector(*numOfVars);
-    createListVector(tmpVector);
-    (*equations)=createListVector(tmpVector);
-
+    (*equations)=createListVector(createVector(*numOfVars));
     (*inequalities)=createListVector(createVector(*numOfVars));
     endEquations=(*equations);
     endInequalities=(*inequalities);
@@ -1006,7 +1003,11 @@ void readLatteProblem(char *fileName, listVector **equations,
 	endEquations->rest=createListVector(tmp->first);
 	endEquations=endEquations->rest;
 	eq++;
-	tmp=tmp->rest;
+	{
+	  listVector *t = tmp->rest;
+	  delete tmp;
+	  tmp=t;
+	}
 	if (eq==numOfEquations) {
 	  endInequalities->rest=tmp;
 	  tmp=0;
@@ -1014,12 +1015,24 @@ void readLatteProblem(char *fileName, listVector **equations,
       } else {
 	endInequalities->rest=createListVector(tmp->first);
 	endInequalities=endInequalities->rest;
-	tmp=tmp->rest;
+	{
+	  listVector *t = tmp->rest;
+	  delete tmp;
+	  tmp=t;
+	}
       }
       ind++;
     }
-    (*equations)=(*equations)->rest;
-    (*inequalities)=(*inequalities)->rest;
+    {
+      listVector *t = (*equations)->rest;
+      delete *equations;
+      *equations = t;
+    }
+    {
+      listVector *t = (*inequalities)->rest;
+      delete *inequalities;
+      *inequalities = t;
+    }
   }
   //if(max[0] == 'y') for(i = 0; i < (*numOfVars-1); i++) in >> cost[i];
   if(Vrep[0] == 'n'){
@@ -1061,7 +1074,7 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
                       char* Memory_Save, char* uni, char* inthull,
 		      char* grobner) {
   int i,j,eq,ind, length = 0, f = 0, numOfVectors,numOfEquations;
-  vec_ZZ indexEquations, tmpVector;
+  vec_ZZ indexEquations;
   listVector *basis, *endBasis, *tmp, *endEquations, *endInequalities;
   vec_ZZ b;
   string tmpString;
@@ -1267,10 +1280,7 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
     cout << "\nEquation indices: ";
     printVector(indexEquations,numOfEquations);
 
-    tmpVector=createVector(*numOfVars);
-    createListVector(tmpVector);
-    (*equations)=createListVector(tmpVector);
-
+    (*equations)=createListVector(createVector(*numOfVars));
     (*inequalities)=createListVector(createVector(*numOfVars));
     endEquations=(*equations);
     endInequalities=(*inequalities);
