@@ -39,15 +39,20 @@ convert_ZZ_to_mpz(const ZZ &zz)
 ZZ
 convert_mpz_to_ZZ(const mpz_class &mpz)
 {
-  size_t size;
+  size_t count;
   int sig = sgn(mpz);
-  void *data = mpz_export(NULL, &size,
-			  -1, 1, 1, 0,
-			  mpz.get_mpz_t());
-  ZZ result = ZZFromBytes((unsigned char *)data, size);
+  int size = 1;
+  int nail = 0;
+  int numb = 8*size - nail;
+  count = (mpz_sizeinbase (mpz.get_mpz_t(), 2) + numb-1) / numb;
+  unsigned char *data = new unsigned char[count * size];
+  mpz_export(data, &count,
+	     /*order:*/ -1, size, /*endian:*/ 1, nail,
+	     mpz.get_mpz_t());
+  ZZ result = ZZFromBytes(data, count);
   if (sig == -1)
     result = -result;
-  free(data);
+  delete[] data;
   return result;
 }
 
