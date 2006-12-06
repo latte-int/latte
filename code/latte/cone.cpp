@@ -53,6 +53,16 @@ listVector *copyListVector(listVector *l)
 }
 
 /* ----------------------------------------------------------------- */
+void freeListVector( listVector* p )
+{
+  while (p != NULL) {
+    listVector *rest = p->rest;
+    delete p;
+    p = rest;
+  }
+}
+
+/* ----------------------------------------------------------------- */
 listCone* createListCone() {
   listCone* z;
 

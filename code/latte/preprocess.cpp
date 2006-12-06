@@ -250,7 +250,7 @@ listVector* preprocessProblem(listVector *equations,
     ind2++;
     tmp=tmp->rest;
   }
-  H=negativeVector(H,lenOfMatrix);
+  H=-H;
   A=H;
 
   H=transpose(H,*numOfVars,numOfRows);

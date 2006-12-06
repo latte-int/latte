@@ -56,37 +56,6 @@ listVector* createListVector(vec_ZZ v) {
             }
         }
 /* ----------------------------------------------------------------- */
-void freeListVector( listVector* p )
-{
-  while (p != NULL) {
-    listVector *rest = p->rest;
-    delete p;
-    p = rest;
-  }
-}
-
-/* ----------------------------------------------------------------- */
-vec_ZZ addVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
-  int i;
-
-  for (i=0; i<numOfVars; i++) v[i]=v[i]+w[i];
-  return (v);
-}
-/* ----------------------------------------------------------------- */
-vec_ZZ subVector(vec_ZZ v, vec_ZZ w, int numOfVars) {
-  int i;
-
-  for (i=0; i<numOfVars; i++) v[i]=v[i]-w[i];
-  return (v);
-}
-/* ----------------------------------------------------------------- */
-vec_ZZ negativeVector(vec_ZZ v, int numOfVars) {
-  int i;
-
-  for (i=0; i<numOfVars; i++) v[i]=-v[i];
-  return (v);
-}
-/* ----------------------------------------------------------------- */
 listVector* updateBasis(listVector *v, listVector *endBasis) {
   endBasis->rest = v;
   v->rest=0;

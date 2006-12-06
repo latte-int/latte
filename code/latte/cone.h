@@ -43,6 +43,9 @@ listVector *appendVectorToListVector(const vec_ZZ &, listVector*);
 /* Copy the linked list of vectors. */
 listVector *copyListVector(listVector *);
 
+/* Free the whole linked list of vectors. */
+void freeListVector(listVector *p);
+
 struct Vertex {
   rationalVector *vertex;
   vec_ZZ ehrhart_vertex; // for exponential Ehrhart computation
