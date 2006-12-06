@@ -22,16 +22,30 @@
 #include <vector>
 #include "triangulation/RecursiveTriangulation.h"
 #include "latte_random.h"
+#include "print.h"
 #include "dual.h"
 #include "triangulation/RegularTriangulationWithCdd.h"
 #include "Irrational.h"
 
 using namespace std;
 
+static void
+check_rays(listCone *cone, int numOfVars)
+{
+  listVector *ray;
+  for (ray = cone->rays; ray!=NULL; ray=ray->rest) {
+    if (ray->first[numOfVars - 1] == 0) {
+      cerr << "The following dualized-back cone has bad rays." << endl;
+      printListCone(cone, numOfVars);
+      abort();
+    }
+  }
+}
+
 /* Consume CONE. */
 static listCone *
 triangulate_recursively
-(listCone *cone, BarvinokParameters *Parameters)
+(listCone *cone, BarvinokParameters *Parameters, int level = 0)
 {
   int numOfVars = Parameters->Number_of_Variables;
   int num_rays = lengthListVector(cone->rays);
@@ -45,7 +59,8 @@ triangulate_recursively
      partitions the cone into left and right subcone.
   */
 #if 1
-  cerr << "Cone with " << num_rays << " rays:  " << flush;
+  cerr << endl << "Level " << level << ": "
+       << "Cone with " << num_rays << " rays:  " << flush;
 #endif
   vector<listVector*> partition_rays(numOfVars - 1);
   int num_tries;
@@ -149,13 +164,17 @@ triangulate_recursively
     freeCone(cone);
     /* Recurse. */
     listCone *left_triang
-      = triangulate_recursively(left_cone, Parameters);
+      = triangulate_recursively(left_cone, Parameters, level + 1);
     listCone *right_triang
-      = triangulate_recursively(right_cone, Parameters);
+      = triangulate_recursively(right_cone, Parameters, level + 1);
     return appendListCones(left_triang, right_triang);
   };
   cerr << "No success after " << num_tries << " tries, dualizing back and irrationalizing." << endl;
+  cerr << "The cone: " << endl;
+  printCone(cone, numOfVars);
   dualizeCone(cone, numOfVars);
+  /* Check that rays do not lie in the forbidden subspace. */
+  check_rays(cone, numOfVars);
   irrationalizeCone(cone, numOfVars);
   listCone *triang = triangulate_cone_with_cdd(cone, Parameters);
   freeCone(cone);
