@@ -498,14 +498,17 @@ barvinokDecomposition_Single (listCone *cone,
 {
   int status = 1;
   listCone *triang = triangulateCone(cone, Parameters->Number_of_Variables, Parameters);
+  Parameters->decompose_time.start();
   listCone *t;
   for (t = triang; t!=NULL; t=t->rest) {
     int num_rays = lengthListVector(t->rays);
+    assert(num_rays == Parameters->Number_of_Variables);
     mat_ZZ B = createConeDecMatrix(t, num_rays, Parameters->Number_of_Variables);
     if ((status = barvinok_Single(B, Parameters, t->vertex)) == -1)
       goto BAILOUT;
   }
  BAILOUT:
+  Parameters->decompose_time.stop();
   freeListCone(triang);
   return status;
 }

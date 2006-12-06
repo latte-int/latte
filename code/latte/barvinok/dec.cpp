@@ -230,9 +230,7 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
 
   cout << "Number of cones: " << numOfAllCones << endl;
 
-  param.decompose_time.start();
   barvinokDecomposition_List(cones, param);
-  param.decompose_time.stop();
 
   cout << endl << "Total Unimodular Cones: " << param.Total_Uni_Cones << endl;
   ofstream UniOut("numOfUnimodularCones");

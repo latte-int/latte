@@ -624,7 +624,9 @@ int main(int argc, char *argv[]) {
 	  = decomposeCones(Poly->cones, not Poly->dualized,
 			   *params);
 	freeListCone(Poly->cones);
-	Poly->cones = decomposed_cones;
+ 	Poly->cones = decomposed_cones;
+// 	cout << "Decomposed cones: " << endl;
+//	printListCone(Poly->cones, Poly->numOfVars);
 	/* Compute points in parallelepipeds */
 	computePointsInParallelepipeds(Poly->cones, Poly->numOfVars);
       }
@@ -645,7 +647,6 @@ int main(int argc, char *argv[]) {
       exit(1);
     }
     else {
-      params->decompose_time.start();
       if (approx) {
 #ifdef HAVE_EXPERIMENTS
 	{
@@ -694,7 +695,6 @@ int main(int argc, char *argv[]) {
 	ofstream out("numOfLatticePoints");
 	out << number_of_lattice_points << endl;
       }
-      params->decompose_time.stop();
     }
     break;
   default:
