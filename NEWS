@@ -57,3 +57,8 @@ Changes since the official release 1.2:
 
   	count --triangulation=topcom
 
+* A new program, `latte2ine' is built that converts from LattE-style
+  input files to cdd-style input files.
+
+  	latte2ine < FILENAME.latte > FILENAME.ine
+

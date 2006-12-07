@@ -1,4 +1,24 @@
+2006-12-07  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* Makefile.am: Build the new latte2ine program.
+
+	* latte2ine.cpp: New program.
+
+	* count.cpp: Enable "homog --all-primal" (it still fails, though).
+	In "--avoid-singularities" mode, don't enforce subspace-avoiding
+	triangulation if we do all-primal decomposition.
+
+	* triangulation/triangulate.h: Doc fix.
+
+	* triangulation/triangulate.cpp (triangulateCone):
+	If a simplicial cone is given, just return a copy.
+	Fixes TOPCOM triangulation for some instances (example2, example3,
+	hickerson-14, knapsackbaby2.equ); see test-suite run from 2006-12-02.
+
 2006-12-06  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* barvinok/barvinok.cpp, barvinok/dec.cpp, count.cpp:
+	decompose_time no longer includes triangulate_time.
 
 	* code/latte/latte_gmp.cpp (convert_mpz_to_ZZ): Allocate the
 	memory with new[], rather than letting GMP use its allocator
