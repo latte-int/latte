@@ -215,7 +215,6 @@ int main(int argc, char *argv[]) {
     }
     else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
-      params->triangulation = BarvinokParameters::SubspaceAvoidingRecursiveTriangulation;
     }
     else if (strncmp(argv[i], "--triangulation=topcom", 32) == 0
 	     || strncmp(argv[i], "--triangulation=TOPCOM", 32) == 0) {
@@ -234,6 +233,19 @@ int main(int argc, char *argv[]) {
     else {
       cerr << "Unknown command/option " << argv[i] << endl;
       exit(1);
+    }
+  }
+
+  if (params->shortvector == BarvinokParameters::SubspaceAvoidingLLL) {
+    if (params->decomposition = BarvinokParameters::IrrationalAllPrimalDecomposition) {
+      /* Triangulation will be done in the primal space, so all
+	 triangulation methods are fine. */
+    }
+    else {
+      /* Triangulation will be done in the dual space, so we must
+	 avoid using facets whose normal vectors lie in the
+	 subspace. */
+      params->triangulation = BarvinokParameters::SubspaceAvoidingRecursiveTriangulation;
     }
   }
   
@@ -527,8 +539,8 @@ int main(int argc, char *argv[]) {
     Poly->cones->rays = rays->rest;
     Poly->dualized = true;
 
-    cout << "Homogenization: " << endl;
-    printListCone(Poly->cones, numOfVars);
+//     cout << "Homogenization: " << endl;
+//     printListCone(Poly->cones, numOfVars);
   }
 
   Poly->numOfVars = numOfVars;
@@ -573,24 +585,25 @@ int main(int argc, char *argv[]) {
     }
     break;
   case BarvinokParameters::IrrationalAllPrimalDecomposition:
-    if (Poly->dualized) {
-      cerr << "You cannot use `homog' and `--all-primal' at the same time." << endl;
-      exit(3);
-    }
-#if 1
-    cout << "Irrationalizing polyhedral cones... ";
-    cout.flush();
+    cout << "Irrationalizing polyhedral cones... "; cout.flush();
     params->dualize_time.start();
-    if (Vrepresentation[0] == 'y') {
-      cout << "(First computing facets for them... "; cout.flush();
+    if (Poly->dualized) {
+      cout << "(First dualizing back... "; cout.flush();
       Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars);
-      Poly->cones = dualizeBackCones(Poly->cones, Poly->numOfVars); // just swaps
       cout << "done; sorry for the interruption.) "; cout.flush();
-    }      
+    }
     else {
-      /* Fill in the facets of all cones; we determine them by
-	 taking all inequalities tight at the respective vertex. */
-      computeTightInequalitiesOfCones(Poly->cones, matrix, Poly->numOfVars);
+      if (Vrepresentation[0] == 'y') {
+	cout << "(First computing facets for them... "; cout.flush();
+	Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars);
+	Poly->cones = dualizeBackCones(Poly->cones, Poly->numOfVars); // just swaps
+	cout << "done; sorry for the interruption.) "; cout.flush();
+      }      
+      else {
+	/* Fill in the facets of all cones; we determine them by
+	   taking all inequalities tight at the respective vertex. */
+	computeTightInequalitiesOfCones(Poly->cones, matrix, Poly->numOfVars);
+      }
     }
     params->dualize_time.stop(); cout << params->dualize_time;
     params->irrationalize_time.start();
@@ -602,7 +615,6 @@ int main(int argc, char *argv[]) {
     irrationalizeCones(Poly->cones, Poly->numOfVars);
     params->irrationalize_time.stop();
     cout << params->irrationalize_time;
-#endif
     break;
   default:
     cerr << "Unknown BarvinokParameters::decomposition" << endl;
