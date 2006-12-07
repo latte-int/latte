@@ -47,6 +47,12 @@ static listCone *
 triangulate_recursively
 (listCone *cone, BarvinokParameters *Parameters, int level = 0)
 {
+#if 1
+  dualizeCone(cone, Parameters->Number_of_Variables);
+  //  printCone(cone, Parameters->Number_of_Variables);
+  check_rays(cone, Parameters->Number_of_Variables);
+  dualizeCone(cone, Parameters->Number_of_Variables);
+#endif
   int numOfVars = Parameters->Number_of_Variables;
   int num_rays = lengthListVector(cone->rays);
   if (num_rays <= numOfVars) {
