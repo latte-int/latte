@@ -26,8 +26,13 @@
 #include "cone.h"
 #include "barvinok/barvinok.h"
 
-/* Triangulate CONE using some method specified in PARAMS, discarding
-   lower-dimensional cones.  Return a linked list of cones.
+/* CONE must be a full-dimensional pointed cone given by its minimal
+   generators (rays).
+   
+   Triangulate CONE using some method specified in PARAMS, discarding
+   lower-dimensional cones.  Return a linked list of freshly allocated
+   cones.
+   
    CONE is not consumed.
 */
 listCone *
