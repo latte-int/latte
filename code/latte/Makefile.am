@@ -1,9 +1,10 @@
-bin_PROGRAMS = maximize minimize count ehrhart
+bin_PROGRAMS = maximize minimize count ehrhart latte2ine
 
 maximize_SOURCES = maximize.cpp
 minimize_SOURCES = minimize.cpp
 count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
+latte2ine_SOURCES = latte2ine.cpp
 
 LDADD = liblatte.a
 AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(TOPCOM_CXXFLAGS) $(CDDLIB_CFLAGS) $(GMP_CFLAGS)
