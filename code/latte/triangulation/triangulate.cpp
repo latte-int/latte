@@ -34,6 +34,10 @@ triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params)
 {
   listCone *result;
+  if (numOfVars == lengthListVector(cone->rays)) {
+    // Already simplicial.
+    return copyCone(cone);
+  }
   params->triangulate_time.start();
   switch(params->triangulation) {
   case BarvinokParameters::RegularTriangulationWithCdd:
