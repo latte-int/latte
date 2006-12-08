@@ -24,10 +24,12 @@
 #include "triangulation/RegularTriangulationWithCdd.h"
 #ifdef HAVE_EXPERIMENTS
 #  include "triangulation/RecursiveTriangulation.h"
+#  include "triangulation/BoundaryTriangulation.h"
 #endif
 #if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
 #  include "triangulation/TriangulationWithTOPCOM.h"
 #endif
+#include "print.h"
 
 listCone *
 triangulateCone(listCone *cone, int numOfVars,
@@ -53,6 +55,16 @@ triangulateCone(listCone *cone, int numOfVars,
     exit(1);
 #endif
     break;
+  case BarvinokParameters::SubspaceAvoidingBoundaryTriangulation:
+#ifdef HAVE_EXPERIMENTS
+    result = boundary_triangulation_of_cone_with_subspace_avoiding_facets
+      (cone, params);
+#else
+    cerr << "SubspaceAvoidingBoundaryTriangulation not compiled in, sorry."
+	 << endl;
+    exit(1);
+#endif
+    break;
   case BarvinokParameters::PlacingTriangulationWithTOPCOM:
 #if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
     result = triangulate_cone_with_TOPCOM(cone, numOfVars);
@@ -67,5 +79,9 @@ triangulateCone(listCone *cone, int numOfVars,
     exit(1);
   }
   params->triangulate_time.stop();
+#if 1
+  printListConeToFile("triangulation", result, numOfVars);
+  cerr << "Printed triangulation to file `triangulation'" << endl;
+#endif
   return result;
 }
