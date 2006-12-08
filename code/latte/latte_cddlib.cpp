@@ -19,6 +19,7 @@
 */
 
 #include "latte_cddlib.h"
+#include "latte_gmp.h"
 
 init_cddlib_class::init_cddlib_class()
 {
@@ -26,4 +27,44 @@ init_cddlib_class::init_cddlib_class()
 }
 
 init_cddlib_class init_cddlib;
+
+void check_cddlib_error(dd_ErrorType error, const char *proc)
+{
+  if (error != dd_NoError) {
+    cerr << "CDDLIB error in " << proc << ": " << endl;
+    dd_WriteErrorMessages(stderr, error);
+    exit(1);
+  }    
+}
+
+dd_MatrixPtr
+rays_to_cddlib_matrix(listVector *rays, int numOfVars)
+{
+  dd_set_global_constants();
+  int num_rays = lengthListVector(rays);
+  int numOfVars_hom = numOfVars + 1;
+  dd_MatrixPtr matrix = dd_CreateMatrix(num_rays, numOfVars_hom);
+  matrix->numbtype = dd_Rational;
+  matrix->representation = dd_Generator;
+  int i, j;
+  listVector *ray;
+  mpq_class x;
+  for (i = 0, ray = rays; i<num_rays; i++, ray = ray->rest) {
+    for (j = 0; j<numOfVars; j++) {
+      x = convert_ZZ_to_mpq(ray->first[j]);
+      dd_set(matrix->matrix[i][j + 1], x.get_mpq_t());
+    }
+  }
+  return matrix;
+}
+
+dd_PolyhedraPtr
+cone_to_cddlib_polyhedron(listCone *cone, int numOfVars)
+{
+  dd_MatrixPtr matrix = rays_to_cddlib_matrix(cone->rays, numOfVars);
+  dd_ErrorType error;
+  dd_PolyhedraPtr poly = dd_DDMatrix2Poly(matrix, &error);
+  check_cddlib_error(error, "cone_to_cddlib_polyhedron");
+  return poly;
+}
 

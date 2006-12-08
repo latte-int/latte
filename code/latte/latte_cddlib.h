@@ -36,6 +36,8 @@ extern "C" {
 }
 #endif
 
+#include "cone.h"
+
 /* Ensure initialization of the library by having a global constructor
    called. */
 class init_cddlib_class {
@@ -43,6 +45,16 @@ public:
   init_cddlib_class(); 
 };
 extern init_cddlib_class init_cddlib;
-  
+
+/* Check for and handle cddlib errors. */
+void check_cddlib_error(dd_ErrorType error, const char *proc);
+
+/* Conversion from LattE data structures to cddlib data structures. */
+dd_MatrixPtr
+rays_to_cddlib_matrix(listVector *rays, int numOfVars);
+
+dd_PolyhedraPtr
+cone_to_cddlib_polyhedron(listCone *cone, int numOfVars);
+
 #endif
 
