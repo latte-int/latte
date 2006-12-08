@@ -29,7 +29,7 @@
 
 static void check_stream(const istream &f, const char *fileName, const char *proc)
 {
-  if (f.bad()) {
+  if (!f.good()) {
     cerr << "Read error on input file " << fileName << " in " << proc << "." << endl;
     exit(1);
   }
@@ -51,6 +51,7 @@ dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep,
   dd_set_global_constants();
   int numOfVectors, numOfVars_hom;
   f >> numOfVectors >> numOfVars_hom;
+  check_stream(f, fileName, "ReadLatteStyleMatrix");
   dd_MatrixPtr matrix = dd_CreateMatrix(numOfVectors, numOfVars_hom);
   matrix->numbtype = dd_Rational;
   if (vrep) matrix->representation = dd_Generator;
@@ -153,23 +154,6 @@ void WriteLatteStyleMatrix(ostream &f, dd_MatrixPtr matrix)
 	f << i << " ";
     f << endl;
   }
-}
-
-static void check_cddlib_error(dd_ErrorType error, const char *proc)
-{
-  if (error != dd_NoError) {
-    cerr << "CDDLIB error in " << proc << ": " << endl;
-    dd_WriteErrorMessages(stderr, error);
-    exit(1);
-  }    
-}
-
-static ZZ
-convert_mpq_to_ZZ(mpq_t mpq)
-{
-  mpq_class elt(mpq);
-  assert(elt.get_den() == 1);
-  return convert_mpz_to_ZZ(elt.get_num());
 }
 
 Polyhedron *ReadLatteStyleVrep(const char *filename, bool homogenize)
