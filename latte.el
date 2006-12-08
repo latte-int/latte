@@ -28,7 +28,8 @@
   '("bigint" "bigint_matrix"))
 
 (defconst cddlib-types
-  '("dd_MatrixPtr" "dd_rowset" "dd_colset"))
+  '("dd_MatrixPtr" "dd_rowset" "dd_colset" "dd_PolyhedraPtr"
+    "dd_ErrorType" "dd_SetFamilyPtr"))
 
 (defconst latte-types
   '("listCone" "listVector"
