@@ -237,7 +237,7 @@ int main(int argc, char *argv[]) {
   }
 
   if (params->shortvector == BarvinokParameters::SubspaceAvoidingLLL) {
-    if (params->decomposition = BarvinokParameters::IrrationalAllPrimalDecomposition) {
+    if (params->decomposition == BarvinokParameters::IrrationalAllPrimalDecomposition) {
       /* Triangulation will be done in the primal space, so all
 	 triangulation methods are fine. */
     }
@@ -245,7 +245,7 @@ int main(int argc, char *argv[]) {
       /* Triangulation will be done in the dual space, so we must
 	 avoid using facets whose normal vectors lie in the
 	 subspace. */
-      params->triangulation = BarvinokParameters::SubspaceAvoidingRecursiveTriangulation;
+      params->triangulation = BarvinokParameters::SubspaceAvoidingBoundaryTriangulation;
     }
   }
   
