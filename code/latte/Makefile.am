@@ -77,13 +77,15 @@ nodist_liblatte_a_SOURCES =				\
 	ExponentialApprox.cpp				\
 	TrivialSubst.cpp				\
 	barvinok/SubspaceAvoidingDecomposition.cpp	\
-	triangulation/RecursiveTriangulation.cpp
+	triangulation/RecursiveTriangulation.cpp	\
+	triangulation/BoundaryTriangulation.cpp
 
 nodist_noinst_HEADERS =					\
 	ExponentialApprox.h				\
 	TrivialSubst.h					\
 	barvinok/SubspaceAvoidingDecomposition.h	\
-	triangulation/RecursiveTriangulation.h
+	triangulation/RecursiveTriangulation.h		\
+	triangulation/BoundaryTriangulation.h
 
 bin_PROGRAMS += test-todd 
 nodist_test_todd_SOURCES = todd/test-todd.cpp
