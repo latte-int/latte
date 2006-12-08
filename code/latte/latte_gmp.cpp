@@ -19,6 +19,7 @@
 */
 
 #include "latte_gmp.h"
+#include <cassert>
 
 mpz_class
 convert_ZZ_to_mpz(const ZZ &zz)
@@ -54,5 +55,26 @@ convert_mpz_to_ZZ(const mpz_class &mpz)
     result = -result;
   delete[] data;
   return result;
+}
+
+mpq_class
+convert_ZZ_to_mpq(const ZZ &zz)
+{
+  return mpq_class(convert_ZZ_to_mpz(zz));
+}
+
+ZZ
+convert_mpq_to_ZZ(mpq_t mpq)
+{
+  mpq_class elt(mpq);
+  assert(elt.get_den() == 1);
+  return convert_mpz_to_ZZ(elt.get_num());
+}
+
+ZZ
+convert_mpq_to_ZZ(mpq_class elt)
+{
+  assert(elt.get_den() == 1);
+  return convert_mpz_to_ZZ(elt.get_num());
 }
 

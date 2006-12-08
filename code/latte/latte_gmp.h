@@ -40,5 +40,15 @@ convert_ZZ_to_mpz(const ZZ &zz);
 ZZ
 convert_mpz_to_ZZ(const mpz_class &mpz);
 
+mpq_class
+convert_ZZ_to_mpq(const ZZ &zz);
+
+ZZ
+convert_mpq_to_ZZ(const mpq_class &mpq);
+
+ZZ
+convert_mpq_to_ZZ(mpq_t mpq);
+
+
 #endif
 
