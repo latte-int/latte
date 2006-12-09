@@ -47,6 +47,7 @@ public:
   // The kind of triangulation to use.
   typedef enum {
     RegularTriangulationWithCdd,
+    RegularTriangulationWithCddlib,
     SubspaceAvoidingRecursiveTriangulation,
     SubspaceAvoidingBoundaryTriangulation,
     PlacingTriangulationWithTOPCOM
