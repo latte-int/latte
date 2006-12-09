@@ -523,7 +523,9 @@ listVector* transformZZMatToListVector(mat_ZZ A, int numOfVectors,
     endL = endL->rest;
   }
 
-  return (L->rest);
+  listVector *result = L->rest;
+  delete L; // deletes dummy head
+  return result;
 }
  listVector* TransformToDualCone(listVector* matrix, int& numOfVars){
  int numOfCons = lengthListVector(matrix);
