@@ -38,12 +38,14 @@ void check_cddlib_error(dd_ErrorType error, const char *proc)
 }
 
 dd_MatrixPtr
-rays_to_cddlib_matrix(listVector *rays, int numOfVars)
+rays_to_cddlib_matrix(listVector *rays, int numOfVars,
+		      int num_homogenization_vars,
+		      int num_extra_rows)
 {
   dd_set_global_constants();
   int num_rays = lengthListVector(rays);
-  int numOfVars_hom = numOfVars + 1;
-  dd_MatrixPtr matrix = dd_CreateMatrix(num_rays, numOfVars_hom);
+  int numOfVars_hom = numOfVars + num_homogenization_vars;
+  dd_MatrixPtr matrix = dd_CreateMatrix(num_rays + num_extra_rows, numOfVars_hom);
   matrix->numbtype = dd_Rational;
   matrix->representation = dd_Generator;
   int i, j;
@@ -52,7 +54,7 @@ rays_to_cddlib_matrix(listVector *rays, int numOfVars)
   for (i = 0, ray = rays; i<num_rays; i++, ray = ray->rest) {
     for (j = 0; j<numOfVars; j++) {
       x = convert_ZZ_to_mpq(ray->first[j]);
-      dd_set(matrix->matrix[i][j + 1], x.get_mpq_t());
+      dd_set(matrix->matrix[i][j + num_homogenization_vars], x.get_mpq_t());
     }
   }
   return matrix;

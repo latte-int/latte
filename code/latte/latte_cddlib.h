@@ -49,9 +49,15 @@ extern init_cddlib_class init_cddlib;
 /* Check for and handle cddlib errors. */
 void check_cddlib_error(dd_ErrorType error, const char *proc);
 
-/* Conversion from LattE data structures to cddlib data structures. */
+/** Conversion from LattE data structures to cddlib data structures. **/
+
+/* Create a matrix whose rows are the RAYS.
+   NUM_HOMOGENIZATION_VARS extra coordinates, each set to zero,
+   are introduced in front of the ray data. */
 dd_MatrixPtr
-rays_to_cddlib_matrix(listVector *rays, int numOfVars);
+rays_to_cddlib_matrix(listVector *rays, int numOfVars,
+		      int num_homogenization_vars = 1,
+		      int num_extra_rows = 0);
 
 dd_PolyhedraPtr
 cone_to_cddlib_polyhedron(listCone *cone, int numOfVars);
