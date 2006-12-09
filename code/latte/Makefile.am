@@ -63,6 +63,8 @@ endif
 
 if HAVE_CDDLIB
 liblatte_a_SOURCES += latte_cddlib.cpp
+liblatte_a_SOURCES += triangulation/RegularTriangulationWithCddlib.cpp
+noinst_HEADERS += triangulation/RegularTriangulationWithCddlib.h
 endif
 
 if HAVE_LIDIA
