@@ -26,6 +26,9 @@
 #include "cone.h"
 #include "barvinok/barvinok.h"
 
+BarvinokParameters::TriangulationType
+triangulation_type_from_name(const char *name);
+
 /* CONE must be a full-dimensional pointed cone given by its minimal
    generators (rays).
    
@@ -38,5 +41,7 @@
 listCone *
 triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params);
+
+
 
 #endif

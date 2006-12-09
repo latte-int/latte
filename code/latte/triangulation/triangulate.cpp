@@ -22,6 +22,9 @@
 #include "config.h"
 #include "triangulation/triangulate.h"
 #include "triangulation/RegularTriangulationWithCdd.h"
+#ifdef HAVE_CDDLIB
+#include "triangulation/RegularTriangulationWithCddlib.h"
+#endif
 #ifdef HAVE_EXPERIMENTS
 #  include "triangulation/RecursiveTriangulation.h"
 #  include "triangulation/BoundaryTriangulation.h"
@@ -30,6 +33,18 @@
 #  include "triangulation/TriangulationWithTOPCOM.h"
 #endif
 #include "print.h"
+
+BarvinokParameters::TriangulationType
+triangulation_type_from_name(const char *name)
+{
+  if (strcmp(name, "cdd") == 0) return BarvinokParameters::RegularTriangulationWithCdd;
+  if (strcmp(name, "cddlib") == 0) return BarvinokParameters::RegularTriangulationWithCddlib;
+  if (strcmp(name, "topcom") == 0) return BarvinokParameters::PlacingTriangulationWithTOPCOM;
+  else {
+    cerr << "Unknown triangulation type name: " << name << endl;
+    exit(1);
+  }
+}
 
 listCone *
 triangulateCone(listCone *cone, int numOfVars,
@@ -44,6 +59,15 @@ triangulateCone(listCone *cone, int numOfVars,
   switch(params->triangulation) {
   case BarvinokParameters::RegularTriangulationWithCdd:
     result = triangulate_cone_with_cdd(cone, params);
+    break;
+  case BarvinokParameters::RegularTriangulationWithCddlib:
+#ifdef HAVE_CDDLIB
+    result = triangulate_cone_with_cddlib(cone, params);
+#else
+    cerr << "RegularTriangulationWithCddlib not compiled in, sorry."
+	 << endl;
+    exit(1);
+#endif
     break;
   case BarvinokParameters::SubspaceAvoidingRecursiveTriangulation:
 #ifdef HAVE_EXPERIMENTS
