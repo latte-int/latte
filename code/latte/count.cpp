@@ -52,6 +52,7 @@
 #include "latte_random.h"
 #include "Irrational.h"
 #include "ExponentialEhrhart.h"
+#include "triangulation/triangulate.h"
 #ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
 #include "TrivialSubst.h"
@@ -86,7 +87,7 @@ int main(int argc, char *argv[]) {
   double sampling_factor = 1.0;
   long int num_samples = -1;
   
-  listVector *matrix = NULL, *equations = NULL, *inequalities = NULL, *rays = NULL, *endRays, *tmpRays;
+  listVector *matrix = NULL, *equations = NULL, *inequalities = NULL;
   vec_ZZ cost;
   listVector *templistVec = NULL;
   listCone *tmpcones;
@@ -216,9 +217,8 @@ int main(int argc, char *argv[]) {
     else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
     }
-    else if (strncmp(argv[i], "--triangulation=topcom", 32) == 0
-	     || strncmp(argv[i], "--triangulation=TOPCOM", 32) == 0) {
-      params->triangulation = BarvinokParameters::PlacingTriangulationWithTOPCOM;
+    else if (strncmp(argv[i], "--triangulation=", 16) == 0) {
+      params->triangulation = triangulation_type_from_name(argv[i] + 16);
     }
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
   /* Compute triangulation or decomposition of each vertex cone. */
 
   if (dualApproach[0]=='y') {
-
+    listVector *rays = NULL, *endRays, *tmpRays;
     Poly->cones=createListCone();
     Poly->cones->vertex = new Vertex(createRationalVector(numOfVars));
     rays=createListVector(createVector(numOfVars));
@@ -537,6 +537,7 @@ int main(int argc, char *argv[]) {
       tmpRays=tmpRays->rest;
     }
     Poly->cones->rays = rays->rest;
+    delete rays; // deletes dummy head
     Poly->dualized = true;
 
 //     cout << "Homogenization: " << endl;
@@ -855,7 +856,7 @@ if(Memory_Save[0] == 'n')
 	    TrivialMonomialSubstitutionMapleOutput(out, Poly->cones, Poly->numOfVars);
 	    out << ";";
 #else
-	    cerr << "Trivial monomial subtitution not compiled in, sorry." << endl;
+	    cerr << "Trivial monomial substitution not compiled in, sorry." << endl;
 #endif
 	    break;
 	  }
