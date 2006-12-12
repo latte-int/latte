@@ -100,14 +100,25 @@ triangulate_cone_with_cddlib(listCone *cone,
 	 triangulation. */
       if (!set_member(num_rays + 1 /* 1-based */,
 		      incidence->set[i])) {
-	/* Is a cone of the triangulation -- check it is simplicial */
-	if (set_card(incidence->set[i]) != Parameters->Number_of_Variables) {
-	  cerr << "Picked unsuitable lifting vectors, trying again." << endl;
-	  goto NEW_LIFTING;
-	}
 	listCone *c = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
-	c->rest = triangulation;
-	triangulation = c;
+	/* Is a cone of the triangulation -- check it is simplicial */
+	int c_num_rays = set_card(incidence->set[i]);
+	if (c_num_rays > Parameters->Number_of_Variables) {
+	  cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
+	       << "in purported triangulation, triangulating it recursively." << endl;
+	  listCone *ct = triangulate_cone_with_cddlib(c, Parameters);
+	  freeCone(c);
+	  triangulation = appendListCones(ct, triangulation);
+	}
+	else if (c_num_rays < Parameters->Number_of_Variables) {
+	  cerr << "Lower-dimensional cone in purported triangulation, should not happen."
+	       << endl;
+	  abort();
+	}
+	else {
+	  c->rest = triangulation;
+	  triangulation = c;
+	}
       }
     }
     dd_FreeMatrix(inequalities);
