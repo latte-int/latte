@@ -21,6 +21,7 @@
 #include <cassert>
 #include <vector>
 #include "latte_cddlib.h"
+#include "latte_gmp.h"
 #include "latte_random.h"
 #include "RegularTriangulationWithCddlib.h"
 
@@ -55,9 +56,33 @@ cone_from_ray_set(vector<listVector *> &rays,
   return c;
 }
 
-listCone *
+typedef void
+height_function_type(mpq_t height, const vec_ZZ &ray, void *data);
+
+static void
+random_height(mpq_t height, const vec_ZZ &ray, void *data)
+{
+  int h = uniform_random_number(1, 10000);
+  dd_set_si(height, h);
+}
+
+static void
+delone_height(mpq_t height, const vec_ZZ &ray, void *data)
+{
+  ZZ h;
+  int i;
+  for (i = 0; i<ray.length(); i++) {
+    h += ray[i] * ray[i];
+  }
+  mpq_class hq = convert_ZZ_to_mpq(h);
+  dd_set(height, hq.get_mpq_t());
+}
+
+static listCone *
 triangulate_cone_with_cddlib(listCone *cone,
-			     BarvinokParameters *Parameters)
+			     BarvinokParameters *Parameters,
+			     height_function_type height_function,
+			     void *height_function_data)
 {
   listCone *triangulation = NULL;
   // Copy rays into an array, so we can index them.
@@ -77,8 +102,7 @@ triangulate_cone_with_cddlib(listCone *cone,
     /* Compute random lifting. */
     int i;
     for (i = 0; i<num_rays; i++) {
-      int height = uniform_random_number(1, 10000);
-      dd_set_si(matrix->matrix[i][1], height);
+      height_function(matrix->matrix[i][1], rays[i]->first, height_function_data);
     }
     /* Compute facets by double-description method. */
     dd_ErrorType error;
@@ -106,7 +130,10 @@ triangulate_cone_with_cddlib(listCone *cone,
 	if (c_num_rays > Parameters->Number_of_Variables) {
 	  cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
 	       << "in purported triangulation, triangulating it recursively." << endl;
-	  listCone *ct = triangulate_cone_with_cddlib(c, Parameters);
+	  /* In the refinement step, always fall back to using a
+	     random height vector. */
+	  listCone *ct = triangulate_cone_with_cddlib(c, Parameters,
+						      random_height, NULL);
 	  freeCone(c);
 	  triangulation = appendListCones(ct, triangulation);
 	}
@@ -132,4 +159,18 @@ triangulate_cone_with_cddlib(listCone *cone,
     dd_FreePolyhedra(poly);
     freeListCone(triangulation); triangulation = NULL;
   } while (1);
+}
+
+listCone *
+random_regular_triangulation_with_cddlib(listCone *cone,
+					 BarvinokParameters *Parameters)
+{
+  return triangulate_cone_with_cddlib(cone, Parameters, random_height, NULL);
+}
+
+listCone *
+refined_delone_triangulation_with_cddlib(listCone *cone,
+					 BarvinokParameters *Parameters)
+{
+  return triangulate_cone_with_cddlib(cone, Parameters, delone_height, NULL);
 }

@@ -26,7 +26,11 @@
 #include "barvinok/barvinok.h"
 
 listCone *
-triangulate_cone_with_cddlib(listCone *cone,
-			     BarvinokParameters *Parameters);
+random_regular_triangulation_with_cddlib(listCone *cone,
+					 BarvinokParameters *Parameters);
+
+listCone *
+refined_delone_triangulation_with_cddlib(listCone *cone,
+					 BarvinokParameters *Parameters);
 
 #endif
