@@ -39,6 +39,8 @@ triangulation_type_from_name(const char *name)
 {
   if (strcmp(name, "cdd") == 0) return BarvinokParameters::RegularTriangulationWithCdd;
   if (strcmp(name, "cddlib") == 0) return BarvinokParameters::RegularTriangulationWithCddlib;
+  if (strcmp(name, "delone") == 0 || strcmp(name, "delaunay") == 0)
+    return BarvinokParameters::DeloneTriangulationWithCddlib;
   if (strcmp(name, "topcom") == 0) return BarvinokParameters::PlacingTriangulationWithTOPCOM;
   else {
     cerr << "Unknown triangulation type name: " << name << endl;
@@ -55,6 +57,7 @@ triangulateCone(listCone *cone, int numOfVars,
     // Already simplicial.
     return copyCone(cone);
   }
+  cout << "Triangulating cone... " << flush;
   params->triangulate_time.start();
   switch(params->triangulation) {
   case BarvinokParameters::RegularTriangulationWithCdd:
@@ -62,9 +65,18 @@ triangulateCone(listCone *cone, int numOfVars,
     break;
   case BarvinokParameters::RegularTriangulationWithCddlib:
 #ifdef HAVE_CDDLIB
-    result = triangulate_cone_with_cddlib(cone, params);
+    result = random_regular_triangulation_with_cddlib(cone, params);
 #else
     cerr << "RegularTriangulationWithCddlib not compiled in, sorry."
+	 << endl;
+    exit(1);
+#endif
+    break;
+  case BarvinokParameters::DeloneTriangulationWithCddlib:
+#ifdef HAVE_CDDLIB
+    result = refined_delone_triangulation_with_cddlib(cone, params);
+#else
+    cerr << "DeloneTriangulationWithCddlib not compiled in, sorry."
 	 << endl;
     exit(1);
 #endif
@@ -102,6 +114,7 @@ triangulateCone(listCone *cone, int numOfVars,
     cerr << "Unknown triangulation method." << endl;
     exit(1);
   }
+  cout << "done." << endl;
   params->triangulate_time.stop();
 #if 1
   printListConeToFile("triangulation", result, numOfVars);
