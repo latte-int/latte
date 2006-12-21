@@ -84,6 +84,7 @@ int main(int argc, char *argv[]) {
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   bool approx;
   bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
+  bool triangulation_specified = false;
   double sampling_factor = 1.0;
   long int num_samples = -1;
   
@@ -218,6 +219,7 @@ int main(int argc, char *argv[]) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
     }
     else if (strncmp(argv[i], "--triangulation=", 16) == 0) {
+      triangulation_specified = true;
       params->triangulation = triangulation_type_from_name(argv[i] + 16);
     }
     else if (strncmp(argv[i], "--approximate", 7) == 0)
@@ -245,7 +247,13 @@ int main(int argc, char *argv[]) {
       /* Triangulation will be done in the dual space, so we must
 	 avoid using facets whose normal vectors lie in the
 	 subspace. */
-      params->triangulation = BarvinokParameters::SubspaceAvoidingBoundaryTriangulation;
+      if (triangulation_specified) {
+	cerr << "Warning: The requested triangulation method is not guaranteed to work with --avoid-singularities."
+	     << endl;
+      }
+      else {
+	params->triangulation = BarvinokParameters::SubspaceAvoidingBoundaryTriangulation;
+      }
     }
   }
   
