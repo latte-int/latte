@@ -36,7 +36,7 @@ check_rays(listCone *cone, int numOfVars)
   for (ray = cone->rays; ray!=NULL; ray=ray->rest) {
     if (ray->first[numOfVars - 1] == 0) {
       cerr << "The following dualized-back cone has bad rays." << endl;
-      printListCone(cone, numOfVars);
+      printCone(cone, numOfVars);
       abort();
     }
   }
