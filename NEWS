@@ -50,7 +50,7 @@ Changes since the official release 1.2:
    (The `ehrhart' program is still available, but it does not accept
    the new command-line options of `count'.)
 
-* The TOPCOM program by Joeg Rambau can be used instead of cddlib to
+* The TOPCOM program by Joerg Rambau can be used instead of cddlib to
   compute triangulations of cones.
 
   	./configure --with-topcom=PATH-TO-TOPCOM
