@@ -27,7 +27,7 @@
 
 using namespace std;
 
-static vector<listVector *>
+vector<listVector *>
 ray_array(listCone *cone)
 {
   int num_rays = lengthListVector(cone->rays);
@@ -39,7 +39,7 @@ ray_array(listCone *cone)
   return rays;
 }
 
-static listCone *
+listCone *
 cone_from_ray_set(vector<listVector *> &rays,
 		  set_type ray_set,
 		  Vertex *vertex)
@@ -59,14 +59,14 @@ cone_from_ray_set(vector<listVector *> &rays,
 typedef void
 height_function_type(mpq_t height, const vec_ZZ &ray, void *data);
 
-static void
+void
 random_height(mpq_t height, const vec_ZZ &ray, void *data)
 {
   int h = uniform_random_number(1, 10000);
   dd_set_si(height, h);
 }
 
-static void
+void
 delone_height(mpq_t height, const vec_ZZ &ray, void *data)
 {
   ZZ h;
@@ -78,11 +78,12 @@ delone_height(mpq_t height, const vec_ZZ &ray, void *data)
   dd_set(height, hq.get_mpq_t());
 }
 
-static listCone *
+listCone *
 triangulate_cone_with_cddlib(listCone *cone,
 			     BarvinokParameters *Parameters,
 			     height_function_type height_function,
-			     void *height_function_data)
+			     void *height_function_data,
+			     int cone_dimension)
 {
   listCone *triangulation = NULL;
   // Copy rays into an array, so we can index them.
@@ -118,33 +119,39 @@ triangulate_cone_with_cddlib(listCone *cone,
     assert(incidence->famsize == num_inequalities);
     /* Walk through all facets. */
     for (i = 0; i<num_inequalities; i++) {
-      /* If the extra ray is incident, we have a facet that is a wall
-	 of the half-infinite cylinder over the cone -- ignore it.
-	 Otherwise, the facet gives a simplicial cone of the
-	 triangulation. */
-      if (!set_member(num_rays + 1 /* 1-based */,
-		      incidence->set[i])) {
-	listCone *c = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
-	/* Is a cone of the triangulation -- check it is simplicial */
-	int c_num_rays = set_card(incidence->set[i]);
-	if (c_num_rays > Parameters->Number_of_Variables) {
-	  cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
-	       << "in purported triangulation, triangulating it recursively." << endl;
-	  /* In the refinement step, always fall back to using a
-	     random height vector. */
-	  listCone *ct = triangulate_cone_with_cddlib(c, Parameters,
-						      random_height, NULL);
-	  freeCone(c);
-	  triangulation = appendListCones(ct, triangulation);
-	}
-	else if (c_num_rays < Parameters->Number_of_Variables) {
-	  cerr << "Lower-dimensional cone in purported triangulation, should not happen."
-	       << endl;
-	  abort();
-	}
-	else {
-	  c->rest = triangulation;
-	  triangulation = c;
+      if (set_member(i + 1, inequalities->linset)) {
+	/* We ignore equalities. */
+      }
+      else {
+	/* If the extra ray is incident, we have a facet that is a wall
+	   of the half-infinite cylinder over the cone -- ignore it.
+	   Otherwise, the facet gives a simplicial cone of the
+	   triangulation. */
+	if (!set_member(num_rays + 1 /* 1-based */,
+			incidence->set[i])) {
+	  listCone *c = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
+	  /* Is a cone of the triangulation -- check it is simplicial */
+	  int c_num_rays = set_card(incidence->set[i]);
+	  if (c_num_rays > cone_dimension) {
+	    cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
+		 << "in purported triangulation, triangulating it recursively." << endl;
+	    /* In the refinement step, always fall back to using a
+	       random height vector. */
+	    listCone *ct = triangulate_cone_with_cddlib(c, Parameters,
+							random_height, NULL,
+							cone_dimension);
+	    freeCone(c);
+	    triangulation = appendListCones(ct, triangulation);
+	  }
+	  else if (c_num_rays < cone_dimension) {
+	    cerr << "Lower-dimensional cone in purported triangulation, should not happen."
+		 << endl;
+	    abort();
+	  }
+	  else {
+	    c->rest = triangulation;
+	    triangulation = c;
+	  }
 	}
       }
     }
@@ -165,12 +172,14 @@ listCone *
 random_regular_triangulation_with_cddlib(listCone *cone,
 					 BarvinokParameters *Parameters)
 {
-  return triangulate_cone_with_cddlib(cone, Parameters, random_height, NULL);
+  return triangulate_cone_with_cddlib(cone, Parameters, random_height, NULL,
+				      Parameters->Number_of_Variables);
 }
 
 listCone *
 refined_delone_triangulation_with_cddlib(listCone *cone,
 					 BarvinokParameters *Parameters)
 {
-  return triangulate_cone_with_cddlib(cone, Parameters, delone_height, NULL);
+  return triangulate_cone_with_cddlib(cone, Parameters, delone_height, NULL,
+				      Parameters->Number_of_Variables);
 }
