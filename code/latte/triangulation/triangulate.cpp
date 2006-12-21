@@ -38,10 +38,11 @@ BarvinokParameters::TriangulationType
 triangulation_type_from_name(const char *name)
 {
   if (strcmp(name, "cdd") == 0) return BarvinokParameters::RegularTriangulationWithCdd;
-  if (strcmp(name, "cddlib") == 0) return BarvinokParameters::RegularTriangulationWithCddlib;
-  if (strcmp(name, "delone") == 0 || strcmp(name, "delaunay") == 0)
+  else if (strcmp(name, "cddlib") == 0) return BarvinokParameters::RegularTriangulationWithCddlib;
+  else if (strcmp(name, "delone") == 0 || strcmp(name, "delaunay") == 0)
     return BarvinokParameters::DeloneTriangulationWithCddlib;
-  if (strcmp(name, "topcom") == 0) return BarvinokParameters::PlacingTriangulationWithTOPCOM;
+  else if (strcmp(name, "topcom") == 0) return BarvinokParameters::PlacingTriangulationWithTOPCOM;
+  else if (strcmp(name, "boundary") == 0) return BarvinokParameters::SubspaceAvoidingBoundaryTriangulation;
   else {
     cerr << "Unknown triangulation type name: " << name << endl;
     exit(1);
