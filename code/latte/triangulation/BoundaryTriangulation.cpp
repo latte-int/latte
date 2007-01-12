@@ -120,6 +120,7 @@ listCone *
 boundary_triangulation_of_cone_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters)
 {
+  int numOfVars = Parameters->Number_of_Variables;
   listCone *boundary_triangulation = NULL;
   vector<listVector *> rays = ray_array(cone);
   dd_PolyhedraPtr poly
@@ -178,6 +179,17 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
       freeCone(simplicial_cone);
     }
   }
+
+  resulting_triangulation
+    = dualizeBackCones(resulting_triangulation, Parameters->Number_of_Variables);
+  for (cone = resulting_triangulation; cone!=NULL; cone=cone->rest) {
+    if (!rays_ok(cone, Parameters->Number_of_Variables)) {
+      cerr << "Note: The following dualized-back cone has bad rays." << endl;
+      printCone(cone, numOfVars);
+    }
+  }
+  resulting_triangulation
+    = dualizeBackCones(resulting_triangulation, Parameters->Number_of_Variables);
   
   return resulting_triangulation;
 }
