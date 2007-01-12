@@ -49,6 +49,73 @@ check_rays(listCone *cone, int numOfVars)
   }
 }
 
+/* Construct a vector whose entries are the numbers alpha_k(w) for w =
+   e_1, ..., e_d.
+*/
+static vec_ZZ
+alpha_basis(listCone *cone, int numOfVars)
+{
+  int num_rays = lengthListVector(cone->rays);
+  assert(num_rays == numOfVars - 1);
+  /* We first complete the rays to a basis of the space. */
+  mat_ZZ ray_matrix;
+  ray_matrix.SetDims(numOfVars, numOfVars);
+  int i;
+  listVector *ray;
+  for (i = 0, ray = cone->rays; ray!=NULL; i++, ray = ray->rest) {
+    ray_matrix[i] = ray->first;
+  }
+  /* Simple and stupid method: Try all unit vectors. */
+  int j;
+  for (j = 0; j<numOfVars; j++) {
+    ray_matrix[i][j] = 1;
+    if (determinant(ray_matrix) != 0) break;
+    ray_matrix[i][j] = 0;
+  }
+  assert(j<numOfVars);
+  mat_ZZ inverse;
+  ZZ d;
+  inv(d, inverse, ray_matrix);
+
+  //cout << "Completed rays: " << ray_matrix << "Inverse: " << inverse << endl;
+  
+  vec_ZZ result;
+  result.SetLength(numOfVars);
+  for (j = 0; j<numOfVars; j++)
+    result[j] = inverse[j][numOfVars - 1];
+  return result;
+}
+
+static vec_ZZ 
+construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_ZZ &det_vector)
+{
+  /* Create a matrix whose rows generate a d-dimensional lattice. */
+  int num_cones = lengthListCone(boundary_triangulation);
+  mat_ZZ alpha;
+  alpha.SetDims(numOfVars, num_cones);
+  listCone *cone;
+  int k;
+  for (k = 0, cone = boundary_triangulation; cone!=NULL; k++, cone=cone->rest) {
+    vec_ZZ alpha_basis_k = alpha_basis(cone, numOfVars);
+    int j;
+    for (j = 0; j<numOfVars; j++) {
+      alpha[j][k] = alpha_basis_k[j];
+    }
+  }
+  cout << "Auxiliary lattice for constructing an interior vector: " << endl
+       << alpha << endl;
+  /* Find a short vector in this lattice. */
+  ZZ det2;
+  mat_ZZ U;
+  U.SetDims(numOfVars, numOfVars);
+  long rank = LLL(det2, alpha, U, 1, 1);
+  cout << "Rank: " << rank << " Variables: " << numOfVars << endl;
+  assert(rank == numOfVars);
+  /* We simply choose the first vector of the reduced basis. */
+  det_vector = alpha[0];
+  return U[0];
+}  
+
 listCone *
 boundary_triangulation_of_cone_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters)
@@ -87,50 +154,30 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
       = appendListCones(facet_triangulation, boundary_triangulation);
   }
   /* Complete the cones with an interior ray. */
-  vec_ZZ interior_ray_vector;
-  interior_ray_vector.SetLength(Parameters->Number_of_Variables);
-  for (i = 0; i<rays.size(); i++) {
-    interior_ray_vector += rays[i]->first;
-  }
-  listCone *simplicial_cone;
-  for (simplicial_cone = boundary_triangulation;
-       simplicial_cone!=NULL;
-       simplicial_cone = simplicial_cone->rest) {
-    simplicial_cone->rays
-      = appendVectorToListVector(interior_ray_vector, simplicial_cone->rays);
-  }
-  bool triangulation_ok = true;
-  do {
-    /* Pick a random interior ray vector. */
-    int j;
-    for (j = 0; j<Parameters->Number_of_Variables; j++) {
-      interior_ray_vector[j] = uniform_random_number(1, 100);
-    }
-    cout << "Interior ray vector: " << interior_ray_vector << endl;
-    /* Replace it in all cones and clear all facets. */
-    for (simplicial_cone = boundary_triangulation;
-	 simplicial_cone!=NULL;
-	 simplicial_cone = simplicial_cone->rest) {
-      simplicial_cone->rays->first = interior_ray_vector;
-      if (simplicial_cone->facets != NULL) {
-	freeListVector(simplicial_cone->facets);
-	simplicial_cone->facets = NULL;
-      }
-    }
-    /* Compute and check the facets. */
-    boundary_triangulation
-      = dualizeBackCones(boundary_triangulation, Parameters->Number_of_Variables);
-    for (simplicial_cone = boundary_triangulation;
-	 simplicial_cone!=NULL;
-	 simplicial_cone = simplicial_cone->rest) {
-      if (!rays_ok(simplicial_cone, Parameters->Number_of_Variables)) {
-	triangulation_ok = false;
-	break;
-      }
-    }
-    boundary_triangulation
-      = dualizeBackCones(boundary_triangulation, Parameters->Number_of_Variables);
-  } while (!triangulation_ok);
+  vec_ZZ det_vector;
+  vec_ZZ interior_ray_vector
+    = construct_interior_vector(boundary_triangulation, Parameters->Number_of_Variables, det_vector);
+  cout << "Interior ray vector: " << interior_ray_vector << endl;
+  cout << "Reuslting determinants: " << det_vector << endl;
+  listCone *resulting_triangulation = NULL;
 
-  return boundary_triangulation;
+  listCone *simplicial_cone, *next_simplicial_cone;
+  for (simplicial_cone = boundary_triangulation, i = 0;
+       simplicial_cone!=NULL;
+       simplicial_cone = next_simplicial_cone, i++) {
+    next_simplicial_cone = simplicial_cone->rest;
+    if (det_vector[i] != 0) {
+      /* A full-dimensional cone is created. */
+      simplicial_cone->rays
+	= appendVectorToListVector(interior_ray_vector, simplicial_cone->rays);
+      simplicial_cone->rest = resulting_triangulation;
+      resulting_triangulation = simplicial_cone;
+    }
+    else {
+      /* A lower-dimensional cone is created -- discard it. */
+      freeCone(simplicial_cone);
+    }
+  }
+  
+  return resulting_triangulation;
 }
