@@ -32,6 +32,9 @@
 #if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
 #  include "triangulation/TriangulationWithTOPCOM.h"
 #endif
+#if defined(HAVE_FORTYTWO_LIB)
+#  include "triangulation/RegularTriangulationWith4ti2.h"
+#endif
 #include "print.h"
 
 BarvinokParameters::TriangulationType
@@ -43,6 +46,7 @@ triangulation_type_from_name(const char *name)
     return BarvinokParameters::DeloneTriangulationWithCddlib;
   else if (strcmp(name, "topcom") == 0) return BarvinokParameters::PlacingTriangulationWithTOPCOM;
   else if (strcmp(name, "boundary") == 0) return BarvinokParameters::SubspaceAvoidingBoundaryTriangulation;
+  else if (strcmp(name, "4ti2") == 0) return BarvinokParameters::RegularTriangulationWith4ti2;
   else {
     cerr << "Unknown triangulation type name: " << name << endl;
     exit(1);
@@ -107,6 +111,15 @@ triangulateCone(listCone *cone, int numOfVars,
     result = triangulate_cone_with_TOPCOM(cone, numOfVars);
 #else
     cerr << "PlacingTriangulationWithTOPCOM not compiled in, sorry."
+	 << endl;
+    exit(1);
+#endif
+    break;
+  case BarvinokParameters::RegularTriangulationWith4ti2:
+#if defined(HAVE_FORTYTWO_LIB)
+    result = random_regular_triangulation_with_4ti2(cone, params);
+#else
+    cerr << "RegularTriangulationWith4ti2 not compiled in, sorry."
 	 << endl;
     exit(1);
 #endif
