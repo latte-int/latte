@@ -107,6 +107,9 @@ AC_DEFINE_UNQUOTED(MAPLE_PATH, "${MAPLEBIN}", [The path to the Maple program.])
 # TOPCOM for triangulations (optional)
 LB_CHECK_TOPCOM
 
+# 4ti2 for triangulations (optional)
+LB_CHECK_FORTYTWO
+
 # Experimental, not release-ready code.
 AC_ARG_ENABLE(experiments, AS_HELP_STRING([--enable-experiments],
 	[use experimental code]))
