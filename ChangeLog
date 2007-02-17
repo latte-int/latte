@@ -1,3 +1,142 @@
+2007-02-17  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* configure.ac: Check for 4ti2.
+
+	* m4/4ti2-check.m4: New.
+
+	* code/latte/Makefile.am: Put object files in a directory
+	hierarchy parallel to the source directory.
+
+	* code/latte/count.cpp: Don't warn if
+	SubspaceAvoidingBoundaryTriangulation is specified.
+
+	* code/latte/latte_4ti2.cpp, code/latte/latte_4ti2.h: New.
+
+	* code/latte/latte_cddlib.cpp,
+	code/latte/latte_cddlib.h (cddlib_matrix_to_cone): New.
+
+	* code/latte/barvinok/barvinok.h: New triangulation method,
+	RegularTriangulationWith4ti2.
+
+	* code/latte/triangulation/triangulate.cpp: New triangulation
+	method "4ti2".
+
+	* code/latte/triangulation/test-triangulation.cpp: Allow reading
+	CDD .ext files as input.  Triangulation method can be specified
+	with --cddlib.
+
+	* code/latte/triangulation/RegularTriangulationWith4ti2.cpp,
+	code/latte/triangulation/RegularTriangulationWith4ti2.h: New.
+
+	* code/latte/triangulation/RegularTriangulation.cpp,
+	code/latte/triangulation/RegularTriangulation.h: New, move some
+	functions here from RegularTriangulationWithCddlib.h, .cpp
+
+	* code/latte/triangulation/RegularTriangulationWithCddlib.cpp,
+	code/latte/triangulation/RegularTriangulationWithCddlib.h: Move
+	some functions to RegularTriangulation.h, .cpp
+
+	* code/latte/vertices/cdd.cpp (createCddExtFile2): Check input file.
+
+2007-01-12  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp: Choose
+	interior ray using generalized Dyer-Kannan method, rather than
+	randomly.
+
+2006-12-21  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: Allow to override triangulation method.
+
+	* code/latte/triangulation/RecursiveTriangulation.cpp (check_rays):
+	Fix output of the bad cone.
+
+	* code/latte/triangulation/triangulate.cpp (triangulation_type_from_name):
+	Handle --triangulation=boundary.
+
+	* code/latte/triangulation/RegularTriangulationWithCddlib.cpp,
+	code/latte/triangulation/RegularTriangulationWithCddlib.h (triangulate_cone_with_cddlib):
+	Generalize to handle lower-dimensional input cones.
+
+	Export some helper functions.
+
+2006-12-20  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/triangulate.cpp (triangulation_type_from_name):
+	Handle "--triangulation=delone" (can also be spelt "delaunay").
+	(triangulateCone): Handle DeloneTriangulationWithCddlib.
+
+	* code/latte/triangulation/RegularTriangulationWithCddlib.cpp,
+	code/latte/triangulation/RegularTriangulationWithCddlib.h 
+	(random_regular_triangulation_with_cddlib):
+	New, renamed from triangulate_cone_with_cddlib.
+	(refined_delone_triangulation_with_cddlib): New.
+	(triangulate_cone_with_cddlib): Generalized, made static.
+
+	* code/latte/barvinok/barvinok.h (DeloneTriangulationWithCddlib):
+	New triangulation type.
+
+2006-12-12  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/RegularTriangulationWithCddlib.cpp
+	(triangulate_cone_with_cddlib): If the chosen heights were not
+	generic, don't restart the whole computation but recurse on the
+	non-simplicial subcones.
+
+2006-12-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Makefile.am: New files
+	RegularTriangulationWithCddlib.h, .cpp
+
+	* code/latte/count.cpp: Support command-line options
+	--triangulation=cdd (the default) and --triangulation=cddlib.  Fix
+	a memory leak.
+
+	* code/latte/triangulation/triangulate.cpp,
+	code/latte/triangulation/triangulate.h (triangulation_type_from_name):
+	New.
+	(triangulateCone): Handle RegularTriangulationWithCddlib.
+
+	* code/latte/barvinok/barvinok.h (RegularTriangulationWithCddlib):
+	New triangulation type.
+
+	* code/latte/latte_cddlib.cpp, code/latte/latte_cddlib.h (rays_to_cddlib_matrix):
+	Changed interface.
+
+	* code/latte/preprocess.cpp: Fix memory leak.
+
+	* code/latte/triangulation/RegularTriangulationWithCddlib.cpp,
+	code/latte/triangulation/RegularTriangulationWithCddlib.h: New
+	files.
+
+2006-12-08  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: Fix typo.  Use
+	SubspaceAvoidingBoundaryTriangulation instead of
+	SubspaceAvoidingRecursiveTriangulation.
+
+	* code/latte/Makefile.am (BoundaryTriangulation.h,
+	BoundaryTriangulation.cpp): New experimental files.
+
+	* code/latte/ReadLatteStyle.cpp (check_stream): Fix stream status
+	check.
+	(ReadLatteStyleMatrix): Check after reading the dimensions.
+	(check_cddlib_error, convert_mpq_to_ZZ): Moved to other files.
+
+	* code/latte/latte_cddlib.cpp,
+	code/latte/latte_cddlib.h (check_cddlib_error,
+	rays_to_cddlib_matrix, cone_to_cddlib_polyhedron): New.
+
+	* code/latte/latte_gmp.cpp, code/latte/latte_gmp.h (convert_ZZ_to_mpq, convert_mpq_to_ZZ):
+	New.
+
+	* code/latte/barvinok/barvinok.h,
+	code/latte/triangulation/triangulate.cpp (SubspaceAvoidingBoundaryTriangulation):
+	New triangulation type.
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp,
+	code/latte/triangulation/BoundaryTriangulation.h: New files.
+
 2006-12-07  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* Makefile.am: Build the new latte2ine program.
