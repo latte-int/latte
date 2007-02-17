@@ -62,5 +62,10 @@ rays_to_cddlib_matrix(listVector *rays, int numOfVars,
 dd_PolyhedraPtr
 cone_to_cddlib_polyhedron(listCone *cone, int numOfVars);
 
+/* MATRIX should be a CDDLIB representation of a cone.
+   Return a corresponding listCone. */
+listCone *
+cddlib_matrix_to_cone(dd_MatrixPtr matrix);
+
 #endif
 

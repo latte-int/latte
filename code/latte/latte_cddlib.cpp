@@ -18,6 +18,8 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
+#include <cassert>
+
 #include "latte_cddlib.h"
 #include "latte_gmp.h"
 
@@ -70,3 +72,27 @@ cone_to_cddlib_polyhedron(listCone *cone, int numOfVars)
   return poly;
 }
 
+listCone *
+cddlib_matrix_to_cone(dd_MatrixPtr matrix)
+{
+  int numOfVars = matrix->colsize - 1;
+  assert(matrix->representation == dd_Generator);
+  listCone *result = createListCone();
+  result->vertex = new Vertex(new rationalVector(numOfVars));
+  int i;
+  for (i = 0; i<matrix->rowsize; i++) {
+    vec_ZZ ray;
+    ray.SetLength(numOfVars);
+    int j;
+    {
+      /* Check generator is homogeneous */
+      mpq_class x(matrix->matrix[i][0]);
+      assert(x == 0);
+    }
+    for (j = 0; j<numOfVars; j++) {
+      ray[j] = convert_mpq_to_ZZ(matrix->matrix[i][j + 1]);
+    }
+    result->rays = new listVector(ray, result->rays);
+  }
+  return result;
+}
