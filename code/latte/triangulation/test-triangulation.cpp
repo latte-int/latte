@@ -25,6 +25,7 @@
 #include "triangulate.h"
 #include "dual.h"
 #include "TriangulationWithTOPCOM.h"
+#include "latte_cddlib.h"
 
 using namespace std;
 
@@ -71,26 +72,62 @@ print_triangulation(listCone *triang, int Number_of_Variables)
 
 int main(int argc, char **argv)
 {
-  if (argc != 2) {
-    cerr << "usage: triangulate LATTE-CONE-FILE" << endl;
+  if (argc < 2) {
+    cerr << "usage: triangulate [OPTIONS] [LATTE-CONE-FILE | CDD-EXT-FILE.ext ] " << endl;
     exit(1);
   }
-  ifstream in(argv[1]);
-  if (in.bad()) {
-    cerr << "triangulate: Unable to open " << argv[1] << endl;
-    exit(1);
+  BarvinokParameters params;
+  listCone *cone;
+
+  params.triangulation = BarvinokParameters::RegularTriangulationWithCddlib;
+
+  {
+    int i;
+    for (i = 1; i<argc-1; i++) {
+      if (strncmp(argv[i], "--triangulation=", 16) == 0) {
+	params.triangulation = triangulation_type_from_name(argv[i] + 16);
+      }
+      else {
+	cerr << "Unknown option " << argv[i] << endl;
+	exit(1);
+      }
+    }
   }
-  listCone *cone = read_cone(in);
-  if (!cone) {
-    cerr << "triangulate: Parse error in file." << endl;
-    exit(1);
+  
+  if (strlen(argv[argc-1]) > 4 && strcmp(argv[argc-1] + strlen(argv[argc-1]) - 4, ".ext") == 0) {
+    /* Input in CDD format. */
+    FILE *in = fopen(argv[argc-1], "r");
+    if (in == NULL) {
+      cerr << "triangulate: Unable to open CDD-style input file " << argv[argc-1] << endl;
+      exit(1);
+    }
+    dd_MatrixPtr M;
+    dd_ErrorType err=dd_NoError;
+    M = dd_PolyFile2Matrix(in, &err);
+    if (err!=dd_NoError) {
+      cerr << "triangulate: Parse error in CDD-style input file " << argv[argc-1] << endl;
+      exit(1);
+    }
+    cone = cddlib_matrix_to_cone(M);
+  }
+  else {
+    /* Input in LattE cone format. */
+    ifstream in(argv[argc-1]);
+    if (in.bad()) {
+      cerr << "triangulate: Unable to open " << argv[argc-1] << endl;
+      exit(1);
+    }
+    cone = read_cone(in);
+    if (!cone) {
+      cerr << "triangulate: Parse error in file." << endl;
+      exit(1);
+    }
   }
 
   if (cone->rays == NULL) {
     cerr << "triangulate: No rays." << endl;
     exit(2);
   }
-  BarvinokParameters params;
   params.Number_of_Variables = cone->rays->first.length();
   cone->vertex = new Vertex(new rationalVector(params.Number_of_Variables));
 
@@ -109,12 +146,11 @@ int main(int argc, char **argv)
        ++i)
     print_triangulation(*i, params.Number_of_Variables);
 #else
-  //   params.triangulation
-  //     = BarvinokParameters::RegularTriangulationWithCdd;
-  params.triangulation = BarvinokParameters::PlacingTriangulationWithTOPCOM;
+
   listCone *triang
     = triangulateCone(cone, params.Number_of_Variables, &params);
   print_triangulation(triang, params.Number_of_Variables);
+
 #endif
   return 0;
 }
