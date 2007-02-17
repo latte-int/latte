@@ -27,18 +27,6 @@
 
 using namespace std;
 
-vector<listVector *>
-ray_array(listCone *cone)
-{
-  int num_rays = lengthListVector(cone->rays);
-  vector<listVector *> rays(num_rays);
-  int j;
-  listVector *ray;
-  for (j = 0, ray = cone->rays; ray!=NULL; j++, ray = ray->rest)
-    rays[j] = ray;
-  return rays;
-}
-
 listCone *
 cone_from_ray_set(vector<listVector *> &rays,
 		  set_type ray_set,
@@ -54,28 +42,6 @@ cone_from_ray_set(vector<listVector *> &rays,
     }
   }
   return c;
-}
-
-typedef void
-height_function_type(mpq_t height, const vec_ZZ &ray, void *data);
-
-void
-random_height(mpq_t height, const vec_ZZ &ray, void *data)
-{
-  int h = uniform_random_number(1, 10000);
-  dd_set_si(height, h);
-}
-
-void
-delone_height(mpq_t height, const vec_ZZ &ray, void *data)
-{
-  ZZ h;
-  int i;
-  for (i = 0; i<ray.length(); i++) {
-    h += ray[i] * ray[i];
-  }
-  mpq_class hq = convert_ZZ_to_mpq(h);
-  dd_set(height, hq.get_mpq_t());
 }
 
 listCone *
@@ -104,6 +70,12 @@ triangulate_cone_with_cddlib(listCone *cone,
     int i;
     for (i = 0; i<num_rays; i++) {
       height_function(matrix->matrix[i][1], rays[i]->first, height_function_data);
+    }
+    /* Output of the file -- for debugging. */
+    {
+      FILE *mf = fopen("lifted_cone_for_triangulation", "w");
+      dd_WriteMatrix(mf, matrix);
+      fclose(mf);
     }
     /* Compute facets by double-description method. */
     dd_ErrorType error;

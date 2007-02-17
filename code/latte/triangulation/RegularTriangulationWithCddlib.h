@@ -26,26 +26,13 @@
 #include "barvinok/barvinok.h"
 
 /* Helper functions. */
-#include <vector>
 #include "latte_cddlib.h"
-
-std::vector<listVector *>
-ray_array(listCone *cone);
+#include "triangulation/RegularTriangulation.h"
 
 listCone *
 cone_from_ray_set(vector<listVector *> &rays,
 		  set_type ray_set,
 		  Vertex *vertex);
-
-/* Height functions for regular triangulations. */
-typedef void
-height_function_type(mpq_t height, const vec_ZZ &ray, void *data);
-
-void
-random_height(mpq_t height, const vec_ZZ &ray, void *data);
-
-void
-delone_height(mpq_t height, const vec_ZZ &ray, void *data);
 
 /* General function to compute a regular triangulation. */
 listCone *
