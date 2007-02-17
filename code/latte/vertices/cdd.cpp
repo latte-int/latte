@@ -238,6 +238,10 @@ void createCddExtFile2(const char* filename) {
   string tmpString;
   // listVector* tmp;
   ifstream in(filename);
+  if (!in.good()) {
+    cerr << "Unable to open input file `" << filename << "'" << endl;
+    exit(1);
+  }
   in >> numOfVec >> numOfVars;
   ofstream OUT;
     getline(in,tmpString);
