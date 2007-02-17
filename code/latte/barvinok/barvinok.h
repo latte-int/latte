@@ -51,7 +51,8 @@ public:
     DeloneTriangulationWithCddlib,
     SubspaceAvoidingRecursiveTriangulation,
     SubspaceAvoidingBoundaryTriangulation,
-    PlacingTriangulationWithTOPCOM
+    PlacingTriangulationWithTOPCOM,
+    RegularTriangulationWith4ti2
   } TriangulationType;
   TriangulationType triangulation;
   // The kind of short vectors we use for decomposition
