@@ -247,7 +247,7 @@ int main(int argc, char *argv[]) {
       /* Triangulation will be done in the dual space, so we must
 	 avoid using facets whose normal vectors lie in the
 	 subspace. */
-      if (triangulation_specified) {
+      if (triangulation_specified && params->triangulation != BarvinokParameters::SubspaceAvoidingBoundaryTriangulation) {
 	cerr << "Warning: The requested triangulation method is not guaranteed to work with --avoid-singularities."
 	     << endl;
       }
@@ -843,7 +843,7 @@ if(Memory_Save[0] == 'n')
 	  createGeneratingFunctionAsMapleInput(fileName,Poly->cones,Poly->numOfVars);  }
         //printListCone(cones, Poly->numOfVars);
 
-	cout << "Printing decomposed cones to decomposed_cones." << endl;
+	cout << "Printing decomposed cones to `decomposed_cones'." << endl;
 	printListConeToFile("decomposed_cones", Poly->cones, Poly->numOfVars);
 
 	if(dualApproach[0] == 'n'){
