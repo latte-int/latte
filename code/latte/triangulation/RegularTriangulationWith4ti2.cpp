@@ -112,7 +112,9 @@ triangulate_cone_with_4ti2(listCone *cone,
 
     /* Walk through all facets.  (Ignore all equalities in *subspace.)
        */
+    int num_equalities = subspace->get_number();
     int num_facets = facets->get_number();
+    int true_dimension = Parameters->Number_of_Variables - num_equalities;
     BitSet incidence(num_rays);
     for (i = 0; i<num_facets; i++) {
       /* We ignore facets that are incident with the extra vertical
@@ -134,18 +136,18 @@ triangulate_cone_with_4ti2(listCone *cone,
 	listCone *c = cone_from_ray_BitSet(rays_array, incidence, cone->vertex);
 	/* Is a cone of the triangulation -- check it is simplicial */
 	int c_num_rays = incidence.count();
-	if (c_num_rays > cone_dimension) {
+	if (c_num_rays > true_dimension && !Parameters->nonsimplicial_subdivision) {
 	  cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
 	       << "in purported triangulation, triangulating it recursively." << endl;
 	  /* In the refinement step, always fall back to using a
 	     random height vector. */
 	  listCone *ct = triangulate_cone_with_4ti2(c, Parameters,
-						    random_height, NULL,
+						    random_height, &Parameters->triangulation_max_height,
 						    cone_dimension);
 	  freeCone(c);
 	  triangulation = appendListCones(ct, triangulation);
 	}
-	else if (c_num_rays < cone_dimension) {
+	else if (c_num_rays < true_dimension) {
 	  cerr << "Lower-dimensional cone in purported triangulation, should not happen."
 	       << endl;
 	  abort();
@@ -175,7 +177,7 @@ listCone *
 random_regular_triangulation_with_4ti2(listCone *cone,
 					 BarvinokParameters *Parameters)
 {
-  return triangulate_cone_with_4ti2(cone, Parameters, random_height, NULL,
+  return triangulate_cone_with_4ti2(cone, Parameters, random_height, &Parameters->triangulation_max_height,
 				    Parameters->Number_of_Variables);
 }
 
