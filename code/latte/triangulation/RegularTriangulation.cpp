@@ -45,7 +45,8 @@ height_function_type(mpq_t height, const vec_ZZ &ray, void *data);
 void
 random_height(mpq_t height, const vec_ZZ &ray, void *data)
 {
-  int h = uniform_random_number(1, 10000);
+  int max_height = * (int *) data;
+  int h = uniform_random_number(1, max_height);
   dd_set_si(height, h);
 }
 
