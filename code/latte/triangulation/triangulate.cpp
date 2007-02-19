@@ -53,6 +53,23 @@ triangulation_type_from_name(const char *name)
   }
 }
 
+bool
+parse_standard_triangulation_option(const char *arg,
+				    BarvinokParameters *params)
+{
+  if (strncmp(arg, "--triangulation=", 16) == 0) {
+    params->triangulation = triangulation_type_from_name(arg + 16);
+  }
+  else if (strncmp(arg, "--triangulation-max-height=", 27) == 0) {
+    params->triangulation_max_height = atoi(arg + 27);
+  }
+  else if (strncmp(arg, "--nonsimplicial-subdivision", 9) == 0) {
+    params->nonsimplicial_subdivision = true;
+  }
+  else return false;
+  return true;
+}
+
 listCone *
 triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params)
@@ -130,7 +147,7 @@ triangulateCone(listCone *cone, int numOfVars,
   }
   cout << "done." << endl;
   params->triangulate_time.stop();
-#if 1
+#if 0
   printListConeToFile("triangulation", result, numOfVars);
   cerr << "Printed triangulation to file `triangulation'" << endl;
 #endif

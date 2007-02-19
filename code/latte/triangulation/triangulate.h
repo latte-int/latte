@@ -29,6 +29,14 @@
 BarvinokParameters::TriangulationType
 triangulation_type_from_name(const char *name);
 
+/* Parse a standard command-line option related to triangulations
+   and fill the correspodingin slots in PARAMS.
+   Return whether a supported option was found and handled.
+*/
+bool
+parse_standard_triangulation_option(const char *arg,
+				    BarvinokParameters *params);
+
 /* CONE must be a full-dimensional pointed cone given by its minimal
    generators (rays).
    
