@@ -218,10 +218,7 @@ int main(int argc, char *argv[]) {
     else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
     }
-    else if (strncmp(argv[i], "--triangulation=", 16) == 0) {
-      triangulation_specified = true;
-      params->triangulation = triangulation_type_from_name(argv[i] + 16);
-    }
+    else if (parse_standard_triangulation_option(argv[i], params)) {}
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
