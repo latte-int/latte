@@ -62,18 +62,26 @@ read_cone(istream &in)
 static void
 print_triangulation(listCone *triang, int Number_of_Variables)
 {
+#if 0
   listCone *t;
   for (t = triang; t!=NULL; t = t->rest) {
     computeDetAndFacetsOfSimplicialCone(t, Number_of_Variables);
   }
-  cout << "*** Triangulation:" << endl;
-  printListCone(triang, Number_of_Variables);
+#endif
+//   cout << "*** Triangulation:" << endl;
+//   printListCone(triang, Number_of_Variables);
+  cout << "Triangulation (with " << lengthListCone(triang)
+       << " cones) printed to file `triangulation'." << endl;
+  printListConeToFile("triangulation", triang, Number_of_Variables);
 }
 
 int main(int argc, char **argv)
 {
   if (argc < 2) {
     cerr << "usage: triangulate [OPTIONS] [LATTE-CONE-FILE | CDD-EXT-FILE.ext ] " << endl;
+    cerr << "Options are: --triangulation={cddlib,4ti2,topcom,...}" << endl
+	 << "             --triangulation-max-height=HEIGHT" << endl
+	 << "             --nonsimplicial-subdivision" << endl;
     exit(1);
   }
   BarvinokParameters params;
@@ -84,9 +92,7 @@ int main(int argc, char **argv)
   {
     int i;
     for (i = 1; i<argc-1; i++) {
-      if (strncmp(argv[i], "--triangulation=", 16) == 0) {
-	params.triangulation = triangulation_type_from_name(argv[i] + 16);
-      }
+      if (parse_standard_triangulation_option(argv[i], &params)) {}
       else {
 	cerr << "Unknown option " << argv[i] << endl;
 	exit(1);
@@ -131,10 +137,11 @@ int main(int argc, char **argv)
   params.Number_of_Variables = cone->rays->first.length();
   cone->vertex = new Vertex(new rationalVector(params.Number_of_Variables));
 
+#if 0
   // Compute facets.
   cone = dualizeCones(cone, params.Number_of_Variables);
   cone = dualizeBackCones(cone, params.Number_of_Variables);
-  
+#endif
   cout << "*** Input cone:" << endl;
   printListCone(cone, params.Number_of_Variables);
 

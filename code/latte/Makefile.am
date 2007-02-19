@@ -1,12 +1,13 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
-bin_PROGRAMS = maximize minimize count ehrhart latte2ine
+bin_PROGRAMS = maximize minimize count ehrhart latte2ine latte2ext
 
 maximize_SOURCES = maximize.cpp
 minimize_SOURCES = minimize.cpp
 count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 latte2ine_SOURCES = latte2ine.cpp
+latte2ext_SOURCES = latte2ext.cpp
 
 LDADD = liblatte.a
 AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(TOPCOM_CXXFLAGS) $(CDDLIB_CFLAGS) $(FORTYTWO_CXXFLAGS) $(GMP_CFLAGS)
@@ -81,6 +82,9 @@ liblatte_a_SOURCES += latte_4ti2.cpp
 liblatte_a_SOURCES += triangulation/RegularTriangulationWith4ti2.cpp
 noinst_HEADERS += latte_4ti2.h
 noinst_HEADERS += triangulation/RegularTriangulationWith4ti2.h
+
+liblatte_a_SOURCES += latte_4ti2_zsolve.cpp
+noinst_HEADERS += latte_4ti2_zsolve.h
 endif
 
 if HAVE_EXPERIMENTS
@@ -106,9 +110,13 @@ nodist_test_todd_SOURCES = todd/test-todd.cpp
 bin_PROGRAMS += aggregate
 nodist_aggregate_SOURCES = aggregation/aggregation.cpp
 
-bin_PROGRAMS += triangulate
-nodist_triangulate_SOURCES = triangulation/test-triangulation.cpp
+bin_PROGRAMS += normaliz
+nodist_normaliz_SOURCES = normalize/normalize.cpp
+
 endif
+
+bin_PROGRAMS += triangulate
+triangulate_SOURCES = triangulation/test-triangulation.cpp
 
 SUBDIRS = adjacency
 

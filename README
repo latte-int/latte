@@ -9,7 +9,7 @@ It requires the following programs and libraries:
   * cddlib
   * (optional) LRS
   * (optional) LiDIA
-
+  * (optional) 4ti2
 
 Building and installing LattE
 -----------------------------

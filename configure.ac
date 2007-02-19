@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(latte, 1.2-mk-0.7.1)
+AC_INIT(latte, 1.2-mk-0.8+cvs)
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
