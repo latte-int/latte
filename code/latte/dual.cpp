@@ -32,7 +32,7 @@
 #include "latte_system.h"
 using namespace std;
 
-void dualizeCone(listCone *tmp, int numOfVars)
+static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
 {
   char cddInFileName[127];
   string tmpString;
@@ -108,6 +108,18 @@ void dualizeCone(listCone *tmp, int numOfVars)
   tmp->facets=tmp->rays;    
   tmp->rays=facets->rest;
   delete facets; // only delete the dummy head
+}
+
+void dualizeCone(listCone *tmp, int numOfVars)
+{
+  if (tmp->rays != NULL && tmp->facets != NULL) {
+    /* Both rays and facets are already computed,
+       so just swap. */
+    swap(tmp->determinant, tmp->dual_determinant);
+    swap(tmp->rays, tmp->facets);
+  }
+  else
+    dualizeCone_with_cdd(tmp, numOfVars);
 }
 
 listCone* dualizeCones(listCone *cones, int numOfVars) {
