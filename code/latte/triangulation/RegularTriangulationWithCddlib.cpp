@@ -104,13 +104,13 @@ triangulate_cone_with_cddlib(listCone *cone,
 	  listCone *c = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
 	  /* Is a cone of the triangulation -- check it is simplicial */
 	  int c_num_rays = set_card(incidence->set[i]);
-	  if (c_num_rays > cone_dimension) {
+	  if (c_num_rays > cone_dimension && !Parameters->nonsimplicial_subdivision) {
 	    cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
 		 << "in purported triangulation, triangulating it recursively." << endl;
 	    /* In the refinement step, always fall back to using a
 	       random height vector. */
 	    listCone *ct = triangulate_cone_with_cddlib(c, Parameters,
-							random_height, NULL,
+							random_height, &Parameters->triangulation_max_height,
 							cone_dimension);
 	    freeCone(c);
 	    triangulation = appendListCones(ct, triangulation);
@@ -144,7 +144,7 @@ listCone *
 random_regular_triangulation_with_cddlib(listCone *cone,
 					 BarvinokParameters *Parameters)
 {
-  return triangulate_cone_with_cddlib(cone, Parameters, random_height, NULL,
+  return triangulate_cone_with_cddlib(cone, Parameters, random_height, &Parameters->triangulation_max_height,
 				      Parameters->Number_of_Variables);
 }
 
