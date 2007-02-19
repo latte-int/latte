@@ -43,12 +43,14 @@
 #include "barvinok/SubspaceAvoidingDecomposition.h"
 #endif
 
-#define SHOWDETS
+// #define SHOWDETS
 
 BarvinokParameters::BarvinokParameters() :
   substitution(PolynomialSubstitution),
   decomposition(DualDecomposition),
   triangulation(RegularTriangulationWithCdd),
+  triangulation_max_height(10000),
+  nonsimplicial_subdivision(false),
   shortvector(LatteLLL),
   max_determinant(0),
   File_Name(NULL),

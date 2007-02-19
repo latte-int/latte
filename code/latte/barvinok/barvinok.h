@@ -55,6 +55,8 @@ public:
     RegularTriangulationWith4ti2
   } TriangulationType;
   TriangulationType triangulation;
+  int triangulation_max_height;
+  bool nonsimplicial_subdivision;
   // The kind of short vectors we use for decomposition
   typedef enum {
     LatteLLL,
