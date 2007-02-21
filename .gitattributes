@@ -1,4 +1,5 @@
 * text=auto !eol
 distro/lidia-2.2.0-2.patch -text svneol=unset#application/octet-stream
 distro/lidia-2.2.0.patch -text svneol=unset#application/octet-stream
+doc/examplebrion.eps -text svneol=unset#application/octet-stream
 /manual_v1.1.pdf -text
