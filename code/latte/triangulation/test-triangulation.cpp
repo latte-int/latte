@@ -105,7 +105,6 @@ int main(int argc, char **argv)
     exit(2);
   }
   params.Number_of_Variables = cone->rays->first.length();
-  cone->vertex = new Vertex(new rationalVector(params.Number_of_Variables));
 
 #if 0
   // Compute facets.
