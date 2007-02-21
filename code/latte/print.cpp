@@ -242,6 +242,7 @@ readConeFromFile(istream &in)
       cone->rays = appendVectorToListVector(v, cone->rays);
     }
   }
+  cone->vertex = new Vertex(new rationalVector(cone->rays->first.length()));
   return cone;
 }
 
