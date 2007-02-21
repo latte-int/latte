@@ -41,7 +41,20 @@ void printRationalVectorToFile(ostream &, rationalVector*, int);
 void printRationalVectorToFileWithoutBrackets(ostream &, rationalVector*, 
 					      int);
 void printConeToFile(ostream &out, listCone* cones, int numOfVars);
+
+// Read a cone in the format of `printCone'.  However, this is NOT
+// a general function at the moment; we only read the extreme rays.
+listCone *
+readConeFromFile(istream &in);
+
 void printListConeToFile(const char*, listCone*, int); 
+
+// Read a list of cones in the format of `printListCone'. However,
+// this is NOT a general function at the moment; we only read the
+// extreme rays.
+listCone *
+readListConeFromFile(istream &in);
+
 void printResidueFile(const char*, listCone*, int);
 
 void

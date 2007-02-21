@@ -218,6 +218,34 @@ void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
+listCone *
+readConeFromFile(istream &in)
+{
+  string s;
+  while (in.good()) {
+    in >> s;
+    if (s == "rays:") break;
+  }
+  if (!in.good()) {
+    return NULL;
+  }
+  listCone *cone = createListCone();
+  while (in.good()) {
+    vec_ZZ v;
+    while (isspace(in.peek())) {
+      char c;
+      in.get(c);
+    }
+    if (in.peek() != '[') break;
+    in >> v;
+    if (in.good()) {
+      cone->rays = appendVectorToListVector(v, cone->rays);
+    }
+  }
+  return cone;
+}
+
+/* ----------------------------------------------------------------- */
 void printListConeToFile(const char *fileName, listCone* cones, int numOfVars) {
   ofstream out(fileName);
   if (!out) {
@@ -235,6 +263,17 @@ void printListConeToFile(const char *fileName, listCone* cones, int numOfVars) {
 
   out.close();
   return ;
+}
+/* ----------------------------------------------------------------- */
+listCone *
+readListConeFromFile(istream &in)
+{
+  listCone *result = NULL;
+  listCone **tail_p = &result;
+  while ((*tail_p = readConeFromFile(in)) != NULL) {
+    tail_p = &(*tail_p)->rest;
+  }
+  return result;
 }
 /* ----------------------------------------------------------------- */
 void printResidueFile(const char* fileName, listCone* cones, int numOfVars) {
