@@ -32,7 +32,7 @@ convert_ZZ_to_int(const ZZ &zz)
     cerr << "Numbers too large for 4ti2 zsolve" << endl;
     abort();
   }
-  return mpz_get_ui(z.get_mpz_t());
+  return mpz_get_si(z.get_mpz_t());
 }
 
 LinearSystem
@@ -55,9 +55,7 @@ facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars)
   setLinearSystemRHS(ls, rhs);
   deleteVector(rhs);
   int col;
-  for (col = 0; col<numOfVars; col++)
-    setLinearSystemLimit(ls, col, -INT_MAX, +INT_MAX, false);
-  for (row = 0; row<num_facets; row++)
-    setLinearSystemEquationType(ls, row, EQUATION_LESSEREQUAL, 0);
+  setLinearSystemLimit(ls, -1, -MAXINT, MAXINT, true);
+  setLinearSystemEquationType(ls, -1, EQUATION_LESSEREQUAL, 0);
   return ls;
 }
