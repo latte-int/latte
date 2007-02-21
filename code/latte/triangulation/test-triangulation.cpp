@@ -29,36 +29,6 @@
 
 using namespace std;
 
-// Read a cone in the format of `printListCone'.
-// However, this is NOT a general function; we only read the extreme
-// rays. 
-listCone *
-read_cone(istream &in)
-{
-  string s;
-  while (in.good()) {
-    in >> s;
-    if (s == "rays:") break;
-  }
-  if (!in.good()) {
-    return NULL;
-  }
-  listCone *cone = createListCone();
-  while (in.good()) {
-    vec_ZZ v;
-    while (isspace(in.peek())) {
-      char c;
-      in.get(c);
-    }
-    if (in.peek() != '[') break;
-    in >> v;
-    if (in.good()) {
-      cone->rays = appendVectorToListVector(v, cone->rays);
-    }
-  }
-  return cone;
-}
-
 static void
 print_triangulation(listCone *triang, int Number_of_Variables)
 {
@@ -123,7 +93,7 @@ int main(int argc, char **argv)
       cerr << "triangulate: Unable to open " << argv[argc-1] << endl;
       exit(1);
     }
-    cone = read_cone(in);
+    cone = readConeFromFile(in);
     if (!cone) {
       cerr << "triangulate: Parse error in file." << endl;
       exit(1);
