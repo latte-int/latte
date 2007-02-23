@@ -78,14 +78,15 @@ int main(int argc, char **argv)
 	exit(1);
       }
       cone = cddlib_matrix_to_cone(M);
+      dd_FreeMatrix(M);
       params.Number_of_Variables = cone->rays->first.length();
     }
     else {
       cerr << "normaliz: Want a .ext file." << endl;
       exit(1);
     }
-    listCone *triang
-      = triangulateCone(cone, params.Number_of_Variables, &params);
+    triang = triangulateCone(cone, params.Number_of_Variables, &params);
+    freeCone(cone);
     string triang_filename = filename + ".triang";
     printListConeToFile(triang_filename.c_str(), triang, params.Number_of_Variables);
     cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
@@ -111,6 +112,12 @@ int main(int argc, char **argv)
     //printCone(t, params.Number_of_Variables);
     dualizeCone(t, params.Number_of_Variables); // just swaps back
 
+    string current_cone_filename = filename + ".current_cone.triang";
+    {
+      ofstream current_cone_file(current_cone_filename.c_str());
+      printConeToFile(current_cone_file, t, params.Number_of_Variables);
+    }
+    
     //printCone(t, params.Number_of_Variables);
     LinearSystem ls
       = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
@@ -120,6 +127,7 @@ int main(int argc, char **argv)
     ZSolveContext ctx
       = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, 0/*OVerbose*/,
 				      zsolveLogCallbackDefault, NULL/*backupEvent*/);
+    deleteLinearSystem(ls);
     zsolveSystem(ctx, /*appendnegatives:*/ true);
     FILE *stream = stdout;
 
@@ -153,6 +161,7 @@ int main(int argc, char **argv)
       }
     deleteZSolveContext(ctx, true);
   }
+  freeListCone(triang);
   return 0;
 }
 
