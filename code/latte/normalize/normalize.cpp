@@ -40,13 +40,24 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  cout << "This is pre-NORMALIZ." << endl;
+  cout << "This is pre-NORMALIZ that actually handles the advertised options." << endl;
   
   BarvinokParameters params;
   listCone *cone;
   listCone *triang;
   
   params.triangulation = BarvinokParameters::RegularTriangulationWith4ti2;
+
+  {
+    int i;
+    for (i = 1; i<argc-1; i++) {
+      if (parse_standard_triangulation_option(argv[i], &params)) {}
+      else {
+	cerr << "Unknown option " << argv[i] << endl;
+	exit(1);
+      }
+    }
+  }
 
   string filename(argv[argc-1]);
 
