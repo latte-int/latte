@@ -39,10 +39,13 @@ FILE *output;
 string filename;
 ofstream stats;
 BarvinokParameters params;
-int max_facets = 0;
+int max_facets = INT_MAX;
 
 static void
-handle_cone(listCone *t, int t_count, int t_total)
+handle_list_cone(listCone *triang, int level);
+
+static void
+handle_cone(listCone *t, int t_count, int t_total, int level)
 {
   int num_rays = lengthListVector(t->rays);
   int num_facets;
@@ -50,7 +53,8 @@ handle_cone(listCone *t, int t_count, int t_total)
   Timer dualization_time("dualization", /*start_timer:*/ false);
   Timer zsolve_time("zsolve", /*start_timer:*/ false);
     
-  cout << "### Cone " << t_count << " of " << t_total << ": "
+  cout << "### " << "Level " << level << ": "
+       << "Cone " << t_count << " of " << t_total << ": "
        << num_rays << " rays "
        << "(dim " << dimension << ")";
   cout.flush();
@@ -66,53 +70,80 @@ handle_cone(listCone *t, int t_count, int t_total)
   cout << ", " << num_facets << " facets; "
        << dualization_time;
     
+#if 0
   string current_cone_filename = filename + ".current_cone.triang";
   {
     ofstream current_cone_file(current_cone_filename.c_str());
     printConeToFile(current_cone_file, t, params.Number_of_Variables);
   }
+#endif
+
+  stats << level << "\t" << t_count << "\t"
+	<< num_rays << "\t" << num_facets << "\t"
+	<< dualization_time.get_seconds() << "\t";
+
+  if (num_facets < max_facets) {
+    // Use zsolve to compute the Hilbert basis.
     
-  //printCone(t, params.Number_of_Variables);
-  LinearSystem ls
-    = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
-
-  //printLinearSystem(ls);
-
-  ZSolveContext ctx
-    = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
-				    zsolveLogCallbackDefault, NULL/*backupEvent*/);
-  deleteLinearSystem(ls);
-  zsolve_time.start();
-  zsolveSystem(ctx, /*appendnegatives:*/ true);
-  zsolve_time.stop();
-
-  int num_hilberts = ctx->Homs->Size;
-  cout << num_hilberts << " Hilbert basis elements; "
-       << zsolve_time;
-    
-  if (num_hilberts < params.Number_of_Variables) {
-    // Sanity check.
-    cerr << "Too few Hilbert basis elements " << endl;
-    printCone(t, params.Number_of_Variables);
+    //printCone(t, params.Number_of_Variables);
     LinearSystem ls
       = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
-    printLinearSystem(ls);
-    fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
-    fprintVectorArray(stdout, ctx->Homs, false);
-    fprintVectorArray(stdout, ctx->Frees, false);
-    abort();
-  }
 
-  fprintVectorArray(output, ctx->Homs, false);
-  fprintVectorArray(output, ctx->Frees, false);
-  deleteZSolveContext(ctx, true);
+    //printLinearSystem(ls);
+
+    ZSolveContext ctx
+      = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
+				      /* logcallback: */ NULL, NULL/*backupEvent*/);
+    deleteLinearSystem(ls);
+    zsolve_time.start();
+    zsolveSystem(ctx, /*appendnegatives:*/ true);
+    zsolve_time.stop();
+
+    int num_hilberts = ctx->Homs->Size;
+    cout << num_hilberts << " Hilbert basis elements; "
+	 << zsolve_time;
     
-  stats << t_count << "\t" << num_rays << "\t" << num_facets << "\t"
-	<< dualization_time.get_seconds() << "\t"
-	<< zsolve_time.get_seconds() << "\t"
-	<< num_hilberts << endl;
+    if (num_hilberts < params.Number_of_Variables) {
+      // Sanity check.
+      cerr << "Too few Hilbert basis elements " << endl;
+      printCone(t, params.Number_of_Variables);
+      LinearSystem ls
+	= facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+      printLinearSystem(ls);
+      fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
+      fprintVectorArray(stdout, ctx->Homs, false);
+      fprintVectorArray(stdout, ctx->Frees, false);
+      abort();
+    }
+
+    fprintVectorArray(output, ctx->Homs, false);
+    fprintVectorArray(output, ctx->Frees, false);
+    deleteZSolveContext(ctx, true);
+    
+    stats << zsolve_time.get_seconds() << "\t"
+	  << num_hilberts << endl;
+  }
+  else {
+    stats << endl;
+    cout << "Too many facets, subdividing..." << endl;
+    listCone *triang = triangulateCone(t, params.Number_of_Variables, &params);
+    handle_list_cone(triang, level + 1);
+    freeListCone(triang);
+  }
 }
 
+static void
+handle_list_cone(listCone *triang, int level)
+{
+  listCone *t;
+  int t_count = 1;
+  int t_total = lengthListCone(triang);
+  cout << "Subdivision has " << lengthListCone(triang) << " cones." << endl;
+  for (t = triang; t!=NULL; t = t->rest, t_count++)
+    handle_cone(t, t_count, t_total, level);
+  cout << "Done." << endl;
+}
+  
 int main(int argc, char **argv)
 {
   if (argc < 2) {
@@ -158,8 +189,6 @@ int main(int argc, char **argv)
       cerr << "Failed to read a triangulation." << endl;
       exit(1);
     }
-    cout << "Read a triangulation or subdivision consisting of "
-	 << lengthListCone(triang) << " cones." << endl;
     params.Number_of_Variables = triang->rays->first.length();
   }
   else {
@@ -193,10 +222,6 @@ int main(int argc, char **argv)
     cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
   }
   
-  listCone *t;
-  int t_count = 1;
-  int t_total = lengthListCone(triang);
-
   string output_filename = filename + ".hil";
   cout << "Output goes to file `" << output_filename << "'..." << endl;
   output = fopen(output_filename.c_str(), "w");
@@ -204,15 +229,14 @@ int main(int argc, char **argv)
   string stats_filename = filename + ".stats";
   cout << "Cone statistics go to file `" << stats_filename << "'..." << endl;
   stats.open(stats_filename.c_str());
-  stats << "# Index\tRays\tFacets\tDualize\tZSolve\tHilberts" << endl;
+  stats << "# Level\tIndex\tRays\tFacets\tDualize\tZSolve\tHilberts" << endl;
 
   // Redirect 4ti2/qsolve output.
   string fortytwolog_filename = filename + ".4ti2log";
   ofstream fortytwolog(fortytwolog_filename.c_str());
   _4ti2_::out = &fortytwolog;
-  
-  for (t = triang; t!=NULL; t = t->rest, t_count++)
-    handle_cone(t, t_count, t_total);
+
+  handle_list_cone(triang, 1);
     
   freeListCone(triang);
   return 0;
