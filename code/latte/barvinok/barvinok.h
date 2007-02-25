@@ -57,6 +57,12 @@ public:
   TriangulationType triangulation;
   int triangulation_max_height;
   bool nonsimplicial_subdivision;
+  // How to dualize non-simplicial cones.
+  typedef enum {
+    DualizationWithCdd,
+    DualizationWith4ti2
+  } DualizationType;
+  DualizationType dualization;
   // The kind of short vectors we use for decomposition
   typedef enum {
     LatteLLL,
