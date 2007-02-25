@@ -52,6 +52,7 @@ int main(int argc, char **argv)
     int i;
     for (i = 1; i<argc-1; i++) {
       if (parse_standard_triangulation_option(argv[i], &params)) {}
+      else if (parse_standard_dualization_option(argv[i], &params)) {} 
       else {
 	cerr << "Unknown option " << argv[i] << endl;
 	exit(1);

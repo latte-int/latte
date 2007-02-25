@@ -192,7 +192,8 @@ int main(int argc, char *argv[]) {
       params->decomposition = BarvinokParameters::IrrationalAllPrimalDecomposition;
     else if (strncmp(argv[i], "--irrational-primal", 5) == 0)
       params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
-    else if (strncmp(argv[i], "--dual", 6) == 0)
+    else if (strcmp(argv[i], "--dual") == 0) // Don't use strncmp to
+					     // avoid clash with --dualization=...
       params->decomposition = BarvinokParameters::DualDecomposition;
     else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0)
       ehrhart_polynomial = true;
@@ -219,6 +220,7 @@ int main(int argc, char *argv[]) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
     }
     else if (parse_standard_triangulation_option(argv[i], params)) {}
+    else if (parse_standard_dualization_option(argv[i], params)) {}
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
