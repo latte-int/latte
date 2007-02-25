@@ -1,7 +1,7 @@
 /* dual.cpp -- Dualize polyhedral cones
 
    Copyright 2002 Raymond Hemmecke, Ruriko Yoshida
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -110,7 +110,18 @@ static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
   delete facets; // only delete the dummy head
 }
 
-void dualizeCone(listCone *tmp, int numOfVars)
+#ifdef HAVE_FORTYTWO_LIB
+static void
+dualizeCone_with_4ti2(listCone *tmp, int numOfVars)
+{
+  cerr << "Not implemented, sorry." << endl;
+  exit(1);
+}
+#endif
+
+void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars);
+
+void dualizeCone(listCone *tmp, int numOfVars, BarvinokParameters *params)
 {
   if (tmp->rays != NULL && tmp->facets != NULL) {
     /* Both rays and facets are already computed,
@@ -118,11 +129,37 @@ void dualizeCone(listCone *tmp, int numOfVars)
     swap(tmp->determinant, tmp->dual_determinant);
     swap(tmp->rays, tmp->facets);
   }
-  else
-    dualizeCone_with_cdd(tmp, numOfVars);
+  else if (lengthListVector(tmp->rays) == params->Number_of_Variables) {
+    /* We assume full-dimensional cones, so this must be a simplicial
+       cone. */
+    computeDetAndFacetsOfSimplicialCone(tmp, params->Number_of_Variables);
+    swap(tmp->determinant, tmp->dual_determinant);
+    swap(tmp->rays, tmp->facets);
+  }
+  else {
+    switch (params->dualization) {
+    case BarvinokParameters::DualizationWithCdd:
+      dualizeCone_with_cdd(tmp, params->Number_of_Variables);
+      break;
+    case BarvinokParameters::DualizationWith4ti2:
+#ifdef HAVE_FORTYTWO_LIB
+      dualizeCone_with_4ti2(tmp, params->Number_of_Variables);
+#else
+    cerr << "DualizationWith4ti2 not compiled in, sorry."
+	 << endl;
+    exit(1);
+#endif
+      break;
+    default:
+      cerr << "Unknown DualizationType" << endl;
+      exit(1);
+    }
+  }
 }
 
-listCone* dualizeCones(listCone *cones, int numOfVars) {
+listCone* dualizeCones(listCone *cones, int numOfVars, BarvinokParameters *params)
+{
+  params->dualize_time.start();
   int numOfConesDualized,numOfAllCones;
   listCone *tmp;
 
@@ -134,7 +171,7 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 
   tmp=cones;
   while (tmp) {
-    dualizeCone(tmp, numOfVars);
+    dualizeCone(tmp, numOfVars, params);
     tmp=tmp->rest;
     numOfConesDualized++;
     if (numOfConesDualized==50*(numOfConesDualized/50)) {
@@ -144,6 +181,8 @@ listCone* dualizeCones(listCone *cones, int numOfVars) {
 
   cout << "All cones are now dualized." << endl;
   //removeListVector(cones->facets);
+  params->dualize_time.stop();
+  cout << params->dualize_time;
   return (cones);
 }
 /* ----------------------------------------------------------------- */

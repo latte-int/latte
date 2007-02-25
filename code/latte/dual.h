@@ -25,12 +25,15 @@
 #define DUAL_H
 
 #include "cone.h"
+#include "barvinok/barvinok.h"
 
 /* Dualize the polyhedral CONE. */
-void dualizeCone(listCone *cone, int numOfVars);
+void dualizeCone(listCone *cone, int numOfVars,
+		 BarvinokParameters *params);
 
 /* Dualize the polyhedral cones in the list. */
-listCone* dualizeCones(listCone *cones, int numOfVars);
+listCone* dualizeCones(listCone *cones, int numOfVars,
+		       BarvinokParameters *params);
 
 /* Fill the slots `determinant', `facets', and `facet_divisors' of
    CONE.  The facet vectors are made primitive.  
