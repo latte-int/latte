@@ -7,6 +7,7 @@ AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
 AC_CONFIG_FILES([Makefile EXAMPLES/Makefile code/Makefile code/latte/Makefile code/test-suite/Makefile code/latte/adjacency/Makefile code/lidia-include.h:code/lidia-include.hin])
+AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
 AC_PROG_RANLIB
 AC_PROG_CC
 AC_PROG_CXX
