@@ -112,17 +112,22 @@ int main(int argc, char **argv)
   FILE *output = fopen(output_filename.c_str(), "w");
   
   for (t = triang; t!=NULL; t = t->rest, t_count++) {
-    cout << "### Cone " << t_count << " of " << t_total << ": ";
+    cout << "### Cone " << t_count << " of " << t_total << ": "
+	 << lengthListVector(t->rays) << " rays "
+	 << "(dim " << t->rays->first.length() << ")";
     cout.flush();
 
     //printCone(t, params.Number_of_Variables);
 
     /* Compute the facets of the cone. */
-    dualizeCone(t, params.Number_of_Variables); // computes and swaps
+    dualizeCone(t, params.Number_of_Variables, &params); // computes and swaps
     //abort();
     //printCone(t, params.Number_of_Variables);
-    dualizeCone(t, params.Number_of_Variables); // just swaps back
+    dualizeCone(t, params.Number_of_Variables, &params); // just swaps back
 
+    cout << ", " << lengthListVector(t->facets) << " facets";
+    cout.flush();
+    
     string current_cone_filename = filename + ".current_cone.triang";
     {
       ofstream current_cone_file(current_cone_filename.c_str());
@@ -154,22 +159,8 @@ int main(int argc, char **argv)
       abort();
     }
 
-    
-    if (stream)
-      {
-#if 0
-	fprintf(stream, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
-	fprintVectorArray(stream, ctx->Homs, false);
-	//fprintf(stream, "\n");
-	fprintVectorArray(stream, ctx->Frees, false);
-#endif
-
-	fprintVectorArray(output, ctx->Homs, false);
-	//fprintf(output, "\n");
-	fprintVectorArray(output, ctx->Frees, false);
-
-	//fclose(stream);
-      }
+    fprintVectorArray(output, ctx->Homs, false);
+    fprintVectorArray(output, ctx->Frees, false);
     deleteZSolveContext(ctx, true);
   }
   freeListCone(triang);

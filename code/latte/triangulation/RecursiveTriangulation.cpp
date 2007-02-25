@@ -48,10 +48,10 @@ triangulate_recursively
 (listCone *cone, BarvinokParameters *Parameters, int level = 0)
 {
 #if 1
-  dualizeCone(cone, Parameters->Number_of_Variables);
+  dualizeCone(cone, Parameters->Number_of_Variables, Parameters);
   //  printCone(cone, Parameters->Number_of_Variables);
   check_rays(cone, Parameters->Number_of_Variables);
-  dualizeCone(cone, Parameters->Number_of_Variables);
+  dualizeCone(cone, Parameters->Number_of_Variables, Parameters);
 #endif
   int numOfVars = Parameters->Number_of_Variables;
   int num_rays = lengthListVector(cone->rays);
@@ -178,7 +178,7 @@ triangulate_recursively
   cerr << "No success after " << num_tries << " tries, dualizing back and irrationalizing." << endl;
   cerr << "The cone: " << endl;
   printCone(cone, numOfVars);
-  dualizeCone(cone, numOfVars);
+  dualizeCone(cone, numOfVars, Parameters);
   /* Check that rays do not lie in the forbidden subspace. */
   check_rays(cone, numOfVars);
   irrationalizeCone(cone, numOfVars);

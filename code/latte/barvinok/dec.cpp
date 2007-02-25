@@ -67,10 +67,7 @@ decomposeCones(listCone *cones, bool dualize,
   Collecting_Single_Cone_Parameters parameters(param);
 
   if (dualize) {
-    parameters.dualize_time.start();
-    cones = dualizeCones(cones, param.Number_of_Variables);
-    parameters.dualize_time.stop();
-    cout << parameters.dualize_time;
+    cones = dualizeCones(cones, param.Number_of_Variables, &param);
   }
     
   cout << "Decomposing all cones.\n";
@@ -206,10 +203,7 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
   mat_ZZ mat;
 
   if (dualize) {
-    param.dualize_time.start();
-    cones = dualizeCones(cones, param.Number_of_Variables);
-    param.dualize_time.stop();
-    cout << param.dualize_time;
+    cones = dualizeCones(cones, param.Number_of_Variables, &param);
   }
 	
   cout << "decomposeCones_Single: Decomposing all cones. (Memory Save on)\n";

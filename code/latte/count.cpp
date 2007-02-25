@@ -583,10 +583,7 @@ int main(int argc, char *argv[]) {
   case BarvinokParameters::DualDecomposition:
   case BarvinokParameters::IrrationalPrimalDecomposition:
     if (not Poly->dualized) {
-      params->dualize_time.start();
-      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars);
-      params->dualize_time.stop();
-      cout << params->dualize_time;
+      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
       Poly->dualized = true;
     }
     break;
@@ -595,13 +592,13 @@ int main(int argc, char *argv[]) {
     params->dualize_time.start();
     if (Poly->dualized) {
       cout << "(First dualizing back... "; cout.flush();
-      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars);
+      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
       cout << "done; sorry for the interruption.) "; cout.flush();
     }
     else {
       if (Vrepresentation[0] == 'y') {
 	cout << "(First computing facets for them... "; cout.flush();
-	Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars);
+	Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
 	Poly->cones = dualizeBackCones(Poly->cones, Poly->numOfVars); // just swaps
 	cout << "done; sorry for the interruption.) "; cout.flush();
       }      
