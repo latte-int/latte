@@ -34,6 +34,85 @@
 
 using namespace std;
 
+
+FILE *output;
+string filename;
+ofstream stats;
+BarvinokParameters params;
+int max_facets = 0;
+
+static void
+handle_cone(listCone *t, int t_count, int t_total)
+{
+  int num_rays = lengthListVector(t->rays);
+  int num_facets;
+  int dimension = t->rays->first.length();
+  Timer dualization_time("dualization", /*start_timer:*/ false);
+  Timer zsolve_time("zsolve", /*start_timer:*/ false);
+    
+  cout << "### Cone " << t_count << " of " << t_total << ": "
+       << num_rays << " rays "
+       << "(dim " << dimension << ")";
+  cout.flush();
+
+  //printCone(t, params.Number_of_Variables);
+
+  /* Compute the facets of the cone. */
+  dualization_time.start();
+  dualizeCone(t, params.Number_of_Variables, &params); // computes and swaps
+  dualizeCone(t, params.Number_of_Variables, &params); // just swaps back
+  dualization_time.stop();
+  num_facets = lengthListVector(t->facets);
+  cout << ", " << num_facets << " facets; "
+       << dualization_time;
+    
+  string current_cone_filename = filename + ".current_cone.triang";
+  {
+    ofstream current_cone_file(current_cone_filename.c_str());
+    printConeToFile(current_cone_file, t, params.Number_of_Variables);
+  }
+    
+  //printCone(t, params.Number_of_Variables);
+  LinearSystem ls
+    = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+
+  //printLinearSystem(ls);
+
+  ZSolveContext ctx
+    = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
+				    zsolveLogCallbackDefault, NULL/*backupEvent*/);
+  deleteLinearSystem(ls);
+  zsolve_time.start();
+  zsolveSystem(ctx, /*appendnegatives:*/ true);
+  zsolve_time.stop();
+
+  int num_hilberts = ctx->Homs->Size;
+  cout << num_hilberts << " Hilbert basis elements; "
+       << zsolve_time;
+    
+  if (num_hilberts < params.Number_of_Variables) {
+    // Sanity check.
+    cerr << "Too few Hilbert basis elements " << endl;
+    printCone(t, params.Number_of_Variables);
+    LinearSystem ls
+      = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+    printLinearSystem(ls);
+    fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
+    fprintVectorArray(stdout, ctx->Homs, false);
+    fprintVectorArray(stdout, ctx->Frees, false);
+    abort();
+  }
+
+  fprintVectorArray(output, ctx->Homs, false);
+  fprintVectorArray(output, ctx->Frees, false);
+  deleteZSolveContext(ctx, true);
+    
+  stats << t_count << "\t" << num_rays << "\t" << num_facets << "\t"
+	<< dualization_time.get_seconds() << "\t"
+	<< zsolve_time.get_seconds() << "\t"
+	<< num_hilberts << endl;
+}
+
 int main(int argc, char **argv)
 {
   if (argc < 2) {
@@ -41,13 +120,14 @@ int main(int argc, char **argv)
     cerr << "Options are: --triangulation={cddlib,4ti2,topcom,...}" << endl
 	 << "             --triangulation-max-height=HEIGHT" << endl
 	 << "             --nonsimplicial-subdivision" << endl
-	 << "             --dualization={cdd,4ti2}" << endl;
+	 << "             --dualization={cdd,4ti2}" << endl
+	 << "             --max-facets=N                Subdivide further if more than N facets" << endl
+      ;
     exit(1);
   }
 
   cout << "This is pre-NORMALIZ that actually handles the advertised options." << endl;
   
-  BarvinokParameters params;
   listCone *cone;
   listCone *triang;
   
@@ -58,7 +138,10 @@ int main(int argc, char **argv)
     int i;
     for (i = 1; i<argc-1; i++) {
       if (parse_standard_triangulation_option(argv[i], &params)) {}
-      else if (parse_standard_dualization_option(argv[i], &params)) {} 
+      else if (parse_standard_dualization_option(argv[i], &params)) {}
+      else if (strncmp(argv[i], "--max-facets=", 13) == 0) {
+	max_facets = atoi(argv[i] + 13);
+      }
       else {
 	cerr << "Unknown option " << argv[i] << endl;
 	exit(1);
@@ -66,7 +149,7 @@ int main(int argc, char **argv)
     }
   }
 
-  string filename(argv[argc-1]);
+  filename = argv[argc-1];
 
   if (strlen(argv[argc-1]) > 7 && strcmp(argv[argc-1] + strlen(argv[argc-1]) - 7, ".triang") == 0) {
     ifstream tf(argv[argc-1]);
@@ -116,11 +199,11 @@ int main(int argc, char **argv)
 
   string output_filename = filename + ".hil";
   cout << "Output goes to file `" << output_filename << "'..." << endl;
-  FILE *output = fopen(output_filename.c_str(), "w");
+  output = fopen(output_filename.c_str(), "w");
 
   string stats_filename = filename + ".stats";
   cout << "Cone statistics go to file `" << stats_filename << "'..." << endl;
-  ofstream stats(stats_filename.c_str());
+  stats.open(stats_filename.c_str());
   stats << "# Index\tRays\tFacets\tDualize\tZSolve\tHilberts" << endl;
 
   // Redirect 4ti2/qsolve output.
@@ -128,75 +211,9 @@ int main(int argc, char **argv)
   ofstream fortytwolog(fortytwolog_filename.c_str());
   _4ti2_::out = &fortytwolog;
   
-  for (t = triang; t!=NULL; t = t->rest, t_count++) {
-    int num_rays = lengthListVector(t->rays);
-    int num_facets;
-    int dimension = t->rays->first.length();
-    Timer dualization_time("dualization", /*start_timer:*/ false);
-    Timer zsolve_time("zsolve", /*start_timer:*/ false);
+  for (t = triang; t!=NULL; t = t->rest, t_count++)
+    handle_cone(t, t_count, t_total);
     
-    cout << "### Cone " << t_count << " of " << t_total << ": "
-	 << num_rays << " rays "
-	 << "(dim " << dimension << ")";
-    cout.flush();
-
-    //printCone(t, params.Number_of_Variables);
-
-    /* Compute the facets of the cone. */
-    dualization_time.start();
-    dualizeCone(t, params.Number_of_Variables, &params); // computes and swaps
-    dualizeCone(t, params.Number_of_Variables, &params); // just swaps back
-    dualization_time.stop();
-    num_facets = lengthListVector(t->facets);
-    cout << ", " << num_facets << " facets; "
-	 << dualization_time;
-    
-    string current_cone_filename = filename + ".current_cone.triang";
-    {
-      ofstream current_cone_file(current_cone_filename.c_str());
-      printConeToFile(current_cone_file, t, params.Number_of_Variables);
-    }
-    
-    //printCone(t, params.Number_of_Variables);
-    LinearSystem ls
-      = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
-
-    //printLinearSystem(ls);
-
-    ZSolveContext ctx
-      = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
-				      zsolveLogCallbackDefault, NULL/*backupEvent*/);
-    deleteLinearSystem(ls);
-    zsolve_time.start();
-    zsolveSystem(ctx, /*appendnegatives:*/ true);
-    zsolve_time.stop();
-
-    int num_hilberts = ctx->Homs->Size;
-    cout << num_hilberts << " Hilbert basis elements; "
-	 << zsolve_time;
-    
-    if (num_hilberts < params.Number_of_Variables) {
-      // Sanity check.
-      cerr << "Too few Hilbert basis elements " << endl;
-      printCone(t, params.Number_of_Variables);
-      LinearSystem ls
-	= facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
-      printLinearSystem(ls);
-      fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
-      fprintVectorArray(stdout, ctx->Homs, false);
-      fprintVectorArray(stdout, ctx->Frees, false);
-      abort();
-    }
-
-    fprintVectorArray(output, ctx->Homs, false);
-    fprintVectorArray(output, ctx->Frees, false);
-    deleteZSolveContext(ctx, true);
-    
-    stats << t_count << "\t" << num_rays << "\t" << num_facets << "\t"
-	  << dualization_time.get_seconds() << "\t"
-	  << zsolve_time.get_seconds() << "\t"
-	  << num_hilberts << endl;
-  }
   freeListCone(triang);
   return 0;
 }
