@@ -26,7 +26,11 @@
 #include "triangulation/triangulate.h"
 #include "dual.h"
 #include "latte_cddlib.h"
+#include "latte_4ti2.h"
 #include "latte_4ti2_zsolve.h"
+#include "timing.h"
+// from 4ti2:
+#include "Globals.h"
 
 using namespace std;
 
@@ -36,7 +40,8 @@ int main(int argc, char **argv)
     cerr << "usage: normaliz [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang } " << endl;
     cerr << "Options are: --triangulation={cddlib,4ti2,topcom,...}" << endl
 	 << "             --triangulation-max-height=HEIGHT" << endl
-	 << "             --nonsimplicial-subdivision" << endl;
+	 << "             --nonsimplicial-subdivision" << endl
+	 << "             --dualization={cdd,4ti2}" << endl;
     exit(1);
   }
 
@@ -47,6 +52,7 @@ int main(int argc, char **argv)
   listCone *triang;
   
   params.triangulation = BarvinokParameters::RegularTriangulationWith4ti2;
+  params.dualization = BarvinokParameters::DualizationWith4ti2;
 
   {
     int i;
@@ -111,23 +117,39 @@ int main(int argc, char **argv)
   string output_filename = filename + ".hil";
   cout << "Output goes to file `" << output_filename << "'..." << endl;
   FILE *output = fopen(output_filename.c_str(), "w");
+
+  string stats_filename = filename + ".stats";
+  cout << "Cone statistics go to file `" << stats_filename << "'..." << endl;
+  ofstream stats(stats_filename.c_str());
+  stats << "# Index\tRays\tFacets\tDualize\tZSolve\tHilberts" << endl;
+
+  // Redirect 4ti2/qsolve output.
+  string fortytwolog_filename = filename + ".4ti2log";
+  ofstream fortytwolog(fortytwolog_filename.c_str());
+  _4ti2_::out = &fortytwolog;
   
   for (t = triang; t!=NULL; t = t->rest, t_count++) {
+    int num_rays = lengthListVector(t->rays);
+    int num_facets;
+    int dimension = t->rays->first.length();
+    Timer dualization_time("dualization", /*start_timer:*/ false);
+    Timer zsolve_time("zsolve", /*start_timer:*/ false);
+    
     cout << "### Cone " << t_count << " of " << t_total << ": "
-	 << lengthListVector(t->rays) << " rays "
-	 << "(dim " << t->rays->first.length() << ")";
+	 << num_rays << " rays "
+	 << "(dim " << dimension << ")";
     cout.flush();
 
     //printCone(t, params.Number_of_Variables);
 
     /* Compute the facets of the cone. */
+    dualization_time.start();
     dualizeCone(t, params.Number_of_Variables, &params); // computes and swaps
-    //abort();
-    //printCone(t, params.Number_of_Variables);
     dualizeCone(t, params.Number_of_Variables, &params); // just swaps back
-
-    cout << ", " << lengthListVector(t->facets) << " facets";
-    cout.flush();
+    dualization_time.stop();
+    num_facets = lengthListVector(t->facets);
+    cout << ", " << num_facets << " facets; "
+	 << dualization_time;
     
     string current_cone_filename = filename + ".current_cone.triang";
     {
@@ -142,13 +164,19 @@ int main(int argc, char **argv)
     //printLinearSystem(ls);
 
     ZSolveContext ctx
-      = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, 0/*OVerbose*/,
+      = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
 				      zsolveLogCallbackDefault, NULL/*backupEvent*/);
     deleteLinearSystem(ls);
+    zsolve_time.start();
     zsolveSystem(ctx, /*appendnegatives:*/ true);
-    FILE *stream = stdout;
+    zsolve_time.stop();
 
-    if (ctx->Homs->Size < params.Number_of_Variables) {
+    int num_hilberts = ctx->Homs->Size;
+    cout << num_hilberts << " Hilbert basis elements; "
+	 << zsolve_time;
+    
+    if (num_hilberts < params.Number_of_Variables) {
+      // Sanity check.
       cerr << "Too few Hilbert basis elements " << endl;
       printCone(t, params.Number_of_Variables);
       LinearSystem ls
@@ -163,6 +191,11 @@ int main(int argc, char **argv)
     fprintVectorArray(output, ctx->Homs, false);
     fprintVectorArray(output, ctx->Frees, false);
     deleteZSolveContext(ctx, true);
+    
+    stats << t_count << "\t" << num_rays << "\t" << num_facets << "\t"
+	  << dualization_time.get_seconds() << "\t"
+	  << zsolve_time.get_seconds() << "\t"
+	  << num_hilberts << endl;
   }
   freeListCone(triang);
   return 0;
