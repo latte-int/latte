@@ -30,7 +30,34 @@
 #include "convert.h"
 #include <list>
 #include "latte_system.h"
+
+#ifdef HAVE_FORTYTWO_LIB
+#include "DualizationWith4ti2.h"
+#endif
+
 using namespace std;
+
+BarvinokParameters::DualizationType
+dualization_type_from_name(const char *name)
+{
+  if (strcmp(name, "cdd") == 0) return BarvinokParameters::DualizationWithCdd;
+  else if (strcmp(name, "4ti2") == 0) return BarvinokParameters::DualizationWith4ti2;
+  else {
+    cerr << "Unknown dualization type name: " << name << endl;
+    exit(1);
+  }
+}
+
+bool
+parse_standard_dualization_option(const char *arg,
+				  BarvinokParameters *params)
+{
+  if (strncmp(arg, "--dualization=", 14) == 0) {
+    params->dualization = dualization_type_from_name(arg + 14);
+  }
+  else return false;
+  return true;
+}
 
 static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
 {
@@ -109,15 +136,6 @@ static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
   tmp->rays=facets->rest;
   delete facets; // only delete the dummy head
 }
-
-#ifdef HAVE_FORTYTWO_LIB
-static void
-dualizeCone_with_4ti2(listCone *tmp, int numOfVars)
-{
-  cerr << "Not implemented, sorry." << endl;
-  exit(1);
-}
-#endif
 
 void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars);
 
