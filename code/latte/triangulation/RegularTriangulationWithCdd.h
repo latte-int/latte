@@ -25,9 +25,11 @@
 
 #include "cone.h"
 #include "barvinok/barvinok.h"
+#include "cone_consumer.h"
 
-listCone *
+void
 triangulate_cone_with_cdd(listCone *cone,
-			  BarvinokParameters *Parameters);
+			  BarvinokParameters *Parameters,
+			  ConeConsumer &consumer);
 
 #endif

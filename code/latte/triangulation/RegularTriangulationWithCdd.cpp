@@ -28,9 +28,10 @@
 
 using namespace std;
 
-listCone *
+void
 triangulate_cone_with_cdd(listCone *cone,
-			  BarvinokParameters *Parameters)
+			  BarvinokParameters *Parameters,
+			  ConeConsumer &consumer)
 {
   int numOfVars = Parameters->Number_of_Variables;
   int numOfRays = lengthListVector(cone->rays);
@@ -80,20 +81,16 @@ triangulate_cone_with_cdd(listCone *cone,
   if(m == n) B[0] = Mat;
 
   /* Collect results. */
-  listCone *result = NULL;
   for(int i = 0; i < Faces; i++) {
     if(IsZero(B[i]) != 1) {
       listCone *new_cone = createListCone();
       new_cone->rays = transformArrayBigVectorToListVector(B[i], n, n);
       new_cone->vertex = new Vertex(*vertex);
-      new_cone->rest = result;
-      result = new_cone;
+      consumer.ConsumeCone(new_cone);
     }
   }
 
   for(int i = 0; i < Faces; i++)
     B[i].kill();
-
-  return result;
 }
 

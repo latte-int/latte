@@ -44,14 +44,14 @@ cone_from_ray_set(vector<listVector *> &rays,
   return c;
 }
 
-listCone *
+void
 triangulate_cone_with_cddlib(listCone *cone,
 			     BarvinokParameters *Parameters,
 			     height_function_type height_function,
 			     void *height_function_data,
-			     int cone_dimension)
+			     int cone_dimension,
+			     ConeConsumer &consumer)
 {
-  listCone *triangulation = NULL;
   // Copy rays into an array, so we can index them.
   vector<listVector *> rays = ray_array(cone);
   /* Create a matrix from the rays, with 2 extra coordinates in
@@ -65,18 +65,20 @@ triangulate_cone_with_cddlib(listCone *cone,
   /* Extra row: `vertical' ray -- This kills all upper facets.
      See Verdoolaege, Woods, Bruynooghe, Cools (2005). */
   dd_set_si(matrix->matrix[num_rays][1], 1);
-  do {
+
     /* Compute random lifting. */
     int i;
     for (i = 0; i<num_rays; i++) {
       height_function(matrix->matrix[i][1], rays[i]->first, height_function_data);
     }
+#if 0
     /* Output of the file -- for debugging. */
     {
       FILE *mf = fopen("lifted_cone_for_triangulation", "w");
       dd_WriteMatrix(mf, matrix);
       fclose(mf);
     }
+#endif
     /* Compute facets by double-description method. */
     dd_ErrorType error;
     dd_PolyhedraPtr poly = dd_DDMatrix2Poly(matrix, &error);
@@ -109,11 +111,10 @@ triangulate_cone_with_cddlib(listCone *cone,
 		 << "in purported triangulation, triangulating it recursively." << endl;
 	    /* In the refinement step, always fall back to using a
 	       random height vector. */
-	    listCone *ct = triangulate_cone_with_cddlib(c, Parameters,
-							random_height, &Parameters->triangulation_max_height,
-							cone_dimension);
+	    triangulate_cone_with_cddlib(c, Parameters,
+					 random_height, &Parameters->triangulation_max_height,
+					 cone_dimension, consumer);
 	    freeCone(c);
-	    triangulation = appendListCones(ct, triangulation);
 	  }
 	  else if (c_num_rays < cone_dimension) {
 	    cerr << "Lower-dimensional cone in purported triangulation, should not happen."
@@ -121,8 +122,7 @@ triangulate_cone_with_cddlib(listCone *cone,
 	    abort();
 	  }
 	  else {
-	    c->rest = triangulation;
-	    triangulation = c;
+	    consumer.ConsumeCone(c);
 	  }
 	}
       }
@@ -131,27 +131,22 @@ triangulate_cone_with_cddlib(listCone *cone,
     dd_FreeSetFamily(incidence);
     dd_FreeMatrix(matrix);
     dd_FreePolyhedra(poly);
-    return triangulation;
-  NEW_LIFTING:
-    dd_FreeMatrix(inequalities);
-    dd_FreeSetFamily(incidence);
-    dd_FreePolyhedra(poly);
-    freeListCone(triangulation); triangulation = NULL;
-  } while (1);
 }
 
-listCone *
+void
 random_regular_triangulation_with_cddlib(listCone *cone,
-					 BarvinokParameters *Parameters)
+					 BarvinokParameters *Parameters,
+					 ConeConsumer &consumer)
 {
-  return triangulate_cone_with_cddlib(cone, Parameters, random_height, &Parameters->triangulation_max_height,
-				      Parameters->Number_of_Variables);
+  triangulate_cone_with_cddlib(cone, Parameters, random_height, &Parameters->triangulation_max_height,
+			       Parameters->Number_of_Variables, consumer);
 }
 
-listCone *
+void
 refined_delone_triangulation_with_cddlib(listCone *cone,
-					 BarvinokParameters *Parameters)
+					 BarvinokParameters *Parameters,
+					 ConeConsumer &consumer)
 {
-  return triangulate_cone_with_cddlib(cone, Parameters, delone_height, NULL,
-				      Parameters->Number_of_Variables);
+  triangulate_cone_with_cddlib(cone, Parameters, delone_height, NULL,
+			       Parameters->Number_of_Variables, consumer);
 }

@@ -28,8 +28,8 @@
 
 /* Return a triangulation of a full-dimensional CONE, such that the
    resulting facets avoid the subspace where the last coordinate is 0. */
-listCone *
+void
 boundary_triangulation_of_cone_with_subspace_avoiding_facets
-(listCone *cone, BarvinokParameters *Parameters);
+(listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer);
 
 #endif

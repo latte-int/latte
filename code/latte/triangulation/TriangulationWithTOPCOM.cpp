@@ -53,14 +53,14 @@ ray_array(listCone *cone)
 // Functions using the TOPCOM library.
 //
 #ifdef HAVE_TOPCOM_LIB
-static listCone *
+static void
 triangulation_to_cones(const SimplicialComplex &sc,
-		       listCone *cone)
+		       listCone *cone,
+		       ConeConsumer &consumer)
 {
   // Copy rays into an array, so we can index them.
   vector<listVector *> rays = ray_array(cone);
   // Iterate through simplices and collect them.
-  listCone *cones = NULL;
   for (SimplicialComplex::const_iterator i = sc.begin(); i!=sc.end(); ++i) {
     const Simplex &simplex = *i;
     listCone *c = createListCone();
@@ -69,10 +69,8 @@ triangulation_to_cones(const SimplicialComplex &sc,
       size_t index = *j;
       c->rays = new listVector(rays[index]->first, c->rays);
     }
-    c->rest = cones;
-    cones = c;
+    consumer.ConsumeCone(c);
   }
-  return cones;
 }
 
 static PointConfiguration
@@ -92,8 +90,8 @@ cone_to_point_configuration(listCone *cone, int numOfVars)
   return points;
 }
 
-listCone *
-triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars)
+void
+triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars, ConeConsumer &consumer)
 {
   PointConfiguration points = cone_to_point_configuration(cone, numOfVars);
   if (points.rank() > points.no()) {
@@ -102,8 +100,8 @@ triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars)
   }
   Chirotope chiro(points, /*preprocess:*/ false);
   PlacingTriang triang(chiro);
-  std::cout << "Triangulation: " << triang << std::endl;
-  return triangulation_to_cones(triang, cone);
+  //  std::cout << "Triangulation: " << triang << std::endl;
+  triangulation_to_cones(triang, cone, consumer);
 }
 #endif
 
@@ -114,9 +112,10 @@ triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars)
 
 #ifdef HAVE_TOPCOM_BIN
 
-static listCone *
+static void
 read_TOPCOM_triangulation(istream &in,
-			  listCone *cone)
+			  listCone *cone,
+			  ConeConsumer &consumer)
 {
   // Copy rays into an array, so we can index them.
   vector<listVector *> rays = ray_array(cone);
@@ -125,7 +124,7 @@ read_TOPCOM_triangulation(istream &in,
   char c;
   // Find and consume left brace of triangulation.
   do { in.get(c); } while (in.good() && c != '{');
-  listCone *cones = NULL;
+  bool result = false;
   do {
     // Consume left brace of simplex.
     in.get(c);
@@ -139,19 +138,18 @@ read_TOPCOM_triangulation(istream &in,
       // Skip the ',' of simplex.
       if (in.peek()==',') in.get(c);
     }
-    simp->rest = cones;
-    cones = simp;
+    consumer.ConsumeCone(simp);
     if (!in.good()) break;
     // Consume the '}' of simplex.
     in.get(c);
     // Expect ',' or '}' of triangulation.
     in.get(c);
     if (!in.good()) break;
-    if (c == '}') return cones;
+    if (c == '}') return;
   } while (c == ',');
   // Error situation:
-  freeListCone(cones);
-  return NULL;
+  cerr << "Failed to read triangulation from TOPCOM output" << endl;
+  exit(1);
 }
 
 static void
@@ -175,8 +173,8 @@ write_TOPCOM_point_configuration(ostream &out,
 
 #ifndef HAVE_TOPCOM_LIB
 // Alternative implementation if the TOPCOM library cannot be used.
-listCone *
-triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars)
+void
+triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars, ConeConsumer &consumer)
 {
   string topcom_input_file_name = temporary_file_name("topcom_input");
   string topcom_output_file_name = temporary_file_name("topcom_output");
@@ -187,12 +185,7 @@ triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars)
   system_with_error_check(TOPCOM_POINTS2PLACINGTRIANG " < " + topcom_input_file_name
 			  + " > " + topcom_output_file_name);
   ifstream topcom_output(topcom_output_file_name.c_str());
-  listCone *triangulation = read_TOPCOM_triangulation(topcom_output, cone);
-  if (!triangulation) {
-    cerr << "Failed to read triangulation from TOPCOM output" << endl;
-    exit(1);
-  }
-  return triangulation;
+  read_TOPCOM_triangulation(topcom_output, cone, consumer);
 }
 #endif
 
@@ -210,7 +203,9 @@ all_triangulations_of_cone_with_TOPCOM(listCone *cone, int numOfVars)
   ifstream topcom_output(topcom_output_file_name.c_str());
   list<listCone *> triangulations;
   while (topcom_output.good()) {
-    listCone *triangulation = read_TOPCOM_triangulation(topcom_output, cone);
+    CollectingConeConsumer ccc;
+    read_TOPCOM_triangulation(topcom_output, cone, ccc);
+    listCone *triangulation = ccc.Collected_Cones;
     if (!triangulation) break;
     triangulations.push_front(triangulation);
   }

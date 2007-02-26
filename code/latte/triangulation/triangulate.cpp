@@ -26,7 +26,6 @@
 #include "triangulation/RegularTriangulationWithCddlib.h"
 #endif
 #ifdef HAVE_EXPERIMENTS
-#  include "triangulation/RecursiveTriangulation.h"
 #  include "triangulation/BoundaryTriangulation.h"
 #endif
 #if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
@@ -74,20 +73,33 @@ listCone *
 triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params)
 {
+  cout << "Triangulating cone... " << flush;
+  params->triangulate_time.start();
+  CollectingConeConsumer ccc;
+  triangulateCone(cone, numOfVars, params, ccc);
+  cout << "done." << endl;
+  params->triangulate_time.stop();
+  return ccc.Collected_Cones;
+}
+
+void
+triangulateCone(listCone *cone, int numOfVars,
+		BarvinokParameters *params,
+		ConeConsumer &consumer)
+{
   listCone *result;
   if (numOfVars == lengthListVector(cone->rays)) {
     // Already simplicial.
-    return copyCone(cone);
+    consumer.ConsumeCone(copyCone(cone));
+    return;
   }
-  cout << "Triangulating cone... " << flush;
-  params->triangulate_time.start();
   switch(params->triangulation) {
   case BarvinokParameters::RegularTriangulationWithCdd:
-    result = triangulate_cone_with_cdd(cone, params);
+    triangulate_cone_with_cdd(cone, params, consumer);
     break;
   case BarvinokParameters::RegularTriangulationWithCddlib:
 #ifdef HAVE_CDDLIB
-    result = random_regular_triangulation_with_cddlib(cone, params);
+    random_regular_triangulation_with_cddlib(cone, params, consumer);
 #else
     cerr << "RegularTriangulationWithCddlib not compiled in, sorry."
 	 << endl;
@@ -96,27 +108,17 @@ triangulateCone(listCone *cone, int numOfVars,
     break;
   case BarvinokParameters::DeloneTriangulationWithCddlib:
 #ifdef HAVE_CDDLIB
-    result = refined_delone_triangulation_with_cddlib(cone, params);
+    refined_delone_triangulation_with_cddlib(cone, params, consumer);
 #else
     cerr << "DeloneTriangulationWithCddlib not compiled in, sorry."
 	 << endl;
     exit(1);
 #endif
     break;
-  case BarvinokParameters::SubspaceAvoidingRecursiveTriangulation:
-#ifdef HAVE_EXPERIMENTS
-    result = triangulate_cone_recursively_with_subspace_avoiding_facets
-      (cone, params);
-#else
-    cerr << "SubspaceAvoidingRecursiveTriangulation not compiled in, sorry."
-	 << endl;
-    exit(1);
-#endif
-    break;
   case BarvinokParameters::SubspaceAvoidingBoundaryTriangulation:
 #ifdef HAVE_EXPERIMENTS
-    result = boundary_triangulation_of_cone_with_subspace_avoiding_facets
-      (cone, params);
+    boundary_triangulation_of_cone_with_subspace_avoiding_facets
+      (cone, params, consumer);
 #else
     cerr << "SubspaceAvoidingBoundaryTriangulation not compiled in, sorry."
 	 << endl;
@@ -125,7 +127,7 @@ triangulateCone(listCone *cone, int numOfVars,
     break;
   case BarvinokParameters::PlacingTriangulationWithTOPCOM:
 #if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
-    result = triangulate_cone_with_TOPCOM(cone, numOfVars);
+    triangulate_cone_with_TOPCOM(cone, numOfVars, consumer);
 #else
     cerr << "PlacingTriangulationWithTOPCOM not compiled in, sorry."
 	 << endl;
@@ -134,7 +136,7 @@ triangulateCone(listCone *cone, int numOfVars,
     break;
   case BarvinokParameters::RegularTriangulationWith4ti2:
 #if defined(HAVE_FORTYTWO_LIB)
-    result = random_regular_triangulation_with_4ti2(cone, params);
+    random_regular_triangulation_with_4ti2(cone, params, consumer);
 #else
     cerr << "RegularTriangulationWith4ti2 not compiled in, sorry."
 	 << endl;
@@ -145,11 +147,4 @@ triangulateCone(listCone *cone, int numOfVars,
     cerr << "Unknown triangulation method." << endl;
     exit(1);
   }
-  cout << "done." << endl;
-  params->triangulate_time.stop();
-#if 0
-  printListConeToFile("triangulation", result, numOfVars);
-  cerr << "Printed triangulation to file `triangulation'" << endl;
-#endif
-  return result;
 }

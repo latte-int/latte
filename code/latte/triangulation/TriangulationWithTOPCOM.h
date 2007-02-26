@@ -25,10 +25,12 @@
 
 #include "cone.h"
 #include <list>
+#include "cone_consumer.h"
 
 /* Return a triangulation of a full-dimensional CONE. */
-listCone *
-triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars);
+void
+triangulate_cone_with_TOPCOM(listCone *cone, int numOfVars,
+			     ConeConsumer &consumer);
 
 /* Return all triangulations. */
 std::list<listCone *>

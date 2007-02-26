@@ -25,6 +25,7 @@
 
 #include "cone.h"
 #include "barvinok/barvinok.h"
+#include "cone_consumer.h"
 
 BarvinokParameters::TriangulationType
 triangulation_type_from_name(const char *name);
@@ -50,6 +51,12 @@ listCone *
 triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params);
 
+/* Likewise, but feed the resulting cones one by one to the CONSUMER.
+*/
+void
+triangulateCone(listCone *cone, int numOfVars,
+		BarvinokParameters *params,
+		ConeConsumer &consumer);
 
 
 #endif

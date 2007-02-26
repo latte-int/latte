@@ -35,20 +35,23 @@ cone_from_ray_set(vector<listVector *> &rays,
 		  Vertex *vertex);
 
 /* General function to compute a regular triangulation. */
-listCone *
+void
 triangulate_cone_with_cddlib(listCone *cone,
 			     BarvinokParameters *Parameters,
 			     height_function_type height_function,
 			     void *height_function_data,
-			     int cone_dimension);
+			     int cone_dimension,
+			     ConeConsumer &consumer);
 
 /* Triangulate a full-dimensional CONE. */
-listCone *
+void
 random_regular_triangulation_with_cddlib(listCone *cone,
-					 BarvinokParameters *Parameters);
+					 BarvinokParameters *Parameters,
+					 ConeConsumer &consumer);
 
-listCone *
+void
 refined_delone_triangulation_with_cddlib(listCone *cone,
-					 BarvinokParameters *Parameters);
+					 BarvinokParameters *Parameters,
+					 ConeConsumer &consumer);
 
 #endif

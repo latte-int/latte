@@ -116,9 +116,9 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
   return U[0];
 }  
 
-listCone *
+void
 boundary_triangulation_of_cone_with_subspace_avoiding_facets
-(listCone *cone, BarvinokParameters *Parameters)
+(listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
 {
   int numOfVars = Parameters->Number_of_Variables;
   listCone *boundary_triangulation = NULL;
@@ -145,10 +145,12 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
     /* Compute a triangulation of that facet. */
     listCone *facet_cone
       = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
-    listCone *facet_triangulation
-      = triangulate_cone_with_cddlib(facet_cone, Parameters,
-				     delone_height, NULL,
-				     Parameters->Number_of_Variables - 1);
+    CollectingConeConsumer ccc;
+    triangulate_cone_with_cddlib(facet_cone, Parameters,
+				 delone_height, NULL,
+				 Parameters->Number_of_Variables - 1,
+				 ccc);
+    listCone *facet_triangulation = ccc.Collected_Cones;
     cout << "Triangulation of facet cone: " << lengthListCone(facet_triangulation)
 	 << " simplicial cones." << endl;
     boundary_triangulation
@@ -190,6 +192,7 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
   }
   resulting_triangulation
     = dualizeBackCones(resulting_triangulation, Parameters->Number_of_Variables);
-  
-  return resulting_triangulation;
+
+  for (cone = resulting_triangulation; cone!=NULL; cone=cone->rest)
+    consumer.ConsumeCone(cone);
 }

@@ -51,14 +51,14 @@ cone_from_ray_BitSet(vector<listVector *> &rays,
   return c;
 }
 
-listCone *
+void
 triangulate_cone_with_4ti2(listCone *cone,
 			   BarvinokParameters *Parameters,
 			   height_function_type height_function,
 			   void *height_function_data,
-			   int cone_dimension)
+			   int cone_dimension,
+			   ConeConsumer &consumer)
 {
-  listCone *triangulation = NULL;
   // Copy rays into an array, so we can index them.
   int num_rays = lengthListVector(cone->rays);
   vector<listVector *> rays_array = ray_array(cone);
@@ -83,7 +83,7 @@ triangulate_cone_with_4ti2(listCone *cone,
       rs->set(i + 1);
     }
   }
-  do {
+
     /* Compute random lifting. */
     int i;
     for (i = 0; i<num_rays; i++) {
@@ -91,12 +91,14 @@ triangulate_cone_with_4ti2(listCone *cone,
       height_function(height.get_mpq_t(), rays_array[i]->first, height_function_data);
       (*matrix)[i][0] = height.get_num();
     }
+#if 0
     /* Output of the file -- for debugging. */
     {
       std::ofstream file("lifted_cone_for_4ti2_triangulation");
       file << matrix->get_number() << " " << lifted_dim << endl;
       print(file, *matrix, 0, lifted_dim);
     }
+#endif
 
     VectorArray *facets = new VectorArray(0, matrix->get_size());
     lattice_basis(*matrix, *facets);
@@ -104,11 +106,13 @@ triangulate_cone_with_4ti2(listCone *cone,
     RayAlgorithm algorithm;
     algorithm.compute(*matrix, *facets, *subspace, *rs);
 
+#if 0
     {
       std::ofstream file("4ti2_triangulation_output");
       file << facets->get_number() << " " << lifted_dim << "\n";
       print(file, *facets, 0, lifted_dim);
     }
+#endif
 
     /* Walk through all facets.  (Ignore all equalities in *subspace.)
        */
@@ -116,6 +120,7 @@ triangulate_cone_with_4ti2(listCone *cone,
     int num_facets = facets->get_number();
     int true_dimension = Parameters->Number_of_Variables - num_equalities;
     BitSet incidence(num_rays);
+    consumer.SetNumCones(num_facets); // estimate is enough
     for (i = 0; i<num_facets; i++) {
       /* We ignore facets that are incident with the extra vertical
 	 ray.  */
@@ -141,11 +146,9 @@ triangulate_cone_with_4ti2(listCone *cone,
 	       << "in purported triangulation, triangulating it recursively." << endl;
 	  /* In the refinement step, always fall back to using a
 	     random height vector. */
-	  listCone *ct = triangulate_cone_with_4ti2(c, Parameters,
-						    random_height, &Parameters->triangulation_max_height,
-						    cone_dimension);
-	  freeCone(c);
-	  triangulation = appendListCones(ct, triangulation);
+	  triangulate_cone_with_4ti2(c, Parameters,
+				     random_height, &Parameters->triangulation_max_height,
+				     cone_dimension, consumer);
 	}
 	else if (c_num_rays < true_dimension) {
 	  cerr << "Lower-dimensional cone in purported triangulation, should not happen."
@@ -153,12 +156,7 @@ triangulate_cone_with_4ti2(listCone *cone,
 	  abort();
 	}
 	else {
-
-	  //computeDetAndFacetsOfSimplicialCone(c, Parameters->Number_of_Variables);
-	  //printCone(c, Parameters->Number_of_Variables);
-
-	  c->rest = triangulation;
-	  triangulation = c;
+	  consumer.ConsumeCone(c);
 	}
       }
     }
@@ -166,25 +164,22 @@ triangulate_cone_with_4ti2(listCone *cone,
     delete subspace;
     delete matrix;
     delete rs;
-    return triangulation;
-  NEW_LIFTING:
-    delete facets;
-    delete subspace;
-  } while (1);
 }
 
-listCone *
+void
 random_regular_triangulation_with_4ti2(listCone *cone,
-					 BarvinokParameters *Parameters)
+				       BarvinokParameters *Parameters,
+				       ConeConsumer &consumer)
 {
-  return triangulate_cone_with_4ti2(cone, Parameters, random_height, &Parameters->triangulation_max_height,
-				    Parameters->Number_of_Variables);
+  triangulate_cone_with_4ti2(cone, Parameters, random_height, &Parameters->triangulation_max_height,
+			     Parameters->Number_of_Variables, consumer);
 }
 
-listCone *
+void
 refined_delone_triangulation_with_4ti2(listCone *cone,
-					 BarvinokParameters *Parameters)
+				       BarvinokParameters *Parameters,
+				       ConeConsumer &consumer)
 {
-  return triangulate_cone_with_4ti2(cone, Parameters, delone_height, NULL,
-				    Parameters->Number_of_Variables);
+  triangulate_cone_with_4ti2(cone, Parameters, delone_height, NULL,
+			     Parameters->Number_of_Variables, consumer);
 }
