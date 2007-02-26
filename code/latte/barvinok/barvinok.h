@@ -25,6 +25,7 @@
 #define BARVINOK__H
 
 #include "cone.h"
+#include "cone_consumer.h"
 #include "timing.h"
 
 class BarvinokParameters {
@@ -49,7 +50,6 @@ public:
     RegularTriangulationWithCdd,
     RegularTriangulationWithCddlib,
     DeloneTriangulationWithCddlib,
-    SubspaceAvoidingRecursiveTriangulation,
     SubspaceAvoidingBoundaryTriangulation,
     PlacingTriangulationWithTOPCOM,
     RegularTriangulationWith4ti2
@@ -98,7 +98,7 @@ public:
   virtual void print_statistics(ostream &s);
 };
 
-class Single_Cone_Parameters : public BarvinokParameters {
+class Single_Cone_Parameters : public BarvinokParameters, public ConeConsumer {
 public:
   // Statistics collected during the computation.
   ZZ		Total_Uni_Cones;
@@ -111,7 +111,6 @@ public:
   Single_Cone_Parameters() : Current_Depth(0), Max_Depth(0) {};
   Single_Cone_Parameters(const BarvinokParameters &params) :
     BarvinokParameters(params), Current_Depth(0), Max_Depth(0) {};
-  virtual int ConsumeCone(listCone *cone) = 0;
   virtual ~Single_Cone_Parameters() {}
   virtual void print_statistics(ostream &s);
 };
