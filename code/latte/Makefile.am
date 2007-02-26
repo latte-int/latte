@@ -30,6 +30,7 @@ liblatte_a_SOURCES =							\
 	ExponentialSubst.cpp ExponentialEhrhart.cpp			\
 	Irrational.cpp							\
 	ReadLatteStyle.cpp						\
+	cone_consumer.cpp						\
 	triangulation/triangulate.cpp					\
 	triangulation/RegularTriangulation.cpp				\
 	triangulation/RegularTriangulationWithCdd.cpp
@@ -52,6 +53,7 @@ noinst_HEADERS =							\
 	ExponentialSubst.h ExponentialEhrhart.h				\
 	Irrational.h							\
 	ReadLatteStyle.h Polyhedron.h					\
+	cone_consumer.h							\
 	triangulation/triangulate.h					\
 	triangulation/RegularTriangulation.h				\
 	triangulation/RegularTriangulationWithCdd.h
@@ -97,14 +99,12 @@ nodist_liblatte_a_SOURCES =				\
 	ExponentialApprox.cpp				\
 	TrivialSubst.cpp				\
 	barvinok/SubspaceAvoidingDecomposition.cpp	\
-	triangulation/RecursiveTriangulation.cpp	\
 	triangulation/BoundaryTriangulation.cpp
 
 nodist_noinst_HEADERS =					\
 	ExponentialApprox.h				\
 	TrivialSubst.h					\
 	barvinok/SubspaceAvoidingDecomposition.h	\
-	triangulation/RecursiveTriangulation.h		\
 	triangulation/BoundaryTriangulation.h
 
 bin_PROGRAMS += test-todd 
