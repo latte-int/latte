@@ -277,6 +277,15 @@ readListConeFromFile(istream &in)
   return result;
 }
 /* ----------------------------------------------------------------- */
+void
+readListConeFromFile(istream &in, ConeConsumer &consumer)
+{
+  listCone *cone;
+  while ((cone = readConeFromFile(in)) != NULL)
+    consumer.ConsumeCone(cone);
+}
+
+/* ----------------------------------------------------------------- */
 void printResidueFile(const char* fileName, listCone* cones, int numOfVars) {
   int numOfTerms;
   char outFileName[127];

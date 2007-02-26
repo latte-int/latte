@@ -26,6 +26,7 @@
 #define PRINT_H
 
 #include "cone.h"
+#include "cone_consumer.h"
 
 void printVector(vec_ZZ, int);
 void printListVector(listVector*, int);
@@ -54,6 +55,10 @@ void printListConeToFile(const char*, listCone*, int);
 // extreme rays.
 listCone *
 readListConeFromFile(istream &in);
+
+// Likewise, but feed the cones one by one to CONSUMER.
+void
+readListConeFromFile(istream &in, ConeConsumer &consumer);
 
 void printResidueFile(const char*, listCone*, int);
 
