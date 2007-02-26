@@ -34,15 +34,34 @@
 
 using namespace std;
 
-
 FILE *output;
 string filename;
 ofstream stats;
 BarvinokParameters params;
 int max_facets = INT_MAX;
 
+class RecursiveNormalizer : public ConeConsumer {
+public:
+  int t_count;
+  int t_level;
+  int t_total;
+  RecursiveNormalizer(int level) : t_count(0), t_total(0), t_level(level) {};
+  int ConsumeCone(listCone *cone);
+  void SetNumCones(size_t num_cones) { t_total = num_cones; }
+};
+
 static void
-handle_list_cone(listCone *triang, int level);
+handle_cone(listCone *t, int t_count, int t_total, int level);
+
+int
+RecursiveNormalizer::ConsumeCone(listCone *cone)
+{
+  t_count++;
+  handle_cone(cone, t_count, t_total, t_level);
+  freeCone(cone);
+  return 1; /* OK */
+}
+
 
 static void
 handle_cone(listCone *t, int t_count, int t_total, int level)
@@ -54,7 +73,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   Timer zsolve_time("zsolve", /*start_timer:*/ false);
     
   cout << "### " << "Level " << level << ": "
-       << "Cone " << t_count << " of " << t_total << ": "
+       << "Cone " << t_count << " of at most " << t_total << ": "
        << num_rays << " rays "
        << "(dim " << dimension << ")";
   cout.flush();
@@ -126,23 +145,12 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   else {
     stats << endl;
     cout << "Too many facets, subdividing..." << endl;
-    listCone *triang = triangulateCone(t, params.Number_of_Variables, &params);
-    handle_list_cone(triang, level + 1);
-    freeListCone(triang);
+    RecursiveNormalizer rec(level + 1);
+    triangulateCone(t, params.Number_of_Variables, &params, rec);
   }
 }
 
-static void
-handle_list_cone(listCone *triang, int level)
-{
-  listCone *t;
-  int t_count = 1;
-  int t_total = lengthListCone(triang);
-  cout << "Subdivision has " << lengthListCone(triang) << " cones." << endl;
-  for (t = triang; t!=NULL; t = t->rest, t_count++)
-    handle_cone(t, t_count, t_total, level);
-  cout << "Done." << endl;
-}
+  //  cout << "Subdivision has " << lengthListCone(triang) << " cones." << endl;
   
 int main(int argc, char **argv)
 {
@@ -182,29 +190,28 @@ int main(int argc, char **argv)
 
   filename = argv[argc-1];
 
-  if (strlen(argv[argc-1]) > 7 && strcmp(argv[argc-1] + strlen(argv[argc-1]) - 7, ".triang") == 0) {
-    ifstream tf(argv[argc-1]);
-    triang = readListConeFromFile(tf);
-    if (triang == NULL) {
-      cerr << "Failed to read a triangulation." << endl;
-      exit(1);
-    }
-    params.Number_of_Variables = triang->rays->first.length();
+  string triang_filename;
+
+  if (strlen(filename.c_str()) > 7
+      && strcmp(filename.c_str() + strlen(filename.c_str()) - 7, ".triang") == 0) {
+    
+    triang_filename = filename;
+    
   }
   else {
     // Read a cone and triangulate it.
-    if (strlen(argv[argc-1]) > 4 && strcmp(argv[argc-1] + strlen(argv[argc-1]) - 4, ".ext") == 0) {
+    if (strlen(filename.c_str()) > 4 && strcmp(filename.c_str() + strlen(filename.c_str()) - 4, ".ext") == 0) {
       /* Input in CDD format. */
-      FILE *in = fopen(argv[argc-1], "r");
+      FILE *in = fopen(filename.c_str(), "r");
       if (in == NULL) {
-	cerr << "normaliz: Unable to open CDD-style input file " << argv[argc-1] << endl;
+	cerr << "normaliz: Unable to open CDD-style input file " << filename << endl;
 	exit(1);
       }
       dd_MatrixPtr M;
       dd_ErrorType err=dd_NoError;
       M = dd_PolyFile2Matrix(in, &err);
       if (err!=dd_NoError) {
-	cerr << "normaliz: Parse error in CDD-style input file " << argv[argc-1] << endl;
+	cerr << "normaliz: Parse error in CDD-style input file " << filename << endl;
 	exit(1);
       }
       cone = cddlib_matrix_to_cone(M);
@@ -215,11 +222,15 @@ int main(int argc, char **argv)
       cerr << "normaliz: Want a .ext file." << endl;
       exit(1);
     }
-    triang = triangulateCone(cone, params.Number_of_Variables, &params);
-    freeCone(cone);
-    string triang_filename = filename + ".triang";
-    printListConeToFile(triang_filename.c_str(), triang, params.Number_of_Variables);
-    cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
+    
+    triang_filename = filename + ".triang";
+
+    {
+      PrintingConeConsumer triang_file_writer(triang_filename);
+      triangulateCone(cone, params.Number_of_Variables, &params, triang_file_writer);
+      freeCone(cone);
+      cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
+    }
   }
   
   string output_filename = filename + ".hil";
@@ -236,9 +247,10 @@ int main(int argc, char **argv)
   ofstream fortytwolog(fortytwolog_filename.c_str());
   _4ti2_::out = &fortytwolog;
 
-  handle_list_cone(triang, 1);
+  ifstream triang_file(triang_filename.c_str());
+  RecursiveNormalizer normalizer(/*level:*/ 1);
+  readListConeFromFile(triang_file, normalizer);
     
-  freeListCone(triang);
   return 0;
 }
 
