@@ -22,6 +22,10 @@
 #include <iostream>
 #include <string>
 #include <cctype>
+#include <vector>
+#include <set>
+#include <functional>
+
 #include "print.h"
 #include "triangulation/triangulate.h"
 #include "dual.h"
@@ -39,6 +43,36 @@ string filename;
 ofstream stats;
 BarvinokParameters params;
 int max_facets = INT_MAX;
+int verbosity = 1;
+
+// Keeping track of the Hilbert basis candidates, to avoid duplicates
+
+vector<int> *v = NULL;
+
+std::set < vector<int> > known_hilbert_vectors;
+
+static bool insert_hilbert_basis_element(int *vec)
+{
+  int numOfVars = params.Number_of_Variables;
+  if (v == NULL) v = new vector<int>(numOfVars);
+
+  int i;
+  for (i = 0; i<numOfVars; i++) {
+    (*v)[i] = vec[i];
+  }
+  
+  std::set<vector<int> >::const_iterator where = known_hilbert_vectors.find(*v);
+  if (where == known_hilbert_vectors.end()) {
+    // Not known yet, so add it and print it. 
+    known_hilbert_vectors.insert(*v);
+    fprintVector(output, vec, numOfVars);
+    fputs("\n", output);
+    return true;
+  }
+  return false;
+}
+
+// The recursive decomposition and Hilbert basis computation.
 
 class RecursiveNormalizer : public ConeConsumer {
 public:
@@ -62,21 +96,44 @@ RecursiveNormalizer::ConsumeCone(listCone *cone)
   return 1; /* OK */
 }
 
+bool
+cone_unimodular(listCone *cone, int numOfVars)
+{
+  int i;
+  listVector *rays;
+  mat_ZZ Mat;
+  Mat.SetDims(numOfVars, numOfVars);
+  rays=cone->rays;
+  for(i = 0; i < numOfVars; i++) {
+    Mat[i] = rays->first;
+    rays = rays -> rest;
+  }
+  ZZ d = determinant(Mat);
+  return abs(d) == 1;
+}
 
 static void
 handle_cone(listCone *t, int t_count, int t_total, int level)
 {
+  params.Number_of_Variables = t->rays->first.length();
+  
   int num_rays = lengthListVector(t->rays);
+
+  if (num_rays == params.Number_of_Variables
+      && cone_unimodular(t, params.Number_of_Variables)) return;
+
   int num_facets;
   int dimension = t->rays->first.length();
   Timer dualization_time("dualization", /*start_timer:*/ false);
   Timer zsolve_time("zsolve", /*start_timer:*/ false);
-    
-  cout << "### " << "Level " << level << ": "
-       << "Cone " << t_count << " of at most " << t_total << ": "
-       << num_rays << " rays "
-       << "(dim " << dimension << ")";
-  cout.flush();
+
+  if (verbosity > 0) {
+    cout << "### " << "Level " << level << ": "
+	 << "Cone " << t_count << " of at most " << t_total << ": "
+	 << num_rays << " rays "
+	 << "(dim " << dimension << ")";
+    cout.flush();
+  }
 
   //printCone(t, params.Number_of_Variables);
 
@@ -86,8 +143,10 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   dualizeCone(t, params.Number_of_Variables, &params); // just swaps back
   dualization_time.stop();
   num_facets = lengthListVector(t->facets);
-  cout << ", " << num_facets << " facets; "
-       << dualization_time;
+  if (verbosity > 0) {
+    cout << ", " << num_facets << " facets; "
+	 << dualization_time;
+  }
     
 #if 0
   string current_cone_filename = filename + ".current_cone.triang";
@@ -99,9 +158,14 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 
   stats << level << "\t" << t_count << "\t"
 	<< num_rays << "\t" << num_facets << "\t"
+	<< t->determinant << "\t"
 	<< dualization_time.get_seconds() << "\t";
 
-  if (num_facets < max_facets) {
+  if (abs(t->determinant) == 1) {
+    // simplicial, unimodular cone: Do nothing.
+    stats << endl;
+  }
+  else if (num_facets < max_facets) {
     // Use zsolve to compute the Hilbert basis.
     
     //printCone(t, params.Number_of_Variables);
@@ -119,8 +183,10 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     zsolve_time.stop();
 
     int num_hilberts = ctx->Homs->Size;
-    cout << num_hilberts << " Hilbert basis elements; "
-	 << zsolve_time;
+    if (verbosity > 0) {
+      cout << num_hilberts << " Hilbert basis elements; "
+	   << zsolve_time;
+    }
     
     if (num_hilberts < params.Number_of_Variables) {
       // Sanity check.
@@ -134,9 +200,16 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
       fprintVectorArray(stdout, ctx->Frees, false);
       abort();
     }
-
-    fprintVectorArray(output, ctx->Homs, false);
-    fprintVectorArray(output, ctx->Frees, false);
+    
+    //fprintVectorArray(output, ctx->Homs, false);
+    //fprintVectorArray(output, ctx->Frees, false);
+    int i;
+    bool any_new = false;
+    for (i = 0; i<ctx->Homs->Size; i++) {
+      if (insert_hilbert_basis_element(ctx->Homs->Data[i])) any_new = true;
+    }
+    if (any_new) fflush(output);
+    
     deleteZSolveContext(ctx, true);
     
     stats << zsolve_time.get_seconds() << "\t"
@@ -144,14 +217,63 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   }
   else {
     stats << endl;
-    cout << "Too many facets, subdividing..." << endl;
+    if (verbosity > 0) {
+      cout << "Too many facets, subdividing..." << endl;
+    }
     RecursiveNormalizer rec(level + 1);
     triangulateCone(t, params.Number_of_Variables, &params, rec);
   }
 }
 
   //  cout << "Subdivision has " << lengthListCone(triang) << " cones." << endl;
-  
+
+static void open_output_and_stats()
+{
+  string output_filename = filename + ".hil";
+  cout << "Output goes to file `" << output_filename << "'..." << endl;
+  output = fopen(output_filename.c_str(), "w");
+
+  string stats_filename = filename + ".stats";
+  cout << "Cone statistics go to file `" << stats_filename << "'..." << endl;
+  stats.open(stats_filename.c_str());
+  stats << "# Level\tIndex\tRays\tFacets\tDet\tDualize\tZSolve\tHilberts" << endl;
+
+  // Redirect 4ti2/qsolve output.
+  string fortytwolog_filename = filename + ".4ti2log";
+  static ofstream fortytwolog(fortytwolog_filename.c_str());
+  _4ti2_::out = &fortytwolog;
+}
+
+static listCone *
+read_cone_cdd_format(string &filename)
+{
+  FILE *in = fopen(filename.c_str(), "r");
+  if (in == NULL) {
+    cerr << "normaliz: Unable to open CDD-style input file " << filename << endl;
+    exit(1);
+  }
+  dd_MatrixPtr M;
+  dd_ErrorType err=dd_NoError;
+  M = dd_PolyFile2Matrix(in, &err);
+  if (err!=dd_NoError) {
+    cerr << "normaliz: Parse error in CDD-style input file " << filename << endl;
+    exit(1);
+  }
+  listCone *cone = cddlib_matrix_to_cone(M);
+  dd_FreeMatrix(M);
+  return cone;
+}
+
+static void
+normalize_from_triang_file(string &triang_filename, size_t num_cones = 0)
+{
+  open_output_and_stats();
+  ifstream triang_file(triang_filename.c_str());
+  RecursiveNormalizer normalizer(/*level:*/ 1);
+  normalizer.t_total = num_cones;
+  readListConeFromFile(triang_file, normalizer);
+}
+
 int main(int argc, char **argv)
 {
   if (argc < 2) {
@@ -161,6 +283,8 @@ int main(int argc, char **argv)
 	 << "             --nonsimplicial-subdivision" << endl
 	 << "             --dualization={cdd,4ti2}" << endl
 	 << "             --max-facets=N                Subdivide further if more than N facets" << endl
+	 << "             --quiet                       Do not show much output" << endl
+	 << "             --no-triang-file              Do not create a .triang file" << endl
       ;
     exit(1);
   }
@@ -169,6 +293,7 @@ int main(int argc, char **argv)
   
   listCone *cone;
   listCone *triang;
+  bool create_triang_file = true;
   
   params.triangulation = BarvinokParameters::RegularTriangulationWith4ti2;
   params.dualization = BarvinokParameters::DualizationWith4ti2;
@@ -180,6 +305,12 @@ int main(int argc, char **argv)
       else if (parse_standard_dualization_option(argv[i], &params)) {}
       else if (strncmp(argv[i], "--max-facets=", 13) == 0) {
 	max_facets = atoi(argv[i] + 13);
+      }
+      else if (strcmp(argv[i], "--quiet") == 0) {
+	verbosity = 0;
+      }
+      else if (strcmp(argv[i], "--no-triang-file") == 0) {
+	create_triang_file = false;
       }
       else {
 	cerr << "Unknown option " << argv[i] << endl;
@@ -196,61 +327,43 @@ int main(int argc, char **argv)
       && strcmp(filename.c_str() + strlen(filename.c_str()) - 7, ".triang") == 0) {
     
     triang_filename = filename;
-    
+    normalize_from_triang_file(triang_filename);
   }
   else {
     // Read a cone and triangulate it.
     if (strlen(filename.c_str()) > 4 && strcmp(filename.c_str() + strlen(filename.c_str()) - 4, ".ext") == 0) {
       /* Input in CDD format. */
-      FILE *in = fopen(filename.c_str(), "r");
-      if (in == NULL) {
-	cerr << "normaliz: Unable to open CDD-style input file " << filename << endl;
-	exit(1);
-      }
-      dd_MatrixPtr M;
-      dd_ErrorType err=dd_NoError;
-      M = dd_PolyFile2Matrix(in, &err);
-      if (err!=dd_NoError) {
-	cerr << "normaliz: Parse error in CDD-style input file " << filename << endl;
-	exit(1);
-      }
-      cone = cddlib_matrix_to_cone(M);
-      dd_FreeMatrix(M);
+      cone = read_cone_cdd_format(filename);
       params.Number_of_Variables = cone->rays->first.length();
     }
     else {
       cerr << "normaliz: Want a .ext file." << endl;
       exit(1);
     }
-    
-    triang_filename = filename + ".triang";
 
-    {
-      PrintingConeConsumer triang_file_writer(triang_filename);
-      triangulateCone(cone, params.Number_of_Variables, &params, triang_file_writer);
+    if (create_triang_file) {
+      // Create a .triang file, then read it back in again one-by-one
+      // and feed it to the normalizer.
+      triang_filename = filename + ".triang";
+      size_t num_cones;
+      {
+	PrintingConeConsumer triang_file_writer(triang_filename);
+	triangulateCone(cone, params.Number_of_Variables, &params, triang_file_writer);
+	freeCone(cone);
+	num_cones = triang_file_writer.cone_count;
+	cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
+      }
+      normalize_from_triang_file(triang_filename, num_cones);
+    }
+    else {
+      // Triangulate and feed cones one-by-one to the normalizer.
+      open_output_and_stats();
+      RecursiveNormalizer normalizer(/*level:*/ 1);
+      triangulateCone(cone, params.Number_of_Variables, &params, normalizer);
       freeCone(cone);
-      cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
     }
   }
-  
-  string output_filename = filename + ".hil";
-  cout << "Output goes to file `" << output_filename << "'..." << endl;
-  output = fopen(output_filename.c_str(), "w");
 
-  string stats_filename = filename + ".stats";
-  cout << "Cone statistics go to file `" << stats_filename << "'..." << endl;
-  stats.open(stats_filename.c_str());
-  stats << "# Level\tIndex\tRays\tFacets\tDualize\tZSolve\tHilberts" << endl;
-
-  // Redirect 4ti2/qsolve output.
-  string fortytwolog_filename = filename + ".4ti2log";
-  ofstream fortytwolog(fortytwolog_filename.c_str());
-  _4ti2_::out = &fortytwolog;
-
-  ifstream triang_file(triang_filename.c_str());
-  RecursiveNormalizer normalizer(/*level:*/ 1);
-  readListConeFromFile(triang_file, normalizer);
-    
   return 0;
 }
 
