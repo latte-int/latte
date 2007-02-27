@@ -46,7 +46,7 @@ int CollectingConeConsumer::ConsumeCone(listCone *cone)
 }
 
 PrintingConeConsumer::PrintingConeConsumer(string filename)
-  : stream(filename.c_str())
+  : stream(filename.c_str()), cone_count(0)
 {}
 
 int
@@ -54,6 +54,7 @@ PrintingConeConsumer::ConsumeCone(listCone *cone)
 {
   assert(cone->rest == NULL);
   int numOfVars = cone->rays->first.length();
+  cone_count++;
   printConeToFile(stream, cone, numOfVars);
   freeCone(cone);
   return 1; // means "success, please continue"

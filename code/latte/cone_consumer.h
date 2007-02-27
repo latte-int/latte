@@ -45,6 +45,7 @@ public:
 class PrintingConeConsumer : public ConeConsumer {
   ofstream stream;
 public:
+  int cone_count;
   PrintingConeConsumer(string filename);
   int ConsumeCone(listCone *cone);
 };
