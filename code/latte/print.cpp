@@ -33,7 +33,7 @@
 #include "print.h"
 
 /* ----------------------------------------------------------------- */
-void printVector(vec_ZZ v, int numOfVars) {
+void printVector(const vec_ZZ &v, int numOfVars) {
   int i;
 
 //    if (v==0) {
@@ -95,7 +95,7 @@ void printListCone(listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printVectorToFile(ostream & out, vec_ZZ v, int numOfVars) {
+void printVectorToFile(ostream & out, const vec_ZZ &v, int numOfVars) {
   int i;
 
 //    if (v==0) {
@@ -123,7 +123,7 @@ void printListVectorToFile(ostream & out, listVector* basis, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printVectorToFileWithoutBrackets(ostream & out, vec_ZZ v, 
+void printVectorToFileWithoutBrackets(ostream & out, const vec_ZZ &v, 
 				      int numOfVars) {
   int i;
 

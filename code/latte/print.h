@@ -28,15 +28,15 @@
 #include "cone.h"
 #include "cone_consumer.h"
 
-void printVector(vec_ZZ, int);
+void printVector(const vec_ZZ &, int);
 void printListVector(listVector*, int);
 listVector* Changeproj(listVector* basis, listVector* equ, int numOfVars);
 void printRationalVector(rationalVector*, int);
 void printCone(listCone*, int);
 void printListCone(listCone*, int);
-void printVectorToFile(ostream &, vec_ZZ, int);
+void printVectorToFile(ostream &, const vec_ZZ &, int);
 void printListVectorToFile(ostream &, listVector*, int);
-void printVectorToFileWithoutBrackets(ostream &, vec_ZZ, int);
+void printVectorToFileWithoutBrackets(ostream &, const vec_ZZ &, int);
 void printListVectorToFileWithoutBrackets(ostream &, listVector*, int);
 void printRationalVectorToFile(ostream &, rationalVector*, int);
 void printRationalVectorToFileWithoutBrackets(ostream &, rationalVector*, 
