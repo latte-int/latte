@@ -211,6 +211,8 @@ distro/config.status
 distro/configure
 distro/configure.lineno
 distro/dest
+doc/manual.pdf
+doc/manual.ps
 /install-sh
 /missing
 /mkinstalldirs
