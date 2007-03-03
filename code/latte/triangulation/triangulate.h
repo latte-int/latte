@@ -58,5 +58,15 @@ triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params,
 		ConeConsumer &consumer);
 
+/* A cone consumer that triangulates cones and passes the results to a
+   continuation. */
+
+class TriangulatingConeTransducer : public ConeTransducer {
+public:
+  TriangulatingConeTransducer(BarvinokParameters *some_parameters);
+  int ConsumeCone(listCone *cone);
+private:
+  BarvinokParameters *params;
+};
 
 #endif
