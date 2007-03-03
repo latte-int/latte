@@ -51,6 +51,14 @@ random_height(mpq_t height, const vec_ZZ &ray, void *data)
 }
 
 void
+biased_random_height(mpq_t height, const vec_ZZ &ray, void *data)
+{
+  int percentage = * (int *) data;
+  int x = uniform_random_number(0, 99);
+  dd_set_si(height, (x < percentage) ? 2 : 1);
+}
+
+void
 delone_height(mpq_t height, const vec_ZZ &ray, void *data)
 {
   ZZ h;

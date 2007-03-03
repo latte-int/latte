@@ -40,4 +40,10 @@ random_height(mpq_t height, const vec_ZZ &ray, void *data);
 void
 delone_height(mpq_t height, const vec_ZZ &ray, void *data);
 
+/* Data points to an integer PERCENTAGE.
+   Give this PERCENTAGE of the rays a height of 2,
+   the rest a height of 1. */
+void
+biased_random_height(mpq_t height, const vec_ZZ &ray, void *data);
+
 #endif
