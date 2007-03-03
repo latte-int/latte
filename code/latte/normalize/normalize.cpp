@@ -33,6 +33,7 @@
 #include "latte_4ti2.h"
 #include "latte_4ti2_zsolve.h"
 #include "timing.h"
+#include "ReadSubcones.h"
 // from 4ti2:
 #include "Globals.h"
 
@@ -112,6 +113,15 @@ cone_unimodular(listCone *cone, int numOfVars)
   return abs(d) == 1;
 }
 
+#include <setjmp.h>
+int zsolve_time_limit = 0;
+jmp_buf timelimit_jmp_buf;
+
+static void check_timelimit(struct zsolvecontext_t *zsolve)
+{
+  longjmp(timelimit_jmp_buf, 1);
+}
+
 static void
 handle_cone(listCone *t, int t_count, int t_total, int level)
 {
@@ -176,44 +186,61 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 
     ZSolveContext ctx
       = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
-				      /* logcallback: */ NULL, NULL/*backupEvent*/);
+				      /* logcallback: */ NULL,
+				      /* backupEvent: */ (zsolve_time_limit
+							  ? check_timelimit
+							  : NULL));
+    ctx->BackupTime = zsolve_time_limit;
     deleteLinearSystem(ls);
     zsolve_time.start();
-    zsolveSystem(ctx, /*appendnegatives:*/ true);
-    zsolve_time.stop();
+    if (zsolve_time_limit == 0 || setjmp(timelimit_jmp_buf) == 0) {
+      zsolveSystem(ctx, /*appendnegatives:*/ true);
+      zsolve_time.stop();
 
-    int num_hilberts = ctx->Homs->Size;
-    if (verbosity > 0) {
-      cout << num_hilberts << " Hilbert basis elements; "
-	   << zsolve_time;
+      int num_hilberts = ctx->Homs->Size;
+      if (verbosity > 0) {
+	cout << num_hilberts << " Hilbert basis elements; "
+	     << zsolve_time;
+      }
+    
+      if (num_hilberts < params.Number_of_Variables) {
+	// Sanity check.
+	cerr << "Too few Hilbert basis elements " << endl;
+	printCone(t, params.Number_of_Variables);
+	LinearSystem ls
+	  = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+	printLinearSystem(ls);
+	fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
+	fprintVectorArray(stdout, ctx->Homs, false);
+	fprintVectorArray(stdout, ctx->Frees, false);
+	abort();
+      }
+    
+      //fprintVectorArray(output, ctx->Homs, false);
+      //fprintVectorArray(output, ctx->Frees, false);
+      int i;
+      bool any_new = false;
+      for (i = 0; i<ctx->Homs->Size; i++) {
+	if (insert_hilbert_basis_element(ctx->Homs->Data[i])) any_new = true;
+      }
+      if (any_new) fflush(output);
+    
+      deleteZSolveContext(ctx, true);
+    
+      stats << zsolve_time.get_seconds() << "\t"
+	    << num_hilberts << endl;
     }
-    
-    if (num_hilberts < params.Number_of_Variables) {
-      // Sanity check.
-      cerr << "Too few Hilbert basis elements " << endl;
-      printCone(t, params.Number_of_Variables);
-      LinearSystem ls
-	= facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
-      printLinearSystem(ls);
-      fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
-      fprintVectorArray(stdout, ctx->Homs, false);
-      fprintVectorArray(stdout, ctx->Frees, false);
-      abort();
+    else {
+      /* Longjmp target -- the timelimit was reached. */
+      zsolve_time.stop();
+      stats << zsolve_time.get_seconds() << endl;
+      deleteZSolveContext(ctx, true);
+      if (verbosity > 0) {
+	cout << "Spent too much time in zsolve, subdividing..." << endl;
+      }
+      RecursiveNormalizer rec(level + 1);
+      triangulateCone(t, params.Number_of_Variables, &params, rec);
     }
-    
-    //fprintVectorArray(output, ctx->Homs, false);
-    //fprintVectorArray(output, ctx->Frees, false);
-    int i;
-    bool any_new = false;
-    for (i = 0; i<ctx->Homs->Size; i++) {
-      if (insert_hilbert_basis_element(ctx->Homs->Data[i])) any_new = true;
-    }
-    if (any_new) fflush(output);
-    
-    deleteZSolveContext(ctx, true);
-    
-    stats << zsolve_time.get_seconds() << "\t"
-	  << num_hilberts << endl;
   }
   else {
     stats << endl;
@@ -224,8 +251,6 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     triangulateCone(t, params.Number_of_Variables, &params, rec);
   }
 }
-
-  //  cout << "Subdivision has " << lengthListCone(triang) << " cones." << endl;
 
 static void open_output_and_stats()
 {
@@ -265,38 +290,50 @@ read_cone_cdd_format(string &filename)
 }
 
 static void
-normalize_from_triang_file(string &triang_filename, size_t num_cones = 0)
+usage()
 {
-  open_output_and_stats();
-  ifstream triang_file(triang_filename.c_str());
-  RecursiveNormalizer normalizer(/*level:*/ 1);
-  normalizer.t_total = num_cones;
-  readListConeFromFile(triang_file, normalizer);
+    cerr << "usage: normaliz [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang } " << endl;
+    cerr << "Options are: " << endl
+	 << "  --dualization={cdd,4ti2}" << endl
+	 << "  --triangulation={cddlib,4ti2,topcom,...}" << endl
+	 << "  --triangulation-max-height=HEIGHT        Use a uniform distribution of height from 1 to HEIGHT." << endl
+         << "  --triangulation-bias=PERCENTAGE          Use a non-uniform distribution of heights 1 and 2." << endl
+	 << "  --nonsimplicial-subdivision              [Default]" << endl
+	 << "  --max-facets=N                           Subdivide further if more than N facets" << endl
+         << "  --zsolve-time-limit=SECONDS              Subdivide further if computation of Hilbert" << endl
+	 << "                                           basis took longer than this number of seconds." << endl
+	 << "  --quiet                                  Do not show much output" << endl
+	 << "  --no-triang-file                         Do not create a .triang file" << endl
+         << "  --subcones=INPUT-FILE.subcones           Read list of subcone indicators to handle" << endl
+         << "  --output-subcones=OUTPUT-FILE.subcones   Write a list of toplevel subcones" << endl
+	 << "  --only-triangulate                       Only triangulate, don't normalize" << endl
+         << "  --no-initial-triangulation               Don't compute an initial triangulation," << endl
+         << "                                           start recursive normalizer on input." << endl
+      ;
 }
 
 int main(int argc, char **argv)
 {
   if (argc < 2) {
-    cerr << "usage: normaliz [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang } " << endl;
-    cerr << "Options are: --triangulation={cddlib,4ti2,topcom,...}" << endl
-	 << "             --triangulation-max-height=HEIGHT" << endl
-	 << "             --nonsimplicial-subdivision" << endl
-	 << "             --dualization={cdd,4ti2}" << endl
-	 << "             --max-facets=N                Subdivide further if more than N facets" << endl
-	 << "             --quiet                       Do not show much output" << endl
-	 << "             --no-triang-file              Do not create a .triang file" << endl
-      ;
+    usage();
     exit(1);
   }
 
   cout << "This is pre-NORMALIZ that actually handles the advertised options." << endl;
-  
+  cout << "--nonsimplicial-subdivision is now on by default." << endl;
   listCone *cone;
   listCone *triang;
   bool create_triang_file = true;
+  string subcones_filename;
+  bool have_subcones = false;
+  string output_subcones_filename;
+  bool have_output_subcones = false;
+  bool normalize = true;
+  bool triangulate_toplevel = true;
   
   params.triangulation = BarvinokParameters::RegularTriangulationWith4ti2;
   params.dualization = BarvinokParameters::DualizationWith4ti2;
+  params.nonsimplicial_subdivision = true;
 
   {
     int i;
@@ -312,6 +349,27 @@ int main(int argc, char **argv)
       else if (strcmp(argv[i], "--no-triang-file") == 0) {
 	create_triang_file = false;
       }
+      else if (strncmp(argv[i], "--zsolve-time-limit=", 20) == 0) {
+	zsolve_time_limit = atoi(argv[i] + 20);
+      }
+      else if (strncmp(argv[i], "--subcones=", 11) == 0) {
+	subcones_filename = string(argv[i] + 11);
+	have_subcones = true;
+      }
+      else if (strncmp(argv[i], "--output-subcones=", 18) == 0) {
+	output_subcones_filename = string(argv[i] + 18);
+	have_output_subcones = true;
+      }
+      else if (strncmp(argv[i], "--only-triangulate", 6) == 0) {
+	normalize = false;
+      }
+      else if (strncmp(argv[i], "--no-initial-triangulation", 12) == 0) {
+	triangulate_toplevel = false;
+      }
+      else if (strncmp(argv[i], "--help", 6) == 0) {
+	usage();
+	exit(0);
+      }
       else {
 	cerr << "Unknown option " << argv[i] << endl;
 	exit(1);
@@ -323,14 +381,22 @@ int main(int argc, char **argv)
 
   string triang_filename;
 
+  // Input handling.
+
+  ConeProducer *producer = NULL;
+  
   if (strlen(filename.c_str()) > 7
       && strcmp(filename.c_str() + strlen(filename.c_str()) - 7, ".triang") == 0) {
-    
+    if (have_subcones) {
+      cerr << "Cannot use both a triangulation file and a subcones file." << endl;
+      exit(1);
+    }
     triang_filename = filename;
-    normalize_from_triang_file(triang_filename);
+    producer = new ListConeReadingConeProducer(filename);
+    triangulate_toplevel = false;
   }
   else {
-    // Read a cone and triangulate it.
+    // Read a cone.
     if (strlen(filename.c_str()) > 4 && strcmp(filename.c_str() + strlen(filename.c_str()) - 4, ".ext") == 0) {
       /* Input in CDD format. */
       cone = read_cone_cdd_format(filename);
@@ -340,28 +406,57 @@ int main(int argc, char **argv)
       cerr << "normaliz: Want a .ext file." << endl;
       exit(1);
     }
+    if (have_subcones) {
+      // Also a subcones file given.
+      producer = new SubconeReadingConeProducer(cone, subcones_filename);
+    }
+    else {
+      producer = new SingletonConeProducer(copyCone(cone));
+    }
+  }
 
-    if (create_triang_file) {
-      // Create a .triang file, then read it back in again one-by-one
+  if (triangulate_toplevel) {
+    // Send input cones through triangulation.
+    ConeTransducer *triangulator = new TriangulatingConeTransducer(&params);
+    producer = compose(producer, triangulator);
+  }
+
+  // Computation handling.   
+
+  if (triangulate_toplevel) {
+    if (have_output_subcones) {
+      // Create a subcones file, then read it back in again one-by-one
       // and feed it to the normalizer.
-      triang_filename = filename + ".triang";
       size_t num_cones;
       {
+	SubconePrintingConeConsumer subcone_file_writer(cone, 
+							output_subcones_filename);
+	producer->Produce(subcone_file_writer);
+	num_cones = subcone_file_writer.cone_count;
+	cout << "Printed triangulation to subcones file `" << output_subcones_filename << "'." << endl;
+      }
+      producer = new SubconeReadingConeProducer(cone, output_subcones_filename, num_cones);
+    }
+    else if (create_triang_file) {
+      // Create a .triang file, then read it back in again one-by-one
+      // and feed it to the normalizer.
+      size_t num_cones;
+      triang_filename = filename + ".triang";
+      {
 	PrintingConeConsumer triang_file_writer(triang_filename);
-	triangulateCone(cone, params.Number_of_Variables, &params, triang_file_writer);
-	freeCone(cone);
+	producer->Produce(triang_file_writer);
 	num_cones = triang_file_writer.cone_count;
 	cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
       }
-      normalize_from_triang_file(triang_filename, num_cones);
+      producer = new ListConeReadingConeProducer(triang_filename, num_cones);
     }
-    else {
-      // Triangulate and feed cones one-by-one to the normalizer.
-      open_output_and_stats();
-      RecursiveNormalizer normalizer(/*level:*/ 1);
-      triangulateCone(cone, params.Number_of_Variables, &params, normalizer);
-      freeCone(cone);
-    }
+  }
+
+  if (normalize) {
+    // Feed cones one-by-one to the normalizer.
+    open_output_and_stats();
+    RecursiveNormalizer normalizer(/*level:*/ 1);
+    producer->Produce(normalizer);
   }
 
   return 0;
