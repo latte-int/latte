@@ -115,6 +115,10 @@ nodist_aggregate_SOURCES = aggregation/aggregation.cpp
 
 bin_PROGRAMS += normaliz
 nodist_normaliz_SOURCES = normalize/normalize.cpp
+nodist_liblatte_a_SOURCES += 				\
+	ReadSubcones.cpp
+nodist_noinst_HEADERS +=				\
+	ReadSubcones.h
 
 endif
 
