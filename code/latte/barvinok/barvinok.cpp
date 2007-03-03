@@ -50,6 +50,7 @@ BarvinokParameters::BarvinokParameters() :
   decomposition(DualDecomposition),
   triangulation(RegularTriangulationWithCdd),
   triangulation_max_height(10000),
+  triangulation_bias(-1),
   nonsimplicial_subdivision(false),
   dualization(DualizationWithCdd),
   shortvector(LatteLLL),

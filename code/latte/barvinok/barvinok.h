@@ -56,6 +56,7 @@ public:
   } TriangulationType;
   TriangulationType triangulation;
   int triangulation_max_height;
+  int triangulation_bias;
   bool nonsimplicial_subdivision;
   // How to dualize non-simplicial cones.
   typedef enum {
