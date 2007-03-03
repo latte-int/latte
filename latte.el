@@ -40,7 +40,8 @@
     "PointsInParallelepipedGenerator" "IntCombEnum"
     "NotGenericException"
     "BarvinokParameters"
-    "Vertex" "Polyhedron"))
+    "Vertex" "Polyhedron"
+    "ConeConsumer"))
 
 (setq c++-font-lock-extra-types
       (cons (regexp-opt (append ntl-types latte-types gmp-types lidia-types cddlib-types))
