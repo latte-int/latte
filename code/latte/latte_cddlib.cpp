@@ -80,7 +80,7 @@ cddlib_matrix_to_cone(dd_MatrixPtr matrix)
   listCone *result = createListCone();
   result->vertex = new Vertex(new rationalVector(numOfVars));
   int i;
-  for (i = 0; i<matrix->rowsize; i++) {
+  for (i = matrix->rowsize - 1; i>=0; i--) {
     vec_ZZ ray;
     ray.SetLength(numOfVars);
     int j;
