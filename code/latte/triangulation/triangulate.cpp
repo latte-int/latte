@@ -65,6 +65,9 @@ parse_standard_triangulation_option(const char *arg,
   else if (strncmp(arg, "--nonsimplicial-subdivision", 9) == 0) {
     params->nonsimplicial_subdivision = true;
   }
+  else if (strncmp(arg, "--triangulation-bias=", 21) == 0) {
+    params->triangulation_bias = atoi(arg + 21);
+  }
   else return false;
   return true;
 }
@@ -148,3 +151,18 @@ triangulateCone(listCone *cone, int numOfVars,
     exit(1);
   }
 }
+
+
+TriangulatingConeTransducer::TriangulatingConeTransducer(BarvinokParameters *some_parameters)
+  : params(some_parameters)
+{
+}
+
+int TriangulatingConeTransducer::ConsumeCone(listCone *cone)
+{
+  triangulateCone(cone, cone->rays->first.length(), params, 
+		  *consumer);
+  freeCone(cone);
+  return 1; /* OK */
+}
+
