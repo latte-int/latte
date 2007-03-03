@@ -78,3 +78,13 @@ convert_mpq_to_ZZ(mpq_class elt)
   return convert_mpz_to_ZZ(elt.get_num());
 }
 
+mpz_vector
+convert_vec_ZZ_to_mpz_vector(const vec_ZZ &vec)
+{
+  mpz_vector result(vec.length());
+  int j;
+  for (j = 0; j<vec.length(); j++) {
+    result[j] = convert_ZZ_to_mpz(vec[j]);
+  }
+  return result;   
+}
