@@ -59,3 +59,63 @@ PrintingConeConsumer::ConsumeCone(listCone *cone)
   freeCone(cone);
   return 1; // means "success, please continue"
 }
+
+
+
+ConeProducer::~ConeProducer()
+{}
+
+SingletonConeProducer::SingletonConeProducer(listCone *a_cone)
+  : cone(a_cone)
+{}
+
+void SingletonConeProducer::Produce(ConeConsumer &consumer)
+{
+  consumer.ConsumeCone(cone);
+}
+
+ListConeReadingConeProducer::ListConeReadingConeProducer
+(const string &a_filename, int a_size_estimate)
+  : filename(a_filename), size_estimate(a_size_estimate)
+{
+}
+
+void ListConeReadingConeProducer::Produce(ConeConsumer &consumer)
+{
+  if (size_estimate)
+    consumer.SetNumCones(size_estimate);
+  ifstream file(filename.c_str());
+  readListConeFromFile(file, consumer);
+}
+
+
+
+ConeTransducer::ConeTransducer()
+  : consumer(0)
+{}
+  
+void
+ConeTransducer::SetConsumer(ConeConsumer *a_consumer)
+{
+  consumer = a_consumer;
+}
+
+CompositeConeProducer::CompositeConeProducer(ConeProducer *a_producer, 
+					     ConeTransducer *a_transducer)
+  : producer(a_producer), transducer(a_transducer)
+{
+}
+
+void
+CompositeConeProducer::Produce(ConeConsumer &consumer)
+{
+  transducer->SetConsumer(&consumer);
+  producer->Produce(*transducer);  
+}
+
+ConeProducer *
+compose(ConeProducer *a_producer, ConeTransducer *a_transducer)
+{
+  return new CompositeConeProducer(a_producer, a_transducer);
+}
+
