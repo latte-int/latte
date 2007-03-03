@@ -255,6 +255,10 @@ int main(int argc, char *argv[]) {
       }
     }
   }
+
+  if (approx) {
+    params->substitution = BarvinokParameters::ExponentialSubstitution;
+  }
   
   if(minimize[0] == 'y') strcpy(maximum, "yes");
   if(grobner[0] == 'y') strcpy(equationsPresent,"yes");
