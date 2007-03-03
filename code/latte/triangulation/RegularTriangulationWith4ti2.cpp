@@ -171,8 +171,14 @@ random_regular_triangulation_with_4ti2(listCone *cone,
 				       BarvinokParameters *Parameters,
 				       ConeConsumer &consumer)
 {
-  triangulate_cone_with_4ti2(cone, Parameters, random_height, &Parameters->triangulation_max_height,
-			     Parameters->Number_of_Variables, consumer);
+  if (Parameters->triangulation_bias >= 0) {
+    triangulate_cone_with_4ti2(cone, Parameters, biased_random_height, &Parameters->triangulation_bias,
+			       Parameters->Number_of_Variables, consumer);
+  }
+  else {
+    triangulate_cone_with_4ti2(cone, Parameters, random_height, &Parameters->triangulation_max_height,
+			       Parameters->Number_of_Variables, consumer);
+  }
 }
 
 void
