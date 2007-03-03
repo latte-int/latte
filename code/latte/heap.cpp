@@ -21,21 +21,14 @@
 
 // $GYWOPT: misc/heap.c,v 1.8 2004/08/16 17:08:54 mkoeppe Exp $
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-
-#include "misc/bool.h"
-#include "misc/errcodes.h"
-#include "misc/macros.h"
-#include "misc/logging.h"
-
-#include "misc/heap.h"
+#include <cassert>
+#include <cstdlib>
+#include "heap.h"
 
 /******************* local helpers ******************/
 
 /* all kinds of percolating stuff */
-INLINE static void
+static void
 percolate_down_int_min(struct heap *h, size_t pos)
 {
     size_t child;
@@ -59,7 +52,7 @@ percolate_down_int_min(struct heap *h, size_t pos)
 	    break;
     }
 }
-INLINE static void
+static void
 percolate_down_int_max(struct heap *h, size_t pos)
 {
     size_t child;
@@ -83,7 +76,7 @@ percolate_down_int_max(struct heap *h, size_t pos)
 	    break;
     }
 }
-INLINE static void
+static void
 percolate_down_dbl_min(struct heap *h, size_t pos)
 {
     size_t child;
@@ -107,7 +100,7 @@ percolate_down_dbl_min(struct heap *h, size_t pos)
 	    break;
     }
 }
-INLINE static void
+static void
 percolate_down_dbl_max(struct heap *h, size_t pos)
 {
     size_t child;
@@ -131,7 +124,7 @@ percolate_down_dbl_max(struct heap *h, size_t pos)
 	    break;
     }
 }
-INLINE static void
+static void
 percolate_down_cust(struct heap *h, size_t pos)
 {
     size_t child;
@@ -159,7 +152,7 @@ percolate_down_cust(struct heap *h, size_t pos)
 }
 
 /* All kinds of bubbles */
-INLINE static void
+static void
 bubble_up_int_min(struct heap *h, size_t pos)
 {
     size_t temp_pos = pos;
@@ -175,7 +168,7 @@ bubble_up_int_min(struct heap *h, size_t pos)
 	    temp_pos = 0;
     }
 }
-INLINE static void
+static void
 bubble_up_int_max(struct heap *h, size_t pos)
 {
     size_t temp_pos = pos;
@@ -191,7 +184,7 @@ bubble_up_int_max(struct heap *h, size_t pos)
 	    temp_pos = 0;
     }
 }
-INLINE static void
+static void
 bubble_up_dbl_min(struct heap *h, size_t pos)
 {
     size_t temp_pos = pos;
@@ -207,7 +200,7 @@ bubble_up_dbl_min(struct heap *h, size_t pos)
 	    temp_pos = 0;
     }
 }
-INLINE static void
+static void
 bubble_up_dbl_max(struct heap *h, size_t pos)
 {
     size_t temp_pos = pos;
@@ -223,11 +216,11 @@ bubble_up_dbl_max(struct heap *h, size_t pos)
 	    temp_pos = 0;
     }
 }
-INLINE static void
+static void
 bubble_up_cust(struct heap *h, size_t pos)
 {
     size_t temp_pos = pos;
-    GYW_ASSERT(h->custom_compare!=NULL);
+    assert(h->custom_compare!=NULL);
 
     while(temp_pos > 0) {
 	size_t parent = (temp_pos - 1) >> 1;
@@ -244,7 +237,7 @@ bubble_up_cust(struct heap *h, size_t pos)
 }
 
 /* heapify a formerly frozen heap as smart as we can */
-INLINE static void
+static void
 heapify(struct heap *h)
 {
     /* about half of the elements are suitable as children. */
@@ -281,8 +274,7 @@ heapify(struct heap *h)
 	      } while (next_insert-- > 0);
 	      break;
 	  default:
-	      logmsg(LOG_ERROR, "Heap type %d unknown\n", h->type);
-	      GYW_ASSERT(h->type == HEAP_INT_MIN || h->type == HEAP_INT_MAX
+	      assert(h->type == HEAP_INT_MIN || h->type == HEAP_INT_MAX
 			 || h->type == HEAP_DBL_MIN || h->type == HEAP_DBL_MAX
 			 || h->type ==HEAP_CUSTOM);
 	      return;
@@ -293,10 +285,10 @@ heapify(struct heap *h)
 
 /* externally visible stuff */
 
-struct heap * RESTRICT
+struct heap *
 heap_alloc(enum HEAP_TYPE type, size_t size, heap_cmp_fun custom_compare_fun)
 {
-    struct heap * RESTRICT result;
+    struct heap * result;
     size_t alloc_size;
     
     switch (type) {
@@ -315,11 +307,11 @@ heap_alloc(enum HEAP_TYPE type, size_t size, heap_cmp_fun custom_compare_fun)
 			+ (size-1) * sizeof(struct heap_component_cust));
 	  break;
       default:
-	  logmsg(LOG_ERROR, "Unknown heap type %d requested\n", type);
+	  assert(0);
 	  return NULL;
     };
 
-    result = malloc(alloc_size);
+    result = (struct heap *) malloc(alloc_size);
     if(result!=NULL) {
 	result->type     = type;
 	result->size     = size;
@@ -328,7 +320,7 @@ heap_alloc(enum HEAP_TYPE type, size_t size, heap_cmp_fun custom_compare_fun)
 	    result->custom_compare = custom_compare_fun;
 	else
 	    result->custom_compare = NULL;
-	result->frozen   = FALSE;
+	result->frozen   = false;
     }
 
     return result;
@@ -338,24 +330,24 @@ heap_alloc(enum HEAP_TYPE type, size_t size, heap_cmp_fun custom_compare_fun)
 void
 heap_freeze(struct heap *h)
 {
-    GYW_ASSERT(h!=NULL);
+    assert(h!=NULL);
     if(h->frozen) {
-	logmsg(LOG_WARN, "heap_freeze(): Heap already frozen\n");
+      assert(0);
     } else
-	h->frozen=TRUE;
+	h->frozen=true;
 }
 
 /* thaw a frozen heap and heapify it immediately */
 void
 heap_thaw(struct heap *h)
 {
-    GYW_ASSERT(h!=NULL);
+    assert(h!=NULL);
 
     if(!h->frozen) {
-	logmsg(LOG_WARN, "heap_thaw(): Heap not frozen\n");
+      assert(0);
     } else {
 	heapify(h);
-	h->frozen=FALSE;
+	h->frozen=false;
     }
 }
 
@@ -364,9 +356,9 @@ void *
 heap_top(struct heap *h)
 {
     void *data;
-    GYW_ASSERT(h!=NULL);
-    GYW_ASSERT(h->next_pos>0);
-    GYW_ASSERT(! h->frozen);
+    assert(h!=NULL);
+    assert(h->next_pos>0);
+    assert(! h->frozen);
     
     switch (h->type) {
       case HEAP_INT_MIN:
@@ -381,7 +373,7 @@ heap_top(struct heap *h)
 	  data = h->u.cust_heap[0].data;
 	  break;
       default:
-	  logmsg(LOG_ERROR, "Heap type %d invalid\n", h->type);
+	assert(0);
 	  return NULL;
     }
     
@@ -393,9 +385,9 @@ void *
 heap_pop(struct heap *h)
 {
     void *data;
-    GYW_ASSERT(h!=NULL);
-    GYW_ASSERT(h->next_pos>0);
-    GYW_ASSERT(! h->frozen);
+    assert(h!=NULL);
+    assert(h->next_pos>0);
+    assert(! h->frozen);
     
     switch (h->type) {
       case HEAP_INT_MIN:
@@ -434,7 +426,7 @@ heap_pop(struct heap *h)
 	  percolate_down_cust(h, 0);
 	  break;
       default:
-	  logmsg(LOG_ERROR, "Heap type %d invalid\n", h->type);
+	assert(0);
 	  return NULL;
     }
     
@@ -445,8 +437,8 @@ heap_pop(struct heap *h)
 void
 heap_insert_intweight(struct heap *h, void *data, int weight)
 {
-    GYW_ASSERT(h->next_pos < h->size);
-    GYW_ASSERT(h->type == HEAP_INT_MIN || h->type == HEAP_INT_MAX);
+    assert(h->next_pos < h->size);
+    assert(h->type == HEAP_INT_MIN || h->type == HEAP_INT_MAX);
     
     h->u.int_heap[h->next_pos].weight = weight;
     h->u.int_heap[h->next_pos].data   = data;
@@ -463,8 +455,8 @@ heap_insert_intweight(struct heap *h, void *data, int weight)
 void
 heap_insert_dblweight(struct heap *h, void *data, double weight)
 {
-    GYW_ASSERT(h->next_pos < h->size);
-    GYW_ASSERT(h->type == HEAP_DBL_MIN || h->type == HEAP_DBL_MAX);
+    assert(h->next_pos < h->size);
+    assert(h->type == HEAP_DBL_MIN || h->type == HEAP_DBL_MAX);
     
     h->u.dbl_heap[h->next_pos].weight = weight;
     h->u.dbl_heap[h->next_pos].data   = data;
@@ -481,8 +473,8 @@ heap_insert_dblweight(struct heap *h, void *data, double weight)
 void
 heap_insert_custweight(struct heap *h, void *data, void *weight)
 {
-    GYW_ASSERT(h->next_pos < h->size);
-    GYW_ASSERT(h->type == HEAP_CUSTOM);
+    assert(h->next_pos < h->size);
+    assert(h->type == HEAP_CUSTOM);
     
     h->u.cust_heap[h->next_pos].weight = weight;
     h->u.cust_heap[h->next_pos].data   = data;
@@ -498,8 +490,8 @@ heap_insert_custweight(struct heap *h, void *data, void *weight)
 void
 heap_change_top_intweight(struct heap *h, int weight)
 {
-    GYW_ASSERT(h->next_pos != 0);
-    GYW_ASSERT(h->type == HEAP_INT_MIN || h->type == HEAP_INT_MAX);
+    assert(h->next_pos != 0);
+    assert(h->type == HEAP_INT_MIN || h->type == HEAP_INT_MAX);
 
     h->u.int_heap[0].weight = weight;
 
@@ -515,37 +507,33 @@ heap_change_top_intweight(struct heap *h, int weight)
 void
 heap_clear(struct heap *h)
 {
-    GYW_ASSERT(h!=NULL);
+    assert(h!=NULL);
     h->next_pos = 0;
 }
 
 void
 heap_destroy(struct heap *h)
 {
-    GYW_ASSERT(h!=NULL);
-#ifndef NDEBUG
-    h->type = 0;
-#endif
-    
+    assert(h!=NULL);
     free(h);
 }
 
 bool
 heap_empty_p(const struct heap *h)
 {
-    GYW_ASSERT(h!=NULL);
+    assert(h!=NULL);
     return h->next_pos==0;
 }
 bool
 heap_nonempty_p(const struct heap *h)
 {
-    GYW_ASSERT(h!=NULL);
+    assert(h!=NULL);
     return h->next_pos!=0;
 }
 
 size_t
 heap_num_fill(const struct heap *h)
 {
-    GYW_ASSERT(h!=NULL);
+    assert(h!=NULL);
     return h->next_pos;
 }

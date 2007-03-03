@@ -23,16 +23,8 @@
  
 #ifndef  HEAP_H_
 #define  HEAP_H_     /*+ To stop multiple inclusions. +*/
- 
-#ifndef SWIG
-#include <stddef.h>	    /*+ for size_t +*/
-#include <stdlib.h>
-#include <assert.h>
- 
-#include "misc/macros.h"
-#include "misc/bool.h"
-#include "misc/errcodes.h"
-#endif
+
+#include <cstddef>
 
 /* heaps have one of the 4 default or a custom comparisons available */
 enum HEAP_TYPE {
@@ -82,7 +74,7 @@ struct heap {
 /* allocate a new heap of specify type. If type == HEAP_CUSTOM, you must specify
    the comparison function. Otherwise that argument is ignored */
 
-struct heap * RESTRICT
+struct heap * 
 heap_alloc(enum HEAP_TYPE type, size_t size, heap_cmp_fun custom_compare_fun);
 
 /* freeze a heap for mass-insertions without immediate heapification */ 
