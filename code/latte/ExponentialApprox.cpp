@@ -27,139 +27,200 @@
 #include "latte_random.h"
 #include "genFunction/piped.h"
 #include "genFunction/IntCombEnum.h"
+#include "triangulation/triangulate.h"
+#include "Irrational.h"
+
+ConeApproximationData::ConeApproximationData(listCone *a_cone,
+					     const Write_Exponential_Sample_Formula_Single_Cone_Parameters &params)
+  : cone(a_cone),
+    ray_scalar_products(INIT_SIZE, params.Number_of_Variables)
+{
+  int Number_of_Variables = params.Number_of_Variables;
+
+  weights
+    = computeExponentialResidueWeights(params.generic_vector,
+				       cone,
+				       Number_of_Variables);
+  int dimension = weights.size() - 1;
+  
+  /*** Compute bounds for the phi function. ***/
+
+  /* Scalar products of the rays. */
+  {
+    int j;
+    listVector *ray;
+    for (j = 0, ray = cone->rays; ray != NULL; j++, ray = ray->rest) {
+      ZZ inner;
+      InnerProduct(inner, params.generic_vector, ray->first);
+      ray_scalar_products[j] = inner;
+    }
+    assert(j == Number_of_Variables);
+  }
+
+  /* Scalar product of the vertex. */
+  ZZ vertex_divisor;
+  vec_ZZ scaled_vertex
+    = scaleRationalVectorToInteger(cone->vertex->vertex, Number_of_Variables,
+				   vertex_divisor);
+  ZZ scaled_vertex_scalar_product;
+  ZZ vertex_scalar_product_lower, vertex_scalar_product_upper;
+  InnerProduct(scaled_vertex_scalar_product,
+	       params.generic_vector, scaled_vertex);
+  ZZ remainder;
+  DivRem(vertex_scalar_product_lower, remainder,
+	 scaled_vertex_scalar_product, vertex_divisor);
+  if (IsZero(remainder))
+    vertex_scalar_product_upper = vertex_scalar_product_lower;
+  else
+    vertex_scalar_product_upper = vertex_scalar_product_lower + 1;
+
+  /* Bounds for <c,x> on v+Pi */
+  ZZ lower_bound, upper_bound;
+  lower_bound = vertex_scalar_product_lower;
+  upper_bound = vertex_scalar_product_upper;
+  {
+    int j;
+    for (j = 0; j<Number_of_Variables; j++) {
+      switch (sign(ray_scalar_products[j])) {
+      case -1:
+	lower_bound += ray_scalar_products[j];
+	break;
+      case +1:
+	upper_bound += ray_scalar_products[j];
+	break;
+      }
+    }
+  }
+
+  /* Bounds for <c,x>^k on v+Pi */
+  vec_ZZ lower_bounds(INIT_SIZE, Number_of_Variables + 1);
+  vec_ZZ upper_bounds(INIT_SIZE, Number_of_Variables + 1);
+  {
+    int k;
+    ZZ lower_k, upper_k;
+    lower_k = 1;
+    upper_k = 1;
+    for (k = 0; k<=Number_of_Variables; /*EMPTY*/) {
+      if (k % 2 == 0) {
+	/* even case */
+	if (sign(upper_bound) == -1) {
+	  lower_bounds[k] = upper_k;
+	  upper_bounds[k] = lower_k;
+	}
+	else if (sign(lower_bound) == +1) {
+	  lower_bounds[k] = lower_k;
+	  upper_bounds[k] = upper_k;
+	}
+	else {
+	  lower_bounds[k] = 0;
+	  upper_bounds[k] = (lower_k > upper_k) ? lower_k : upper_k;
+	}
+      }
+      else {
+	/* odd case */
+	lower_bounds[k] = lower_k;
+	upper_bounds[k] = upper_k;
+      }
+      k++;
+      lower_k *= lower_bound;
+      upper_k *= upper_bound;
+    }
+  }
+
+  /* Total bounds */
+  mpq_vector total_lower_bounds(Number_of_Variables + 1);
+  mpq_vector total_upper_bounds(Number_of_Variables + 1);
+
+  this_total_lower_bound = 0;
+  this_total_upper_bound = 0;
+  int k;
+  for (k = 0; k<=Number_of_Variables; k++) {
+    ZZ l = cone->coefficient * lower_bounds[k] * abs(cone->determinant);
+    mpq_class lower_contrib = convert_ZZ_to_mpz(l) * weights[k];
+    ZZ u = cone->coefficient * upper_bounds[k] * abs(cone->determinant);
+    mpq_class upper_contrib = convert_ZZ_to_mpz(u) * weights[k];
+
+    if (lower_contrib < upper_contrib) {
+      total_lower_bounds[k] += lower_contrib;
+      total_upper_bounds[k] += upper_contrib;
+    }
+    else {
+      total_lower_bounds[k] += upper_contrib;
+      total_upper_bounds[k] += lower_contrib;
+    }
+    this_total_lower_bound += total_lower_bounds[k];
+    this_total_upper_bound += total_upper_bounds[k];
+  }
+}
+
+double ConeApproximationData::GetWeight()
+{
+  mpq_class difference = this_total_upper_bound - this_total_lower_bound;
+  return difference.get_d();
+}
 
 void Write_Exponential_Sample_Formula_Single_Cone_Parameters::InitializeComputation()
 {
   Exponential_Single_Cone_Parameters::InitializeComputation();
   approximate_result = 0;
-  total_lower_bound = 0.0;
-  total_upper_bound = 0.0;
+  total_lower_bound = 0;
+  total_upper_bound = 0;
   stream << "*** Computation with new generic vector " << endl;
 }
 
 int
 Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *cone)
 {
+  // We receive triangulated cones.
   assert(cone->rest == NULL);
-  try {
-    mpq_vector weights
-      = computeExponentialResidueWeights(generic_vector,
-					 cone,
-					 Number_of_Variables);
-    int dimension = weights.size() - 1;
   
-    /*** Compute bounds for the phi function. ***/
+  switch (decomposition) {
+  case BarvinokParameters::IrrationalPrimalDecomposition:
+    // Do Barvinok decomposition on the primal cones.
+    dualizeBackCones(cone, Number_of_Variables);
+    irrationalizeCone(cone, Number_of_Variables);
+    break;
+  case BarvinokParameters::IrrationalAllPrimalDecomposition:
+    // FIXME: triangulateCone may feed us simplicial cones for which
+    // the determinant has not been computed yet, but the facets are!
+    // But computeDetAndFacetsOfSimplicialCone will complain about
+    // existing facets...
+    freeListVector(cone->facets);
+    cone->facets = NULL;
+    computeDetAndFacetsOfSimplicialCone(cone, Number_of_Variables);
+    break;
+  }
 
-    /* Scalar products of the rays. */
-    vec_ZZ ray_scalar_products(INIT_SIZE, Number_of_Variables);
-    {
-      int j;
-      listVector *ray;
-      for (j = 0, ray = cone->rays; ray != NULL; j++, ray = ray->rest) {
-	ZZ inner;
-	InnerProduct(inner, generic_vector, ray->first);
-	ray_scalar_products[j] = inner;
-      }
-      assert(j == Number_of_Variables);
-    }
+  EvaluateCone(cone);
+  return 1;
+}
 
-    /* Scalar product of the vertex. */
-    ZZ vertex_divisor;
-    vec_ZZ scaled_vertex
-      = scaleRationalVectorToInteger(cone->vertex->vertex, Number_of_Variables,
-				     vertex_divisor);
-    ZZ scaled_vertex_scalar_product;
-    ZZ vertex_scalar_product_lower, vertex_scalar_product_upper;
-    InnerProduct(scaled_vertex_scalar_product,
-		 generic_vector, scaled_vertex);
-    ZZ remainder;
-    DivRem(vertex_scalar_product_lower, remainder,
-	   scaled_vertex_scalar_product, vertex_divisor);
-    if (IsZero(remainder))
-      vertex_scalar_product_upper = vertex_scalar_product_lower;
-    else
-      vertex_scalar_product_upper = vertex_scalar_product_lower + 1;
+void
+Write_Exponential_Sample_Formula_Single_Cone_Parameters::EvaluateCone(listCone *cone)
+{
+  if (abs(cone->determinant) <= max_determinant) {
+    /* Small cone, so do exact evaluation. */
+    mpq_class result
+      = computeExponentialResidue_Single(generic_vector, cone, Number_of_Variables);
+    total_lower_bound += result;
+    total_upper_bound += result;
+    cout << "* [" << abs(cone->determinant) << "], ";
+    freeCone(cone);
+  }
+  else {
+    // Compute approximation data and add to heap.
+    ConeApproximationData *data = new ConeApproximationData(cone, *this);
+    total_lower_bound += data->this_total_lower_bound;
+    total_upper_bound += data->this_total_upper_bound;
+    heap_insert_dblweight(cone_heap, data, data->GetWeight());
+    //cout << "Received cone with bound difference: " << data->GetWeight() << endl;
+    cout << data->GetWeight() << " [" << abs(cone->determinant) << "], ";
+  }
+}
 
-    /* Bounds for <c,x> on v+Pi */
-    ZZ lower_bound, upper_bound;
-    lower_bound = vertex_scalar_product_lower;
-    upper_bound = vertex_scalar_product_upper;
-    {
-      int j;
-      for (j = 0; j<Number_of_Variables; j++) {
-	switch (sign(ray_scalar_products[j])) {
-	case -1:
-	  lower_bound += ray_scalar_products[j];
-	  break;
-	case +1:
-	  upper_bound += ray_scalar_products[j];
-	  break;
-	}
-      }
-    }
-
-    /* Bounds for <c,x>^k on v+Pi */
-    vec_ZZ lower_bounds(INIT_SIZE, Number_of_Variables + 1);
-    vec_ZZ upper_bounds(INIT_SIZE, Number_of_Variables + 1);
-    {
-      int k;
-      ZZ lower_k, upper_k;
-      lower_k = 1;
-      upper_k = 1;
-      for (k = 0; k<=Number_of_Variables; /*EMPTY*/) {
-	if (k % 2 == 0) {
-	  /* even case */
-	  if (sign(upper_bound) == -1) {
-	    lower_bounds[k] = upper_k;
-	    upper_bounds[k] = lower_k;
-	  }
-	  else if (sign(lower_bound) == +1) {
-	    lower_bounds[k] = lower_k;
-	    upper_bounds[k] = upper_k;
-	  }
-	  else {
-	    lower_bounds[k] = 0;
-	    upper_bounds[k] = (lower_k > upper_k) ? lower_k : upper_k;
-	  }
-	}
-	else {
-	  /* odd case */
-	  lower_bounds[k] = lower_k;
-	  upper_bounds[k] = upper_k;
-	}
-	k++;
-	lower_k *= lower_bound;
-	upper_k *= upper_bound;
-      }
-    }
-
-    /* Total bounds */
-    vector<double> total_lower_bounds(Number_of_Variables + 1);
-    vector<double> total_upper_bounds(Number_of_Variables + 1);
-
-    int k;
-    double this_total_lower_bound = 0.0;
-    double this_total_upper_bound = 0.0;
-    for (k = 0; k<=Number_of_Variables; k++) {
-      ZZ l = cone->coefficient * lower_bounds[k] * abs(cone->determinant);
-      double lower_contrib = convert_ZZ_to_mpz(l).get_d() * weights[k].get_d();
-      ZZ u = cone->coefficient * upper_bounds[k] * abs(cone->determinant);
-      double upper_contrib = convert_ZZ_to_mpz(u).get_d() * weights[k].get_d();
-
-      if (lower_contrib < upper_contrib) {
-	total_lower_bounds[k] += lower_contrib;
-	total_upper_bounds[k] += upper_contrib;
-      }
-      else {
-	total_lower_bounds[k] += upper_contrib;
-	total_upper_bounds[k] += lower_contrib;
-      }
-      this_total_lower_bound += total_lower_bounds[k];
-      this_total_upper_bound += total_upper_bounds[k];
-    }
-    total_lower_bound += this_total_lower_bound;
-    total_upper_bound += this_total_upper_bound;
-
+#if 0
+{
+  try {
     /* Output */
     
     //printConeToFile(stream, cone, Number_of_Variables);
@@ -276,18 +337,71 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
     return -1;
   }
 }
+#endif
+
+void
+Write_Exponential_Sample_Formula_Single_Cone_Parameters::ShowStats()
+{
+  mpq_class diff = total_upper_bound - total_lower_bound;
+  cout << "L: " << total_lower_bound.get_d()
+       << " U: " << total_upper_bound.get_d()
+       << " D: " << diff.get_d()
+       << " #: " << heap_num_fill(cone_heap) << ". ";
+}
 
 void
 decomposeAndWriteExponentialSampleFormula(listCone *cones,
 					  Write_Exponential_Sample_Formula_Single_Cone_Parameters &param)
 {
-  barvinokDecomposition_List(cones, param);
-  cout << "*** Lower bound: " << param.total_lower_bound << endl;
-  cout << "*** Upper bound: " << param.total_upper_bound << endl;
+  param.InitializeComputation();
+  param.cone_heap = heap_alloc(HEAP_DBL_MAX, /*FIXME: fixed size!*/ 100000,
+			       NULL);
+  cout << "Initial cones: ";
+  {
+    listCone *cone;
+    for (cone = cones; cone!=NULL; cone = cone->rest) {
+      triangulateCone(cone, param.Number_of_Variables, &param, param);
+      // calls ConsumeCone, filling the heap
+    }
+  }
+  cout << endl;
+  while (heap_nonempty_p(param.cone_heap)) {
+    param.ShowStats();
+    listCone *cone;
+    {
+      ConeApproximationData *data = (ConeApproximationData*) heap_top(param.cone_heap);
+      heap_pop(param.cone_heap);
+      param.total_lower_bound -= data->this_total_lower_bound;
+      param.total_upper_bound -= data->this_total_upper_bound;
+      
+      cout << "Cone bound diff " << data->GetWeight()
+	   << " [Det " << abs(data->cone->determinant) << "]"
+	   << " --> " << flush;
+      cone = data->cone;
+      delete data;
+    }
+    vector <listCone *> Cones(param.Number_of_Variables);
+    vec_ZZ Dets;
+    Dets.SetLength(param.Number_of_Variables);
+    bool barvinok_success
+      = barvinokStep(cone, Cones, Dets, param.Number_of_Variables, &param);
+    freeCone(cone);
+    int i;
+    for (i = 0; i<param.Number_of_Variables; i++) {
+      if (Cones[i] != NULL)
+	param.EvaluateCone(Cones[i]);
+    }
+    cout << endl;
+  }
+  cout << "*** Lower bound: " << param.total_lower_bound.get_d() << endl;
+  cout << "*** Upper bound: " << param.total_upper_bound.get_d() << endl;
+}
+
+#if 0
   cout << "*** Estimate obtained by sampling: "
        << param.approximate_result.get_d() << endl;
 #ifdef DO_EXACT_COMPUTATION_TOO
   cout << "*** Exact answer: "
        << param.result.get_d() << endl;
 #endif
-}
+#endif

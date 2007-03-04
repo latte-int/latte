@@ -27,9 +27,24 @@
 #include <fstream>
 #include "latte_gmp.h"
 #include "barvinok/dec.h"
+#include "heap.h"
 
 using namespace std;
 
+class Write_Exponential_Sample_Formula_Single_Cone_Parameters;
+
+class ConeApproximationData {
+public:
+  listCone *cone;
+  mpq_vector weights;
+  vec_ZZ ray_scalar_products;
+  mpq_class this_total_lower_bound;
+  mpq_class this_total_upper_bound;
+  
+  ConeApproximationData(listCone *a_cone, const Write_Exponential_Sample_Formula_Single_Cone_Parameters &params);
+  double GetWeight();
+};
+  
 class Write_Exponential_Sample_Formula_Single_Cone_Parameters :
   public Exponential_Single_Cone_Parameters
 {
@@ -37,9 +52,10 @@ public:
   ofstream stream;
   double sampling_factor;
   long int num_samples;
-  double total_lower_bound;
-  double total_upper_bound;
+  mpq_class total_lower_bound;
+  mpq_class total_upper_bound;
   mpq_class approximate_result;
+  heap *cone_heap;
   Write_Exponential_Sample_Formula_Single_Cone_Parameters
   (const BarvinokParameters &params,
    const char *filename, double a_sampling_factor, long int a_num_samples) :
@@ -47,6 +63,9 @@ public:
     stream(filename), sampling_factor(a_sampling_factor), num_samples(a_num_samples) {};
   virtual void InitializeComputation();
   virtual int ConsumeCone(listCone *cone);
+public:
+  void ShowStats();
+  void EvaluateCone(listCone *cone);
 };
 
 void
