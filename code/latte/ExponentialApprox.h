@@ -65,7 +65,7 @@ public:
   virtual int ConsumeCone(listCone *cone);
 public:
   void ShowStats();
-  void EvaluateCone(listCone *cone);
+  double EvaluateCone(listCone *cone);
 };
 
 void

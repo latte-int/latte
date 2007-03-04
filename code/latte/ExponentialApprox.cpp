@@ -195,7 +195,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
   return 1;
 }
 
-void
+double
 Write_Exponential_Sample_Formula_Single_Cone_Parameters::EvaluateCone(listCone *cone)
 {
   if (abs(cone->determinant) <= max_determinant) {
@@ -206,6 +206,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::EvaluateCone(listCone *
     total_upper_bound += result;
     cout << "* [" << abs(cone->determinant) << "], ";
     freeCone(cone);
+    return 0.0;
   }
   else {
     // Compute approximation data and add to heap.
@@ -215,6 +216,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::EvaluateCone(listCone *
     heap_insert_dblweight(cone_heap, data, data->GetWeight());
     //cout << "Received cone with bound difference: " << data->GetWeight() << endl;
     cout << data->GetWeight() << " [" << abs(cone->determinant) << "], ";
+    return data->GetWeight();
   }
 }
 
@@ -368,6 +370,7 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
   while (heap_nonempty_p(param.cone_heap)) {
     param.ShowStats();
     listCone *cone;
+    double weight;
     {
       ConeApproximationData *data = (ConeApproximationData*) heap_top(param.cone_heap);
       heap_pop(param.cone_heap);
@@ -378,6 +381,7 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
 	   << " [Det " << abs(data->cone->determinant) << "]"
 	   << " --> " << flush;
       cone = data->cone;
+      weight = data->GetWeight();
       delete data;
     }
     vector <listCone *> Cones(param.Number_of_Variables);
@@ -387,10 +391,13 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
       = barvinokStep(cone, Cones, Dets, param.Number_of_Variables, &param);
     freeCone(cone);
     int i;
+    double weight_sum = 0.0;
     for (i = 0; i<param.Number_of_Variables; i++) {
-      if (Cones[i] != NULL)
-	param.EvaluateCone(Cones[i]);
+      if (Cones[i] != NULL) {
+	weight_sum += param.EvaluateCone(Cones[i]);
+      }
     }
+    cout << "(" << weight_sum / weight * 100 << "%)";
     cout << endl;
   }
   cout << "*** Lower bound: " << param.total_lower_bound.get_d() << endl;
