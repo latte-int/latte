@@ -97,12 +97,14 @@ if HAVE_EXPERIMENTS
 
 nodist_liblatte_a_SOURCES =				\
 	ExponentialApprox.cpp				\
+	heap.cpp					\
 	TrivialSubst.cpp				\
 	barvinok/SubspaceAvoidingDecomposition.cpp	\
 	triangulation/BoundaryTriangulation.cpp
 
 nodist_noinst_HEADERS =					\
 	ExponentialApprox.h				\
+	heap.h						\
 	TrivialSubst.h					\
 	barvinok/SubspaceAvoidingDecomposition.h	\
 	triangulation/BoundaryTriangulation.h
