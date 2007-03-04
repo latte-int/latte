@@ -127,7 +127,7 @@ listCone *copyCone(listCone *cone)
   copy->vertex = new Vertex(*cone->vertex);
   copy->determinant = cone->determinant;
   copy->rays = copyListVector(cone->rays);
-  copy->dual_determinant = cone->determinant;
+  copy->dual_determinant = cone->dual_determinant;
   copy->facets = copyListVector(cone->facets);
   copy->facet_divisors = cone->facet_divisors;
   copy->latticePoints = copyListVector(cone->latticePoints);
