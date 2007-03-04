@@ -27,6 +27,7 @@
 #include "cone.h"
 #include "cone_consumer.h"
 #include "timing.h"
+#include <vector>
 
 class BarvinokParameters {
 public:
@@ -137,5 +138,20 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 int
 barvinokDecomposition_Single (listCone *cone,
 			      Single_Cone_Parameters *Parameters);
+
+/* Decompose the cone spanned by GENERATOR (which has determinant DET)
+   according to Barvinok's theory into M (the dimension) many CONES
+   and store their determinants in DETS.
+
+   Entries with Det[i] == 0 have Cones[i] == NULL (we don't generate
+   lower-dimensional cones).
+
+   Return true if the decomposition successfully reduced determinants;
+   this is always the case except for SubspaceAvoidingLLL.
+*/
+bool
+barvinokStep(const listCone *Cone, 
+	     std::vector <listCone *> &Cones, vec_ZZ &Dets,
+	     int m, Single_Cone_Parameters *Parameters);
 
 #endif

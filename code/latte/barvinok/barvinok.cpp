@@ -255,7 +255,7 @@ computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
    Entries with Det[i] == 0 have Cones[i] == NULL (we don't generate
    lower-dimensional cones).
 */
-static bool
+bool
 barvinokStep(const listCone *Cone, 
 	     vector <listCone *> &Cones, vec_ZZ &Dets,
 	     int m, Single_Cone_Parameters *Parameters)
