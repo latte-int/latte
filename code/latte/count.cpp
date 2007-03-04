@@ -258,6 +258,10 @@ int main(int argc, char *argv[]) {
 
   if (approx) {
     params->substitution = BarvinokParameters::ExponentialSubstitution;
+    if (params->decomposition == BarvinokParameters::DualDecomposition) {
+      cout << "Exponential approximation not implemented for dual decomposition; switching to irrational primal decomposition." << endl;
+      params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
+    }
   }
   
   if(minimize[0] == 'y') strcpy(maximum, "yes");
