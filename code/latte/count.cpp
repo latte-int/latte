@@ -593,6 +593,11 @@ int main(int argc, char *argv[]) {
   case BarvinokParameters::DualDecomposition:
   case BarvinokParameters::IrrationalPrimalDecomposition:
     if (not Poly->dualized) {
+      if (Vrepresentation[0] != 'y') {
+	/* Compute all inequalities tight at the respective vertex.
+	   Then dualizeCones just needs to swap rays and facets. */
+	computeTightInequalitiesOfCones(Poly->cones, matrix, Poly->numOfVars);
+      }
       Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
       Poly->dualized = true;
     }
