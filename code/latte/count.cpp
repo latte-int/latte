@@ -219,7 +219,10 @@ int main(int argc, char *argv[]) {
     else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
     }
-    else if (parse_standard_triangulation_option(argv[i], params)) {}
+    else if (parse_standard_triangulation_option(argv[i], params)) {
+      if (strncmp(argv[i], "--triangulation=", 16) == 0)
+	triangulation_specified = true;
+    }
     else if (parse_standard_dualization_option(argv[i], params)) {}
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
@@ -604,7 +607,6 @@ int main(int argc, char *argv[]) {
     break;
   case BarvinokParameters::IrrationalAllPrimalDecomposition:
     cout << "Irrationalizing polyhedral cones... "; cout.flush();
-    params->dualize_time.start();
     if (Poly->dualized) {
       cout << "(First dualizing back... "; cout.flush();
       Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
@@ -620,10 +622,11 @@ int main(int argc, char *argv[]) {
       else {
 	/* Fill in the facets of all cones; we determine them by
 	   taking all inequalities tight at the respective vertex. */
+	params->dualize_time.start();
 	computeTightInequalitiesOfCones(Poly->cones, matrix, Poly->numOfVars);
+	params->dualize_time.stop(); cout << params->dualize_time;
       }
     }
-    params->dualize_time.stop(); cout << params->dualize_time;
     params->irrationalize_time.start();
     {
       listCone *cone;
