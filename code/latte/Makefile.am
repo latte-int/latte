@@ -122,6 +122,11 @@ nodist_liblatte_a_SOURCES += 				\
 nodist_noinst_HEADERS +=				\
 	ReadSubcones.h
 
+bin_PROGRAMS += check-representation
+nodist_check_representation_SOURCES = normalize/check-representation.cpp
+check_representation_LDFLAGS = -L/localapp/cplex-9.1/cplex91/bin/ultrasparc64_8_6.2 -R/localapp/cplex-9.1/cplex91/bin/ultrasparc64_8_6.2 -lcplex91 -lm -lnsl -lsocket -lpthread $(AM_LDFLAGS)
+check_representation_CXXFLAGS = -I/localapp/cplex-9.1/cplex91/include/ilcplex $(AM_CXXFLAGS)
+
 endif
 
 bin_PROGRAMS += triangulate
