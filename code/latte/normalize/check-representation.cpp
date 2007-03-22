@@ -32,7 +32,7 @@ int verbose = false;
 
 static void usage()
 {
-  cerr << "usage: check-reprentation VECTORS GENERATORS" << endl;
+  cerr << "usage: check-reprentation [--no-header --verbose] VECTORS GENERATORS" << endl;
 }
 
 void
@@ -53,19 +53,46 @@ open_matrix_file(const string &filename, ifstream &file,
 
 int main(int argc, char **argv)
 {
-  if (argc != 3) {
+  if (argc < 3) {
     usage();
     exit(1);
   }
-  string vectors_filename(argv[1]);
-  string generators_filename(argv[2]);
-  int num_vectors, dim_vectors;
-  ifstream vectors_file;
-  open_matrix_file(vectors_filename, vectors_file, num_vectors, dim_vectors);
+  bool vectors_file_no_header = false;
+  {
+    int i;
+    for (i = 1; i<argc-2; i++) {
+      if (strcmp(argv[i], "--no-header") == 0) {
+	vectors_file_no_header = true;
+      }
+      if (strcmp(argv[i], "--verbose") == 0) {
+	verbose = true;
+      }
+      else {
+	cerr << "Unknown option: " << argv[i] << endl;
+	exit(1);
+      }
+    }
+  }
+  string vectors_filename(argv[argc - 2]);
+  string generators_filename(argv[argc - 1]);
   int num_generators, dim_generators;
   ifstream generators_file;
   open_matrix_file(generators_filename, generators_file, num_generators, dim_generators);
-  assert(dim_vectors == dim_generators);
+  int num_vectors, dim_vectors;
+  ifstream vectors_file;
+  if (vectors_file_no_header) {
+    vectors_file.open(vectors_filename.c_str());
+    if (!vectors_file.good()) {
+      cerr << "Failed to open file " << vectors_filename << endl;
+      exit(1);
+    }
+    dim_vectors = dim_generators;
+    num_vectors = INT_MAX;
+  }
+  else {
+    open_matrix_file(vectors_filename, vectors_file, num_vectors, dim_vectors);
+    assert(dim_vectors == dim_generators);
+  }
   int dim = dim_vectors;
 
   int status;
@@ -106,8 +133,17 @@ int main(int argc, char **argv)
   }
 
   double *multipliers = new double[num_generators];
+  int *indices = new int[num_generators];
+  char *ctype = new char[num_generators];
+  {
+    int i;
+    for (i = 0; i<num_generators; i++) {
+      indices[i] = i;
+      ctype[i] = CPX_INTEGER;
+    }
+  }
 
-  cout << "Checking that all vectors are in the cone." << endl;
+  cout << "Checking that all vectors are generated over the nonnegative reals, and the nonnegative inetgers." << endl;
   for (i = 0; i<num_vectors; i++) {
     if (i % 1000 == 0) {
       cout << i << "/" << num_vectors << " done. " << endl;
@@ -123,8 +159,13 @@ int main(int argc, char **argv)
       status = CPXchgcoef(env, lp, j, -1, x);
       if (status != 0) abort();
     }
+
+    if (vectors_file_no_header && vectors_file.eof()) {
+      cout << "After reading " << i << " vectors, end of file." << endl;
+      exit(0);
+    }
     if (!vectors_file.good()) {
-      cerr << "Parse error reading vectors file" << endl;
+      cerr << "After reading " << i << " vectors, parse error reading vectors file" << endl;
       exit(1);
     }
     if (verbose)
@@ -152,6 +193,34 @@ int main(int argc, char **argv)
 	cout << endl;
       }
     }
+
+    status = CPXchgprobtype(env, lp, CPXPROB_MILP);
+    if (status != 0) abort();
+    status = CPXchgctype(env, lp, num_generators, indices, ctype);
+    if (status != 0) abort();
+    status = CPXmipopt(env, lp);
+    if (status != 0) abort();
+    int mipstat = CPXgetstat(env, lp);
+    if (mipstat != CPXMIP_OPTIMAL) {
+      cerr << "MIP solution status code: " << mipstat << endl;
+      cout << "MIP written out as repr-ip.lp" << endl;
+      status = CPXwriteprob(env, lp, "repr-ip.lp", "LP");
+      if (status != 0) abort();
+    }
+    else {
+      if (verbose) {
+	cout << "CPLEX says: Vector is generated over the nonnegative integers." << endl
+	     << "Multipliers: ";
+	status = CPXgetmipx(env, lp, multipliers, 0, num_generators - 1);
+	if (status != 0) abort();
+	
+	for (j = 0; j<num_generators; j++)
+	  cout << multipliers[j] << " ";
+	cout << endl;
+      }
+    }
+    status = CPXchgprobtype(env, lp, CPXPROB_LP);
+    if (status != 0) abort();
   }
   status = CPXfreeprob(env, &lp);
   if (status != 0) abort();
