@@ -111,6 +111,22 @@ LB_CHECK_TOPCOM
 # 4ti2 for triangulations (optional)
 LB_CHECK_FORTYTWO
 
+# CPLEX for experimental code (optional)
+AC_ARG_WITH(cplex-sharedlib,
+    AS_HELP_STRING([--with-cplex-sharedlib=/PATH/TO/FILE.so],
+                   [Specify name of CPLEX shared library]),
+    [  CPLEX_SHAREDLIB=$withval ])
+
+CPLEX_LDFLAGS="-L`dirname ${CPLEX_SHAREDLIB}` -R`dirname ${CPLEX_SHAREDLIB}` -l`basename ${CPLEX_SHAREDLIB} .so | sed 's/^lib//' ` -lm -lnsl -lsocket -lpthread "
+AC_SUBST(CPLEX_LDFLAGS)
+
+AC_ARG_WITH(cplex-include, 
+    AS_HELP_STRING([--with-cplex-include=DIR], [Specify location of CPLEX include files]),
+    [  CPLEX_CFLAGS="-I$withval" ])
+AC_SUBST(CPLEX_CFLAGS)
+
+AM_CONDITIONAL(HAVE_CPLEX, test x$CPLEX_SHAREDLIB != x -a x$CPLEX_CFLAGS != x)
+
 # Experimental, not release-ready code.
 AC_ARG_ENABLE(experiments, AS_HELP_STRING([--enable-experiments],
 	[use experimental code]))
