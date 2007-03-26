@@ -193,6 +193,12 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
   resulting_triangulation
     = dualizeBackCones(resulting_triangulation, Parameters->Number_of_Variables);
 
-  for (cone = resulting_triangulation; cone!=NULL; cone=cone->rest)
-    consumer.ConsumeCone(cone);
+  {
+    listCone *next = NULL;
+    for (cone = resulting_triangulation; cone!=NULL; cone=next) {
+      next = cone->rest;
+      cone->rest = NULL;
+      consumer.ConsumeCone(cone);
+    }
+  }
 }
