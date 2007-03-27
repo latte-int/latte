@@ -189,11 +189,16 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
     vec_ZZ F_comb;
     F_comb = multi * UF;
     if (singularity_avoiding(num_cones, numOfVars, alpha_comb, F_comb)) {
-      cout << "### Found vector" << endl;
+      cout << "### Found vector:" << endl
+	   << multi * U << endl
+	   << alpha_comb << endl
+	   << F_comb << endl;
+      det_vector = alpha_comb;
+      return multi * U;
     }
   }  
-  det_vector = alpha[0];
-  return U[0];
+  cout << "No suitable vector found." << endl;
+  exit(1);
 }  
 
 void
