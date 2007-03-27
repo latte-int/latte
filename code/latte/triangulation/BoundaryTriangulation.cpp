@@ -51,9 +51,15 @@ check_rays(listCone *cone, int numOfVars)
 
 /* Construct a vector whose entries are the numbers alpha_k(w) for w =
    e_1, ..., e_d.
+
+   Also construct a matrix F whose columns collect the last coordinates
+   of all facet normals created, when the extra vector w runs through
+   e_1, ..., e_d. 
 */
-static vec_ZZ
-alpha_basis(listCone *cone, int numOfVars)
+static void
+alpha_basis(listCone *cone, int numOfVars, 
+	    mat_ZZ &alpha, int alpha_column_index,
+	    mat_ZZ &F, int F_start_column_index)
 {
   int num_rays = lengthListVector(cone->rays);
   assert(num_rays == numOfVars - 1);
@@ -79,11 +85,21 @@ alpha_basis(listCone *cone, int numOfVars)
 
   //cout << "Completed rays: " << ray_matrix << "Inverse: " << inverse << endl;
   
-  vec_ZZ result;
-  result.SetLength(numOfVars);
   for (j = 0; j<numOfVars; j++)
-    result[j] = inverse[j][numOfVars - 1];
-  return result;
+    alpha[j][alpha_column_index] = inverse[j][numOfVars - 1];
+  
+  int s;
+  for (s = 0; s<numOfVars; s++) { // Consider unit vector w = e_s.
+    int l;
+    for (l = 0; l<numOfVars - 1; l++) {
+      // Compute the (d+1)-st coordinate of $\tilde b^*_{l,d+1}(e_s)$
+      
+      F[s][l + F_start_column_index]
+	= inverse[s][numOfVars - 1] * inverse[numOfVars - 1][l]
+	- inverse[s][l] * inverse[numOfVars - 1][numOfVars - 1];
+      
+    }
+  }
 }
 
 static vec_ZZ 
@@ -93,17 +109,17 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
   int num_cones = lengthListCone(boundary_triangulation);
   mat_ZZ alpha;
   alpha.SetDims(numOfVars, num_cones);
+  mat_ZZ F;
+  F.SetDims(numOfVars, num_cones * (numOfVars - 1));
   listCone *cone;
   int k;
   for (k = 0, cone = boundary_triangulation; cone!=NULL; k++, cone=cone->rest) {
-    vec_ZZ alpha_basis_k = alpha_basis(cone, numOfVars);
-    int j;
-    for (j = 0; j<numOfVars; j++) {
-      alpha[j][k] = alpha_basis_k[j];
-    }
+    alpha_basis(cone, numOfVars, alpha, k, F, k * (numOfVars - 1));
   }
   cout << "Auxiliary lattice for constructing an interior vector: " << endl
        << alpha << endl;
+  cout << "Need to avoid zeros here: " << endl
+       << F << endl;
   /* Find a short vector in this lattice. */
   ZZ det2;
   mat_ZZ U;
@@ -111,6 +127,17 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
   long rank = LLL(det2, alpha, U, 1, 1);
   cout << "Rank: " << rank << " Variables: " << numOfVars << endl;
   assert(rank == numOfVars);
+
+  /* Determine if the LLL basis vectors avoid the zeros. */
+  mat_ZZ UF;
+  UF = U * F;
+  cout << "L3 basis: " << endl
+       << U << endl;
+  cout << "In auxiliary space:" << endl
+       << alpha << endl;
+  cout << "In zero-avoidance space:" << endl
+       << UF;
+  
   /* We simply choose the first vector of the reduced basis. */
   det_vector = alpha[0];
   return U[0];
