@@ -25,6 +25,7 @@
 #include "latte_random.h"
 #include "print.h"
 #include "dual.h"
+#include "genFunction/IntCombEnum.h"
 
 using namespace std;
 
@@ -102,6 +103,29 @@ alpha_basis(listCone *cone, int numOfVars,
   }
 }
 
+static bool
+singularity_avoiding(int num_cones, int numOfVars,
+		     const vec_ZZ &alpha, const vec_ZZ &f)
+{
+  int k;
+  for (k = 0; k<num_cones; k++) {
+    if (alpha[k] != 0) {
+      //cout << "Cone " << k << " full-dimensional: ";
+      // full-dimensional cone
+      int l;
+      for (l = 0; l<numOfVars - 1; l++) {
+	//cout << f[k * (numOfVars - 1) + l] << " ";
+	if (f[k * (numOfVars - 1) + l] == 0) {
+	  //cout << "Not singularity-avoiding" << endl;
+	  return false;
+	}
+      }
+      //cout << endl;
+    }
+  }
+  return true;
+}
+
 static vec_ZZ 
 construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_ZZ &det_vector)
 {
@@ -139,6 +163,35 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
        << UF;
   
   /* We simply choose the first vector of the reduced basis. */
+  /* Check basis vectors. */
+  int i;
+  for (i = 0; i<numOfVars; i++) {
+    cout << "# Basis vector " << i << ":" << endl;
+    if (singularity_avoiding(num_cones, numOfVars, alpha[i], UF[i])) {
+      cout << "### Found vector" << endl;
+    }
+  }
+  /* Try integer combinations of the basis vectors */
+  int max_coeff = 5;
+  int *max_comb = new int[numOfVars];
+  for (i = 0; i<numOfVars; i++)
+    max_comb[i] = 2 * max_coeff;
+  IntCombEnum iter_comb(max_comb, numOfVars);
+  int *next;
+  vec_ZZ multi;
+  multi.SetLength(numOfVars);
+  while((next = iter_comb.getNext())) {
+    int j;
+    for (j = 0; j<numOfVars; j++)
+      multi[j] = next[j] - max_coeff;
+    vec_ZZ alpha_comb;
+    alpha_comb = multi * alpha;
+    vec_ZZ F_comb;
+    F_comb = multi * UF;
+    if (singularity_avoiding(num_cones, numOfVars, alpha_comb, F_comb)) {
+      cout << "### Found vector" << endl;
+    }
+  }  
   det_vector = alpha[0];
   return U[0];
 }  
