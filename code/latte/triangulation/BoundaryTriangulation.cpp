@@ -1,6 +1,6 @@
 /* BoundaryTriangulation.cpp -- Boundary triangulation
 	       
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -202,7 +202,7 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
 }  
 
 void
-boundary_triangulation_of_cone_with_subspace_avoiding_facets
+compute_triangulation_of_boundary
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
 {
   int numOfVars = Parameters->Number_of_Variables;
@@ -230,17 +230,20 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
     /* Compute a triangulation of that facet. */
     listCone *facet_cone
       = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
-    CollectingConeConsumer ccc;
     triangulate_cone_with_cddlib(facet_cone, Parameters,
 				 delone_height, NULL,
 				 Parameters->Number_of_Variables - 1,
-				 ccc);
-    listCone *facet_triangulation = ccc.Collected_Cones;
-    cout << "Triangulation of facet cone: " << lengthListCone(facet_triangulation)
-	 << " simplicial cones." << endl;
-    boundary_triangulation
-      = appendListCones(facet_triangulation, boundary_triangulation);
+				 consumer);
+//     cout << "Triangulation of facet cone: " << lengthListCone(facet_triangulation)
+// 	 << " simplicial cones." << endl;
   }
+}
+
+void
+complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
+(listCone *boundary_triangulation, BarvinokParameters *Parameters, ConeConsumer &consumer)
+{
+  int numOfVars = Parameters->Number_of_Variables;
   /* Complete the cones with an interior ray. */
   vec_ZZ det_vector;
   vec_ZZ interior_ray_vector
@@ -250,6 +253,7 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
   listCone *resulting_triangulation = NULL;
 
   listCone *simplicial_cone, *next_simplicial_cone;
+  int i;
   for (simplicial_cone = boundary_triangulation, i = 0;
        simplicial_cone!=NULL;
        simplicial_cone = next_simplicial_cone, i++) {
@@ -269,6 +273,7 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
 
   resulting_triangulation
     = dualizeBackCones(resulting_triangulation, Parameters->Number_of_Variables);
+  listCone *cone;
   for (cone = resulting_triangulation; cone!=NULL; cone=cone->rest) {
     if (!rays_ok(cone, Parameters->Number_of_Variables)) {
       cerr << "Note: The following dualized-back cone has bad rays." << endl;
@@ -286,4 +291,14 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
       consumer.ConsumeCone(cone);
     }
   }
+}
+
+void
+boundary_triangulation_of_cone_with_subspace_avoiding_facets
+(listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
+{
+  CollectingConeConsumer ccc;
+  compute_triangulation_of_boundary(cone, Parameters, ccc);
+  complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
+    (ccc.Collected_Cones, Parameters, consumer);
 }

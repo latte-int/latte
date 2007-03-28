@@ -2,7 +2,7 @@
 
 /* BoundaryTriangulation.h -- Boundary triangulation
 	       
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -31,5 +31,18 @@
 void
 boundary_triangulation_of_cone_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer);
+
+/* The first part:
+   Compute a triangulation of the boundary of the cone. */
+void
+compute_triangulation_of_boundary
+(listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer);
+
+/* The second part:
+   Compute an extra ray to complete the triangulation of the boundary
+   to a full triangulation. */
+void
+complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
+(listCone *boundary_triangulation, BarvinokParameters *Parameters, ConeConsumer &consumer);
 
 #endif
