@@ -21,35 +21,41 @@
 #ifndef READINGFILE__H
 #define READINGFILE__H
 
+#include <string>
+
+#include "cone.h"
 #include "latte_ntl.h"
 
-void CheckRed(char* Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation);
-void CheckInputFileCDDRep1(char *InputFile);
+// Changes Filename!
+void CheckRed(std::string &Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation);
+void CheckRed(char *Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation);
+
+void CheckInputFileCDDRep1(const char *InputFile);
 listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars, 
 		    listVector *equations);
 listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars, 
 		     mat_ZZ AA, vec_ZZ b);
-void CheckInputFileCDDRep(char *InputFile);
-void CheckInputFileCDDRep3(char *InputFile);
-void CheckInputFileCDDRep4(char *InputFile);
-void CheckInputFile(char *InputFile);
-void CheckInputFileVrep(char *InputFile);
-void CheckLength(char * filename, char * equ);
-void CheckLength2(char * filename, char* equ);
-void readLatteProblem(char *fileName, listVector **equations,
+void CheckInputFileCDDRep(const char *InputFile);
+void CheckInputFileCDDRep3(const char *InputFile);
+void CheckInputFileCDDRep4(const char *InputFile);
+void CheckInputFile(const char *InputFile);
+void CheckInputFileVrep(const char *InputFile);
+void CheckLength(const char * filename, char * equ);
+void CheckLength2(const char * filename, char* equ);
+void readLatteProblem(const char *fileName, listVector **equations,
 		      listVector **inequalities, 
 		      char *equationsPresent,
                       int *numOfVars, char *nonneg, char* dual,
-		      char* grobner, char* max, vec_ZZ & cost, char* Vrep);
+		      char* grobner, char* Vrep);
 
 ZZ FindBigElt(listVector* equation, int numOfVars);
 
-int CDDstylereadLatteProblem(char *fileName, listVector **equations,
+int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
 		      listVector **inequalities, 
 		      char *equationsPresent,
                       int *numOfVars, char *nonneg, char* dual,
                       char* taylor, int & degree, 
-                      char* rat, int & cone_output, int & flags,
+                      char* rat, int & cone_output, 
 		      char* Memory_Save, char* uni, char* inthull,
 		      char* grobner);
 

@@ -45,7 +45,7 @@
 #include "binarySearchIP.h"
 #include "latte_system.h"
 
-void CheckEmpty(char * Filename){
+void CheckEmpty(const char * Filename){
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
   string tmpString;
   char equ[127], nonneg[127];

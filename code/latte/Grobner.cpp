@@ -34,7 +34,7 @@
 #include "latte_system.h"
 
 /* ---------------------------------------------------------------------- */
-void CheckGrobner(char* filename, char * cdd){
+void CheckGrobner(const char* filename, char * cdd){
 
   ifstream in(filename);
   ifstream in2(filename);
@@ -67,7 +67,7 @@ void CheckGrobner(char* filename, char * cdd){
 
 }
 /* ---------------------------------------------------------------------- */
-void ReadGrobnerProblem(char* filename, mat_ZZ & A, mat_ZZ & W, ZZ & bignum, int & d, int & n, char * uni, char * cdd){
+void ReadGrobnerProblem(const char* filename, mat_ZZ & A, mat_ZZ & W, ZZ & bignum, int & d, int & n, char * uni, char * cdd){
   if(cdd[0] == 'n'){
   ifstream in2(filename);
   ifstream in(filename);
@@ -124,7 +124,7 @@ void ReadGrobnerProblem(char* filename, mat_ZZ & A, mat_ZZ & W, ZZ & bignum, int
 
 /* ------------------------------------------------------------------ */
 
-void WriteGrobnerProblem(mat_ZZ A, mat_ZZ W, int index, char* filename, 
+void WriteGrobnerProblem(mat_ZZ A, mat_ZZ W, int index, const char* filename, 
                          int d, int n){
  
   ofstream out(filename);
@@ -153,7 +153,7 @@ void WriteGrobnerProblem(mat_ZZ A, mat_ZZ W, int index, char* filename,
 /* -------------------------------------------------------------- */
 
 
-void readLatteGrobProblem(char *fileName, listVector **equations,
+void readLatteGrobProblem(const char *fileName, listVector **equations,
 		      listVector **inequalities, 
 		      char *equationsPresent,
                       int *numOfVars, char *nonneg, char* dual,
@@ -626,7 +626,7 @@ listVector* Grobner(listVector *equations,
 
 
 /* -------------------------------------------------------------- */
-void SolveGrobner(char * filename, char * nonneg, char * dualApproach,
+void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
 	char * grobner, char * equationsPresent, char * cdd){
   
  ZZ bignum;

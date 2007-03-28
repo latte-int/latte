@@ -36,7 +36,7 @@ listCone* readCddExtFile(int &numOfVars);
 rationalVector* ReadLpsFile(int numOfVars, bool verbose = true);
 listCone* readCddEadFile(listCone*, int);
 listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars);
-listCone* computeVertexCones(char*, listVector*, int);
+listCone* computeVertexCones(const char* fileName, listVector*, int);
 rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
 		   bool verbose = true);
 listCone* CopyListCones(listCone* RudyCones, int numOfVars, 
@@ -48,7 +48,7 @@ listCone* CopyListCones(listCone* RudyCones, int numOfVars);
    NUMOFVARS. */
 listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars);
 
-listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix, 
+listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix, 
 				   int numOfVars);
 void CreatExtEadFile();
 

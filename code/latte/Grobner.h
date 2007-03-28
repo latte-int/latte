@@ -31,8 +31,8 @@ listVector* Grobner(listVector *equations,
 		    listVector *inequalities, vec_ZZ **generators,
 		    int *numOfVars, listVector **newVec, int & oldnumber,
 		    int bignum);
-void SolveGrobner(char * filename, char * nonneg, char * dualApproach,
+void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
 		  char * grobner, char * equationsPresent, char* cdd);
-void CheckGrobner(char* filename, char * cdd);
+void CheckGrobner(const char* filename, char * cdd);
 #endif
 

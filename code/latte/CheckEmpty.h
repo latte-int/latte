@@ -22,6 +22,6 @@
 #ifndef CHECKEMPTY__H
 #define CHECKEMPTY__H
 
-void CheckEmpty(char * filename);
+void CheckEmpty(const char * filename);
 
 #endif

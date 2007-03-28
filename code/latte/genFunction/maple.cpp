@@ -80,7 +80,7 @@ void writeTermOfGeneratingFunctionToFile(ofstream & out, listCone *cone,
   return;
 }
 /* ----------------------------------------------------------------- */
-void createGeneratingFunctionAsMapleInput(char *fileName, listCone* cones, 
+void createGeneratingFunctionAsMapleInput(const char *fileName, listCone* cones, 
 					  int numOfVars) {
   char mapleInFileName[127];
   listCone *tmp;

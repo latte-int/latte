@@ -631,7 +631,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
 
 
 /* ----------------------------------------------------------------- */
-listCone* computeVertexCones(char* fileName, listVector* matrix, 
+listCone* computeVertexCones(const char* fileName, listVector* matrix, 
 			     int numOfVars) {
   char cddOutFileName[127], command[127];
   listCone *cones;
@@ -672,7 +672,7 @@ listCone* computeVertexCones(char* fileName, listVector* matrix,
 
 /* ----------------------------------------------------------------- */
 
-listCone* computeVertexConesViaLrs(char* fileName, listVector* matrix, 
+listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix, 
 			     int numOfVars) {
 
   char cddOutFileName[127], command[127];

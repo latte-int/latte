@@ -42,11 +42,20 @@
 //#include "testing.h"
 #include "IntegralHull.h"
 #include "latte_system.h"
+#include "ReadingFile.h"
 
 /* ----------------------------------------------------------------- */
 
 void
-CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, char* dil, int dilation)
+CheckRed(char *Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation)
+{
+  string fn = Filename;
+  CheckRed(fn, equ, max, nonneg, interior, dil, dilation);
+  strcpy(Filename, fn.c_str());
+}
+
+void
+CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, char* dil, int dilation)
 {
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
   string tmpString;
@@ -54,7 +63,7 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
   vec_ZZ Index, Index2;
   cout << "Removing redundant inequalities and finding hidden equalities....";
   cout.flush();
-  ifstream IN(Filename);
+  ifstream IN(Filename.c_str());
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
     exit(1);
@@ -75,7 +84,7 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
       for(int i = 0; i < numOfNonneg; i++) IN >> Index2[i];
     }
   }
-  ifstream in(Filename);
+  ifstream in(Filename.c_str());
   // cout << "here" << endl;
   in >> numOfConsts >> numOfDims;
   //  cout << numOfConsts << " " << numOfDims << endl; 
@@ -200,9 +209,9 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
     // Then we can safely parallelize tests simply by changing into fresh
     // directories. (Temporary solution.) --mkoeppe
     //strcat(Filename, ".latte");
-    strcpy(Filename, "latte_nonredundant_input");
+    Filename = "latte_nonredundant_input";
 
-    ofstream out2(Filename);
+    ofstream out2(Filename.c_str());
 
     out2 << numOfConsts2 << " " << numOfDims << endl;
     for(int i = 0; i < numOfConsts2; i++){
@@ -226,7 +235,7 @@ CheckRed(char* Filename, char *equ, char * max, char* nonneg, char* interior, ch
 }
 
 /* ----------------------------------------------------------------- */
-void CheckInputFileCDDRep1(char *InputFile){
+void CheckInputFileCDDRep1(const char *InputFile){
   /*
     Author: Ruriko Yoshida
     Date: January 28th, 2003
@@ -477,7 +486,7 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
   
   
 /* ----------------------------------------------------------------- */
-void CheckInputFileCDDRep(char *InputFile){
+void CheckInputFileCDDRep(const char *InputFile){
   /*
     Author: Ruriko Yoshida
     Date: January 28th, 2003
@@ -522,7 +531,7 @@ void CheckInputFileCDDRep(char *InputFile){
 
 /* ----------------------------------------------------------------- */
 
-void CheckInputFileCDDRep3(char *InputFile){
+void CheckInputFileCDDRep3(const char *InputFile){
   /*
     Author: Ruriko Yoshida
     Date: January 28th, 2003
@@ -556,7 +565,7 @@ void CheckInputFileCDDRep3(char *InputFile){
 }
 
 /* ----------------------------------------------------------------- */
-void CheckInputFileCDDRep4(char *InputFile){
+void CheckInputFileCDDRep4(const char *InputFile){
   /*
     Author: Ruriko Yoshida
     Date: January 28th, 2003
@@ -611,7 +620,7 @@ void CheckInputFileCDDRep4(char *InputFile){
 
 
 /* ----------------------------------------------------------------- */
-void CheckInputFile(char *InputFile){
+void CheckInputFile(const char *InputFile){
   /*
     Author: Ruriko Yoshida
     Date: January 28th, 2003
@@ -654,7 +663,7 @@ void CheckInputFile(char *InputFile){
   return ;
 }
 /* ----------------------------------------------------------------- */
-void CheckInputFileVrep(char *InputFile){
+void CheckInputFileVrep(const char *InputFile){
   /*
     Author: Ruriko Yoshida
     Date: January 28th, 2003
@@ -698,7 +707,7 @@ void CheckInputFileVrep(char *InputFile){
 
 /* ---------------------------------------------------------------- */
 
-void CheckLength(char * filename, char * equ)
+void CheckLength(const char * filename, char * equ)
 {
    ifstream in(filename);
    int numOfConstraints = 0, numOfVars = 0, numOfequ = 0;
@@ -732,7 +741,7 @@ void CheckLength(char * filename, char * equ)
 
 /* ---------------------------------------------------------------------- */
 
-void CheckLength2(char * filename, char * equ)
+void CheckLength2(const char * filename, char * equ)
 {
    ifstream in(filename);
    int numOfConstraints = 0, numOfVars = 0, numOfequ = 0;
@@ -778,11 +787,11 @@ ZZ FindBigElt(listVector* equation, int numOfVars){
 }
 
 /* ----------------------------------------------------------------- */
-void readLatteProblem(char *fileName, listVector **equations,
+void readLatteProblem(const char *fileName, listVector **equations,
 		      listVector **inequalities, 
 		      char *equationsPresent,
                       int *numOfVars, char *nonneg, char* dual,
-		      char* grobner, char* max, vec_ZZ & cost, char * Vrep) {
+		      char* grobner, char * Vrep) {
   int i,j,eq,ind,numOfVectors,numOfEquations;
   vec_ZZ indexEquations;
   listVector *basis, *endBasis, *tmp, *endEquations, *endInequalities;
@@ -1065,12 +1074,12 @@ void readLatteProblem(char *fileName, listVector **equations,
 }
 
 /* ----------------------------------------------------------------- */
-int CDDstylereadLatteProblem(char *fileName, listVector **equations,
+int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
 		      listVector **inequalities, 
 		      char *equationsPresent,
                       int *numOfVars, char *nonneg, char* dual,
                       char* taylor, int & degree, 
-                      char* rat, int & cone_output, int & flags,
+                      char* rat, int & cone_output, 
                       char* Memory_Save, char* uni, char* inthull,
 		      char* grobner) {
   int i,j,eq,ind, length = 0, f = 0, numOfVectors,numOfEquations;
@@ -1080,7 +1089,6 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
   string tmpString;
   
   if(grobner[0] == 'y') strcpy(equationsPresent, "yes");
-  if(dual[0] == 'y') flags |= DUAL_APPROACH;
   if(rat[0] == 'y') strcpy(rat, "yes");
   /* Reads numOfVars, matrix A, and rhs b. */
 
@@ -1092,8 +1100,7 @@ int CDDstylereadLatteProblem(char *fileName, listVector **equations,
 
   while(in2 >> tmpString){ //cout << tmpString << endl;
 
-    if(tmpString == "dual") {strcpy(dual, "yes");
-    flags |= DUAL_APPROACH;}
+    if(tmpString == "dual") {strcpy(dual, "yes");}
     else if(tmpString == "nonneg") strcpy(nonneg, "yes");
     else if(tmpString == "taylor") 
         {strcpy(taylor, "yes");
