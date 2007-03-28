@@ -45,9 +45,6 @@
 #include "flags.h"
 //#include "testing.h"
 #include "IntegralHull.h"
-#include "ReadingFile.h"
-#include "binarySearchIP.h"
-#include "CheckEmpty.h"
 #include "ExponentialSubst.h"
 #include "latte_random.h"
 #include "Irrational.h"
@@ -62,41 +59,31 @@
 #include "convert.h"
 #include "latte_system.h"
 #include "Polyhedron.h"
-#include "ReadLatteStyle.h"
+#include "ReadPolyhedron.h"
 
-static void usage(const char *progname)
+static void
+usage(const char *progname)
 {
   cerr << "usage: " << progname << " [OPTIONS...] " << "INPUTFILE" << endl;
 }
 
 /* ----------------------------------------------------------------- */
-int main(int argc, char *argv[]) {
-  float z;
-  int i, degree = 1;
+int
+main(int argc, char *argv[])
+{
+  int i;
   unsigned int flags = 0, print_flag = 0, output_cone = 0;
-  vec_ZZ dim, v, w;
-  int oldnumofvars;
-  char fileName[127], invocation[127], equationsPresent[10],
-    assumeUnimodularCones[127], dualApproach[127], taylor[127], printfile[127],
-    rationalCone[127], nonneg[127], Memory_Save[127], Save_Tri[127],
-    Load_Tri[127], Print[127], inthull[127], cddstyle[127], grobner[127],
-    removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
-    Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
+  char printfile[127],
+    Save_Tri[127],
+    Load_Tri[127], Print[127], 
+    removeFiles[127], command[127];
   bool approx;
   bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
   bool triangulation_specified = false;
   double sampling_factor = 1.0;
   long int num_samples = -1;
+  ReadPolyhedronData read_polyhedron_data;
   
-  listVector *matrix = NULL, *equations = NULL, *inequalities = NULL;
-  vec_ZZ cost;
-  listVector *templistVec = NULL;
-  listCone *tmpcones;
-  mat_ZZ ProjU, ProjU2, AA;
-  vec_ZZ bb;
-  mat_ZZ AAA;
-  RR LP_OPT;
-  vec_ZZ holdCost;
   struct BarvinokParameters *params = new BarvinokParameters;
 
   latte_banner(cout);
@@ -106,39 +93,19 @@ int main(int argc, char *argv[]) {
     exit(1);
   }
   
-  z=0;
   //setbuf(stdout,0);
 
-  strcpy(invocation,"Invocation: ");
-  strcat(invocation,argv[0]);
-  strcat(invocation," ");
-/*    strcat(invocation,argv[argc-1]); */
-/*    strcat(invocation,"\n\n"); */
-/*    printf(invocation); */
+  cout << "Invocation: ";
+  for (i = 0; i<argc; i++) {
+    cout << argv[i] << " ";
+  }
+  cout << endl;
 
-  strcpy(Vrepresentation,"no");
-  strcpy(interior,"no");
-  strcpy(dilation,"no");
-  strcpy(binary,"no");
-  strcpy(Singlecone,"no");
   strcpy(removeFiles,"yes");
-  strcpy(grobner,"no");
-  strcpy(maximum,"no");
-  strcpy(minimize,"no");
-  strcpy(dualApproach,"no");
-  strcpy(equationsPresent,"no");
-  strcpy(assumeUnimodularCones,"no");
   strcpy(printfile,"no");
-  strcpy(taylor,"no");
-  strcpy(rationalCone,"no");
-  strcpy(nonneg, "no");
-  strcpy(Memory_Save, "yes");
   strcpy(Save_Tri, "no");
   strcpy(Load_Tri, "no");
   strcpy(Print, "no");
-  strcpy(inthull, "no");
-  strcpy(cddstyle, "no");
-  strcpy(LRS, "no");
   approx = false;
   ehrhart_polynomial = false;
   params->substitution = BarvinokParameters::PolynomialSubstitution;
@@ -146,39 +113,24 @@ int main(int argc, char *argv[]) {
   params->triangulation = BarvinokParameters::RegularTriangulationWithCdd;
   params->max_determinant = 1;
 
-  int last_command_index = argc - 2;
-  for (i=1; i<=last_command_index; i++) {
-    strcat(invocation,argv[i]);
-    strcat(invocation," ");
-    if (strncmp(argv[i],"vrep",3)==0) strcpy(Vrepresentation,"yes"); 
-    // else if(strncmp(argv[i],"bbs",3)==0) strcpy(binary,"yes");
-    else if(strncmp(argv[i],"int",3)==0) strcpy(interior,"yes");
-    //else if(strncmp(argv[i],"min",3)==0) strcpy(minimize,"yes");
-    //else if(strncmp(argv[i],"gro",3)==0) strcpy(grobner,"yes");
-    else if(strncmp(argv[i],"nodecom",3)==0
+  for (i=1; i<argc; i++) {
+    if(strncmp(argv[i],"nodecom",3)==0
 	    || strncmp(argv[i], "--nodecomposition", 5) == 0
 	    || strncmp(argv[i], "--no-decomposition", 7) == 0)
       params->max_determinant = 0;
-    else if(strncmp(argv[i],"homog",3)==0) {strcpy(dualApproach,"yes"); flags |= DUAL_APPROACH;}
-    else if(strncmp(argv[i],"equ",3)==0) strcpy(equationsPresent,"yes");
-    else if(strncmp(argv[i],"uni",3)==0) strcpy(assumeUnimodularCones,"yes");
+    else if(strncmp(argv[i],"uni",3)==0) strcpy(read_polyhedron_data.assumeUnimodularCones,"yes");
     //else if(strncmp(argv[i],"simp",4)==0) {strcpy(printfile,"yes"); flags |= PRINT;}
-    else if(strncmp(argv[i],"file",4)==0) strcpy(Memory_Save, "no");
+    else if(strncmp(argv[i],"file",4)==0) strcpy(read_polyhedron_data.Memory_Save, "no");
     //else if(strncmp(argv[i],"single",6)==0) strcpy(Singlecone,"yes");
     //else if(strncmp(argv[i],"ehrhartsimp",3)==0) strcpy(rationalCone,"yes");
-    else if(strncmp(argv[i],"+", 1) ==0) strcpy(nonneg,"yes");
-    else if(strncmp(argv[i],"memsave",7)==0) strcpy (Memory_Save, "yes");
+    else if(strncmp(argv[i],"memsave",7)==0) strcpy (read_polyhedron_data.Memory_Save, "yes");
     else if(strncmp(argv[i],"printcones",3)==0) strcpy (Print, "yes");
-    else if(strncmp(argv[i],"cdd",3)==0) strcpy (cddstyle, "yes");
     //else if(strncmp(argv[i],"hull",3)==0) strcpy (inthull, "yes");
-    // else if(strncmp(argv[i],"max",3)==0) strcpy (maximum, "yes");
-    else if(strncmp(argv[i],"lrs",3)==0) strcpy (LRS, "yes");
-    else if(strncmp(argv[i],"dil",3)==0) {
-      strcpy (dilation, "yes");
-      last_command_index--;
+    else if(strncmp(argv[i],"lrs",3)==0) strcpy (read_polyhedron_data.LRS, "yes");
+    else if(strncmp(argv[i],"rem",3)==0) {
+      strcpy (removeFiles, "no");
+      strcpy (read_polyhedron_data.Memory_Save, "no");
     }
-    else if(strncmp(argv[i],"rem",3)==0) strcpy (removeFiles, "no");
-    else if(strncmp(argv[i],"rem",3)==0) strcpy (Memory_Save, "no");
     else if(strncmp(argv[i],"trisave",7)==0) {strcpy (Save_Tri, "yes"); flags |= SAVE;}
     else if(strncmp(argv[i],"triload",7)==0) {strcpy (Load_Tri, "yes"); flags |= LOAD;}
     else if (strncmp(argv[i], "--exponential", 5) == 0)
@@ -199,22 +151,19 @@ int main(int argc, char *argv[]) {
       ehrhart_polynomial = true;
     else if (strncmp(argv[i], "--ehrhart-series", 11) == 0) {
       ehrhart_series = true;
-      strcpy(dualApproach,"yes");
-      flags |= DUAL_APPROACH;
+      strcpy(read_polyhedron_data.dualApproach,"yes");
       strcpy(printfile,"yes");
       flags |= PRINT;
     }
     else if (strncmp(argv[i], "--simplified-ehrhart-series", 14) == 0) {
       ehrhart_series = true;
-      strcpy(dualApproach,"yes");
-      flags |= DUAL_APPROACH;
-      strcpy(rationalCone, "yes");
+      strcpy(read_polyhedron_data.dualApproach,"yes");
+      strcpy(read_polyhedron_data.rationalCone, "yes");
     }
     else if (strncmp(argv[i], "--ehrhart-taylor=", 17) == 0) {
-      strcpy(taylor, "yes");
-      degree = atoi(argv[i] + 17);
-      strcpy(dualApproach,"yes");
-      flags |= DUAL_APPROACH;
+      strcpy(read_polyhedron_data.taylor, "yes");
+      read_polyhedron_data.degree = atoi(argv[i] + 17);
+      strcpy(read_polyhedron_data.dualApproach,"yes");
     }
     else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
@@ -234,12 +183,18 @@ int main(int argc, char *argv[]) {
       unsigned int seed = atoi(argv[i] + 14);
       seed_random_generator(seed);
     }
+    else if (read_polyhedron_data.parse_option(argv[i])) {}
     else {
       cerr << "Unknown command/option " << argv[i] << endl;
       exit(1);
     }
   }
 
+  if (read_polyhedron_data.expect_filename) {
+    cerr << "Filename missing" << endl;
+    exit(1);
+  }
+  
   if (params->shortvector == BarvinokParameters::SubspaceAvoidingLLL) {
     if (params->decomposition == BarvinokParameters::IrrationalAllPrimalDecomposition) {
       /* Triangulation will be done in the primal space, so all
@@ -267,306 +222,41 @@ int main(int argc, char *argv[]) {
     }
   }
   
-  if(minimize[0] == 'y') strcpy(maximum, "yes");
-  if(grobner[0] == 'y') strcpy(equationsPresent,"yes");
-  if(binary[0] == 'y') {strcpy(maximum,"yes"); strcpy(Memory_Save, "no");}
-  if(maximum[0] == 'y') strcpy(Memory_Save, "no");
-  if(printfile[0] == 'y') strcpy(Memory_Save, "no");
-  if(rationalCone[0] == 'y') strcpy(Memory_Save, "no");
+  if(read_polyhedron_data.minimize[0] == 'y') strcpy(read_polyhedron_data.maximum, "yes");
+  if(read_polyhedron_data.grobner[0] == 'y') strcpy(read_polyhedron_data.equationsPresent,"yes");
+  if(read_polyhedron_data.maximum[0] == 'y') strcpy(read_polyhedron_data.Memory_Save, "no");
+  if(printfile[0] == 'y') strcpy(read_polyhedron_data.Memory_Save, "no");
+  if(read_polyhedron_data.rationalCone[0] == 'y') strcpy(read_polyhedron_data.Memory_Save, "no");
   if(printfile[0] == 'y') print_flag = 1;
 
-  if(rationalCone[0] == 'y'){
+  if(read_polyhedron_data.rationalCone[0] == 'y'){
     
     //HugInt digit(argv[1]);
     //conv(output_cone, digit.BigInt);
     // User can use only Mode one
     output_cone = 3;
   }
-  int dilation_const = 1;
-
-  if(dilation[0] == 'y') dilation_const = atoi(argv[argc-2]);
-
-  strcat(invocation,argv[argc-1]);
-  strcat(invocation,"\n\n");
-#if 1
-  cout << invocation;
-#endif
 
   if(output_cone > 3) output_cone = 0;
   flags |= (output_cone << 1);
 
-  char costFile[127];
-  if(maximum[0] == 'y'){
-    strcpy(fileName,argv[argc-1]);
-    strcpy(costFile, argv[argc - 1]);
-    strcat(costFile, ".cost");
-  }
-  else strcpy(fileName,argv[argc-1]);
-  //  cout << fileName << " " << costFile << endl;
-  if(maximum[0] == 'y') {
-    ifstream ReadTest(fileName);
-    if(!ReadTest){
-      cerr << "Need a polytope input file." << endl;
-      exit(2);
-    }
-    //    cout << fileName << " " << costFile << endl;
-    ifstream INCost(costFile);
-    if(!INCost){
-      cerr << "Need a cost input file." << endl;
-      exit(3);
-    }
-    int costDim, dummy;
-    INCost >> dummy >> costDim; 
-    cost.SetLength(costDim);
-    for(i = 0; i < costDim; i++)
-      INCost >> cost[i]; 
-  }
-  //strcpy (fileName,"stdin");
+  const char *fileName = read_polyhedron_data.filename.c_str();
 
+  if (read_polyhedron_data.dualApproach[0] == 'y') {
+    flags |= DUAL_APPROACH;
+  }
+  
   /* INPUT HANDLING. */
 
-  Polyhedron *Poly = NULL;
-
-  if(grobner[0] == 'y'){
-    CheckGrobner(fileName, cddstyle);
-    SolveGrobner(fileName,  nonneg, dualApproach,
-		 grobner, equationsPresent, cddstyle);
-    exit(0);
-  }
-  
-  if (Vrepresentation[0] == 'y') {
-    /* The polyhedron is given by its V-representation in a
-       LattE-style input format. */
-    if (cddstyle[0] == 'y') {
-      cerr << "The command-line keyword `vrep' denotes the use of a LattE-style " << endl
-	   << "input format.  It is not compatible with using a CDD-style input format." << endl;
-      exit(2);
-    }
-    if(equationsPresent[0] == 'y') {
-      cerr<<"You cannot use vrep and equ at the same time." << endl;
-      exit(4);
-    }
-    if (dilation_const != 1) {
-      cerr << "Dilation unimplemented for `vrep' input" << endl;
-      exit(1);
-    }
-    Poly = ReadLatteStyleVrep(fileName, dualApproach[0] == 'y');
-  }
-  else {
-    /* Not VREP. */
-    Poly = new Polyhedron;
-    int numOfVars;
-  
-  if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
-    cerr<<"You cannot use + and dua at the same time." << endl;
-    exit(2);
-  }
-  
-  if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
-    cerr<<"You cannot use int and memsave at the same time." << endl;
-    exit(3);
-  }
-
-  
-  /* Check input file. */
-  if(Vrepresentation[0] == 'n'){
-    if((cddstyle[0] == 'n') && (grobner[0] == 'n') && (maximum[0] == 'n')&& (minimize[0] == 'n')){
-      CheckInputFile(fileName);
-      CheckLength(fileName, equationsPresent);
-    }
-    if(minimize[0] == 'y')  strcpy (maximum, "yes");   
- 
-    if((cddstyle[0] == 'n') && (grobner[0] == 'n') && (maximum[0] == 'y')){
-      CheckInputFile(fileName);
-      CheckLength(fileName,equationsPresent);
-    }
-
-    if(cddstyle[0] == 'y')
-      { CheckInputFileCDDRep(argv[argc - 1]);
-      CheckInputFileCDDRep1(argv[argc - 1]);
-      CheckInputFileCDDRep3(argv[argc - 1]);
-      CheckInputFileCDDRep4(argv[argc - 1]);
-      }
-  }else CheckInputFileVrep(fileName);
-  if (cddstyle[0] == 'y') {
-    cerr << "Warning: Not performing check for empty polytope, "
-	 << "because it is unimplemented for the CDD-style input format. "
-	 << endl;
-  }
-  else {
-    CheckEmpty(fileName);
-  }
-  //vec_ZZ cost;
-  /* Read problem data. */
-  params->read_time.start();
-  
-  if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) CheckRed(fileName, equationsPresent, maximum, nonneg, interior, dilation, dilation_const); 
-
-  dilation_const = 1;
-  if((cddstyle[0] == 'n') && (grobner[0] == 'n'))
-    readLatteProblem(fileName,&equations,&inequalities,equationsPresent,
-		     &numOfVars, nonneg, dualApproach, grobner, maximum, 
-		     cost,Vrepresentation);
-//   if((equationsPresent[0] == 'n') && (interior[0] == 'y'))
-//     Interior(inequalities);
-  // if(minimize[0] == 'y') cost = -cost;
-  if(cddstyle[0] == 'y'){
-    int tmpoutput, tmpflags;
-    CDDstylereadLatteProblem(fileName,&equations,&inequalities,equationsPresent,
-			     &numOfVars, nonneg, dualApproach, taylor, degree,
-			     rationalCone, tmpoutput, tmpflags, Memory_Save,
-			     assumeUnimodularCones, inthull, grobner);
-    output_cone = 3;
-    flags = tmpflags;
-  }
-  
-  // cout << grobner << endl;
-  if(minimize[0] == 'y') cost = - cost;
-  holdCost = cost;
-  //cout <<"Cost is: " << cost << endl;
-  vec_RR holdcost_RR;
-  holdcost_RR.SetLength(holdCost.length());
-  for(i = 0; i < holdCost.length(); i++) conv(holdcost_RR[i], holdCost[i]);
-
-  if(minimize[0] == 'y') holdcost_RR = - holdcost_RR;
-
-  if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
-    cerr<<"You cannot use + and dua at the same time." << endl;
-    exit(2);
-  }
-  
-  if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
-    cerr<<"You cannot use int and memsave at the same time." << endl;
-    exit(3);
-  }
-  
-  numOfVars--;
-  /* Binary seach IP*/
-
-  if(binary[0] == 'y'){
-    cout << "The number of optimal solutions: " << binarySearch(equations, inequalities,cost, numOfVars, minimize) << endl;
-    cout << "Time: " << GetTime() << endl;
+  if(read_polyhedron_data.grobner[0] == 'y'){
+    CheckGrobner(fileName, read_polyhedron_data.cddstyle);
+    SolveGrobner(fileName,  read_polyhedron_data.nonneg, read_polyhedron_data.dualApproach,
+		 read_polyhedron_data.grobner, read_polyhedron_data.equationsPresent, read_polyhedron_data.cddstyle);
     exit(0);
   }
 
-  ProjU.SetDims(numOfVars, numOfVars);
-  ProjU2.SetDims(numOfVars, numOfVars);
-  oldnumofvars = numOfVars;
-  {
-    listVector *matrixTmp;
-    if (equationsPresent[0]=='y') {
-      /*    if(grobner[0] == 'y')
-	    {  
-	    matrixTmp=Grobner(equations,inequalities,&generators,&numOfVars, &templistVec, oldnumofvars);
-     
-	    }*/
-      {
-	vec_ZZ *generators = NULL;
-	matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
-	if (generators) delete[] generators;
-      }
-      freeListVector(equations);
-      freeListVector(inequalities);
-      ProjU2 = transpose(ProjU);
-      bb = ProjU2[0];
-      AAA.SetDims(ProjU2.NumRows() - 1, ProjU2.NumCols());
-      for(i = 1; i <= numOfVars; i++){
-	AAA[i - 1] = ProjU2[i];
-      }
-      AA = transpose(AAA);
-      // cout << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
-      templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows()); 
-    } else {
-      dilateListVector(inequalities, numOfVars, dilation_const);
-      matrixTmp=inequalities;
-    }
-    if((dualApproach[0] == 'y')&&(equationsPresent[0]=='y')){
-      matrix = TransformToDualCone(matrixTmp,numOfVars);
-      freeListVector(matrixTmp);
-    }
-    else {
-      matrix = matrixTmp;
-    }
-  }
-/* Now matrix contains the new inequalities. */
-  params->read_time.stop();
-  cout << params->read_time;
-  
-    //   cout << "Project down cost function: " << cost << endl;
-    vec_RR Rat_solution, tmp_den, tmp_num;
-    mat_RR ProjU_RR;
-    ProjU_RR.SetDims(ProjU.NumRows(), ProjU.NumCols());
-    for(i = 0; i < ProjU.NumRows(); i++)
-      for(int j = 0; j < ProjU.NumCols(); j++) conv(ProjU_RR[i][j], ProjU[i][j]);
-    //cout << ProjU << ProjU_RR << endl;
-    Rat_solution.SetLength(numOfVars);
-    tmp_den.SetLength(numOfVars);
-    tmp_num.SetLength(numOfVars);
-/* Compute vertices and edges. */
-    rationalVector* LP_vertex;
-    
-    params->vertices_time.start();
-  if ((dualApproach[0]=='n') && (Vrepresentation[0] == 'n')) {
-    if(LRS[0] == 'n')
-    tmpcones=computeVertexCones(fileName,matrix,numOfVars);
-    else
-      tmpcones=computeVertexConesViaLrs(fileName,matrix,numOfVars);
-      if(maximum[0] == 'y'){ 
-     LP_vertex = LP(matrix, cost, numOfVars);
-     vec_RR Rat_cost;  Rat_cost.SetLength(numOfVars);
-     for (i = 0; i < numOfVars; i++){
-       conv(tmp_num[i], LP_vertex->numerators()[i]);
-       conv(tmp_den[i], LP_vertex->denominators()[i]);
-       Rat_solution[i] = tmp_num[i]/tmp_den[i];
-       conv(Rat_cost[i], cost[i]);
-     }
-     if(Singlecone[0] == 'y')
-       Poly->cones = CopyListCones(tmpcones, numOfVars, LP_vertex);
-     else Poly->cones = tmpcones;
-       if(lengthListCone(Poly->cones) == 1) 
-	cout <<"\nWe found a single vertex cone for IP.\n" << endl;
-       cout <<"A vertex which we found via LP is: " << ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
-      //printRationalVector(LP_vertex, numOfVars);
-       LP_OPT = Rat_cost*Rat_solution; //cout << cost << endl;
-      cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
-      }else {Poly->cones = tmpcones;
-      cout << "The polytope has " << lengthListCone(Poly->cones) << " vertices." << endl;
-    //system_with_error_check("rm -f numOfLatticePoints");
-    }
-  } 
+  Polyhedron *Poly = read_polyhedron_data.read_polyhedron(params);
 
-  params->vertices_time.stop();
-  cout << params->vertices_time;
-
-  /* Compute triangulation or decomposition of each vertex cone. */
-
-  if (dualApproach[0]=='y') {
-    listVector *rays = NULL, *endRays, *tmpRays;
-    Poly->cones=createListCone();
-    Poly->cones->vertex = new Vertex(createRationalVector(numOfVars));
-    rays=createListVector(createVector(numOfVars));
-    endRays=rays;
-    tmpRays=matrix;
-    while (tmpRays) {
-      v=createVector(numOfVars);
-      for (i=0; i<numOfVars; i++) v[i]=-(tmpRays->first)[i+1];
-      endRays->rest=createListVector(v);
-      endRays=endRays->rest;
-      tmpRays=tmpRays->rest;
-    }
-    Poly->cones->rays = rays->rest;
-    delete rays; // deletes dummy head
-    Poly->dualized = true;
-
-//     cout << "Homogenization: " << endl;
-//     printListCone(Poly->cones, numOfVars);
-  }
-
-  Poly->numOfVars = numOfVars;
-  } /* Not VREP */
-
-  
-  
   if (ehrhart_polynomial) {
     /* Translate all cones to the origin, saving the original vertex. */
     listCone *cone;
@@ -588,7 +278,7 @@ int main(int argc, char *argv[]) {
   }
     
   params->Flags = flags;
-  params->File_Name = fileName;
+  params->File_Name = (char*) fileName;
   params->Number_of_Variables = Poly->numOfVars;
 
 
@@ -596,10 +286,10 @@ int main(int argc, char *argv[]) {
   case BarvinokParameters::DualDecomposition:
   case BarvinokParameters::IrrationalPrimalDecomposition:
     if (not Poly->dualized) {
-      if (Vrepresentation[0] != 'y') {
+      if (read_polyhedron_data.Vrepresentation[0] != 'y') {
 	/* Compute all inequalities tight at the respective vertex.
 	   Then dualizeCones just needs to swap rays and facets. */
-	computeTightInequalitiesOfCones(Poly->cones, matrix, Poly->numOfVars);
+	computeTightInequalitiesOfCones(Poly->cones, read_polyhedron_data.matrix, Poly->numOfVars);
       }
       Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
       Poly->dualized = true;
@@ -613,7 +303,7 @@ int main(int argc, char *argv[]) {
       cout << "done; sorry for the interruption.) "; cout.flush();
     }
     else {
-      if (Vrepresentation[0] == 'y') {
+      if (read_polyhedron_data.Vrepresentation[0] == 'y') {
 	cout << "(First computing facets for them... "; cout.flush();
 	Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
 	Poly->cones = dualizeBackCones(Poly->cones, Poly->numOfVars); // just swaps
@@ -623,7 +313,7 @@ int main(int argc, char *argv[]) {
 	/* Fill in the facets of all cones; we determine them by
 	   taking all inequalities tight at the respective vertex. */
 	params->dualize_time.start();
-	computeTightInequalitiesOfCones(Poly->cones, matrix, Poly->numOfVars);
+	computeTightInequalitiesOfCones(Poly->cones, read_polyhedron_data.matrix, Poly->numOfVars);
 	params->dualize_time.stop(); cout << params->dualize_time;
       }
     }
@@ -651,8 +341,8 @@ int main(int argc, char *argv[]) {
 	   << "for the exponential substitution." << endl;
       exit(1);
     }
-    if (assumeUnimodularCones[0]=='n') {
-      if (Memory_Save[0] == 'n') {
+    if (read_polyhedron_data.assumeUnimodularCones[0]=='n') {
+      if (read_polyhedron_data.Memory_Save[0] == 'n') {
 	listCone *decomposed_cones
 	  = decomposeCones(Poly->cones, not Poly->dualized,
 			   *params);
@@ -668,13 +358,13 @@ int main(int argc, char *argv[]) {
 	Standard_Single_Cone_Parameters *standard_params
 	  = new Standard_Single_Cone_Parameters(*params);
 	delete params; params = standard_params;
-	decomposeAndComputeResidue(Poly->cones, degree, false,
+	decomposeAndComputeResidue(Poly->cones, read_polyhedron_data.degree, false,
 				   *standard_params);
       }
     }
     break;
   case BarvinokParameters::ExponentialSubstitution:
-    if (dualApproach[0] == 'y') {
+    if (read_polyhedron_data.dualApproach[0] == 'y') {
       cerr << "Exponential substitution is not yet implemented for the homogenized version."
 	   << endl;
       exit(1);
@@ -735,122 +425,28 @@ int main(int argc, char *argv[]) {
     abort();
   }
 
-  if(grobner[0] == 'y'){
+  if(read_polyhedron_data.grobner[0] == 'y'){
 
- Poly->cones = ProjectUp(Poly->cones, oldnumofvars, Poly->numOfVars, templistVec);
- Poly->numOfVars = oldnumofvars;
+ Poly->cones = ProjectUp(Poly->cones, read_polyhedron_data.oldnumofvars,
+			 Poly->numOfVars, read_polyhedron_data.templistVec);
+ Poly->numOfVars = read_polyhedron_data.oldnumofvars;
 
   }
  if(Print[0] == 'y')
   printListCone(Poly->cones,Poly->numOfVars);
 
- if(inthull[0] == 'y')
-   ;
  //   printListVector(IntegralHull(Poly->cones,  inequalities, equations, Poly->numOfVars), Poly->numOfVars);
- if(maximum[0] == 'y') {
-   listCone * Opt_cones;
-   if(Singlecone[0] == 'n'){
-   Opt_cones = CopyListCones(Poly->cones, Poly->numOfVars);
-   ZZ NumOfLatticePoints; //printListCone(Opt_cones, Poly->numOfVars);
-   NumOfLatticePoints = Residue(Opt_cones, Poly->numOfVars);
-   cout <<"Finished computing a rational function. " << endl;
-   cout <<"Time: " << GetTime() << " sec." << endl;
-   if(IsZero(NumOfLatticePoints) == 1){
-     cerr<<"Integrally empty polytope.  Check the right hand side."<< endl;
-     exit(0);}
-      else{
-	int singleCone = 0;
-	if(Singlecone[0] == 'y') singleCone = 1;
-	vec_ZZ Opt_solution; 
-	if(minimize[0] == 'y') holdCost = -holdCost;
-	Opt_solution = SolveIP(Poly->cones, matrix, cost, Poly->numOfVars, singleCone); 
-        if(minimize[0] == 'y') cost = -cost;
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
-	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
-	RR tmp_RR;
+ if(read_polyhedron_data.Memory_Save[0] == 'n')
+   {
 
-	conv(tmp_RR, cost * Opt_solution);
-	// cout << tmp_RR << " " << LP_OPT << endl;
-	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ext");
-        system_with_error_check(command);
-
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".cdd");
-        system_with_error_check(command);
-
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ead");
-        system_with_error_check(command);
-
-	if(cddstyle[0] == 'n' && Vrepresentation[0] == 'n'){
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        system_with_error_check(command);
-	}
-
-	exit(0);
-      }
-   }
-   else{
-	int singleCone = 0;
-	if(Singlecone[0] == 'y') singleCone = 1;
-	vec_ZZ Opt_solution; 
-	if(minimize[0] == 'y') holdCost = -holdCost;
-	Opt_solution = SolveIP(Poly->cones, matrix, cost, Poly->numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
-        if(minimize[0] == 'y') cost = -cost;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, Poly->numOfVars) << "." << endl;
-	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
-	RR tmp_RR;
-	conv(tmp_RR, IP_OPT);
-	// cout << cost * Opt_solution << endl;
-	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ext");
-        system_with_error_check(command);
-
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".cdd");
-        system_with_error_check(command);
-
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ead");
-        system_with_error_check(command);
-
-	if(cddstyle[0] == 'n' && Vrepresentation[0] == 'n'){
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        system_with_error_check(command);
-	}
-
-	exit(0);
-   }
- }else{
-if(Memory_Save[0] == 'n')
-{
-
-	if(dualApproach[0] == 'n'){
+	if(read_polyhedron_data.dualApproach[0] == 'n'){
 	  cout << "Creating generating function.\n"; 
 	  //printListVector(templistVec, oldnumofvars); cout << ProjU << endl;
-	if(equationsPresent[0] == 'y'){ Poly->cones = ProjectUp2(Poly->cones, oldnumofvars, Poly->numOfVars, AA, bb);
-	Poly->numOfVars = oldnumofvars;}
+	if(read_polyhedron_data.equationsPresent[0] == 'y'){
+	  Poly->cones = ProjectUp2(Poly->cones, read_polyhedron_data.oldnumofvars,
+				   Poly->numOfVars, read_polyhedron_data.AA, read_polyhedron_data.bb);
+	  Poly->numOfVars = read_polyhedron_data.oldnumofvars;
+	}
 
 	  createGeneratingFunctionAsMapleInput(fileName,Poly->cones,Poly->numOfVars);  }
         //printListCone(cones, Poly->numOfVars);
@@ -858,12 +454,12 @@ if(Memory_Save[0] == 'n')
 	cout << "Printing decomposed cones to `decomposed_cones'." << endl;
 	printListConeToFile("decomposed_cones", Poly->cones, Poly->numOfVars);
 
-	if(dualApproach[0] == 'n'){
+	if(read_polyhedron_data.dualApproach[0] == 'n'){
 	cout << "Starting final computation.\n";
 	cout << endl << "****  The number of lattice points is: " << Residue(Poly->cones,Poly->numOfVars) << "  ****" << endl << endl;}
 
 
-	if(dualApproach[0] == 'y')
+	if(read_polyhedron_data.dualApproach[0] == 'y')
 	{
 	  cout << "Starting final computation.\n";
 	  //cout << "output_cone: " << output_cone;
@@ -881,7 +477,7 @@ if(Memory_Save[0] == 'n')
 	    break;
 	  }
 	  case BarvinokParameters::DualDecomposition:
-	    ResidueFunction(Poly->cones,Poly->numOfVars, print_flag, degree, output_cone);
+	    ResidueFunction(Poly->cones,Poly->numOfVars, print_flag, read_polyhedron_data.degree, output_cone);
 	    // ResidueFunction consumes cones.
 	    Poly->cones = NULL;
 	    break;
@@ -890,19 +486,17 @@ if(Memory_Save[0] == 'n')
 	  }
 	//  Else we have already computed the residue.
 	}
-
-}
- }
+   }
   } catch (NotIrrationalException) {
     cerr << "Bug: Irrationalization failed" << endl;
     exit(1);
   };
 
-  freeListVector(templistVec);
-  freeListVector(matrix);
+  freeListVector(read_polyhedron_data.templistVec);
+  freeListVector(read_polyhedron_data.matrix);
   delete Poly;
 
- if(rationalCone[0] == 'y') {
+if(read_polyhedron_data.rationalCone[0] == 'y') {
    cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
    strcpy(command, "mv ");
    strcat(command, "simplify.sum ");
@@ -919,7 +513,7 @@ if(Memory_Save[0] == 'n')
    strcat(command, ".rat");
    system_with_error_check(command);
  }
- if((removeFiles[0] == 'y') && (dualApproach[0] == 'n')){
+ if((removeFiles[0] == 'y') && (read_polyhedron_data.dualApproach[0] == 'n')){
    
   strcpy(command,"rm -f ");
   strcat(command,fileName);
@@ -931,7 +525,7 @@ if(Memory_Save[0] == 'n')
   strcat(command,".cdd");
   system_with_error_check(command); 
   
-  if(Memory_Save[0] == 'n'){
+  if(read_polyhedron_data.Memory_Save[0] == 'n'){
     strcpy(command,"rm -f ");
     strcat(command,fileName);
     strcat(command,".maple");
@@ -943,14 +537,14 @@ if(Memory_Save[0] == 'n')
   strcat(command,".ead");
   system_with_error_check(command); 
   
-  if(cddstyle[0] == 'n' && Vrepresentation[0] == 'n'){
+  if(read_polyhedron_data.cddstyle[0] == 'n' && read_polyhedron_data.Vrepresentation[0] == 'n'){
     strcpy(command,"rm -f ");
     strcat(command,fileName);
     system_with_error_check(command);
   }
  }
 
-  if((dualApproach[0] == 'y') && (cddstyle[0] == 'n') && Vrepresentation[0] == 'n'){
+  if((read_polyhedron_data.dualApproach[0] == 'y') && (read_polyhedron_data.cddstyle[0] == 'n') && read_polyhedron_data.Vrepresentation[0] == 'n'){
 
     strcpy(command,"rm -f ");
     strcat(command,fileName);
