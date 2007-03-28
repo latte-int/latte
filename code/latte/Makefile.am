@@ -33,7 +33,8 @@ liblatte_a_SOURCES =							\
 	cone_consumer.cpp						\
 	triangulation/triangulate.cpp					\
 	triangulation/RegularTriangulation.cpp				\
-	triangulation/RegularTriangulationWithCdd.cpp
+	triangulation/RegularTriangulationWithCdd.cpp			\
+	ReadPolyhedron.cpp
 
 noinst_HEADERS =							\
 	CheckEmpty.h							\
@@ -56,7 +57,8 @@ noinst_HEADERS =							\
 	cone_consumer.h							\
 	triangulation/triangulate.h					\
 	triangulation/RegularTriangulation.h				\
-	triangulation/RegularTriangulationWithCdd.h
+	triangulation/RegularTriangulationWithCdd.h			\
+	ReadPolyhedron.h
 
 if HAVE_TOPCOM_LIB
 liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
