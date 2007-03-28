@@ -235,21 +235,22 @@ int main(int argc, char *argv[]) {
 
   if((cddstyle[0] == 'n') && (grobner[0] == 'n'))
     readLatteProblem(fileName,&equations,&inequalities,equationsPresent,
-		     &numOfVars, nonneg, dualApproach, grobner, maximum, 
-		     cost,Vrepresentation);
+		     &numOfVars, nonneg, dualApproach, grobner, Vrepresentation);
 
   if((equationsPresent[0] == 'n') && (interior[0] == 'y'))
     Interior(inequalities);
 
   // if(minimize[0] == 'y') cost = -cost;
   if(cddstyle[0] == 'y'){
-    int tmpoutput, tmpflags;
+    int tmpoutput;
     CDDstylereadLatteProblem(fileName,&equations,&inequalities,equationsPresent,
 			     &numOfVars, nonneg, dualApproach, taylor, degree,
-			     rationalCone, tmpoutput, tmpflags, Memory_Save,
+			     rationalCone, tmpoutput, Memory_Save,
 			     assumeUnimodularCones, inthull, grobner);
     output_cone = 3;
-    flags = tmpflags;
+    if (dualApproach[0] == 'y') {
+      flags |= DUAL_APPROACH;
+    }
   }
   
   // cout << grobner << endl;
