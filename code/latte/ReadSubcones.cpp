@@ -178,6 +178,7 @@ IncrementalVectorFileWriter::UpdateNumVectors()
   stream.seekp(0, ios::beg);
   stream << setw(16) << left << num_vectors;
   stream.seekp(0, ios::end);
+  stream.flush();
 }
 
 
