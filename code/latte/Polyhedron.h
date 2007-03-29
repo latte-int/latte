@@ -38,7 +38,7 @@ public:
 private:
   Polyhedron(const Polyhedron &);
 public:
-  Polyhedron() : cones(0), numOfVars(0), dualized(false), homogenized(false) {}
+  Polyhedron() : numOfVars(0), homogenized(false), dualized(false), cones(0) {}
   ~Polyhedron() { freeListCone(cones); }
 };
 

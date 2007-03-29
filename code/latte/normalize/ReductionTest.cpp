@@ -112,5 +112,8 @@ ReductionTestFactory::CreateReductionTest()
   case ReductionWithFacets:
     cerr << "ReductionWithFacets not written yet, sorry." << endl;
     exit(1);
+  default:
+    cerr << "Unknown reduction method." << endl;
+    exit(1);
   }
 }

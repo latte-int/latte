@@ -51,7 +51,7 @@ static listCone *cone_from_ray_indicator(const vector<listVector *> &ray_array,
 {
   listCone *result = createListCone();
   assert(ray_array.size() == ray_indicator.size());
-  int i;
+  unsigned int i;
   for (i = 0; i<ray_array.size(); i++) {
     if (ray_indicator[i]) {
       result->rays = new listVector(ray_array[i]->first, result->rays);

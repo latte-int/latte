@@ -191,7 +191,7 @@ Polyhedron *ReadLatteStyleVrep(const char *filename, bool homogenize)
     dd_FreeMatrix(matrix);
     P->cones = cone;
     P->dualized = false;
-    P->homogenized == true;
+    P->homogenized = true;
   }
   else {
     /* Don't homogenize. */

@@ -54,7 +54,6 @@ facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars)
   Vector rhs = createZeroVector(num_facets);
   setLinearSystemRHS(ls, rhs);
   deleteVector(rhs);
-  int col;
   setLinearSystemLimit(ls, -1, -MAXINT, MAXINT, true);
   setLinearSystemEquationType(ls, -1, EQUATION_LESSEREQUAL, 0);
   return ls;

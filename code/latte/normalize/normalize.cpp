@@ -88,7 +88,7 @@ public:
   int t_count;
   int t_level;
   int t_total;
-  RecursiveNormalizer(int level) : t_count(0), t_total(0), t_level(level) {};
+  RecursiveNormalizer(int level) : t_count(0), t_level(level), t_total(0) {};
   int ConsumeCone(listCone *cone);
   void SetNumCones(size_t num_cones) { t_total = num_cones; }
 };
@@ -347,7 +347,6 @@ int main(int argc, char **argv)
   cout << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
 
   listCone *cone;
-  listCone *triang;
   bool create_triang_file = true;
   string subcones_filename;
   bool have_subcones = false;

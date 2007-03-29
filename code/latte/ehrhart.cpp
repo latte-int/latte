@@ -300,7 +300,7 @@ int main(int argc, char *argv[]) {
 		     &numOfVars, nonneg, dualApproach, grobner, Vrepresentation);
   // if(minimize[0] == 'y') cost = -cost;
   if(cddstyle[0] == 'y'){
-    int tmpoutput, tmpflags;
+    int tmpoutput;
     CDDstylereadLatteProblem(fileName,&equations,&inequalities,equationsPresent,
 			     &numOfVars, nonneg, dualApproach, taylor, degree,
 			     rationalCone, tmpoutput, Memory_Save,

@@ -73,7 +73,7 @@ void create_temporary_directory()
       return;
     }
     else {
-      if (errno = EEXIST) continue;
+      if (errno == EEXIST) continue;
       perror("create_temporary_directory: mkdir failed");
       exit(1);
     }

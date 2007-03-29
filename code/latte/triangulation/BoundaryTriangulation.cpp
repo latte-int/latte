@@ -205,8 +205,6 @@ void
 compute_triangulation_of_boundary
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
 {
-  int numOfVars = Parameters->Number_of_Variables;
-  listCone *boundary_triangulation = NULL;
   vector<listVector *> rays = ray_array(cone);
   dd_PolyhedraPtr poly
     = cone_to_cddlib_polyhedron(cone, Parameters->Number_of_Variables);

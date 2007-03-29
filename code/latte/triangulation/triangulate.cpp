@@ -90,7 +90,6 @@ triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params,
 		ConeConsumer &consumer)
 {
-  listCone *result;
   if (numOfVars == lengthListVector(cone->rays)) {
     // Already simplicial.
     consumer.ConsumeCone(copyCone(cone));
