@@ -127,6 +127,9 @@ nodist_liblatte_a_SOURCES += 				\
 nodist_noinst_HEADERS +=				\
 	ReadSubcones.h
 
+bin_PROGRAMS += polyhedron-to-cones
+polyhedron_to_cones_SOURCES = polyhedron-to-cones.cpp
+
 endif
 
 bin_PROGRAMS += triangulate
