@@ -39,7 +39,9 @@
 
 using namespace std;
 
-FILE *output;
+string hil_filename;
+IncrementalVectorFileWriter *hil_file_writer = NULL;
+
 string filename;
 ofstream stats;
 BarvinokParameters params;
@@ -66,8 +68,7 @@ static bool insert_hilbert_basis_element(int *vec)
   if (where == known_hilbert_vectors.end()) {
     // Not known yet, so add it and print it. 
     known_hilbert_vectors.insert(*v);
-    fprintVector(output, vec, numOfVars);
-    fputs("\n", output);
+    hil_file_writer->WriteVector(*v);
     return true;
   }
   return false;
@@ -126,6 +127,10 @@ static void
 handle_cone(listCone *t, int t_count, int t_total, int level)
 {
   params.Number_of_Variables = t->rays->first.length();
+  if (hil_file_writer == NULL) {
+    hil_file_writer
+      = new IncrementalVectorFileWriter(hil_filename, params.Number_of_Variables);
+  }
   
   int num_rays = lengthListVector(t->rays);
 
@@ -223,7 +228,8 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
       for (i = 0; i<ctx->Homs->Size; i++) {
 	if (insert_hilbert_basis_element(ctx->Homs->Data[i])) any_new = true;
       }
-      if (any_new) fflush(output);
+      if (any_new)
+	hil_file_writer->UpdateNumVectors();
     
       deleteZSolveContext(ctx, true);
     
@@ -254,9 +260,8 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 
 static void open_output_and_stats()
 {
-  string output_filename = filename + ".hil";
-  cout << "Output goes to file `" << output_filename << "'..." << endl;
-  output = fopen(output_filename.c_str(), "w");
+  hil_filename = filename + ".hil";
+  cout << "Output goes to file `" << hil_filename << "'..." << endl;
 
   string stats_filename = filename + ".stats";
   cout << "Cone statistics go to file `" << stats_filename << "'..." << endl;
@@ -264,7 +269,7 @@ static void open_output_and_stats()
   stats << "# Level\tIndex\tRays\tFacets\tDet\tDualize\tZSolve\tHilberts" << endl;
 
   // Redirect 4ti2/qsolve output.
-  string fortytwolog_filename = filename + ".4ti2log";
+  string fortytwolog_filename = "/dev/null"; //filename + ".4ti2log";
   static ofstream fortytwolog(fortytwolog_filename.c_str());
   _4ti2_::out = &fortytwolog;
 }
@@ -457,6 +462,10 @@ int main(int argc, char **argv)
     open_output_and_stats();
     RecursiveNormalizer normalizer(/*level:*/ 1);
     producer->Produce(normalizer);
+    if (hil_file_writer) {
+      // Update the number of vectors, close the file.
+      delete hil_file_writer;
+    }
   }
 
   return 0;
