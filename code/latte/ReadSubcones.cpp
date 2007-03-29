@@ -123,9 +123,67 @@ void SubconeReadingConeProducer::Produce(ConeConsumer &consumer)
 }
 
 
+IncrementalVectorFileWriter::IncrementalVectorFileWriter(const std::string &filename, int a_dimension)
+  : num_vectors(0), stream(filename.c_str()), dimension(a_dimension)
+{
+  // We fill in the correct number of lines later.
+  stream << setw(16) << left << -1 << setw(0) << right
+	 << " " << dimension << endl;
+}
+
+IncrementalVectorFileWriter::~IncrementalVectorFileWriter()
+{
+  UpdateNumVectors();
+}
+
+void
+IncrementalVectorFileWriter::WriteVector(const vec_ZZ &v)
+{
+  int index;
+  assert(dimension == v.length());
+  for (index = 0; index<dimension; index++) {
+    stream << v[index] << " ";
+  }
+  stream << endl;
+  num_vectors++;
+}
+
+void
+IncrementalVectorFileWriter::WriteVector(const std::vector<bool> &v)
+{
+  int index;
+  assert(dimension == v.size());
+  for (index = 0; index<dimension; index++) {
+    stream << v[index] << " ";
+  }
+  stream << endl;
+  num_vectors++;
+}
+
+void
+IncrementalVectorFileWriter::WriteVector(const std::vector<int> &v)
+{
+  int index;
+  assert(dimension == v.size());
+  for (index = 0; index<dimension; index++) {
+    stream << v[index] << " ";
+  }
+  stream << endl;
+  num_vectors++;
+}
+
+void
+IncrementalVectorFileWriter::UpdateNumVectors()
+{
+  stream.seekp(0, ios::beg);
+  stream << setw(16) << left << num_vectors;
+  stream.seekp(0, ios::end);
+}
+
+
 SubconePrintingConeConsumer::SubconePrintingConeConsumer(const listCone *master_cone, 
 							 const std::string & filename)
-  : cone_count(0), stream(filename.c_str())
+  : cone_count(0)
 {
   listVector *ray;
   int index;
@@ -134,17 +192,12 @@ SubconePrintingConeConsumer::SubconePrintingConeConsumer(const listCone *master_
 						   p.second = index);
     index_map.insert(p);
   }
-  // We fill in the correct number of lines later.
-  stream << setw(16) << left << -1 << setw(0) << right
-	 << " " << index << endl;
+  file_writer = new IncrementalVectorFileWriter(filename, index);
 }
 
 SubconePrintingConeConsumer::~SubconePrintingConeConsumer()
 {
-  // Go to the beginning and fill in the correct number of lines.
-  stream.seekp(0, ios::beg);
-  stream << setw(16) << left << cone_count;
-  
+  delete file_writer;
 }
 
 int SubconePrintingConeConsumer::ConsumeCone(listCone *cone)
@@ -165,11 +218,7 @@ int SubconePrintingConeConsumer::ConsumeCone(listCone *cone)
     int index = (*i).second;
     ray_indicator[index] = true;
   }
-  int index;
-  for (index = 0; index<num_master_rays; index++) {
-    stream << ray_indicator[index] << " ";
-  }
-  stream << endl;
+  file_writer->WriteVector(ray_indicator);
   freeCone(cone);
   return 1;
 }

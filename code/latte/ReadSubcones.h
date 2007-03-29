@@ -49,6 +49,20 @@ public:
   void Produce(ConeConsumer &consumer);
 };
 
+class IncrementalVectorFileWriter {
+public:
+  long int num_vectors;
+  IncrementalVectorFileWriter(const std::string &filename, int a_dimension);
+  ~IncrementalVectorFileWriter();
+  void WriteVector(const vec_ZZ &v);
+  void WriteVector(const std::vector<bool> &v);
+  void WriteVector(const std::vector<int> &v);
+  void UpdateNumVectors();
+private:
+  std::ofstream stream;
+  int dimension;
+};
+
 class SubconePrintingConeConsumer : public ConeConsumer {
 public:
   int cone_count;
@@ -56,7 +70,7 @@ public:
   ~SubconePrintingConeConsumer();
   int ConsumeCone(listCone *cone);
 private:
-  std::ofstream stream;
+  IncrementalVectorFileWriter *file_writer;
   std::map<vector<mpz_class>, int> index_map;
 };
 
