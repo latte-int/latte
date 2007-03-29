@@ -32,6 +32,7 @@ public:
   ReductionTestWithCPLEX(const ReductionTestFactory &data);
   virtual ~ReductionTestWithCPLEX();
   virtual bool IsReducible(const std::vector<int> &v);
+  virtual int GetDimension();
 private:
   bool verbose;
   CPXENVptr env;

@@ -31,6 +31,7 @@ class ReductionTest {
 public:
   virtual ~ReductionTest();
   virtual bool IsReducible(const std::vector<int> &v) = 0;
+  virtual int GetDimension();
 };
 
 class ReductionTestFactory {

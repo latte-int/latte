@@ -35,6 +35,12 @@ ReductionTest::~ReductionTest()
 {
 }
 
+int
+ReductionTest::GetDimension()
+{
+  return -1;
+}
+
 
 NoReductionTest::NoReductionTest(const ReductionTestFactory &)
 {

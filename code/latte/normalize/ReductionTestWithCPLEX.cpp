@@ -180,3 +180,9 @@ ReductionTestWithCPLEX::IsReducible(const vector<int> &v)
   if (status != 0) abort();
   return is_reducible;
 }
+
+int ReductionTestWithCPLEX::GetDimension()
+{
+  return dim;
+}
+
