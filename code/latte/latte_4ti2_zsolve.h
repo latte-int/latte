@@ -27,6 +27,10 @@
 
 extern "C" {
 #  include "libzsolve.h"
+  // These defines come from defs.h; undefine them again.
+#undef bool
+#undef true
+#undef false
 }
 
 /* Create a 4ti2/zsolve LinearSystem representing the homogeneous
