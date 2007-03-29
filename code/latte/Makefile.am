@@ -1,5 +1,10 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
+SUBDIRS = adjacency . 
+if HAVE_EXPERIMENTS
+SUBDIRS += normalize
+endif
+
 bin_PROGRAMS = maximize minimize count ehrhart latte2ine latte2ext
 
 maximize_SOURCES = maximize.cpp
@@ -117,26 +122,15 @@ nodist_test_todd_SOURCES = todd/test-todd.cpp
 bin_PROGRAMS += aggregate
 nodist_aggregate_SOURCES = aggregation/aggregation.cpp
 
-bin_PROGRAMS += normaliz
-nodist_normaliz_SOURCES = normalize/normalize.cpp
 nodist_liblatte_a_SOURCES += 				\
 	ReadSubcones.cpp
 nodist_noinst_HEADERS +=				\
 	ReadSubcones.h
 
-if HAVE_CPLEX
-bin_PROGRAMS += check-representation
-nodist_check_representation_SOURCES = normalize/check-representation.cpp
-check_representation_LDFLAGS = $(CPLEX_LDFLAGS) $(AM_LDFLAGS)
-check_representation_CXXFLAGS = $(CPLEX_CFLAGS) $(AM_CXXFLAGS)
-endif
-
 endif
 
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
-
-SUBDIRS = adjacency
 
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
