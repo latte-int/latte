@@ -35,22 +35,24 @@ static void check_stream(const istream &f, const char *fileName, const char *pro
   }
 };
 
-dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep)
+dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep, bool homogenize)
 {
   ifstream f(fileName);
   if (!f) {
     cerr << "Cannot open input file " << fileName << " in ReadLatteStyleMatrix." << endl;
     exit(1);
   }
-  return ReadLatteStyleMatrix(f, vrep, fileName);
+  return ReadLatteStyleMatrix(f, vrep, homogenize, fileName);
 }
 
-dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep,
+dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep, bool homogenize,
 				  const char *fileName)
 {
   dd_set_global_constants();
-  int numOfVectors, numOfVars_hom;
-  f >> numOfVectors >> numOfVars_hom;
+  int numOfVectors, numOfVars;
+  f >> numOfVectors >> numOfVars;
+  int num_homog = homogenize ? 1 : 0;
+  int numOfVars_hom = numOfVars + num_homog;
   check_stream(f, fileName, "ReadLatteStyleMatrix");
   dd_MatrixPtr matrix = dd_CreateMatrix(numOfVectors, numOfVars_hom);
   matrix->numbtype = dd_Rational;
@@ -59,10 +61,10 @@ dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep,
   int i, j;
   mpq_class x;
   for (i = 0; i<numOfVectors; i++) {
-    for (j = 0; j<numOfVars_hom; j++) {
+    for (j = 0; j<numOfVars; j++) {
       f >> x;
       check_stream(f, fileName, "ReadLatteStyleMatrix");
-      dd_set(matrix->matrix[i][j], x.get_mpq_t());
+      dd_set(matrix->matrix[i][j + num_homog], x.get_mpq_t());
     }
   }
   // Skip whitespace
@@ -108,9 +110,9 @@ dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep,
 	int index; /* 1-based */
 	f >> index;
 	check_stream(f, fileName, "ReadLatteStyleMatrix");
-	for (j = 0; j<numOfVars_hom; j++)
-	  dd_set_si(new_matrix->matrix[i][j], 0);
-	dd_set_si(new_matrix->matrix[i][index], 1);
+	for (j = 0; j<numOfVars; j++)
+	  dd_set_si(new_matrix->matrix[i][j + num_homog], 0);
+	dd_set_si(new_matrix->matrix[i][index + num_homog], 1);
       }
       set_copy(new_matrix->linset, matrix->linset);
       dd_FreeMatrix(matrix);
@@ -162,7 +164,8 @@ Polyhedron *ReadLatteStyleVrep(const char *filename, bool homogenize)
   if (homogenize) {
     /* Homogenize. */
     dd_MatrixPtr matrix = ReadLatteStyleMatrix(filename,
-					       true /* vrep */);
+					       /* vrep: */ true,
+					       /* homogenize: */ false);
     //dd_WriteMatrix(stdout, matrix);
     dd_ErrorType error;
     dd_rowset redundant = dd_RedundantRows(matrix, &error);

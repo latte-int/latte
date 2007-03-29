@@ -27,10 +27,16 @@
 #include "latte_cddlib.h"
 #include "Polyhedron.h"
 
-/* Read a file in LattE format and return a cddlib matrix. */
+/* Read a file in LattE format and return a cddlib matrix.
+
+   If HOMOGENIZE is true, add a zero column in front.  This is useful
+   for reading in 4ti2-style matrix files.
+*/
 dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep,
+				  bool homogenize,
 				  const char *file_description = "");
-dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep);
+dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep,
+				  bool homogenize);
 
 /* Write a cddlib matrix to a file in LattE format. */
 void WriteLatteStyleMatrix(ostream &f, dd_MatrixPtr matrix);
