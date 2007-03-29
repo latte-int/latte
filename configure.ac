@@ -117,9 +117,6 @@ AC_ARG_WITH(cplex-sharedlib,
                    [Specify name of CPLEX shared library]),
     [  CPLEX_SHAREDLIB=$withval ])
 
-CPLEX_LDFLAGS="-L`dirname ${CPLEX_SHAREDLIB}` -R`dirname ${CPLEX_SHAREDLIB}` -l`basename ${CPLEX_SHAREDLIB} .so | sed 's/^lib//' ` -lm -lnsl -lsocket -lpthread "
-AC_SUBST(CPLEX_LDFLAGS)
-
 AC_ARG_WITH(cplex-include, 
     AS_HELP_STRING([--with-cplex-include=DIR], [Specify location of CPLEX include files]),
     [  CPLEX_CFLAGS="-I$withval" ])
@@ -128,7 +125,9 @@ AC_SUBST(CPLEX_CFLAGS)
 AM_CONDITIONAL(HAVE_CPLEX, test x$CPLEX_SHAREDLIB != x -a x$CPLEX_CFLAGS != x)
 if test x$CPLEX_SHAREDLIB != x -a x$CPLEX_CFLAGS != x ; then
    AC_DEFINE(HAVE_CPLEX, 1, [Define if the CPLEX callable library is available])
+  CPLEX_LDFLAGS="-L`dirname ${CPLEX_SHAREDLIB}` -R`dirname ${CPLEX_SHAREDLIB}` -l`basename ${CPLEX_SHAREDLIB} .so | sed 's/^lib//' ` -lm -lnsl -lsocket -lpthread "
 fi
+AC_SUBST(CPLEX_LDFLAGS)
 
 # Experimental, not release-ready code.
 AC_ARG_ENABLE(experiments, AS_HELP_STRING([--enable-experiments],
