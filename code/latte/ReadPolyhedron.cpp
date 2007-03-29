@@ -94,6 +94,11 @@ Polyhedron *ReadPolyhedronData::read_polyhedron(BarvinokParameters *params)
 {
   Polyhedron *Poly = NULL;
 
+  if (expect_filename) {
+    cerr << "The input file name is missing." << endl;
+    exit(2);
+  }
+
   listVector *equations = NULL, *inequalities = NULL;
   
   if (Vrepresentation[0] == 'y') {
