@@ -25,8 +25,8 @@ endif
 bin_PROGRAMS += normaliz
 nodist_normaliz_SOURCES = normalize.cpp
 
-# if HAVE_CPLEX
-# bin_PROGRAMS += check-representation
-# nodist_check_representation_SOURCES = check-representation.cpp
-# endif
+if HAVE_CPLEX
+bin_PROGRAMS += check-representation
+nodist_check_representation_SOURCES = check-representation.cpp
+endif
 
