@@ -26,13 +26,21 @@
 
 #include <cplex.h>
 
+#include "ReductionTest.h"
+
 using namespace std;
 
 int verbose = false;
 
+ReductionTest *reduction_test = NULL;
+ReductionTestFactory reduction_test_factory;
+
 static void usage()
 {
-  cerr << "usage: check-reprentation [--no-header --verbose] VECTORS GENERATORS" << endl;
+  cerr << "usage: check-representation [OPTIONS] VECTORS" << endl;
+  cerr << "Options are: " << endl
+       << "  --no-header                              Read an input file without a dimensions header" << endl;
+  reduction_test_factory.show_options(cerr);
 }
 
 void
@@ -53,19 +61,23 @@ open_matrix_file(const string &filename, ifstream &file,
 
 int main(int argc, char **argv)
 {
-  if (argc < 3) {
+  if (argc < 2) {
     usage();
     exit(1);
   }
+  // Set default.
+  reduction_test_factory.type = ReductionTestFactory::ReductionWithCPLEX;
+  
   bool vectors_file_no_header = false;
   {
     int i;
-    for (i = 1; i<argc-2; i++) {
-      if (strcmp(argv[i], "--no-header") == 0) {
+    for (i = 1; i<argc-1; i++) {
+      if (reduction_test_factory.parse_option(argv[i])) {}
+      else if (strcmp(argv[i], "--no-header") == 0) {
 	vectors_file_no_header = true;
       }
-      if (strcmp(argv[i], "--verbose") == 0) {
-	verbose = true;
+      else if (strcmp(argv[i], "--verbose") == 0) {
+	reduction_test_factory.verbose = true;
       }
       else {
 	cerr << "Unknown option: " << argv[i] << endl;
@@ -73,11 +85,11 @@ int main(int argc, char **argv)
       }
     }
   }
-  string vectors_filename(argv[argc - 2]);
-  string generators_filename(argv[argc - 1]);
-  int num_generators, dim_generators;
-  ifstream generators_file;
-  open_matrix_file(generators_filename, generators_file, num_generators, dim_generators);
+  reduction_test = reduction_test_factory.CreateReductionTest();
+
+  int dim_generators = reduction_test->GetDimension();
+  
+  string vectors_filename(argv[argc - 1]);
   int num_vectors, dim_vectors;
   ifstream vectors_file;
   if (vectors_file_no_header) {
@@ -86,64 +98,23 @@ int main(int argc, char **argv)
       cerr << "Failed to open file " << vectors_filename << endl;
       exit(1);
     }
+    if (dim_generators < 0) {
+      cerr << "Sorry, I do not know the dimension of the vectors." << endl;
+      exit(1);
+    }
     dim_vectors = dim_generators;
     num_vectors = INT_MAX;
   }
   else {
     open_matrix_file(vectors_filename, vectors_file, num_vectors, dim_vectors);
-    assert(dim_vectors == dim_generators);
-  }
-  int dim = dim_vectors;
-
-  int status;
-  CPXENVptr env = CPXopenCPLEX(&status);
-  if (status != 0) {
-    cerr << "Failed to obtain CPLEX environent." << endl;
-    abort();
-  }
-
-  CPXLPptr lp = CPXcreateprob(env, &status, "repr");
-  if (status != 0) abort();
-  
-  status = CPXnewrows(env, lp, dim, /*rhs:*/ NULL, /*sense:*/ NULL,
-		      /*rngval:*/ NULL, /*rownames:*/ NULL);
-  if (status != 0) abort();
-
-  status = CPXnewcols(env, lp, num_generators, /*obj:*/ NULL,
-		      /*lb:*/ NULL, /*ub:*/ NULL,
-		      /*ctype:*/ NULL, /*colname:*/NULL);
-  if (status != 0) abort();
-  
-  int i;
-  for (i = 0; i<num_generators; i++) {
-    status = CPXchgcoef(env, lp, -1, i, 1.0);
-    if (status != 0) abort();
-    int j;
-    for (j = 0; j<dim; j++) {
-      double x;
-      generators_file >> x;
-      status = CPXchgcoef(env, lp, j, i, x);
-      if (status != 0) abort();
-      
-    }
-    if (!generators_file.good()) {
-      cerr << "Parse error reading generator file" << endl;
-      exit(1);
-    }
-  }
-
-  double *multipliers = new double[num_generators];
-  int *indices = new int[num_generators];
-  char *ctype = new char[num_generators];
-  {
-    int i;
-    for (i = 0; i<num_generators; i++) {
-      indices[i] = i;
-      ctype[i] = CPX_INTEGER;
+    if (dim_generators >= 0) {
+      assert(dim_vectors == dim_generators);
     }
   }
 
   cout << "Checking that all vectors are generated over the nonnegative reals, and the nonnegative inetgers." << endl;
+  vector<int> v(dim_vectors);
+  int i;
   for (i = 0; i<num_vectors; i++) {
     if (i % 1000 == 0) {
       cout << i << "/" << num_vectors << " done. " << endl;
@@ -151,13 +122,10 @@ int main(int argc, char **argv)
     if (verbose)
       cout << "Checking vector: ";
     int j;
-    for (j = 0; j<dim; j++) {
-      double x;
-      vectors_file >> x;
+    for (j = 0; j<dim_vectors; j++) {
+      vectors_file >> v[j];
       if (verbose)
-	cout << x << " ";
-      status = CPXchgcoef(env, lp, j, -1, x);
-      if (status != 0) abort();
+	cout << v[j] << " ";
     }
 
     if (vectors_file_no_header && vectors_file.eof()) {
@@ -171,59 +139,12 @@ int main(int argc, char **argv)
     if (verbose)
       cout << endl;
 
-    status = CPXdualopt(env, lp);
-    if (status != 0) abort();
-
-    int lpstat = CPXgetstat(env, lp);
-    if (lpstat != CPX_STAT_OPTIMAL) {
-      cerr << "LP solution status code: " << lpstat << endl;
-      cout << "LP written out as repr.lp" << endl;
-      status = CPXwriteprob(env, lp, "repr.lp", "LP");
-      if (status != 0) abort();
+    if (!reduction_test->IsReducible(v)) {
+      cout << "Irreducible: ";
+      for (j = 0; j<dim_vectors; j++)
+	cout << v[j] << " ";
+      cout << endl;
     }
-    else {
-      if (verbose) {
-	cout << "CPLEX says: Vector lies in cone." << endl
-	     << "Multipliers: ";
-	status = CPXgetx(env, lp, multipliers, 0, num_generators - 1);
-	if (status != 0) abort();
-	
-	for (j = 0; j<num_generators; j++)
-	  cout << multipliers[j] << " ";
-	cout << endl;
-      }
-    }
-
-    status = CPXchgprobtype(env, lp, CPXPROB_MILP);
-    if (status != 0) abort();
-    status = CPXchgctype(env, lp, num_generators, indices, ctype);
-    if (status != 0) abort();
-    status = CPXmipopt(env, lp);
-    if (status != 0) abort();
-    int mipstat = CPXgetstat(env, lp);
-    if (mipstat != CPXMIP_OPTIMAL) {
-      cerr << "MIP solution status code: " << mipstat << endl;
-      cout << "MIP written out as repr-ip.lp" << endl;
-      status = CPXwriteprob(env, lp, "repr-ip.lp", "LP");
-      if (status != 0) abort();
-    }
-    else {
-      if (verbose) {
-	cout << "CPLEX says: Vector is generated over the nonnegative integers." << endl
-	     << "Multipliers: ";
-	status = CPXgetmipx(env, lp, multipliers, 0, num_generators - 1);
-	if (status != 0) abort();
-	
-	for (j = 0; j<num_generators; j++)
-	  cout << multipliers[j] << " ";
-	cout << endl;
-      }
-    }
-    status = CPXchgprobtype(env, lp, CPXPROB_LP);
-    if (status != 0) abort();
   }
-  status = CPXfreeprob(env, &lp);
-  if (status != 0) abort();
-  status = CPXcloseCPLEX(&env);
-  if (status != 0) abort();
+  delete reduction_test;
 }
