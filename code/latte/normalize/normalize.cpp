@@ -34,6 +34,10 @@
 #include "latte_4ti2_zsolve.h"
 #include "timing.h"
 #include "ReadSubcones.h"
+#include "ReadLatteStyle.h"
+
+#include "normalize/ReductionTest.h"
+
 // from 4ti2:
 #include "Globals.h"
 
@@ -41,6 +45,7 @@ using namespace std;
 
 string hil_filename;
 IncrementalVectorFileWriter *hil_file_writer = NULL;
+ReductionTest *reduction_test = NULL;
 
 string filename;
 ofstream stats;
@@ -66,10 +71,12 @@ static bool insert_hilbert_basis_element(int *vec)
   
   std::set<vector<int> >::const_iterator where = known_hilbert_vectors.find(*v);
   if (where == known_hilbert_vectors.end()) {
-    // Not known yet, so add it and print it. 
-    known_hilbert_vectors.insert(*v);
-    hil_file_writer->WriteVector(*v);
-    return true;
+    if (!reduction_test->IsReducible(*v)) {
+      // Not known yet, so add it and print it. 
+      known_hilbert_vectors.insert(*v);
+      hil_file_writer->WriteVector(*v);
+      return true;
+    }
   }
   return false;
 }
@@ -130,6 +137,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   if (hil_file_writer == NULL) {
     hil_file_writer
       = new IncrementalVectorFileWriter(hil_filename, params.Number_of_Variables);
+    hil_file_writer->UpdateNumVectors();
   }
   
   int num_rays = lengthListVector(t->rays);
@@ -294,10 +302,21 @@ read_cone_cdd_format(string &filename)
   return cone;
 }
 
+static listCone *
+read_cone_4ti2_format(string &filename)
+{
+  dd_MatrixPtr M = ReadLatteStyleMatrix(filename.c_str(), /*vrep:*/true, /*homogenize:*/true);
+  listCone *cone = cddlib_matrix_to_cone(M);
+  dd_FreeMatrix(M);
+  return cone;
+}
+
+ReductionTestFactory reduction_test_factory;
+
 static void
 usage()
 {
-    cerr << "usage: normaliz [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang } " << endl;
+    cerr << "usage: normaliz [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang | 4TI2-STYLE-FILE.{rays,tra} } " << endl;
     cerr << "Options are: " << endl
 	 << "  --dualization={cdd,4ti2}" << endl
 	 << "  --triangulation={cddlib,4ti2,topcom,...}" << endl
@@ -315,6 +334,7 @@ usage()
          << "  --no-initial-triangulation               Don't compute an initial triangulation," << endl
          << "                                           start recursive normalizer on input." << endl
       ;
+    reduction_test_factory.show_options(cerr);
 }
 
 int main(int argc, char **argv)
@@ -324,8 +344,8 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  cout << "This is pre-NORMALIZ that actually handles the advertised options." << endl;
-  cout << "--nonsimplicial-subdivision is now on by default." << endl;
+  cout << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
+
   listCone *cone;
   listCone *triang;
   bool create_triang_file = true;
@@ -340,11 +360,13 @@ int main(int argc, char **argv)
   params.dualization = BarvinokParameters::DualizationWith4ti2;
   params.nonsimplicial_subdivision = true;
 
+  
   {
     int i;
     for (i = 1; i<argc-1; i++) {
       if (parse_standard_triangulation_option(argv[i], &params)) {}
       else if (parse_standard_dualization_option(argv[i], &params)) {}
+      else if (reduction_test_factory.parse_option(argv[i])) {}
       else if (strncmp(argv[i], "--max-facets=", 13) == 0) {
 	max_facets = atoi(argv[i] + 13);
       }
@@ -382,6 +404,9 @@ int main(int argc, char **argv)
     }
   }
 
+  if (normalize)
+    reduction_test = reduction_test_factory.CreateReductionTest();
+
   filename = argv[argc-1];
 
   string triang_filename;
@@ -405,12 +430,13 @@ int main(int argc, char **argv)
     if (strlen(filename.c_str()) > 4 && strcmp(filename.c_str() + strlen(filename.c_str()) - 4, ".ext") == 0) {
       /* Input in CDD format. */
       cone = read_cone_cdd_format(filename);
-      params.Number_of_Variables = cone->rays->first.length();
     }
     else {
-      cerr << "normaliz: Want a .ext file." << endl;
-      exit(1);
+      /* Try to read a 4ti2-style file. */
+      cout << "Trying to read `" << filename << "' as a list of rays in 4ti2-style format." << endl;
+      cone = read_cone_4ti2_format(filename);
     }
+    params.Number_of_Variables = cone->rays->first.length();
     if (have_subcones) {
       // Also a subcones file given.
       producer = new SubconeReadingConeProducer(cone, subcones_filename);
@@ -466,6 +492,7 @@ int main(int argc, char **argv)
       // Update the number of vectors, close the file.
       delete hil_file_writer;
     }
+    delete reduction_test;
   }
 
   return 0;
