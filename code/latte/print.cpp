@@ -250,7 +250,7 @@ readConeFromFile(istream &in)
 void printListConeToFile(const char *fileName, listCone* cones, int numOfVars) {
   ofstream out(fileName);
   if (!out) {
-    printf("Error opening output file for writing in printListConeToFile!");
+    cerr << "Error opening output file `" << fileName << "' for writing in printListConeToFile!" << endl;
     exit(1);
   }
 
