@@ -167,6 +167,7 @@ code/latte/genFunction/SunWS_cache
 code/latte/gmptest
 code/latte/maximize
 code/latte/minimize
+code/latte/normalize/Makefile.in
 code/latte/numOfLatticePoints
 code/latte/numOfUnimodularCones
 code/latte/redcheck
