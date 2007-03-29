@@ -6,7 +6,7 @@ AC_INIT(latte, 1.2-mk-0.8+cvs)
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
-AC_CONFIG_FILES([Makefile EXAMPLES/Makefile code/Makefile code/latte/Makefile code/test-suite/Makefile code/latte/adjacency/Makefile code/lidia-include.h:code/lidia-include.hin])
+AC_CONFIG_FILES([Makefile EXAMPLES/Makefile code/Makefile code/latte/Makefile code/latte/normalize/Makefile code/test-suite/Makefile code/latte/adjacency/Makefile code/lidia-include.h:code/lidia-include.hin])
 AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
 AC_PROG_RANLIB
 AC_PROG_CC
@@ -126,6 +126,9 @@ AC_ARG_WITH(cplex-include,
 AC_SUBST(CPLEX_CFLAGS)
 
 AM_CONDITIONAL(HAVE_CPLEX, test x$CPLEX_SHAREDLIB != x -a x$CPLEX_CFLAGS != x)
+if test x$CPLEX_SHAREDLIB != x -a x$CPLEX_CFLAGS != x ; then
+   AC_DEFINE(HAVE_CPLEX, 1, [Define if the CPLEX callable library is available])
+fi
 
 # Experimental, not release-ready code.
 AC_ARG_ENABLE(experiments, AS_HELP_STRING([--enable-experiments],
