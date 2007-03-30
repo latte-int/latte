@@ -283,7 +283,7 @@ static void open_output_and_stats()
 }
 
 static listCone *
-read_cone_cdd_format(string &filename)
+read_cone_cdd_format(const string &filename)
 {
   FILE *in = fopen(filename.c_str(), "r");
   if (in == NULL) {
@@ -303,7 +303,7 @@ read_cone_cdd_format(string &filename)
 }
 
 static listCone *
-read_cone_4ti2_format(string &filename)
+read_cone_4ti2_format(const string &filename)
 {
   dd_MatrixPtr M = ReadLatteStyleMatrix(filename.c_str(), /*vrep:*/true, /*homogenize:*/true);
   listCone *cone = cddlib_matrix_to_cone(M);
