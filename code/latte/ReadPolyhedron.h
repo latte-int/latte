@@ -61,6 +61,8 @@ public:
   ReadPolyhedronData();
   bool parse_option(const char *arg);
   Polyhedron *read_polyhedron(BarvinokParameters *params);
+private:
+  Polyhedron *read_polyhedron_hairy(BarvinokParameters *params);
 public:
   bool expect_dilation_factor;
   bool expect_filename;

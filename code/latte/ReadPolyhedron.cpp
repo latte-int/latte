@@ -63,6 +63,7 @@ ReadPolyhedronData::ReadPolyhedronData()
 
 bool ReadPolyhedronData::parse_option(const char *arg)
 {
+  /* Parse traditional LattE options. */
   if (strncmp(arg,"vrep",3)==0) strcpy(Vrepresentation,"yes"); 
   else if(strncmp(arg,"int",3)==0) strcpy(interior,"yes");
   else if(strncmp(arg,"homog",3)==0) strcpy(dualApproach,"yes");
@@ -72,6 +73,11 @@ bool ReadPolyhedronData::parse_option(const char *arg)
   else if(strncmp(arg,"dil",3)==0) {
     strcpy (dilation, "yes");
     expect_dilation_factor = true;
+  }
+  /* Parse new options. */
+  else if (strncmp(argv[i], "--subcones=", 11) == 0) {
+    subcones_filename = string(argv[i] + 11);
+    have_subcones = true;
   }
   else if(strncmp(arg,"--", 2)!=0) {
     // Regular argument, see if we expect one
@@ -90,7 +96,20 @@ bool ReadPolyhedronData::parse_option(const char *arg)
   return true;
 }
 
-Polyhedron *ReadPolyhedronData::read_polyhedron(BarvinokParameters *params)
+Polyhedron *ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
+{
+  Polyhedron *Poly = NULL;
+
+  if (expect_filename) {
+    cerr << "The input file name is missing." << endl;
+    exit(2);
+  }
+
+  if 
+
+}
+
+Polyhedron *ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
 {
   Polyhedron *Poly = NULL;
 
