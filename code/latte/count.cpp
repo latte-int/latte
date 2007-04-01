@@ -65,6 +65,8 @@ static void
 usage(const char *progname)
 {
   cerr << "usage: " << progname << " [OPTIONS...] " << "INPUTFILE" << endl;
+  cerr << "Type `" << progname << " --help' "
+       << "for a list of options and input specifications." << endl;
 }
 
 /* ----------------------------------------------------------------- */
@@ -182,6 +184,10 @@ main(int argc, char *argv[])
     else if (strncmp(argv[i], "--random-seed=", 14) == 0) {
       unsigned int seed = atoi(argv[i] + 14);
       seed_random_generator(seed);
+    }
+    else if (strcmp(argv[i], "--help") == 0) {
+      read_polyhedron_data.show_options(cout);
+      exit(0);
     }
     else if (read_polyhedron_data.parse_option(argv[i])) {}
     else {
@@ -395,7 +401,7 @@ main(int argc, char *argv[])
 	  = decomposeAndComputeEhrhartPolynomial(Poly->cones, *exp_param);
 	cout << endl << "Ehrhart polynomial: ";
 	{
-	  int i;
+	  unsigned int i;
 	  for (i = 0; i<ehrhart_coefficients.size(); i++) {
 	    if (ehrhart_coefficients[i] > 0) 
 	      cout << " + " << ehrhart_coefficients[i] << " * t^" << i;
