@@ -130,6 +130,9 @@ nodist_noinst_HEADERS +=				\
 bin_PROGRAMS += polyhedron-to-cones
 polyhedron_to_cones_SOURCES = polyhedron-to-cones.cpp
 
+bin_PROGRAMS += triangulate-boundary
+triangulate_boundary_SOURCES = triangulation/triangulate-boundary.cpp 
+
 endif
 
 bin_PROGRAMS += triangulate
