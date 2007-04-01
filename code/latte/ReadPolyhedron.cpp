@@ -31,6 +31,7 @@
 #include "convert.h"
 #include "preprocess.h"
 #include "ramon.h"
+#include "ReadSubcones.h"
 
 ReadPolyhedronData::ReadPolyhedronData()
 {
@@ -57,8 +58,39 @@ ReadPolyhedronData::ReadPolyhedronData()
   expect_filename = true;
   degree = 1;
 
+  input_homog_cone = false;
+  input_dualized = false;
+  have_subcones = false;
+  input_listcone_format = false;
+
   matrix = NULL;
   templistVec = NULL;
+}
+
+void ReadPolyhedronData::show_options(ostream &stream)
+{
+  stream << "Standard input specifications:" << endl
+         << "  FILENAME                                 Inequalities in LattE format" << endl
+	 << "    dil DILATION-FACTOR                    - Dilate by DILATION-FACTOR" << endl
+	 << "    +                                      - Add non-negativity constraints" << endl
+         << "    int                                    - Handle the interior of the polyhedron" << endl
+	 << "  vrep FILENAME                            Vertices in LattE format" << endl
+	 << "  cdd FILENAME.{ext,ine}                   Inequalities or vertices in CDD format" << endl
+	 << "Intermediate input specifications:" << endl
+	 << "  --input-primal-homog-cone=CONE.ext       The homogenized polyhedron given by a " << endl
+	 << "                                           full-dimensional cone in CDD format" << endl
+	 << "  --input-dual-homog-cone=CONE.ext         The dual of the homogenized polyhedron given by a " << endl
+         << "                                           full-dimensional cone in CDD format" << endl
+	 << "  --subcones=FILENAME                      Use a subdivision of the above specified" << endl
+         << "                                           cone (up to lower-dimensional cones), given by " << endl
+         << "                                           ray indicator vectors" << endl
+	 << "  --input-primal-homog-cones=CONES         The homogenized polyhedron given by a " << endl
+	 << "                                           union of cones (up to lower-dimensional cones) " << endl
+	 << "                                           in LattE's internal format" << endl
+	 << "  --input-dual-homog-cones=CONES           The dual of the homogenized polyhedron given by a " << endl
+         << "                                           union of cones (up to lower-dimensional cones) " << endl
+	 << "                                           in LattE's internal format" << endl
+    ;
 }
 
 bool ReadPolyhedronData::parse_option(const char *arg)
@@ -75,9 +107,39 @@ bool ReadPolyhedronData::parse_option(const char *arg)
     expect_dilation_factor = true;
   }
   /* Parse new options. */
-  else if (strncmp(argv[i], "--subcones=", 11) == 0) {
-    subcones_filename = string(argv[i] + 11);
+  else if (strncmp(arg, "--input-primal-homog-cone=", 26)==0) {
+    filename = arg + 26;
+    expect_filename = false;
+    input_homog_cone = true;
+    input_dualized = false;
+    strcpy(dualApproach,"yes");
+  }
+  else if (strncmp(arg, "--input-dual-homog-cone=", 24)==0) {
+    filename = arg + 24;
+    expect_filename = false;
+    input_homog_cone = true;
+    input_dualized = true;
+    strcpy(dualApproach,"yes");
+  }
+  else if (strncmp(arg, "--subcones=", 11) == 0) {
+    subcones_filename = string(arg + 11);
     have_subcones = true;
+  }
+  else if (strncmp(arg, "--input-primal-homog-cones=", 27)==0) {
+    filename = arg + 27;
+    expect_filename = false;
+    input_homog_cone = true;
+    input_dualized = false;
+    input_listcone_format = true;
+    strcpy(dualApproach,"yes");
+  }
+  else if (strncmp(arg, "--input-dual-homog-cones=", 25)==0) {
+    filename = arg + 25;
+    expect_filename = false;
+    input_homog_cone = true;
+    input_dualized = true;
+    input_listcone_format = true;
+    strcpy(dualApproach,"yes");
   }
   else if(strncmp(arg,"--", 2)!=0) {
     // Regular argument, see if we expect one
@@ -96,20 +158,82 @@ bool ReadPolyhedronData::parse_option(const char *arg)
   return true;
 }
 
-Polyhedron *ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
+static listCone *
+read_cone_cdd_format(const string &filename)
 {
-  Polyhedron *Poly = NULL;
+  FILE *in = fopen(filename.c_str(), "r");
+  if (in == NULL) {
+    cerr << "Unable to open CDD-style input file " << filename << endl;
+    exit(1);
+  }
+  dd_MatrixPtr M;
+  dd_ErrorType err=dd_NoError;
+  M = dd_PolyFile2Matrix(in, &err);
+  if (err!=dd_NoError) {
+    cerr << "Parse error in CDD-style input file " << filename << endl;
+    exit(1);
+  }
+  listCone *cone = cddlib_matrix_to_cone(M);
+  dd_FreeMatrix(M);
+  return cone;
+}
 
+Polyhedron *
+ReadPolyhedronData::read_polyhedron(BarvinokParameters *params)
+{
   if (expect_filename) {
     cerr << "The input file name is missing." << endl;
     exit(2);
   }
 
-  if 
-
+  if (input_homog_cone)
+    return read_polyhedron_from_homog_cone_input(params);
+  else
+    return read_polyhedron_hairy(params);
 }
 
-Polyhedron *ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
+Polyhedron *
+ReadPolyhedronData::read_polyhedron_from_homog_cone_input(BarvinokParameters *params)
+{
+  /* We are already given a full-dimensional, homogenized cone
+     or a list of those. */
+  ConeProducer *producer = NULL;
+  if (input_listcone_format) {
+    if (have_subcones) {
+      cerr << "Cannot use both a triangulation file and a subcones file." << endl;
+      exit(1);
+    }
+    producer = new ListConeReadingConeProducer(filename);
+  }
+  else {
+    listCone *cone = read_cone_cdd_format(filename);
+    if (have_subcones) {
+      // Also a subcones file given.
+      producer = new SubconeReadingConeProducer(cone, subcones_filename);
+    }
+    else {
+      producer = new SingletonConeProducer(copyCone(cone));
+    }
+  }
+  /* Use the producer to create the polyhedron. */
+  CollectingConeConsumer ccc;
+  producer->Produce(ccc);
+  delete producer;
+  Polyhedron *Poly = new Polyhedron;
+  Poly->cones = ccc.Collected_Cones;
+  int numOfVars;
+  if (Poly->cones == NULL || Poly->cones->rays == NULL)
+    numOfVars = 0;
+  else
+    numOfVars = Poly->cones->rays->first.length();
+  Poly->numOfVars = numOfVars;
+  Poly->homogenized = true;
+  Poly->dualized = input_dualized;
+  return Poly;
+}
+
+Polyhedron *
+ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
 {
   Polyhedron *Poly = NULL;
 

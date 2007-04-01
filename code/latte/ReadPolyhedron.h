@@ -50,6 +50,10 @@ public:
   char LRS[127];
   int degree;
 public:
+  // Data for input of cones
+  bool input_homog_cone, input_dualized, have_subcones, input_listcone_format;
+  string subcones_filename;
+public:
   // A maze of twisty intermediate data, all alike.
   vec_ZZ cost;
   listVector *matrix;  // Sometimes the original matrix.
@@ -59,9 +63,11 @@ public:
   listVector *templistVec; 	// 
 public:
   ReadPolyhedronData();
+  void show_options(ostream &stream);
   bool parse_option(const char *arg);
   Polyhedron *read_polyhedron(BarvinokParameters *params);
 private:
+  Polyhedron *read_polyhedron_from_homog_cone_input(BarvinokParameters *params);
   Polyhedron *read_polyhedron_hairy(BarvinokParameters *params);
 public:
   bool expect_dilation_factor;
