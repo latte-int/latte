@@ -85,6 +85,10 @@ void ListConeReadingConeProducer::Produce(ConeConsumer &consumer)
   if (size_estimate)
     consumer.SetNumCones(size_estimate);
   ifstream file(filename.c_str());
+  if (!file.good()) {
+    cerr << "Error opening file `" << filename << "'" << endl;
+    exit(1);
+  }
   readListConeFromFile(file, consumer);
 }
 
