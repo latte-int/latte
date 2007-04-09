@@ -21,6 +21,7 @@
 #include <cassert>
 #include "triangulation/BoundaryTriangulation.h"
 #include "triangulation/RegularTriangulationWithCddlib.h"
+#include "triangulation/RegularTriangulationWith4ti2.h"
 #include "latte_cddlib.h"
 #include "latte_random.h"
 #include "print.h"
@@ -218,7 +219,7 @@ compute_triangulation_of_boundary
   assert(incidence->famsize == num_inequalities);
   int i;
   for (i = 0; i<num_inequalities; i++) {
-    cout << "Facet " << i << ": ";
+    cout << "Facet " << i+1 << "/" << num_inequalities << ": ";
     int j;
     for (j = 0; j<incidence->setsize; j++)
       if (set_member(j + 1, incidence->set[i])) {
@@ -228,10 +229,14 @@ compute_triangulation_of_boundary
     /* Compute a triangulation of that facet. */
     listCone *facet_cone
       = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
-    triangulate_cone_with_cddlib(facet_cone, Parameters,
-				 delone_height, NULL,
-				 Parameters->Number_of_Variables - 1,
-				 consumer);
+//     triangulate_cone_with_cddlib(facet_cone, Parameters,
+// 				 delone_height, NULL,
+// 				 Parameters->Number_of_Variables - 1,
+// 				 consumer);
+    triangulate_cone_with_4ti2(facet_cone, Parameters,
+			       random_height, &Parameters->triangulation_max_height,
+			       Parameters->Number_of_Variables - 1,
+			       consumer);
 //     cout << "Triangulation of facet cone: " << lengthListCone(facet_triangulation)
 // 	 << " simplicial cones." << endl;
   }
