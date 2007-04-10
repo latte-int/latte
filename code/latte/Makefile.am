@@ -133,6 +133,9 @@ polyhedron_to_cones_SOURCES = polyhedron-to-cones.cpp
 bin_PROGRAMS += triangulate-boundary
 triangulate_boundary_SOURCES = triangulation/triangulate-boundary.cpp 
 
+bin_PROGRAMS += complete-boundary-triangulation
+complete_boundary_triangulation_SOURCES = triangulation/complete-boundary-triangulation.cpp 
+
 endif
 
 bin_PROGRAMS += triangulate
