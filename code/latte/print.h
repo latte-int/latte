@@ -56,6 +56,9 @@ void printListConeToFile(const char*, listCone*, int);
 listCone *
 readListConeFromFile(istream &in);
 
+listCone *
+readListConeFromFile(const char *);
+
 // Likewise, but feed the cones one by one to CONSUMER.
 void
 readListConeFromFile(istream &in, ConeConsumer &consumer);

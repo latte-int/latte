@@ -277,6 +277,14 @@ readListConeFromFile(istream &in)
   return result;
 }
 /* ----------------------------------------------------------------- */
+listCone *
+readListConeFromFile(const char *filename)
+{
+  ifstream in(filename);
+  return readListConeFromFile(in);
+}
+
+/* ----------------------------------------------------------------- */
 void
 readListConeFromFile(istream &in, ConeConsumer &consumer)
 {
