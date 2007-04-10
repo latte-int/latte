@@ -32,6 +32,7 @@
 #include "preprocess.h"
 #include "ramon.h"
 #include "ReadSubcones.h"
+#include "print.h"
 
 ReadPolyhedronData::ReadPolyhedronData()
 {
@@ -200,10 +201,16 @@ ReadPolyhedronData::read_polyhedron_from_homog_cone_input(BarvinokParameters *pa
   ConeProducer *producer = NULL;
   if (input_listcone_format) {
     if (have_subcones) {
-      cerr << "Cannot use both a triangulation file and a subcones file." << endl;
-      exit(1);
+      listCone *cones = readListConeFromFile(filename.c_str());
+      if (lengthListCone(cones) != 1) {
+	cerr << "A subcones file can only be given for a single-cone file." << endl;
+	exit(1);
+      }
+      producer = new SubconeReadingConeProducer(cones, subcones_filename);
     }
-    producer = new ListConeReadingConeProducer(filename);
+    else {
+      producer = new ListConeReadingConeProducer(filename);
+    }
   }
   else {
     listCone *cone = read_cone_cdd_format(filename);
@@ -460,5 +467,10 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
     Poly->numOfVars = numOfVars;
   } /* Not VREP */
 
+  if (dualApproach[0] == 'y')
+    Poly->homogenized = true;
+  else
+    Poly->homogenized = false;
+  
   return Poly;
 }
