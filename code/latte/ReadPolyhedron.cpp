@@ -32,6 +32,9 @@
 #include "preprocess.h"
 #include "ramon.h"
 #include "ReadSubcones.h"
+#ifdef HAVE_FORTYTWO_LIB
+#  include "VertexConesWith4ti2.h"
+#endif
 #include "print.h"
 
 ReadPolyhedronData::ReadPolyhedronData()
@@ -51,9 +54,10 @@ ReadPolyhedronData::ReadPolyhedronData()
   strcpy(taylor,"no");
   strcpy(rationalCone,"no");
   strcpy(inthull, "no");
-  strcpy(LRS, "no");
   strcpy(Memory_Save, "yes");
 
+  vertexcones = VertexConesWithCdd;
+  
   expect_dilation_factor = false;
   dilation_const = 1;
   expect_filename = true;
@@ -107,6 +111,8 @@ bool ReadPolyhedronData::parse_option(const char *arg)
     strcpy (dilation, "yes");
     expect_dilation_factor = true;
   }
+  else if (strncmp(arg, "lrs", 3)==0)
+    vertexcones = ReadPolyhedronData::VertexConesWithLrs;
   /* Parse new options. */
   else if (strncmp(arg, "--input-primal-homog-cone=", 26)==0) {
     filename = arg + 26;
@@ -141,6 +147,18 @@ bool ReadPolyhedronData::parse_option(const char *arg)
     input_dualized = true;
     input_listcone_format = true;
     strcpy(dualApproach,"yes");
+  }
+  else if (strncmp(arg, "--compute-vertex-cones=", 23) == 0) {
+    if (strcmp(arg + 23, "cdd") == 0) 
+      vertexcones = VertexConesWithCdd;
+    else if (strcmp(arg + 23, "lrs") == 0)
+      vertexcones = VertexConesWithLrs;
+    else if (strcmp(arg + 23, "4ti2") == 0)
+      vertexcones = VertexConesWith4ti2;
+    else {
+      cerr << "Unknown vertex cone method: " << arg + 23 << endl;
+      exit(1);
+    }
   }
   else if(strncmp(arg,"--", 2)!=0) {
     // Regular argument, see if we expect one
@@ -402,10 +420,27 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
     params->vertices_time.start();
     if ((dualApproach[0]=='n') && (Vrepresentation[0] == 'n')) {
       listCone *tmpcones;
-      if(LRS[0] == 'n')
+
+      switch (vertexcones) {
+      case VertexConesWithCdd:
 	tmpcones=computeVertexCones(filename.c_str(),matrix,numOfVars);
-      else
+	break;
+      case VertexConesWithLrs:
 	tmpcones=computeVertexConesViaLrs(filename.c_str(),matrix,numOfVars);
+	break;
+      case VertexConesWith4ti2:
+#ifdef HAVE_FORTYTWO_LIB
+	tmpcones=computeVertexConesWith4ti2(matrix, numOfVars);
+#else
+	cerr << "VertexConesWith4ti2 not compiled in, sorry" << endl;
+	exit(1);
+#endif
+	break;
+      default:
+	cerr << "Bad VertexConesType" << endl;
+	abort();
+      };
+	  
       if(maximum[0] == 'y'){ 
 	LP_vertex = LP(matrix, cost, numOfVars);
 	vec_RR Rat_cost;  Rat_cost.SetLength(numOfVars);

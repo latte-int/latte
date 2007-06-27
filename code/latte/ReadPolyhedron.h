@@ -47,12 +47,19 @@ public:
   char rationalCone[127];
   char assumeUnimodularCones[127];
   char Singlecone[127];
-  char LRS[127];
   int degree;
 public:
   // Data for input of cones
   bool input_homog_cone, input_dualized, have_subcones, input_listcone_format;
   string subcones_filename;
+public:
+  // How to compute vertex cones.
+  typedef enum {
+    VertexConesWithCdd,
+    VertexConesWithLrs,
+    VertexConesWith4ti2
+  } VertexConesType;
+  VertexConesType vertexcones;
 public:
   // A maze of twisty intermediate data, all alike.
   vec_ZZ cost;
