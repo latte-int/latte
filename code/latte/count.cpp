@@ -128,7 +128,6 @@ main(int argc, char *argv[])
     else if(strncmp(argv[i],"memsave",7)==0) strcpy (read_polyhedron_data.Memory_Save, "yes");
     else if(strncmp(argv[i],"printcones",3)==0) strcpy (Print, "yes");
     //else if(strncmp(argv[i],"hull",3)==0) strcpy (inthull, "yes");
-    else if(strncmp(argv[i],"lrs",3)==0) strcpy (read_polyhedron_data.LRS, "yes");
     else if(strncmp(argv[i],"rem",3)==0) {
       strcpy (removeFiles, "no");
       strcpy (read_polyhedron_data.Memory_Save, "no");
