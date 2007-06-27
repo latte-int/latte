@@ -63,10 +63,14 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
   VectorArray* subspace = new VectorArray(0, matrix->get_size());
   RayAlgorithm algorithm;
   algorithm.compute(*matrix, *rays, *subspace, *rs);
+  delete rs;
 
   assert(subspace->get_number() == 0); /* We assume polytopes,
 					  thus a pointed
 					  homogenization */
+  delete matrix;
+  delete subspace;
+  
   int num_rays = rays->get_number();
   
   /* Walk through all rays of the homogenization; each gives a vertex
@@ -127,6 +131,7 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
     consumer.ConsumeCone(cone);
 
   }
+  delete rays;
 }
 
 listCone *
