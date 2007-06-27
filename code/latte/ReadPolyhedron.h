@@ -60,6 +60,13 @@ public:
     VertexConesWith4ti2
   } VertexConesType;
   VertexConesType vertexcones;
+  // How to obtain a non-redundant representation.
+  typedef enum {
+    RedundancyCheckWithCdd,
+    NoRedundancyCheck,
+    RedundancyCheckWithCddlib
+  } RedundancyCheckType;
+  RedundancyCheckType redundancycheck;
 public:
   // A maze of twisty intermediate data, all alike.
   vec_ZZ cost;

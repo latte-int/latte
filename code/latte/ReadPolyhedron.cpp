@@ -57,6 +57,7 @@ ReadPolyhedronData::ReadPolyhedronData()
   strcpy(Memory_Save, "yes");
 
   vertexcones = VertexConesWithCdd;
+  redundancycheck = RedundancyCheckWithCdd;
   
   expect_dilation_factor = false;
   dilation_const = 1;
@@ -95,6 +96,10 @@ void ReadPolyhedronData::show_options(ostream &stream)
 	 << "  --input-dual-homog-cones=CONES           The dual of the homogenized polyhedron given by a " << endl
          << "                                           union of cones (up to lower-dimensional cones) " << endl
 	 << "                                           in LattE's internal format" << endl
+         << "Input handling options:" << endl
+	 << "  --compute-vertex-cones={cdd,lrs,4ti2}    Use this method for computing vertex cones" << endl
+	 << "  --redundancy-check={none,cdd}            Use this method for computing an irredundant " << endl
+	 << "                                           representation" << endl
     ;
 }
 
@@ -157,6 +162,16 @@ bool ReadPolyhedronData::parse_option(const char *arg)
       vertexcones = VertexConesWith4ti2;
     else {
       cerr << "Unknown vertex cone method: " << arg + 23 << endl;
+      exit(1);
+    }
+  }
+  else if (strncmp(arg, "--redundancy-check=", 19) == 0) {
+    if (strcmp(arg + 19, "none") == 0)
+      redundancycheck = NoRedundancyCheck;
+    else if (strcmp(arg + 19, "cdd") == 0)
+      redundancycheck = RedundancyCheckWithCdd;
+    else {
+      cerr << "Unknown redundancy check method: " << arg + 19 << endl;
       exit(1);
     }
   }
@@ -304,8 +319,8 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
 
   
     /* Check input file. */
-    if(Vrepresentation[0] == 'n'){
-      if((cddstyle[0] == 'n') && (maximum[0] == 'n')&& (minimize[0] == 'n')){
+
+    if((cddstyle[0] == 'n') && (maximum[0] == 'n')&& (minimize[0] == 'n')){
 	CheckInputFile(filename.c_str());
 	CheckLength(filename.c_str(), equationsPresent);
       }
@@ -322,7 +337,7 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
 	  CheckInputFileCDDRep3(filename.c_str());
 	  CheckInputFileCDDRep4(filename.c_str());
 	}
-    }else CheckInputFileVrep(filename.c_str());
+
     if (cddstyle[0] == 'y') {
       cerr << "Warning: Not performing check for empty polytope, "
 	   << "because it is unimplemented for the CDD-style input format. "
@@ -335,8 +350,23 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
     /* Read problem data. */
     params->read_time.start();
   
-    if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n'))
-      CheckRed(filename, equationsPresent, maximum, nonneg, interior, dilation, dilation_const); 
+    if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) {
+      switch (redundancycheck) {
+      case NoRedundancyCheck:
+	break;
+      case RedundancyCheckWithCdd:
+	/* this changes FILENAME: */
+	CheckRed(filename, equationsPresent, maximum, nonneg, interior, dilation, dilation_const);
+	break;
+      case RedundancyCheckWithCddlib:
+	cerr << "RedundancyCheckWithCddlib unimplemented." << endl;
+	exit(1);
+	break;
+      default:
+	cerr << "Unknown redundancy check" << endl;
+	abort();
+      }
+    }
 
     dilation_const = 1;
     if((cddstyle[0] == 'n'))
