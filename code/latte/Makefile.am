@@ -89,8 +89,10 @@ endif
 if HAVE_FORTYTWO_LIB
 liblatte_a_SOURCES += latte_4ti2.cpp
 liblatte_a_SOURCES += triangulation/RegularTriangulationWith4ti2.cpp
+liblatte_a_SOURCES += VertexConesWith4ti2.cpp
 noinst_HEADERS += latte_4ti2.h
 noinst_HEADERS += triangulation/RegularTriangulationWith4ti2.h
+noinst_HEADERS += VertexConesWith4ti2.h
 
 liblatte_a_SOURCES += DualizationWith4ti2.cpp
 noinst_HEADERS += DualizationWith4ti2.h
