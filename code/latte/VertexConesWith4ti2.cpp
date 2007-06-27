@@ -27,6 +27,7 @@
 #include "latte_gmp.h"
 #include "latte_4ti2.h"
 #include "VertexConesWith4ti2.h"
+#include "dual.h"
 #include "DualizationWith4ti2.h"
 
 #include "print.h"
@@ -107,12 +108,19 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
        hold of the adjacent rays of the current ray of the
        homogenization.
 
-       Here we compute the rays from the facets instead, the discard
+       Here we compute the rays from the facets instead, then discard
        the facets (because later code does not like them).
     */
     cone->rays = cone->facets;
     cone->facets = NULL;
-    dualizeCone_with_4ti2(cone, numOfVars);
+    if (lengthListVector(cone->rays) == numOfVars) {
+      /* Simplicial cone. */
+      computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
+      swap(cone->determinant, cone->dual_determinant);
+      swap(cone->rays, cone->facets);
+    }
+    else
+      dualizeCone_with_4ti2(cone, numOfVars);
     freeListVector(cone->facets);
     cone->facets = NULL;
 
