@@ -274,8 +274,7 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
     }
   }
 
-  resulting_triangulation
-    = dualizeBackCones(resulting_triangulation, Parameters->Number_of_Variables);
+  dualizeCones(resulting_triangulation, Parameters->Number_of_Variables, Parameters);
   listCone *cone;
   for (cone = resulting_triangulation; cone!=NULL; cone=cone->rest) {
     if (!rays_ok(cone, Parameters->Number_of_Variables)) {
@@ -283,8 +282,7 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
       printCone(cone, numOfVars);
     }
   }
-  resulting_triangulation
-    = dualizeBackCones(resulting_triangulation, Parameters->Number_of_Variables);
+  dualizeCones(resulting_triangulation, Parameters->Number_of_Variables, Parameters);
 
   {
     listCone *next = NULL;
