@@ -177,7 +177,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::ConsumeCone(listCone *c
   switch (decomposition) {
   case BarvinokParameters::IrrationalPrimalDecomposition:
     // Do Barvinok decomposition on the primal cones.
-    dualizeBackCones(cone, Number_of_Variables);
+    dualizeCone(cone, Number_of_Variables, this);
     irrationalizeCone(cone, Number_of_Variables);
     break;
   case BarvinokParameters::IrrationalAllPrimalDecomposition:

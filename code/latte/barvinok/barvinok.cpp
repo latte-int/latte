@@ -195,7 +195,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 	  break;
 	case BarvinokParameters::IrrationalPrimalDecomposition:
 	  // Do Barvinok decomposition on the primal cones.
-	  dualizeBackCones(dummy, Parameters->Number_of_Variables);
+	  dualizeCone(dummy, Parameters->Number_of_Variables, Parameters);
 	  irrationalizeCone(dummy, Parameters->Number_of_Variables);
 	  break;
 	case BarvinokParameters::IrrationalAllPrimalDecomposition:
@@ -352,7 +352,7 @@ deliver_cone(listCone *C, Single_Cone_Parameters *Parameters)
 	 << endl;
   switch (Parameters->decomposition) {
   case BarvinokParameters::DualDecomposition:
-    C = dualizeBackCones(C, Parameters->Number_of_Variables);
+    dualizeCone(C, Parameters->Number_of_Variables, Parameters);
     return Parameters->ConsumeCone(C);
   case BarvinokParameters::IrrationalPrimalDecomposition:
   case BarvinokParameters::IrrationalAllPrimalDecomposition:
