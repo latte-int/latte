@@ -50,11 +50,11 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
     = rays_to_4ti2_VectorArray(ineqs, 1 + numOfVars,
 			       /* num_homogenization_vars: */ num_ineqs,
 			       /* num_extra_rows: */ 0);
-    /* Add identity matrix for the slack variables. */
+  /* Add negative identity matrix for the slack variables. */
   {
     int i;
     for (i = 0; i<num_ineqs; i++) {
-      (*matrix)[i][i] = 1;
+      (*matrix)[i][i] = -1;
       rs->set(i);
     }
   }
@@ -99,37 +99,20 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
 	facet_vector.SetLength(numOfVars);
 	int k;
 	for (k = 0; k<numOfVars; k++)
-	  facet_vector[k] = ineq->first[k + 1];
+	  facet_vector[k] = - ineq->first[k + 1];
 	cone->facets = new listVector(facet_vector, cone->facets);
       }
     }
 
-#if 0
-    printListCone(cone, numOfVars);
-#endif
-    
-    /* FIXME: To compute the rays of the vertex cone, we need to get
-       hold of the adjacent rays of the current ray of the
+    /* FIXME: To cheaply compute the rays of the vertex cone, we need
+       to get hold of the adjacent rays of the current ray of the
        homogenization.
 
-       Here we compute the rays from the facets instead, then discard
-       the facets (because later code does not like them).
+       For the moment, don't compute the rays.  Later code will construct
+       them when needed.
     */
-    cone->rays = cone->facets;
-    cone->facets = NULL;
-    if (lengthListVector(cone->rays) == numOfVars) {
-      /* Simplicial cone. */
-      computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
-      swap(cone->determinant, cone->dual_determinant);
-      swap(cone->rays, cone->facets);
-    }
-    else
-      dualizeCone_with_4ti2(cone, numOfVars);
-    freeListVector(cone->facets);
-    cone->facets = NULL;
 
     consumer.ConsumeCone(cone);
-
   }
   delete rays;
 }
