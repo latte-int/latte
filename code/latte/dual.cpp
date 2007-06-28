@@ -147,6 +147,12 @@ void dualizeCone(listCone *tmp, int numOfVars, BarvinokParameters *params)
     swap(tmp->determinant, tmp->dual_determinant);
     swap(tmp->rays, tmp->facets);
   }
+  else if (tmp->rays == NULL && tmp->facets != NULL) {
+    /* Facets are already computed, so just swap, so we have a ray
+       representation. */
+    swap(tmp->determinant, tmp->dual_determinant);
+    swap(tmp->rays, tmp->facets);
+  }
   else if (lengthListVector(tmp->rays) == params->Number_of_Variables) {
     /* We assume full-dimensional cones, so this must be a simplicial
        cone. */
@@ -175,7 +181,8 @@ void dualizeCone(listCone *tmp, int numOfVars, BarvinokParameters *params)
   }
 }
 
-listCone* dualizeCones(listCone *cones, int numOfVars, BarvinokParameters *params)
+void
+dualizeCones(listCone *cones, int numOfVars, BarvinokParameters *params)
 {
   params->dualize_time.start();
   int numOfConesDualized,numOfAllCones;
@@ -201,8 +208,8 @@ listCone* dualizeCones(listCone *cones, int numOfVars, BarvinokParameters *param
   //removeListVector(cones->facets);
   params->dualize_time.stop();
   cout << params->dualize_time;
-  return (cones);
 }
+
 /* ----------------------------------------------------------------- */
 
 void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
@@ -256,30 +263,6 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
   }
 }
 
-listCone* dualizeBackCones(listCone *cones, int numOfVars) 
-{
-  int numOfConesDualized,numOfAllCones;
-  listCone *tmp;
-
-  numOfConesDualized=0;
-  numOfAllCones=lengthListCone(cones);
-
-  tmp=cones;
-  while (tmp) {
-    if (tmp->facets == NULL) {
-      computeDetAndFacetsOfSimplicialCone(tmp, numOfVars);
-      numOfConesDualized++;
-      if (numOfConesDualized==50*(numOfConesDualized/50)) {
-	printf("%d / %d done.\n",numOfConesDualized,numOfAllCones);
-      }
-    }
-    swap(tmp->determinant, tmp->dual_determinant);
-    swap(tmp->rays, tmp->facets);
-    tmp=tmp->rest;
-  }
-  return (cones);
-}
-
 /* ----------------------------------------------------------------- */
 
 void computeTightInequalitiesOfCones(listCone *cones,
@@ -288,29 +271,30 @@ void computeTightInequalitiesOfCones(listCone *cones,
 {
   listCone *cone;
   for (cone = cones; cone; cone = cone->rest) {
-    assert(cone->facets == NULL);
-    listVector *inequality;
-    listVector *tight_inequalities = NULL;
-    ZZ vertex_scale_factor;
-    vec_ZZ scaled_vertex
-      = scaleRationalVectorToInteger(cone->vertex->vertex, numOfVars,
-				     vertex_scale_factor);
-    for (inequality = inequalities; inequality; inequality = inequality->rest) {
-      int i;
-      ZZ sp;
-      vec_ZZ &ineq = inequality->first;
-      sp = vertex_scale_factor * ineq[0];
-      for (i = 0; i<numOfVars; i++)
-	sp += scaled_vertex[i] * ineq[i + 1];
-      if (IsZero(sp)) {
-	vec_ZZ vec;
-	vec.SetLength(numOfVars);
+    if (cone->facets == NULL) {
+      listVector *inequality;
+      listVector *tight_inequalities = NULL;
+      ZZ vertex_scale_factor;
+      vec_ZZ scaled_vertex
+	= scaleRationalVectorToInteger(cone->vertex->vertex, numOfVars,
+				       vertex_scale_factor);
+      for (inequality = inequalities; inequality; inequality = inequality->rest) {
+	int i;
+	ZZ sp;
+	vec_ZZ &ineq = inequality->first;
+	sp = vertex_scale_factor * ineq[0];
 	for (i = 0; i<numOfVars; i++)
-	  vec[i] = -ineq[i+1];
-	tight_inequalities = new listVector(vec,
-					    tight_inequalities);
+	  sp += scaled_vertex[i] * ineq[i + 1];
+	if (IsZero(sp)) {
+	  vec_ZZ vec;
+	  vec.SetLength(numOfVars);
+	  for (i = 0; i<numOfVars; i++)
+	    vec[i] = -ineq[i+1];
+	  tight_inequalities = new listVector(vec,
+					      tight_inequalities);
+	}
       }
+      cone->facets = tight_inequalities;
     }
-    cone->facets = tight_inequalities;
   }
 }
