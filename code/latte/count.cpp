@@ -286,7 +286,6 @@ main(int argc, char *argv[])
   params->File_Name = (char*) fileName;
   params->Number_of_Variables = Poly->numOfVars;
 
-
   switch (params->decomposition) {
   case BarvinokParameters::DualDecomposition:
   case BarvinokParameters::IrrationalPrimalDecomposition:
@@ -296,7 +295,7 @@ main(int argc, char *argv[])
 	   Then dualizeCones just needs to swap rays and facets. */
 	computeTightInequalitiesOfCones(Poly->cones, read_polyhedron_data.matrix, Poly->numOfVars);
       }
-      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
+      dualizeCones(Poly->cones, Poly->numOfVars, params);
       Poly->dualized = true;
     }
     break;
@@ -304,14 +303,14 @@ main(int argc, char *argv[])
     cout << "Irrationalizing polyhedral cones... "; cout.flush();
     if (Poly->dualized) {
       cout << "(First dualizing back... "; cout.flush();
-      Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
+      dualizeCones(Poly->cones, Poly->numOfVars, params);
       cout << "done; sorry for the interruption.) "; cout.flush();
     }
     else {
       if (read_polyhedron_data.Vrepresentation[0] == 'y') {
 	cout << "(First computing facets for them... "; cout.flush();
-	Poly->cones = dualizeCones(Poly->cones, Poly->numOfVars, params);
-	Poly->cones = dualizeBackCones(Poly->cones, Poly->numOfVars); // just swaps
+	dualizeCones(Poly->cones, Poly->numOfVars, params);
+	dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
 	cout << "done; sorry for the interruption.) "; cout.flush();
       }      
       else {
@@ -320,6 +319,15 @@ main(int argc, char *argv[])
 	params->dualize_time.start();
 	computeTightInequalitiesOfCones(Poly->cones, read_polyhedron_data.matrix, Poly->numOfVars);
 	params->dualize_time.stop(); cout << params->dualize_time;
+      }
+      if (Poly->cones && Poly->cones->rays == NULL) {
+	/* Only facets computed, for instance by using the 4ti2
+	   method of computing vertex cones.  So dualize twice to
+	   compute the rays. */
+	cout << "(First computing their rays... "; cout.flush();
+	dualizeCones(Poly->cones, Poly->numOfVars, params);
+	dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
+	cout << "done; sorry for the interruption.) "; cout.flush();
       }
     }
     params->irrationalize_time.start();
