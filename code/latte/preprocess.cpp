@@ -21,7 +21,6 @@
 #include "cone.h"
 #include "print.h"
 #include "ramon.h"
-#include "ReadingFile.h"
 
 /* ----------------------------------------------------------------- */
 vec_ZZ transpose(vec_ZZ mat, int numOfVars, int numOfRows){
@@ -223,9 +222,8 @@ listVector* preprocessProblem(listVector *equations,
 	exit(0);}
     }
     else{
-
       cerr << "The polytope is not bounded." << endl;
-      exit(0);
+      exit(1);
     }
   }
   numOfRows=lengthListVector(equations);
