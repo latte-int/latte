@@ -108,8 +108,8 @@ int main(int argc, char **argv)
 
 #if 0
   // Compute facets.
-  cone = dualizeCones(cone, params.Number_of_Variables);
-  cone = dualizeBackCones(cone, params.Number_of_Variables);
+  dualizeCones(cone, params.Number_of_Variables);
+  dualizeCones(cone, params.Number_of_Variables);
 #endif
   cout << "*** Input cone:" << endl;
   printListCone(cone, params.Number_of_Variables);
