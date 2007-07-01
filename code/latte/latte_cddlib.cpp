@@ -1,6 +1,6 @@
 /* latte_cddlib.cpp -- Interface to cddlib
 
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -96,3 +96,28 @@ cddlib_matrix_to_cone(dd_MatrixPtr matrix)
   }
   return result;
 }
+
+void
+cddlib_matrix_to_equations_and_inequalities(dd_MatrixPtr matrix,
+					    listVector **equations,
+					    listVector **inequalities)
+{
+  assert(matrix->representation == dd_Inequality);
+  int numOfVars = matrix->colsize - 1;
+  *equations = NULL;
+  *inequalities = NULL;
+  int i;
+  for (i = matrix->rowsize - 1; i>=0; i--) {
+    vec_ZZ ineq;
+    ineq.SetLength(numOfVars + 1);
+    int j;
+    for (j = 0; j<=numOfVars; j++) {
+      ineq[j] = convert_mpq_to_ZZ(matrix->matrix[i][j]);
+    }
+    if (set_member(i + 1, matrix->linset))
+      (*equations) = new listVector(ineq, *equations);
+    else
+      (*inequalities) = new listVector(ineq, *inequalities);
+  }
+}
+

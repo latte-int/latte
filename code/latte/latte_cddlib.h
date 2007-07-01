@@ -2,7 +2,7 @@
    
 /* latte_cddlib.h -- Interface to cddlib
 
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -66,6 +66,13 @@ cone_to_cddlib_polyhedron(listCone *cone, int numOfVars);
    Return a corresponding listCone. */
 listCone *
 cddlib_matrix_to_cone(dd_MatrixPtr matrix);
+
+/* MATRIX should be an H-representation of a polyhedron.
+   Return equations and inequalities. */
+void
+cddlib_matrix_to_equations_and_inequalities(dd_MatrixPtr matrix,
+					    listVector **equations,
+					    listVector **inequalities);
 
 #endif
 
