@@ -26,6 +26,9 @@
 #include "latte_gmp.h"
 #include "latte_cddlib.h"
 #include "vertices/cdd.h"
+#include <vector>
+
+using namespace std;
 
 static void check_stream(const istream &f, const char *fileName, const char *proc)
 {
@@ -35,18 +38,51 @@ static void check_stream(const istream &f, const char *fileName, const char *pro
   }
 };
 
-dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep, bool homogenize)
+dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep, bool homogenize,
+				  bool nonnegativity)
 {
   ifstream f(fileName);
   if (!f) {
     cerr << "Cannot open input file " << fileName << " in ReadLatteStyleMatrix." << endl;
     exit(1);
   }
-  return ReadLatteStyleMatrix(f, vrep, homogenize, fileName);
+  return ReadLatteStyleMatrix(f, vrep, homogenize, fileName, nonnegativity);
+}
+
+/* NONNEGATIVITY contains 1-based variable indices.
+   Add corrresponding non-negativity constraints and return a new
+   matrix.
+*/
+static dd_MatrixPtr
+add_nonnegativity(dd_MatrixPtr matrix, const vector<int> &nonnegatives,
+		  int num_homog)
+{
+  int num_nonnegative = nonnegatives.size();
+  int numOfVectors = matrix->rowsize;
+  int numOfVars_hom = matrix->colsize;
+  int numOfVars = numOfVars_hom - num_homog;
+  dd_MatrixPtr new_matrix
+    = dd_CreateMatrix(numOfVectors + num_nonnegative, numOfVars_hom);
+  new_matrix->numbtype = dd_Rational;
+  new_matrix->representation = dd_Inequality;
+  int i, j;
+  for (i = 0; i<numOfVectors; i++)
+    for (j = 0; j<numOfVars_hom; j++)
+      dd_set(new_matrix->matrix[i][j], matrix->matrix[i][j]);
+  int k;
+  for (k = 0; k<num_nonnegative; k++, i++) {
+    int index = nonnegatives[k]; /* 1-based */
+    for (j = 0; j<numOfVars; j++)
+      dd_set_si(new_matrix->matrix[i][j + num_homog], 0);
+    dd_set_si(new_matrix->matrix[i][index + num_homog], 1);
+  }
+  set_copy(new_matrix->linset, matrix->linset);
+  return new_matrix;
 }
 
 dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep, bool homogenize,
-				  const char *fileName)
+				  const char *fileName,
+				  bool nonnegativity)
 {
   dd_set_global_constants();
   int numOfVectors, numOfVars;
@@ -96,25 +132,18 @@ dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep, bool homogenize,
       int num_nonnegative;
       f >> num_nonnegative;
       check_stream(f, fileName, "ReadLatteStyleMatrix");
-      // Create a new matrix that includes non-negativity
-      // inequalities. 
-      dd_MatrixPtr new_matrix
-	= dd_CreateMatrix(numOfVectors + num_nonnegative, numOfVars_hom);
-      new_matrix->numbtype = dd_Rational;
-      new_matrix->representation = dd_Inequality;
-      for (i = 0; i<numOfVectors; i++)
-	for (j = 0; j<numOfVars_hom; j++)
-	  dd_set(new_matrix->matrix[i][j], matrix->matrix[i][j]);
+      vector<int> nonnegatives(num_nonnegative);
       int k;
-      for (k = 0; k<num_nonnegative; k++, i++) {
+      for (k = 0; k<num_nonnegative; k++) {
 	int index; /* 1-based */
 	f >> index;
 	check_stream(f, fileName, "ReadLatteStyleMatrix");
-	for (j = 0; j<numOfVars; j++)
-	  dd_set_si(new_matrix->matrix[i][j + num_homog], 0);
-	dd_set_si(new_matrix->matrix[i][index + num_homog], 1);
+	nonnegatives[k] = index;
       }
-      set_copy(new_matrix->linset, matrix->linset);
+      // Create a new matrix that includes non-negativity
+      // inequalities.
+      dd_MatrixPtr new_matrix
+	= add_nonnegativity(matrix, nonnegatives, num_homog);
       dd_FreeMatrix(matrix);
       matrix = new_matrix;
     }
@@ -128,6 +157,16 @@ dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep, bool homogenize,
       char c;
       f.get(c);
     }
+  }
+  if (nonnegativity) {
+    vector<int> nonnegatives(numOfVars);
+    int k;
+    for (k = 0; k<numOfVars; k++)
+      nonnegatives[k] = k + 1; /* 1-based indices */
+    dd_MatrixPtr new_matrix
+      = add_nonnegativity(matrix, nonnegatives, num_homog);
+    dd_FreeMatrix(matrix);
+    matrix = new_matrix;
   }
   return matrix;	
 }
@@ -158,46 +197,3 @@ void WriteLatteStyleMatrix(ostream &f, dd_MatrixPtr matrix)
   }
 }
 
-Polyhedron *ReadLatteStyleVrep(const char *filename, bool homogenize)
-{
-  Polyhedron *P = new Polyhedron;
-  if (homogenize) {
-    /* Homogenize. */
-    dd_MatrixPtr matrix = ReadLatteStyleMatrix(filename,
-					       /* vrep: */ true,
-					       /* homogenize: */ false);
-    //dd_WriteMatrix(stdout, matrix);
-    dd_ErrorType error;
-    dd_rowset redundant = dd_RedundantRows(matrix, &error);
-    check_cddlib_error(error, "ReadLatteStyleVrep");
-    /* The non-redundant rows are the rays of the homogenization. */
-    int i;
-    listCone *cone = createListCone();
-    P->numOfVars = matrix->colsize;
-    vec_ZZ ray;
-    ray.SetLength(matrix->colsize);
-    for (i = 1; i<=matrix->rowsize; i++) {
-      if (!set_member(i, redundant)) {
-	int j;
-	/* CDD has homogenization in the 0-th,
-	   LattE expects it in the last coordinate. */
-	for (j = 0; j < matrix->colsize - 1; j++)
-	  ray[j] = convert_mpq_to_ZZ(matrix->matrix[i - 1][j + 1]);
-	ray[matrix->colsize-1] = convert_mpq_to_ZZ(matrix->matrix[i - 1][0]);
-	cone->rays = appendVectorToListVector(ray, cone->rays);
-	cone->vertex = new Vertex(createRationalVector(P->numOfVars));
-      }
-    }
-    dd_FreeMatrix(matrix);
-    P->cones = cone;
-    P->dualized = false;
-    P->homogenized = true;
-  }
-  else {
-    /* Don't homogenize. */
-    P->cones = computeVertexConesFromVrep(filename, P->numOfVars);
-    P->dualized = false;
-    P->homogenized = false;
-  }
-  return P;
-}
