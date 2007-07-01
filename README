@@ -11,6 +11,18 @@ It requires the following programs and libraries:
   * (optional) LiDIA
   * (optional) 4ti2
 
+If you do not have these libraries installed yet, follow the
+instructions below to install them.  However, we also package a source
+code distribution called
+
+   "latte-for-tea-too"
+
+that includes all of these libraries and will build them automatically. 
+You can get it at the same place where you got LattE macchiato,
+
+    http://www.math.uni-magdeburg.de/~mkoeppe/latte/
+
+
 Building and installing LattE
 -----------------------------
 
@@ -50,6 +62,8 @@ hierarchy rooted at the directory $HOME/latte.
    include/lidia but expects its header files in include/LiDIA.  We
    advise to put a symbolic link after installation of LiDIA.
 
+6. Optionally, install 4ti2.
+
 N. Build and install LattE
 
    From the source directory of LattE:
@@ -69,7 +83,9 @@ More information
 
  * Authors: see AUTHORS
 
- * Documentation: see manual_v1.1.pdf
+ * Documentation: See the old LattE manual (file `manual_v1.1.pdf') to get started.
+   		  For brief information on the new features of LattE macchiato,
+		  see the file `NEWS'.
 
  * Changes since the official release 1.2: see NEWS and ChangeLog
 
