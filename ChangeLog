@@ -1,3 +1,461 @@
+2007-07-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ReadPolyhedron.cpp, code/latte/ReadPolyhedron.h:
+	Rewrite the reading of input files and the redundancy check.
+
+	The "equ" command-line option is now ignored.
+
+	New command-line option --redundancy-check={none,cddlib,full-cddlib}.
+	"full-cddlib" uses cddlib to compute an irredundant system of linear
+	equations and inequalities describing the polyhedron.  This
+	corresponds to the traditional behavior; it can be expensive.
+	"cddlib" (the new default) uses cddlib to compute the implicit linearities only.
+	"none" does nothing, the input description of the polytope should be
+	irredundant.
+
+	* code/latte/ReadLatteStyle.cpp, code/latte/ReadLatteStyle.h
+	(ReadLatteStyleMatrix): Extend interface to accept a
+	"nonnegativity" flag.
+	(ReadLatteStyleVrep): Move to ReadPolyhedron.h, .cpp
+
+	* code/latte/count.cpp: Don't remove the file storing the
+	non-redundant representation (we no longer create one).
+
+	* code/latte/latte_cddlib.cpp, code/latte/latte_cddlib.h 
+	(cddlib_matrix_to_equations_and_inequalities): New.
+
+	* code/latte/preprocess.cpp: Don't #include "ReadingFile.h".
+
+	If polyhedron is not bounded, exit with code 1.
+
+	* code/latte/triangulation/test-triangulation.cpp:
+	Use dualizeCones instead of dualizeBackCones
+
+	* code/test-suite/test.pl.in:
+	Fix test result of corrected example "4x4Table11".
+
+2007-06-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* EXAMPLES/yoshida/4x4Table11: Add missing "linearity" keyword
+
+2007-06-28  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp:
+	Use dualizeCone instead of dualizeBackCones.
+
+	* code/latte/count.cpp: Use changed interface of dualizeCones.
+	Use dualizeCones instead of dualizeBackCones.
+
+	In the all-primal algorithm, if only the facets of vertex cones are
+	known [happens when computed with 4ti2], first compute the rays.
+
+	* code/latte/VertexConesWith4ti2.cpp: Don't compute the rays.
+	Get sign of the facets right.
+
+	* code/latte/ExponentialApprox.cpp:
+	Use dualizeCone instead of dualizeBackCones.
+
+	* code/latte/barvinok/dec.cpp:
+	Use dualizeCones instead of dualizeBackCones.
+
+	* code/latte/barvinok/barvinok.cpp:
+	Use dualizeCone instead of dualizeBackCones.
+
+	* code/latte/dual.cpp, code/latte/dual.h (dualizeBackCones):
+	Removed; use dualizeCones everywhere.
+	(dualizeCones): Change interface (no longer return the list).
+
+2007-06-27  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ReadPolyhedron.cpp, code/latte/ReadPolyhedron.h:
+	New option --redundancy-check=...
+
+	* code/latte/VertexConesWith4ti2.cpp (computeVertexConesWith4ti2):
+	Fix memory leaks.
+
+	* code/latte/VertexConesWith4ti2.cpp: Special-case simplicial
+	vertex cones (for speed).
+
+	* code/latte/Makefile.am (VertexConesWith4ti2.h, .cpp): New files.
+
+	* code/latte/count.cpp: Old-style "lrs" command line option is now
+	handled by ReadPolyhedron.cpp
+
+	* code/latte/ReadPolyhedron.cpp, code/latte/ReadPolyhedron.h:
+	Handle new command-line option --compute-vertex-cones={cdd,lrs,4ti2}.
+
+	* code/latte/VertexConesWith4ti2.cpp, code/latte/VertexConesWith4ti2.h:
+	New files
+
+2007-04-10  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/print.cpp, code/latte/print.h (readListConeFromFile):
+	New overload.
+
+	* code/latte/ReadPolyhedron.cpp:
+	Support listCone format in conjunction with --subcones
+
+2007-04-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp (compute_triangulation_of_boundary):
+	Use 4ti2 instead of cddlib for
+	computing the facet triangulations.
+
+2007-04-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Makefile.am (triangulate-boundary): New program.
+
+	* code/latte/ReadPolyhedron.cpp, code/latte/ReadPolyhedron.h (ReadPolyhedron):
+	Support intermediate input specifications:
+	--input-primal-homog-cone=CONE.ext
+	--input-dual-homog-cone=CONE.ext
+	--subcones=FILENAME
+	--input-primal-homog-cones=CONES
+	--input-dual-homog-cones=CONES
+
+	* code/latte/count.cpp: Implement --help switch.
+
+	* code/latte/cone_consumer.cpp (ListConeReadingConeProducer):
+	Handle file-open error.
+
+2007-03-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/normalize/normalize.cpp: Constness fix
+
+2007-03-29  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Polyhedron.h, code/latte/ReadLatteStyle.cpp,
+	code/latte/ReadSubcones.cpp, code/latte/ehrhart.cpp,
+	code/latte/latte_4ti2_zsolve.cpp, code/latte/latte_system.cpp,
+	code/latte/normalize/ReductionTest.cpp,
+	code/latte/normalize/normalize.cpp,
+	code/latte/triangulation/BoundaryTriangulation.cpp,
+	code/latte/triangulation/triangulate.cpp: 
+	Fix compiler warnings.
+
+	* configure.ac: Fix CPLEX flags.
+
+	* code/latte/print.cpp (printListConeToFile): Beautify error message.
+
+	* code/latte/ReadPolyhedron.cpp:
+	Complain if no input filename was given.
+
+	* code/latte/Makefile.am, code/latte/polyhedron-to-cones.cpp:
+	New file polyhedron-to-cones.cpp
+
+	* code/latte/normalize/Makefile.am:
+	Build the check-representation program again.
+
+	* code/latte/normalize/check-representation.cpp:
+	Use the code moved into ReductionTest.
+
+	* code/latte/normalize/ReductionTest.cpp,
+	code/latte/normalize/ReductionTest.h,
+	code/latte/normalize/ReductionTestWithCPLEX.cpp,
+	code/latte/normalize/ReductionTestWithCPLEX.h (ReductionTest::GetDimension):
+	New.
+
+	* code/latte/ReadSubcones.cpp (IncrementalVectorFileWriter):
+	Flush the stream.
+
+	* code/latte/Makefile.am:
+	Move normalize-related programs to sub-Makefile
+
+	* configure.ac: New Makefile, code/latte/normalize/Makefile
+
+	* code/latte/ReadLatteStyle.cpp,
+	code/latte/ReadLatteStyle.h (ReadLatteStyleMatrix): Add
+	"homogenize" argument.
+
+	* code/latte/normalize/normalize.cpp: Use ReductionTest.
+
+	* code/latte/normalize/Makefile.am,
+	code/latte/normalize/ReductionTest.cpp,
+	code/latte/normalize/ReductionTest.h,
+	code/latte/normalize/ReductionTestWithCPLEX.cpp,
+	code/latte/normalize/ReductionTestWithCPLEX.h: 
+	New files
+
+	* code/latte/normalize/normalize.cpp:
+	Use IncrementalVectorFileWriter for writing the .hil file
+
+	* code/latte/ReadSubcones.cpp, code/latte/ReadSubcones.h (IncrementalVectorFileWriter):
+	New class, factored out from SubconePrintingConeConsumer.
+	(SubconePrintingConeConsumer): Use it here.
+
+	* code/latte/latte_4ti2_zsolve.h:
+	Undefine some macros created by the zsolve headers.
+
+2007-03-28  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp,
+	code/latte/triangulation/BoundaryTriangulation.h
+	(compute_triangulation_of_boundary,
+	complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets): 
+	New.
+	(boundary_triangulation_of_cone_with_subspace_avoiding_facets):
+	Implement in terms of these functions.
+
+	* code/latte/Makefile.am: New files ReadPolyhedron.h, .cpp
+
+	* code/latte/count.cpp: Move input handling to ReadPolyhedron.h, .cpp
+
+	* code/latte/ReadPolyhedron.cpp, code/latte/ReadPolyhedron.h:
+	New file, move input handling here from count.cpp
+
+	* code/latte/ehrhart.cpp, code/latte/maximize.cpp, code/latte/minimize.cpp:
+	Change calls to readLatteProblem, CDDstylereadLatteProblem, whose
+	interfaces changed slightly.
+
+	* code/latte/ReadingFile.cpp, code/latte/ReadingFile.h,
+	code/latte/Grobner.cpp, code/latte/Grobner.h,
+	code/latte/CheckEmpty.cpp, code/latte/CheckEmpty.h,
+	code/latte/genFunction/maple.cpp, code/latte/genFunction/maple.h,
+	code/latte/vertices/cdd.cpp, code/latte/vertices/cdd.h: Constness
+	fixes.
+
+2007-03-27  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp:
+	Check combinations of basis vectors
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp:
+	Compute avoidance lattice.
+
+2007-03-26  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp: Fix last change.
+
+2007-03-22  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* configure.ac: New configuration options, --with-cplex-sharedlib,
+	--with-cplex-include.
+
+	* code/latte/Makefile.am:
+	Build check-representation only if CPLEX is available.
+
+	* code/latte/normalize/check-representation.cpp: Finish.
+
+2007-03-06  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp:
+	Don't override triangulation method if explicitly specified.
+
+2007-03-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp:
+	Compute the tight inequalities of cones, rather than computing facets
+	from rays.
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h (barvinokStep):
+	Export.
+
+	* code/latte/ExponentialApprox.cpp, code/latte/ExponentialApprox.h:
+	Decomposition according to worst-case bounds
+
+	* code/latte/count.cpp: --approx implies --exp and (--irr or --all).
+
+	* code/latte/Makefile.am: New files, heap.cpp, heap.h
+
+	* code/latte/cone.cpp (copyCone): Copy the dual_determinant properly.
+
+2007-03-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/count.cpp: --approximate implies --exponential.
+
+	* code/latte/heap.h, code/latte/heap.cpp:
+	Make compile in C++, remove GYWOPT-isms.
+
+	* code/latte/heap.h, code/latte/heap.cpp: Taken from GYWOPT.
+
+	* distro/Makefile.am: Quoting fixes.
+
+	* code/latte/triangulation/triangulate.h (TriangulatingConeTransducer):
+	New.
+
+	* code/latte/triangulation/triangulate.cpp (parse_standard_triangulation_option):
+	New option --triangulation-bias.
+
+	(TriangulatingConeTransducer): New.
+
+	* code/latte/triangulation/RegularTriangulationWith4ti2.cpp
+	(random_regular_triangulation_with_4ti2): Use biased_random_height
+	here if a bias is given.
+
+	* code/latte/triangulation/RegularTriangulation.cpp,
+	code/latte/triangulation/RegularTriangulation.h (biased_random_height):
+	New.
+
+	* code/latte/normalize/normalize.cpp: Restructure using
+	producer/consumer pattern.  Subcone files.  ZSolve time limits.
+
+	* code/latte/Makefile.am: New experimental sources.
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h (BarvinokParameters):
+	New slot, triangulation_bias.
+
+	* code/latte/latte_gmp.cpp, code/latte/latte_gmp.h (convert_vec_ZZ_to_mpz_vector):
+	New.
+
+	* code/latte/latte_cddlib.cpp (cddlib_matrix_to_cone): Don't
+	reverse the order of the rays.
+
+	* code/latte/ReadSubcones.cpp, code/latte/ReadSubcones.h: New.
+
+	* code/latte/cone_consumer.cpp, code/latte/cone_consumer.h:
+	Add ConeProducer, ConeTransducer classes.
+
+2007-02-27  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/cone_consumer.cpp, code/latte/cone_consumer.h (PrintingConeConsumer):
+	Also count the cones.
+
+	* code/latte/normalize/normalize.cpp: Uniquify results.
+	Nothing to be done for unimodular cones.
+	New options --no-triang-file, --quiet
+
+	* code/latte/print.cpp, code/latte/print.h:
+	Replace some vec_ZZ by "const vec_ZZ &", to avoid needless copying.
+
+2007-02-26  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/normalize/normalize.cpp: Don't keep all cones in memory.
+
+	* code/latte/barvinok/barvinok.h (TriangulationType):
+	Remove SubspaceAvoidingRecursiveTriangulation.
+	(Single_Cone_Parameters): Inherit from ConeConsumer.
+
+	* code/latte/triangulation/BoundaryTriangulation.cpp,
+	code/latte/triangulation/BoundaryTriangulation.h,
+	code/latte/triangulation/RegularTriangulationWith4ti2.cpp,
+	code/latte/triangulation/RegularTriangulationWith4ti2.h,
+	code/latte/triangulation/RegularTriangulationWithCdd.cpp,
+	code/latte/triangulation/RegularTriangulationWithCdd.h,
+	code/latte/triangulation/RegularTriangulationWithCddlib.cpp,
+	code/latte/triangulation/RegularTriangulationWithCddlib.h,
+	code/latte/triangulation/TriangulationWithTOPCOM.cpp,
+	code/latte/triangulation/TriangulationWithTOPCOM.h,
+	code/latte/triangulation/triangulate.cpp,
+	code/latte/triangulation/triangulate.h (triangulateCone): 
+	New version that sends subcones to a ConeConsumer,
+	rather than collecting them.
+
+	Change all backends.
+
+	* code/latte/print.cpp, code/latte/print.h (readListConeFromFile):
+	New CPS version.
+
+	* code/latte/Makefile.am: Removed RecursiveTriangulation.h, .cpp.
+	Added cone_consumer.h, cone_consumer.cpp.
+
+	* code/latte/cone_consumer.cpp, code/latte/cone_consumer.h: New files.
+
+	* code/latte/triangulation/RecursiveTriangulation.cpp,
+	code/latte/triangulation/RecursiveTriangulation.h: Removed.
+
+2007-02-25  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/normalize/normalize.cpp: Recursively subdivide if too
+	many facets
+
+	* code/latte/normalize/normalize.cpp: Some beautification
+
+	* code/latte/normalize/normalize.cpp: Make 4ti2 dualization default.
+	More stats.
+
+	* configure.ac, code/test-suite/test.pl.in: Install test.pl
+
+	* code/latte/count.cpp, code/latte/normalize/normalize.cpp:
+	Handle --dualization={4ti2,cdd}
+
+	* code/latte/dual.cpp, code/latte/dual.h 
+	(dualization_type_from_name, parse_standard_dualization_option):
+	New.
+
+	* code/latte/Makefile.am: New files DualizationWith4ti2.h, .cpp
+
+	* code/latte/DualizationWith4ti2.cpp, code/latte/DualizationWith4ti2.h:
+	New files.
+
+	* code/latte/normalize/normalize.cpp, code/latte/barvinok/dec.cpp,
+	code/latte/count.cpp,
+	code/latte/triangulation/RecursiveTriangulation.cpp: Change all
+	callers of dualizeCone, dualizeCones.
+
+	* code/latte/dual.cpp, code/latte/dual.h (dualizeCone):
+	Change interface to accept BarvinokParameters. Pick
+	dualization method accordingly.  Handle simplicial cones directly,
+	using computeDetAndFacetsOfSimplicialCone.
+	(dualizeCones): Likewise, also keep track of dualize_time.
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h:
+	New parameter, dualization.
+
+2007-02-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/normalize/normalize.cpp:
+	Don't forget to handle the triangulation options.
+
+	* code/latte/normalize/normalize.cpp: Fix memory leaks.
+
+2007-02-21  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* doc/examplebrion.eps, doc/manual.tex, doc/secrets.tex:
+	Manual sources, from Raymond.
+
+	* code/latte/triangulation/test-triangulation.cpp:
+	Vertex is now initialized in readConeFromFile.
+
+	* code/latte/print.cpp (readConeFromFile): Initialize the vertex.
+
+	* code/latte/triangulation/test-triangulation.cpp:
+	Move read_cone function into print.cpp
+
+	* code/latte/latte_4ti2_zsolve.cpp (convert_ZZ_to_int):
+	Don't lose the sign.
+	(facets_to_4ti2_zsolve_LinearSystem): Use shorthand.
+
+	* code/latte/print.cpp, code/latte/print.h (readConeFromFile,
+	readListConeFromFile): New.
+
+2007-02-19  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/latte_4ti2_zsolve.cpp, code/latte/latte_4ti2_zsolve.h:
+	New.
+
+	* code/latte/dual.cpp (dualizeCone): If facets and rays are
+	already computed, just swap.
+
+	* code/latte/count.cpp: Use parse_standard_triangulation_option.
+
+	* code/latte/latte2ext.cpp: New.
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h
+	(BarvinokParameters): New parameters triangulation_max_height,
+	nonsimplicial_subdivision.
+
+	* code/latte/triangulation/RegularTriangulationWithCddlib.cpp
+	(random_regular_triangulation_with_cddlib): Use the
+	triangulation_max_height parameter.
+
+	(triangulate_cone_with_4ti2): Handle the nonsimplicial_subdivision
+	parameter.
+
+	* code/latte/triangulation/RegularTriangulationWith4ti2.cpp
+	(random_regular_triangulation_with_4ti2): Use the
+	triangulation_max_height parameter.
+
+	(triangulate_cone_with_4ti2): Handle lower-dimensional cones.
+
+	* code/latte/triangulation/RegularTriangulation.cpp (random_height):
+	Use the data parameter.
+
+	* code/latte/triangulation/triangulate.cpp,
+	code/latte/triangulation/triangulate.h (parse_standard_triangulation_option):
+	New.
+
+	* m4/4ti2-check.m4: Check for the 4ti2 zsolve library, too.
+
 2007-02-18  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	Version 1.2-mk-0.8
