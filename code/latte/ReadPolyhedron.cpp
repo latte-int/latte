@@ -24,7 +24,6 @@
 #include <cstring>
 
 #include "CheckEmpty.h"
-#include "ReadingFile.h"
 #include "ReadLatteStyle.h"
 #include "ReadPolyhedron.h"
 #include "vertices/cdd.h"
@@ -53,11 +52,10 @@ ReadPolyhedronData::ReadPolyhedronData()
   strcpy(assumeUnimodularCones,"no");
   strcpy(taylor,"no");
   strcpy(rationalCone,"no");
-  strcpy(inthull, "no");
   strcpy(Memory_Save, "yes");
 
   vertexcones = VertexConesWithCdd;
-  redundancycheck = RedundancyCheckWithCdd;
+  redundancycheck = RedundancyCheckWithCddlib;
   
   expect_dilation_factor = false;
   dilation_const = 1;
@@ -109,7 +107,10 @@ bool ReadPolyhedronData::parse_option(const char *arg)
   if (strncmp(arg,"vrep",3)==0) strcpy(Vrepresentation,"yes"); 
   else if(strncmp(arg,"int",3)==0) strcpy(interior,"yes");
   else if(strncmp(arg,"homog",3)==0) strcpy(dualApproach,"yes");
-  else if(strncmp(arg,"equ",3)==0) strcpy(equationsPresent,"yes");
+  else if(strncmp(arg,"equ",3)==0) {
+    cerr << "Warning: Ignoring the old-style LattE option `equ', "
+	 << "since we detect the presence of equations ourselves." << endl;
+  }
   else if(strncmp(arg,"+", 1) ==0) strcpy(nonneg,"yes");
   else if(strncmp(arg,"cdd",3)==0) strcpy (cddstyle, "yes");
   else if(strncmp(arg,"dil",3)==0) {
@@ -168,8 +169,10 @@ bool ReadPolyhedronData::parse_option(const char *arg)
   else if (strncmp(arg, "--redundancy-check=", 19) == 0) {
     if (strcmp(arg + 19, "none") == 0)
       redundancycheck = NoRedundancyCheck;
-    else if (strcmp(arg + 19, "cdd") == 0)
-      redundancycheck = RedundancyCheckWithCdd;
+    else if (strcmp(arg + 19, "cddlib") == 0)
+      redundancycheck = RedundancyCheckWithCddlib;
+    else if (strcmp(arg + 19, "full-cddlib") == 0)
+      redundancycheck = FullRedundancyCheckWithCddlib;
     else {
       cerr << "Unknown redundancy check method: " << arg + 19 << endl;
       exit(1);
@@ -272,6 +275,24 @@ ReadPolyhedronData::read_polyhedron_from_homog_cone_input(BarvinokParameters *pa
   return Poly;
 }
 
+static dd_MatrixPtr
+ReadCddStyleMatrix(const string &filename)
+{
+  FILE *in = fopen(filename.c_str(), "r");
+  if (in == NULL) {
+    cerr << "Unable to open CDD-style input file " << filename << endl;
+    exit(1);
+  }
+  dd_MatrixPtr M;
+  dd_ErrorType err = dd_NoError;
+  M = dd_PolyFile2Matrix(in, &err);
+  if (err!=dd_NoError) {
+    cerr << "Parse error in CDD-style input file " << filename << endl;
+    exit(1);
+  }
+  return M;
+}
+
 Polyhedron *
 ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
 {
@@ -282,260 +303,259 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
     exit(2);
   }
 
-  listVector *equations = NULL, *inequalities = NULL;
+  dd_MatrixPtr M;
   
-  if (Vrepresentation[0] == 'y') {
-    /* The polyhedron is given by its V-representation in a
-       LattE-style input format. */
-    if (cddstyle[0] == 'y') {
+  if (cddstyle[0] == 'y') {
+    /* Read an input file in CDD input format. */
+    if (Vrepresentation[0] == 'y') {
       cerr << "The command-line keyword `vrep' denotes the use of a LattE-style " << endl
-	   << "input format.  It is not compatible with using a CDD-style input format." << endl;
+	   << "input format giving the V-representation.  If you want to give " << endl
+	   << "the a V-representation in CDD format, just do that, but don't use " << endl
+	   << "the `vrep' keyword." << endl;
       exit(2);
     }
-    if(equationsPresent[0] == 'y') {
-      cerr<<"You cannot use vrep and equ at the same time." << endl;
-      exit(4);
-    }
-    if (dilation_const != 1) {
-      cerr << "Dilation unimplemented for `vrep' input" << endl;
-      exit(1);
-    }
-    Poly = ReadLatteStyleVrep(filename.c_str(), dualApproach[0] == 'y');
+    cerr << "Warning: Not performing check for empty polytope, "
+	 << "because it is unimplemented for the CDD-style input format. "
+	 << endl;
+    M = ReadCddStyleMatrix(filename);
   }
   else {
-    /* Not VREP. */
-    Poly = new Polyhedron;
-    int numOfVars;
-  
-    if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
-      cerr<<"You cannot use + and dua at the same time." << endl;
-      exit(2);
-    }
-  
-    if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
-      cerr<<"You cannot use int and memsave at the same time." << endl;
-      exit(3);
-    }
-
-  
-    /* Check input file. */
-
-    if((cddstyle[0] == 'n') && (maximum[0] == 'n')&& (minimize[0] == 'n')){
-	CheckInputFile(filename.c_str());
-	CheckLength(filename.c_str(), equationsPresent);
+    /* Read an input file in LattE format. */
+    if (Vrepresentation[0] == 'y') {
+      /* The polyhedron is given by its V-representation in a
+	 LattE-style input format. */
+      if (dilation_const != 1) {
+	cerr << "Dilation unimplemented for `vrep' input" << endl;
+	exit(1);
       }
-      if(minimize[0] == 'y')  strcpy (maximum, "yes");   
- 
-      if((cddstyle[0] == 'n') && (maximum[0] == 'y')){
-	CheckInputFile(filename.c_str());
-	CheckLength(filename.c_str(),equationsPresent);
+      if (dualApproach[0] != 'y') {
+	/* FIXME: Special case that ought to be handled uniformly. */
+	/* Don't homogenize. */
+	Polyhedron *P = new Polyhedron;
+	P->cones = computeVertexConesFromVrep(filename.c_str(), P->numOfVars);
+	P->dualized = false;
+	P->homogenized = false;
+	return P;		/* Directly deliver the polyhedron. */
       }
-
-      if(cddstyle[0] == 'y')
-	{ CheckInputFileCDDRep(filename.c_str());
-	  CheckInputFileCDDRep1(filename.c_str());
-	  CheckInputFileCDDRep3(filename.c_str());
-	  CheckInputFileCDDRep4(filename.c_str());
-	}
-
-    if (cddstyle[0] == 'y') {
-      cerr << "Warning: Not performing check for empty polytope, "
-	   << "because it is unimplemented for the CDD-style input format. "
-	   << endl;
+      M = ReadLatteStyleMatrix(filename.c_str(), /* vrep: */ true,
+			       /* homogenize: */ false);
     }
     else {
+      /* Not VREP. */
       CheckEmpty(filename.c_str());
+      M = ReadLatteStyleMatrix(filename.c_str(), /* vrep: */ false,
+			       /* homogenize: */ false,
+			       /* nonnegative: */ nonneg[0] == 'y');
     }
-    //vec_ZZ cost;
-    /* Read problem data. */
-    params->read_time.start();
-  
-    if((cddstyle[0] == 'n') && (Vrepresentation[0] == 'n')) {
-      switch (redundancycheck) {
-      case NoRedundancyCheck:
-	break;
-      case RedundancyCheckWithCdd:
-	/* this changes FILENAME: */
-	CheckRed(filename, equationsPresent, maximum, nonneg, interior, dilation, dilation_const);
-	break;
-      case RedundancyCheckWithCddlib:
-	cerr << "RedundancyCheckWithCddlib unimplemented." << endl;
-	exit(1);
-	break;
-      default:
-	cerr << "Unknown redundancy check" << endl;
-	abort();
-      }
-    }
+  }
 
-    dilation_const = 1;
-    if((cddstyle[0] == 'n'))
-      readLatteProblem(filename.c_str(),&equations,&inequalities,equationsPresent,
-		       &numOfVars, nonneg, dualApproach, grobner, Vrepresentation);
-    if(cddstyle[0] == 'y'){
-      int tmpoutput;
-      CDDstylereadLatteProblem(filename.c_str(),&equations,&inequalities,equationsPresent,
-			       &numOfVars, nonneg, dualApproach, taylor, degree,
-			       rationalCone, tmpoutput, Memory_Save,
-			       assumeUnimodularCones, inthull, grobner);
-    }
-  
-    if((dualApproach[0] == 'y') && (nonneg[0] == 'y')&&(equationsPresent[0] == 'n')){
-      cerr<<"You cannot use + and dua at the same time." << endl;
-      exit(2);
-    }
-  
-    if((Memory_Save[0] == 'y') && (inthull[0] == 'y')){
-      cerr<<"You cannot use int and memsave at the same time." << endl;
-      exit(3);
-    }
-  
-    numOfVars--;
+  /* Now we have in M the H-representation or the V-representation. */
 
-    mat_ZZ ProjU, ProjU2;
-    ProjU.SetDims(numOfVars, numOfVars);
-    ProjU2.SetDims(numOfVars, numOfVars);
-    oldnumofvars = numOfVars;
+  switch (M->representation) {
+  case dd_Generator: /* V-representation */
+    return PolyhedronFromVrepMatrix(M, /* homogenize: */ dualApproach[0] == 'y');
+  case dd_Inequality: /* H-representation */
+    return PolyhedronFromHrepMatrix(M, params);
+  default:
+    cerr << "Unknown representation" << endl;
+    abort();
+  }
+}
+
+Polyhedron *
+ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters *params)
+{
+  Polyhedron *Poly = new Polyhedron;
+  int numOfVars = M->colsize - 1; /* Number of variables, not
+				     including RHS. */
+  
+  params->read_time.start();
+
+  switch (redundancycheck) {
+  case NoRedundancyCheck:
+    break;
+  case RedundancyCheckWithCddlib:
     {
-      listVector *matrixTmp;
-      if (equationsPresent[0]=='y') {
-	{
-	  vec_ZZ *generators = NULL;
-	  matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
-	  if (generators) delete[] generators;
-	}
-	freeListVector(equations);
-	freeListVector(inequalities);
-	ProjU2 = transpose(ProjU);
-	bb = ProjU2[0];
-	mat_ZZ AAA;
-	AAA.SetDims(ProjU2.NumRows() - 1, ProjU2.NumCols());
-	int i;
-	for(i = 1; i <= numOfVars; i++){
-	  AAA[i - 1] = ProjU2[i];
-	}
-	AA = transpose(AAA);
-	// cout << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
-	templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows()); 
-      } else {
-	dilateListVector(inequalities, numOfVars, dilation_const);
-	matrixTmp=inequalities;
-      }
-      if((dualApproach[0] == 'y')&&(equationsPresent[0]=='y')){
-	matrix = TransformToDualCone(matrixTmp,numOfVars);
-	freeListVector(matrixTmp);
-      }
-      else {
-	matrix = matrixTmp;
-      }
+      cerr << "Finding hidden equalities using cddlib...";
+      cout.flush();
+      dd_rowset impl_lin;
+      dd_rowindex newpos;
+      dd_ErrorType err;
+      dd_MatrixCanonicalizeLinearity(&M, &impl_lin, &newpos, &err);
+      check_cddlib_error(err, "PolyhedronFromHrepMatrix");
+      cerr << "done. " << endl;
+      break;
     }
-    /* Now matrix contains the new inequalities. */
-    params->read_time.stop();
-    cout << params->read_time;
-  
-    //   cout << "Project down cost function: " << cost << endl;
-    vec_RR Rat_solution, tmp_den, tmp_num;
-    mat_RR ProjU_RR;
-    ProjU_RR.SetDims(ProjU.NumRows(), ProjU.NumCols());
+  case FullRedundancyCheckWithCddlib:
+    {
+      cerr << "Removing redundant inequalities and finding hidden equalities using cddlib...";
+      cout.flush();
+      dd_rowset impl_lin, redset;
+      dd_rowindex newpos;
+      dd_ErrorType err;
+      dd_MatrixCanonicalize(&M, &impl_lin, &redset, &newpos, &err);
+      check_cddlib_error(err, "PolyhedronFromHrepMatrix");
+      cerr << "done. " << endl;
+      break;
+    }
+  default:
+    cerr << "Unknown redundancy check" << endl;
+    abort();
+  }
+
+  listVector *equations, *inequalities;
+  cddlib_matrix_to_equations_and_inequalities(M, &equations, &inequalities);
+  dd_FreeMatrix(M);
+
+  cout << "Ax <= b, given as (b|-A):\n";
+  cout << "=========================\n";
+  printListVector(inequalities, numOfVars + 1);
+  cout << endl;
+  cout << "Ax = b, given as (b|-A):\n";
+  cout << "========================\n";
+  printListVector(equations, numOfVars + 1);
+  cout << endl;
+
+  if (equations != NULL)
+    strcpy(equationsPresent, "yes");
+  else
+    strcpy(equationsPresent, "no");
+
+  /* Project out variables using equations. */
+  mat_ZZ ProjU, ProjU2;
+  ProjU.SetDims(numOfVars, numOfVars);
+  ProjU2.SetDims(numOfVars, numOfVars);
+  oldnumofvars = numOfVars;
+
+  listVector *matrixTmp;
+  if (equationsPresent[0]=='y') {
+    {
+      vec_ZZ *generators = NULL;
+      matrixTmp=preprocessProblem(equations,inequalities,&generators,&numOfVars, cost, ProjU, interior, dilation_const);
+      if (generators) delete[] generators;
+    }
+    freeListVector(equations);
+    freeListVector(inequalities);
+    ProjU2 = transpose(ProjU);
+    bb = ProjU2[0];
+    mat_ZZ AAA;
+    AAA.SetDims(ProjU2.NumRows() - 1, ProjU2.NumCols());
     int i;
-    for(i = 0; i < ProjU.NumRows(); i++)
-      for(int j = 0; j < ProjU.NumCols(); j++) conv(ProjU_RR[i][j], ProjU[i][j]);
-    //cout << ProjU << ProjU_RR << endl;
-    Rat_solution.SetLength(numOfVars);
-    tmp_den.SetLength(numOfVars);
-    tmp_num.SetLength(numOfVars);
+    for(i = 1; i <= numOfVars; i++){
+      AAA[i - 1] = ProjU2[i];
+    }
+    AA = transpose(AAA);
+    // cout << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
+    templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows()); 
+  }
+  else {
+    /* No equations. */
+    dilateListVector(inequalities, numOfVars, dilation_const);
+    matrixTmp=inequalities;
+  }
+  matrix = matrixTmp;
+  params->read_time.stop();
+  cout << params->read_time;
+  /* Now matrix contains the new inequalities. */
+  
+  if (dualApproach[0] == 'y') {
+    Poly->numOfVars = numOfVars + 1;
+    listVector *rays = NULL, *endRays, *tmpRays;
+    Poly->cones=createListCone();
+    Poly->cones->vertex = new Vertex(createRationalVector(numOfVars + 1));
+    rays=createListVector(createVector(numOfVars + 1));
+    endRays=rays;
+    tmpRays=matrix;
+    vec_ZZ v;
+    v.SetLength(numOfVars + 1);
+    while (tmpRays) {
+      /* Change from CDD format ( b | -A ) to LattE's homogenized format ( A | -b ). */
+      int i;
+      for (i=0; i<numOfVars; i++) v[i] = -(tmpRays->first)[i + 1];
+      v[numOfVars] = -(tmpRays->first)[0];
+      endRays->rest=createListVector(v);
+      endRays=endRays->rest;
+      tmpRays=tmpRays->rest;
+    }
+    Poly->cones->rays = rays->rest;
+    delete rays; // deletes dummy head
+    Poly->dualized = true;
+    Poly->homogenized = true;
+  }
+  else {
+    Poly->numOfVars = numOfVars;
     /* Compute vertices and edges. */
-    rationalVector* LP_vertex;
-    
+    listCone *tmpcones;
+
     params->vertices_time.start();
-    if ((dualApproach[0]=='n') && (Vrepresentation[0] == 'n')) {
-      listCone *tmpcones;
-
-      switch (vertexcones) {
-      case VertexConesWithCdd:
-	tmpcones=computeVertexCones(filename.c_str(),matrix,numOfVars);
-	break;
-      case VertexConesWithLrs:
-	tmpcones=computeVertexConesViaLrs(filename.c_str(),matrix,numOfVars);
-	break;
-      case VertexConesWith4ti2:
+    switch (vertexcones) {
+    case VertexConesWithCdd:
+      tmpcones=computeVertexCones(filename.c_str(),matrix,numOfVars);
+      break;
+    case VertexConesWithLrs:
+      tmpcones=computeVertexConesViaLrs(filename.c_str(),matrix,numOfVars);
+      break;
+    case VertexConesWith4ti2:
 #ifdef HAVE_FORTYTWO_LIB
-	tmpcones=computeVertexConesWith4ti2(matrix, numOfVars);
+      tmpcones=computeVertexConesWith4ti2(matrix, numOfVars);
 #else
-	cerr << "VertexConesWith4ti2 not compiled in, sorry" << endl;
-	exit(1);
+      cerr << "VertexConesWith4ti2 not compiled in, sorry" << endl;
+      exit(1);
 #endif
-	break;
-      default:
-	cerr << "Bad VertexConesType" << endl;
-	abort();
-      };
+      break;
+    default:
+      cerr << "Bad VertexConesType" << endl;
+      abort();
+    };
 	  
-      if(maximum[0] == 'y'){ 
-	LP_vertex = LP(matrix, cost, numOfVars);
-	vec_RR Rat_cost;  Rat_cost.SetLength(numOfVars);
-	for (i = 0; i < numOfVars; i++){
-	  conv(tmp_num[i], LP_vertex->numerators()[i]);
-	  conv(tmp_den[i], LP_vertex->denominators()[i]);
-	  Rat_solution[i] = tmp_num[i]/tmp_den[i];
-	  conv(Rat_cost[i], cost[i]);
-	}
-	if(Singlecone[0] == 'y')
-	  Poly->cones = CopyListCones(tmpcones, numOfVars, LP_vertex);
-	else Poly->cones = tmpcones;
-	if(lengthListCone(Poly->cones) == 1) 
-	  cout <<"\nWe found a single vertex cone for IP.\n" << endl;
-	cout <<"A vertex which we found via LP is: " << ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
-	//printRationalVector(LP_vertex, numOfVars);
-	RR LP_OPT;
-	vec_RR holdcost_RR;
-	holdcost_RR.SetLength(cost.length());
-	for(i = 0; i < cost.length(); i++) conv(holdcost_RR[i], cost[i]);
-	if(minimize[0] == 'y') holdcost_RR = - holdcost_RR;
-	LP_OPT = Rat_cost*Rat_solution; //cout << cost << endl;
-	cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
-      }
-      else {
-	Poly->cones = tmpcones;
-	cout << "The polytope has " << lengthListCone(Poly->cones) << " vertices." << endl;
-	//system_with_error_check("rm -f numOfLatticePoints");
-      }
-    } 
-
+    Poly->cones = tmpcones;
+    cout << "The polytope has " << lengthListCone(Poly->cones) << " vertices." << endl;
+    //system_with_error_check("rm -f numOfLatticePoints");
     params->vertices_time.stop();
     cout << params->vertices_time;
-
-    /* Compute triangulation or decomposition of each vertex cone. */
-
-    if (dualApproach[0]=='y') {
-      listVector *rays = NULL, *endRays, *tmpRays;
-      Poly->cones=createListCone();
-      Poly->cones->vertex = new Vertex(createRationalVector(numOfVars));
-      rays=createListVector(createVector(numOfVars));
-      endRays=rays;
-      tmpRays=matrix;
-      while (tmpRays) {
-	vec_ZZ v=createVector(numOfVars);
-	for (i=0; i<numOfVars; i++) v[i]=-(tmpRays->first)[i+1];
-	endRays->rest=createListVector(v);
-	endRays=endRays->rest;
-	tmpRays=tmpRays->rest;
-      }
-      Poly->cones->rays = rays->rest;
-      delete rays; // deletes dummy head
-      Poly->dualized = true;
-
-      //     cout << "Homogenization: " << endl;
-      //     printListCone(Poly->cones, numOfVars);
-    }
-
-    Poly->numOfVars = numOfVars;
-  } /* Not VREP */
-
-  if (dualApproach[0] == 'y')
-    Poly->homogenized = true;
-  else
     Poly->homogenized = false;
-  
+  } 
+
   return Poly;
+}
+
+
+
+Polyhedron *PolyhedronFromVrepMatrix(dd_MatrixPtr matrix, bool homogenize)
+{
+  Polyhedron *P = new Polyhedron;
+  if (homogenize) {
+    /* Homogenize. */
+    dd_ErrorType error;
+    dd_rowset redundant = dd_RedundantRows(matrix, &error);
+    check_cddlib_error(error, "ReadLatteStyleVrep");
+    /* The non-redundant rows are the rays of the homogenization. */
+    int i;
+    listCone *cone = createListCone();
+    P->numOfVars = matrix->colsize;
+    vec_ZZ ray;
+    ray.SetLength(matrix->colsize);
+    for (i = 1; i<=matrix->rowsize; i++) {
+      if (!set_member(i, redundant)) {
+	int j;
+	/* CDD has homogenization in the 0-th,
+	   LattE expects it in the last coordinate. */
+	for (j = 0; j < matrix->colsize - 1; j++)
+	  ray[j] = convert_mpq_to_ZZ(matrix->matrix[i - 1][j + 1]);
+	ray[matrix->colsize-1] = convert_mpq_to_ZZ(matrix->matrix[i - 1][0]);
+	cone->rays = appendVectorToListVector(ray, cone->rays);
+	cone->vertex = new Vertex(createRationalVector(P->numOfVars));
+      }
+    }
+    dd_FreeMatrix(matrix);
+    P->cones = cone;
+    P->dualized = false;
+    P->homogenized = true;
+  }
+  else {
+    /* Don't homogenize. */
+    cerr << "PolyhedronFromVrepMatrix: Unimplemented for homogenize=false." << endl;
+    abort();
+  }
+  return P;
 }

@@ -24,6 +24,7 @@
 #define LATTE_READPOLYHEDRON_H
 
 #include "Polyhedron.h"
+#include "latte_cddlib.h"
 #include "barvinok/barvinok.h"
 
 class ReadPolyhedronData {
@@ -39,7 +40,6 @@ public:
   char dualApproach[127];
   string filename;
   char Memory_Save[127];
-  char inthull[127];
   char grobner[127];
   char maximum[127];
   char minimize[127];
@@ -62,9 +62,9 @@ public:
   VertexConesType vertexcones;
   // How to obtain a non-redundant representation.
   typedef enum {
-    RedundancyCheckWithCdd,
+    RedundancyCheckWithCddlib,
     NoRedundancyCheck,
-    RedundancyCheckWithCddlib
+    FullRedundancyCheckWithCddlib
   } RedundancyCheckType;
   RedundancyCheckType redundancycheck;
 public:
@@ -83,9 +83,21 @@ public:
 private:
   Polyhedron *read_polyhedron_from_homog_cone_input(BarvinokParameters *params);
   Polyhedron *read_polyhedron_hairy(BarvinokParameters *params);
+  Polyhedron *PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters *params);
 public:
   bool expect_dilation_factor;
   bool expect_filename;
 };
+
+
+/* Helper functions. */
+
+/* Read a VREP file in LattE format
+   and create a corresponding Polyhedron. */
+Polyhedron *ReadLatteStyleVrep(const char *filename, bool homogenize);
+
+/* Create a polyhedron from a vrep matrix. */
+Polyhedron *PolyhedronFromVrepMatrix(dd_MatrixPtr matrix, bool homogenize);
+
 
 #endif
