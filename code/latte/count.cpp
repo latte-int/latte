@@ -1,7 +1,7 @@
 /* count.cpp -- Master program
 
    Copyright 2002, 2003 Raymond Hemmecke, Ruriko Yoshida
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -550,20 +550,8 @@ if(read_polyhedron_data.rationalCone[0] == 'y') {
   strcat(command,".ead");
   system_with_error_check(command); 
   
-  if(read_polyhedron_data.cddstyle[0] == 'n' && read_polyhedron_data.Vrepresentation[0] == 'n'){
-    strcpy(command,"rm -f ");
-    strcat(command,fileName);
-    system_with_error_check(command);
-  }
  }
 
-  if((read_polyhedron_data.dualApproach[0] == 'y') && (read_polyhedron_data.cddstyle[0] == 'n') && read_polyhedron_data.Vrepresentation[0] == 'n'){
-
-    strcpy(command,"rm -f ");
-    strcat(command,fileName);
-    system_with_error_check(command);
-
-  }
   //cout << "Computation done. " << endl;
 
   params->total_time.stop();
