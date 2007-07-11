@@ -66,9 +66,12 @@ add_nonnegativity(dd_MatrixPtr matrix, const vector<int> &nonnegatives,
   new_matrix->numbtype = dd_Rational;
   new_matrix->representation = dd_Inequality;
   int i, j;
-  for (i = 0; i<numOfVectors; i++)
+  for (i = 0; i<numOfVectors; i++) {
     for (j = 0; j<numOfVars_hom; j++)
       dd_set(new_matrix->matrix[i][j], matrix->matrix[i][j]);
+    if (set_member(i + 1, matrix->linset))
+      set_addelem(new_matrix->linset, i + 1);
+  }
   int k;
   for (k = 0; k<num_nonnegative; k++, i++) {
     int index = nonnegatives[k]; /* 1-based */
@@ -76,7 +79,6 @@ add_nonnegativity(dd_MatrixPtr matrix, const vector<int> &nonnegatives,
       dd_set_si(new_matrix->matrix[i][j + num_homog], 0);
     dd_set_si(new_matrix->matrix[i][index + num_homog], 1);
   }
-  set_copy(new_matrix->linset, matrix->linset);
   return new_matrix;
 }
 
