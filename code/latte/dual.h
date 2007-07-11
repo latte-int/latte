@@ -24,6 +24,7 @@
 #ifndef DUAL_H
 #define DUAL_H
 
+#include <ostream>
 #include "cone.h"
 #include "barvinok/barvinok.h"
 
@@ -33,6 +34,9 @@ dualization_type_from_name(const char *name);
 bool
 parse_standard_dualization_option(const char *arg,
 				  BarvinokParameters *params);
+
+void
+show_standard_dualization_option(ostream &stream);
 
 /* Dualize the polyhedral CONE. */
 void dualizeCone(listCone *cone, int numOfVars,

@@ -59,6 +59,12 @@ parse_standard_dualization_option(const char *arg,
   return true;
 }
 
+void
+show_standard_dualization_option(ostream &stream)
+{
+  stream << "  --dualization={cdd,4ti2}" << endl;
+}
+
 static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
 {
   char cddInFileName[127];
