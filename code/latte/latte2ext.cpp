@@ -31,6 +31,7 @@ int main(int argc, char **argv)
     exit(1);
   }
   dd_MatrixPtr m = ReadLatteStyleMatrix(cin, /* vrep: */ true,
+					/* homogenize: */ false,
 					"standard input");
   dd_WriteMatrix(stdout, m);
   dd_FreeMatrix(m);
