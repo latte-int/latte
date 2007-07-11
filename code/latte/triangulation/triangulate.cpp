@@ -1,6 +1,6 @@
 /* triangulate.cpp -- Compute triangulations.
 
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -70,6 +70,15 @@ parse_standard_triangulation_option(const char *arg,
   }
   else return false;
   return true;
+}
+
+void
+show_standard_triangulation_options(ostream &stream)
+{
+  stream << "Triangulation options:" << endl
+	 << "  --triangulation={cddlib,4ti2,topcom,...}" << endl
+	 << "  --triangulation-max-height=HEIGHT        Use a uniform distribution of height from 1 to HEIGHT." << endl
+         << "  --triangulation-bias=PERCENTAGE          Use a non-uniform distribution of heights 1 and 2." << endl;
 }
 
 listCone *

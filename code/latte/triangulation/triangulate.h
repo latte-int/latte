@@ -2,7 +2,7 @@
 
 /* triangulate.h -- Compute triangulations.
 
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -23,6 +23,7 @@
 #ifndef TRIANGULATION_TRIANGULATE__H
 #define TRIANGULATION_TRIANGULATE__H
 
+#include <ostream>
 #include "cone.h"
 #include "barvinok/barvinok.h"
 #include "cone_consumer.h"
@@ -37,6 +38,9 @@ triangulation_type_from_name(const char *name);
 bool
 parse_standard_triangulation_option(const char *arg,
 				    BarvinokParameters *params);
+
+void
+show_standard_triangulation_options(std::ostream &stream);
 
 /* CONE must be a full-dimensional pointed cone given by its minimal
    generators (rays).
