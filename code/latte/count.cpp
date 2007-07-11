@@ -148,6 +148,9 @@ main(int argc, char *argv[])
     else if (strcmp(argv[i], "--dual") == 0) // Don't use strncmp to
 					     // avoid clash with --dualization=...
       params->decomposition = BarvinokParameters::DualDecomposition;
+    else if (strncmp(argv[i], "--count-lattice-points", 7) == 0) {
+      // Default.
+    }
     else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0)
       ehrhart_polynomial = true;
     else if (strncmp(argv[i], "--ehrhart-series", 11) == 0) {
@@ -186,6 +189,33 @@ main(int argc, char *argv[])
     }
     else if (strcmp(argv[i], "--help") == 0) {
       read_polyhedron_data.show_options(cout);
+      cout << "Options that control what to compute:" << endl
+	   << "  --count-lattice-points                   Compute the number of lattice points" << endl
+	   << "                                           (default)" << endl
+	   << "  --ehrhart-polynomial                     Compute an Ehrhart polynomial of an integral polytope" << endl
+	   << "  --ehrhart-series                         Compute the unsimplified Ehrhart series" << endl
+	   << "                                           as a univariate rational function" << endl
+	   << "  --simplified-ehrhart-series              Compute the simplified Ehrhart series" << endl
+	   << "                                           as a univariate rational function" << endl
+	   << "  --ehrhart-taylor=N                       Compute the first N terms of the Ehrhart series" << endl;
+      cout << "Options for the Barvinok algorithm:" << endl
+	   << "  --dual                                   Triangulate and signed-decompose in the dual space" << endl
+	   << "                                           (traditional method, default)" << endl
+	   << "  --irrational-primal                      Triangulate in the dual space, signed-decompose" << endl
+	   << "                                           in the primal space using irrationalization" << endl
+	   << "  --irrational-all-primal                  Triangulate and signed-decompose in the primal space" << endl
+	   << "                                           using irrationalization" << endl
+	   << "  --maxdet=N                               Decompose down to an index (determinant) of N" << endl
+	   << "                                           instead of index 1 (unimodular cones)" << endl
+	   << "  --no-decomposition                       Do not signed-decompose simplicial cones" << endl;
+      cout << "Options for specialization:" << endl
+	   << "  --polynomial                             Use polynomial substitution for specialization" << endl
+	   << "                                           (traditional method, default)" << endl
+	   << "  --exponential                            Use exponential substitution for specialization" << endl
+	   << "                                           (recommended for maxdet > 1)" << endl;
+      cout << "Algorithmic options for subproblems:" << endl;
+      show_standard_dualization_option(cout);
+      show_standard_triangulation_options(cout);
       exit(0);
     }
     else if (read_polyhedron_data.parse_option(argv[i])) {}
