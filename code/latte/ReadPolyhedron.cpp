@@ -75,11 +75,12 @@ void ReadPolyhedronData::show_options(ostream &stream)
 {
   stream << "Standard input specifications:" << endl
          << "  FILENAME                                 Inequalities in LattE format" << endl
-	 << "    dil DILATION-FACTOR                    - Dilate by DILATION-FACTOR" << endl
-	 << "    +                                      - Add non-negativity constraints" << endl
-         << "    int                                    - Handle the interior of the polyhedron" << endl
 	 << "  vrep FILENAME                            Vertices in LattE format" << endl
 	 << "  cdd FILENAME.{ext,ine}                   Inequalities or vertices in CDD format" << endl
+         << "Input modifications:" << endl
+	 << "  --dilation=DILATION-FACTOR               Dilate by DILATION-FACTOR" << endl
+         << "  --interior                               Handle the interior of the polyhedron" << endl
+    //	 << "    +                                      - Add non-negativity constraints" << endl
 	 << "Intermediate input specifications:" << endl
 	 << "  --input-primal-homog-cone=CONE.ext       The homogenized polyhedron given by a " << endl
 	 << "                                           full-dimensional cone in CDD format" << endl
@@ -111,15 +112,31 @@ bool ReadPolyhedronData::parse_option(const char *arg)
     cerr << "Warning: Ignoring the old-style LattE option `equ', "
 	 << "since we detect the presence of equations ourselves." << endl;
   }
-  else if(strncmp(arg,"+", 1) ==0) strcpy(nonneg,"yes");
+  else if(strncmp(arg,"+", 1) ==0) {
+    cerr << "Note: Recommend specifying nonnegativity constraints in the " << endl
+	 << "      input file rather than using the old-style LattE option `+'." << endl;
+    strcpy(nonneg,"yes");
+  }
   else if(strncmp(arg,"cdd",3)==0) strcpy (cddstyle, "yes");
   else if(strncmp(arg,"dil",3)==0) {
+    cerr << "Note: Old-style LattE option `dil FACTOR' corresponds to " << endl
+	 << "      new option `--dilation=FACTOR'." << endl;
     strcpy (dilation, "yes");
     expect_dilation_factor = true;
   }
-  else if (strncmp(arg, "lrs", 3)==0)
+  else if (strncmp(arg, "lrs", 3)==0) {
+    cerr << "Note: Old-style LattE option `lrs' corresponds to " << endl
+	 << "      new option `--compute-vertex-cones=lrs'." << endl;
     vertexcones = ReadPolyhedronData::VertexConesWithLrs;
+  }
   /* Parse new options. */
+  else if (strncmp(arg, "--dilation=", 11)==0) {
+    strcpy (dilation, "yes");
+    dilation_const = atoi(arg + 11);
+  }
+  else if (strcmp(arg, "--interior") == 0) {
+    strcpy(interior,"yes");
+  }
   else if (strncmp(arg, "--input-primal-homog-cone=", 26)==0) {
     filename = arg + 26;
     expect_filename = false;
