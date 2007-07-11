@@ -318,11 +318,9 @@ usage()
 {
     cerr << "usage: normaliz [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang | 4TI2-STYLE-FILE.{rays,tra} } " << endl;
     cerr << "Options are: " << endl
-	 << "  --dualization={cdd,4ti2}" << endl
-	 << "  --triangulation={cddlib,4ti2,topcom,...}" << endl
-	 << "  --triangulation-max-height=HEIGHT        Use a uniform distribution of height from 1 to HEIGHT." << endl
-         << "  --triangulation-bias=PERCENTAGE          Use a non-uniform distribution of heights 1 and 2." << endl
-	 << "  --nonsimplicial-subdivision              [Default]" << endl
+	 << "  --dualization={cdd,4ti2}" << endl;
+    show_standard_triangulation_options(cerr);
+    cerr << "  --nonsimplicial-subdivision              [Default]" << endl
 	 << "  --max-facets=N                           Subdivide further if more than N facets" << endl
          << "  --zsolve-time-limit=SECONDS              Subdivide further if computation of Hilbert" << endl
 	 << "                                           basis took longer than this number of seconds." << endl
