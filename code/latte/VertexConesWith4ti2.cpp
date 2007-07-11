@@ -58,6 +58,9 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
       rs->set(i);
     }
   }
+  /* Make the homogenization coordinate (corresponding to the right-hand side) non-negative */
+  rs->set(num_ineqs);
+  
   VectorArray *rays = new VectorArray(0, matrix->get_size());
   lattice_basis(*matrix, *rays);
   VectorArray* subspace = new VectorArray(0, matrix->get_size());
@@ -77,42 +80,48 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
      of the polytope. */
   int i;
   for (i = 0; i<num_rays; i++) {
-    listCone *cone = createListCone();
     ZZ denominator = convert_mpz_to_ZZ((*rays)[i][num_ineqs]);
-    vec_ZZ numerator;
-    numerator.SetLength(numOfVars);
-    int j;
-    for (j = 0; j<numOfVars; j++)
-      numerator[j] = convert_mpz_to_ZZ((*rays)[i][num_ineqs + 1 + j]);
-    rationalVector *vertex_vector = new rationalVector(numerator, denominator);
-    cone->vertex = new Vertex(vertex_vector);
-
-    /* Compute the facets: */
-    /* Find incident facets.
-       They are the facets whose corresponding slack variables are
-       zero. */
-    listVector *ineq;
-    for (j = 0, ineq = ineqs; j<num_ineqs; j++, ineq = ineq->rest) {
-      if ((*rays)[i][j] == 0) {
-	/* Incident! */
-	vec_ZZ facet_vector;
-	facet_vector.SetLength(numOfVars);
-	int k;
-	for (k = 0; k<numOfVars; k++)
-	  facet_vector[k] = - ineq->first[k + 1];
-	cone->facets = new listVector(facet_vector, cone->facets);
-      }
+    if (denominator == 0) {
+      /* This ray corresponds to a ray of the (unbounded!) polyhedron;
+	 ignore it. */
     }
+    else {
+      listCone *cone = createListCone();
+      vec_ZZ numerator;
+      numerator.SetLength(numOfVars);
+      int j;
+      for (j = 0; j<numOfVars; j++)
+	numerator[j] = convert_mpz_to_ZZ((*rays)[i][num_ineqs + 1 + j]);
+      rationalVector *vertex_vector = new rationalVector(numerator, denominator);
+      cone->vertex = new Vertex(vertex_vector);
 
-    /* FIXME: To cheaply compute the rays of the vertex cone, we need
-       to get hold of the adjacent rays of the current ray of the
-       homogenization.
+      /* Compute the facets: */
+      /* Find incident facets.
+	 They are the facets whose corresponding slack variables are
+	 zero. */
+      listVector *ineq;
+      for (j = 0, ineq = ineqs; j<num_ineqs; j++, ineq = ineq->rest) {
+	if ((*rays)[i][j] == 0) {
+	  /* Incident! */
+	  vec_ZZ facet_vector;
+	  facet_vector.SetLength(numOfVars);
+	  int k;
+	  for (k = 0; k<numOfVars; k++)
+	    facet_vector[k] = - ineq->first[k + 1];
+	  cone->facets = new listVector(facet_vector, cone->facets);
+	}
+      }
 
-       For the moment, don't compute the rays.  Later code will construct
-       them when needed.
-    */
+      /* FIXME: To cheaply compute the rays of the vertex cone, we need
+	 to get hold of the adjacent rays of the current ray of the
+	 homogenization.
 
-    consumer.ConsumeCone(cone);
+	 For the moment, don't compute the rays.  Later code will construct
+	 them when needed.
+      */
+
+      consumer.ConsumeCone(cone);
+    }
   }
   delete rays;
 }
