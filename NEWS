@@ -51,7 +51,7 @@ Changes since the official release 1.2:
    the new command-line options of `count'.)
 
 * The TOPCOM program by Joerg Rambau can be used instead of cddlib to
-  compute triangulations of cones.
+  compute triangulations of cones (but it is usually not faster).
 
   	./configure --with-topcom=PATH-TO-TOPCOM
 
@@ -64,6 +64,17 @@ Changes since the official release 1.2:
         ./configure --with-4ti2=PATH-TO-4ti2
 
 	count --triangulation=4ti2 --dualization=4ti2 --compute-vertex-cones=4ti2
+
+* New command-line option --redundancy-check={none,cddlib,full-cddlib}.
+  
+  - "full-cddlib" uses cddlib to compute an irredundant system of
+    linear equations and inequalities describing the polyhedron.  This
+    corresponds to the traditional LattE behavior; it can be expensive.
+
+  - "cddlib" (the new default) uses cddlib to compute the implicit linearities only.
+
+  - "none" does nothing, the input description of the polytope should
+    be irredundant.
 
 * New programs, `latte2ine' and `latte2ext', are built that perform
   the trivial conversion from LattE-style input files to CDD-style
