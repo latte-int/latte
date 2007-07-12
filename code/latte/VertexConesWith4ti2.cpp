@@ -36,8 +36,10 @@ using namespace _4ti2_;
 
 void
 computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
+			   bool &unbounded,
 			   ConeConsumer &consumer)
 {
+  unbounded = false;
   listCone *cones = NULL;
   int num_ineqs = lengthListVector(ineqs);
   /* Create a matrix from the facets, with extra coordinates
@@ -84,6 +86,7 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
     if (denominator == 0) {
       /* This ray corresponds to a ray of the (unbounded!) polyhedron;
 	 ignore it. */
+      unbounded = true;
     }
     else {
       listCone *cone = createListCone();
@@ -127,9 +130,10 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
 }
 
 listCone *
-computeVertexConesWith4ti2(listVector* matrix, int numOfVars)
+computeVertexConesWith4ti2(listVector* matrix, int numOfVars,
+			   bool &unbounded)
 {
   CollectingConeConsumer ccc;
-  computeVertexConesWith4ti2(matrix, numOfVars, ccc);
+  computeVertexConesWith4ti2(matrix, numOfVars, unbounded, ccc);
   return ccc.Collected_Cones;
 }

@@ -32,12 +32,14 @@
    the 0-th coordinate being the RHS.
 
    Compute the vertex cones of the polytope.
+
+   Also determine whether the polytope is UNBOUNDED.
 */
 listCone *
-computeVertexConesWith4ti2(listVector* matrix, int numOfVars);
+computeVertexConesWith4ti2(listVector* matrix, int numOfVars, bool &unbounded);
 
 void
-computeVertexConesWith4ti2(listVector* matrix, int numOfVars,
+computeVertexConesWith4ti2(listVector* matrix, int numOfVars, bool &unbounded,
 			   ConeConsumer &consumer);
 
 #endif
