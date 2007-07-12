@@ -514,7 +514,7 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
       break;
     case VertexConesWith4ti2:
 #ifdef HAVE_FORTYTWO_LIB
-      tmpcones=computeVertexConesWith4ti2(matrix, numOfVars);
+      tmpcones=computeVertexConesWith4ti2(matrix, numOfVars, Poly->unbounded);
 #else
       cerr << "VertexConesWith4ti2 not compiled in, sorry" << endl;
       exit(1);
