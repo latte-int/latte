@@ -2,7 +2,7 @@
    
 /* Polyhedron.h -- Representation of a polyhedron.
 
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -34,11 +34,14 @@ public:
 			the supporting cones of all vertices of the
 			polyhedron. */
   bool dualized;	       /* Whether CONES have been dualized. */
+  bool unbounded;	       /* Whether the polyhedron is
+				  unbounded. */
   listCone *cones; 
 private:
   Polyhedron(const Polyhedron &);
 public:
-  Polyhedron() : numOfVars(0), homogenized(false), dualized(false), cones(0) {}
+  Polyhedron() : numOfVars(0), homogenized(false), dualized(false),
+		 unbounded(false), cones(0) {}
   ~Polyhedron() { freeListCone(cones); }
 };
 
