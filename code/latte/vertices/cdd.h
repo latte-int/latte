@@ -24,6 +24,8 @@
 #ifndef VERTICES_CDD__H
 #define VERTICES_CDD__H
 
+#include "cone.h"
+
 void createCddIneFile(listVector*, int);
 void createCddExtFile(listVector*, int);
 void createCddIneLPFile(listVector* matrix, int numOfVars, vec_ZZ & cost);

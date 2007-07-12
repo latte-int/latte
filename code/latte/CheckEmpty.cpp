@@ -40,7 +40,6 @@
 #include "rational.h"
 #include "timing.h"
 
-#include "IntegralHull.h"
 #include "ReadingFile.h"
 #include "binarySearchIP.h"
 #include "latte_system.h"
