@@ -1,6 +1,7 @@
 /* ReadingFile.h -- Reading file and check the input is correct.
 
    Copyright 2002, 2003 Raymond Hemmecke, Ruriko Yoshida
+   Copyright 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -31,10 +32,6 @@ void CheckRed(std::string &Filename, char *equ, char* max, char* nonneg, char* i
 void CheckRed(char *Filename, char *equ, char* max, char* nonneg, char* interior, char* dil, int dilation);
 
 void CheckInputFileCDDRep1(const char *InputFile);
-listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars, 
-		    listVector *equations);
-listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars, 
-		     mat_ZZ AA, vec_ZZ b);
 void CheckInputFileCDDRep(const char *InputFile);
 void CheckInputFileCDDRep3(const char *InputFile);
 void CheckInputFileCDDRep4(const char *InputFile);
