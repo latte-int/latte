@@ -90,6 +90,17 @@ void Single_Cone_Parameters::print_statistics(ostream &s)
   s << "Maximum depth of the decomposition tree: " << Max_Depth  << endl;
 }
 
+void DelegatingSingleConeParameters::SetConsumer(ConeConsumer *a_consumer)
+{
+  consumer = a_consumer;
+}
+
+int DelegatingSingleConeParameters::ConsumeCone(listCone *cone)
+{
+  assert(consumer != NULL);
+  return consumer->ConsumeCone(cone);    
+}
+
  /* Note:  We are dealing with the "Row space" of the
     input matrix due to NTL. */
 

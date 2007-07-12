@@ -34,7 +34,11 @@ public:
   // Whether we use the
   //   - traditional LattE monomial substitution z_i |-> (1 + s)^(lambda_i) 
   //   - or the exponential substitution         z_i |-> exp(t lambda_i)
-  enum { PolynomialSubstitution, ExponentialSubstitution } substitution;
+  //   - or no substitution, keeping a multivariate generating function
+  enum { PolynomialSubstitution,
+	 ExponentialSubstitution,
+	 NoSubstitution
+  } substitution;
   // Whether to use
   //  - traditional dual decomposition
   //  - irrational primal decomposition
@@ -115,6 +119,18 @@ public:
     BarvinokParameters(params), Current_Depth(0), Max_Depth(0) {};
   virtual ~Single_Cone_Parameters() {}
   virtual void print_statistics(ostream &s);
+};
+
+// Send all decomposed cones to a different ConeConsumer.
+
+class DelegatingSingleConeParameters : public Single_Cone_Parameters {
+public:
+  DelegatingSingleConeParameters(const BarvinokParameters &params) :
+    Single_Cone_Parameters(params), consumer(0) {};
+  void SetConsumer(ConeConsumer *a_consumer);
+  int ConsumeCone(listCone *cone);
+protected:
+  ConeConsumer *consumer;
 };
 
 /* Do a signed decomposition, modulo lower-dimensional cones, of the
