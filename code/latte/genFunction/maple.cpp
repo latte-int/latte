@@ -2,6 +2,7 @@
 
    Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
       Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
+   Copyright 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -19,11 +20,10 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
-#include "../cone.h"
-#include "../ramon.h"
-#include "../vertices/cdd.h"
+#include "maple.h"
+
 /* ----------------------------------------------------------------- */
-void writeTermToFile(ofstream & out, vec_ZZ v, int numOfVars) {
+void writeTermToFile(ofstream & out, const vec_ZZ &v, int numOfVars) {
   int i,firstEntry;
 
   firstEntry=0;
@@ -134,3 +134,19 @@ void createGeneratingFunctionAsMapleInputGrob(listCone* cones,
 }
 /* ----------------------------------------------------------------- */
 
+GeneratingFunctionWritingConeConsumer::GeneratingFunctionWritingConeConsumer(const std::string &genfun_filename)
+  : genfun_stream(genfun_filename.c_str()),
+    first_term(true)
+{
+}
+
+int GeneratingFunctionWritingConeConsumer::ConsumeCone(listCone *cone)
+{
+  if (!first_term)
+    genfun_stream << " + ";
+  writeTermOfGeneratingFunctionToFile(genfun_stream, cone,
+				      cone->vertex->vertex->numerators().length());
+  genfun_stream << endl;
+  first_term = false;
+  freeCone(cone);
+}

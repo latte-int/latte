@@ -1,7 +1,10 @@
+// This is a -*- C++ -*- header file.
+
 /* maple.h -- Create Maple input
 
    Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
       Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
+   Copyright 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -19,14 +22,29 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
-rationalVector* addRationalVectorsWithUpperBoundOne(rationalVector*, 
-						    rationalVector*, int);
-rationalVector* subRationalVector(rationalVector*, rationalVector*, int);
-listVector* readListVector(char*);
-vec_ZZ movePoint(vec_ZZ, rationalVector*, rationalVector*, vec_ZZ*, int, int);
-listVector* pointsInParallelepiped(rationalVector*, listVector*, int);
-void writeTermToFile(FILE*, vec_ZZ, int);
-void writeTermOfGeneratingFunctionToFile(FILE*, listCone*, int);
+#ifndef GENFUNCTION_MAPLE_H
+#define GENFUNCTION_MAPLE_H
+
+#include <string>
+#include <fstream>
+
+#include "cone.h"
+#include "cone_consumer.h"
+#include "barvinok/barvinok.h"
+
+void writeTermToFile(ofstream & out, const vec_ZZ &, int);
+void writeTermOfGeneratingFunctionToFile(ofstream & out, listCone*, int);
 void createGeneratingFunctionAsMapleInput(const char*, listCone*, int);
 void createGeneratingFunctionAsMapleInputGrob(listCone* cones, 
 					      int numOfVars, ofstream & out);
+
+class GeneratingFunctionWritingConeConsumer : public ConeConsumer {
+public:
+  GeneratingFunctionWritingConeConsumer(const std::string &genfun_filename);
+  virtual int ConsumeCone(listCone *cone);
+private:
+  ofstream genfun_stream;
+  bool first_term;
+};
+  
+#endif
