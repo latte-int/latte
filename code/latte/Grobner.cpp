@@ -32,6 +32,7 @@
 #include "genFunction/maple.h"
 #include "barvinok/dec.h"
 #include "latte_system.h"
+#include "ProjectUp.h"
 
 /* ---------------------------------------------------------------------- */
 void CheckGrobner(const char* filename, char * cdd){

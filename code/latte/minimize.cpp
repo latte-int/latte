@@ -45,6 +45,7 @@
 #include "ReadingFile.h"
 #include "binarySearchIP.h"
 #include "CheckEmpty.h" 
+#include "ProjectUp.h"
 
 #include "banner.h"
 #include "convert.h"
