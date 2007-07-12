@@ -39,7 +39,8 @@ liblatte_a_SOURCES =							\
 	triangulation/triangulate.cpp					\
 	triangulation/RegularTriangulation.cpp				\
 	triangulation/RegularTriangulationWithCdd.cpp			\
-	ReadPolyhedron.cpp
+	ReadPolyhedron.cpp						\
+	ProjectUp.cpp
 
 noinst_HEADERS =							\
 	CheckEmpty.h							\
@@ -63,7 +64,8 @@ noinst_HEADERS =							\
 	triangulation/triangulate.h					\
 	triangulation/RegularTriangulation.h				\
 	triangulation/RegularTriangulationWithCdd.h			\
-	ReadPolyhedron.h
+	ReadPolyhedron.h						\
+	ProjectUp.h
 
 if HAVE_TOPCOM_LIB
 liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
@@ -76,6 +78,7 @@ endif
 endif
 
 if HAVE_CDDLIB
+
 liblatte_a_SOURCES += latte_cddlib.cpp
 liblatte_a_SOURCES += triangulation/RegularTriangulationWithCddlib.cpp
 noinst_HEADERS += triangulation/RegularTriangulationWithCddlib.h
