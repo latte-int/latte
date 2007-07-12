@@ -33,4 +33,20 @@ listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
 listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars, 
 		     mat_ZZ AA, vec_ZZ b);
 
+class ProjectingUpConeTransducer : public ConeTransducer
+{
+public:
+  ProjectingUpConeTransducer(int a_oldNumOfVars, int a_newNumOfVars,
+			     const mat_ZZ &a_AA, const vec_ZZ &a_b)
+    : oldNumOfVars(a_oldNumOfVars),
+      newNumOfVars(a_newNumOfVars),
+      AA(a_AA), b(a_b) {}
+  int ConsumeCone(listCone *cone);
+private:
+  int oldNumOfVars;
+  int newNumOfVars;
+  mat_ZZ AA;
+  vec_ZZ b;
+};
+
 #endif

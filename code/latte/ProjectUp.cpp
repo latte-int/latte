@@ -18,6 +18,7 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
+#include <cassert>
 #include "ProjectUp.h"
 
 /* ----------------------------------------------------------------- */
@@ -120,6 +121,9 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
   
   while(current_cone)
     {
+      /* FIXME: Handle non-unimodular cones */
+      assert(current_cone->latticePoints != NULL);
+      assert(current_cone->latticePoints->rest == NULL);
       
       //  cout << " Here 1" << endl;
       i = 0;
@@ -143,6 +147,8 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
       //  cout << " Here 4" << endl;
       for(i = 0; i < oldNumOfVars; i++)
 	current_cone->latticePoints->first[i] = newVector[i];
+
+      /* FIXME: Handle the vertex. */
       
       current_ray = current_cone->rays;
       new_ray = new listVector;
@@ -179,8 +185,17 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
 	  else
 	    new_ray->rest = NULL;
 	}
+
+      /* FIXME: Handle (or null) facets, etc. */
       
       current_cone = current_cone->rest;
     }
   return cone;
 }
+
+int ProjectingUpConeTransducer::ConsumeCone(listCone *cone)
+{
+  cone = ProjectUp2(cone, oldNumOfVars, newNumOfVars, AA, b);
+  return consumer->ConsumeCone(cone);
+}
+
