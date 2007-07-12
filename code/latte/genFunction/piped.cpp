@@ -439,3 +439,10 @@ void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
     delete[] n;
   }
 }
+
+int
+PointsInParallelepipedComputingConeTransducer::ConsumeCone(listCone *cone)
+{
+  computePointsInParallelepiped(cone, cone->vertex->vertex->numerators().length());
+  return consumer->ConsumeCone(cone);
+}

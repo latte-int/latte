@@ -24,6 +24,7 @@
 #define GENFUNCTION_PIPED_H
 
 #include "cone.h"
+#include "cone_consumer.h"
 #include <vector>
 using namespace std;
 
@@ -78,5 +79,11 @@ public:
 /* Compute the lattice_points_scalar_products slot of CONE. */
 void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
 					const vec_ZZ &generic_vector);
+
+class PointsInParallelepipedComputingConeTransducer : public ConeTransducer
+{
+public:
+  int ConsumeCone(listCone *cone);
+};
 
 #endif
