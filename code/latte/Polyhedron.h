@@ -24,6 +24,7 @@
 #define POLYHEDRON__H
 
 #include "cone.h"
+#include "cone_consumer.h"
 
 class Polyhedron {
 public:
@@ -36,12 +37,16 @@ public:
   bool dualized;	       /* Whether CONES have been dualized. */
   bool unbounded;	       /* Whether the polyhedron is
 				  unbounded. */
-  listCone *cones; 
+  listCone *cones;
+  ConeTransducer *projecting_up_transducer;   /* If non-NULL, a cone
+						 transducer that
+						 "projects up" cones
+						 into original space" */
 private:
   Polyhedron(const Polyhedron &);
 public:
   Polyhedron() : numOfVars(0), homogenized(false), dualized(false),
-		 unbounded(false), cones(0) {}
+		 unbounded(false), cones(0), projecting_up_transducer(0) {}
   ~Polyhedron() { freeListCone(cones); }
 };
 
