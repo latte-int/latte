@@ -83,3 +83,14 @@ Changes since the official release 1.2:
   	latte2ine < FILENAME.latte > FILENAME.ine
 	latte2ext < FILENAME.vrep.latte > FILENAME.ext
 
+* New command-line option --multivariate-generating-function.
+
+  It allows to compute the multivariate generating function of a
+  rational polyhedron.  For unbounded polyhedra, one needs to combine
+  it with --compute-vertex-cones=4ti2, since the traditional method in
+  LattE (using CDD+) currently refuses to handle unbounded polyhedra.
+
+  	count --compute-vertex-cones=4ti2 --multivariate-generating-function FILENAME
+
+  writes the multivariate generating function (in Maple notation) to "FILENAME.rat".
+
