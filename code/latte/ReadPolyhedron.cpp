@@ -31,6 +31,7 @@
 #include "preprocess.h"
 #include "ramon.h"
 #include "ReadSubcones.h"
+#include "ProjectUp.h"
 #ifdef HAVE_FORTYTWO_LIB
 #  include "VertexConesWith4ti2.h"
 #endif
@@ -463,7 +464,9 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
     }
     AA = transpose(AAA);
     // cout << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
-    templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows()); 
+    templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows());
+    Poly->projecting_up_transducer
+      = new ProjectingUpConeTransducer(oldnumofvars, numOfVars, AA, bb);
   }
   else {
     /* No equations. */
