@@ -142,11 +142,13 @@ GeneratingFunctionWritingConeConsumer::GeneratingFunctionWritingConeConsumer(con
 
 int GeneratingFunctionWritingConeConsumer::ConsumeCone(listCone *cone)
 {
-  if (!first_term)
-    genfun_stream << " + ";
-  writeTermOfGeneratingFunctionToFile(genfun_stream, cone,
-				      cone->vertex->vertex->numerators().length());
-  genfun_stream << endl;
-  first_term = false;
+  if (cone->latticePoints != NULL) {
+    if (!first_term)
+      genfun_stream << " + ";
+    writeTermOfGeneratingFunctionToFile(genfun_stream, cone,
+					cone->latticePoints->first.length());
+    genfun_stream << endl;
+    first_term = false;
+  }
   freeCone(cone);
 }
