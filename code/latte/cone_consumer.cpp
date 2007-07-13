@@ -117,9 +117,27 @@ CompositeConeProducer::Produce(ConeConsumer &consumer)
   producer->Produce(*transducer);  
 }
 
+CompositeConeConsumer::CompositeConeConsumer(ConeTransducer *a_transducer,
+					     ConeConsumer *a_consumer)
+  : transducer(a_transducer), consumer(a_consumer)
+{
+  transducer->SetConsumer(consumer);
+}
+
+int CompositeConeConsumer::ConsumeCone(listCone *cone)
+{
+  return transducer->ConsumeCone(cone);
+}
+
 ConeProducer *
 compose(ConeProducer *a_producer, ConeTransducer *a_transducer)
 {
   return new CompositeConeProducer(a_producer, a_transducer);
+}
+
+ConeConsumer *
+compose(ConeTransducer *a_transducer, ConeConsumer *a_consumer)
+{
+  return new CompositeConeConsumer(a_transducer, a_consumer);
 }
 
