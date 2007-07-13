@@ -408,7 +408,11 @@ main(int argc, char *argv[])
   case BarvinokParameters::PolynomialSubstitution:
     if (ehrhart_polynomial) {
       cerr << "Computation of Ehrhart polynomials is only implemented "
-	   << "for the exponential substitution." << endl;
+	   << "for the exponential substitution (--exp)." << endl;
+      exit(1);
+    }
+    if (Poly->unbounded) {
+      cerr << "The polyhedron is unbounded." << endl;
       exit(1);
     }
     if (read_polyhedron_data.assumeUnimodularCones[0]=='n') {
@@ -434,6 +438,10 @@ main(int argc, char *argv[])
     }
     break;
   case BarvinokParameters::ExponentialSubstitution:
+    if (Poly->unbounded) {
+      cerr << "The polyhedron is unbounded." << endl;
+      exit(1);
+    }
     if (read_polyhedron_data.dualApproach[0] == 'y') {
       cerr << "Exponential substitution is not yet implemented for the homogenized version."
 	   << endl;
