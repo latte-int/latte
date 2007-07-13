@@ -36,15 +36,12 @@
 #include "RudyResNTL.h"
 #include "Residue.h"
 #include "Grobner.h"
-//  #include "jesus.h"
 #include "preprocess.h"
 #include "print.h"
 #include "ramon.h"
 #include "rational.h"
 #include "timing.h"
 #include "flags.h"
-//#include "testing.h"
-#include "IntegralHull.h"
 #include "ExponentialSubst.h"
 #include "latte_random.h"
 #include "Irrational.h"
@@ -60,6 +57,7 @@
 #include "latte_system.h"
 #include "Polyhedron.h"
 #include "ReadPolyhedron.h"
+#include "ProjectUp.h"
 
 static void
 usage(const char *progname)
@@ -151,6 +149,9 @@ main(int argc, char *argv[])
     else if (strncmp(argv[i], "--count-lattice-points", 7) == 0) {
       // Default.
     }
+    else if (strncmp(argv[i], "--multivariate-generating-function", 7) == 0) {
+      params->substitution = BarvinokParameters::NoSubstitution;
+    }
     else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0)
       ehrhart_polynomial = true;
     else if (strncmp(argv[i], "--ehrhart-series", 11) == 0) {
@@ -192,6 +193,8 @@ main(int argc, char *argv[])
       cout << "Options that control what to compute:" << endl
 	   << "  --count-lattice-points                   Compute the number of lattice points" << endl
 	   << "                                           (default)" << endl
+	   << "  --multivariate-generating-function       Compute the multivariate generating function of" << endl
+	   << "                                           the set of lattice points of the polyhedron" << endl
 	   << "  --ehrhart-polynomial                     Compute an Ehrhart polynomial of an integral polytope" << endl
 	   << "  --ehrhart-series                         Compute the unsimplified Ehrhart series" << endl
 	   << "                                           as a univariate rational function" << endl
@@ -301,10 +304,10 @@ main(int argc, char *argv[])
 	= scaleRationalVectorToInteger(cone->vertex->vertex,
 				       Poly->numOfVars, scale_factor);
       if (scale_factor != 1) {
-	cerr << "Computation of Ehrhart polynomials is only implemented "
+	cerr << "Computation of Ehrhart (quasi-)polynomials is only implemented "
 	     << "for integral polytopes." << endl
-	     << "Use `ehrhart' for computing the Ehrhart series "
-	     << "of rational polytopes." << endl;
+	     << "Use `--ehrhart-series' or `--simplfied-ehrhart-series' for computing "
+	     << "the Ehrhart series of rational polytopes." << endl;
 	exit(1);
       }
       delete cone->vertex->vertex;
@@ -378,6 +381,30 @@ main(int argc, char *argv[])
   try {
     
   switch (params->substitution) {
+  case BarvinokParameters::NoSubstitution:
+    {
+      string rat_filename = read_polyhedron_data.filename + ".rat";
+      DelegatingSingleConeParameters *write_params
+	= new DelegatingSingleConeParameters(*params);
+      delete params;
+      params = write_params;
+      ConeConsumer *writing_consumer
+	= new GeneratingFunctionWritingConeConsumer(rat_filename);
+      if (Poly->projecting_up_transducer)
+	writing_consumer = compose(Poly->projecting_up_transducer,
+				   writing_consumer);
+      writing_consumer = compose(new PointsInParallelepipedComputingConeTransducer,
+				 writing_consumer);
+      write_params->SetConsumer(writing_consumer);
+      cerr << "Writing multivariate generating function to `"
+	   << rat_filename << "'." << endl;
+      listCone *cone;
+      for (cone = Poly->cones; cone != NULL; cone = cone->rest)
+	barvinokDecomposition_Single(cone, write_params);
+      cerr << "Multivariate generating function written to `"
+	   << rat_filename << "'." << endl;
+      break;
+    }
   case BarvinokParameters::PolynomialSubstitution:
     if (ehrhart_polynomial) {
       cerr << "Computation of Ehrhart polynomials is only implemented "
