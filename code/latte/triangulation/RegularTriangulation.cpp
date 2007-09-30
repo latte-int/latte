@@ -20,7 +20,6 @@
 
 #include <cassert>
 #include <vector>
-#include "latte_cddlib.h"
 #include "latte_gmp.h"
 #include "latte_random.h"
 #include "RegularTriangulationWithCddlib.h"
@@ -47,7 +46,7 @@ random_height(mpq_t height, const vec_ZZ &ray, void *data)
 {
   int max_height = * (int *) data;
   int h = uniform_random_number(1, max_height);
-  dd_set_si(height, h);
+  mpq_set_si(height, h, 1);
 }
 
 void
@@ -55,7 +54,7 @@ biased_random_height(mpq_t height, const vec_ZZ &ray, void *data)
 {
   int percentage = * (int *) data;
   int x = uniform_random_number(0, 99);
-  dd_set_si(height, (x < percentage) ? 2 : 1);
+  mpq_set_si(height, (x < percentage) ? 2 : 1, 1);
 }
 
 void
@@ -67,6 +66,6 @@ delone_height(mpq_t height, const vec_ZZ &ray, void *data)
     h += ray[i] * ray[i];
   }
   mpq_class hq = convert_ZZ_to_mpq(h);
-  dd_set(height, hq.get_mpq_t());
+  mpq_set(height, hq.get_mpq_t());
 }
 
