@@ -149,6 +149,7 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
   ZZ det2;
   mat_ZZ U;
   U.SetDims(numOfVars, numOfVars);
+  cout << "Computing LLL basis: " << endl;
   long rank = LLL(det2, alpha, U, 1, 1);
   cout << "Rank: " << rank << " Variables: " << numOfVars << endl;
   assert(rank == numOfVars);
@@ -173,31 +174,40 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
     }
   }
   /* Try integer combinations of the basis vectors */
-  int max_coeff = 5;
   int *max_comb = new int[numOfVars];
-  for (i = 0; i<numOfVars; i++)
-    max_comb[i] = 2 * max_coeff;
-  IntCombEnum iter_comb(max_comb, numOfVars);
-  int *next;
-  vec_ZZ multi;
-  multi.SetLength(numOfVars);
-  while((next = iter_comb.getNext())) {
-    int j;
-    for (j = 0; j<numOfVars; j++)
-      multi[j] = next[j] - max_coeff;
-    vec_ZZ alpha_comb;
-    alpha_comb = multi * alpha;
-    vec_ZZ F_comb;
-    F_comb = multi * UF;
-    if (singularity_avoiding(num_cones, numOfVars, alpha_comb, F_comb)) {
-      cout << "### Found vector:" << endl
-	   << multi * U << endl
-	   << alpha_comb << endl
-	   << F_comb << endl;
-      det_vector = alpha_comb;
-      return multi * U;
+  int max_coeff;
+  for (max_coeff = 1; ; max_coeff++) {
+    cout << "# Trying combinations with maximum coefficient " << max_coeff << endl;
+    for (i = 0; i<numOfVars; i++)
+      max_comb[i] = 2 * max_coeff;
+    IntCombEnum iter_comb(max_comb, numOfVars);
+    int *next;
+    vec_ZZ multi;
+    multi.SetLength(numOfVars);
+    while((next = iter_comb.getNext())) {
+      int j;
+      bool have_max = false;
+      for (j = 0; j<numOfVars; j++) {
+	multi[j] = next[j] - max_coeff;
+	if (abs(multi[j]) == max_coeff) have_max = true; 
+      }
+      if (have_max) {
+	vec_ZZ alpha_comb;
+	alpha_comb = multi * alpha;
+	vec_ZZ F_comb;
+	F_comb = multi * UF;
+	if (singularity_avoiding(num_cones, numOfVars, alpha_comb, F_comb)) {
+	  cout << "### Found vector:" << endl
+	       << " multipliers: " << multi << endl
+	       << " vector:      " << multi * U << endl
+	       << " alpha_comb:  " << alpha_comb << endl
+	       << " F_comb:      " << F_comb << endl;
+	  det_vector = alpha_comb;
+	  return multi * U;
+	}
+      }
     }
-  }  
+  }
   cout << "No suitable vector found." << endl;
   exit(1);
 }  

@@ -28,8 +28,9 @@
 #include "latte_gmp.h"
 #include "latte_random.h"
 #include "SpecialSimplex.h"
+#include "triangulation/TriangulationWithTOPCOM.h"
 #include "triangulation/RegularTriangulationWith4ti2.h"
-
+#include "triangulation/RegularTriangulationWithCddlib.h"
 #include "dual.h"
 #include "print.h"
 
@@ -162,26 +163,44 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
   return special;
 }
 
+struct special_height_data {
+  listCone *special_cone;
+  vec_ZZ c;
+};
+
+static bool
+has_ray(listCone *cone, const vec_ZZ &ray_vector)
+{
+  listVector *ray;
+  for (ray = cone->rays; ray != NULL; ray = ray->rest)
+    if (ray->first == ray_vector) return true;
+  return false;
+}
+
 void
 special_height(mpq_t height, const vec_ZZ &ray, void *data)
 {
-  listCone *special_cone = (listCone *) data;
+  special_height_data *shd = (special_height_data *) data;
+
+  /* Compute nominal height. */
+  ZZ alpha;
+  alpha = 100000;
+  ZZ h;
+  InnerProduct(h, shd->c, ray);
+  h = alpha-h;
   
-  int max_height = 10000;
-  listVector *r;
-  int h = 1;
-  for (r = special_cone->rays; r!=NULL; r = r->rest, h++) {
-    if (r->first == ray) {
-      /* Have a special ray, put it on low height. */
-      mpq_set_si(height, h, 1);
-      return;
-    }
+  int max_height = 100000;
+
+  /* Increase height of all non-special rays */
+  if (!has_ray(shd->special_cone, ray)) {
+    h += 1000 * uniform_random_number(1000, max_height);
   }
-  /* Choose a random height. */
-  h = uniform_random_number(10000, 10000 + max_height);
-  mpq_set_si(height, h, 1);
+      
+  mpz_class hz = convert_ZZ_to_mpz(h);
+  mpq_set_z(height, hz.get_mpz_t());
 }
 
+
 static bool
 facets_ok(listCone *cone, int numOfVars)
 {
@@ -197,8 +216,8 @@ static void
 check_facets(listCone *cone, int numOfVars)
 {
   if (!facets_ok(cone, numOfVars)) {
-    cerr << "The following cone has bad facets." << endl;
-    printCone(cone, numOfVars);
+    cerr << "This cone has bad facets." << endl;
+    //printCone(cone, numOfVars);
     //abort();
   }
 }
@@ -218,16 +237,110 @@ int FacetCheckingConeTransducer::ConsumeCone(listCone *cone)
   return consumer->ConsumeCone(cone);
 }
 
+
+
+class ExistenceCheckingConeTransducer : public ConeTransducer {
+  bool found_special;
+  listCone *special;
+public:
+  ExistenceCheckingConeTransducer(listCone *a_special) :
+    found_special(false),
+    special(a_special) {}
+  int ConsumeCone(listCone *cone);
+  virtual ~ExistenceCheckingConeTransducer();
+};
+
+static bool
+cone_equal(listCone *a, listCone *b)
+{
+  if (lengthListVector(a->rays) != lengthListVector(b->rays))
+    return false;
+  listVector *a_ray;
+  for (a_ray = a->rays; a_ray != NULL; a_ray = a_ray->rest) {
+    if (!has_ray(b, a_ray->first)) return false;
+  }
+  return true;
+}
+
+static bool
+is_subcone(listCone *a, listCone *b)
+{
+  listVector *a_ray;
+  for (a_ray = a->rays; a_ray != NULL; a_ray = a_ray->rest) {
+    if (!has_ray(b, a_ray->first)) return false;
+  }
+  return true;
+}
+
+int ExistenceCheckingConeTransducer::ConsumeCone(listCone *cone)
+{
+  int numOfVars = cone->rays->first.length();
+  if (/* cone_equal(cone, special) */ is_subcone(special, cone)) {
+    if (!cone_equal(special, cone)) {
+      cerr << "Warning: Special cone only appeared as a subcone." << endl;
+    }
+    found_special = true;
+  }
+  return consumer->ConsumeCone(cone);
+}
+
+ExistenceCheckingConeTransducer::~ExistenceCheckingConeTransducer()
+{
+  if (!found_special) {
+    cerr << "WARNING: Special cone did not appear in the triangulation." << endl;
+  }
+}
+
+
 void
 special_triangulation_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
 {
-  listCone *special_cone = FindSpecialSimplex(cone, Parameters->Number_of_Variables);
+  int numOfVars = Parameters->Number_of_Variables;
+  listCone *special_cone = FindSpecialSimplex(cone, numOfVars);
   cerr << "Found special cone: " << endl;
-  printListCone(special_cone, Parameters->Number_of_Variables);
+  computeDetAndFacetsOfSimplicialCone(special_cone, numOfVars);
+  printListCone(special_cone, numOfVars);
+  ConeConsumer *effective_consumer = &consumer;
+  /* Install check for singularity-avoiding facet normals. */
+#if 0
   FacetCheckingConeTransducer checking_transducer;
-  checking_transducer.SetConsumer(&consumer);
+  checking_transducer.SetConsumer(effective_consumer);
+  effective_consumer = &checking_transducer;
+#endif
+  /* Install check for special simplex. */
+  ExistenceCheckingConeTransducer existence_transducer(special_cone);
+  existence_transducer.SetConsumer(effective_consumer);
+  effective_consumer = &existence_transducer;
+#ifdef TRY_WITH_TOPCOM
+  listCone *sorted_cone = createListCone();
+  sorted_cone->vertex = new Vertex(*cone->vertex);
+  listVector *ray;
+  for (ray = cone->rays; ray != NULL; ray = ray->rest) {
+    if (!has_ray(special_cone, ray->first))
+      sorted_cone->rays = appendVectorToListVector(ray->first, sorted_cone->rays);
+  }
+  for (ray = cone->rays; ray != NULL; ray = ray->rest) {
+    if (has_ray(special_cone, ray->first))
+      sorted_cone->rays = appendVectorToListVector(ray->first, sorted_cone->rays);
+  }
+  cerr << "Sorted cone: " << endl;
+  printCone(sorted_cone, numOfVars);
+  triangulate_cone_with_TOPCOM(sorted_cone,
+			       numOfVars, *effective_consumer);
+#else
+  special_height_data shd;
+  shd.special_cone = special_cone;
+  {
+    /* Choose a generic facet normal (c,1) for the special cone */
+    shd.c.SetLength(numOfVars);
+    int i;
+    for (i = 0; i<numOfVars; i++)
+      shd.c[i] = uniform_random_number(1, 100000);
+  }
+  /*FIXME: */ Parameters->nonsimplicial_subdivision = true;
   triangulate_cone_with_4ti2(cone, Parameters,
-			     special_height, special_cone,
-			     Parameters->Number_of_Variables, checking_transducer);
+			     special_height, &shd,
+			     numOfVars, *effective_consumer);
+#endif
 }
