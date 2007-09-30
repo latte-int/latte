@@ -27,6 +27,9 @@
 #endif
 #ifdef HAVE_EXPERIMENTS
 #  include "triangulation/BoundaryTriangulation.h"
+#  ifdef HAVE_CPLEX
+#    include "triangulation/SpecialSimplex.h"
+#  endif
 #endif
 #if defined(HAVE_TOPCOM_LIB) || defined(HAVE_TOPCOM_BIN)
 #  include "triangulation/TriangulationWithTOPCOM.h"
@@ -45,6 +48,7 @@ triangulation_type_from_name(const char *name)
     return BarvinokParameters::DeloneTriangulationWithCddlib;
   else if (strcmp(name, "topcom") == 0) return BarvinokParameters::PlacingTriangulationWithTOPCOM;
   else if (strcmp(name, "boundary") == 0) return BarvinokParameters::SubspaceAvoidingBoundaryTriangulation;
+  else if (strcmp(name, "special") == 0) return BarvinokParameters::SubspaceAvoidingSpecialTriangulation;
   else if (strcmp(name, "4ti2") == 0) return BarvinokParameters::RegularTriangulationWith4ti2;
   else {
     cerr << "Unknown triangulation type name: " << name << endl;
@@ -132,6 +136,16 @@ triangulateCone(listCone *cone, int numOfVars,
       (cone, params, consumer);
 #else
     cerr << "SubspaceAvoidingBoundaryTriangulation not compiled in, sorry."
+	 << endl;
+    exit(1);
+#endif
+    break;
+  case BarvinokParameters::SubspaceAvoidingSpecialTriangulation:
+#if defined(HAVE_EXPERIMENTS) && defined(HAVE_CPLEX)
+    special_triangulation_with_subspace_avoiding_facets
+      (cone, params, consumer);
+#else
+    cerr << "SubspaceAvoidingSpecialTriangulation not compiled in, sorry."
 	 << endl;
     exit(1);
 #endif
