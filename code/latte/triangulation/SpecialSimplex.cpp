@@ -68,17 +68,10 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
 		      /*rngval:*/ NULL, /*rownames:*/ NULL);
   if (status != 0) abort();
 
-  {
-    double *obj = new double[num_rays];
-    int i;
-    for (i = 0; i<num_rays; i++)
-      obj[i] = 1.0;
-    status = CPXnewcols(env, lp, num_rays, obj,
-			/*lb:*/ NULL, /*ub:*/ NULL,
-			/*ctype:*/ NULL, /*colname:*/NULL);
-    delete[] obj;
-    if (status != 0) abort();
-  }
+  status = CPXnewcols(env, lp, num_rays, /*obj:*/ NULL,
+		      /*lb:*/ NULL, /*ub:*/ NULL,
+		      /*ctype:*/ NULL, /*colname:*/NULL);
+  if (status != 0) abort();
 
   listVector *ray;
   int j;
@@ -103,14 +96,18 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
     char ctype = 'B';
     status = CPXchgctype(env, lp, 1, &index, &ctype);
     if (status != 0) abort();
+    /* We minimize the number of used rays. */
+    status = CPXchgcoef(env, lp, -1, index, 1.0);
+    if (status != 0) abort();
   }
   { /* Enter -10 * e_n as a right-hand side.
-       FIXME: Actually need to try both positive and negative. */
+       Later we try + 10 * e_n too. */
     int index = numOfVars - 1;
     double value = +10.0;
     status = CPXchgrhs(env, lp, 1, &index, &value);
     if (status != 0) abort();
   }
+#if 0
   /* Add a cardinality constraint. */
   {
     int beg = 0;
@@ -129,6 +126,7 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
     delete[] val;
     if (status != 0) abort();
   }
+#endif
   /* Add variables and constraints that ensure we can linearly
      represent all other unit vectors too (linear span property). */
   int k;
@@ -173,7 +171,7 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
       double val[4];
       char sense[2];
       beg[0] = 0;  ind[0] = j + col_offset; val[0] = +1; ind[1] = num_rays + j; val[1] = -M; sense[0] = 'L';
-      beg[1] = 2;  ind[2] = j + col_offset; val[2] = -1; ind[3] = num_rays + j; val[3] = +M; sense[1] = 'L';
+      beg[1] = 2;  ind[2] = j + col_offset; val[2] = -1; ind[3] = num_rays + j; val[3] = -M; sense[1] = 'L';
       status = CPXaddrows(env, lp, 0, 2, 4, /* rhs: */ NULL, sense, beg, ind, val,
 			  /* colname: */ NULL, /* rowname: */ NULL);
       if (status != 0) abort();
@@ -187,30 +185,56 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
   
   int stat = CPXgetstat(env, lp);
   if (stat != CPXMIP_OPTIMAL) {
-    cerr << "Did not find special simplex (CPLEX solution status "
-	 << stat << ")." << endl;
-    exit(1);
+    cerr << "No solution for + e_n (CPLEX solution status "
+	   << stat << ")." << endl;
+    
+    int index = numOfVars - 1;
+    double value = -10.0;
+    status = CPXchgrhs(env, lp, 1, &index, &value);
+    if (status != 0) abort();
+
+    status = CPXmipopt(env, lp);
+    if (status != 0) abort();
+
+    int stat = CPXgetstat(env, lp);
+    if (stat != CPXMIP_OPTIMAL) {
+      cerr << "No solution for -e_n (CPLEX solution status "
+	   << stat << ")." << endl;
+      cerr << "Did not find special simplex." << endl;
+      exit(1);
+    }
   }
 
   /* Inspect which rays form the special simplex. */
 
+  cerr << "Vertical line is generated as follows by the rays: " << endl;
   listCone *special = createListCone();
   special->vertex = new Vertex(*cone->vertex);
   {
     double *x = new double[num_rays];
+    double *y = new double[num_rays];
+    status = CPXgetmipx(env, lp, y, 0, num_rays - 1);
+    if (status != 0) abort();
     status = CPXgetmipx(env, lp, x, num_rays, 2 * num_rays - 1);
     if (status != 0) abort();
     int i;
     listVector *ray;
     for (ray = cone->rays, i = 0; i<num_rays; ray = ray->rest, i++) {
       if (fabs(x[i] - 1.0) < 0.1) {
+	cerr << "+ " << y[i] << " * " << ray->first << endl;
 	special->rays = new listVector(ray->first, special->rays);
       }
     }
     delete[] x;
   }
-  assert(lengthListVector(special->rays) == numOfVars);
-  
+
+  if (lengthListVector(special->rays) == numOfVars) {
+    cerr << "Found simplicial special cone (good)." << endl;
+  }
+  else {
+    cerr << "Smallest special cone is non-simplicial; it has " << lengthListVector(special->rays)
+	 << " generators." << endl;
+  }
   return special;
 }
 
@@ -347,6 +371,7 @@ void
 special_triangulation_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
 {
+  cerr << "Looking for a special cone using CPLEX..." << endl;
   int numOfVars = Parameters->Number_of_Variables;
   listCone *special_cone = FindSpecialSimplex(cone, numOfVars);
   cerr << "Found special cone: " << endl;
