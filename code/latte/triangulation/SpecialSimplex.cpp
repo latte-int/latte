@@ -104,10 +104,10 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
     status = CPXchgctype(env, lp, 1, &index, &ctype);
     if (status != 0) abort();
   }
-  { /* Enter -1000 * e_n as a right-hand side.
+  { /* Enter -10 * e_n as a right-hand side.
        FIXME: Actually need to try both positive and negative. */
     int index = numOfVars - 1;
-    double value = -1000.0;
+    double value = +10.0;
     status = CPXchgrhs(env, lp, 1, &index, &value);
     if (status != 0) abort();
   }
@@ -129,6 +129,56 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
     delete[] val;
     if (status != 0) abort();
   }
+  /* Add variables and constraints that ensure we can linearly
+     represent all other unit vectors too (linear span property). */
+  int k;
+  double *lb = new double[num_rays];
+  double *ub = new double[num_rays];
+  {
+    int i;
+    for (i = 0; i<num_rays; i++) {
+      lb[i] = -CPX_INFBOUND;
+      ub[i] = CPX_INFBOUND;
+    }
+  }
+  for (k = 0; k<numOfVars - 1; k++) {
+    int row_offset = CPXgetnumrows(env, lp);
+    int col_offset = CPXgetnumcols(env, lp);
+    status = CPXnewrows(env, lp, numOfVars, /*rhs:*/ NULL, /*sense:*/ NULL,
+			/*rngval:*/ NULL, /*rownames:*/ NULL);
+    if (status != 0) abort();
+    { /* Enter 1 * e_k as a right-hand side. */
+      int index = row_offset + k;
+      double value = 1000.0;
+      status = CPXchgrhs(env, lp, 1, &index, &value);
+      if (status != 0) abort();
+    }
+    /* New variables z_k */
+    status = CPXnewcols(env, lp, num_rays, NULL,
+			lb, ub,
+			/*ctype:*/ NULL, /*colname:*/NULL);
+    if (status != 0) abort();
+    
+    for (ray = cone->rays, j = 0; ray!=NULL; ray = ray->rest, j++) {
+      int i;
+      for (i = 0; i<numOfVars; i++) {
+	status = CPXchgcoef(env, lp, i + row_offset, j + col_offset,
+			    convert_ZZ_to_double(ray->first[i]));
+	if (status != 0) abort();
+      }
+      /* Add constraints -M x_i <= z_{ki} <= M x_i */
+      double M = 1000;
+      int beg[2];
+      int ind[4];
+      double val[4];
+      char sense[2];
+      beg[0] = 0;  ind[0] = j + col_offset; val[0] = +1; ind[1] = num_rays + j; val[1] = -M; sense[0] = 'L';
+      beg[1] = 2;  ind[2] = j + col_offset; val[2] = -1; ind[3] = num_rays + j; val[3] = +M; sense[1] = 'L';
+      status = CPXaddrows(env, lp, 0, 2, 4, /* rhs: */ NULL, sense, beg, ind, val,
+			  /* colname: */ NULL, /* rowname: */ NULL);
+      if (status != 0) abort();
+    }
+  }
   status = CPXwriteprob(env, lp, "special-simplex.lp", "LP");
   if (status != 0) abort();
 
@@ -137,7 +187,8 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
   
   int stat = CPXgetstat(env, lp);
   if (stat != CPXMIP_OPTIMAL) {
-    cerr << "Did not find special simplex." << endl;
+    cerr << "Did not find special simplex (CPLEX solution status "
+	 << stat << ")." << endl;
     exit(1);
   }
 
