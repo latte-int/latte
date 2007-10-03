@@ -32,10 +32,16 @@ using namespace std;
 static void
 print_triangulation(listCone *triang, int Number_of_Variables)
 {
-#if 0
+  BarvinokParameters params;
+  params.dualization = BarvinokParameters::DualizationWith4ti2;
+  params.Number_of_Variables = Number_of_Variables;
+#if 1
   listCone *t;
   for (t = triang; t!=NULL; t = t->rest) {
-    computeDetAndFacetsOfSimplicialCone(t, Number_of_Variables);
+    if (t->facets == NULL) {
+      dualizeCone(t, Number_of_Variables, &params);
+      dualizeCone(t, Number_of_Variables, &params);
+    }
   }
 #endif
 //   cout << "*** Triangulation:" << endl;
@@ -49,9 +55,8 @@ int main(int argc, char **argv)
 {
   if (argc < 2) {
     cerr << "usage: triangulate [OPTIONS] [LATTE-CONE-FILE | CDD-EXT-FILE.ext ] " << endl;
-    cerr << "Options are: --triangulation={cddlib,4ti2,topcom,...}" << endl
-	 << "             --triangulation-max-height=HEIGHT" << endl
-	 << "             --nonsimplicial-subdivision" << endl;
+    show_standard_triangulation_options(cerr);
+    cerr << "  --nonsimplicial-subdivision" << endl;
     exit(1);
   }
   BarvinokParameters params;
