@@ -145,9 +145,9 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
     status = CPXnewrows(env, lp, numOfVars, /*rhs:*/ NULL, /*sense:*/ NULL,
 			/*rngval:*/ NULL, /*rownames:*/ NULL);
     if (status != 0) abort();
-    { /* Enter 1 * e_k as a right-hand side. */
+    { /* Enter 10 * e_k as a right-hand side. */
       int index = row_offset + k;
-      double value = 1000.0;
+      double value = 10.0;
       status = CPXchgrhs(env, lp, 1, &index, &value);
       if (status != 0) abort();
     }
@@ -180,6 +180,9 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
   status = CPXwriteprob(env, lp, "special-simplex.lp", "LP");
   if (status != 0) abort();
 
+  status = CPXsetintparam(env, CPX_PARAM_SCRIND, CPX_ON);
+  if (status != 0) abort();
+  
   status = CPXmipopt(env, lp);
   if (status != 0) abort();
   
@@ -298,16 +301,20 @@ check_facets(listCone *cone, int numOfVars)
 }
 
 class FacetCheckingConeTransducer : public ConeTransducer {
+  BarvinokParameters *params;
 public:
-  FacetCheckingConeTransducer() {}
+  FacetCheckingConeTransducer(BarvinokParameters *a_params) :
+    params(a_params) {}
   int ConsumeCone(listCone *cone);
 };
 
 int FacetCheckingConeTransducer::ConsumeCone(listCone *cone)
 {
   int numOfVars = cone->rays->first.length();
-  if (cone->facets == NULL)
-    computeDetAndFacetsOfSimplicialCone(cone, numOfVars);
+  if (cone->facets == NULL) {
+      dualizeCone(cone, params->Number_of_Variables, params);
+      dualizeCone(cone, params->Number_of_Variables, params);
+  }
   check_facets(cone, numOfVars);
   return consumer->ConsumeCone(cone);
 }
@@ -364,6 +371,9 @@ ExistenceCheckingConeTransducer::~ExistenceCheckingConeTransducer()
   if (!found_special) {
     cerr << "WARNING: Special cone did not appear in the triangulation." << endl;
   }
+  else {
+    cerr << "Special cone appears in the triangulation. Good."  << endl;
+  }
 }
 
 
@@ -371,16 +381,26 @@ void
 special_triangulation_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
 {
-  cerr << "Looking for a special cone using CPLEX..." << endl;
   int numOfVars = Parameters->Number_of_Variables;
-  listCone *special_cone = FindSpecialSimplex(cone, numOfVars);
-  cerr << "Found special cone: " << endl;
-  computeDetAndFacetsOfSimplicialCone(special_cone, numOfVars);
-  printListCone(special_cone, numOfVars);
+  listCone *special_cone;
+  if (Parameters->triangulation_special_cone) {
+    cerr << "Using the provided special cone..." << endl;
+    special_cone = Parameters->triangulation_special_cone;
+  }
+  else {
+    cerr << "Looking for a special cone using CPLEX..." << endl;
+    special_cone = FindSpecialSimplex(cone, numOfVars);
+    cerr << "Found special cone: " << endl;
+    if (special_cone->facets == NULL) {
+      dualizeCone(special_cone, numOfVars, Parameters);
+      dualizeCone(special_cone, numOfVars, Parameters);
+    }
+    printListCone(special_cone, numOfVars);
+  }
   ConeConsumer *effective_consumer = &consumer;
   /* Install check for singularity-avoiding facet normals. */
-#if 0
-  FacetCheckingConeTransducer checking_transducer;
+#if 1
+  FacetCheckingConeTransducer checking_transducer(Parameters);
   checking_transducer.SetConsumer(effective_consumer);
   effective_consumer = &checking_transducer;
 #endif
