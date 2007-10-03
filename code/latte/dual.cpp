@@ -225,6 +225,7 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
   mat_ZZ Mat, Inverse;
 
   assert(cone->facets == NULL);
+  assert(lengthListVector(cone->rays) == numOfVars);
   
   Mat.SetDims(numOfVars, numOfVars);
 
@@ -238,6 +239,7 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars)
   // computes d = det A and solves X*A = I*d if d != 0.
   // thus X = det A * A^{-1}, det X = (det A)^{n-1}.
   inv(det, Inverse, Mat);
+  assert(det != 0);
   cone->determinant = det;
   if (det < 0) {
     // Fix the sign.
