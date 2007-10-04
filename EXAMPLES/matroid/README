@@ -1,0 +1,21 @@
+From: "David Haws" <dchaws@gmail.com>
+Subject: Re: Matroid polytope data
+To: "Matthias Koeppe" <mkoeppe@mail.math.uni-magdeburg.de>
+Date: Wed, 03 Oct 2007 17:43:15 -0700
+
+I've attached all the data I have. The file ``haws.oxleybasis.txt'' is the basis description as given to me by Gordon Royle for his Oxley list. See http://people.csse.uwa.edu.au/
+gordon/oxley-list.html
+
+``haws.oxleybasis.alldata.tar.gz''
+
+contains:
+
+    haws.oxleybasis.txt.l*.ext               cddr file of the vertex representation
+                                                         I added the origin to make it full dimensional.
+                                                         This also contains the matroid reference for Gordon Royle's webpage.
+    haws.oxleybasis.txt.l*.ine              cddr's conversion of the file into ine description.
+
+    haws.oxleybasis.txt.l*.lat              LattE ready input. I place the final equation as an equality.
+
+The rest is the output.
+
