@@ -64,6 +64,7 @@ ReadPolyhedronData::ReadPolyhedronData()
   degree = 1;
 
   input_homog_cone = false;
+  input_vertex_cones = false;
   input_dualized = false;
   have_subcones = false;
   input_listcone_format = false;
@@ -96,9 +97,11 @@ void ReadPolyhedronData::show_options(ostream &stream)
 	 << "  --input-dual-homog-cones=CONES           The dual of the homogenized polyhedron given by a " << endl
          << "                                           union of cones (up to lower-dimensional cones) " << endl
 	 << "                                           in LattE's internal format" << endl
+         << "  --input-vertex-cones=CONES               The collection of vertex cones " << endl
+	 << "                                           in LattE's internal format" << endl
          << "Input handling options:" << endl
 	 << "  --compute-vertex-cones={cdd,lrs,4ti2}    Use this method for computing vertex cones" << endl
-	 << "  --redundancy-check={none,cdd}            Use this method for computing an irredundant " << endl
+	 << "  --redundancy-check={none,cddlib,full-cddlib}   Use this method for computing an irredundant " << endl
 	 << "                                           representation" << endl
     ;
 }
@@ -172,6 +175,13 @@ bool ReadPolyhedronData::parse_option(const char *arg)
     input_listcone_format = true;
     strcpy(dualApproach,"yes");
   }
+  else if (strncmp(arg, "--input-vertex-cones=", 21) == 0) {
+    filename = arg + 21;
+    expect_filename = false;
+    input_vertex_cones = true;
+    input_dualized = false;
+    input_listcone_format = true;
+  }
   else if (strncmp(arg, "--compute-vertex-cones=", 23) == 0) {
     if (strcmp(arg + 23, "cdd") == 0) 
       vertexcones = VertexConesWithCdd;
@@ -243,6 +253,8 @@ ReadPolyhedronData::read_polyhedron(BarvinokParameters *params)
 
   if (input_homog_cone)
     return read_polyhedron_from_homog_cone_input(params);
+  else if (input_vertex_cones)
+    return read_polyhedron_from_vertex_cone_input(params);
   else
     return read_polyhedron_hairy(params);
 }
@@ -289,6 +301,28 @@ ReadPolyhedronData::read_polyhedron_from_homog_cone_input(BarvinokParameters *pa
     numOfVars = Poly->cones->rays->first.length();
   Poly->numOfVars = numOfVars;
   Poly->homogenized = true;
+  Poly->dualized = input_dualized;
+  return Poly;
+}
+
+Polyhedron *
+ReadPolyhedronData::read_polyhedron_from_vertex_cone_input(BarvinokParameters *params)
+{
+  ConeProducer *producer;
+  producer = new ListConeReadingConeProducer(filename);
+  CollectingConeConsumer ccc;
+  producer->Produce(ccc);
+  delete producer;
+  Polyhedron *Poly = new Polyhedron;
+  Poly->cones = ccc.Collected_Cones;
+  int numOfVars;
+  if (Poly->cones == NULL)
+    numOfVars = 0;
+  else
+    numOfVars = ambient_cone_dimension(Poly->cones);
+  printListCone(Poly->cones, numOfVars);
+  Poly->numOfVars = numOfVars;
+  Poly->homogenized = false;
   Poly->dualized = input_dualized;
   return Poly;
 }

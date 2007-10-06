@@ -50,7 +50,7 @@ public:
   int degree;
 public:
   // Data for input of cones
-  bool input_homog_cone, input_dualized, have_subcones, input_listcone_format;
+  bool input_homog_cone, input_vertex_cones, input_dualized, have_subcones, input_listcone_format;
   string subcones_filename;
 public:
   // How to compute vertex cones.
@@ -82,6 +82,7 @@ public:
   Polyhedron *read_polyhedron(BarvinokParameters *params);
 private:
   Polyhedron *read_polyhedron_from_homog_cone_input(BarvinokParameters *params);
+  Polyhedron *read_polyhedron_from_vertex_cone_input(BarvinokParameters *params);
   Polyhedron *read_polyhedron_hairy(BarvinokParameters *params);
   Polyhedron *PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters *params);
 public:
