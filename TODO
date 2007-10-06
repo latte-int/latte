@@ -33,6 +33,11 @@ Code clean-up:
   simplicial/non-simplicial case.
 
 
+Bug fixes:
+
+* Vertex cone computation via CDD thinks the polytope is empty when
+  there is only the "trivial vertex" 0.
+
 Documentation:
 
 

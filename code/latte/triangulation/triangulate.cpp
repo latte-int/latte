@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include "config.h"
 #include "triangulation/triangulate.h"
+#include "print.h"
 #include "triangulation/RegularTriangulationWithCdd.h"
 #ifdef HAVE_CDDLIB
 #include "triangulation/RegularTriangulationWithCddlib.h"
@@ -72,6 +73,13 @@ parse_standard_triangulation_option(const char *arg,
   else if (strncmp(arg, "--triangulation-bias=", 21) == 0) {
     params->triangulation_bias = atoi(arg + 21);
   }
+  else if (strncmp(arg, "--special-cone=", 15) == 0) {
+    params->triangulation_special_cone = readListConeFromFile(arg + 15);
+    if (lengthListCone(params->triangulation_special_cone) != 1) {
+      cerr << "Error: Special cone file must contain exactly one cone." << endl;
+      exit(1);
+    }
+  }
   else return false;
   return true;
 }
@@ -82,7 +90,8 @@ show_standard_triangulation_options(ostream &stream)
   stream << "Triangulation options:" << endl
 	 << "  --triangulation={cddlib,4ti2,topcom,...}" << endl
 	 << "  --triangulation-max-height=HEIGHT        Use a uniform distribution of height from 1 to HEIGHT." << endl
-         << "  --triangulation-bias=PERCENTAGE          Use a non-uniform distribution of heights 1 and 2." << endl;
+         << "  --triangulation-bias=PERCENTAGE          Use a non-uniform distribution of heights 1 and 2." << endl
+	 << "  --special-cone=LATTE-CONE-FILE" << endl;
 }
 
 listCone *

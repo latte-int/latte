@@ -290,22 +290,14 @@ facets_ok(listCone *cone, int numOfVars)
   return true;
 }
 
-static void
-check_facets(listCone *cone, int numOfVars)
-{
-  if (!facets_ok(cone, numOfVars)) {
-    cerr << "This cone has bad facets." << endl;
-    //printCone(cone, numOfVars);
-    //abort();
-  }
-}
-
 class FacetCheckingConeTransducer : public ConeTransducer {
   BarvinokParameters *params;
+  bool have_bad_facets;
 public:
   FacetCheckingConeTransducer(BarvinokParameters *a_params) :
-    params(a_params) {}
+    params(a_params), have_bad_facets(false) {}
   int ConsumeCone(listCone *cone);
+  virtual ~FacetCheckingConeTransducer();
 };
 
 int FacetCheckingConeTransducer::ConsumeCone(listCone *cone)
@@ -315,8 +307,19 @@ int FacetCheckingConeTransducer::ConsumeCone(listCone *cone)
       dualizeCone(cone, params->Number_of_Variables, params);
       dualizeCone(cone, params->Number_of_Variables, params);
   }
-  check_facets(cone, numOfVars);
+  if (!facets_ok(cone, numOfVars)) {
+    cerr << "This cone has bad facets." << endl;
+    printCone(cone, numOfVars);
+    have_bad_facets = true;
+  }
   return consumer->ConsumeCone(cone);
+}
+
+FacetCheckingConeTransducer::~FacetCheckingConeTransducer()
+{
+  if (have_bad_facets) {
+    cerr << "There are cones with bad facets." << endl;
+  }
 }
 
 
@@ -361,6 +364,8 @@ int ExistenceCheckingConeTransducer::ConsumeCone(listCone *cone)
     if (!cone_equal(special, cone)) {
       cerr << "Warning: Special cone only appeared as a subcone." << endl;
     }
+    cerr << "Cone found: " << endl;
+    printCone(cone, numOfVars);
     found_special = true;
   }
   return consumer->ConsumeCone(cone);
@@ -435,8 +440,14 @@ special_triangulation_with_subspace_avoiding_facets
       shd.c[i] = uniform_random_number(1, 100000);
   }
   /*FIXME: */ Parameters->nonsimplicial_subdivision = true;
+#if 1
+  triangulate_cone_with_cddlib(cone, Parameters,
+			       special_height, &shd,
+			       numOfVars, *effective_consumer);
+#else
   triangulate_cone_with_4ti2(cone, Parameters,
 			     special_height, &shd,
 			     numOfVars, *effective_consumer);
+#endif
 #endif
 }

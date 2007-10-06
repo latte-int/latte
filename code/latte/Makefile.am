@@ -112,7 +112,7 @@ nodist_liblatte_a_SOURCES =				\
 	heap.cpp					\
 	TrivialSubst.cpp				\
 	barvinok/SubspaceAvoidingDecomposition.cpp	\
-	triangulation/BoundaryTriangulation.cpp
+	triangulation/BoundaryTriangulation.cpp	
 
 nodist_noinst_HEADERS =					\
 	ExponentialApprox.h				\
@@ -140,6 +140,19 @@ triangulate_boundary_SOURCES = triangulation/triangulate-boundary.cpp
 
 bin_PROGRAMS += complete-boundary-triangulation
 complete_boundary_triangulation_SOURCES = triangulation/complete-boundary-triangulation.cpp 
+
+if HAVE_CPLEX
+AM_LDFLAGS = $(CPLEX_LDFLAGS)
+AM_CXXFLAGS += $(CPLEX_CFLAGS)
+
+nodist_liblatte_a_SOURCES += triangulation/SpecialSimplex.cpp 
+nodist_noinst_HEADERS += triangulation/SpecialSimplex.h
+
+bin_PROGRAMS += special-simplex
+special_simplex_SOURCES = triangulation/special-simplex.cpp
+special_simplex_LDFLAGS = $(CPLEX_LDFLAGS)
+special_simplex_CXXFLAGS = $(AM_CXXFLAGS) $(CPLEX_CFLAGS)
+endif
 
 endif
 

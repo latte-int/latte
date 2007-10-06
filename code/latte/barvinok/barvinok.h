@@ -56,6 +56,7 @@ public:
     RegularTriangulationWithCddlib,
     DeloneTriangulationWithCddlib,
     SubspaceAvoidingBoundaryTriangulation,
+    SubspaceAvoidingSpecialTriangulation,
     PlacingTriangulationWithTOPCOM,
     RegularTriangulationWith4ti2
   } TriangulationType;
@@ -63,6 +64,7 @@ public:
   int triangulation_max_height;
   int triangulation_bias;
   bool nonsimplicial_subdivision;
+  listCone *triangulation_special_cone;
   // How to dualize non-simplicial cones.
   typedef enum {
     DualizationWithCdd,

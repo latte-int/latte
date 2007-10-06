@@ -43,7 +43,7 @@
 #include "barvinok/SubspaceAvoidingDecomposition.h"
 #endif
 
-// #define SHOWDETS
+#define SHOWDETS
 
 BarvinokParameters::BarvinokParameters() :
   substitution(PolynomialSubstitution),
@@ -374,24 +374,27 @@ deliver_cone(listCone *C, Single_Cone_Parameters *Parameters)
   }
 }
 
+static ZZ
+criterion_abs_det(listCone *C, Single_Cone_Parameters *Parameters)
+{
+  switch (Parameters->decomposition) {
+  case BarvinokParameters::DualDecomposition:
+    return abs(C->dual_determinant);
+  case BarvinokParameters::IrrationalPrimalDecomposition:
+  case BarvinokParameters::IrrationalAllPrimalDecomposition:
+    return abs(C->determinant);
+  default:
+    cerr << "Unknown BarvinokParameters::decomposition" << endl;
+    abort();
+  }
+}
+
 int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 {
   if (Parameters->Current_Depth > Parameters->Max_Depth)
     Parameters->Max_Depth = Parameters->Current_Depth;
   
-  ZZ absDet;
-  switch (Parameters->decomposition) {
-  case BarvinokParameters::DualDecomposition:
-    absDet = abs(C->dual_determinant);
-    break;
-  case BarvinokParameters::IrrationalPrimalDecomposition:
-  case BarvinokParameters::IrrationalAllPrimalDecomposition:
-    absDet = abs(C->determinant);
-    break;
-  default:
-    cerr << "Unknown BarvinokParameters::decomposition" << endl;
-    abort();
-  }
+  ZZ absDet = criterion_abs_det(C, Parameters);
        	
   if (absDet == 0) {
     cerr << "barvinok_DFS: Det = 0." << endl;
@@ -445,15 +448,15 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   for(int i = 0; i < m; i++)
     {
       Dets[i] = abs(Dets[i]);
-#ifdef SHOWDETS
-      cout << Dets[i] << ", ";
-#endif
       if(Dets[i] > max)
 	max = Dets[i];
       
       if (Dets[i] > 0) {
 	Parameters->Current_Simplicial_Cones_Total ++;
 
+#ifdef SHOWDETS
+	cout << criterion_abs_det(cones1[i], Parameters) << ", ";
+#endif
 	switch (Parameters->decomposition) {
 	case BarvinokParameters::DualDecomposition:
 	  break;

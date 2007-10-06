@@ -244,11 +244,16 @@ main(int argc, char *argv[])
       /* Triangulation will be done in the dual space, so we must
 	 avoid using facets whose normal vectors lie in the
 	 subspace. */
-      if (triangulation_specified && params->triangulation != BarvinokParameters::SubspaceAvoidingBoundaryTriangulation) {
-	cerr << "Warning: The requested triangulation method is not guaranteed to work with --avoid-singularities."
-	     << endl;
-      }
+      if (triangulation_specified) {
+	if (params->triangulation != BarvinokParameters::SubspaceAvoidingBoundaryTriangulation
+	    && params->triangulation != BarvinokParameters::SubspaceAvoidingSpecialTriangulation) {
+	  cerr << "Warning: The requested triangulation method is not guaranteed to work with --avoid-singularities."
+	       << endl;
+	}
+      }	
       else {
+	/* Not specified, so choose one that will work. */
+	cerr << "Choosing SubspaceAvoidingBoundaryTriangulation method" << endl;
 	params->triangulation = BarvinokParameters::SubspaceAvoidingBoundaryTriangulation;
       }
     }
