@@ -295,6 +295,21 @@ main(int argc, char *argv[])
 
   Polyhedron *Poly = read_polyhedron_data.read_polyhedron(params);
 
+  /* Compute the facet information from tight inequalities if
+     possible.  It is essential that this is done BEFORE translating
+     vertexes to the origin (in Ehrhart polynomial mode) -- otherwise
+     tightness information is wrong. */
+  if (not Poly->dualized
+      && Poly->cones != NULL
+      && read_polyhedron_data.matrix != NULL
+      && read_polyhedron_data.Vrepresentation[0] != 'y') {
+    /* Fill in the facets of all cones; we determine them by
+       taking all inequalities tight at the respective vertex. */
+    params->dualize_time.start();
+    computeTightInequalitiesOfCones(Poly->cones, read_polyhedron_data.matrix, Poly->numOfVars);
+    params->dualize_time.stop(); cout << params->dualize_time;
+  }
+  
   if (ehrhart_polynomial) {
     /* Translate all cones to the origin, saving the original vertex. */
     listCone *cone;
@@ -339,21 +354,14 @@ main(int argc, char *argv[])
       dualizeCones(Poly->cones, Poly->numOfVars, params);
       cout << "done; sorry for the interruption.) "; cout.flush();
     }
-    else {
-      if (read_polyhedron_data.Vrepresentation[0] == 'y') {
+    else if (Poly->cones != NULL) {
+      if (Poly->cones->facets == NULL) {
 	cout << "(First computing facets for them... "; cout.flush();
 	dualizeCones(Poly->cones, Poly->numOfVars, params);
 	dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
 	cout << "done; sorry for the interruption.) "; cout.flush();
-      }      
-      else {
-	/* Fill in the facets of all cones; we determine them by
-	   taking all inequalities tight at the respective vertex. */
-	params->dualize_time.start();
-	computeTightInequalitiesOfCones(Poly->cones, read_polyhedron_data.matrix, Poly->numOfVars);
-	params->dualize_time.stop(); cout << params->dualize_time;
       }
-      if (Poly->cones && Poly->cones->rays == NULL) {
+      else if (Poly->cones->rays == NULL) {
 	/* Only facets computed, for instance by using the 4ti2
 	   method of computing vertex cones.  So dualize twice to
 	   compute the rays. */
