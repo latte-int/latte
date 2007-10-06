@@ -152,8 +152,10 @@ main(int argc, char *argv[])
     else if (strncmp(argv[i], "--multivariate-generating-function", 7) == 0) {
       params->substitution = BarvinokParameters::NoSubstitution;
     }
-    else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0)
+    else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0) {
       ehrhart_polynomial = true;
+      params->substitution = BarvinokParameters::ExponentialSubstitution;
+    }
     else if (strncmp(argv[i], "--ehrhart-series", 11) == 0) {
       ehrhart_series = true;
       strcpy(read_polyhedron_data.dualApproach,"yes");
