@@ -24,6 +24,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <cassert>
 #include <time.h>
 #include <list>
 #include <vector>
@@ -95,13 +96,10 @@ void printListCone(listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printVectorToFile(ostream & out, const vec_ZZ &v, int numOfVars) {
+void printVectorToFile(ostream & out, const vec_ZZ &v, int numOfVars)
+{
   int i;
-
-//    if (v==0) {
-//      out << "[]\n";
-//      return ;
-//    }
+  assert(v.length() == numOfVars);
   out << "[";
   for (i=0; i<(numOfVars-1); i++) {
     out << v[i] << " ";
@@ -192,7 +190,8 @@ void printRationalVectorToFileWithoutBrackets(ostream & out,
   return ;
 }
 /* ----------------------------------------------------------------- */
-void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
+void printConeToFile(ostream & out,listCone* cones, int numOfVars)
+{
   out << "==========\n";
   out << "Cone.\n";
 
@@ -218,31 +217,75 @@ void printConeToFile(ostream & out,listCone* cones, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-listCone *
-readConeFromFile(istream &in)
+
+
+static bool
+look_for(istream &in, const char *token)
 {
   string s;
   while (in.good()) {
     in >> s;
-    if (s == "rays:") break;
+    if (s == token) return true;
   }
-  if (!in.good()) {
-    return NULL;
+  return false;
+}
+
+static void
+skip_space(istream &in)
+{
+  while (isspace(in.peek())) {
+    char c;
+    in.get(c);
   }
-  listCone *cone = createListCone();
+}
+
+static listVector *
+readListVector(istream &in)
+{
+  listVector *result = NULL;
+  listVector **end_p = &result;
   while (in.good()) {
     vec_ZZ v;
-    while (isspace(in.peek())) {
-      char c;
-      in.get(c);
-    }
+    skip_space(in);
     if (in.peek() != '[') break;
     in >> v;
     if (in.good()) {
-      cone->rays = appendVectorToListVector(v, cone->rays);
+      *end_p = new listVector(v);
+      end_p = &(*end_p)->rest;
     }
   }
-  cone->vertex = new Vertex(new rationalVector(cone->rays->first.length()));
+  if (result->rest == NULL
+      && result->first.length() == 0) {
+    /* Read [], which is meant to designate an empty list,
+       rather than a list of one zero-dimensional vector. */
+    freeListVector(result);
+    return NULL;
+  }
+  return result;
+}
+
+listCone *
+readConeFromFile(istream &in)
+{
+  if (!look_for(in, "Cone.")) return NULL;
+  listCone *cone = createListCone();
+  if (!look_for(in, "Coefficient:")) return NULL;
+  in >> cone->coefficient;
+  if (!in.good()) return NULL;
+  if (!look_for(in, "Vertex:")) return NULL;
+  /* FIXME: Actually need to handle rational data */
+  skip_space(in);
+  if (in.peek() != '[') return NULL;
+  vec_ZZ v;
+  in >> v;
+  if (!in.good()) return NULL;
+  ZZ denom;
+  denom = 1;
+  cone->vertex = new Vertex(new rationalVector(v, denom));
+  if (!look_for(in, "rays:")) return NULL;
+  cone->rays = readListVector(in);
+  if (!look_for(in, "Facets:")) return NULL;
+  cone->facets = readListVector(in);
   return cone;
 }
 
