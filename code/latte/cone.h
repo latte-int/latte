@@ -91,4 +91,7 @@ listCone *appendListCones(listCone *A, listCone *B);
 /* Copy a single cone. */
 listCone *copyCone(listCone *cone);
 
+/* Deduce the ambient dimension of CONE from its data. */
+int ambient_cone_dimension(listCone *cone);
+
 #endif

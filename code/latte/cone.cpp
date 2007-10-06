@@ -135,3 +135,9 @@ listCone *copyCone(listCone *cone)
   copy->rest = NULL;
   return copy;
 }
+
+int ambient_cone_dimension(listCone *cone)
+{
+  if (cone == NULL) return 0;
+  return cone->vertex->vertex->numerators().length();
+}
