@@ -40,7 +40,8 @@ liblatte_a_SOURCES =							\
 	triangulation/RegularTriangulation.cpp				\
 	triangulation/RegularTriangulationWithCdd.cpp			\
 	ReadPolyhedron.cpp						\
-	ProjectUp.cpp
+	ProjectUp.cpp							\
+	ReadSubcones.cpp
 
 noinst_HEADERS =							\
 	CheckEmpty.h							\
@@ -65,7 +66,8 @@ noinst_HEADERS =							\
 	triangulation/RegularTriangulation.h				\
 	triangulation/RegularTriangulationWithCdd.h			\
 	ReadPolyhedron.h						\
-	ProjectUp.h
+	ProjectUp.h							\
+	ReadSubcones.h
 
 if HAVE_TOPCOM_LIB
 liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
@@ -104,6 +106,9 @@ liblatte_a_SOURCES += latte_4ti2_zsolve.cpp
 noinst_HEADERS += latte_4ti2_zsolve.h
 endif
 
+bin_PROGRAMS += polyhedron-to-cones
+polyhedron_to_cones_SOURCES = polyhedron-to-cones.cpp
+
 if HAVE_EXPERIMENTS
 # Experimental stuff
 
@@ -127,19 +132,11 @@ nodist_test_todd_SOURCES = todd/test-todd.cpp
 bin_PROGRAMS += aggregate
 nodist_aggregate_SOURCES = aggregation/aggregation.cpp
 
-nodist_liblatte_a_SOURCES += 				\
-	ReadSubcones.cpp
-nodist_noinst_HEADERS +=				\
-	ReadSubcones.h
-
-bin_PROGRAMS += polyhedron-to-cones
-polyhedron_to_cones_SOURCES = polyhedron-to-cones.cpp
-
 bin_PROGRAMS += triangulate-boundary
-triangulate_boundary_SOURCES = triangulation/triangulate-boundary.cpp 
+nodist_triangulate_boundary_SOURCES = triangulation/triangulate-boundary.cpp 
 
 bin_PROGRAMS += complete-boundary-triangulation
-complete_boundary_triangulation_SOURCES = triangulation/complete-boundary-triangulation.cpp 
+nodist_complete_boundary_triangulation_SOURCES = triangulation/complete-boundary-triangulation.cpp 
 
 if HAVE_CPLEX
 AM_LDFLAGS = $(CPLEX_LDFLAGS)
@@ -149,7 +146,7 @@ nodist_liblatte_a_SOURCES += triangulation/SpecialSimplex.cpp
 nodist_noinst_HEADERS += triangulation/SpecialSimplex.h
 
 bin_PROGRAMS += special-simplex
-special_simplex_SOURCES = triangulation/special-simplex.cpp
+nodist_special_simplex_SOURCES = triangulation/special-simplex.cpp
 special_simplex_LDFLAGS = $(CPLEX_LDFLAGS)
 special_simplex_CXXFLAGS = $(AM_CXXFLAGS) $(CPLEX_CFLAGS)
 endif

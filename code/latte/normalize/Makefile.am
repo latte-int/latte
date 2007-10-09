@@ -5,11 +5,11 @@ noinst_LIBRARIES =
 nodist_noinst_HEADERS =
 
 noinst_LIBRARIES += libnormaliz.a
-libnormaliz_a_SOURCES = ReductionTest.cpp
+nodist_libnormaliz_a_SOURCES = ReductionTest.cpp
 nodist_noinst_HEADERS += ReductionTest.h
 AM_CPPFLAGS = -I$(srcdir)/..
 if HAVE_CPLEX
-libnormaliz_a_SOURCES += ReductionTestWithCPLEX.cpp
+nodist_libnormaliz_a_SOURCES += ReductionTestWithCPLEX.cpp
 nodist_noinst_HEADERS += ReductionTestWithCPLEX.h
 endif
 
