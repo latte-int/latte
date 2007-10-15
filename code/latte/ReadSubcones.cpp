@@ -189,8 +189,8 @@ SubconePrintingConeConsumer::SubconePrintingConeConsumer(const listCone *master_
   listVector *ray;
   int index;
   for (ray = master_cone->rays, index = 0; ray!=NULL; ray=ray->rest, index++) {
-    std::map<vector<mpz_class>, int>::value_type p(convert_vec_ZZ_to_mpz_vector(ray->first),						  
-						   p.second = index);
+    std::map<vector<mpz_class>, int>::value_type p(convert_vec_ZZ_to_mpz_vector(ray->first), 
+						   index);
     index_map.insert(p);
   }
   file_writer = new IncrementalVectorFileWriter(filename, index);
