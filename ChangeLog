@@ -1,3 +1,132 @@
+2007-10-15  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* ReadSubcones.cpp: Fix a build problem with GCC 3.2.3
+
+2007-10-09  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	Version 1.2-mk-0.9
+
+2007-10-06  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* ReadPolyhedron.cpp, ReadPolyhedron.h:
+	New option --input-vertex-cones=CONES
+
+	* print.cpp (printVectorToFile): Add length assertion.
+	(readConeFromFile): Read more data, not just the rays.  Don't reverse
+	list of rays.
+
+	* cone.cpp, cone.h (ambient_cone_dimension): New.
+
+	* count.cpp (--ehrhart-polynomial):
+	Turn on --exp automatically, rather than complain to user.
+
+	* count.cpp: In Ehrhart polynomial mode, use tight-inequality
+	information BEFORE shifting cones to the origin.  Fixes wrong
+	result for "code/latte/count --compute-vertex-cones=cdd
+	--ehrhart-polynomial --exp --all-primal
+	/home/mkoeppe/w/latte/EXAMPLES/matroid/haws.oxleybasis.txt.l10.lat"
+
+2007-10-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* triangulation/test-triangulation.cpp: Compute facets using 2 *
+	dualizeCone, rather than computeDetAndFacetsOfSimplicialCone, to
+	also handle general subdivisions
+
+	* dual.cpp (computeDetAndFacetsOfSimplicialCone): Add assertions
+	that we indeed have a full-dimensional simplicial cone.
+
+2007-09-30  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* triangulation/RegularTriangulation.cpp: Use mpq_ instead of dd_
+	functions
+
+2007-07-13  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* count.cpp: For all operations except the computation of
+	multivariate generating function, refuse to handle unbounded
+	polyhedra (where the computed results would be meaningless).
+
+	* count.cpp: New option "--multivariate-generating-function".
+
+	* genFunction/maple.cpp (GeneratingFunctionWritingConeConsumer):
+	Read off the dimension of the
+	cone from the lattice points, not the vertex.  (Workaround for
+	broken ProjectUp2, which currently does not handle the vertex.)
+
+	* cone_consumer.cpp (CompositeConeConsumer): Implemented.
+	(compose): Implement corresponding overload.
+
+	* ReadPolyhedron.cpp: When equations are present, fill the
+	"projecting_up_transducer" slot of the Polyhedron.
+
+2007-07-12  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* Polyhedron.h (Polyhedron): New slot, *projecting_up_transducer
+
+	* ProjectUp.cpp, ProjectUp.h (ProjectUp2): Add assertions.
+	(ProjectingUpConeTransducer): New class.
+
+	* barvinok/barvinok.cpp,
+	barvinok/barvinok.h (DelegatingSingleConeParameters): New class.
+
+	* genFunction/piped.cpp,
+	genFunction/piped.h (PointsInParallelepipedComputingConeTransducer):
+	New class.
+
+	* genFunction/maple.cpp,
+	genFunction/maple.h (GeneratingFunctionWritingConeConsumer): New
+	class.
+
+	* Makefile.am: New files ProjectUp.h, .cpp
+
+	* Grobner.cpp, ehrhart.cpp, maximize.cpp, minimize.cpp:
+	Fix #include list
+
+	* ProjectUp.cpp, ProjectUp.h, ReadingFile.cpp,
+	ReadingFile.h (ProjectUp, ProjectUp2): Move from ReadingFile.h,
+	.cpp to new files ProjectUp.h, .cpp
+
+	* vertices/cdd.h, ReadingFile.cpp: Clean #include list
+
+	* ReadPolyhedron.cpp: Use changed interface of
+	computeVertexConesWith4ti2.
+
+	* VertexConesWith4ti2.cpp, VertexConesWith4ti2.h:
+	Report whether unbounded.
+
+	* Polyhedron.h (Polyhedron): New slot "unbounded".
+
+	* CheckEmpty.cpp: Clean #include list
+
+2007-07-11  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* VertexConesWith4ti2.cpp (computeVertexConesWith4ti2): Handle
+	unbounded polyhedra properly
+	(don't mistake rays for vertices).
+
+	* latte2ext.cpp, latte2ine.cpp: Use changed interface of
+	ReadLatteStyleMatrix.
+
+	* ReadLatteStyle.cpp (add_nonnegativity): Don't use set_copy to
+	copy equality-ness between sets of different ground-set
+	cardinalities.  (Fixes BUG, where sporadically inequalities were
+	turned into equalities.)
+
+	* ReadPolyhedron.cpp: New options
+	--dilation=DILATION-FACTOR (equivalent to old option "dil
+	DILATION-FACTOR") and --interior (equivalent to "+").
+
+	* count.cpp: New option --count-lattice-points corresponding to
+	the default.  Show more help on --help.
+
+	* dual.cpp, dual.h (show_standard_dualization_option): New.
+
+	* normalize/normalize.cpp: Use it here.
+
+	* triangulation/triangulate.cpp,
+	triangulation/triangulate.h (show_standard_triangulation_options):
+	New.
+
 2007-07-01  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/ReadPolyhedron.cpp, code/latte/ReadPolyhedron.h:
