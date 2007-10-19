@@ -32,6 +32,7 @@ Code clean-up:
 * dualize & dualizeback want to be one function, dispatching over
   simplicial/non-simplicial case.
 
+* Handle "-" to mean "read from stdin".
 
 Bug fixes:
 

@@ -1,3 +1,33 @@
+2007-10-19  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/Residue.cpp, code/latte/RudyResNTL.cpp,
+	code/latte/RudyResNTL.h, code/latte/banner.cpp,
+	code/latte/barvinok/Cone.cpp,
+	code/latte/barvinok/SubspaceAvoidingDecomposition.cpp,
+	code/latte/barvinok/Triangulation.cpp,
+	code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h,
+	code/latte/barvinok/dec.cpp, code/latte/binarySearchIP.cpp,
+	code/latte/count.cpp, code/latte/dual.cpp, code/latte/ehrhart.cpp,
+	code/latte/genFunction/IntCombEnum.cpp,
+	code/latte/genFunction/NTL_to_LiDIA.cpp,
+	code/latte/genFunction/piped.cpp, code/latte/maximize.cpp,
+	code/latte/minimize.cpp, code/latte/normalize/normalize.cpp,
+	code/latte/polyhedron-to-cones.cpp, code/latte/preprocess.cpp,
+	code/latte/print.cpp, code/latte/rational.cpp,
+	code/latte/triangulation/BoundaryTriangulation.cpp,
+	code/latte/triangulation/test-triangulation.cpp,
+	code/latte/triangulation/triangulate.cpp,
+	code/latte/vertices/cdd.cpp, code/latte/CheckEmpty.cpp,
+	code/latte/ConeInfo.cpp, code/latte/ExponentialApprox.cpp,
+	code/latte/ExponentialSubst.cpp, code/latte/Grobner.cpp,
+	code/latte/IntegralHull.cpp, code/latte/Irrational.cpp,
+	code/latte/ProjectUp.cpp, code/latte/ReadPolyhedron.cpp,
+	code/latte/ReadingFile.cpp, code/latte/ResSingle.cpp: Send all
+	debugging and progress messages to standard error rather than
+	standard output. Now only the final result (usually a number of
+	lattice points) should appear on standard output.  
+	Reported by Nicolas Thiery.
+
 2007-10-15  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* ReadSubcones.cpp: Fix a build problem with GCC 3.2.3
