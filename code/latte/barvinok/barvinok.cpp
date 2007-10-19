@@ -1,7 +1,7 @@
 /* barvinok.cpp -- Barvinok's decomposition of a cone.
 
    Copyright 2002, 2003 Ruriko Yoshida
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -75,6 +75,16 @@ void BarvinokParameters::print_statistics(ostream &s)
 {
   s << read_time << vertices_time << irrationalize_time << dualize_time
     << triangulate_time << decompose_time << total_time;
+}
+
+void BarvinokParameters::deliver_number_of_lattice_points(const ZZ &number)
+{
+  cerr << endl << "****  The number of lattice points is: "; cerr.flush();
+  cout << number; cout.flush();
+  cerr << "  ****" << endl; cerr.flush();
+  cout << endl;
+  ofstream out("numOfLatticePoints");
+  out << number << endl;
 }
 
 void Single_Cone_Parameters::print_statistics(ostream &s)
@@ -166,7 +176,7 @@ int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 		const Vertex *vertex)
 {
-	//cout << "barvinok_Single Called." << endl;;
+	//cerr << "barvinok_Single Called." << endl;;
 	
 	long m, n;
   	m = B.NumRows();
@@ -290,7 +300,7 @@ barvinokStep(const listCone *Cone,
       = computeAndCheckDeterminants(generator, Cone->determinant, Z,
 				    m, mat, Dets);
     if (!success) {
-      cout << "Second loop... " << endl;
+      cerr << "Second loop... " << endl;
       Z = ComputeOmega(generator, dual, m, 2, 2);
       Z = CheckOmega(generator, Z);
       success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
@@ -354,7 +364,7 @@ deliver_cone(listCone *C, Single_Cone_Parameters *Parameters)
 {
   Parameters->Total_Uni_Cones += 1;
   if ( Parameters->Total_Uni_Cones % 1000 == 0)
-    cout << Parameters->Total_Uni_Cones
+    cerr << Parameters->Total_Uni_Cones
 	 << (Parameters->max_determinant == 0
 	     ? " simplicial cones done."
 	     : (Parameters->max_determinant == 1
@@ -417,7 +427,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
       return deliver_cone(C, Parameters);
   }
   
-  //cout << "barvinok_DFS: non-uni cone." << endl;
+  //cerr << "barvinok_DFS: non-uni cone." << endl;
      
   int result = 1;
   long m = Parameters->Number_of_Variables;
@@ -443,7 +453,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   max = -1;
 
 #ifdef SHOWDETS
-  cout << "Level " << Parameters->Current_Depth << ": Index " << absDet << " -> ";
+  cerr << "Level " << Parameters->Current_Depth << ": Index " << absDet << " -> ";
 #endif
   for(int i = 0; i < m; i++)
     {
@@ -455,7 +465,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 	Parameters->Current_Simplicial_Cones_Total ++;
 
 #ifdef SHOWDETS
-	cout << criterion_abs_det(cones1[i], Parameters) << ", ";
+	cerr << criterion_abs_det(cones1[i], Parameters) << ", ";
 #endif
 	switch (Parameters->decomposition) {
 	case BarvinokParameters::DualDecomposition:
@@ -471,7 +481,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
       }
     }
 #ifdef SHOWDETS
-  cout << endl;
+  cerr << endl;
 #endif
 
   int current;

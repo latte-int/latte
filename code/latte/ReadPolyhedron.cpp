@@ -429,7 +429,7 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
   case RedundancyCheckWithCddlib:
     {
       cerr << "Finding hidden equalities using cddlib...";
-      cout.flush();
+      cerr.flush();
       dd_rowset impl_lin;
       dd_rowindex newpos;
       dd_ErrorType err;
@@ -441,7 +441,7 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
   case FullRedundancyCheckWithCddlib:
     {
       cerr << "Removing redundant inequalities and finding hidden equalities using cddlib...";
-      cout.flush();
+      cerr.flush();
       dd_rowset impl_lin, redset;
       dd_rowindex newpos;
       dd_ErrorType err;
@@ -459,14 +459,14 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
   cddlib_matrix_to_equations_and_inequalities(M, &equations, &inequalities);
   dd_FreeMatrix(M);
 
-  cout << "Ax <= b, given as (b|-A):\n";
-  cout << "=========================\n";
-  printListVector(inequalities, numOfVars + 1);
-  cout << endl;
-  cout << "Ax = b, given as (b|-A):\n";
-  cout << "========================\n";
-  printListVector(equations, numOfVars + 1);
-  cout << endl;
+  cerr << "Ax <= b, given as (b|-A):\n";
+  cerr << "=========================\n";
+  printListVectorToFile(cerr, inequalities, numOfVars + 1);
+  cerr << endl;
+  cerr << "Ax = b, given as (b|-A):\n";
+  cerr << "========================\n";
+  printListVectorToFile(cerr, equations, numOfVars + 1);
+  cerr << endl;
 
   if (equations != NULL)
     strcpy(equationsPresent, "yes");
@@ -497,7 +497,7 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
       AAA[i - 1] = ProjU2[i];
     }
     AA = transpose(AAA);
-    // cout << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
+    // cerr << ProjU << determinant(transpose(AAA)*AAA) <<  endl;
     templistVec = transformArrayBigVectorToListVector(ProjU, ProjU.NumCols(), ProjU.NumRows());
     Poly->projecting_up_transducer
       = new ProjectingUpConeTransducer(oldnumofvars, numOfVars, AA, bb);
@@ -509,7 +509,7 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
   }
   matrix = matrixTmp;
   params->read_time.stop();
-  cout << params->read_time;
+  cerr << params->read_time;
   /* Now matrix contains the new inequalities. */
   
   if (dualApproach[0] == 'y') {
@@ -563,10 +563,10 @@ ReadPolyhedronData::PolyhedronFromHrepMatrix(dd_MatrixPtr M, BarvinokParameters 
     };
 	  
     Poly->cones = tmpcones;
-    cout << "The polytope has " << lengthListCone(Poly->cones) << " vertices." << endl;
+    cerr << "The polytope has " << lengthListCone(Poly->cones) << " vertices." << endl;
     //system_with_error_check("rm -f numOfLatticePoints");
     params->vertices_time.stop();
-    cout << params->vertices_time;
+    cerr << params->vertices_time;
     Poly->homogenized = false;
   } 
 

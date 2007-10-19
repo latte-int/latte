@@ -98,11 +98,11 @@ listCone *
 triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params)
 {
-  cout << "Triangulating cone... " << flush;
+  cerr << "Triangulating cone... " << flush;
   params->triangulate_time.start();
   CollectingConeConsumer ccc;
   triangulateCone(cone, numOfVars, params, ccc);
-  cout << "done." << endl;
+  cerr << "done." << endl;
   params->triangulate_time.stop();
   return ccc.Collected_Cones;
 }

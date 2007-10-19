@@ -204,7 +204,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::EvaluateCone(listCone *
       = computeExponentialResidue_Single(generic_vector, cone, Number_of_Variables);
     total_lower_bound += result;
     total_upper_bound += result;
-    cout << "* [" << abs(cone->determinant) << "], ";
+    cerr << "* [" << abs(cone->determinant) << "], ";
     freeCone(cone);
     return 0.0;
   }
@@ -214,8 +214,8 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::EvaluateCone(listCone *
     total_lower_bound += data->this_total_lower_bound;
     total_upper_bound += data->this_total_upper_bound;
     heap_insert_dblweight(cone_heap, data, data->GetWeight());
-    //cout << "Received cone with bound difference: " << data->GetWeight() << endl;
-    cout << data->GetWeight() << " [" << abs(cone->determinant) << "], ";
+    //cerr << "Received cone with bound difference: " << data->GetWeight() << endl;
+    cerr << data->GetWeight() << " [" << abs(cone->determinant) << "], ";
     return data->GetWeight();
   }
 }
@@ -345,7 +345,7 @@ void
 Write_Exponential_Sample_Formula_Single_Cone_Parameters::ShowStats()
 {
   mpq_class diff = total_upper_bound - total_lower_bound;
-  cout << "L: " << total_lower_bound.get_d()
+  cerr << "L: " << total_lower_bound.get_d()
        << " U: " << total_upper_bound.get_d()
        << " D: " << diff.get_d()
        << " #: " << heap_num_fill(cone_heap) << ". ";
@@ -358,7 +358,7 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
   param.InitializeComputation();
   param.cone_heap = heap_alloc(HEAP_DBL_MAX, /*FIXME: fixed size!*/ 100000,
 			       NULL);
-  cout << "Initial cones: ";
+  cerr << "Initial cones: ";
   {
     listCone *cone;
     for (cone = cones; cone!=NULL; cone = cone->rest) {
@@ -366,7 +366,7 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
       // calls ConsumeCone, filling the heap
     }
   }
-  cout << endl;
+  cerr << endl;
   while (heap_nonempty_p(param.cone_heap)) {
     param.ShowStats();
     listCone *cone;
@@ -377,7 +377,7 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
       param.total_lower_bound -= data->this_total_lower_bound;
       param.total_upper_bound -= data->this_total_upper_bound;
       
-      cout << "Cone bound diff " << data->GetWeight()
+      cerr << "Cone bound diff " << data->GetWeight()
 	   << " [Det " << abs(data->cone->determinant) << "]"
 	   << " --> " << flush;
       cone = data->cone;
@@ -397,18 +397,18 @@ decomposeAndWriteExponentialSampleFormula(listCone *cones,
 	weight_sum += param.EvaluateCone(Cones[i]);
       }
     }
-    cout << "(" << weight_sum / weight * 100 << "%)";
-    cout << endl;
+    cerr << "(" << weight_sum / weight * 100 << "%)";
+    cerr << endl;
   }
-  cout << "*** Lower bound: " << param.total_lower_bound.get_d() << endl;
-  cout << "*** Upper bound: " << param.total_upper_bound.get_d() << endl;
+  cerr << "*** Lower bound: " << param.total_lower_bound.get_d() << endl;
+  cerr << "*** Upper bound: " << param.total_upper_bound.get_d() << endl;
 }
 
 #if 0
-  cout << "*** Estimate obtained by sampling: "
+  cerr << "*** Estimate obtained by sampling: "
        << param.approximate_result.get_d() << endl;
 #ifdef DO_EXACT_COMPUTATION_TOO
-  cout << "*** Exact answer: "
+  cerr << "*** Exact answer: "
        << param.result.get_d() << endl;
 #endif
 #endif

@@ -85,7 +85,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
   	long int k;//n=0,p; // extra vars to use as needed
   	//long int totalNoGs=noGsPerC*noCones; //total no. of generators,ie,rowdim of B
   	// long int B[totalNoGs][dim];  // B is the denominator vectors
-  	//  cout<<"tNG: "<<totalNoGs<<endl;
+  	//  cerr<<"tNG: "<<totalNoGs<<endl;
 	int result = 1;
 	
   	Integer tmp_A;
@@ -104,37 +104,37 @@ int ResidueFunction_Single_Cone(listCone *cones,
      			basis = cones1->rays;
      			while(basis) 
 			{
-				//cout << "R_Exponent";
+				//cerr << "R_Exponent";
     				for (j=0; j<noGsPerC; j++) 
 				{
 					Cones_Array[i].Generators_of_Cone[j].R_Exponent = 0;
 					
 					Cones_Array[i].Generators_of_Cone[j].T_Exponent=basis->first[dim -1];  //exponent of t in the denominator	
-    					//cout << "ResidueFunction_Single: Random Lambda = ";
+    					//cerr << "ResidueFunction_Single: Random Lambda = ";
 					for(k = 0; k < dim - 1; k++)
 					{
     						Cones_Array[i].Generators_of_Cone[j].R_Exponent += basis->first[k] * Residue_Parameters->generic_vector[k];
-      						//cout << Residue_Parameters->generic_vector[k] << " ";
+      						//cerr << Residue_Parameters->generic_vector[k] << " ";
 					}
-					//cout << endl;
+					//cerr << endl;
 
 					// Test to see if dot product is zero...if so, barf
 					if(Cones_Array[i].Generators_of_Cone[j].R_Exponent == 0 && Cones_Array[i].Generators_of_Cone[j].T_Exponent == 0)
 					{
-						cout << "ResidueFunction_Single: zero dotproduct. ";
+						cerr << "ResidueFunction_Single: zero dotproduct. ";
 						for (int p = 0; p < dim-1;p++)
-							cout << basis->first[p] << " ";
-						cout << endl;
+							cerr << basis->first[p] << " ";
+						cerr << endl;
 						result = -1;	
       					
 					}
 					//else	
 					//{
 					//	for (int p = 0; p < dim;p++)
-					//		cout << basis->first[p] << " ";
-					//	cout << endl;
+					//		cerr << basis->first[p] << " ";
+					//	cerr << endl;
 					//}
-					//cout << Cones_Array[i].Generators_of_Cone[j].R_Exponent << " ";	
+					//cerr << Cones_Array[i].Generators_of_Cone[j].R_Exponent << " ";	
 					// Check when k=dim-1 if input is 0, increment order of cone
 					//Cones_Array[i].Generators_of_Cone[j].T_Exponent=basis->first[dim -1];  //exponent of t in the denominator	
 					Cones_Array[i].Generators_of_Cone[j].Form_Type = ONE_SUB_RT;
@@ -152,14 +152,14 @@ int ResidueFunction_Single_Cone(listCone *cones,
     		cones1 = cones1->rest;
     		freeCone(listtmp3);
   	}
-	//cout << "ResidueFunction_Single: Done reading input." << endl;  
+	//cerr << "ResidueFunction_Single: Done reading input." << endl;  
 	
 	if (result == -1)
 		return result;
 	
 	i = 0;
  	
-	//cout << "Copying dot product into Cones_Array" << endl; 
+	//cerr << "Copying dot product into Cones_Array" << endl; 
   	//*****************************************************************
   	//  PETER/DAVE CODE REALLY BEGINS HERE
   	//  Our data structure Cones_Array which holds all of our information
@@ -177,7 +177,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	}
 	
 	
-	//cout << "Simplifying generators to have nonnegative exponents" << endl;
+	//cerr << "Simplifying generators to have nonnegative exponents" << endl;
   	//**************************************************************************
   	//  Simplify all the generators of each cone such that all the
   	//  exponents are nonnegative, changing the sign and Form_Type accordingly.
@@ -250,8 +250,8 @@ int ResidueFunction_Single_Cone(listCone *cones,
 
 	}
 
-	//cout << "Minimum exponent is " << Numerator_R_Exponent_Minimum << endl;
-	//cout << "Factoring out minumum exponent of r" << endl;
+	//cerr << "Minimum exponent is " << Numerator_R_Exponent_Minimum << endl;
+	//cerr << "Factoring out minumum exponent of r" << endl;
   
   //************************************************************************
   //  Peter/Dave: Here we make sure all the numerators of the Cones are
@@ -319,14 +319,14 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	if(Residue_Parameters->Flags & PRINT	== 1)
 		 {
 		   // system_with_error_check("rm func.rat");
-	 		 //cout << "Outputing rational functions to file" << endl;
+	 		 //cerr << "Outputing rational functions to file" << endl;
 		   // char File[200];
 		   // strcpy(File, fileName);
 		   // strcat(File, ".rat");
 		    Rational_Function_Output_File.open ("func.rat");
 		 }
 
-	//cout << "Formulating rational functions and performing taylor expansion on cones." << endl;
+	//cerr << "Formulating rational functions and performing taylor expansion on cones." << endl;
 
 	ofstream Simplify_Sum, Simplify_Term;
 	
@@ -651,7 +651,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 		// N_(order) is simply a polynomial
 		//
 				
-		//cout << "Residue coefficient" << endl;
+		//cerr << "Residue coefficient" << endl;
 			
 		Quotient_Coefficient[0] = Numerator_Vector[0]; // C_0
 
@@ -750,7 +750,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 
 			system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify3.add >out.simplify");
 		
-			cout << "%";	
+			cerr << "%";	
 		}
 		
 		if (OUTPUT_S_T_FUNCTION == 1)
@@ -824,7 +824,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 		if (COMPUTE_SUM_MAPLE == 1)
 		{
 			//system_with_error_check("rm simplify.term");
-			cout << "%";
+			cerr << "%";
 			
 			Simplify_Term.open ("simplify.term");
 
@@ -848,16 +848,16 @@ int ResidueFunction_Single_Cone(listCone *cones,
 		if (OUTPUT_CONE == 0 )
 		{
 		
-		//cout << "ResidueFunction: Computer taylor expansion...";	
+		//cerr << "ResidueFunction: Computer taylor expansion...";	
 		Final_Cone_Expression->Taylor_Expansion(Cone_Taylor_Parameters);	
-		//cout << "done." << endl;
+		//cerr << "done." << endl;
 	
-		//cout << "ResidueFunction: Copying result of taylor expansion into Parameters result...";
+		//cerr << "ResidueFunction: Copying result of taylor expansion into Parameters result...";
 		for (int k = 0; k <= DEGREE; k++)
 		{
 			Residue_Parameters->Taylor_Expansion_Result[k] += Cone_Taylor_Parameters->Result[k];
 		}
-		//cout << "done." << endl;
+		//cerr << "done." << endl;
 		
 		}
 		

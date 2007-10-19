@@ -86,7 +86,7 @@ main(int argc, char *argv[])
   
   struct BarvinokParameters *params = new BarvinokParameters;
 
-  latte_banner(cout);
+  latte_banner(cerr);
 
   if (argc < 2) {
     usage(argv[0]);
@@ -95,11 +95,11 @@ main(int argc, char *argv[])
   
   //setbuf(stdout,0);
 
-  cout << "Invocation: ";
+  cerr << "Invocation: ";
   for (i = 0; i<argc; i++) {
-    cout << argv[i] << " ";
+    cerr << argv[i] << " ";
   }
-  cout << endl;
+  cerr << endl;
 
   strcpy(removeFiles,"yes");
   strcpy(printfile,"no");
@@ -191,8 +191,8 @@ main(int argc, char *argv[])
       seed_random_generator(seed);
     }
     else if (strcmp(argv[i], "--help") == 0) {
-      read_polyhedron_data.show_options(cout);
-      cout << "Options that control what to compute:" << endl
+      read_polyhedron_data.show_options(cerr);
+      cerr << "Options that control what to compute:" << endl
 	   << "  --count-lattice-points                   Compute the number of lattice points" << endl
 	   << "                                           (default)" << endl
 	   << "  --multivariate-generating-function       Compute the multivariate generating function of" << endl
@@ -203,7 +203,7 @@ main(int argc, char *argv[])
 	   << "  --simplified-ehrhart-series              Compute the simplified Ehrhart series" << endl
 	   << "                                           as a univariate rational function" << endl
 	   << "  --ehrhart-taylor=N                       Compute the first N terms of the Ehrhart series" << endl;
-      cout << "Options for the Barvinok algorithm:" << endl
+      cerr << "Options for the Barvinok algorithm:" << endl
 	   << "  --dual                                   Triangulate and signed-decompose in the dual space" << endl
 	   << "                                           (traditional method, default)" << endl
 	   << "  --irrational-primal                      Triangulate in the dual space, signed-decompose" << endl
@@ -213,14 +213,14 @@ main(int argc, char *argv[])
 	   << "  --maxdet=N                               Decompose down to an index (determinant) of N" << endl
 	   << "                                           instead of index 1 (unimodular cones)" << endl
 	   << "  --no-decomposition                       Do not signed-decompose simplicial cones" << endl;
-      cout << "Options for specialization:" << endl
+      cerr << "Options for specialization:" << endl
 	   << "  --polynomial                             Use polynomial substitution for specialization" << endl
 	   << "                                           (traditional method, default)" << endl
 	   << "  --exponential                            Use exponential substitution for specialization" << endl
 	   << "                                           (recommended for maxdet > 1)" << endl;
-      cout << "Algorithmic options for subproblems:" << endl;
-      show_standard_dualization_option(cout);
-      show_standard_triangulation_options(cout);
+      cerr << "Algorithmic options for subproblems:" << endl;
+      show_standard_dualization_option(cerr);
+      show_standard_triangulation_options(cerr);
       exit(0);
     }
     else if (read_polyhedron_data.parse_option(argv[i])) {}
@@ -262,7 +262,7 @@ main(int argc, char *argv[])
   if (approx) {
     params->substitution = BarvinokParameters::ExponentialSubstitution;
     if (params->decomposition == BarvinokParameters::DualDecomposition) {
-      cout << "Exponential approximation not implemented for dual decomposition; switching to irrational primal decomposition." << endl;
+      cerr << "Exponential approximation not implemented for dual decomposition; switching to irrational primal decomposition." << endl;
       params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     }
   }
@@ -314,7 +314,7 @@ main(int argc, char *argv[])
        taking all inequalities tight at the respective vertex. */
     params->dualize_time.start();
     computeTightInequalitiesOfCones(Poly->cones, read_polyhedron_data.matrix, Poly->numOfVars);
-    params->dualize_time.stop(); cout << params->dualize_time;
+    params->dualize_time.stop(); cerr << params->dualize_time;
   }
   
   if (ehrhart_polynomial) {
@@ -355,27 +355,27 @@ main(int argc, char *argv[])
     }
     break;
   case BarvinokParameters::IrrationalAllPrimalDecomposition:
-    cout << "Irrationalizing polyhedral cones... "; cout.flush();
+    cerr << "Irrationalizing polyhedral cones... "; cerr.flush();
     if (Poly->dualized) {
-      cout << "(First dualizing back... "; cout.flush();
+      cerr << "(First dualizing back... "; cerr.flush();
       dualizeCones(Poly->cones, Poly->numOfVars, params);
-      cout << "done; sorry for the interruption.) "; cout.flush();
+      cerr << "done; sorry for the interruption.) "; cerr.flush();
     }
     else if (Poly->cones != NULL) {
       if (Poly->cones->facets == NULL) {
-	cout << "(First computing facets for them... "; cout.flush();
+	cerr << "(First computing facets for them... "; cerr.flush();
 	dualizeCones(Poly->cones, Poly->numOfVars, params);
 	dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
-	cout << "done; sorry for the interruption.) "; cout.flush();
+	cerr << "done; sorry for the interruption.) "; cerr.flush();
       }
       else if (Poly->cones->rays == NULL) {
 	/* Only facets computed, for instance by using the 4ti2
 	   method of computing vertex cones.  So dualize twice to
 	   compute the rays. */
-	cout << "(First computing their rays... "; cout.flush();
+	cerr << "(First computing their rays... "; cerr.flush();
 	dualizeCones(Poly->cones, Poly->numOfVars, params);
 	dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
-	cout << "done; sorry for the interruption.) "; cout.flush();
+	cerr << "done; sorry for the interruption.) "; cerr.flush();
       }
     }
     params->irrationalize_time.start();
@@ -386,7 +386,7 @@ main(int argc, char *argv[])
     }
     irrationalizeCones(Poly->cones, Poly->numOfVars);
     params->irrationalize_time.stop();
-    cout << params->irrationalize_time;
+    cerr << params->irrationalize_time;
     break;
   default:
     cerr << "Unknown BarvinokParameters::decomposition" << endl;
@@ -437,7 +437,7 @@ main(int argc, char *argv[])
 			   *params);
 	freeListCone(Poly->cones);
  	Poly->cones = decomposed_cones;
-// 	cout << "Decomposed cones: " << endl;
+// 	cerr << "Decomposed cones: " << endl;
 //	printListCone(Poly->cones, Poly->numOfVars);
 	/* Compute points in parallelepipeds */
 	computePointsInParallelepipeds(Poly->cones, Poly->numOfVars);
@@ -486,7 +486,7 @@ main(int argc, char *argv[])
 	params = exp_param;
 	mpq_vector ehrhart_coefficients
 	  = decomposeAndComputeEhrhartPolynomial(Poly->cones, *exp_param);
-	cout << endl << "Ehrhart polynomial: ";
+	cerr << endl << "Ehrhart polynomial: ";
 	{
 	  unsigned int i;
 	  for (i = 0; i<ehrhart_coefficients.size(); i++) {
@@ -505,11 +505,7 @@ main(int argc, char *argv[])
 	params = exp_param;
 	Integer number_of_lattice_points
 	  = decomposeAndComputeExponentialResidue(Poly->cones, *exp_param);
-	cout << endl << "****  The number of lattice points is: "
-	     << number_of_lattice_points << "  ****" << endl << endl;
-	// FIXME: Centralize this output stuff.
-	ofstream out("numOfLatticePoints");
-	out << number_of_lattice_points << endl;
+	params->deliver_number_of_lattice_points(number_of_lattice_points);
       }
     }
     break;
@@ -533,8 +529,8 @@ main(int argc, char *argv[])
    {
 
 	if(read_polyhedron_data.dualApproach[0] == 'n'){
-	  cout << "Creating generating function.\n"; 
-	  //printListVector(templistVec, oldnumofvars); cout << ProjU << endl;
+	  cerr << "Creating generating function.\n"; 
+	  //printListVector(templistVec, oldnumofvars); cerr << ProjU << endl;
 	if(read_polyhedron_data.equationsPresent[0] == 'y'){
 	  Poly->cones = ProjectUp2(Poly->cones, read_polyhedron_data.oldnumofvars,
 				   Poly->numOfVars, read_polyhedron_data.AA, read_polyhedron_data.bb);
@@ -544,18 +540,19 @@ main(int argc, char *argv[])
 	  createGeneratingFunctionAsMapleInput(fileName,Poly->cones,Poly->numOfVars);  }
         //printListCone(cones, Poly->numOfVars);
 
-	cout << "Printing decomposed cones to `decomposed_cones'." << endl;
+	cerr << "Printing decomposed cones to `decomposed_cones'." << endl;
 	printListConeToFile("decomposed_cones", Poly->cones, Poly->numOfVars);
 
 	if(read_polyhedron_data.dualApproach[0] == 'n'){
-	cout << "Starting final computation.\n";
-	cout << endl << "****  The number of lattice points is: " << Residue(Poly->cones,Poly->numOfVars) << "  ****" << endl << endl;}
+	  cerr << "Starting final computation.\n";
+	  params->deliver_number_of_lattice_points(Residue(Poly->cones,Poly->numOfVars));
+	}
 
 
 	if(read_polyhedron_data.dualApproach[0] == 'y')
 	{
-	  cout << "Starting final computation.\n";
-	  //cout << "output_cone: " << output_cone;
+	  cerr << "Starting final computation.\n";
+	  //cerr << "output_cone: " << output_cone;
 	  switch (params->decomposition) {
 	  case BarvinokParameters::IrrationalPrimalDecomposition:
 	  case BarvinokParameters::IrrationalAllPrimalDecomposition: {
@@ -570,7 +567,8 @@ main(int argc, char *argv[])
 	    break;
 	  }
 	  case BarvinokParameters::DualDecomposition:
-	    ResidueFunction(Poly->cones,Poly->numOfVars, print_flag, read_polyhedron_data.degree, output_cone);
+	    ResidueFunction(Poly->cones,Poly->numOfVars, print_flag,
+			    read_polyhedron_data.degree, output_cone, params);
 	    // ResidueFunction consumes cones.
 	    Poly->cones = NULL;
 	    break;
@@ -590,7 +588,7 @@ main(int argc, char *argv[])
   delete Poly;
 
 if(read_polyhedron_data.rationalCone[0] == 'y') {
-   cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
+   cerr << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
    strcpy(command, "mv ");
    strcat(command, "simplify.sum ");
    strcat(command, argv[argc - 1]);
@@ -599,7 +597,7 @@ if(read_polyhedron_data.rationalCone[0] == 'y') {
  }
 
  if(printfile[0] == 'y'){
-   cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
+   cerr << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
    strcpy(command, "mv ");
    strcat(command, "func.rat ");
    strcat(command, argv[argc - 1]);
@@ -632,10 +630,10 @@ if(read_polyhedron_data.rationalCone[0] == 'y') {
   
  }
 
-  //cout << "Computation done. " << endl;
+  //cerr << "Computation done. " << endl;
 
   params->total_time.stop();
-  cout << params->total_time;
+  cerr << params->total_time;
   
   {
     // until we have a more sophisticated test script --mkoeppe

@@ -167,7 +167,7 @@ void readLatteGrobProblem(const char *fileName, listVector **equations,
   /* Reads numOfVars, matrix A, and rhs b. */
 
 
-  cout << "Reading problem.\n";
+  cerr << "Reading problem.\n";
 
   //setbuf(stdout,0);
 
@@ -321,15 +321,15 @@ void readLatteGrobProblem(const char *fileName, listVector **equations,
  
   b=createVector(*numOfVars);
   ZZ hold;
-  in >> hold;// cout << hold << endl;
+  in >> hold;// cerr << hold << endl;
   for (j=1; j<(*numOfVars)-1; j++) in >> b[j];
-  b[*numOfVars-1] = hold;// cout << b << endl;
+  b[*numOfVars-1] = hold;// cerr << b << endl;
   basis = createListVector(b);
   endBasis = basis;
 
   for (i=1; i<numOfVectors; i++) {
     b=createVector(*numOfVars);
-    in >> hold;//cout << hold << endl;
+    in >> hold;//cerr << hold << endl;
     for (j=1; j<(*numOfVars)-1; j++) in >> b[j];
   b[*numOfVars-1] = hold;
     endBasis = updateBasis(createListVector(b), endBasis);
@@ -348,8 +348,8 @@ void readLatteGrobProblem(const char *fileName, listVector **equations,
     indexEquations=createVector(numOfEquations);
 
     for (i=0; i<numOfEquations; i++) in >> indexEquations[i];
-    cout << "\nEquation indices: ";
-    printVector(indexEquations,numOfEquations);
+    cerr << "\nEquation indices: ";
+    printVectorToFile(cerr, indexEquations,numOfEquations);
 
     tmpVector=createVector(*numOfVars);
     createListVector(tmpVector);
@@ -384,25 +384,25 @@ void readLatteGrobProblem(const char *fileName, listVector **equations,
     (*inequalities)=(*inequalities)->rest;
   }
 
-  cout << endl;
-  cout << "Ax <= b, given as (b|-A):\n";
-  cout << "=========================\n";
-  printListVector(*inequalities,*numOfVars);
+  cerr << endl;
+  cerr << "Ax <= b, given as (b|-A):\n";
+  cerr << "=========================\n";
+  printListVectorToFile(cerr, *inequalities,*numOfVars);
   
-  cout << endl;
+  cerr << endl;
 
-  cout << "Ax = b, given as (b|-A):\n";
-  cout << "========================\n";
-  printListVector(*equations,*numOfVars);
+  cerr << "Ax = b, given as (b|-A):\n";
+  cerr << "========================\n";
+  printListVectorToFile(cerr, *equations,*numOfVars);
 
-  cout << endl;
+  cerr << endl;
 
   return;
 }
 /******************************************************************/
 void CheckFeasibility(listVector* basis, vec_ZZ infeas, int & flag) {
   flag = 0;
-  if (basis==0) cout << "[]\n";
+  if (basis==0) cerr << "[]\n";
   while(basis) { 
     if(basis->first == infeas) flag = 1;
     basis = basis->rest; 
@@ -485,21 +485,21 @@ listVector* Grobner(listVector *equations,
   sol=createVector(*numOfVars);
 
   for (i=0; i<(*numOfVars); i++) sol[i]=0;
-//    cout << "sol:\n";
+//    cerr << "sol:\n";
 //    printVector(sol,*numOfVars);
-//    cout << "numOfRows " << numOfRows << endl;
-//    cout << "numOfVars " << *numOfVars << endl;
+//    cerr << "numOfRows " << numOfRows << endl;
+//    cerr << "numOfVars " << *numOfVars << endl;
 
   indSol=0;
   for (i=0; i<numOfRows; i++) {
     if (H[(*numOfVars)*i+i]!=0) {
-//    cout << "numOfRows " << numOfRows << endl;
-//    cout << "numOfVars " << *numOfVars << endl;
-//    cout << "lenOfMatrix " << lenOfMatrix << endl;
-//    cout << "(i,i) " << (*numOfVars)*i+i << endl;
-//        cout << i << " " << indSol << " " << rhs[i] << " " 
+//    cerr << "numOfRows " << numOfRows << endl;
+//    cerr << "numOfVars " << *numOfVars << endl;
+//    cerr << "lenOfMatrix " << lenOfMatrix << endl;
+//    cerr << "(i,i) " << (*numOfVars)*i+i << endl;
+//        cerr << i << " " << indSol << " " << rhs[i] << " " 
 //  	   << H[(*numOfVars)*i+i] << endl;
-      // cout << "Mmm..." << endl;
+      // cerr << "Mmm..." << endl;
       sol[i]=rhs[i]/H[(*numOfVars)*i+i];
       indSol++;
       for (j=i+1; j<numOfRows; j++) {
@@ -508,7 +508,7 @@ listVector* Grobner(listVector *equations,
       }
     }
   }
-  //   cout << "sol:\n";
+  //   cerr << "sol:\n";
   //   printVector(sol,*numOfVars);
 
   particularSolution=createVector(*numOfVars);
@@ -520,9 +520,9 @@ listVector* Grobner(listVector *equations,
       particularSolution[i]=particularSolution[i]+U[i*(*numOfVars)+j]*sol[j];
     }
   }
-//    cout << "Particular solution:\n";
+//    cerr << "Particular solution:\n";
 //    printVector(particularSolution,*numOfVars);
-//    cout << "Basis:\n";
+//    cerr << "Basis:\n";
 //    printListVector(basis,*numOfVars);
 
   newNumOfVars=lengthListVector(basis)+1;
@@ -569,8 +569,8 @@ listVector* Grobner(listVector *equations,
   newInequalities=newInequalities->rest;
 /*    printf("OriginalInequalities:\n"); */
 /*    printListVector(inequalities,(*numOfVars)+1); */
-  cout << "New inequalities:\n";
-  printListVector(newInequalities,newNumOfVars);
+  cerr << "New inequalities:\n";
+  printListVectorToFile(cerr, newInequalities,newNumOfVars);
   vec_ZZ infeas;
   infeas.SetLength(newNumOfVars + 1);
   infeas[0] = -1;
@@ -583,14 +583,14 @@ listVector* Grobner(listVector *equations,
   int count = 0;
   // listVector *tmplist;
   tmplist = newInequalities;
-  //  cout << numOfRows << endl;
+  //  cerr << numOfRows << endl;
   vec_ZZ HoldingUp;
   HoldingUp.SetLength(newNumOfVars - 1);
 
   // count = 1;
    for(count = 0; count < *numOfVars; ){
      //count++;
-    // cout << tmplist -> first[0] << endl;
+    // cerr << tmplist -> first[0] << endl;
     if(tmplist -> first[0] == 0){
       // endtemplistVec -> rest = createListVector(createVector(newNumOfVars - 1));
       for(i = 0; i < (newNumOfVars - 1); i++){
@@ -599,7 +599,7 @@ listVector* Grobner(listVector *equations,
 	if(HoldingUp[i] == 0) check1++;
         if(HoldingUp[i] == 1) check2++;
       }
-      // cout << HoldingUp << check1 << " " << check2 << " " << count<<endl;
+      // cerr << HoldingUp << check1 << " " << check2 << " " << count<<endl;
       if((check1 != newNumOfVars - 2) || (check2 != 1)){
 	//count++;
 	endtemplistVec -> rest = createListVector(createVector(newNumOfVars - 1));
@@ -691,9 +691,9 @@ void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
  }
  //  system_with_error_check("rm Gro.latte*"); 
   out << "0;" << endl;
-  cout << "*******************************************************" << endl;
-  cout <<"\nThe total number of lattice points is: " << TotalNumLattice << "." << endl << endl;
-  cout << "*******************************************************" << endl;
+  cerr << "*******************************************************" << endl;
+  cerr <<"\nThe total number of lattice points is: " << TotalNumLattice << "." << endl << endl;
+  cerr << "*******************************************************" << endl;
  
 }
 

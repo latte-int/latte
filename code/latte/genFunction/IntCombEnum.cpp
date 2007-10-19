@@ -55,7 +55,7 @@ void IntCombEnum::set_zero(int *v, int lower_col, int upper_col) {
 int *IntCombEnum::getNext() {
    /* check if there are any more integer combinations */
    if (is_last()) {
-      // cout << "IntCombEnum::getNext -- found last integer combination.\n";
+      // cerr << "IntCombEnum::getNext -- found last integer combination.\n";
       return NULL;
    }
    /* set next initially equal to the prev iteration */
@@ -111,22 +111,22 @@ int IntCombEnum::is_last() {
 }
 
 void IntCombEnum::print_debug() {
-   cout << "IntCombEnum:: Begin print_debug...\n";
-   cout << "len = " << len << ",cur_col = " << cur_col << "\n";
-   cout << "next = ";
+   cerr << "IntCombEnum:: Begin print_debug...\n";
+   cerr << "len = " << len << ",cur_col = " << cur_col << "\n";
+   cerr << "next = ";
    for (int i = 0; i < len; i++) {
-      cout << next[i] << ",";
+      cerr << next[i] << ",";
    }
-   cout << "\n";
-   cout << "prev = ";
+   cerr << "\n";
+   cerr << "prev = ";
    for (int i = 0; i < len; i++) {
-      cout << prev[i] << ",";
+      cerr << prev[i] << ",";
    }
-   cout << "\n";
-   cout << "upper_bound = ";
+   cerr << "\n";
+   cerr << "upper_bound = ";
    for (int i = 0; i < len; i++) {
-      cout << upper_bound[i] << ",";
+      cerr << upper_bound[i] << ",";
    }
-   cout << "\n";
-   cout << "IntCombEnum:: End print_debug...\n";
+   cerr << "\n";
+   cerr << "IntCombEnum:: End print_debug...\n";
 }

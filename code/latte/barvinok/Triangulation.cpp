@@ -193,7 +193,7 @@ void readCDDicdFileRudy(int & face2, vec_ZZ & numOfPoints, mat_ZZ & Result) {
 /* ----------------------------------------------------------------- */
 int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, char* a, list< int >& List, char *File_Name, int Cone_Index, unsigned int Flags) 
 {
-//	cout << "Triangulation_Load_Save: Cone_Index: " << Cone_Index << "  Flags: " << Flags << endl;
+//	cerr << "Triangulation_Load_Save: Cone_Index: " << Cone_Index << "  Flags: " << Flags << endl;
   vec_ZZ neg; 
  	int	File_Present = 1;	 
 	char		File_Path [256];
@@ -223,7 +223,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 		ifstream	checkforfile;
 		
 
-		cout << "Triangulation_Load_Save: Checking for " << File_Path << endl;
+		cerr << "Triangulation_Load_Save: Checking for " << File_Path << endl;
 
 		checkforfile.open (File_Path);
 
@@ -232,7 +232,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 			//file not present
 			File_Present = 0;
 
-			cout << "Triangulation_Load_Save: File not present.  Calculation triangulation." << endl;
+			cerr << "Triangulation_Load_Save: File not present.  Calculation triangulation." << endl;
   			writeCDDextFileRudy(m,n,Mat);
   			system_with_error_check(CDD_PATH " tri.ext > tri.out");
   			system_with_error_check("rm -f tri.out");
@@ -243,7 +243,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 			strcpy (System_Command, "tar -zxf ");
 			strcat (System_Command, File_Path );
 
-			cout << "Triangulation_Load_Save: File present.  Unziping using command: " << System_Command << endl;
+			cerr << "Triangulation_Load_Save: File present.  Unziping using command: " << System_Command << endl;
 	
 			system_with_error_check (System_Command);
 		}		
@@ -301,7 +301,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 		strcat (System_Command, File_Path);
 		strcat (System_Command, " tri.ine tri.icd");
 
-		cout << "Triangulation_Load_Save: Save mode.  Creating archive of tri.ine tri.icd with command: " << System_Command << endl;
+		cerr << "Triangulation_Load_Save: Save mode.  Creating archive of tri.ine tri.icd with command: " << System_Command << endl;
 
 		system_with_error_check (System_Command);
 		

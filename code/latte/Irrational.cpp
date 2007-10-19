@@ -42,13 +42,13 @@ computeConeStabilityCube_simplicial(listCone *cone, int numOfVars,
     = scaleRationalVectorToInteger(cone->vertex->vertex, numOfVars,
 				   vertex_denominator);
 #ifdef DEBUG_IRRATIONAL
-  cout << "vertex = " << vertex_numerator << " / "
+  cerr << "vertex = " << vertex_numerator << " / "
        << vertex_denominator << endl;
 #endif
   // Compute vertex multipliers, multiplied by the determinant
   mat_ZZ dual = createFacetMatrix2(cone, numOfVars, numOfVars);
 #ifdef DEBUG_IRRATIONAL
-  cout << "dual (-B^{-1}) = " << dual << endl;
+  cerr << "dual (-B^{-1}) = " << dual << endl;
 #endif
   vec_ZZ scaled_D_lambda = dual * vertex_numerator;
   // Round down to go to the bottom of the known stability region
@@ -59,7 +59,7 @@ computeConeStabilityCube_simplicial(listCone *cone, int numOfVars,
   }
 
 #ifdef DEBUG_IRRATIONAL
-  cout << "bottom multipliers: " << scaled_D_lambda << endl;
+  cerr << "bottom multipliers: " << scaled_D_lambda << endl;
 #endif
   // Now move to the center; read it as the numerator over 2*D
   ZZ D = abs(cone->determinant);
@@ -70,7 +70,7 @@ computeConeStabilityCube_simplicial(listCone *cone, int numOfVars,
 	* scaled_D_lambda);
   ZZ center_denominator = 2 * D;
 #ifdef DEBUG_IRRATIONAL
-  cout << "--center--> " << center_numerator << " / "
+  cerr << "--center--> " << center_numerator << " / "
        << center_denominator << endl; 
 #endif
   // Compute stability length
@@ -253,9 +253,9 @@ irrationalizeCone(listCone *cone, int numOfVars)
       scaleRationalVectorToInteger(stability_center, numOfVars,
 				   center_denominator);
 #ifdef DEBUG_IRRATIONAL
-    cout << "stability center: ";
+    cerr << "stability center: ";
     printRationalVector(stability_center, numOfVars);
-    cout << "stability length: " << stability_length_numerator
+    cerr << "stability length: " << stability_length_numerator
 	 << "/" << stability_length_denominator << endl;
 #endif
     delete stability_center;
@@ -270,7 +270,7 @@ irrationalizeCone(listCone *cone, int numOfVars)
     int barvinok_depth
       = estimate_barvinok_depth(cone, numOfVars);
 #ifdef DEBUG_IRRATIONAL
-    cout << "Estimated tree depth " << barvinok_depth << endl;
+    cerr << "Estimated tree depth " << barvinok_depth << endl;
 #endif
     ZZ C;
     C = 0;
@@ -320,14 +320,14 @@ irrationalizeCone(listCone *cone, int numOfVars)
   rationalVector *new_vertex = new rationalVector(new_vertex_numerator,
 						  common_denominator);
 #ifdef DEBUG_IRRATIONAL
-  cout << "--irrationalize--> ";
+  cerr << "--irrationalize--> ";
   printRationalVector(new_vertex, numOfVars);
 #endif
   /* Canonicalizing is very expensive and unnecessary */
 #if 0
   canonicalizeRationalVector(new_vertex, numOfVars);
 #ifdef DEBUG_IRRATIONAL
-  cout << "--canonicalize---> ";
+  cerr << "--canonicalize---> ";
   printRationalVector(new_vertex, numOfVars);
 #endif
 #endif

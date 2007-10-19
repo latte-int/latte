@@ -75,7 +75,7 @@ listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOf
 		{
       
 		/*      if(((tmpVector -> first)*cost) == 0){
-		cout <<"Zero dot product." << endl; exit (1);
+		cerr <<"Zero dot product." << endl; exit (1);
 		}*/
       		if(((tmpVector -> first)*cost) > 0)
 		{ 
@@ -128,7 +128,7 @@ listCone* FindRationalFunction(listCone* cones, vec_ZZ a, vec_ZZ cost, int numOf
 vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, int SINGLE_CONE)
 {
   //int SINGLE_CONE = 1;
-	//cout << "SolveIP Called. Cost = " << cost << endl;
+	//cerr << "SolveIP Called. Cost = " << cost << endl;
   	int	Digging_Count = 0;
 	vec_ZZ OptVertex;
   	int  flag = 0;
@@ -141,7 +141,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 	vec_ZZ possible;
   	ZZ RHS;
   
-	//  cout << cost << endl;
+	//  cerr << cost << endl;
 	//
 
 	ConeInfo *new_info;
@@ -159,7 +159,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 	int	Pertubation_Count = 0;	
 
 	int	Cone_Heap_Count = 0;	
-	//cout << "Solve_IP: Creating Cone_Heap...";
+	//cerr << "Solve_IP: Creating Cone_Heap...";
 	while(tmpcone)
 	{
 
@@ -180,10 +180,10 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 			  cerr << "Zero Dot product.  Please start IP without a single cone method." << endl;
 			  exit(1);
 			}
-			cout << "S_Value zero for some cone. Pertubating. " << endl;
+			cerr << "S_Value zero for some cone. Pertubating. " << endl;
 			
 			//if ((Pertubation_Count % 1) == 0)
-			//       cout << "%";	
+			//       cerr << "%";	
 			cone_heap.Clear_Tree ();
 
 			tmpcone = cones;
@@ -196,12 +196,12 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 		}	
 			
 		//if ((Cone_Heap_Count % 100) == 0)
-		//	cout << Cone_Heap_Count << " added to Cone_Heap. " << endl;
+		//	cerr << Cone_Heap_Count << " added to Cone_Heap. " << endl;
 		Cone_Heap_Count++;
   	}
-	//cout << "Done" << endl;
-	//cout << endl;
-	//cout << "SolveIP: cone_heap ready. Looping until coefficient_Sum is nonzero." << endl;
+	//cerr << "Done" << endl;
+	//cerr << endl;
+	//cerr << "SolveIP: cone_heap ready. Looping until coefficient_Sum is nonzero." << endl;
 	
 	/***************************
 	// LOOP UNTIL OPTIMAL VALUE IS FOUND
@@ -213,7 +213,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 	// This loop only breaks when the coefficient_Sum is nonzero
 	while(1)
 	{
-		//cout << "$% ";
+		//cerr << "$% ";
 		// pop items off coneinfo heap as long as they have the same
 		// current highest term as the first item removed
 		
@@ -228,9 +228,9 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 
 		
 		Coefficient_Sum = ConeInfo_List_Highest_Terms->ConeInfo_Pointer->Get_Coefficient ();
-		//cout << "First cone coefficient: " << Coefficient_Sum << " " << ConeInfo_List_Highest_Terms->ConeInfo_Pointer->Heap << endl;
+		//cerr << "First cone coefficient: " << Coefficient_Sum << " " << ConeInfo_List_Highest_Terms->ConeInfo_Pointer->Heap << endl;
 		
-		//cout << "SolveIP: Highest Term removed, checking for more on heap." << endl;	
+		//cerr << "SolveIP: Highest Term removed, checking for more on heap." << endl;	
 		
 		while (cone_heap.Check_Top_Heap ( ConeInfo_List_Highest_Terms->ConeInfo_Pointer ) == 1 )
 		{
@@ -240,30 +240,30 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 			
 			Coefficient_Sum += ConeInfo_List_Highest_Terms->Next->ConeInfo_Pointer->Get_Coefficient ();
 
-			//cout << ConeInfo_List_Highest_Terms->Next->ConeInfo_Pointer->Get_Coefficient () << " ";
-			//cout << ConeInfo_List_Highest_Terms->Next->ConeInfo_Pointer->Heap << " " << endl;
+			//cerr << ConeInfo_List_Highest_Terms->Next->ConeInfo_Pointer->Get_Coefficient () << " ";
+			//cerr << ConeInfo_List_Highest_Terms->Next->ConeInfo_Pointer->Heap << " " << endl;
 			ConeInfo_List_Highest_Terms = ConeInfo_List_Highest_Terms->Next;
 			
 		}
-		//cout << endl;	
+		//cerr << endl;	
 
-		//cout << "SolveIP: Checking coefficient_sum. " << endl;	
+		//cerr << "SolveIP: Checking coefficient_sum. " << endl;	
 			
 		// if Coefficnt_Sum is 0 we got a problem !!!
 
 		if (Coefficient_Sum == 0)
 		{
 			if (Digging_Count % 100 == 0)
-				cout << "Digging [" << Digging_Count + 1 << "] ";
+				cerr << "Digging [" << Digging_Count + 1 << "] ";
 
 			Digging_Count++;	
 			ConeInfo_List_Highest_Terms = Head_ConeInfo_List;
 
 			while (ConeInfo_List_Highest_Terms != NULL)
 			{
-				//cout << "Digging: calculating next term: ";
+				//cerr << "Digging: calculating next term: ";
 				ConeInfo_List_Highest_Terms->ConeInfo_Pointer->Calculate_Next_Highest_Term ();
-				//cout << "Done calculation next highest term." << endl;
+				//cerr << "Done calculation next highest term." << endl;
 			
 				cone_heap.Add_Heap (ConeInfo_List_Highest_Terms->ConeInfo_Pointer);
 				
@@ -273,7 +273,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 			
 				delete Temp_ConeInfo_List;
 			}
-			//cout << "Done Digging " << Digging_Count << endl;
+			//cerr << "Done Digging " << Digging_Count << endl;
 		}
 		else	//if coefficient_sum != 0 then break
 		{	
@@ -304,12 +304,12 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 				{
     					flag = 0;
     					possible = solutions2.front(); 
-    					solutions2.pop_front(); //cout << possible << endl;
-    					//cout << possible << " ";
+    					solutions2.pop_front(); //cerr << possible << endl;
+    					//cerr << possible << " ";
 					tmpmatrix = matrix;      
     					while(tmpmatrix)
 					{ 
-						RHS = 0; //cout <<"after while: " << possible << endl;
+						RHS = 0; //cerr <<"after while: " << possible << endl;
       						for(int i = 0; i < numOfVars; i++)
 							RHS += (tmpmatrix -> first)[i + 1] * possible[i];
       						if((tmpmatrix -> first[0] + RHS) < 0)
@@ -326,25 +326,25 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 						OptVertex = possible; 
 						//solutions.clear ();
 						//possible = solutions2.front ();
-						//cout << "Solution feasible, breaking." << endl;
+						//cerr << "Solution feasible, breaking." << endl;
 						break;
 					}
 					if(solutions2.empty())
 					{
 						if (SINGLE_CONE != 1)
 						{
-							cout << "Not in SINGLE_CONE mode, coefficient is non zero but no feasible solutions" << endl;
+							cerr << "Not in SINGLE_CONE mode, coefficient is non zero but no feasible solutions" << endl;
 							exit (1);
 						}
 						// solution set is empty, so make them dig!
-						cout << "Solutions is empty.  Point not feasible, make em dig!";
+						cerr << "Solutions is empty.  Point not feasible, make em dig!";
 						ConeInfo_List_Highest_Terms = Head_ConeInfo_List;
 
 						while (ConeInfo_List_Highest_Terms != NULL)
 						{
-							//cout << "Digging: calculating next term: ";
+							//cerr << "Digging: calculating next term: ";
 							ConeInfo_List_Highest_Terms->ConeInfo_Pointer->Calculate_Next_Highest_Term ();
-							//cout << "Done calculation next highest term." << endl;
+							//cerr << "Done calculation next highest term." << endl;
 			
 							cone_heap.Add_Heap (ConeInfo_List_Highest_Terms->ConeInfo_Pointer);
 				
@@ -369,10 +369,10 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 	}
 	if(Pertubation_Count == 0){
 	  if(Coefficient_Sum == 1)
-	    cout << endl << "There is one optimal solution. \t\t" << endl;
+	    cerr << endl << "There is one optimal solution. \t\t" << endl;
 	  else
-	    cout << endl << "There are " << Coefficient_Sum << " optimal solutions.\t\t" << endl;
-	  //cout << "SolveIP: coefficient_sum is nonzero, exit while loop." << endl;
+	    cerr << endl << "There are " << Coefficient_Sum << " optimal solutions.\t\t" << endl;
+	  //cerr << "SolveIP: coefficient_sum is nonzero, exit while loop." << endl;
 	}
 	
 	//if (SINGLE_CONE != 1)
@@ -397,10 +397,10 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 	//}
 	//solutions.push_front( Temp_Vector );
 	
-  	// cout <<"indicator " << Indicator << endl;
+  	// cerr <<"indicator " << Indicator << endl;
   	/*if(Indicator == 0) 
 	{
-       		cout << "Error on IP." << endl;
+       		cerr << "Error on IP." << endl;
     		//   printf("=======================\n"); 
     		
 
@@ -415,18 +415,18 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 	/*
   	OptVertex.SetLength(numOfVars);
   
-	//cout << "Possible solutions: ";
+	//cerr << "Possible solutions: ";
 	while(!solutions.empty())
 	{
     		flag = 0;
     		possible = solutions.front();
-	        cout << "Possible solution: " << possible << endl;	
-    		solutions.pop_front(); //cout << possible << endl;
-    		//cout << possible << " ";
+	        cerr << "Possible solution: " << possible << endl;	
+    		solutions.pop_front(); //cerr << possible << endl;
+    		//cerr << possible << " ";
 		tmpmatrix = matrix;      
     		while(tmpmatrix)
 		{ 
-			RHS = 0; //cout <<"after while: " << possible << endl;
+			RHS = 0; //cerr <<"after while: " << possible << endl;
       			for(int i = 0; i < numOfVars; i++)
 				RHS += (tmpmatrix -> first)[i + 1] * possible[i];
       			if((tmpmatrix -> first[0] + RHS) < 0)
@@ -445,14 +445,14 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 
 		if(solutions.empty())
 		{
-			cout << "\n OH NO!!!!###########################################################";
-  			cout << "\nCost:  " << cost << "\t\tVertex:  " << OptVertex << "\n";
+			cerr << "\n OH NO!!!!###########################################################";
+  			cerr << "\nCost:  " << cost << "\t\tVertex:  " << OptVertex << "\n";
 			exit (1);
 		}
 	}
 	*/
-	//cout << endl;
-	//cout << "\nCost:  " << cost << "\t\tVertex:  " << OptVertex << "\n";
+	//cerr << endl;
+	//cerr << "\nCost:  " << cost << "\t\tVertex:  " << OptVertex << "\n";
 	
 	// Delete the ConeInfos that resulted in highest term;
 	ConeInfo_List *Delete_ConeInfo_List;	
@@ -501,7 +501,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 			
 			if (flag == 0)
 				if ( ( (possible + OptVertex )*cost) > Max_IP)
-					cout << "Oracle Wrong!" << endl;
+					cerr << "Oracle Wrong!" << endl;
 
 		
 
@@ -534,7 +534,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 			tmpmatrix = matrix;      
 	    		while(tmpmatrix)
 			{ 
-				RHS = 0; //cout <<"after while: " << possible << endl;
+				RHS = 0; //cerr <<"after while: " << possible << endl;
       				for(int l = 0; l < numOfVars; l++)
 					RHS += (tmpmatrix -> first)[l + 1] * possible[l];
       				if((tmpmatrix -> first[0] + RHS) < 0)
@@ -554,7 +554,7 @@ vec_ZZ SolveIP(listCone* cones,listVector* matrix, vec_ZZ cost, int numOfVars, i
 	}
 	
 	if ( (OptVertex * cost) != Max_IP)
-		cout << "Oracle wrong!" << endl;
+		cerr << "Oracle wrong!" << endl;
 	*/
 	
 	return OptVertex;
@@ -597,7 +597,7 @@ listVector* GetHRepresentation(listVector* vertices, int numOfVars){
   while (tmpString!="end"){ getline(in,tmpString); numOfHyperplane++;}
 
   numOfHyperplane = numOfHyperplane - 2;
-  // cout << numOfHyperplane << endl;
+  // cerr << numOfHyperplane << endl;
  ifstream in2("IH.ine");
   if(!in2){
     cerr << "Cannot open input file in IH.ine file." << endl;
@@ -652,7 +652,7 @@ listVector* GetVertices(listCone* cones, listVector* matrix, listVector* hyperpl
 						cost[i] = - cost[i];
 				
 				}
-				vertex = SolveIP(cones, matrix, cost, numOfVars, 0); // cout << vertex << endl;
+				vertex = SolveIP(cones, matrix, cost, numOfVars, 0); // cerr << vertex << endl;
 				endVertex -> rest = createListVector(vertex);
 				endVertex = endVertex -> rest;
       			}
@@ -678,7 +678,7 @@ listVector* GetVertices(listCone* cones, listVector* matrix, listVector* hyperpl
 	{
     		vertices = createListVector(createVector(numOfVars));
     		endVertex = vertices;
-    		cout << "Enter a cost function." << endl;
+    		cerr << "Enter a cost function." << endl;
     		vec_ZZ cost;
     		cost.SetLength(numOfVars);
     		for(int i = 0; i < numOfVars; i++)  
@@ -704,7 +704,7 @@ int CheckVertices(listVector* vertices, listVector* newVertices)
 
   	len1 = lengthListVector(vertices);
   	len2 = lengthListVector(newVertices);
-  	// cout << len1 << " " << len2 << endl;
+  	// cerr << len1 << " " << len2 << endl;
   	for(int i = 0; i < len1; i++)
 	{
     		vertex = tmpvertices -> first; 
@@ -720,7 +720,7 @@ int CheckVertices(listVector* vertices, listVector* newVertices)
   	}
   	
 	if(counter < len2)  
-		flag = 1;// cout << counter << " " << len2 << endl;
+		flag = 1;// cerr << counter << " " << len2 << endl;
   	
 	return flag; 
 }
@@ -764,7 +764,7 @@ listVector* Push_Vector(listVector* head, listVector* tail, int numOfVars){
 
 ZZ Calculate_Polytope_Width (listCone *cones,listVector *matrix,int numOfVars)	
 {
-	//cout << "SolveIP Called. Cost = " << cost << endl;
+	//cerr << "SolveIP Called. Cost = " << cost << endl;
 	vec_ZZ OptVertex;
   	listCone * tmpcone;
   	listVector *tmpVector;
@@ -829,7 +829,7 @@ ZZ Calculate_Polytope_Width (listCone *cones,listVector *matrix,int numOfVars)
 	Root = 1;
 
 	N = Max_Direction*Max_Direction;
-	//cout << "N = " << N " ";
+	//cerr << "N = " << N " ";
 	for (int i = 0; i < 1000; i++)
 	{
 		Root = ((Root + N/Root)/2);
@@ -842,7 +842,7 @@ ZZ Calculate_Polytope_Width (listCone *cones,listVector *matrix,int numOfVars)
 	Polytope_Max_Width = Root;
 	
 
-	//cout << "Calculate_Polytope_Width: Max width is = " << Root << endl;
+	//cerr << "Calculate_Polytope_Width: Max width is = " << Root << endl;
 	return Root;	
 }
 
@@ -852,7 +852,7 @@ listVector* IntegralHull(listCone* cones,listVector* matrix, int numOfVars)
 	
 	if (IntegralHull_Flag == 1)
 	{
-		cout << "Computing Integer Hull: " ;
+		cerr << "Computing Integer Hull: " ;
 		Calculate_Polytope_Width (cones, matrix, numOfVars);	
 		int counter = 1, len = 0;
 	
@@ -870,11 +870,11 @@ listVector* IntegralHull(listCone* cones,listVector* matrix, int numOfVars)
    		while(counter != 0)
 		{
 		       	if ((Hull_Counter % 100) == 0)
-				cout << Hull_Counter << " Done. " << endl;
+				cerr << Hull_Counter << " Done. " << endl;
 			
     			hyperplanes = GetHRepresentation(vertices, numOfVars);
    	 		newVertices = GetVertices(cones, matrix, hyperplanes, numOfVars, 0);
-    			counter = CheckVertices(vertices, newVertices);// cout << counter << endl;
+    			counter = CheckVertices(vertices, newVertices);// cerr << counter << endl;
     			vertices = Push_Vector(vertices, newVertices, numOfVars);
        			
 			Hull_Counter++;
@@ -895,7 +895,7 @@ listVector* IntegralHull(listCone* cones,listVector* matrix, int numOfVars)
 		int	Int_Read;
 		int	Solve_Count = 0;
 		
-		cout << "Reading in file." << endl;	
+		cerr << "Reading in file." << endl;	
 		while (!Cost_File.eof())
 		{
 			for (int j = 0; j < numOfVars; j++)
@@ -906,13 +906,13 @@ listVector* IntegralHull(listCone* cones,listVector* matrix, int numOfVars)
 
 				Cost_Vector[j] = Int_Read;		
 			}
-			//cout << "ConeInfo Object_Count: " << ConeInfo::Get_Object_Count () << endl;	
+			//cerr << "ConeInfo Object_Count: " << ConeInfo::Get_Object_Count () << endl;	
 			SolveIP (cones, matrix, Cost_Vector, numOfVars, 0);
 
 			Solve_Count++;
 
 			if ((Solve_Count % 500) == 0)
-				cout << "Solve_Count[" << Solve_Count << "]" << endl;	
+				cerr << "Solve_Count[" << Solve_Count << "]" << endl;	
 		}
   	
 	}

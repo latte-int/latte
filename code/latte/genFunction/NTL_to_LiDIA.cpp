@@ -119,11 +119,11 @@ convert_bigint_matrix_to_mat_ZZ(const bigint_matrix & lidia_m) {
 
 void
 print_debug_vector(const bigint * v, int len) {
-   cout << "Begin vector: ["; 
+   cerr << "Begin vector: ["; 
    for (int i = 0; i < len; i++) {
-      cout << v[i] << ","; 
+      cerr << v[i] << ","; 
    }
-   cout << "]: End vector\n"; 
+   cerr << "]: End vector\n"; 
 }
 
 void
@@ -131,14 +131,14 @@ print_debug_matrix(const bigint_matrix & m) {
    int rows = m.get_no_of_rows(); 
    int cols = m.get_no_of_columns(); 
 
-   cout << "Begin matrix:\n"; 
+   cerr << "Begin matrix:\n"; 
    for (int i = 0; i < rows; i++) {
-   cout << "["; 
+   cerr << "["; 
       for (int j = 0; j < cols; j++) {
-         cout << m.member(i,j) << ","; 
+         cerr << m.member(i,j) << ","; 
       }
-      cout << "]\n"; 
+      cerr << "]\n"; 
    }
-   cout << ":End matrix\n"; 
+   cerr << ":End matrix\n"; 
 }
 

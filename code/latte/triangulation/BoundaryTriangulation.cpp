@@ -85,7 +85,7 @@ alpha_basis(listCone *cone, int numOfVars,
   ZZ d;
   inv(d, inverse, ray_matrix);
 
-  //cout << "Completed rays: " << ray_matrix << "Inverse: " << inverse << endl;
+  //cerr << "Completed rays: " << ray_matrix << "Inverse: " << inverse << endl;
   
   for (j = 0; j<numOfVars; j++)
     alpha[j][alpha_column_index] = inverse[j][numOfVars - 1];
@@ -111,17 +111,17 @@ singularity_avoiding(int num_cones, int numOfVars,
   int k;
   for (k = 0; k<num_cones; k++) {
     if (alpha[k] != 0) {
-      //cout << "Cone " << k << " full-dimensional: ";
+      //cerr << "Cone " << k << " full-dimensional: ";
       // full-dimensional cone
       int l;
       for (l = 0; l<numOfVars - 1; l++) {
-	//cout << f[k * (numOfVars - 1) + l] << " ";
+	//cerr << f[k * (numOfVars - 1) + l] << " ";
 	if (f[k * (numOfVars - 1) + l] == 0) {
-	  //cout << "Not singularity-avoiding" << endl;
+	  //cerr << "Not singularity-avoiding" << endl;
 	  return false;
 	}
       }
-      //cout << endl;
+      //cerr << endl;
     }
   }
   return true;
@@ -141,43 +141,43 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
   for (k = 0, cone = boundary_triangulation; cone!=NULL; k++, cone=cone->rest) {
     alpha_basis(cone, numOfVars, alpha, k, F, k * (numOfVars - 1));
   }
-  cout << "Auxiliary lattice for constructing an interior vector: " << endl
+  cerr << "Auxiliary lattice for constructing an interior vector: " << endl
        << alpha << endl;
-  cout << "Need to avoid zeros here: " << endl
+  cerr << "Need to avoid zeros here: " << endl
        << F << endl;
   /* Find a short vector in this lattice. */
   ZZ det2;
   mat_ZZ U;
   U.SetDims(numOfVars, numOfVars);
-  cout << "Computing LLL basis: " << endl;
+  cerr << "Computing LLL basis: " << endl;
   long rank = LLL(det2, alpha, U, 1, 1);
-  cout << "Rank: " << rank << " Variables: " << numOfVars << endl;
+  cerr << "Rank: " << rank << " Variables: " << numOfVars << endl;
   assert(rank == numOfVars);
 
   /* Determine if the LLL basis vectors avoid the zeros. */
   mat_ZZ UF;
   UF = U * F;
-  cout << "L3 basis: " << endl
+  cerr << "L3 basis: " << endl
        << U << endl;
-  cout << "In auxiliary space:" << endl
+  cerr << "In auxiliary space:" << endl
        << alpha << endl;
-  cout << "In zero-avoidance space:" << endl
+  cerr << "In zero-avoidance space:" << endl
        << UF;
   
   /* We simply choose the first vector of the reduced basis. */
   /* Check basis vectors. */
   int i;
   for (i = 0; i<numOfVars; i++) {
-    cout << "# Basis vector " << i << ":" << endl;
+    cerr << "# Basis vector " << i << ":" << endl;
     if (singularity_avoiding(num_cones, numOfVars, alpha[i], UF[i])) {
-      cout << "### Found vector" << endl;
+      cerr << "### Found vector" << endl;
     }
   }
   /* Try integer combinations of the basis vectors */
   int *max_comb = new int[numOfVars];
   int max_coeff;
   for (max_coeff = 1; ; max_coeff++) {
-    cout << "# Trying combinations with maximum coefficient " << max_coeff << endl;
+    cerr << "# Trying combinations with maximum coefficient " << max_coeff << endl;
     for (i = 0; i<numOfVars; i++)
       max_comb[i] = 2 * max_coeff;
     IntCombEnum iter_comb(max_comb, numOfVars);
@@ -197,7 +197,7 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
 	vec_ZZ F_comb;
 	F_comb = multi * UF;
 	if (singularity_avoiding(num_cones, numOfVars, alpha_comb, F_comb)) {
-	  cout << "### Found vector:" << endl
+	  cerr << "### Found vector:" << endl
 	       << " multipliers: " << multi << endl
 	       << " vector:      " << multi * U << endl
 	       << " alpha_comb:  " << alpha_comb << endl
@@ -208,7 +208,7 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
       }
     }
   }
-  cout << "No suitable vector found." << endl;
+  cerr << "No suitable vector found." << endl;
   exit(1);
 }  
 
@@ -229,13 +229,13 @@ compute_triangulation_of_boundary
   assert(incidence->famsize == num_inequalities);
   int i;
   for (i = 0; i<num_inequalities; i++) {
-    cout << "Facet " << i+1 << "/" << num_inequalities << ": ";
+    cerr << "Facet " << i+1 << "/" << num_inequalities << ": ";
     int j;
     for (j = 0; j<incidence->setsize; j++)
       if (set_member(j + 1, incidence->set[i])) {
-	cout << j + 1 << " ";
+	cerr << j + 1 << " ";
       }
-    cout << "(cardinality " << set_card(incidence->set[i]) << ")" << endl;
+    cerr << "(cardinality " << set_card(incidence->set[i]) << ")" << endl;
     /* Compute a triangulation of that facet. */
     listCone *facet_cone
       = cone_from_ray_set(rays, incidence->set[i], cone->vertex);
@@ -247,7 +247,7 @@ compute_triangulation_of_boundary
 			       random_height, &Parameters->triangulation_max_height,
 			       Parameters->Number_of_Variables - 1,
 			       consumer);
-//     cout << "Triangulation of facet cone: " << lengthListCone(facet_triangulation)
+//     cerr << "Triangulation of facet cone: " << lengthListCone(facet_triangulation)
 // 	 << " simplicial cones." << endl;
   }
 }
@@ -261,8 +261,8 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
   vec_ZZ det_vector;
   vec_ZZ interior_ray_vector
     = construct_interior_vector(boundary_triangulation, Parameters->Number_of_Variables, det_vector);
-  cout << "Interior ray vector: " << interior_ray_vector << endl;
-  cout << "Reuslting determinants: " << det_vector << endl;
+  cerr << "Interior ray vector: " << interior_ray_vector << endl;
+  cerr << "Reuslting determinants: " << det_vector << endl;
   listCone *resulting_triangulation = NULL;
 
   listCone *simplicial_cone, *next_simplicial_cone;

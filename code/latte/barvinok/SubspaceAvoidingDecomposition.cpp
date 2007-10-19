@@ -78,7 +78,7 @@ ComputeShortVectorAvoidingSubspace(const mat_ZZ & B, const mat_ZZ &Dual)
   // Try to greedily reduce the norm of result_L by adding or subtracting basis
   // vectors that lie in the subspace.
   bool change;
-  cout << "L = " << result_L << endl;
+  cerr << "L = " << result_L << endl;
   do {
     change = false;
     for(i = 1; i <= dim; i++) {
@@ -88,7 +88,7 @@ ComputeShortVectorAvoidingSubspace(const mat_ZZ & B, const mat_ZZ &Dual)
 	if (tn < least_max_norm) {
 	  least_max_norm = tn;
 	  result_L = tL;
-	  cout << "L = " << result_L << endl;
+	  cerr << "L = " << result_L << endl;
 	  result_U -= U(i);
 	  change = true;
 	}
@@ -98,7 +98,7 @@ ComputeShortVectorAvoidingSubspace(const mat_ZZ & B, const mat_ZZ &Dual)
 	  if (tn < least_max_norm) {
 	    least_max_norm = tn;
 	    result_L = tL;
-	    cout << "L = " << result_L << endl;
+	    cerr << "L = " << result_L << endl;
 	    result_U += U(i);
 	    change = true;
 	  }

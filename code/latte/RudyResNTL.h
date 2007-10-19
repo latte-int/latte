@@ -1,8 +1,10 @@
+/* This is a -*- C++ -*- header file. */
+
 /* RudyResNTL.h -- Polynomial substitution and residue calculations
 
    Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
       Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -27,7 +29,8 @@
 #include "barvinok/dec.h" // for Standard_Single_Cone_Parameters
 
 /* Consumes CONES. */
-void ResidueFunction(listCone* cones, int numOfVars, int print_flag, int degree, int output_cone);
+void ResidueFunction(listCone* cones, int numOfVars, int print_flag, int degree, int output_cone,
+		     BarvinokParameters *params);
 
 // Returns -1 if a Dot Product is zero in the denominator, otherwise 1
 // if ok

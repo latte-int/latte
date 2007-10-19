@@ -95,7 +95,7 @@ get_multipliers_from_snf(const mat_ZZ & snf)
    vec_ZZ n;
    n.SetLength(row);
    for (j = 0; j < row; j++) {
-     //cout << "get_multipliers_from_snf:: snf[" << j << "," << j << "] = " << snf[j][j] << "\n"; 
+     //cerr << "get_multipliers_from_snf:: snf[" << j << "," << j << "] = " << snf[j][j] << "\n"; 
      n[j] = snf[j][j];
    }
    return n;
@@ -121,7 +121,7 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
     /* General case: */
     mat_ZZ snf_U, B, C;
 
-    //cout << "Computing Smith-Normal form...\n";
+    //cerr << "Computing Smith-Normal form...\n";
     /* get Smith Normal form of matrix, Smith(U) = BUC */
     snf_U = SmithNormalForm(U, B, C);
 
@@ -322,7 +322,7 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
    * 0 <= k <= (n_i - 1) of each vector.
    */
   IntCombEnum iter_comb(n, numOfVars);
-  //cout << "Enumerating lattice points...\n";
+  //cerr << "Enumerating lattice points...\n";
   iter_comb.decrementUpperBound();
   listVector *lat_points = NULL;
   int *next;
@@ -340,7 +340,7 @@ void computePointsInParallelepiped(listCone *cone, int numOfVars)
 {
 #if 0
   if (abs(cone->determinant) != 1)
-    cout << "Processing cone with determinant " << cone->determinant << endl;
+    cerr << "Processing cone with determinant " << cone->determinant << endl;
 #endif
   cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
 }
@@ -354,7 +354,7 @@ void computePointsInParallelepipeds(listCone *cones, int numOfVars)
     tmp=tmp->rest;
     Cones_Processed_Count++;
     if ((Cones_Processed_Count % 1000) == 0 )
-      cout << Cones_Processed_Count << " cones processed." << endl;
+      cerr << Cones_Processed_Count << " cones processed." << endl;
   }
 }
 
@@ -427,7 +427,7 @@ void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
      * 0 <= k <= (n_i - 1) of each vector.
      */
     IntCombEnum iter_comb(n, numOfVars);
-    //cout << "Enumerating lattice points...\n";
+    //cerr << "Enumerating lattice points...\n";
     iter_comb.decrementUpperBound();
     int *next;
     int num_scalar = 0;

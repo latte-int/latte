@@ -34,29 +34,14 @@
 #include "print.h"
 
 /* ----------------------------------------------------------------- */
-void printVector(const vec_ZZ &v, int numOfVars) {
-  int i;
-
-//    if (v==0) {
-//      cout << "[]\n";
-//      return ;
-//    }
-  cout << "[";
-  for (i=0; i<(numOfVars-1); i++) {
-    cout << v[i] << " ";
-  }
-  cout << v[i] << "]" << endl;
-  return ;
+void printVector(const vec_ZZ &v, int numOfVars)
+{
+  printVectorToFile(cout, v, numOfVars);
 }
 /* ----------------------------------------------------------------- */
-void printListVector(listVector* basis, int numOfVars) {
-  if (basis==0) cout << "[]\n";
-  while(basis) {
-    printVector(basis->first,numOfVars);
-    basis = basis->rest;
-  }
-/*  printf("\n"); */
-  return ;
+void printListVector(listVector* basis, int numOfVars)
+{
+  printListVectorToFile(cout, basis, numOfVars);
 }
 /* ----------------------------------------------------------------- */
 void printRationalVector(rationalVector *v, int numOfVars) {
@@ -386,11 +371,11 @@ void
 print_debug_vector(const vec_ZZ & v) {
    int len = v.length(); 
 
-   cout << "Begin vector: ["; 
+   cerr << "Begin vector: ["; 
    for (int i = 0; i < len; i++) {
-      cout << v[i] << ","; 
+      cerr << v[i] << ","; 
    }
-   cout << "]: End vector\n"; 
+   cerr << "]: End vector\n"; 
 }
 
 void
@@ -398,13 +383,13 @@ print_debug_matrix(const mat_ZZ & m) {
    int rows = m.NumRows(); 
    int cols = m.NumCols(); 
 
-   cout << "Begin matrix:\n"; 
+   cerr << "Begin matrix:\n"; 
    for (int i = 0; i < rows; i++) {
-      cout << "["; 
+      cerr << "["; 
       for (int j = 0; j < cols; j++) {
-         cout << m[i][j] << ","; 
+         cerr << m[i][j] << ","; 
       }
-      cout << "]\n"; 
+      cerr << "]\n"; 
    }
-   cout << ":End matrix\n"; 
+   cerr << ":End matrix\n"; 
 }

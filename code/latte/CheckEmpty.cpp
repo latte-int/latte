@@ -52,8 +52,8 @@ void CheckEmpty(const char * Filename){
   nonneg[0] = 'n';
   int numOfNonneg = 0, hold = 0;
   vec_ZZ Index, Index2;
-  cout << "Checking whether the input polytope is empty or not...";
-  cout.flush();
+  cerr << "Checking whether the input polytope is empty or not...";
+  cerr.flush();
   ifstream IN(Filename);
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
@@ -76,26 +76,26 @@ void CheckEmpty(const char * Filename){
     }
   }
   ifstream in(Filename);
-  // cout << "here" << endl;
+  // cerr << "here" << endl;
   in >> numOfConsts >> numOfDims;
-  //  cout << numOfConsts << " " << numOfDims << endl; 
+  //  cerr << numOfConsts << " " << numOfDims << endl; 
   int equs[numOfConsts];
   //ZZ cost[numOfDims - 1];
   mat_ZZ entries;
   entries.SetDims(numOfConsts, numOfDims);
-  // cout << "here2" << endl;
+  // cerr << "here2" << endl;
   if(flag == 2) hold = numOfDims - 1;
   for(int i = 0; i < numOfEqu; i++) conv(equs[i], Index[i]);
-  //  cout << "ther" << endl; 
+  //  cerr << "ther" << endl; 
  for(int i = 0; i < numOfConsts; i++)
     for(int j = 0; j < numOfDims; j++)
       { in >> entries[i][j]; }
- //  cout << "here3" << endl;
+ //  cerr << "here3" << endl;
  // printListVector(CheckRedIneq(entries), numOfDims);
  if((equ[0] == 'y') && (flag == 0)){ in >> numOfEqu;
  
  for(int i = 0; i < numOfEqu; i++) in >> equs[i];}
- // for(int i = 0; i < numOfEqu; i++) cout << equs[i] << endl;
+ // for(int i = 0; i < numOfEqu; i++) cerr << equs[i] << endl;
  /*  if(max[0] == 'y') 
       for(int i = 0; i < numOfDims - 1; i++) in >> cost[i]; */
  mat_ZZ NONNEG;
@@ -103,7 +103,7 @@ void CheckEmpty(const char * Filename){
  
   int tmpInt;
   for(int i = 0; i < numOfNonneg; i++){
-    conv(tmpInt, Index2[i]); //cout << Index2[i] << " ";
+    conv(tmpInt, Index2[i]); //cerr << Index2[i] << " ";
     NONNEG[tmpInt-1][tmpInt-1] = 1;
   }
   
@@ -118,13 +118,13 @@ void CheckEmpty(const char * Filename){
   out << numOfConsts + hold + numOfEqu << " " << numOfDims << " rational" << endl;
   for(int i = 0; i < numOfConsts; i++){
     for(int j = 0; j < numOfDims; j++){
-      out << entries[i][j] << " ";}//  cout << entries[i][j] << " ";}
+      out << entries[i][j] << " ";}//  cerr << entries[i][j] << " ";}
     out << endl;
-  }//cout << "here" << endl;
+  }//cerr << "here" << endl;
   if(equ[0] == 'y'){
     for(int i = 0; i < numOfEqu; i++){out << -entries[equs[i]-1][0] << " ";
     for(int j = 1; j < numOfDims; j++){
-      out << -entries[equs[i]-1][j] << " "; }//cout << entries[i][j] << " ";}
+      out << -entries[equs[i]-1][j] << " "; }//cerr << entries[i][j] << " ";}
     out << endl;
     }
   }
@@ -160,7 +160,7 @@ void CheckEmpty(const char * Filename){
     exit(1);
   }
   while(IN3 >> tmpString){
-    //  cout << tmpString << endl;
+    //  cerr << tmpString << endl;
     if((tmpString == "primal_solution") || ( tmpString == "primal_direction")){
       FLAG = 1;
     }
@@ -174,5 +174,5 @@ void CheckEmpty(const char * Filename){
     NOL << 0 << endl;
     exit (0);
   }
-  cout << "done." << endl;
+  cerr << "done." << endl;
 }

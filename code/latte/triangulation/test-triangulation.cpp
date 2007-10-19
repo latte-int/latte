@@ -44,9 +44,9 @@ print_triangulation(listCone *triang, int Number_of_Variables)
     }
   }
 #endif
-//   cout << "*** Triangulation:" << endl;
+//   cerr << "*** Triangulation:" << endl;
 //   printListCone(triang, Number_of_Variables);
-  cout << "Triangulation (with " << lengthListCone(triang)
+  cerr << "Triangulation (with " << lengthListCone(triang)
        << " cones) printed to file `triangulation'." << endl;
   printListConeToFile("triangulation", triang, Number_of_Variables);
 }
@@ -116,7 +116,7 @@ int main(int argc, char **argv)
   dualizeCones(cone, params.Number_of_Variables);
   dualizeCones(cone, params.Number_of_Variables);
 #endif
-  cout << "*** Input cone:" << endl;
+  cerr << "*** Input cone:" << endl;
   printListCone(cone, params.Number_of_Variables);
 
 #if 0

@@ -40,7 +40,7 @@ using namespace std;
 
 /***********************************************************************************/
 void ResidueFunction(listCone* cones, int numOfVars, int print_flag, 
-    int degree, int output_cone) {
+		     int degree, int output_cone, BarvinokParameters *params) {
   int numOfTerms, DEGREE = 1;
 //  char outFileName[127];
   listVector *tmp;
@@ -99,7 +99,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   long int totalNoGs=noGsPerC*noCones; //total no. of generators,ie,rowdim of B
   vector<list<Integer> > A(noCones);  // A is the numerator vectors
   // long int B[totalNoGs][dim];  // B is the denominator vectors
-  //  cout<<"tNG: "<<totalNoGs<<endl;
+  //  cerr<<"tNG: "<<totalNoGs<<endl;
 
   class denom {
   public:
@@ -173,14 +173,14 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   
     /* Bitr=B;
      Bitr=Bitr->next;
-     cout<<"B[1]: ";
-     for(i=0;i<noGsPerC;i++) {cout<<endl;
-     for(j=0;j<dim;j++) cout<<Bitr->D[i*dim+j]<<" ";
+     cerr<<"B[1]: ";
+     for(i=0;i<noGsPerC;i++) {cerr<<endl;
+     for(j=0;j<dim;j++) cerr<<Bitr->D[i*dim+j]<<" ";
      }
      return ; */
 
   t=clock();
-  //  cout<<"  Clock at start reads "<<t<<"."<<endl;
+  //  cerr<<"  Clock at start reads "<<t<<"."<<endl;
 
   //------------------------------------------------------------------------------
   //---FIND LAMBDA AND DENOMINATOR EXPONENTS: We want to make substitution
@@ -196,8 +196,8 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   //---vector, which may let me skip some lambdas.
   //------------------------------------------------------------------------------
 
-  //  cout<<"Getting lambda..."<<endl;
-  //cout<<"k is "<<k;cin.get();
+  //  cerr<<"Getting lambda..."<<endl;
+  //cerr<<"k is "<<k;cin.get();
 
   //VARS:
   //Integer k;
@@ -211,13 +211,13 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   long int halt, haltCone;
   halt = 0;
   haltCone=-1; // will track the index where the dot product is 0
-  k=0; //cout<<"k is "<<k;// loop control var
+  k=0; //cerr<<"k is "<<k;// loop control var
   // Also, n tracks the lowest index where lambda changed (dlambda[n] not zero).
- // cout << totalNoGs << endl;
+ // cerr << totalNoGs << endl;
   //--------LOOP 1: try up to 5000 lambdas with entries in {-1,0,1,2}
-  //cout<<"k is "<<k;cin.get();
+  //cerr<<"k is "<<k;cin.get();
  while(k<5000) {
-   //cout << k << " ";cin.get();
+   //cerr << k << " ";cin.get();
     //--FIRST check if lambda works.
     Bitr=B;
     for(i=0;i<haltCone;i++) {
@@ -261,19 +261,19 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
       } // end if/else
     k++;
   } // end while
- // cout << totalNoGs << end;
+ // cerr << totalNoGs << end;
  // 	
  //for (int q = 0;q<dim-1;q++)
-//	 cout << lambda[q] << " ";
- //cout << " Lambda " << endl;
+//	 cerr << lambda[q] << " ";
+ //cerr << " Lambda " << endl;
 
   /*for(j = 0; j < noCones; j++) 
 	  if(dotProducts[j] == 0) 
-		  cout <<  "oops";
+		  cerr <<  "oops";
 
   exit(1);*/
   
-  // cout << endl;*/
+  // cerr << endl;*/
 
   //--IN CASE no lambda found yet...
 
@@ -288,7 +288,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 //     if(dotProducts[i]==0) i=totalNoGs+2;
 //   }
 //   if(i==totalNoGs) k=200000;
-// } cout<<"k: "<<k<<endl<<"clk: "<<clock()<<endl;
+// } cerr<<"k: "<<k<<endl<<"clk: "<<clock()<<endl;
 
  //-------LOOP 2: in case no lambda found yet, try bigger lambda entries...
  //int d=1; // d runs through odds... it gets added to a single entry of lambda
@@ -335,15 +335,15 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
     if(i==noCones) k=200000;
   }
 
-  // cout<<"lambda: "; cin.get();
-//  for(i=0;i<dim;i++) cout<<lambda[i]<<" ";
- // cout << endl;
- // cout << ss << endl;
-  // cout<<endl<<"  Clock at checkpoint 2: "<<clock()<<endl;
+  // cerr<<"lambda: "; cin.get();
+//  for(i=0;i<dim;i++) cerr<<lambda[i]<<" ";
+ // cerr << endl;
+ // cerr << ss << endl;
+  // cerr<<endl<<"  Clock at checkpoint 2: "<<clock()<<endl;
   //cin.get();
-  //  cout<<"denominator: ";
- //   for(i=0;i<noGsPerC*noCones;i++) cout<<dotProducts[i]<<" ";
- //   cout<<i <<endl;
+  //  cerr<<"denominator: ";
+ //   for(i=0;i<noGsPerC*noCones;i++) cerr<<dotProducts[i]<<" ";
+ //   cerr<<i <<endl;
   //  return 0;
   //----------------------------------------------------------------------------
   //---CALCULATE NUMERATOR EXPONENTS of t under substitution x[i]->t^lambda[i].
@@ -355,7 +355,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
  
 
   
- 	//cout << "Copying dot product into Cones_Array" << endl; 
+ 	//cerr << "Copying dot product into Cones_Array" << endl; 
   //*****************************************************************
   //  PETER/DAVE CODE REALLY BEGINS HERE
   //  Our data structure Cones_Array which holds all of our information
@@ -369,7 +369,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	{
 		Cones_Array[q].Numerator_Generator.R_Exponent = 0;
 	
-		//cout << "Calculationg dot product of numerator" << endl;	
+		//cerr << "Calculationg dot product of numerator" << endl;	
 		// Calculate dot product of numerator
 		for (int f = 0;f < dim-1 ;f++)
 		{
@@ -379,7 +379,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		
 		A[q].pop_front ();  //remove last dimension's exponent
 		
-		//cout << "Store dot product of generators into Cones_Array" << endl;
+		//cerr << "Store dot product of generators into Cones_Array" << endl;
 		// Store dot product of generators into Cones_Array
 		for (int t = 0;t < noGsPerC;t++)
 		{
@@ -388,7 +388,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	}
 	
 	
-	//cout << "Simplifying generators to have nonnegative exponents" << endl;
+	//cerr << "Simplifying generators to have nonnegative exponents" << endl;
   //**************************************************************************
   //  Simplify all the generators of each cone such that all the
   //  exponents are nonnegative, changing the sign and Form_Type accordingly.
@@ -461,8 +461,8 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 	}
 
-	//cout << "Minimum exponent is " << Numerator_R_Exponent_Minimum << endl;
-	//cout << "Factoring out minumum exponent of r" << endl;
+	//cerr << "Minimum exponent is " << Numerator_R_Exponent_Minimum << endl;
+	//cerr << "Factoring out minumum exponent of r" << endl;
   
   //************************************************************************
   //  Peter/Dave: Here we make sure all the numerators of the Cones are
@@ -507,7 +507,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	// Initialize our final expression
 
 
-	cout << endl << endl;
+	cerr << endl << endl;
 	
 	Node_Controller	Controller (noGsPerC, DEGREE);
 
@@ -537,17 +537,17 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	if(print_flag == 1)
 		 {
 		   //system_with_error_check("rm func.rat");
-	 		 cout << "Outputing rational functions to file" << endl;
+	 		 cerr << "Outputing rational functions to file" << endl;
 			Rational_Function_Output_File.open ("func.rat");
 		 }
 
-	cout << "Formulating rational functions and performing taylor expansion on cones." << endl;
+	cerr << "Formulating rational functions and performing taylor expansion on cones." << endl;
 
 	ofstream Simplify_Sum, Simplify_Term;
 	
 	if (COMPUTE_SUM_MAPLE == 1)
 	{
-		cout << "Compute maple called" << endl;
+		cerr << "Compute maple called" << endl;
 		//system_with_error_check("rm simplify.sum");
 		
 		//Create initial sum file simplify.sum
@@ -911,17 +911,17 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	
 			// DEBUG
 			/*
-			cout << "Sign " << Cones_Array[i].sign << endl;
+			cerr << "Sign " << Cones_Array[i].sign << endl;
 			for (int k = 0; k <= Cones_Array[i].order; k++)
 			{
 				Numerator_Vector[k]->Print ();
 				if (k != 0)
-					cout << "s^" << k ;
+					cerr << "s^" << k ;
 				
 				if (k <= Cones_Array[i].order - 1)
-					cout << " + " << endl;
+					cerr << " + " << endl;
 			}	
-			cout << endl << "  Divided by " << endl;
+			cerr << endl << "  Divided by " << endl;
 
 
 			for (int k = 0; k <= Cones_Array[i].order; k++)
@@ -929,13 +929,13 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 				Denominator_Result[k]->Print ();
 				
 				if (k != 0)
-					cout << "s^" << k;
+					cerr << "s^" << k;
 				
 				if (k <= Cones_Array[i].order - 1)
-					cout << " + " << endl;
+					cerr << " + " << endl;
 			}
 			
-			cout << endl << endl;
+			cerr << endl << endl;
 			*/
 	
 		} //End of loop iterating through generators.	
@@ -956,7 +956,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		// N_(order) is simply a polynomial
 		//
 				
-		//cout << "Residue coefficient" << endl;
+		//cerr << "Residue coefficient" << endl;
 			
 		Quotient_Coefficient[0] = Numerator_Vector[0]; // C_0
 
@@ -1060,7 +1060,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 			system_with_error_check(MAPLE_PATH " < " MAPLE_SCRIPT_DIR "/simplify3.add >out.simplify");
 		
-			cout << "%";	
+			cerr << "%";	
 		}
 		
 		if ( OUTPUT_CONE_MULTI == 1)
@@ -1149,7 +1149,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		if (COMPUTE_SUM_MAPLE == 1)
 		{
 			//system_with_error_check("rm simplify.term");
-			cout << "%";
+			cerr << "%";
 			
 			Simplify_Term.open ("simplify.term");
 
@@ -1181,13 +1181,13 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		
 		Final_Cone_Expression->Taylor_Expansion(Cone_Taylor_Parameters);	
 
-		//cout << "Residue: Taylor Expansion of " << i << " cone. ";
+		//cerr << "Residue: Taylor Expansion of " << i << " cone. ";
 		
 		//for (int k = 0; k <= DEGREE; k++)
 		//{
-		//	cout << Cone_Taylor_Parameters->Result[k] << "t^" << k << " + ";
+		//	cerr << Cone_Taylor_Parameters->Result[k] << "t^" << k << " + ";
 		//}
-		//cout << endl;	
+		//cerr << endl;	
 		
 		for (int k = 0; k <= DEGREE; k++)
 		{
@@ -1203,7 +1203,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		delete [] Cones_Array[i].Generators_of_Cone;
 		
 		if (i%50 == 0)
-			cout << i << " / " << noCones << " Done " << endl;
+			cerr << i << " / " << noCones << " Done " << endl;
 		
 	} //End of for loop iterating through all the cones
 
@@ -1217,7 +1217,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	}
 	
 	if(DEGREE > 1){
-	cout << endl << "This is the taylor expansion of our signed sum of rational functions up to degree ";
+	cerr << endl << "This is the taylor expansion of our signed sum of rational functions up to degree ";
 	cout << DEGREE << endl << endl;
 	
 	// The quotient function internaly will multiply its results by Ten_Power
@@ -1236,9 +1236,7 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	cout << endl << endl; }
 	else if(DEGREE == 1){
 
-	  // cout << "\n****  Total number of lattice points is: " << (Final_Taylor_Result[1] + *Ten_Power/2) /  *Ten_Power << "  ****" << endl << endl;
-	  ofstream out("numOfLatticePoints");
-	  out << (Final_Taylor_Result[1] + *Ten_Power/2) /  *Ten_Power << endl;
+	  params->deliver_number_of_lattice_points((Final_Taylor_Result[1] + *Ten_Power/2) /  *Ten_Power);
 	}
 	
 	delete[] Cone_Taylor_Parameters->Result;

@@ -3,7 +3,7 @@
 /* barvinok.h -- Barvinok's decomposition of a cone.
 
    Copyright 2002, 2003 Ruriko Yoshida
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -104,6 +104,11 @@ public:
   BarvinokParameters();
   virtual ~BarvinokParameters();
   virtual void print_statistics(ostream &s);
+  // Call this method to deliver the result.  Several legacy codepaths
+  // in LattE want to deliver the result and exit early, in situations
+  // where emptiness is detected.  This method at least unifies how
+  // this output is delivered.  --mkoeppe
+  virtual void deliver_number_of_lattice_points(const ZZ &number);
 };
 
 class Single_Cone_Parameters : public BarvinokParameters, public ConeConsumer {

@@ -37,7 +37,7 @@ listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
   {
 
     temp2 = equations;
-    //  cout << " Here 1" << endl;
+    //  cerr << " Here 1" << endl;
     i = 0;
     while(temp2)
       {	  
@@ -45,25 +45,25 @@ listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
 	temp2 = temp2->rest;
 	i++;
       }
-    //  cout << " Here 2" << endl;
+    //  cerr << " Here 2" << endl;
     for(i = oldNumOfVars - newNumOfVars; i < oldNumOfVars; i++)
       {
 	newVector[i] = current_cone->latticePoints->first[i - oldNumOfVars + newNumOfVars];
       }
-    // cout << " Here 3" << endl;
+    // cerr << " Here 3" << endl;
     delete current_cone->latticePoints;
     current_cone->latticePoints = new listVector;
     current_cone->latticePoints->rest = NULL;
 
     current_cone->latticePoints->first.SetLength(oldNumOfVars);
-    //  cout << " Here 4" << endl;
+    //  cerr << " Here 4" << endl;
     for(i = 0; i < oldNumOfVars; i++)
       current_cone->latticePoints->first[i] = newVector[i];
 
     current_ray = current_cone->rays;
     new_ray = new listVector;
     current_cone->rays = new_ray;
-    //   cout << " Here 5" << endl;
+    //   cerr << " Here 5" << endl;
     while(current_ray)
       {
 	temp2 = equations;
@@ -86,7 +86,7 @@ listCone* ProjectUp(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
 	delete temp;
 	
 	new_ray->first.SetLength(oldNumOfVars);
-	//   cout << " Here 6" << endl;
+	//   cerr << " Here 6" << endl;
 	for(i = 0; i < oldNumOfVars; i++)
 	  new_ray->first[i] = newVector[i];
       
@@ -125,7 +125,7 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
       assert(current_cone->latticePoints != NULL);
       assert(current_cone->latticePoints->rest == NULL);
       
-      //  cout << " Here 1" << endl;
+      //  cerr << " Here 1" << endl;
       i = 0;
       newVector = b;
       
@@ -133,18 +133,18 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
 	newVector[i] += AA[i] * current_cone->latticePoints->first;
       }
       
-      //  cout << " Here 2" << endl;
+      //  cerr << " Here 2" << endl;
       /*    for(i = oldNumOfVars - newNumOfVars; i < oldNumOfVars; i++)
 	    {
 	    newVector[i] = current_cone->latticePoints->first[i - oldNumOfVars + newNumOfVars];
 	    }*/
-	// cout << " Here 3" << endl;
+	// cerr << " Here 3" << endl;
       delete current_cone->latticePoints;
       current_cone->latticePoints = new listVector;
       current_cone->latticePoints->rest = NULL;
       
       current_cone->latticePoints->first.SetLength(oldNumOfVars);
-      //  cout << " Here 4" << endl;
+      //  cerr << " Here 4" << endl;
       for(i = 0; i < oldNumOfVars; i++)
 	current_cone->latticePoints->first[i] = newVector[i];
 
@@ -153,7 +153,7 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
       current_ray = current_cone->rays;
       new_ray = new listVector;
       current_cone->rays = new_ray;
-      //   cout << " Here 5" << endl;
+      //   cerr << " Here 5" << endl;
       while(current_ray)
 	{
 	  i = 0;
@@ -172,7 +172,7 @@ listCone* ProjectUp2(listCone* cone, int & oldNumOfVars, int & newNumOfVars,
 	  delete temp;
 	  
 	  new_ray->first.SetLength(oldNumOfVars);
-	  //   cout << " Here 6" << endl;
+	  //   cerr << " Here 6" << endl;
 	  for(i = 0; i < oldNumOfVars; i++)
 	    new_ray->first[i] = newVector[i];
 	  

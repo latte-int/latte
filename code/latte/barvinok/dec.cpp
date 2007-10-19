@@ -70,7 +70,7 @@ decomposeCones(listCone *cones, bool dualize,
     dualizeCones(cones, param.Number_of_Variables, &param);
   }
     
-  cout << "Decomposing all cones.\n";
+  cerr << "Decomposing all cones.\n";
   numOfConesDecomposed=0;
   numOfAllCones=lengthListCone(cones);
 
@@ -85,13 +85,13 @@ decomposeCones(listCone *cones, bool dualize,
     tmp=tmp->rest;
     numOfConesDecomposed++;
     if (numOfConesDecomposed==50*(numOfConesDecomposed/50)) {
-      cout << numOfConesDecomposed << " / " << numOfAllCones << " done.\n";
+      cerr << numOfConesDecomposed << " / " << numOfAllCones << " done.\n";
     }
     parameters.Cone_Index++;
   }
 
-  cout << "All cones have been decomposed.\n";
-  cout << lengthListCone(parameters.Decomposed_Cones) << " cones in total.\n";
+  cerr << "All cones have been decomposed.\n";
+  cerr << lengthListCone(parameters.Decomposed_Cones) << " cones in total.\n";
   
   return parameters.Decomposed_Cones;
 }
@@ -150,12 +150,12 @@ barvinokDecomposition_List(listCone *cones,
 			      // value handling by exception.
 	}
 	if (index%1 == 0)
-	  cout << index << " vertex cones done. " << endl;
+	  cerr << index << " vertex cones done. " << endl;
       }
       return;
     }
     catch (NotGenericException) {
-      cout << "Generic vector chosen unsuccessfully, trying again." << endl;
+      cerr << "Generic vector chosen unsuccessfully, trying again." << endl;
     };
   } while (1);
 }
@@ -179,14 +179,14 @@ Standard_Single_Cone_Parameters::InitializeComputation()
 int
 Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 {
-  //cout << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
+  //cerr << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
   if ( (Flags & DUAL_APPROACH) == 0)
     computePointsInParallelepiped(Cone, Number_of_Variables);
   //printListCone(Cone, Number_of_Variables);
 		
   if (Flags & DUAL_APPROACH)	
     {
-      //cout << "barvinok_DFS: Calling ResidueFunction_Single_Cone" << endl;
+      //cerr << "barvinok_DFS: Calling ResidueFunction_Single_Cone" << endl;
       return ResidueFunction_Single_Cone (Cone, this);
     }	
   else
@@ -206,9 +206,9 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
     dualizeCones(cones, param.Number_of_Variables, &param);
   }
 	
-  cout << "decomposeCones_Single: Decomposing all cones. (Memory Save on)\n";
+  cerr << "decomposeCones_Single: Decomposing all cones. (Memory Save on)\n";
   numOfAllCones=lengthListCone(cones);
-  cout << numOfAllCones << " cones total to be done!";	
+  cerr << numOfAllCones << " cones total to be done!";	
 	
   //Set Ten_Power to 100 billion
   // FIXME: What is magic about this number? --mkoeppe, Sat Mar  4 21:21:45 PST 2006
@@ -216,25 +216,25 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
   for (int i = 0; i < Exponent_Ten_Power; i++)	
     param.Ten_Power *= 10;
 
-  cout << "decomposeCones_Single: degree = " << degree << endl;
+  cerr << "decomposeCones_Single: degree = " << degree << endl;
   param.Taylor_Expansion_Result = new ZZ [degree + 1 ];
 	
   param.Degree_of_Taylor_Expansion = degree;
   param.Controller = new Node_Controller(param.Number_of_Variables + 1, degree);			
 
-  cout << "Number of cones: " << numOfAllCones << endl;
+  cerr << "Number of cones: " << numOfAllCones << endl;
 
   barvinokDecomposition_List(cones, param);
 
-  cout << endl << "Total Unimodular Cones: " << param.Total_Uni_Cones << endl;
+  cerr << endl << "Total Unimodular Cones: " << param.Total_Uni_Cones << endl;
   ofstream UniOut("numOfUnimodularCones");
   UniOut << param.Total_Uni_Cones << endl;
-  cout << "Maximum number of simplicial cones in memory at once: " << param.Max_Simplicial_Cones_Total << endl;
+  cerr << "Maximum number of simplicial cones in memory at once: " << param.Max_Simplicial_Cones_Total << endl;
 
 	
   if ( param.Flags & DUAL_APPROACH)
     {
-      cout << "Memory Save Mode: Taylor Expansion:" << endl;
+      cerr << "Memory Save Mode: Taylor Expansion:" << endl;
       if(degree > 1){		
 	for (int i = 0; i<= degree; i++)
 	  {
@@ -249,27 +249,15 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
       else if(degree == 1){
 	Integer numOfLatticePoints
 	  = ( param.Taylor_Expansion_Result[1] + param.Ten_Power/2)/param.Ten_Power;
-	cout << "\n****  Total number of lattice points is: " << numOfLatticePoints << "  ****" << endl << endl;
-	ofstream out("numOfLatticePoints");
-	out << numOfLatticePoints;
+	param.deliver_number_of_lattice_points(numOfLatticePoints);
       }
     }
-  else 
-    {
-#if 0
-      cout << "Result: " << param.Total_Lattice_Points << " / "
-	   << param.Ten_Power << endl;
-#endif
-      cout << "\n*****  Total number of lattice points: ";
-      ofstream out("numOfLatticePoints");
-      param.Total_Lattice_Points = abs( param.Total_Lattice_Points);
-		
-      cout <<	( param.Total_Lattice_Points + param.Ten_Power/2)/param.Ten_Power;
-      out <<	( param.Total_Lattice_Points + param.Ten_Power/2)/param.Ten_Power << endl;
-      cout << "  ****" << endl << endl;
-    }
+  else {
+    param.Total_Lattice_Points = abs(param.Total_Lattice_Points);
+    param.deliver_number_of_lattice_points((param.Total_Lattice_Points + param.Ten_Power/2)/param.Ten_Power);
+  }
 	
-  //cout << lengthListCone(newCones->rest) << " cones in total.\n";
+  //cerr << lengthListCone(newCones->rest) << " cones in total.\n";
 
   delete param.Controller;
   delete [] param.Taylor_Expansion_Result;

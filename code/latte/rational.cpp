@@ -146,8 +146,8 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
   int i, len;
   char* tmpString = new char[2000];
   in >> tmpString;
-//  cout << endl;
-//  cout << tmpString << endl; 
+//  cerr << endl;
+//  cerr << tmpString << endl; 
   len=strlen(tmpString);
   int flag = 0, index = 0;
   int sign = 0;
@@ -157,8 +157,8 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
   char* t2 = new char[strlen(tmpString) + 1];
   char* s2 = new char[strlen(tmpString) + 1];
   for (i=0;i<len+1; i++) {s2[i]=0; t2[i]=0;}
-//  cout << "s2 = " << t2 << endl;
-//  cout << "t2 = " << t2 << endl;
+//  cerr << "s2 = " << t2 << endl;
+//  cerr << "t2 = " << t2 << endl;
   conv(denominator, 1);
   for (i = 0; i<len; i++)
     if (tmpString[i] == '/') {
@@ -166,17 +166,17 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator) {
       flag = 1;
     }
 
-//  cout << "flag = " << flag << ", index = " << index << endl;
-//  cout << "t2 = " << t2 << endl;
+//  cerr << "flag = " << flag << ", index = " << index << endl;
+//  cerr << "t2 = " << t2 << endl;
 
   if(flag == 1)
     strncat(t2, tmpString, index);
   else
     strcpy(t2, tmpString);
 
-//  cout << "t2 = " << t2 << endl;
+//  cerr << "t2 = " << t2 << endl;
 
-  HugInt x(t2);   //cout << t2 << endl;
+  HugInt x(t2);   //cerr << t2 << endl;
   numerator = x.BigInt;
 
 //  if (abs(numerator)>10) exit(1);

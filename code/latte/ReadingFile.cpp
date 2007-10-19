@@ -48,8 +48,8 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
   string tmpString;
   int numOfNonneg = 0, hold = 0;
   vec_ZZ Index, Index2;
-  cout << "Removing redundant inequalities and finding hidden equalities....";
-  cout.flush();
+  cerr << "Removing redundant inequalities and finding hidden equalities....";
+  cerr.flush();
   ifstream IN(Filename.c_str());
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
@@ -72,21 +72,21 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
     }
   }
   ifstream in(Filename.c_str());
-  // cout << "here" << endl;
+  // cerr << "here" << endl;
   in >> numOfConsts >> numOfDims;
-  //  cout << numOfConsts << " " << numOfDims << endl; 
+  //  cerr << numOfConsts << " " << numOfDims << endl; 
   int equs[numOfConsts];
   //ZZ cost[numOfDims - 1];
   mat_ZZ entries;
   entries.SetDims(numOfConsts, numOfDims);
-  // cout << "here2" << endl;
+  // cerr << "here2" << endl;
   if(flag == 2) hold = numOfDims - 1;
   for(int i = 0; i < numOfEqu; i++) conv(equs[i], Index[i]);
-  //  cout << "ther" << endl; 
+  //  cerr << "ther" << endl; 
  for(int i = 0; i < numOfConsts; i++)
     for(int j = 0; j < numOfDims; j++)
       { in >> entries[i][j]; }
- //  cout << "here3" << endl;
+ //  cerr << "here3" << endl;
  // printListVector(CheckRedIneq(entries), numOfDims);
  if((equ[0] == 'y') && (flag == 0)){ in >> numOfEqu;
  
@@ -111,7 +111,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
  
   int tmpInt;
   for(int i = 0; i < numOfNonneg; i++){
-    conv(tmpInt, Index2[i]); //cout << Index2[i] << " ";
+    conv(tmpInt, Index2[i]); //cerr << Index2[i] << " ";
     NONNEG[tmpInt-1][tmpInt-1] = 1;
   }
   
@@ -125,7 +125,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
   out << numOfConsts + hold << " " << numOfDims << " rational" << endl;
   for(int i = 0; i < numOfConsts; i++){
     for(int j = 0; j < numOfDims; j++){
-      out << entries[i][j] << " "; }//cout << entries[i][j] << " ";}
+      out << entries[i][j] << " "; }//cerr << entries[i][j] << " ";}
     out << endl;
   }
   if(nonneg[0] == 'y'){
@@ -169,7 +169,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
       for(int i = 0; i < numOfEqu2; i++) {
 	// NewIndex[i] = 0; 
 	in2 >> NewIndex[i];
-	//  cout << NewIndex[i];
+	//  cerr << NewIndex[i];
       }
       
   }
@@ -217,7 +217,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
       for(int i = 0; i < numOfDims - 1; i++) out2 << cost[i] << " ";
       out2 << endl; */
     system_with_error_check("rm -f Check_red*");
-    cout << "done." << endl;
+    cerr << "done." << endl;
     if (NewIndex) delete[] NewIndex;
 }
 
@@ -241,9 +241,9 @@ void CheckInputFileCDDRep1(const char *InputFile){
   //  if(tmp[0] == '*')
     while(tmpString != "begin") {getline(in2, tmpString); 
     if(tmpString[0] == 'l') flag3 = 1;
-    //  cout << tmpString << endl;
+    //  cerr << tmpString << endl;
     counter++;}
-  //cout << counter << endl;
+  //cerr << counter << endl;
 
   if(tmp[0] == '*')
     for(int i = 0; i < counter-2; i++) getline(in, tmpString);
@@ -266,16 +266,16 @@ void CheckInputFileCDDRep1(const char *InputFile){
       int tmp_int = 0, num; 
       string tmpString2;
       /*      while(tmpString2 != "linearity"){ in4 >>tmpString2; } 
-      in4 >> tmp_int; //cout << tmpString2 << " " << tmp_int << endl;
+      in4 >> tmp_int; //cerr << tmpString2 << " " << tmp_int << endl;
       for(int i = 0; i < tmp_int; i++) in4 >> num;
-      in4 >> tmpString2;//cout << tmpString2 << endl; */
+      in4 >> tmpString2;//cerr << tmpString2 << endl; */
       if(tmpString2  != "begin") flag = 1;
-      in4 >> tmpString2;//cout << tmpString2 << endl;
-      in4 >> tmpString2;//cout << tmpString2 << endl;
-      in4 >> tmpString2;//cout << tmpString2 << endl;
+      in4 >> tmpString2;//cerr << tmpString2 << endl;
+      in4 >> tmpString2;//cerr << tmpString2 << endl;
+      in4 >> tmpString2;//cerr << tmpString2 << endl;
       if(tmpString2  != "integer") flag = 1;
       while(tmpString2 != "linearity"){ in4 >>tmpString2; } 
-      in4 >> tmp_int; //cout << tmpString2 << " " << tmp_int << endl;
+      in4 >> tmp_int; //cerr << tmpString2 << " " << tmp_int << endl;
       for(int i = 0; i < tmp_int; i++) in4 >> num;
 
     }
@@ -293,7 +293,7 @@ void CheckInputFileCDDRep1(const char *InputFile){
   while(!in.eof()) in >> tmpString;
   
   //  if(tmpString  != "end") flag = 1;  
-  // cout << flag3 << endl;
+  // cerr << flag3 << endl;
 
   if(flag == 1){
     ofstream out("Error");
@@ -336,7 +336,7 @@ void CheckInputFileCDDRep(const char *InputFile){
      
     }
 
-  // cout << flag << endl;
+  // cerr << flag << endl;
   if(flag != 3){
     ofstream out("Error");
     out << "Your input file is not correct!" << endl;
@@ -368,7 +368,7 @@ void CheckInputFileCDDRep3(const char *InputFile){
   in >> numOfConst >> dim >> tmpString;
 
   while (tmpString!="end") 
-    {in >> tmpString;// cout << tmpString << endl;
+    {in >> tmpString;// cerr << tmpString << endl;
     counter ++;
     }
 
@@ -620,7 +620,7 @@ void readLatteProblem(const char *fileName, listVector **equations,
   /* Reads numOfVars, matrix A, and rhs b. */
 
 
-  cout << "Reading problem.\n";
+  cerr << "Reading problem.\n";
 
   //setbuf(stdout,0);
 
@@ -688,7 +688,7 @@ void readLatteProblem(const char *fileName, listVector **equations,
       endBasis = updateBasis(createListVector(b), endBasis);
     }
 
-    B = transpose(A); //cout << B << endl;
+    B = transpose(A); //cerr << B << endl;
     for(i = 0; i < *numOfVars; i++)
     { ZZ tmp_ZZ;
     tmp_ZZ = B[i]*B[i];
@@ -786,15 +786,15 @@ void readLatteProblem(const char *fileName, listVector **equations,
  
   b=createVector(*numOfVars);
   ZZ hold;
-  in >> hold;// cout << hold << endl;
+  in >> hold;// cerr << hold << endl;
   for (j=1; j<(*numOfVars)-1; j++) in >> b[j];
-  b[*numOfVars-1] = hold;// cout << b << endl;
+  b[*numOfVars-1] = hold;// cerr << b << endl;
   basis = createListVector(b);
   endBasis = basis;
 
   for (i=1; i<numOfVectors; i++) {
     b=createVector(*numOfVars);
-    in >> hold;//cout << hold << endl;
+    in >> hold;//cerr << hold << endl;
     for (j=1; j<(*numOfVars)-1; j++) in >> b[j];
   b[*numOfVars-1] = hold;
     endBasis = updateBasis(createListVector(b), endBasis);
@@ -814,8 +814,8 @@ void readLatteProblem(const char *fileName, listVector **equations,
 
     for (i=0; i<numOfEquations; i++) in >> indexEquations[i];
 #if 0
-    cout << "\nEquation indices: ";
-    printVector(indexEquations,numOfEquations);
+    cerr << "\nEquation indices: ";
+    printVectorToFile(cerr,indexEquations,numOfEquations);
 #endif
 
     (*equations)=createListVector(createVector(*numOfVars));
@@ -866,28 +866,28 @@ void readLatteProblem(const char *fileName, listVector **equations,
   //if(max[0] == 'y') for(i = 0; i < (*numOfVars-1); i++) in >> cost[i];
   if(Vrep[0] == 'n'){
 #if 0
-  cout << endl;
-  cout << "Ax <= b, given as (b|-A):\n";
-  cout << "=========================\n";
-  printListVector(*inequalities,*numOfVars);
+  cerr << endl;
+  cerr << "Ax <= b, given as (b|-A):\n";
+  cerr << "=========================\n";
+  printListVectorToFile(cerr, *inequalities,*numOfVars);
   
-  cout << endl;
+  cerr << endl;
 
-  cout << "Ax = b, given as (b|-A):\n";
-  cout << "========================\n";
-  printListVector(*equations,*numOfVars);
+  cerr << "Ax = b, given as (b|-A):\n";
+  cerr << "========================\n";
+  printListVectorToFile(cerr, *equations,*numOfVars);
 
-  cout << endl;
+  cerr << endl;
 #endif
   }
 
   else{
-  cout << endl;
-  cout << "The vertex Set, given by (1| V):\n";
-  cout << "=========================\n";
-  printListVector(*inequalities,*numOfVars);
+  cerr << endl;
+  cerr << "The vertex Set, given by (1| V):\n";
+  cerr << "=========================\n";
+  printListVectorToFile(cerr, *inequalities,*numOfVars);
   
-  cout << endl;
+  cerr << endl;
   }
   }
   return;
@@ -918,13 +918,13 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
     exit(1);
   }
 
-  while(in2 >> tmpString){ //cout << tmpString << endl;
+  while(in2 >> tmpString){ //cerr << tmpString << endl;
 
     if(tmpString == "dual") {strcpy(dual, "yes");}
     else if(tmpString == "nonneg") strcpy(nonneg, "yes");
     else if(tmpString == "taylor") 
         {strcpy(taylor, "yes");
-	in2 >> degree; //cout << degree << endl;
+	in2 >> degree; //cerr << degree << endl;
 	}
     else if(tmpString == "rational") 
         {strcpy(rat, "yes");
@@ -944,8 +944,8 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
   if(grobner[0] == 'y') return 0;
   else{
     // int length = 0;
-  cout << "Reading problem.\n";
-  //  cout << degree << endl;
+  cerr << "Reading problem.\n";
+  //  cerr << degree << endl;
   //setbuf(stdout,0);
   ZZ bignum;
   ifstream in(fileName);
@@ -963,7 +963,7 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
       while (tmpString!="linearity") in2 >> tmpString;
       //  int length;
       in2 >> length;
-      //     cout << length << endl;
+      //     cerr << length << endl;
       indexEquations.SetLength(length);
       for(i = 0; i < length; i++) in2 >> indexEquations[i];
     }
@@ -1011,10 +1011,10 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
       endBasis = updateBasis(createListVector(b), endBasis);
     }
 
-    B = transpose(A); cout << B << endl;
+    B = transpose(A); cerr << B << endl;
     for(i = 0; i < *numOfVars; i++)
     { ZZ tmp_ZZ;
-    tmp_ZZ = B[i]*B[i];  //cout << B[i] << endl;
+    tmp_ZZ = B[i]*B[i];  //cerr << B[i] << endl;
     if(bignum < tmp_ZZ)  bignum = tmp_ZZ;
     }
     bignum = (*numOfVars + 1) * (*numOfVars - length) * power(bignum, length/2);
@@ -1037,7 +1037,7 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
     for(i = 0; i < *numOfVars; i++)
     { ZZ tmp_ZZ;
     tmp_ZZ = B[i]*B[i];
-    if(bignum < tmp_ZZ)  bignum = tmp_ZZ; //cout << bignum << endl;
+    if(bignum < tmp_ZZ)  bignum = tmp_ZZ; //cerr << bignum << endl;
     }
     bignum = (*numOfVars + 1) * (*numOfVars - length) * power(bignum, (length)/2);
   }
@@ -1077,15 +1077,15 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
  
   b=createVector(*numOfVars);
   ZZ hold;
-  in >> hold;// cout << hold << endl;
+  in >> hold;// cerr << hold << endl;
   for (j=1; j<(*numOfVars)-1; j++) in >> b[j];
-  b[*numOfVars-1] = hold;// cout << b << endl;
+  b[*numOfVars-1] = hold;// cerr << b << endl;
   basis = createListVector(b);
   endBasis = basis;
 
   for (i=1; i<numOfVectors; i++) {
     b=createVector(*numOfVars);
-    in >> hold;//cout << hold << endl;
+    in >> hold;//cerr << hold << endl;
     for (j=1; j<(*numOfVars)-1; j++) in >> b[j];
   b[*numOfVars-1] = hold;
     endBasis = updateBasis(createListVector(b), endBasis);
@@ -1104,8 +1104,8 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
     indexEquations=createVector(numOfEquations);
     if(f == 0)
     for (i=0; i<numOfEquations; i++) in >> indexEquations[i]; */
-    cout << "\nEquation indices: ";
-    printVector(indexEquations,numOfEquations);
+    cerr << "\nEquation indices: ";
+    printVectorToFile(cerr,indexEquations,numOfEquations);
 
     (*equations)=createListVector(createVector(*numOfVars));
     (*inequalities)=createListVector(createVector(*numOfVars));
@@ -1137,18 +1137,18 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
     (*inequalities)=(*inequalities)->rest;
   }
 
-  cout << endl;
-  cout << "Ax <= b, given as (b|-A):\n";
-  cout << "=========================\n";
-  printListVector(*inequalities,*numOfVars);
+  cerr << endl;
+  cerr << "Ax <= b, given as (b|-A):\n";
+  cerr << "=========================\n";
+  printListVectorToFile(cerr, *inequalities,*numOfVars);
   
-  cout << endl;
+  cerr << endl;
 
-  cout << "Ax = b, given as (b|-A):\n";
-  cout << "========================\n";
-  printListVector(*equations,*numOfVars);
+  cerr << "Ax = b, given as (b|-A):\n";
+  cerr << "========================\n";
+  printListVectorToFile(cerr, *equations,*numOfVars);
 
-  cout << endl;
+  cerr << endl;
 
   return 0;
   }

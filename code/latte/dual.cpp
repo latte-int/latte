@@ -194,8 +194,8 @@ dualizeCones(listCone *cones, int numOfVars, BarvinokParameters *params)
   int numOfConesDualized,numOfAllCones;
   listCone *tmp;
 
-  cout << "Dualizing all cones...";
-  cout.flush();
+  cerr << "Dualizing all cones...";
+  cerr.flush();
 
   numOfConesDualized=0;
   numOfAllCones=lengthListCone(cones);
@@ -210,10 +210,10 @@ dualizeCones(listCone *cones, int numOfVars, BarvinokParameters *params)
     }
   }
 
-  cout << "All cones are now dualized." << endl;
+  cerr << "All cones are now dualized." << endl;
   //removeListVector(cones->facets);
   params->dualize_time.stop();
-  cout << params->dualize_time;
+  cerr << params->dualize_time;
 }
 
 /* ----------------------------------------------------------------- */

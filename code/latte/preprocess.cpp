@@ -49,7 +49,7 @@ int ihermite(vec_ZZ *S, vec_ZZ *U, vec_ZZ* rhs, int m, int n){
   c=1;
   crk=0;
 
-  cout << "Computing hermitean normal form.\n";
+  cerr << "Computing hermitean normal form.\n";
 
   if (m>n) mn=n; else mn=m;
 
@@ -136,7 +136,7 @@ int ihermite(vec_ZZ *S, vec_ZZ *U, vec_ZZ* rhs, int m, int n){
 /* ----------------------------------------------------------------- */
 void checkListVector(listVector* basis, int numOfVars) {
   if (basis==NULL){
-    cout << "\n\n**** Total number of lattice points is: 0 ****\n" << endl;
+    cerr << "\n\n**** Total number of lattice points is: 0 ****\n" << endl;
     ofstream out("numOfLatticePoints");
     out << 0 << endl;
     exit(0);
@@ -149,7 +149,7 @@ void checkListVector(listVector* basis, int numOfVars) {
     for(int i = 1; i < numOfVars; i++) counter += abs(basis -> first[i]);
     basis = basis->rest;
     if((IsZero(counter) == 1) &&(RHS < 0)){
-      cout << "\n\n**** Total number of lattice points is: 0 **** \n" << endl;
+      cerr << "\n\n**** Total number of lattice points is: 0 **** \n" << endl;
       ofstream out("numOfLatticePoints");
       out << 0 << endl;
       exit(0);
@@ -190,7 +190,7 @@ listVector* preprocessProblem(listVector *equations,
   listVector *tmp, *tmp2, *basis, *endBasis, *newInequalities, 
     *endNewInequalities;
   mat_ZZ M,unimodM, Solve;
-  //  cout << *numOfVars << lengthListVector(equations) << endl;
+  //  cerr << *numOfVars << lengthListVector(equations) << endl;
   if(inequalities == 0){ 
     if(lengthListVector(equations) == *numOfVars){
       tmp = equations; i = 0;
@@ -201,7 +201,7 @@ listVector* preprocessProblem(listVector *equations,
 	for(j = 1; j < *numOfVars + 1; j++) Solve[i][j - 1] = -tmp -> first[j];
 	tmp = tmp -> rest;
       }
-      // cout << Solve << sol << endl;
+      // cerr << Solve << sol << endl;
       vec_ZZ x;
       x.SetLength(*numOfVars);
       ZZ d, sum, sum2;
@@ -209,14 +209,14 @@ listVector* preprocessProblem(listVector *equations,
       inv(d, Inv, Solve); x = Inv * sol;
       for(i = 0; i < *numOfVars; i++) sum += x[i];
       for(i = 0; i < *numOfVars; i++) sum2 += x[i]/d;
-      //cout << d << " " <<sum << " " <<d*sum2 << x << endl; exit(0);
+      //cerr << d << " " <<sum << " " <<d*sum2 << x << endl; exit(0);
       if(sum == d*sum2){
 	ofstream OUT("numOfLatticePoints");
-        cout << "The number of lattice points is 1." << endl;
+        cerr << "The number of lattice points is 1." << endl;
 	OUT << 1 << endl;
 	exit(0);
       }else{
-	cout << "The number of lattice points is 0." << endl;
+	cerr << "The number of lattice points is 0." << endl;
 	ofstream OUT("numOfLatticePoints");
 	OUT << 0 << endl;
 	exit(0);}
@@ -310,12 +310,12 @@ listVector* preprocessProblem(listVector *equations,
     }
   }
 
-  // cout << HH << UU << endl;
-  //  cout << rhs << endl;
+  // cerr << HH << UU << endl;
+  //  cerr << rhs << endl;
   ZZ DD, zeros;
   mat_ZZ invHH;
   inv(DD, invHH, HHH);
-  //  cout <<  invHH <<endl << rhs << endl << DD << endl;
+  //  cerr <<  invHH <<endl << rhs << endl << DD << endl;
   vec_ZZ sol2;
   sol=createVector(*numOfVars);
   sol2=createVector(*numOfVars);
@@ -323,21 +323,21 @@ listVector* preprocessProblem(listVector *equations,
     sol2 = (invHH * rhs);
 
   for (i=0; i<(*numOfVars); i++) sol[i]=0;
-//    cout << "sol:\n";
+//    cerr << "sol:\n";
 //    printVector(sol,*numOfVars);
-//    cout << "numOfRows " << numOfRows << endl;
-//    cout << "numOfVars " << *numOfVars << endl;
+//    cerr << "numOfRows " << numOfRows << endl;
+//    cerr << "numOfVars " << *numOfVars << endl;
 
   indSol=0;
   for (i=0; i<numOfRows; i++) {
     if (H[(*numOfVars)*i+i]!=0) {
-//    cout << "numOfRows " << numOfRows << endl;
-//    cout << "numOfVars " << *numOfVars << endl;
-//    cout << "lenOfMatrix " << lenOfMatrix << endl;
-//    cout << "(i,i) " << (*numOfVars)*i+i << endl;
-//        cout << i << " " << indSol << " " << rhs[i] << " " 
+//    cerr << "numOfRows " << numOfRows << endl;
+//    cerr << "numOfVars " << *numOfVars << endl;
+//    cerr << "lenOfMatrix " << lenOfMatrix << endl;
+//    cerr << "(i,i) " << (*numOfVars)*i+i << endl;
+//        cerr << i << " " << indSol << " " << rhs[i] << " " 
 //  	   << H[(*numOfVars)*i+i] << endl;
-      // cout << "Mmm..." << endl;
+      // cerr << "Mmm..." << endl;
       sol[i]=rhs[i]/H[(*numOfVars)*i+i];
       indSol++;
       for (j=i+1; j<numOfRows; j++) {
@@ -346,21 +346,21 @@ listVector* preprocessProblem(listVector *equations,
       }
     }
   }
-    cout << "sol:\n";
+    cerr << "sol:\n";
     //    int flag_sol = 0;
-    printVector(sol,*numOfVars);
+    printVectorToFile(cerr,sol,*numOfVars);
     if(DD != 0){
       for(i = 0; i < *numOfVars; i++){
 	zeros = abs(sol2[i] - sol[i]*DD);
 	if(zeros != 0) { 
-	cout << "Integrally empty polytope." << endl;
-	cout << "\n\n**** Total number of lattice points: 0 ****" << endl << endl;
+	cerr << "Integrally empty polytope." << endl;
+	cerr << "\n\n**** Total number of lattice points: 0 ****" << endl << endl;
 	ofstream OutZero("numOfLatticePoints");
 	OutZero << 0 << endl;
 	exit(0);}
 	zeros = 0;
       } 
-    }//cout << sol << endl;
+    }//cerr << sol << endl;
   particularSolution=createVector(*numOfVars);
   for (i=0; i<(*numOfVars); i++) particularSolution[i]=0;
 
@@ -370,9 +370,9 @@ listVector* preprocessProblem(listVector *equations,
       particularSolution[i]=particularSolution[i]+U[i*(*numOfVars)+j]*sol[j];
     }
   }
-//    cout << "Particular solution:\n";
+//    cerr << "Particular solution:\n";
 //    printVector(particularSolution,*numOfVars);
-//    cout << "Basis:\n";
+//    cerr << "Basis:\n";
 //    printListVector(basis,*numOfVars);
 
   newNumOfVars=lengthListVector(basis)+1;
@@ -423,9 +423,9 @@ listVector* preprocessProblem(listVector *equations,
 	  tmp2=tmp2->rest;
 	}
 	for(int m = 0; m < newNumOfVars; m++) ProjU[i][m] = Proj[i][m];
-      } //cout << ProjU << endl;
+      } //cerr << ProjU << endl;
 
-      //  cout << tmpcost << endl;
+      //  cerr << tmpcost << endl;
       /*   cost[0]=tmpcost[0];
 	   for (k=0; k<(*numOfVars); k++) {
 	   cost[0]=cost[0]+tmpcost[k]*particularSolution[k];
@@ -436,7 +436,7 @@ listVector* preprocessProblem(listVector *equations,
 	cost[j]=0;
 	for (k=0; k<(*numOfVars); k++) {
 	  cost[j]=cost[j]+tmpcost[k]*(tmp2->first)[k];
-	  // cout << (tmp2->first)[k] << " ";
+	  // cerr << (tmp2->first)[k] << " ";
 	}
 	tmp2=tmp2->rest;
      }}
@@ -471,7 +471,7 @@ listVector* preprocessProblem(listVector *equations,
     } 
     if((check_Tri == 0) && (b[0] < 0))
       {
-	cout << "this polytope is empty!" << endl;
+	cerr << "this polytope is empty!" << endl;
 	ofstream OutPut("numOfLatticePoints");
 	OutPut << 0 << endl;
 	exit(0);
@@ -487,12 +487,12 @@ listVector* preprocessProblem(listVector *equations,
   freeListVector(basis);
 /*    printf("OriginalInequalities:\n"); */
 /*    printListVector(inequalities,(*numOfVars)+1); */
-  cout << "New inequalities:\n";
-  printListVector(newInequalities,newNumOfVars);
+  cerr << "New inequalities:\n";
+  printListVectorToFile(cerr, newInequalities,newNumOfVars + 1);
   checkListVector(newInequalities, newNumOfVars);
   if(newInequalities == NULL){
 
-    cout << "\n\n****  Total number of lattice points is: 0 ****\n" << endl;
+    cerr << "\n\n****  Total number of lattice points is: 0 ****\n" << endl;
     ofstream out("numOfLatticePoints");
     out << 0 << endl;
     exit(0);
@@ -529,7 +529,7 @@ listVector* transformZZMatToListVector(mat_ZZ A, int numOfVectors,
  int numOfCons = lengthListVector(matrix);
  mat_ZZ ConeMatrix, tmpMatrix;
  vec_ZZ tmp;
- { tmp = matrix->first; //cout << tmp <<" " << numOfVars << endl;
+ { tmp = matrix->first; //cerr << tmp <<" " << numOfVars << endl;
     matrix = matrix -> rest;}
  int number = tmp.length();
  tmpMatrix.SetDims(numOfCons, number);
@@ -538,7 +538,7 @@ listVector* transformZZMatToListVector(mat_ZZ A, int numOfVectors,
  //rays = matrix;
  tmpMatrix[0] = tmp;
  for(int i = 1; i < numOfCons; i++)
-    { tmpMatrix[i] = matrix->first;// cout << tmp <<" " << numOfVars << endl;
+    { tmpMatrix[i] = matrix->first;// cerr << tmp <<" " << numOfVars << endl;
     matrix = matrix -> rest;}     // exit(3);
  for(int i = 0; i < numOfCons; i++)
      ConeMatrix[i][number-1] = tmpMatrix[i][0];
@@ -547,22 +547,22 @@ listVector* transformZZMatToListVector(mat_ZZ A, int numOfVectors,
     for(int j = 1; j < number-1; j++){
        ConeMatrix[i][j] = tmpMatrix[i][j];
     }   
-  cout << endl << "After projecting up for a dual cone:" << endl;
-  cout <<"===================================" << endl;
+  cerr << endl << "After projecting up for a dual cone:" << endl;
+  cerr <<"===================================" << endl;
   for(int i = 0; i < numOfCons; i++){
-     cout <<"[";
+     cerr <<"[";
      for(int j = 0; j < number - 1; j++)
-       cout << ConeMatrix[i][j] << " ";
-     cout << ConeMatrix[i][number - 1] << "]" << endl;
+       cerr << ConeMatrix[i][j] << " ";
+     cerr << ConeMatrix[i][number - 1] << "]" << endl;
      }
-   cout << "===================================" << endl;
+   cerr << "===================================" << endl;
   numOfVars = numOfVars + 1;
   return(transformZZMatToListVector(ConeMatrix, numOfCons, number + 1));
 }
 /* ----------------------------------------------------------------- */
 
 vec_ZZ ProjectingUp(mat_ZZ ProjU, vec_ZZ cost, int numOfVars){
-  // cout << ProjU << endl;
+  // cerr << ProjU << endl;
   int numOfrows = ProjU.NumRows(), numOfcolms = ProjU.NumCols();
   vec_ZZ answer; 
   if(IsZero(ProjU))
@@ -576,14 +576,14 @@ vec_ZZ ProjectingUp(mat_ZZ ProjU, vec_ZZ cost, int numOfVars){
       }
       
     }
-  }// cout << answer << endl;
+  }// cerr << answer << endl;
   return answer;
 }
 
 /* ----------------------------------------------------------------- */
 
 vec_RR ProjectingUpRR(mat_RR ProjU, vec_RR cost, int numOfVars){
-  // cout << ProjU << endl;
+  // cerr << ProjU << endl;
   int numOfrows = ProjU.NumRows(), numOfcolms = ProjU.NumCols();
   vec_RR answer; 
   if(IsZero(ProjU))
@@ -598,7 +598,7 @@ vec_RR ProjectingUpRR(mat_RR ProjU, vec_RR cost, int numOfVars){
       }
       if(answer[i] < power2_RR(-10)) answer[i] = 0;      
     }
-  }// cout << answer << endl;
+  }// cerr << answer << endl;
   return answer;
 }
 

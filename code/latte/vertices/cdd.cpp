@@ -263,7 +263,7 @@ void createCddExtFile2(const char* filename) {
 void createCddIneLPFile(listVector* matrix, int numOfVars, vec_ZZ & cost) {
   int i;
   listVector* tmp;
-  // cout << cost << " " << numOfVars << endl;
+  // cerr << cost << " " << numOfVars << endl;
   ofstream OUT;
 
   OUT.open("LP.ine");
@@ -295,8 +295,8 @@ rationalVector* ReadLpsFile(int numOfVars, bool verbose = true)
   string tmpString;
   ZZ x, y;
   if (verbose) {
-    cout << "Reading .lps file...";
-    cout.flush();
+    cerr << "Reading .lps file...";
+    cerr.flush();
   }
   rationalVector* OptVector;
   OptVector = createRationalVector(numOfVars);
@@ -318,7 +318,7 @@ rationalVector* ReadLpsFile(int numOfVars, bool verbose = true)
       
     }
   if (verbose) {
-    cout <<"done." << endl;
+    cerr <<"done." << endl;
   }
   return OptVector;
 }
@@ -382,7 +382,7 @@ listCone* readCddExtFile(int &numOfVars) {
   listCone *cones,*endCones,*c;
   string tmpString;
 
-  cout << "Reading .ext file..."; cout.flush();
+  cerr << "Reading .ext file..."; cerr.flush();
 
   strcpy(cddInFileName,"latte_cdd.ext");
 
@@ -399,7 +399,7 @@ listCone* readCddExtFile(int &numOfVars) {
   cones=createListCone();
   endCones=cones;
   if(numOfVertices == 0){
-    cout << "Empty Polytope." << endl;
+    cerr << "Empty Polytope." << endl;
     ofstream OUT("numOfLatticePoints");
     OUT << 0 << endl;
     exit(0);}
@@ -415,7 +415,7 @@ listCone* readCddExtFile(int &numOfVars) {
     
     while(((read == '\n' || read == '\r') || read == ' ') || read == '\t')
       {in.get( read); 
-      if(read == '0') {	cout << "\n\nUnbounded polytope!" << endl << endl;
+      if(read == '0') {	cerr << "\n\nUnbounded polytope!" << endl << endl;
       exit(0);}}
     
     while(read != '\n' && read != '\r')
@@ -428,14 +428,14 @@ listCone* readCddExtFile(int &numOfVars) {
     
     if(flag)
       {
-	cout << "Integrally empty Polytope." << endl;
+	cerr << "Integrally empty Polytope." << endl;
 	OUT << 0 << endl;
 
       }
     
     else
       {
-	cout << "\n\n*****  Total number of lattice points: " << 1 << " ****" << endl << endl;
+	cerr << "\n\n*****  Total number of lattice points: " << 1 << " ****" << endl << endl;
 	OUT << 1 << endl;
 
       }
@@ -452,7 +452,7 @@ listCone* readCddExtFile(int &numOfVars) {
 	v->set_entry(j-1, x, y);
       } else {
 	if (x==0) {
-	  cout << "\n\nGiven polyhedron is unbounded!!!\n\n";
+	  cerr << "\n\nGiven polyhedron is unbounded!!!\n\n";
 	  ofstream Empty("numOfLatticePoints");
 	  Empty << 0 << endl;
 	  exit(0);
@@ -467,7 +467,7 @@ listCone* readCddExtFile(int &numOfVars) {
 
   in.close();
 
-  cout << "done.\n";
+  cerr << "done.\n";
 
   listCone *result = cones->rest;
   freeCone(cones);
@@ -483,7 +483,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
   listCone *tmp;
   string tmpString;
 
-  cout << "Reading .ead file..."; cout.flush();
+  cerr << "Reading .ead file..."; cerr.flush();
 
   strcpy(cddInFileName,"latte_cdd.ead");
 
@@ -508,7 +508,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
   for (i=0; i<numOfVertices; i++) {
     in >> k;
     if (i!=(k-1)) {
-      cout << "Vertex numbering in file latte_cdd.ead is not increasing!\n";
+      cerr << "Vertex numbering in file latte_cdd.ead is not increasing!\n";
       system_with_error_check("rm -f latte_cdd.*"); 
       exit(1);
     }
@@ -533,7 +533,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
   delete[] vertices;
 
   in.close();
-  cout << "done.\n";
+  cerr << "done.\n";
 
   return (cones);
 }
@@ -576,7 +576,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
   listCone *tmp;
   string tmpString;
 
-  cout << "Reading .ead file..."; cout.flush();
+  cerr << "Reading .ead file..."; cerr.flush();
 
   strcpy(cddInFileName,"latte_cdd.ead");
   int tmp_int;
@@ -601,7 +601,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
   for (i=0; i<numOfVertices; i++) {
     in >> k;
     if (i!=(k-1)) {
-      cout << "Vertex numbering in file latte_cdd.ead is not increasing!\n";
+      cerr << "Vertex numbering in file latte_cdd.ead is not increasing!\n";
       system_with_error_check("rm -f latte_cdd.*"); 
       exit(1);
     }
@@ -624,7 +624,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
   }
 
   in.close();
-  cout << "done.\n";
+  cerr << "done.\n";
 
   return (cones);
 }
@@ -640,10 +640,10 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
 
   createCddIneFile(matrix,numOfVars+1);
 
-  cout << "Computing vertices and edges with cdd...";
-  cout.flush();
+  cerr << "Computing vertices and edges with cdd...";
+  cerr.flush();
   system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
-  cout << "done." << endl;
+  cerr << "done." << endl;
 
   strcpy(command,"cp latte_cdd.ext ");
   strcat(command,fileName);
@@ -682,16 +682,16 @@ listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix,
 
   createLrsIneFile(matrix,numOfVars+1);
 
-  cout << "Computing vertices with lrs...";
+  cerr << "Computing vertices with lrs...";
   system_with_error_check(LRS_PATH " latte_lrs.ine > latte_lrs.ext");
-  cout << "done.\n\n";
+  cerr << "done.\n\n";
 
   createLrsIneFileToPostAnalysys(matrix, numOfVars + 1);
   createLrsExtFileToPostAnalysys(matrix, numOfVars + 1);
 
-  cout << "Computing edges with cdd...";
+  cerr << "Computing edges with cdd...";
   system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
-  cout << "done.\n\n";
+  cerr << "done.\n\n";
 
   strcpy(command,"cp latte_cdd.ext ");
   strcat(command,fileName);
@@ -727,9 +727,9 @@ listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars) {
 
  createCddExtFile2(fileName);
 
-  cout << "Computing vertices and edges with cdd...";
+  cerr << "Computing vertices and edges with cdd...";
   system_with_error_check(COMPUTEADJACENCY_PATH " latte_cdd.ext > latte_cdd.jnk 2>&1");
-  cout << "done.\n\n";
+  cerr << "done.\n\n";
   //  CreatExtEadFile();
    strcpy(command,"cp latte_cdd.ext ");
   strcat(command,fileName);
@@ -763,14 +763,14 @@ rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
   rationalVector* Opt_vector;
   createCddIneLPFile(matrix,numOfVars+1,cost);
   if (verbose) {
-    cout << "Computing LP... "; cout.flush();
+    cerr << "Computing LP... "; cerr.flush();
   }
   system_with_error_check(CDD_PATH " LP.ine > LP.out");
   if (verbose) {
-    cout << "done."; cout.flush();
+    cerr << "done."; cerr.flush();
   }
   Opt_vector = ReadLpsFile(numOfVars, verbose);
-  //  cout << Opt_vector->numerators() << " " << Opt_vector -> denominator << endl;
+  //  cerr << Opt_vector->numerators() << " " << Opt_vector -> denominator << endl;
   system_with_error_check("rm -f LP.*"); 
 
   return(Opt_vector);

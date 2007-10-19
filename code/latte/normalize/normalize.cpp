@@ -151,11 +151,11 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   Timer zsolve_time("zsolve", /*start_timer:*/ false);
 
   if (verbosity > 0) {
-    cout << "### " << "Level " << level << ": "
+    cerr << "### " << "Level " << level << ": "
 	 << "Cone " << t_count << " of at most " << t_total << ": "
 	 << num_rays << " rays "
 	 << "(dim " << dimension << ")";
-    cout.flush();
+    cerr.flush();
   }
 
   //printCone(t, params.Number_of_Variables);
@@ -167,7 +167,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   dualization_time.stop();
   num_facets = lengthListVector(t->facets);
   if (verbosity > 0) {
-    cout << ", " << num_facets << " facets; "
+    cerr << ", " << num_facets << " facets; "
 	 << dualization_time;
   }
     
@@ -212,7 +212,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 
       int num_hilberts = ctx->Homs->Size;
       if (verbosity > 0) {
-	cout << num_hilberts << " Hilbert basis elements; "
+	cerr << num_hilberts << " Hilbert basis elements; "
 	     << zsolve_time;
       }
     
@@ -250,7 +250,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
       stats << zsolve_time.get_seconds() << endl;
       deleteZSolveContext(ctx, true);
       if (verbosity > 0) {
-	cout << "Spent too much time in zsolve, subdividing..." << endl;
+	cerr << "Spent too much time in zsolve, subdividing..." << endl;
       }
       RecursiveNormalizer rec(level + 1);
       triangulateCone(t, params.Number_of_Variables, &params, rec);
@@ -259,7 +259,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   else {
     stats << endl;
     if (verbosity > 0) {
-      cout << "Too many facets, subdividing..." << endl;
+      cerr << "Too many facets, subdividing..." << endl;
     }
     RecursiveNormalizer rec(level + 1);
     triangulateCone(t, params.Number_of_Variables, &params, rec);
@@ -269,10 +269,10 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 static void open_output_and_stats()
 {
   hil_filename = filename + ".hil";
-  cout << "Output goes to file `" << hil_filename << "'..." << endl;
+  cerr << "Output goes to file `" << hil_filename << "'..." << endl;
 
   string stats_filename = filename + ".stats";
-  cout << "Cone statistics go to file `" << stats_filename << "'..." << endl;
+  cerr << "Cone statistics go to file `" << stats_filename << "'..." << endl;
   stats.open(stats_filename.c_str());
   stats << "# Level\tIndex\tRays\tFacets\tDet\tDualize\tZSolve\tHilberts" << endl;
 
@@ -342,7 +342,7 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  cout << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
+  cerr << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
 
   listCone *cone;
   bool create_triang_file = true;
@@ -430,7 +430,7 @@ int main(int argc, char **argv)
     }
     else {
       /* Try to read a 4ti2-style file. */
-      cout << "Trying to read `" << filename << "' as a list of rays in 4ti2-style format." << endl;
+      cerr << "Trying to read `" << filename << "' as a list of rays in 4ti2-style format." << endl;
       cone = read_cone_4ti2_format(filename);
     }
     params.Number_of_Variables = cone->rays->first.length();
@@ -461,7 +461,7 @@ int main(int argc, char **argv)
 							output_subcones_filename);
 	producer->Produce(subcone_file_writer);
 	num_cones = subcone_file_writer.cone_count;
-	cout << "Printed triangulation to subcones file `" << output_subcones_filename << "'." << endl;
+	cerr << "Printed triangulation to subcones file `" << output_subcones_filename << "'." << endl;
       }
       producer = new SubconeReadingConeProducer(cone, output_subcones_filename, num_cones);
     }
@@ -474,7 +474,7 @@ int main(int argc, char **argv)
 	PrintingConeConsumer triang_file_writer(triang_filename);
 	producer->Produce(triang_file_writer);
 	num_cones = triang_file_writer.cone_count;
-	cout << "Printed triangulation to file `" << triang_filename << "'." << endl;
+	cerr << "Printed triangulation to file `" << triang_filename << "'." << endl;
       }
       producer = new ListConeReadingConeProducer(triang_filename, num_cones);
     }

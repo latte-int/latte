@@ -36,7 +36,7 @@ ZZ norm(const vec_ZZ& x, long m){
   for(int i = 1; i <= m; i++)
     if(normal < abs(x(i)))    
        normal = abs(x(i));
-  //cout << normal << endl;
+  //cerr << normal << endl;
   return normal;
 }
 
@@ -47,7 +47,7 @@ RR norm2(const vec_RR& x, long m){
   for(int i = 1; i <= m; i++)
     if(normal < abs(x(i)))    
        normal = abs(x(i));
-  //cout << normal << endl;
+  //cerr << normal << endl;
   return normal;
 }
 
@@ -68,7 +68,7 @@ vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
   mat_ZZ LL;
   LL = L;
   LLL( det2, L, U, 1, 1);
-  //cout << U << endl << L << endl;
+  //cerr << U << endl << L << endl;
   int index = 1;
   ZZ p, pp;
 //    long tmp = 1000000;
@@ -125,8 +125,8 @@ vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
          				tmp = tmp / 10;
       	 			}
        				/*       for(int j = 0; j < m; j++)
-         			cout << number[j] << " ";
-	 			cout << endl;*/
+         			cerr << number[j] << " ";
+	 			cerr << endl;*/
        				for(int j = 0; j < m; j++)
         			{	 
 					number[j] -= 5;
@@ -135,10 +135,10 @@ vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
 	       			for(int j = 0; j < m; j++)
 				{
        		  			conv(tmp3, number[j]);
-		 			dummyV = dummyV + tmp3 * L(j + 1); //cout << dummyV << endl;
+		 			dummyV = dummyV + tmp3 * L(j + 1); //cerr << dummyV << endl;
         			}
        
-       				norm2 = norm(dummyV, m); // cout << norm2 << endl;
+       				norm2 = norm(dummyV, m); // cerr << norm2 << endl;
        				if((norm2 < norm1) && (IsZero(norm2) != 1))
 				{
      		    			for(int j = 0; j < m; j++)
@@ -149,7 +149,7 @@ vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
       				}
               			count++;
      			}
-     			// cout << ShortV << endl;
+     			// cerr << ShortV << endl;
 
   			vec_ZZ INDEX;
   			INDEX.SetLength(m);
@@ -159,7 +159,7 @@ vec_ZZ ComputeOmega(const mat_ZZ & B, const mat_ZZ &Dual,
     	
 			// Z = INDEX * U;
     			LatticeSolve(Z, LL, ShortV);
-    			//cout << INDEX << endl;
+    			//cerr << INDEX << endl;
     			count = 0;
    			INDEX.kill();
   		}
@@ -227,11 +227,11 @@ vec_ZZ ComputeOmega_2(mat_ZZ & B, long m)
 
    // now det will have 1/abs(det^1/m)
    det = abs(det);
-   cout << endl << "Newtons method called...";
+   cerr << endl << "Newtons method called...";
    det = k_root(&det, m, 200000);
-   cout << "done." << endl;
+   cerr << "done." << endl;
 
-   cout << endl << det << endl;
+   cerr << endl << det << endl;
 
    // sets R = W (i.e., B)
 
@@ -283,20 +283,20 @@ vec_ZZ ComputeOmega_2(mat_ZZ & B, long m)
 	
     	R_inverse = inv(R);
      	//det = determinant(R_inverse);
-     	//cout << endl << "det of R_inverse:  " << det << endl;
+     	//cerr << endl << "det of R_inverse:  " << det << endl;
 
 	int result = 1;
      
    	if( Test_Points(0, Mins, Maxs, m, &R_inverse, &point) == -1)   
     	{
-		cout << "NOoooooo!  :(" << endl;
+		cerr << "NOoooooo!  :(" << endl;
 		result = -1;
     	}
 	   
    
           
 
- cout << "Deleting stuff" << endl;
+ cerr << "Deleting stuff" << endl;
    
   W.kill();
   R.kill();
@@ -316,7 +316,7 @@ if( result == 1)
 		}
 			
 	       	
-		cout << "yay!! :)";
+		cerr << "yay!! :)";
 
 }
 
@@ -324,7 +324,7 @@ else
 	for(int i = 1; i <= m; i++)
 		integral_point(i) = 0;
  
-	cout << "Returning" << endl;	
+	cerr << "Returning" << endl;	
   return integral_point;
 }
 
@@ -355,10 +355,10 @@ int Test_Points(int level, vector<RR> &Mins, vector<RR> &Maxs, int dim, mat_RR *
 		if((Norm < 1.0001) && non_zero == 1)
 		{
 
-			//cout << "Test_Points: Success! here is the point: ";
+			//cerr << "Test_Points: Success! here is the point: ";
 			//for(int i = 1; i <= dim; i++)
-			//	cout << (*point)(i) << " ";
-			//cout << endl;
+			//	cerr << (*point)(i) << " ";
+			//cerr << endl;
 			return 1;
 		
 		}	
@@ -371,7 +371,7 @@ int Test_Points(int level, vector<RR> &Mins, vector<RR> &Maxs, int dim, mat_RR *
 	{
 		RR current;
 
-		//cout << "Test_Points:  Min = " << Min_Max[level][0] << "  Max = " << Min_Max[level][1] << endl;
+		//cerr << "Test_Points:  Min = " << Min_Max[level][0] << "  Max = " << Min_Max[level][1] << endl;
 		current = Mins[level];
 
 		while(current <= ( Maxs[level] + 0.5))

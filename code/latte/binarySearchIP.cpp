@@ -41,7 +41,7 @@ ZZ  NOT_FOUND;
 void createCddIneLPFile2(listVector* matrix, listVector* ineq, int numOfVars, vec_ZZ & cost) {
   int i;
   listVector* tmp, *tmp2;
-  // cout << cost << " " << numOfVars << endl;
+  // cerr << cost << " " << numOfVars << endl;
   ofstream OUT;
 
   OUT.open("LP.ine");
@@ -84,7 +84,7 @@ rationalVector* ReadLpsFile2(int numOfVars)
   ifstream in("LP.lps");
   string tmpString;
   ZZ x, y;
-  cout << "Reading .lps file...";
+  cerr << "Reading .lps file...";
   rationalVector* OptVector;
   OptVector = createRationalVector(numOfVars);
   if(!in){
@@ -104,7 +104,7 @@ rationalVector* ReadLpsFile2(int numOfVars)
       OptVector->set_entry(i, x, y);
 
     }
-  cout <<"done." << endl;
+  cerr <<"done." << endl;
   return OptVector;
 }
 
@@ -113,11 +113,11 @@ rationalVector* LP2(listVector* matrix, listVector* ineq, vec_ZZ& cost, int numO
 
   rationalVector* Opt_vector;
    createCddIneLPFile2(matrix, ineq, numOfVars+1, cost);
-   cout << "Computing LP...";
+   cerr << "Computing LP...";
   system_with_error_check(CDD_PATH " LP.ine > LP.out");
-  cout << "done.\n\n";
+  cerr << "done.\n\n";
   Opt_vector = ReadLpsFile2(numOfVars);
-  //  cout << Opt_vector->numerators() << " " << Opt_vector -> denominator << endl;
+  //  cerr << Opt_vector->numerators() << " " << Opt_vector -> denominator << endl;
   system_with_error_check("rm -f LP.*");
 
   return(Opt_vector);
@@ -127,7 +127,7 @@ rationalVector* LP2(listVector* matrix, listVector* ineq, vec_ZZ& cost, int numO
 void createLatteFileEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec_ZZ lhs) {
   int i;
   listVector* tmp, *tmp2;
-  //cout << rhs << endl;
+  //cerr << rhs << endl;
   ofstream OUT;
   OUT.open("latte_BS");
   //  OUT << "H-representation" << endl;
@@ -137,7 +137,7 @@ void createLatteFileEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ 
   while (tmp) {
     for (i=0; i<(numOfVars); i++) OUT << (tmp->first)[i] << " ";
     OUT << endl;
-    tmp=tmp->rest; //cout << "here" << endl;
+    tmp=tmp->rest; //cerr << "here" << endl;
   }
   OUT << -rhs << " ";
   for (i=0; i<(numOfVars) - 1; i++) OUT << lhs[i] << " ";
@@ -145,7 +145,7 @@ void createLatteFileEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ 
     while (tmp2) {
     for (i=0; i<(numOfVars); i++) OUT << (tmp2->first)[i] << " ";
     OUT << endl;
-    tmp2=tmp2->rest; //cout << "here" << endl;
+    tmp2=tmp2->rest; //cerr << "here" << endl;
   }
   // OUT << "end" << endl;
   // OUT << "linearity" << " "<< 1 << " " << 1 << endl;
@@ -179,7 +179,7 @@ ZZ OptimalCheckEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, 
 void createLatteFile(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec_ZZ lhs) {
   int i;
   listVector* tmp, *tmp2;
-  //cout << rhs << endl;
+  //cerr << rhs << endl;
   ofstream OUT;
   OUT.open("latte_BS");
   //  OUT << "H-representation" << endl;
@@ -189,7 +189,7 @@ void createLatteFile(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs
   while (tmp) {
     for (i=0; i<(numOfVars); i++) OUT << (tmp->first)[i] << " ";
     OUT << endl;
-    tmp=tmp->rest; //cout << "here" << endl;
+    tmp=tmp->rest; //cerr << "here" << endl;
   }
   OUT << -rhs << " ";
   for (i=0; i<(numOfVars) - 1; i++) OUT << lhs[i] << " ";
@@ -197,7 +197,7 @@ void createLatteFile(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs
     while (tmp2) {
     for (i=0; i<(numOfVars); i++) OUT << (tmp2->first)[i] << " ";
     OUT << endl;
-    tmp2=tmp2->rest; //cout << "here" << endl;
+    tmp2=tmp2->rest; //cerr << "here" << endl;
   }
 
   if(lengthListVector(matrix) != 0){
@@ -228,7 +228,7 @@ ZZ OptimalCheck(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec
   ZZ numOfUniCones;
   in2 >> numOfUniCones;
   TotalNumOfUniCones += numOfUniCones;
-  cout << "Number of Unimodular cones: " << numOfUniCones << endl;
+  cerr << "Number of Unimodular cones: " << numOfUniCones << endl;
 
   system_with_error_check("rm -f latte_BS*");
 
@@ -246,9 +246,9 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
       vec_RR Low_solution, High_solution, tmp_den, tmp_num, Rat_cost, Rat_cost2;
       RR Rat_low, Rat_high;
       vec_ZZ low_cost;
-      // cout << cost << endl;
+      // cerr << cost << endl;
       low_cost = -cost;
-      //      cout << cost << endl;
+      //      cerr << cost << endl;
       //  printListVector(matrix, numOfVars); exit(0);
       ofstream tmpFile("numOfLatticePoints");
       tmpFile << "Junk." << endl;
@@ -256,9 +256,9 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
       Low_opt =  LP2(matrix, ineq, low_cost, numOfVars);
       High_opt =  LP2(matrix, ineq, cost, numOfVars);
 
-      //cout << Low_opt ->numerators() << " " << High_opt->numerators() << endl;
-      //cout << Low_opt ->denominators() << " " << High_opt->denominators()<< endl;
-      cout << "A optimal solution for LP relax.: ";
+      //cerr << Low_opt ->numerators() << " " << High_opt->numerators() << endl;
+      //cerr << Low_opt ->denominators() << " " << High_opt->denominators()<< endl;
+      cerr << "A optimal solution for LP relax.: ";
       printRationalVector(High_opt, numOfVars);
       Low_solution.SetLength(numOfVars);
       High_solution.SetLength(numOfVars);
@@ -282,7 +282,7 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
 
       Rat_high = Rat_cost * High_solution;
       Rat_low = (Rat_cost) * Low_solution;
-      cout << "The optimal value for LP relax.: " << Rat_high << endl << endl;
+      cerr << "The optimal value for LP relax.: " << Rat_high << endl << endl;
       high = CeilToZZ(Rat_high);
       Opt = OptimalCheckEqu(matrix, ineq, numOfVars, high, cost);
 
@@ -297,14 +297,14 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
       }
 
       if(IsZero(Opt) == 0){
-        cout << "The optimal value: " << high - 1 << endl << endl;
+        cerr << "The optimal value: " << high - 1 << endl << endl;
 	return Opt;
 	}
        else{
 	while(IsOne(high - low) == 0)
 	  {
 	    mid = (low + high) / 2;
-	    //cout << mid << endl;
+	    //cerr << mid << endl;
 	    Opt = OptimalCheck(matrix, ineq, numOfVars, mid, cost, TotalNumOfUniCones);
 	    if(IsZero(Opt) == 0)
 	      low = mid;
@@ -314,17 +314,17 @@ ZZ binarySearch(listVector* matrix, listVector* ineq, vec_ZZ cost, int numOfVars
 	    // else return mid; //found
 	    counter++;
 	    if((counter % 10) == 0){
-	      cout << "Iterations: " << counter << endl;
+	      cerr << "Iterations: " << counter << endl;
 	    }
 	  }
       }
       Opt = OptimalCheck(matrix, ineq, numOfVars, low, cost, TotalNumOfUniCones);
-      cout << endl << "Total of Iterations: " << counter << endl;
-      cout << "The total number of unimodular cones: " << TotalNumOfUniCones << endl;
+      cerr << endl << "Total of Iterations: " << counter << endl;
+      cerr << "The total number of unimodular cones: " << TotalNumOfUniCones << endl;
       if(min[0] == 'y')
-	cout << "The optimal value: " << -low << endl << endl;
+	cerr << "The optimal value: " << -low << endl << endl;
       else
-	cout << "The optimal value: " << low << endl << endl;
+	cerr << "The optimal value: " << low << endl << endl;
       return Opt;
 
 }

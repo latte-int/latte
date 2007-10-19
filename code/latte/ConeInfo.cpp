@@ -43,7 +43,7 @@ Vector_Heap::Vector_Heap (int Initial_Number_of_Generators)
 		Controller = new Vector_Heap_Array_Node_Controller(Initial_Number_of_Generators); 
 
 	if (Initial_Number_of_Generators != Controller->Get_Current_Integer_Array_Size ())
-		cout << "Vector_Heap Constructor: Problem!!!" << endl;
+		cerr << "Vector_Heap Constructor: Problem!!!" << endl;
 }
 
 Vector_Heap::~Vector_Heap ()
@@ -107,7 +107,7 @@ void Vector_Heap::Add_Heap (int *Sum_Vector, ZZ *Total_Sum)
 
 		if ( (Temp_Node_Mask & Node_Count) == 0) //Add to left
 		{
-			//cout << "Add to left" << endl;
+			//cerr << "Add to left" << endl;
 			Temp_Heap_Node->Left = new Heap_Node;
 
 			Temp_Heap_Node->Left->Parent = Temp_Heap_Node;
@@ -117,7 +117,7 @@ void Vector_Heap::Add_Heap (int *Sum_Vector, ZZ *Total_Sum)
 		}
 		else //Add to Right
 		{
-			//cout << "Add to right" << endl;
+			//cerr << "Add to right" << endl;
 			Temp_Heap_Node->Right = new Heap_Node;
 
 			Temp_Heap_Node->Right->Parent = Temp_Heap_Node;
@@ -130,13 +130,13 @@ void Vector_Heap::Add_Heap (int *Sum_Vector, ZZ *Total_Sum)
 		// Use Controller
 		//Temp_Heap_Node->Sum_Vector = Controller->Get_Integer_Array ();
 	
-		//cout << "Vector added to heap for cone: " << this << " [";
+		//cerr << "Vector added to heap for cone: " << this << " [";
 		for (int i = 0;i < Number_of_Generators; i++)
 		{
-			//cout << Sum_Vector[i] << " ";
+			//cerr << Sum_Vector[i] << " ";
 			Temp_Heap_Node->Sum_Vector[i] = Sum_Vector[i];
 		}
-		//cout << "]" << endl;
+		//cerr << "]" << endl;
 
 		//Temp_Heap_Node->Total_Sum = new ZZ;
 		// Use Controller
@@ -147,12 +147,12 @@ void Vector_Heap::Add_Heap (int *Sum_Vector, ZZ *Total_Sum)
 
 	
 		//resort
-		//cout << "Calling restore" << endl;
+		//cerr << "Calling restore" << endl;
 		Restore_Up (Temp_Heap_Node);
 	}
 	else // no nodes exist, create first. 
 	{
-		//cout << "No nodes.  Adding to root" << endl;
+		//cerr << "No nodes.  Adding to root" << endl;
 		Root_Node = new Heap_Node;
 
 		Root_Node->Left = Root_Node->Right = NULL;
@@ -163,13 +163,13 @@ void Vector_Heap::Add_Heap (int *Sum_Vector, ZZ *Total_Sum)
 		Root_Node->Sum_Vector = Controller->Get_Integer_Array ();			
 		Root_Node->Total_Sum = Controller->Get_ZZ ();
 		
-		//cout << "Vector added to heap for cone: " << this << " [";
+		//cerr << "Vector added to heap for cone: " << this << " [";
 		for (int i = 0;i < Number_of_Generators; i++)
 		{
 			Root_Node->Sum_Vector[i] = Sum_Vector[i];
-			//cout << Root_Node->Sum_Vector[i] << " ";
+			//cerr << Root_Node->Sum_Vector[i] << " ";
 		}
-		//cout << "]" << endl;
+		//cerr << "]" << endl;
 
 		*(Root_Node->Total_Sum) = *Total_Sum;
 
@@ -206,21 +206,21 @@ int Vector_Heap::Pop_Top_Heap (int Sum_Vector [], ZZ *Total_Sum)
 		
 	if (Node_Count != 1)
 	{
-		//cout << "Pop_Top_Heap: Node_Count = " << Node_Count << ". [" << this << "]. ";
+		//cerr << "Pop_Top_Heap: Node_Count = " << Node_Count << ". [" << this << "]. ";
 		//get the return values setup, then resort
-		//cout << "[ ";
+		//cerr << "[ ";
 		for (int i = 0; i < Number_of_Generators; i++)
 		{
 			Sum_Vector[i] = Root_Node->Sum_Vector[i];
-			//cout << Sum_Vector[i] << " ";
+			//cerr << Sum_Vector[i] << " ";
 		}
-		//cout << "]" << endl;
-		//cout << *(Root_Node->Total_Sum);
-		//cout << "For loop done. blarg" << endl;
+		//cerr << "]" << endl;
+		//cerr << *(Root_Node->Total_Sum);
+		//cerr << "For loop done. blarg" << endl;
 		
 		*Total_Sum = *(Root_Node->Total_Sum);
 
-		//cout << "blarg" << endl;
+		//cerr << "blarg" << endl;
 		//swap values of the lowest and root.
 		//find lowest node
 
@@ -229,7 +229,7 @@ int Vector_Heap::Pop_Top_Heap (int Sum_Vector [], ZZ *Total_Sum)
 		while ( !( Temp_Node_Mask & Node_Count)  )
 			Temp_Node_Mask = Temp_Node_Mask >> 1;
 
-		//cout << "Temp_Node_Mask = " << Temp_Node_Mask;
+		//cerr << "Temp_Node_Mask = " << Temp_Node_Mask;
 		Temp_Node_Mask >>= 1;
 
 		Heap_Node *Temp_Heap_Node = Root_Node;
@@ -238,12 +238,12 @@ int Vector_Heap::Pop_Top_Heap (int Sum_Vector [], ZZ *Total_Sum)
 		{
 			if ( (Temp_Node_Mask & Node_Count) == 0) //Left
 			{	
-				//cout << "Left. ";
+				//cerr << "Left. ";
 				Temp_Heap_Node = Temp_Heap_Node->Left;
 			}
 			else //right
 			{	
-				//cout << "Right. ";
+				//cerr << "Right. ";
 				Temp_Heap_Node = Temp_Heap_Node->Right;
 			}
 			Temp_Node_Mask >>= 1;
@@ -292,16 +292,16 @@ int Vector_Heap::Pop_Top_Heap (int Sum_Vector [], ZZ *Total_Sum)
 	}
 	else
 	{	
-		//cout << "Pop_Top_Heap: Node_Count = " << Node_Count << ". [" << this << "]. ";
+		//cerr << "Pop_Top_Heap: Node_Count = " << Node_Count << ". [" << this << "]. ";
 		//get the return values setup, then resort
-		//cout << "[ ";
+		//cerr << "[ ";
 
 		for (int i = 0; i < Number_of_Generators; i++)
 		{
 			Sum_Vector[i] = Root_Node->Sum_Vector[i];
-			//cout << Sum_Vector[i] << " ";
+			//cerr << Sum_Vector[i] << " ";
 		}
-		//cout << "]" << endl;
+		//cerr << "]" << endl;
 		*Total_Sum = *(Root_Node->Total_Sum);
 	
 	
@@ -403,32 +403,32 @@ void Vector_Heap::Print_Tree ()
 	if ( Root_Node != NULL)
 	{
 		Print_Sub_Tree (Root_Node);
-		cout << endl;
+		cerr << endl;
 	}
 	else
-		cout << "NULL" << endl;
+		cerr << "NULL" << endl;
 }
 
 void Vector_Heap::Print_Sub_Tree (Heap_Node *Temp_Heap_Node)
 {
-	/*cout << "Vector [";
+	/*cerr << "Vector [";
 
 	for (int i = 0; i < Number_of_Generators; i++)
 	{
-		cout << Temp_Heap_Node->Sum_Vector[i] << " ";
+		cerr << Temp_Heap_Node->Sum_Vector[i] << " ";
 	}	
-	cout << "] ";
+	cerr << "] ";
 	*/
-	cout << "Sum: " << *(Temp_Heap_Node->Total_Sum) << "\t";
+	cerr << "Sum: " << *(Temp_Heap_Node->Total_Sum) << "\t";
 
 	if ( Temp_Heap_Node->Left != NULL)
 	{
-		//cout << "Left. ";	
+		//cerr << "Left. ";	
 		Print_Sub_Tree ( Temp_Heap_Node->Left);
 	}
 	if ( Temp_Heap_Node->Right != NULL)
 	{
-		//cout << "Right. ";
+		//cerr << "Right. ";
 		Print_Sub_Tree ( Temp_Heap_Node->Right);
 	}
 
@@ -440,7 +440,7 @@ void Vector_Heap::Restore_Up (Heap_Node *Temp_Heap_Node)
 	{
 		if ( *(Temp_Heap_Node->Total_Sum) > *(Temp_Heap_Node->Parent->Total_Sum) )
 		{
-			//cout << "Restore_Up: swaping" << endl;			
+			//cerr << "Restore_Up: swaping" << endl;			
 			int	*Temp_Int;
 			ZZ	*Temp_ZZ;
 
@@ -456,10 +456,10 @@ void Vector_Heap::Restore_Up (Heap_Node *Temp_Heap_Node)
 			Restore_Up(Temp_Heap_Node->Parent);
 		}
 		//else
-			//cout << "No swap" << endl;
+			//cerr << "No swap" << endl;
 	}
 	//else
-		//cout << "Parent Null" << endl;
+		//cerr << "Parent Null" << endl;
 }
 
 int Vector_Heap::Get_Node_Count ()
@@ -491,7 +491,7 @@ ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 		
 		/*if (S_Values_Zero_Flag == 1)
 		{
-			cout << "S_Value zero. Calculating Pertubation. " << this << endl;
+			cerr << "S_Value zero. Calculating Pertubation. " << this << endl;
 			Our_Cost = Calculate_Pertubation (cost, 3);
 			S_Values_Zero_Flag = 0;
 		}*/
@@ -500,16 +500,16 @@ ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 
 		listVector *current = listCone_pointer->rays;
 	
-		//cout << "ConeInfo Constructor: Generators { ";	
+		//cerr << "ConeInfo Constructor: Generators { ";	
 		for(int i = 0; i < NumGensPerCone; i++)
 		{
-			//cout << current->first << " ";
+			//cerr << current->first << " ";
 			S_Values[i] = (Our_Cost) * (current->first);
 			current = current->rest;
 
 			if(S_Values[i] ==  0)
 			{
-				//cout << "ConeInfo Constructor: S_Value zero. " << this << endl;
+				//cerr << "ConeInfo Constructor: S_Value zero. " << this << endl;
 				S_Values_Zero_Flag = 1;
 			}
 		
@@ -530,30 +530,30 @@ ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 
 			zero_vector[i] = 0;
 		}
-	//cout << " } " << endl;
+	//cerr << " } " << endl;
 
-	//cout << "Done computing S_Values. " << this << endl;
+	//cerr << "Done computing S_Values. " << this << endl;
 
 	
-	//cout << "Coefficient after dot products " << Coefficient << endl;
+	//cerr << "Coefficient after dot products " << Coefficient << endl;
 	Number_of_Generators = lengthListVector(listCone_pointer->rays);	
 
 	Order = new int[Number_of_Generators];
 	
 
-	/*cout << "ConeInfo Constructor: S_Values before sort: [ ";
+	/*cerr << "ConeInfo Constructor: S_Values before sort: [ ";
 	for (int i = 0; i < Number_of_Generators; i++)
 	{
-		cout << S_Values[i] << " ";
+		cerr << S_Values[i] << " ";
 	}
-	cout << "]" << endl;
+	cerr << "]" << endl;
 	*/
 	Sort_S_Values ();
 	
 	/*for (int i = 1; i < Number_of_Generators; i++)
 	{
 		if (S_Values[i] == S_Values[i-1])
-			cout << "ConeInfo Constructor: Repeated S_Values terms." << endl;
+			cerr << "ConeInfo Constructor: Repeated S_Values terms." << endl;
 	}*/
 	zero_vector[0] = 1;
 	
@@ -567,7 +567,7 @@ ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 			All_Same = 0;
 	}
 	if (All_Same == 1)
-		cout << "ConeInfo Constructor: S_Values all the same" << endl;
+		cerr << "ConeInfo Constructor: S_Values all the same" << endl;
 	*/
 	Heap = new Vector_Heap(numOfVars);
 
@@ -576,7 +576,7 @@ ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 	//Temp_Total_Sum = *Numer_Exp + S_Values[0];
 	Temp_Total_Sum = S_Values[0];
 
-	//cout << "ConeInfo Constructor: Adding 1 0 0" << endl;	
+	//cerr << "ConeInfo Constructor: Adding 1 0 0" << endl;	
 	Heap->Add_Heap(zero_vector, &Temp_Total_Sum);
 
 	Integer_Vector_List	*New_Integer_Vector_List = new Integer_Vector_List;
@@ -600,7 +600,7 @@ ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 	{
 		if (Hash_Table_Initialized_Flag == 0)
 		{
-			//cout << "Creating hash coefficients." << endl;
+			//cerr << "Creating hash coefficients." << endl;
 			Hash_Function_Coefficients = new int[Number_of_Generators];
 
 			for (int i = 0; i < Number_of_Generators; i ++)
@@ -634,7 +634,7 @@ ConeInfo::~ConeInfo ()
 	
 	/*if (Object_Count == 0)
 	{
-		//cout << "ConeInfo Destructor: Deleting hash functions coefficients." << endl;
+		//cerr << "ConeInfo Destructor: Deleting hash functions coefficients." << endl;
 		delete [] Hash_Function_Coefficients;
 
 	}*/
@@ -695,15 +695,15 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 {
 	if (S_Values_Zero_Flag == 1)
 	{
-		cout << "Trying to dig on a S_Value zero cone! Exiting. " << this << endl;
+		cerr << "Trying to dig on a S_Value zero cone! Exiting. " << this << endl;
 		exit (1);
 	}
 	
-	//cout << "CalcNextTerm: Coefficient = " << Coefficient << endl;
-	/*cout << endl << "Svalues: ";
+	//cerr << "CalcNextTerm: Coefficient = " << Coefficient << endl;
+	/*cerr << endl << "Svalues: ";
 	for (int i = 0; i < Number_of_Generators; i++)
 	{
-		cout << S_Values[i] << ", ";
+		cerr << S_Values[i] << ", ";
 
 	}*/
 	int First_Non_Zero;
@@ -724,7 +724,7 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 		delete Delete_Node;
 	}
 
-	//cout << "Calculation_Next: Data deleted." << endl;	
+	//cerr << "Calculation_Next: Data deleted." << endl;	
 	
 	// Retain the sign of the coefficient.
 	if (Coefficient < 0)
@@ -737,7 +737,7 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 
 	// Pop off the highest term off the top of the heap.
 	if ( Heap->Pop_Top_Heap (New_Integer_Array, Expansion_Highest_Term) == 0)
-		cout << "Error with Pop_Top in ConeInfo::Calculate_Next_Highest_Term " << endl;
+		cerr << "Error with Pop_Top in ConeInfo::Calculate_Next_Highest_Term " << endl;
 
 	// Create new node.
 	Temp_Integer_Vector_List = new Integer_Vector_List;
@@ -750,9 +750,9 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 	*Current_Highest_Term = *Numer_Exp + *Expansion_Highest_Term;
 	
 	if (*Expansion_Highest_Term > 0)
-		//cout << "Expansion_Highest_Term Negative" << endl;
+		//cerr << "Expansion_Highest_Term Negative" << endl;
 	//else
-		cout << "Expansion_Highest_Term Positive." << endl;
+		cerr << "Expansion_Highest_Term Positive." << endl;
 	
 	
 	int	Hash_Value;
@@ -761,9 +761,9 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 	Time_Stamp++;
 
 	if (Time_Stamp == 0)
-		cout << "Calculate_Next_Highest_Term: Error, Time_Stamp == 0.  Roll Over!" << endl;	
+		cerr << "Calculate_Next_Highest_Term: Error, Time_Stamp == 0.  Roll Over!" << endl;	
 	//debug
-	//cout << Time_Stamp << endl;
+	//cerr << Time_Stamp << endl;
 	
 	int *New_Integer_Array2;
 	
@@ -806,7 +806,7 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 	
 	//debug
 	if(First_Non_Zero == Number_of_Generators)
-		cout << "Calculate_Next_Highest_Term: First_Non_Zero == Number_of_Generators";
+		cerr << "Calculate_Next_Highest_Term: First_Non_Zero == Number_of_Generators";
 	
 	if (First_Non_Zero != Number_of_Generators - 1 )
 	{
@@ -861,7 +861,7 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 	*/
 		
 		Hash_Value = Hash_Integer_Vector (New_Integer_Array);
-		//cout << "Integer Vector hashed." << endl;	
+		//cerr << "Integer Vector hashed." << endl;	
 			
 		while(1)
 		{
@@ -872,7 +872,7 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 				{	
 					if (New_Integer_Array[j] != Hash_Table[Hash_Value].Integer_Array[j])
 					{
-						//cout << "Vectors not equal." << endl;
+						//cerr << "Vectors not equal." << endl;
 						Equal_Indicator = 0;
 						break;
 					}		
@@ -962,7 +962,7 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 	
 	}
 	//Heap->Print_Tree ();
-	//cout << "%%";	
+	//cerr << "%%";	
 	//Insert new vectors into the heap
 
 	/*Temp_Integer_Vector_List = Vector_List_Head;
@@ -1016,7 +1016,7 @@ void ConeInfo::Calculate_Next_Highest_Term ()
 	//delete [] New_Integer_Array;
 	//delete New_Total_Sum;
 	
-	//cout << "CalcNextTerm Done: Coefficient: " << Coefficient << endl;
+	//cerr << "CalcNextTerm Done: Coefficient: " << Coefficient << endl;
 }
 
 ConeInfo_Heap::ConeInfo_Heap ()
@@ -1095,7 +1095,7 @@ void ConeInfo_Heap::Add_Heap (ConeInfo *Temp_ConeInfo)
 
 		if ( (Temp_Node_Mask & Node_Count) == 0) //Add to left
 		{
-			//cout << "Add to left" << endl;
+			//cerr << "Add to left" << endl;
 			ConeInfo_Temp_Heap_Node->Left = new ConeInfo_Heap_Node;
 
 			ConeInfo_Temp_Heap_Node->Left->Parent = ConeInfo_Temp_Heap_Node;
@@ -1105,7 +1105,7 @@ void ConeInfo_Heap::Add_Heap (ConeInfo *Temp_ConeInfo)
 		}
 		else //Add to Right
 		{
-			//cout << "Add to right" << endl;
+			//cerr << "Add to right" << endl;
 			ConeInfo_Temp_Heap_Node->Right = new ConeInfo_Heap_Node;
 
 			ConeInfo_Temp_Heap_Node->Right->Parent = ConeInfo_Temp_Heap_Node;
@@ -1117,12 +1117,12 @@ void ConeInfo_Heap::Add_Heap (ConeInfo *Temp_ConeInfo)
 		ConeInfo_Temp_Heap_Node->ConeInfo_Pointer = Temp_ConeInfo; 
 	
 		//resort
-		//cout << "Calling restore" << endl;
+		//cerr << "Calling restore" << endl;
 		Restore_Up (ConeInfo_Temp_Heap_Node);
 	}
 	else // no nodes exist, create first. 
 	{
-		//cout << "No nodes.  Adding to root" << endl;
+		//cerr << "No nodes.  Adding to root" << endl;
 		Root_Node = new ConeInfo_Heap_Node;
 
 		Root_Node->Left = Root_Node->Right = NULL;
@@ -1152,7 +1152,7 @@ ConeInfo *ConeInfo_Heap::Get_Top_Heap ()
 
 ConeInfo *ConeInfo_Heap::Pop_Top_Heap ()
 {
-	//cout << "Pop_Top_Heap: Called." << endl;
+	//cerr << "Pop_Top_Heap: Called." << endl;
 	ConeInfo	*Return_Value = Root_Node->ConeInfo_Pointer;
 	
 	if (Root_Node != NULL)
@@ -1160,7 +1160,7 @@ ConeInfo *ConeInfo_Heap::Pop_Top_Heap ()
 		
 	if (Node_Count != 1)
 	{
-		//cout << "Pop_Top_Heap: Traversing tree. " << Node_Count << endl;
+		//cerr << "Pop_Top_Heap: Traversing tree. " << Node_Count << endl;
 		//get the return values setup, then resort
 		
 		//swap values of the lowest and root.
@@ -1175,7 +1175,7 @@ ConeInfo *ConeInfo_Heap::Pop_Top_Heap ()
 
 		ConeInfo_Heap_Node *Temp_ConeInfo_Heap_Node = Root_Node;
 	
-		//cout << "POp_Top_Heap: Traversing tree..." << endl;	
+		//cerr << "POp_Top_Heap: Traversing tree..." << endl;	
 		while ( Temp_Node_Mask )
 		{
 			if ( (Temp_Node_Mask & Node_Count) == 0) //Left
@@ -1186,11 +1186,11 @@ ConeInfo *ConeInfo_Heap::Pop_Top_Heap ()
 			Temp_Node_Mask >>= 1;
 			
 			//if (Temp_ConeInfo_Heap_Node == NULL)
-				//cout << "Pop_Top_Heap: Null found on right or left. " << Temp_Node_Mask << endl;
+				//cerr << "Pop_Top_Heap: Null found on right or left. " << Temp_Node_Mask << endl;
 			
 		}	
 	
-		//cout << "Pop_TOp_Heap: Traversing ended." << endl;	
+		//cerr << "Pop_TOp_Heap: Traversing ended." << endl;	
 
 		
 		Root_Node->ConeInfo_Pointer = Temp_ConeInfo_Heap_Node->ConeInfo_Pointer;
@@ -1198,7 +1198,7 @@ ConeInfo *ConeInfo_Heap::Pop_Top_Heap ()
 		//delete bottom node
 	
 
-		//cout << "Pop_Top_Heap: Deleting bottom Node" << endl;
+		//cerr << "Pop_Top_Heap: Deleting bottom Node" << endl;
 		if (Temp_ConeInfo_Heap_Node->Parent->Left == Temp_ConeInfo_Heap_Node)
 		{  //Left
 			Temp_ConeInfo_Heap_Node = Temp_ConeInfo_Heap_Node->Parent;
@@ -1243,7 +1243,7 @@ ConeInfo *ConeInfo_Heap::Pop_Top_Heap ()
 
 void ConeInfo_Heap::Restore_Down (ConeInfo_Heap_Node *Temp_ConeInfo_Heap_Node)
 {
-	//cout << "Restore_Down: Called." << endl;
+	//cerr << "Restore_Down: Called." << endl;
 	int Swap_Right = 1;
 	int Swap_Left = 1;
 
@@ -1298,7 +1298,7 @@ void ConeInfo_Heap::Restore_Up (ConeInfo_Heap_Node *Temp_ConeInfo_Heap_Node)
 	{
 		if ( *(Temp_ConeInfo_Heap_Node->ConeInfo_Pointer->Get_Current_Highest_Term () ) > *(Temp_ConeInfo_Heap_Node->Parent->ConeInfo_Pointer->Get_Current_Highest_Term () ) )
 		{
-			//cout << "Restore_Up: swaping" << endl;			
+			//cerr << "Restore_Up: swaping" << endl;			
 			ConeInfo	*Temp_ConeInfo;
 			
 
@@ -1311,10 +1311,10 @@ void ConeInfo_Heap::Restore_Up (ConeInfo_Heap_Node *Temp_ConeInfo_Heap_Node)
 			Restore_Up(Temp_ConeInfo_Heap_Node->Parent);
 		}
 		//else
-			//cout << "No swap" << endl;
+			//cerr << "No swap" << endl;
 	}
 	//else
-		//cout << "Parent Null" << endl;
+		//cerr << "Parent Null" << endl;
 }
 
 int ConeInfo_Heap::Check_Top_Heap(ConeInfo *Temp_ConeInfo)
@@ -1408,7 +1408,7 @@ int	ConeInfo::Hash_Integer_Vector (int *Integer_Array)
 vec_ZZ	Calculate_Pertubation (listCone *cones, vec_ZZ *Cost, int Mod_Value, int Number_of_Variables)
 {
 	/* OLD CODE: 
-	//cout << "Calculate_Pertubation: " << (*Cost)*(*Cost) << endl;
+	//cerr << "Calculate_Pertubation: " << (*Cost)*(*Cost) << endl;
 	vec_ZZ	Return_Vector;
 
 	Return_Vector = *Cost;

@@ -53,6 +53,7 @@
 
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
+  BarvinokParameters params;
 #ifdef SUN
   struct tms tms_buf;
 #endif
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]) {
   listVector *templistVec;
   listCone *cones, *tmp, *tmpcones;
 
-  latte_banner(cout);
+  latte_banner(cerr);
 
   z=0;
   //setbuf(stdout,0);
@@ -240,7 +241,7 @@ int main(int argc, char *argv[]) {
 
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
-  cout << invocation;
+  cerr << invocation;
   char costFile[127];
   if(maximum[0] == 'y'){
     strcpy(fileName,argv[argc-1]);
@@ -248,14 +249,14 @@ int main(int argc, char *argv[]) {
     strcat(costFile, ".cost");
   }
   else strcpy(fileName,argv[argc-1]);
-  //  cout << fileName << " " << costFile << endl;
+  //  cerr << fileName << " " << costFile << endl;
   if(maximum[0] == 'y') {
     ifstream ReadTest(fileName);
     if(!ReadTest){
       cerr << "Need a polytope input file." << endl;
       exit(2);
     }
-    //    cout << fileName << " " << costFile << endl;
+    //    cerr << fileName << " " << costFile << endl;
     ifstream INCost(costFile);
     if(!INCost){
       cerr << "Need a cost input file." << endl;
@@ -312,11 +313,11 @@ int main(int argc, char *argv[]) {
     }
   }
   
-  // cout << grobner << endl;
+  // cerr << grobner << endl;
   vec_ZZ holdCost;
   if(minimize[0] == 'y') cost = - cost;
   holdCost = cost;
-  //cout <<"Cost is: " << cost << endl;
+  //cerr <<"Cost is: " << cost << endl;
   vec_RR holdcost_RR;
   holdcost_RR.SetLength(holdCost.length());
   for(i = 0; i < holdCost.length(); i++) conv(holdcost_RR[i], holdCost[i]);
@@ -347,8 +348,8 @@ int main(int argc, char *argv[]) {
   /* Binary seach IP*/
 
   if(binary[0] == 'y'){
-    cout << "The number of optimal solutions: " << binarySearch(equations, inequalities,cost, numOfVars, minimize) << endl;
-    cout << "Time: " << GetTime() << endl;
+    cerr << "The number of optimal solutions: " << binarySearch(equations, inequalities,cost, numOfVars, minimize) << endl;
+    cerr << "Time: " << GetTime() << endl;
     exit(0);
   }
 
@@ -376,14 +377,14 @@ int main(int argc, char *argv[]) {
     matrix = matrixTmp;}
 /* Now matrix contains the new inequalities. */
   RR LP_OPT;
-    cout << "\nTime: " << GetTime() << " sec\n\n";
-    //   cout << "Project down cost function: " << cost << endl;
+    cerr << "\nTime: " << GetTime() << " sec\n\n";
+    //   cerr << "Project down cost function: " << cost << endl;
     vec_RR Rat_solution, tmp_den, tmp_num;
     mat_RR ProjU_RR;
     ProjU_RR.SetDims(ProjU.NumRows(), ProjU.NumCols());
     for(i = 0; i < ProjU.NumRows(); i++)
       for(int j = 0; j < ProjU.NumCols(); j++) conv(ProjU_RR[i][j], ProjU[i][j]);
-    //cout << ProjU << ProjU_RR << endl;
+    //cerr << ProjU << ProjU_RR << endl;
     Rat_solution.SetLength(numOfVars);
     tmp_den.SetLength(numOfVars);
     tmp_num.SetLength(numOfVars);
@@ -407,15 +408,15 @@ int main(int argc, char *argv[]) {
        cones = CopyListCones(tmpcones, numOfVars, LP_vertex);
      else cones = tmpcones;
        if(lengthListCone(cones) == 1) 
-	cout <<"\nWe found a single vertex cone for IP.\n" << endl;
-       cout <<"A vertex which we found via LP is: " << ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
+	cerr <<"\nWe found a single vertex cone for IP.\n" << endl;
+       cerr <<"A vertex which we found via LP is: " << ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       //printRationalVector(LP_vertex, numOfVars);
-       LP_OPT = Rat_cost*Rat_solution; //cout << cost << endl;
-      cout << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
+       LP_OPT = Rat_cost*Rat_solution; //cerr << cost << endl;
+      cerr << "The LP optimal value is: " << holdcost_RR*ProjectingUpRR(ProjU_RR, Rat_solution, numOfVars) << endl;
       }else {cones = tmpcones;
-    cout << "\nThe polytope has " << lengthListCone(cones) << " vertices.\n";
+    cerr << "\nThe polytope has " << lengthListCone(cones) << " vertices.\n";
     //system_with_error_check("rm -f numOfLatticePoints");
-    cout << endl;}
+    cerr << endl;}
   } 
 
   /* Reading from the vertex representation. */
@@ -480,7 +481,7 @@ int main(int argc, char *argv[]) {
 
  if(Memory_Save[0] == 'n')
  {
-	 cout << "Computing the points in the Parallelepiped of the unimodular Cones." << endl;
+	 cerr << "Computing the points in the Parallelepiped of the unimodular Cones." << endl;
   	tmp=cones;
 	int	Cones_Processed_Count = 0;
  	while (tmp) 
@@ -491,7 +492,7 @@ int main(int argc, char *argv[]) {
 		Cones_Processed_Count++;
 
 		if ((Cones_Processed_Count % 1000) == 0 )
-			cout << Cones_Processed_Count << " cones processed." << endl;
+			cerr << Cones_Processed_Count << " cones processed." << endl;
   	}
 }
   
@@ -517,8 +518,8 @@ int main(int argc, char *argv[]) {
    Opt_cones = CopyListCones(cones, numOfVars);
    ZZ NumOfLatticePoints; //printListCone(Opt_cones, numOfVars);
    NumOfLatticePoints = Residue(Opt_cones, numOfVars);
-   cout <<"Finished computing a rational function. " << endl;
-   cout <<"Time: " << GetTime() << " sec." << endl;
+   cerr <<"Finished computing a rational function. " << endl;
+   cerr <<"Time: " << GetTime() << " sec." << endl;
    if(IsZero(NumOfLatticePoints) == 1){
      cerr<<"Integrally empty polytope.  Check the right hand side."<< endl;
      exit(0);}
@@ -529,18 +530,18 @@ int main(int argc, char *argv[]) {
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
         if(minimize[0] == 'y') cost = -cost;
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "The projected down opt value is: " << cost * Opt_solution << endl;
+	cerr <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
 	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
 
 	conv(tmp_RR, cost * Opt_solution);
-	// cout << tmp_RR << " " << LP_OPT << endl;
+	// cerr << tmp_RR << " " << LP_OPT << endl;
 	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
+	cerr <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
+	cerr << "Computation done." << endl;
+	cerr <<"Time: " << GetTime() << " sec." << endl;
         strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ext");
@@ -571,18 +572,18 @@ int main(int argc, char *argv[]) {
 	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, matrix, cost, numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
         if(minimize[0] == 'y') cost = -cost;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "The projected down opt value is: " << cost * Opt_solution << endl;
+	cerr <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
 	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
 	conv(tmp_RR, IP_OPT);
-	// cout << cost * Opt_solution << endl;
+	// cerr << cost * Opt_solution << endl;
 	if(minimize[0] == 'y') LP_OPT = - LP_OPT;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
+	cerr <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
+	cerr << "Computation done." << endl;
+	cerr <<"Time: " << GetTime() << " sec." << endl;
         strcpy(command,"rm -f ");
         strcat(command,fileName);
         strcat(command,".ext");
@@ -613,8 +614,8 @@ int main(int argc, char *argv[]) {
    Opt_cones = CopyListCones(cones, numOfVars);
    ZZ NumOfLatticePoints; //printListCone(Opt_cones, numOfVars);
    NumOfLatticePoints = Residue(Opt_cones, numOfVars);
-   cout <<"Finished computing a rational function. " << endl;
-   cout <<"Time: " << GetTime() << " sec." << endl;
+   cerr <<"Finished computing a rational function. " << endl;
+   cerr <<"Time: " << GetTime() << " sec." << endl;
    if(IsZero(NumOfLatticePoints) == 1){
      cerr<<"Integrally empty polytope.  Check the right hand side."<< endl;
      exit(0);}
@@ -624,16 +625,16 @@ int main(int argc, char *argv[]) {
 	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, inequalities, equations,  cost, numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "The projected down opt value is: " << cost * Opt_solution << endl;
+	cerr <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
 	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
 	conv(tmp_RR, IP_OPT);
-	// cout << cost * Opt_solution << endl;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
+	// cerr << cost * Opt_solution << endl;
+	cerr <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
+	cerr << "Computation done." << endl;
+	cerr <<"Time: " << GetTime() << " sec." << endl;
 	exit(0);
       }
    }
@@ -643,16 +644,16 @@ int main(int argc, char *argv[]) {
 	vec_ZZ Opt_solution; 
 	if(minimize[0] == 'y') holdCost = -holdCost;
 	Opt_solution = SolveIP(cones, inequalities, equations,  cost, numOfVars, singleCone); 
-	cout << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
-	cout << "The projected down opt value is: " << cost * Opt_solution << endl;
-	cout <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "An optimal solution for " <<  holdCost << " is: " << ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
+	cerr << "The projected down opt value is: " << cost * Opt_solution << endl;
+	cerr <<"The optimal value is: " << holdCost * ProjectingUp(ProjU, Opt_solution, numOfVars) << "." << endl;
 	ZZ IP_OPT; IP_OPT = cost*Opt_solution;
 	RR tmp_RR;
 	conv(tmp_RR, IP_OPT);
-	// cout << cost * Opt_solution << endl;
-	cout <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
-	cout << "Computation done." << endl;
-	cout <<"Time: " << GetTime() << " sec." << endl;
+	// cerr << cost * Opt_solution << endl;
+	cerr <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
+	cerr << "Computation done." << endl;
+	cerr <<"Time: " << GetTime() << " sec." << endl;
 	exit(0);
    }
    }else{*/
@@ -660,27 +661,27 @@ if(Memory_Save[0] == 'n')
 {
 
 	if(dualApproach[0] == 'n'){
-	  cout << "Creating generating function.\n"; 
-	  //printListVector(templistVec, oldnumofvars); cout << ProjU << endl;
+	  cerr << "Creating generating function.\n"; 
+	  //printListVector(templistVec, oldnumofvars); cerr << ProjU << endl;
 	if(equationsPresent[0] == 'y'){ cones = ProjectUp(cones, oldnumofvars, numOfVars, templistVec);
 	numOfVars = oldnumofvars;}
 
 	  createGeneratingFunctionAsMapleInput(fileName,cones,numOfVars);  }
         //printListCone(cones, numOfVars);
 
-	cout << "Printing decomposed cones to decomposed_cones." << endl;
+	cerr << "Printing decomposed cones to decomposed_cones." << endl;
 	printListConeToFile("decomposed_cones", cones, numOfVars);
 
 	if(dualApproach[0] == 'n'){
-	cout << "Starting final computation.\n";
-	cout << endl << "****  The number of lattice points is: " << Residue(cones,numOfVars) << "  ****" << endl << endl;}
+	cerr << "Starting final computation.\n";
+	cerr << endl << "****  The number of lattice points is: " << Residue(cones,numOfVars) << "  ****" << endl << endl;}
 
 
 	if(dualApproach[0] == 'y')
 	{
-		cout << "Starting final computation.\n";
-		//cout << "output_cone: " << output_cone;
-  		ResidueFunction(cones,numOfVars, print_flag, degree, output_cone);
+		cerr << "Starting final computation.\n";
+		//cerr << "output_cone: " << output_cone;
+  		ResidueFunction(cones,numOfVars, print_flag, degree, output_cone, &params);
 	//  Else we have already computed the residue.
 	}
 
@@ -688,7 +689,7 @@ if(Memory_Save[0] == 'n')
  }
 
  if(rationalCone[0] == 'y') {
-   cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
+   cerr << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
    strcpy(command, "mv ");
    strcat(command, "simplify.sum ");
    strcat(command, argv[argc - 1]);
@@ -697,7 +698,7 @@ if(Memory_Save[0] == 'n')
  }
 
  if(printfile[0] == 'y'){
-   cout << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
+   cerr << endl <<"Rational function written to " << argv[argc - 1] << ".rat" << endl << endl;
    strcpy(command, "mv ");
    strcat(command, "func.rat ");
    strcat(command, argv[argc - 1]);
@@ -738,8 +739,8 @@ if(Memory_Save[0] == 'n')
     system_with_error_check(command);
   }
 
- cout << "Computation done. " << endl;
- cout << "Time: " << GetTime() << " sec\n\n";
+ cerr << "Computation done. " << endl;
+ cerr << "Time: " << GetTime() << " sec\n\n";
  
  return(0);
 }

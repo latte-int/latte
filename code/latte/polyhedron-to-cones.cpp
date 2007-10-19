@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
     exit(1);
   }
   printListConeToFile(output_filename.c_str(), poly->cones, poly->numOfVars);
-  cout << "Cones (homogenized: " << boolalpha << poly->homogenized
+  cerr << "Cones (homogenized: " << boolalpha << poly->homogenized
        << ", dualized: " << poly->dualized
        << ") printed to file `" << output_filename << "'." << endl;
   return 0;

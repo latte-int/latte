@@ -80,7 +80,7 @@ Residue(listCone* cones, int numOfVars)
   long int totalNoGs=noGsPerC*noCones; //total no. of generators,ie,rowdim of B
   list<Integer> A[noCones];  // A is the numerator vectors
   // long int B[totalNoGs][dim];  // B is the denominator vectors
-  //  cout<<"tNG: "<<totalNoGs<<endl;
+  //  cerr<<"tNG: "<<totalNoGs<<endl;
 
   class denom {
   public:
@@ -109,10 +109,10 @@ Residue(listCone* cones, int numOfVars)
      // printVectorToFileWithoutBrackets(out,tmp->first,numOfVars);
     for (j=0; j<(numOfVars); j++) {
     tmp_A = tmp->first[j];  A[i].push_back(tmp_A);
-    //cout << tmp_A << " ";
+    //cerr << tmp_A << " ";
     
     }
-    //cout << endl;
+    //cerr << endl;
      // printListVectorToFileWithoutBrackets(out,cones->rays,numOfVars);
      basis = cones1->rays;
      while(basis) {
@@ -156,18 +156,18 @@ Residue(listCone* cones, int numOfVars)
   
     /* Bitr=B;
      Bitr=Bitr->next;
-     cout<<"B[1]: ";
-     for(i=0;i<noGsPerC;i++) {cout<<endl;
-     for(j=0;j<dim;j++) cout<<Bitr->D[i*dim+j]<<" ";
+     cerr<<"B[1]: ";
+     for(i=0;i<noGsPerC;i++) {cerr<<endl;
+     for(j=0;j<dim;j++) cerr<<Bitr->D[i*dim+j]<<" ";
      }
      return ; */    
 
 
-  // cout<<".done"<<endl<<"Number of cones: "<<noCones<<endl;cin.get();
+  // cerr<<".done"<<endl<<"Number of cones: "<<noCones<<endl;cin.get();
 //        <<"Number of generators in total: "<<totalNoGs<<endl
 //        <<endl<<"Now start calculations and stopwatch."<<endl;
   t=clock();
-  //  cout<<"  Clock at start reads "<<t<<"."<<endl;
+  //  cerr<<"  Clock at start reads "<<t<<"."<<endl;
 
   //------------------------------------------------------------------------------
   //---FIND LAMBDA AND DENOMINATOR EXPONENTS: We want to make substitution
@@ -183,8 +183,8 @@ Residue(listCone* cones, int numOfVars)
   //---vector, which may let me skip some lambdas.
   //------------------------------------------------------------------------------
 
-  //  cout<<"Getting lambda..."<<endl;
-  //cout<<"k is "<<k;cin.get();
+  //  cerr<<"Getting lambda..."<<endl;
+  //cerr<<"k is "<<k;cin.get();
 
   //VARS:
   //Integer k;
@@ -197,13 +197,13 @@ Residue(listCone* cones, int numOfVars)
   long int halt, haltCone;
   halt = 0;
   haltCone=-1; // will track the index where the dot product is 0
-  k=0; //cout<<"k is "<<k;// loop control var
+  k=0; //cerr<<"k is "<<k;// loop control var
   // Also, n tracks the lowest index where lambda changed (dlambda[n] not zero).
- // cout << totalNoGs << endl;
+ // cerr << totalNoGs << endl;
   //--------LOOP 1: try up to 5000 lambdas with entries in {-1,0,1,2}
-  //cout<<"k is "<<k;cin.get();
+  //cerr<<"k is "<<k;cin.get();
  while(k<5000) {
-   //cout << k << " ";cin.get();
+   //cerr << k << " ";cin.get();
     //--FIRST check if lambda works.
     Bitr=B;
     for(i=0;i<haltCone;i++) {
@@ -247,10 +247,10 @@ Residue(listCone* cones, int numOfVars)
       } // end if/else
     k++;
   } // end while
- // cout << totalNoGs << endl;
+ // cerr << totalNoGs << endl;
 
- // for(j = 0; j < totalNoGs; j++) cout << dotProducts[j] << " ";
-  // cout << endl;
+ // for(j = 0; j < totalNoGs; j++) cerr << dotProducts[j] << " ";
+  // cerr << endl;
 
   //--IN CASE no lambda found yet...
 
@@ -265,7 +265,7 @@ Residue(listCone* cones, int numOfVars)
 //     if(dotProducts[i]==0) i=totalNoGs+2;
 //   }
 //   if(i==totalNoGs) k=200000;
-// } cout<<"k: "<<k<<endl<<"clk: "<<clock()<<endl;
+// } cerr<<"k: "<<k<<endl<<"clk: "<<clock()<<endl;
 
  //-------LOOP 2: in case no lambda found yet, try bigger lambda entries...
   int d=0; // d runs through odds... it gets added to a single entry of lambda
@@ -307,13 +307,13 @@ Residue(listCone* cones, int numOfVars)
     if(i==noCones) k=200000;
   }
 
-  // cout<<"lambda: "; cin.get();
-  // for(i=0;i<dim;i++) cout<<lambda[i]<<" ";
-  // cout<<endl<<"  Clock at checkpoint 2: "<<clock()<<endl;
+  // cerr<<"lambda: "; cin.get();
+  // for(i=0;i<dim;i++) cerr<<lambda[i]<<" ";
+  // cerr<<endl<<"  Clock at checkpoint 2: "<<clock()<<endl;
   //cin.get();
-  //  cout<<"denominator: ";
- //   for(i=0;i<noGsPerC*noCones;i++) cout<<dotProducts[i]<<" ";
- //   cout<<i <<endl;
+  //  cerr<<"denominator: ";
+ //   for(i=0;i<noGsPerC*noCones;i++) cerr<<dotProducts[i]<<" ";
+ //   cerr<<i <<endl;
   //  return 0;
   //----------------------------------------------------------------------------
   //---CALCULATE NUMERATOR EXPONENTS of t under substitution x[i]->t^lambda[i].
@@ -329,7 +329,7 @@ Residue(listCone* cones, int numOfVars)
     then, the following loop simplifies as f(K(v)) = t^4 /(1-t)(1-t^2).
 
   *****************************************************************************/
-  //  cout<<"Getting numerator...";
+  //  cerr<<"Getting numerator...";
   Integer translation, numExps[noCones], kk;
   int tmp_k = k;
   kk = tmp_k;
@@ -342,9 +342,9 @@ Residue(listCone* cones, int numOfVars)
       if(kk<0) {dotProducts[noGsPerC*i+j]=-kk; numExps[i]+=-kk; E[i]*= -1;}
     }
   }
-  // cout<<"numexps: ";cin.get();
-   // for(i=0;i<noCones;i++) cout<<numExps[i]<<" ";
-  // cout<<endl;
+  // cerr<<"numexps: ";cin.get();
+   // for(i=0;i<noCones;i++) cerr<<numExps[i]<<" ";
+  // cerr<<endl;
    // return 0;
   // Now I Calculate into j the least translation possible for numExps...
   /*************************************************************************
@@ -386,11 +386,11 @@ Residue(listCone* cones, int numOfVars)
   translation/=1+noCones/100;
   translation-=translation%j;
   for(i=0;i<noCones;i++) numExps[i]-=translation;
- //    cout<<"translation: "<<translation<<"  numexps: ";
- //  for(i=0;i<noCones;i++) cout<<numExps[i]<<" ";
-  //  cout<<endl;
+ //    cerr<<"translation: "<<translation<<"  numexps: ";
+ //  for(i=0;i<noCones;i++) cerr<<numExps[i]<<" ";
+  //  cerr<<endl;
   //   return 0;
-  // cout<<".done"<<endl<<"  clock at checkpoint 3: "<<clock()<<endl;
+  // cerr<<".done"<<endl<<"  clock at checkpoint 3: "<<clock()<<endl;
 
   //-------------------------------------------------------------------------------
   //---CALCULATE AND SUM UP CONSTANT COEFFICIENTS IN SERIES EXPANSIONS ABOUT T=1---
@@ -407,7 +407,7 @@ Residue(listCone* cones, int numOfVars)
   //---where q is quotient, n is numerator, d is denominator.)
   //-------------------------------------------------------------------------------
 
-  // cout<<"Getting contributions in the big loop..." << endl;
+  // cerr<<"Getting contributions in the big loop..." << endl;
 
   //VARS
   long int tenPow=10;  // To be used in getting extra digits of precision
@@ -547,7 +547,7 @@ Residue(listCone* cones, int numOfVars)
 
     //ADD CONTRIBUTION
     noLatticePts=noLatticePts+tempVec[j]; sc2=sc2+clock();
-    //   cout<<" contrib: "<<mpz_get_str(NULL,10,tempVec[j])<<endl;
+    //   cerr<<" contrib: "<<mpz_get_str(NULL,10,tempVec[j])<<endl;
   } // end this long contribution loop
 
   //-----------------------------------------------------------------------------
@@ -556,7 +556,7 @@ Residue(listCone* cones, int numOfVars)
 
   //REFINE (take abs and round) noLatticePts.
   noLatticePts=abs(noLatticePts); // case noGsPerC is odd (denom. factors)
-  // cout<<".done"<<endl<<endl<<"tenPow: "<<tenPow<<endl;
+  // cerr<<".done"<<endl<<endl<<"tenPow: "<<tenPow<<endl;
 //        <<"noLatticePts before division: "<<mpz_get_str(NULL,10,noLatticePts)<<endl;
   noLatticePts=noLatticePts+tenPow/2;
   noLatticePts=noLatticePts/tenPow;
@@ -564,13 +564,13 @@ Residue(listCone* cones, int numOfVars)
   out << noLatticePts << endl;
 
   //OUTPUT TIMES AND RESULT
-//    cout<<"denominator subclock: "<<sc<<endl<<"numerator subclock: "<<sc2<<endl
+//    cerr<<"denominator subclock: "<<sc<<endl<<"numerator subclock: "<<sc2<<endl
 //        <<"clocks per second: "<<CLOCKS_PER_SEC<<endl<<endl;
-//    cout<<"TIME FOR CALCULATION (in seconds): "<<(clock()-t)/CLOCKS_PER_SEC<<".";
+//    cerr<<"TIME FOR CALCULATION (in seconds): "<<(clock()-t)/CLOCKS_PER_SEC<<".";
   i=((clock()-t)%CLOCKS_PER_SEC)*100/CLOCKS_PER_SEC;
-//    if(i<10) cout<<"0";
-//    cout<<i<<endl;
-//  cout<<endl<<"  **** THE NUMBER OF LATTICE POINTS IS: "<< noLatticePts <<" ****"<<endl<<endl;
+//    if(i<10) cerr<<"0";
+//    cerr<<i<<endl;
+//  cerr<<endl<<"  **** THE NUMBER OF LATTICE POINTS IS: "<< noLatticePts <<" ****"<<endl<<endl;
 
   return noLatticePts;
 }
@@ -673,18 +673,18 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
   
     /* Bitr=B;
      Bitr=Bitr->next;
-     cout<<"B[1]: ";
-     for(i=0;i<noGsPerC;i++) {cout<<endl;
-     for(j=0;j<dim;j++) cout<<Bitr->D[i*dim+j]<<" ";
+     cerr<<"B[1]: ";
+     for(i=0;i<noGsPerC;i++) {cerr<<endl;
+     for(j=0;j<dim;j++) cerr<<Bitr->D[i*dim+j]<<" ";
      }
      return ; */    
 
 
-  // cout<<".done"<<endl<<"Number of cones: "<<noCones<<endl;cin.get();
+  // cerr<<".done"<<endl<<"Number of cones: "<<noCones<<endl;cin.get();
 //        <<"Number of generators in total: "<<totalNoGs<<endl
 //        <<endl<<"Now start calculations and stopwatch."<<endl;
   t=clock();
-  //  cout<<"  Clock at start reads "<<t<<"."<<endl;
+  //  cerr<<"  Clock at start reads "<<t<<"."<<endl;
 
   //----------------------------------------------------------------------------
   //---CALCULATE NUMERATOR EXPONENTS of t under substitution x[i]->t^lambda[i].
@@ -700,7 +700,7 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
     then, the following loop simplifies as f(K(v)) = t^4 /(1-t)(1-t^2).
 
   *****************************************************************************/
-  //  cout<<"Getting numerator...";
+  //  cerr<<"Getting numerator...";
   Integer translation, numExps[noCones], kk;
   int tmp_k = k;
   kk = tmp_k;
@@ -713,9 +713,9 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
       if(kk<0) {dotProducts[noGsPerC*i+j]=-kk; numExps[i]+=-kk; E[i]*= -1;}
     }
   }
-  // cout<<"numexps: ";cin.get();
-   // for(i=0;i<noCones;i++) cout<<numExps[i]<<" ";
-  // cout<<endl;
+  // cerr<<"numexps: ";cin.get();
+   // for(i=0;i<noCones;i++) cerr<<numExps[i]<<" ";
+  // cerr<<endl;
    // return 0;
   // Now I Calculate into j the least translation possible for numExps...
   /*************************************************************************
@@ -759,11 +759,11 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
   translation-=translation%j;
   for(i=0;i<noCones;i++) numExps[i]-=translation;
   */
-  //    cout<<"translation: "<<translation<<"  numexps: ";
- //  for(i=0;i<noCones;i++) cout<<numExps[i]<<" ";
-  //  cout<<endl;
+  //    cerr<<"translation: "<<translation<<"  numexps: ";
+ //  for(i=0;i<noCones;i++) cerr<<numExps[i]<<" ";
+  //  cerr<<endl;
   //   return 0;
-  // cout<<".done"<<endl<<"  clock at checkpoint 3: "<<clock()<<endl;
+  // cerr<<".done"<<endl<<"  clock at checkpoint 3: "<<clock()<<endl;
 
   //-------------------------------------------------------------------------------
   //---CALCULATE AND SUM UP CONSTANT COEFFICIENTS IN SERIES EXPANSIONS ABOUT T=1---
@@ -780,7 +780,7 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
   //---where q is quotient, n is numerator, d is denominator.)
   //-------------------------------------------------------------------------------
 
-  // cout<<"Getting contributions in the big loop..." << endl;
+  // cerr<<"Getting contributions in the big loop..." << endl;
 
   //VARS
   //long int tenPow=10;  // To be used in getting extra digits of precision
@@ -922,7 +922,7 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 
     //ADD CONTRIBUTION
     noLatticePts=noLatticePts+tempVec[j]; sc2=sc2+clock();
-    //   cout<<" contrib: "<<mpz_get_str(NULL,10,tempVec[j])<<endl;
+    //   cerr<<" contrib: "<<mpz_get_str(NULL,10,tempVec[j])<<endl;
   } // end this long contribution loop
 
   //-----------------------------------------------------------------------------
@@ -931,22 +931,22 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 
   //REFINE (take abs and round) noLatticePts.
   //noLatticePts=abs(noLatticePts); // case noGsPerC is odd (denom. factors)
-  // cout<<".done"<<endl<<endl<<"tenPow: "<<tenPow<<endl;
+  // cerr<<".done"<<endl<<endl<<"tenPow: "<<tenPow<<endl;
 //        <<"noLatticePts before division: "<<mpz_get_str(NULL,10,noLatticePts)<<endl;
   //noLatticePts=noLatticePts+tenPow/2;
   //noLatticePts=noLatticePts/tenPow;
 	
- // 	cout << "Residue_Single_Cone: " << 
+ // 	cerr << "Residue_Single_Cone: " << 
   
   *Total_Lattice_Points += noLatticePts;
   
   //OUTPUT TIMES AND RESULT
-//    cout<<"denominator subclock: "<<sc<<endl<<"numerator subclock: "<<sc2<<endl
+//    cerr<<"denominator subclock: "<<sc<<endl<<"numerator subclock: "<<sc2<<endl
 //        <<"clocks per second: "<<CLOCKS_PER_SEC<<endl<<endl;
-//    cout<<"TIME FOR CALCULATION (in seconds): "<<(clock()-t)/CLOCKS_PER_SEC<<".";
+//    cerr<<"TIME FOR CALCULATION (in seconds): "<<(clock()-t)/CLOCKS_PER_SEC<<".";
   i=((clock()-t)%CLOCKS_PER_SEC)*100/CLOCKS_PER_SEC;
-//    if(i<10) cout<<"0";
-//    cout<<i<<endl;
+//    if(i<10) cerr<<"0";
+//    cerr<<i<<endl;
 
   return 1;
   

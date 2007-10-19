@@ -168,7 +168,7 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
     result += convert_ZZ_to_mpz(sum) * weights[k];
   }
 #endif
-//   cout << "Cone contributes: "
+//   cerr << "Cone contributes: "
 //        << cone->coefficient << " * " << result << endl;
   return cone->coefficient * result;
 }
@@ -184,12 +184,12 @@ computeExponentialResidue(listCone *cones, int numOfVars)
     try {
       for (cone = cones; cone != NULL; cone = cone->rest) 
 	result += computeExponentialResidue_Single(generic_vector, cone, numOfVars);
-      //cout << "Result: " << result << endl;
+      //cerr << "Result: " << result << endl;
       assert(result.get_den()==1);
       return convert_mpz_to_ZZ(result.get_num());
     }
     catch (NotGenericException) {};
-    cout << "New generic vector..." << endl;
+    cerr << "New generic vector..." << endl;
   } while (1);
 }
 
