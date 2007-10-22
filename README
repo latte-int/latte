@@ -26,7 +26,13 @@ You can get it at the same place where you got LattE macchiato,
 Building and installing LattE
 -----------------------------
 
-The following instructions assume you want to install LattE and
+It is STRONGLY RECOMMENDED to use the source code distribution called
+"latte-for-tea-too".  It contains all prerequisite libraries and also
+PATCHES for some of the libraries that fix configuration and build
+problems that are not yet included in upstream releases of the library.
+
+If you do not wish to use "latte-for-tea-too", following these
+instructions.  The instructions assume you want to install LattE and
 all its prerequisites into your home directory, namely into a
 hierarchy rooted at the directory $HOME/latte.
 
@@ -52,7 +58,7 @@ hierarchy rooted at the directory $HOME/latte.
 3. Install Komei Fukuda's packages CDD+ and cddlib
 
    Obtain then from http://www.ifor.math.ethz.ch/~fukuda/cdd_home
-   
+
 4. Put $HOME/latte/bin into your $PATH
    and $HOME/latte/lib into your LD_LIBRARY_PATH.
 
