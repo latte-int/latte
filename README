@@ -31,10 +31,10 @@ It is STRONGLY RECOMMENDED to use the source code distribution called
 PATCHES for some of the libraries that fix configuration and build
 problems that are not yet included in upstream releases of the library.
 
-If you do not wish to use "latte-for-tea-too", following these
-instructions.  The instructions assume you want to install LattE and
-all its prerequisites into your home directory, namely into a
-hierarchy rooted at the directory $HOME/latte.
+If you do not wish to use "latte-for-tea-too", follow the instructions
+below.  The instructions assume you want to install LattE and all its
+prerequisites into your home directory, namely into a hierarchy rooted
+at the directory $HOME/latte.
 
 1. Install the GNU Multiple Precision Library
 
