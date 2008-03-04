@@ -360,7 +360,7 @@ int main(int argc, char **argv)
   
   {
     int i;
-    for (i = 1; i<argc-1; i++) {
+    for (i = 1; i<argc; i++) {
       if (parse_standard_triangulation_option(argv[i], &params)) {}
       else if (parse_standard_dualization_option(argv[i], &params)) {}
       else if (reduction_test_factory.parse_option(argv[i])) {}
@@ -394,8 +394,15 @@ int main(int argc, char **argv)
 	usage();
 	exit(0);
       }
-      else {
+      else if (strncmp(argv[i], "--", 2) == 0) {
 	cerr << "Unknown option " << argv[i] << endl;
+	exit(1);
+      }
+      else if (i == argc-1) {
+	filename = argv[i];
+      }
+      else {
+	cerr << "Unexpected argument " << argv[i] << endl;
 	exit(1);
       }
     }
@@ -404,7 +411,10 @@ int main(int argc, char **argv)
   if (normalize)
     reduction_test = reduction_test_factory.CreateReductionTest();
 
-  filename = argv[argc-1];
+  if (filename.length() == 0) {
+    cerr << "Missing input filename" << endl;
+    exit(1);
+  }
 
   string triang_filename;
 
