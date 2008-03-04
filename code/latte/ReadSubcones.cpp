@@ -79,6 +79,7 @@ ReadSubcones(listCone *master_cone, int numOfVars,
   int i;
   vector<listVector *> rays = ray_array(master_cone);
   vector<bool> ray_indicator(numOfRays);
+  consumer.SetNumCones(numOfSubcones);
   for (i = 0; i<numOfSubcones; i++) {
     int j;
     for (j = 0; j<numOfRays; j++) {
