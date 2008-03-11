@@ -23,7 +23,7 @@
 #ifndef LATTE_4TI2__H
 #define LATTE_4TI2__H
 
-#include "VectorArray.h"
+#include "groebner/VectorArray.h"
 #include "cone.h"
 
 /* Create a matrix whose rows are the RAYS.

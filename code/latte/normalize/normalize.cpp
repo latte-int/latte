@@ -39,7 +39,7 @@
 #include "normalize/ReductionTest.h"
 
 // from 4ti2:
-#include "Globals.h"
+#include "groebner/Globals.h"
 
 using namespace std;
 
