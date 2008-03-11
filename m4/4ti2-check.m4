@@ -35,7 +35,7 @@ fi
 
 for FORTYTWO_HOME in ${FORTYTWO_HOME_PATH} 
  do	
-if test -r "$FORTYTWO_HOME/include/RayAlgorithm.h"; then
+    if test -r "$FORTYTWO_HOME/include/groebner/RayAlgorithm.h"; then
 	if test "x$FORTYTWO_HOME" != "x/usr" -a "x$FORTYTWO_HOME" != "x/usr/local"; then
 		FORTYTWO_CXXFLAGS="-I${FORTYTWO_HOME}/include -D__STDC_LIMIT_MACROS -D_4ti2_GMP_"
 		FORTYTWO_LIBS="-L${FORTYTWO_HOME}/lib -l4ti2gmp -lzsolve"
@@ -47,20 +47,15 @@ if test -r "$FORTYTWO_HOME/include/RayAlgorithm.h"; then
 	LIBS="${BACKUP_LIBS} ${FORTYTWO_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK([
-#include "RayAlgorithm.h"
-extern "C" {
-  #include "libzsolve.h"
-}
+#include "groebner/RayAlgorithm.h"
+#include "zsolve/VectorArray.hpp"
 ],
 [ _4ti2_::RayAlgorithm algorithm;
-  ZSolveContext context;
+  VectorArray<int> array; 
 ],
 [	FORTYTWO_found="yes"
 	break
-]
-)
-else
-	FORTYTWO_found="no"
+])
 fi
 done
 
