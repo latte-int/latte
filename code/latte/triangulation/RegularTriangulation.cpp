@@ -69,3 +69,26 @@ delone_height(mpq_t height, const vec_ZZ &ray, void *data)
   mpq_set(height, hq.get_mpq_t());
 }
 
+void
+prescribed_height(mpq_t height, const vec_ZZ &ray_vector, void *data)
+{
+  prescribed_height_data *height_data = (prescribed_height_data *) data;
+  ZZ h;
+  h = 0;
+  listVector *ray;
+  int index;
+#if 0
+  cerr << "ray_vector: " << ray_vector << endl;
+#endif
+  for (ray = height_data->special_rays, index = 0; ray != NULL; ray = ray->rest, index++) {
+#if 0
+    cerr << "special ray: " << ray->first << endl;
+#endif
+    if (ray->first == ray_vector) {
+      h = (*height_data->special_heights)[index];
+      break;
+    }
+  }
+  mpq_class hq = convert_ZZ_to_mpq(h);
+  mpq_set(height, hq.get_mpq_t());
+}

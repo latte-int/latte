@@ -46,4 +46,15 @@ delone_height(mpq_t height, const vec_ZZ &ray, void *data);
 void
 biased_random_height(mpq_t height, const vec_ZZ &ray, void *data);
 
+/* Data points to a PRESCRIBED_HEIGHT structure.
+   Give all rays that are listed here the corresponding height,
+   the rest a height of 0. */
+struct prescribed_height_data {
+  listVector *special_rays;
+  vec_ZZ *special_heights;
+};
+
+void
+prescribed_height(mpq_t height, const vec_ZZ &ray, void *data);
+
 #endif
