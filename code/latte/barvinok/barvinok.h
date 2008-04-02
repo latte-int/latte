@@ -3,7 +3,7 @@
 /* barvinok.h -- Barvinok's decomposition of a cone.
 
    Copyright 2002, 2003 Ruriko Yoshida
-   Copyright 2006, 2007 Matthias Koeppe
+   Copyright 2006, 2007, 2008 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -27,6 +27,7 @@
 #include "cone.h"
 #include "cone_consumer.h"
 #include "timing.h"
+#include "triangulation/RegularTriangulation.h"
 #include <vector>
 
 class BarvinokParameters {
@@ -65,6 +66,8 @@ public:
   int triangulation_bias;
   bool nonsimplicial_subdivision;
   listCone *triangulation_special_cone;
+  prescribed_height_data *triangulation_prescribed_height_data;
+  bool debug_triangulation;
   // How to dualize non-simplicial cones.
   typedef enum {
     DualizationWithCdd,

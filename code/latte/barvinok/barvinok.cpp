@@ -52,6 +52,8 @@ BarvinokParameters::BarvinokParameters() :
   triangulation_max_height(10000),
   triangulation_bias(-1),
   nonsimplicial_subdivision(false),
+  triangulation_special_cone(NULL),
+  triangulation_prescribed_height_data(NULL),
   dualization(DualizationWithCdd),
   shortvector(LatteLLL),
   max_determinant(0),
