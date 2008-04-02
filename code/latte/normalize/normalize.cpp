@@ -35,6 +35,7 @@
 #include "timing.h"
 #include "ReadSubcones.h"
 #include "ReadLatteStyle.h"
+#include "vertices/cdd.h"
 
 #include "normalize/ReductionTest.h"
 
@@ -331,8 +332,40 @@ usage()
 	 << "  --only-triangulate                       Only triangulate, don't normalize" << endl
          << "  --no-initial-triangulation               Don't compute an initial triangulation," << endl
          << "                                           start recursive normalizer on input." << endl
-      ;
+	 << "  --triangulation-height-vector=4TI2-ROWVECTOR-FILE      Use this vector as a height vector." << endl;
     reduction_test_factory.show_options(cerr);
+}
+
+static void check_stream(const istream &f, const char *fileName, const char *proc)
+{
+  if (!f.good()) {
+    cerr << "Read error on input file " << fileName << " in " << proc << "." << endl;
+    exit(1);
+  }
+};
+
+static vec_ZZ *
+read_4ti2_vector(const char *filename)
+{
+  ifstream f(filename);
+  check_stream(f, filename, "read_4ti2_vector");
+  int num_vectors, dimension;
+  f >> num_vectors >> dimension;
+  check_stream(f, filename, "read_4ti2_vector");
+  if (num_vectors != 1) {
+    cerr << "Too many vectors (rows) in file " << filename
+	 << "; it is supposed to contain only one vector."
+	 << endl;
+    exit(1);
+  }
+  int i;
+  vec_ZZ *result = new vec_ZZ;
+  result->SetLength(dimension);
+  for (i = 0; i<dimension; i++) {
+    f >> (*result)[i];
+    check_stream(f, filename, "read_4ti2_vector");
+  }
+  return result;
 }
 
 int main(int argc, char **argv)
@@ -379,6 +412,12 @@ int main(int argc, char **argv)
       else if (strncmp(argv[i], "--subcones=", 11) == 0) {
 	subcones_filename = string(argv[i] + 11);
 	have_subcones = true;
+      }
+      else if (strncmp(argv[i], "--triangulation-height-vector=", 30) == 0) {
+	params.triangulation_prescribed_height_data
+	  = new prescribed_height_data;
+	params.triangulation_prescribed_height_data->special_heights = read_4ti2_vector(argv[i] + 30);
+	params.triangulation_prescribed_height_data->special_rays = NULL;
       }
       else if (strncmp(argv[i], "--output-subcones=", 18) == 0) {
 	output_subcones_filename = string(argv[i] + 18);
@@ -451,6 +490,23 @@ int main(int argc, char **argv)
     else {
       producer = new SingletonConeProducer(copyCone(cone));
     }
+  }
+
+  if (params.triangulation_prescribed_height_data) {
+    params.triangulation_prescribed_height_data->special_rays
+      = copyListVector(cone->rays);
+    if (lengthListVector(params.triangulation_prescribed_height_data->special_rays)
+	!= (*params.triangulation_prescribed_height_data->special_heights).length()) {
+      cerr << "Lengths of prescribed height vector and number of rays of master cone do not match."
+	   << endl;
+      exit(1);
+    }
+    cerr << "Using prescribed height vector: "
+	 << *params.triangulation_prescribed_height_data->special_heights << endl;
+#if 0
+    cerr << "for rays: " << endl;
+    printListVector(params.triangulation_prescribed_height_data->special_rays, params.Number_of_Variables);
+#endif
   }
 
   if (triangulate_toplevel) {
