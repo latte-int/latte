@@ -80,6 +80,9 @@ parse_standard_triangulation_option(const char *arg,
       exit(1);
     }
   }
+  else if (strcmp(arg, "--debug-triangulation") == 0) {
+    params->debug_triangulation = true;
+  }
   else return false;
   return true;
 }
@@ -91,7 +94,7 @@ show_standard_triangulation_options(ostream &stream)
 	 << "  --triangulation={cddlib,4ti2,topcom,...}" << endl
 	 << "  --triangulation-max-height=HEIGHT        Use a uniform distribution of height from 1 to HEIGHT." << endl
          << "  --triangulation-bias=PERCENTAGE          Use a non-uniform distribution of heights 1 and 2." << endl
-	 << "  --special-cone=LATTE-CONE-FILE" << endl;
+	 << "  --special-cone=LATTE-CONE-FILE           Ensure that this cone will be a part of the triangulation." << endl;
 }
 
 listCone *
