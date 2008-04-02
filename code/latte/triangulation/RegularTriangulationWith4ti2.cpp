@@ -91,14 +91,14 @@ triangulate_cone_with_4ti2(listCone *cone,
       height_function(height.get_mpq_t(), rays_array[i]->first, height_function_data);
       (*matrix)[i][0] = height.get_num();
     }
-#if 0
+
     /* Output of the file -- for debugging. */
-    {
+    if (Parameters->debug_triangulation) {
       std::ofstream file("lifted_cone_for_4ti2_triangulation");
       file << matrix->get_number() << " " << lifted_dim << endl;
       print(file, *matrix, 0, lifted_dim);
+      cerr << "Created file `lifted_cone_for_4ti2_triangulation'" << endl;
     }
-#endif
 
     VectorArray *facets = new VectorArray(0, matrix->get_size());
     lattice_basis(*matrix, *facets);
@@ -106,13 +106,12 @@ triangulate_cone_with_4ti2(listCone *cone,
     RayAlgorithm algorithm;
     algorithm.compute(*matrix, *facets, *subspace, *rs);
 
-#if 0
-    {
+    if (Parameters->debug_triangulation) {
       std::ofstream file("4ti2_triangulation_output");
       file << facets->get_number() << " " << lifted_dim << "\n";
       print(file, *facets, 0, lifted_dim);
+      cerr << "Created file `4ti2_triangulation_output'" << endl;
     }
-#endif
 
     /* Walk through all facets.  (Ignore all equalities in *subspace.)
        */
@@ -171,7 +170,11 @@ random_regular_triangulation_with_4ti2(listCone *cone,
 				       BarvinokParameters *Parameters,
 				       ConeConsumer &consumer)
 {
-  if (Parameters->triangulation_bias >= 0) {
+  if (Parameters->triangulation_prescribed_height_data != NULL) {
+    triangulate_cone_with_4ti2(cone, Parameters, prescribed_height, Parameters->triangulation_prescribed_height_data,
+			       Parameters->Number_of_Variables, consumer);
+  }
+  else if (Parameters->triangulation_bias >= 0) {
     triangulate_cone_with_4ti2(cone, Parameters, biased_random_height, &Parameters->triangulation_bias,
 			       Parameters->Number_of_Variables, consumer);
   }
