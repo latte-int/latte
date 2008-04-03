@@ -21,9 +21,11 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <cctype>
 #include <vector>
 #include <set>
+#include <list>
 #include <functional>
 
 #include "print.h"
@@ -332,7 +334,8 @@ usage()
 	 << "  --only-triangulate                       Only triangulate, don't normalize" << endl
          << "  --no-initial-triangulation               Don't compute an initial triangulation," << endl
          << "                                           start recursive normalizer on input." << endl
-	 << "  --triangulation-height-vector=4TI2-ROWVECTOR-FILE      Use this vector as a height vector." << endl;
+	 << "  --triangulation-height-vector=4TI2-ROWVECTOR-FILE      Use this vector as a height vector." << endl
+	 << "  --triangulation-pull-rays=INDEX,...      Pull the rays that have these (1-based) indices." << endl;
     reduction_test_factory.show_options(cerr);
 }
 
@@ -368,6 +371,52 @@ read_4ti2_vector(const char *filename)
   return result;
 }
 
+static list<int> *
+sscan_comma_separated_list(const char *s)
+{
+  list<int> *result = new list<int>;
+  string csl = s;
+  std::istringstream f(csl);
+  while (f.good()) {
+    int a;
+    f >> a;
+    result->push_back(a);
+    if (f.eof()) break;
+    char c;
+    f >> c;
+    if (c != ',') {
+      cerr << "Expected comma-separated list of integers" << endl;
+      exit(1);
+    }
+  }
+  return result;
+}
+
+static vec_ZZ *
+height_vector_from_pull_list(const listVector *rays, const list<int> * pull_list)
+{
+  vec_ZZ *result = new vec_ZZ;
+  int num_rays = lengthListVector(rays);
+  result->SetLength(num_rays);
+  list<int>::const_iterator i;
+  ZZ height;
+  height = 1;
+  if (pull_list->size() > 1) {
+    /* FIXME: lame lexicography */
+    cerr << "Warning: I am using lame lexicography here." << endl;
+  }
+  for (i = pull_list->begin(); i != pull_list->end(); ++i) {
+    int index = *i;
+    if (index <= 0 || index > num_rays) {
+      cerr << "Index out of range: " << index << endl;
+      exit(1);
+    }
+    (*result)[index - 1] = height;
+    height *= 1000;
+  }
+  return result;
+}
+
 int main(int argc, char **argv)
 {
   if (argc < 2) {
@@ -385,11 +434,11 @@ int main(int argc, char **argv)
   bool have_output_subcones = false;
   bool normalize = true;
   bool triangulate_toplevel = true;
+  list<int> *triangulation_pull_rays = NULL;
   
   params.triangulation = BarvinokParameters::RegularTriangulationWith4ti2;
   params.dualization = BarvinokParameters::DualizationWith4ti2;
   params.nonsimplicial_subdivision = true;
-
   
   {
     int i;
@@ -418,6 +467,11 @@ int main(int argc, char **argv)
 	  = new prescribed_height_data;
 	params.triangulation_prescribed_height_data->special_heights = read_4ti2_vector(argv[i] + 30);
 	params.triangulation_prescribed_height_data->special_rays = NULL;
+      }
+      else if (strncmp(argv[i], "--triangulation-pull-rays=", 26) == 0) {
+	params.triangulation_prescribed_height_data
+	  = new prescribed_height_data;
+	triangulation_pull_rays = sscan_comma_separated_list(argv[i] + 26);
       }
       else if (strncmp(argv[i], "--output-subcones=", 18) == 0) {
 	output_subcones_filename = string(argv[i] + 18);
@@ -495,6 +549,13 @@ int main(int argc, char **argv)
   if (params.triangulation_prescribed_height_data) {
     params.triangulation_prescribed_height_data->special_rays
       = copyListVector(cone->rays);
+    
+    if (triangulation_pull_rays) {
+      params.triangulation_prescribed_height_data->special_heights
+	= height_vector_from_pull_list(params.triangulation_prescribed_height_data->special_rays,
+				       triangulation_pull_rays);
+    }
+    
     if (lengthListVector(params.triangulation_prescribed_height_data->special_rays)
 	!= (*params.triangulation_prescribed_height_data->special_heights).length()) {
       cerr << "Lengths of prescribed height vector and number of rays of master cone do not match."
