@@ -38,6 +38,7 @@
 #include "ReadSubcones.h"
 #include "ReadLatteStyle.h"
 #include "vertices/cdd.h"
+#include "genFunction/piped.h"
 
 #include "normalize/ReductionTest.h"
 
@@ -55,15 +56,30 @@ ofstream stats;
 BarvinokParameters params;
 int max_facets = INT_MAX;
 int verbosity = 1;
+ZZ max_determinant_for_enumeration;
 
 // Keeping track of the Hilbert basis candidates, to avoid duplicates
 
-vector<int> *v = NULL;
-
 std::set < vector<int> > known_hilbert_vectors;
 
-static bool insert_hilbert_basis_element(int *vec)
+static bool insert_hilbert_basis_element(const vector<int> &v)
 {
+  std::set<vector<int> >::const_iterator where = known_hilbert_vectors.find(v);
+  if (where == known_hilbert_vectors.end()) {
+    if (!reduction_test->IsReducible(v)) {
+      // Not known yet, so add it and print it. 
+      known_hilbert_vectors.insert(v);
+      hil_file_writer->WriteVector(v);
+      return true;
+    }
+  }
+  return false;
+}
+
+static bool insert_hilbert_basis_element(const int *vec)
+{
+  static vector<int> *v = NULL;
+
   int numOfVars = params.Number_of_Variables;
   if (v == NULL) v = new vector<int>(numOfVars);
 
@@ -71,17 +87,31 @@ static bool insert_hilbert_basis_element(int *vec)
   for (i = 0; i<numOfVars; i++) {
     (*v)[i] = vec[i];
   }
-  
-  std::set<vector<int> >::const_iterator where = known_hilbert_vectors.find(*v);
-  if (where == known_hilbert_vectors.end()) {
-    if (!reduction_test->IsReducible(*v)) {
-      // Not known yet, so add it and print it. 
-      known_hilbert_vectors.insert(*v);
-      hil_file_writer->WriteVector(*v);
-      return true;
-    }
+
+  return insert_hilbert_basis_element(*v);
+}
+
+// Computing (supersets) of Hilbert bases using LattE's enumeration
+// of the fundamental parallelepiped.
+
+static void
+enumerate_simplicial_cone_with_latte(listCone *cone)
+{
+  int numOfVars = params.Number_of_Variables;
+  listVector* points = pointsInParallelepiped(cone, numOfVars);
+  vector<int> v(numOfVars);
+  bool any_new = false;
+
+  listVector *point;
+  for (point = points; point != NULL; point = point->rest) {
+    int i;
+    for (i = 0; i<numOfVars; i++)
+      v[i] = convert_ZZ_to_int(point->first[i]);
+    any_new = any_new || insert_hilbert_basis_element(v);
   }
-  return false;
+  freeListVector(points);
+  if (any_new)
+    hil_file_writer->UpdateNumVectors();
 }
 
 // The recursive decomposition and Hilbert basis computation.
@@ -169,6 +199,8 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   dualizeCone(t, params.Number_of_Variables, &params); // just swaps back
   dualization_time.stop();
   num_facets = lengthListVector(t->facets);
+  if (t->determinant != 0)
+    cerr << ", determinant " << abs(t->determinant);
   if (verbosity > 0) {
     cerr << ", " << num_facets << " facets; "
 	 << dualization_time;
@@ -190,6 +222,12 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   if (abs(t->determinant) == 1) {
     // simplicial, unimodular cone: Do nothing.
     stats << endl;
+  }
+  else if (num_rays == params.Number_of_Variables
+	   && abs(t->determinant) < max_determinant_for_enumeration) {
+    cerr << "Enumerating fundamental parallelepiped..." << flush;
+    enumerate_simplicial_cone_with_latte(t);
+    cerr << endl;
   }
   else if (num_facets < max_facets) {
     // Use zsolve to compute the Hilbert basis.
@@ -335,7 +373,11 @@ usage()
          << "  --no-initial-triangulation               Don't compute an initial triangulation," << endl
          << "                                           start recursive normalizer on input." << endl
 	 << "  --triangulation-height-vector=4TI2-ROWVECTOR-FILE      Use this vector as a height vector." << endl
-	 << "  --triangulation-pull-rays=INDEX,...      Pull the rays that have these (1-based) indices." << endl;
+	 << "  --triangulation-pull-rays=INDEX,...      Pull the rays that have these (1-based) indices." << endl
+	 << "  --max-determinant-for-enumeration=NUMBER Do not attempt to enumerate the lattice points of" << endl
+	 << "                                           the fundamental parallelepiped of simplicial cones" << endl
+	 << "                                           that have a larger determinant than this." << endl
+	 << "                                           (Default: Do not enumerate it at all, always use zsolve.)" << endl;
     reduction_test_factory.show_options(cerr);
 }
 
@@ -439,6 +481,8 @@ int main(int argc, char **argv)
   params.triangulation = BarvinokParameters::RegularTriangulationWith4ti2;
   params.dualization = BarvinokParameters::DualizationWith4ti2;
   params.nonsimplicial_subdivision = true;
+
+  max_determinant_for_enumeration = -1; // By default, don't use enumeration
   
   {
     int i;
@@ -482,6 +526,16 @@ int main(int argc, char **argv)
       }
       else if (strncmp(argv[i], "--no-initial-triangulation", 12) == 0) {
 	triangulate_toplevel = false;
+      }
+      else if (strncmp(argv[i], "--max-determinant-for-enumeration=", 34) == 0) {
+	string s(argv[i] + 34);
+	std::istringstream f(s);
+	f >> max_determinant_for_enumeration;
+	
+	if (f.bad()) {
+	  cerr << "Expected integer for --max-determinant-for-enumeration, got " << s << endl;
+	  exit(1);
+	}
       }
       else if (strncmp(argv[i], "--help", 6) == 0) {
 	usage();
