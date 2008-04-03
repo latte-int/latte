@@ -24,17 +24,6 @@
 
 using namespace std;
 
-static int
-convert_ZZ_to_int(const ZZ &zz)
-{
-  mpz_class z = convert_ZZ_to_mpz(zz);
-  if (abs(z) > INT_MAX) {
-    cerr << "Numbers too large for 4ti2 zsolve" << endl;
-    abort();
-  }
-  return mpz_get_si(z.get_mpz_t());
-}
-
 LinearSystem
 facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars)
 {
