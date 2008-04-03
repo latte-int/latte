@@ -36,7 +36,7 @@ struct listVector {
 };
 
 /* Return the length of the linked list of vectors. */
-int lengthListVector(listVector*);
+int lengthListVector(const listVector*);
 
 listVector *appendVectorToListVector(const vec_ZZ &, listVector*);
 

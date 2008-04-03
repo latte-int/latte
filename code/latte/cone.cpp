@@ -24,7 +24,7 @@
 #include "ramon.h"
 
 /* ----------------------------------------------------------------- */
-int lengthListVector(listVector* LIST) {
+int lengthListVector(const listVector* LIST) {
   int len=0;
 
   while (LIST) {len++; LIST = LIST->rest;}
