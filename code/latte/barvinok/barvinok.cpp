@@ -54,6 +54,7 @@ BarvinokParameters::BarvinokParameters() :
   nonsimplicial_subdivision(false),
   triangulation_special_cone(NULL),
   triangulation_prescribed_height_data(NULL),
+  triangulation_assume_fulldim(true),
   dualization(DualizationWithCdd),
   shortvector(LatteLLL),
   max_determinant(0),

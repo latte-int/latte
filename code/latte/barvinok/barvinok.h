@@ -68,6 +68,7 @@ public:
   listCone *triangulation_special_cone;
   prescribed_height_data *triangulation_prescribed_height_data;
   bool debug_triangulation;
+  bool triangulation_assume_fulldim;
   // How to dualize non-simplicial cones.
   typedef enum {
     DualizationWithCdd,
