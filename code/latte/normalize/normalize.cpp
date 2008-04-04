@@ -624,6 +624,8 @@ int main(int argc, char **argv)
 #endif
   }
 
+  params.triangulation_assume_fulldim = false;
+  
   if (triangulate_toplevel) {
     // Send input cones through triangulation.
     ConeTransducer *triangulator = new TriangulatingConeTransducer(&params);
