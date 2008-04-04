@@ -56,7 +56,6 @@ triangulate_cone_with_4ti2(listCone *cone,
 			   BarvinokParameters *Parameters,
 			   height_function_type height_function,
 			   void *height_function_data,
-			   int cone_dimension,
 			   ConeConsumer &consumer)
 {
   // Copy rays into an array, so we can index them.
@@ -147,7 +146,7 @@ triangulate_cone_with_4ti2(listCone *cone,
 	     random height vector. */
 	  triangulate_cone_with_4ti2(c, Parameters,
 				     random_height, &Parameters->triangulation_max_height,
-				     cone_dimension, consumer);
+				     consumer);
 	}
 	else if (c_num_rays < true_dimension) {
 	  cerr << "Lower-dimensional cone in purported triangulation, should not happen."
@@ -172,15 +171,15 @@ random_regular_triangulation_with_4ti2(listCone *cone,
 {
   if (Parameters->triangulation_prescribed_height_data != NULL) {
     triangulate_cone_with_4ti2(cone, Parameters, prescribed_height, Parameters->triangulation_prescribed_height_data,
-			       Parameters->Number_of_Variables, consumer);
+			       consumer);
   }
   else if (Parameters->triangulation_bias >= 0) {
     triangulate_cone_with_4ti2(cone, Parameters, biased_random_height, &Parameters->triangulation_bias,
-			       Parameters->Number_of_Variables, consumer);
+			       consumer);
   }
   else {
     triangulate_cone_with_4ti2(cone, Parameters, random_height, &Parameters->triangulation_max_height,
-			       Parameters->Number_of_Variables, consumer);
+			       consumer);
   }
 }
 
@@ -190,5 +189,5 @@ refined_delone_triangulation_with_4ti2(listCone *cone,
 				       ConeConsumer &consumer)
 {
   triangulate_cone_with_4ti2(cone, Parameters, delone_height, NULL,
-			     Parameters->Number_of_Variables, consumer);
+			     consumer);
 }

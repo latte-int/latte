@@ -245,7 +245,6 @@ compute_triangulation_of_boundary
 // 				 consumer);
     triangulate_cone_with_4ti2(facet_cone, Parameters,
 			       random_height, &Parameters->triangulation_max_height,
-			       Parameters->Number_of_Variables - 1,
 			       consumer);
 //     cerr << "Triangulation of facet cone: " << lengthListCone(facet_triangulation)
 // 	 << " simplicial cones." << endl;

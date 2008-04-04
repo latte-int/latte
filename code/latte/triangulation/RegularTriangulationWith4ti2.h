@@ -32,7 +32,6 @@ triangulate_cone_with_4ti2(listCone *cone,
 			   BarvinokParameters *Parameters,
 			   height_function_type height_function,
 			   void *height_function_data,
-			   int cone_dimension,
 			   ConeConsumer &consumer);
 
 /* Triangulate a full-dimensional CONE. */
