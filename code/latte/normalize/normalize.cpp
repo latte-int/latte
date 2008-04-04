@@ -1,6 +1,6 @@
 /* normalize.cpp -- Re-implementation of NORMALIZ
 	       
-   Copyright 2007 Matthias Koeppe
+   Copyright 2007, 2008 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -52,6 +52,7 @@ IncrementalVectorFileWriter *hil_file_writer = NULL;
 ReductionTest *reduction_test = NULL;
 
 string filename;
+string subcones_filename;
 ofstream stats;
 BarvinokParameters params;
 int max_facets = INT_MAX;
@@ -309,12 +310,26 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 
 static void open_output_and_stats()
 {
-  hil_filename = filename + ".hil";
+  string base_filename = filename;
+  if (subcones_filename.length() > 0) {
+    base_filename += "--subcones-";
+    size_t slash = subcones_filename.rfind('/');
+    if (slash == string::npos)
+      base_filename += subcones_filename;
+    else
+      base_filename += subcones_filename.substr(slash + 1);
+  }
+  
+  hil_filename = base_filename + ".hil";
   cerr << "Output goes to file `" << hil_filename << "'..." << endl;
 
-  string stats_filename = filename + ".stats";
+  string stats_filename = base_filename + ".stats";
   cerr << "Cone statistics go to file `" << stats_filename << "'..." << endl;
   stats.open(stats_filename.c_str());
+  if (!stats.good()) {
+    cerr << "Cannot write to file `" << stats_filename << "'..." << endl;
+    exit(1);
+  }
   stats << "# Level\tIndex\tRays\tFacets\tDet\tDualize\tZSolve\tHilberts" << endl;
 
   // Redirect 4ti2/qsolve output.
@@ -470,7 +485,6 @@ int main(int argc, char **argv)
 
   listCone *cone;
   bool create_triang_file = true;
-  string subcones_filename;
   bool have_subcones = false;
   string output_subcones_filename;
   bool have_output_subcones = false;
