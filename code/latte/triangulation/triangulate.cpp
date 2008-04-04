@@ -115,7 +115,7 @@ triangulateCone(listCone *cone, int numOfVars,
 		BarvinokParameters *params,
 		ConeConsumer &consumer)
 {
-  if (numOfVars == lengthListVector(cone->rays)) {
+  if (params->triangulation_assume_fulldim && numOfVars == lengthListVector(cone->rays)) {
     // Already simplicial.
     consumer.ConsumeCone(copyCone(cone));
     return;
