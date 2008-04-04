@@ -128,6 +128,10 @@ IncrementalVectorFileWriter::IncrementalVectorFileWriter(const std::string &file
   : num_vectors(0), stream(filename.c_str()), dimension(a_dimension)
 {
   // We fill in the correct number of lines later.
+  if (!stream.good()) {
+    cerr << "Cannot write to file " << filename << endl;
+    exit(1);
+  }
   stream << setw(16) << left << -1 << setw(0) << right
 	 << " " << dimension << endl;
 }
@@ -147,6 +151,10 @@ IncrementalVectorFileWriter::WriteVector(const vec_ZZ &v)
   }
   stream << endl;
   num_vectors++;
+  if (!stream.good()) {
+    cerr << "Error writing to vector file" << endl;
+    exit(1);
+  }
 }
 
 void
@@ -159,6 +167,10 @@ IncrementalVectorFileWriter::WriteVector(const std::vector<bool> &v)
   }
   stream << endl;
   num_vectors++;
+  if (!stream.good()) {
+    cerr << "Error writing to vector file" << endl;
+    exit(1);
+  }
 }
 
 void
@@ -171,6 +183,10 @@ IncrementalVectorFileWriter::WriteVector(const std::vector<int> &v)
   }
   stream << endl;
   num_vectors++;
+  if (!stream.good()) {
+    cerr << "Error writing to vector file" << endl;
+    exit(1);
+  }
 }
 
 void
@@ -180,6 +196,10 @@ IncrementalVectorFileWriter::UpdateNumVectors()
   stream << setw(16) << left << num_vectors;
   stream.seekp(0, ios::end);
   stream.flush();
+  if (!stream.good()) {
+    cerr << "Error writing to vector file" << endl;
+    exit(1);
+  }
 }
 
 
