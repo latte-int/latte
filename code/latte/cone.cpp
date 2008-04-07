@@ -79,6 +79,8 @@ listCone* createListCone() {
   z->determinant = 0;
   z->dual_determinant = 0;
   z->latticePoints=0;
+  z->subspace_generators = 0;
+  z->equalities = 0;
   z->rest=0;
 
   return (z);
@@ -97,6 +99,8 @@ void freeCone(listCone *cone)
   freeListVector(cone->rays);
   freeListVector(cone->facets);
   freeListVector(cone->latticePoints);
+  freeListVector(cone->subspace_generators);
+  freeListVector(cone->equalities);
   delete cone;
 }
 
@@ -132,6 +136,8 @@ listCone *copyCone(listCone *cone)
   copy->facet_divisors = cone->facet_divisors;
   copy->latticePoints = copyListVector(cone->latticePoints);
   copy->lattice_points_scalar_products = cone->lattice_points_scalar_products;
+  copy->subspace_generators = copyListVector(cone->subspace_generators);
+  copy->equalities = copyListVector(cone->equalities);
   copy->rest = NULL;
   return copy;
 }

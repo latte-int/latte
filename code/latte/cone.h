@@ -61,9 +61,11 @@ struct listCone {
   ZZ determinant;		// determinant of the matrix formed by
 				// the RAYS, with sign
   listVector *rays;
+  listVector *subspace_generators; // for non-pointed cones
   ZZ dual_determinant;		// determinant of the matrix formed by
 				// the FACETS, with sign
   listVector *facets;
+  listVector *equalities;	// for non-fulldimensional cones
   // For simplicial cones where RAYS and FACETS are both computed, we
   // guarantee that < RAY_i, FACET_j > = -FACET_DIVISOR_i * DELTA_{i,j}.
   vec_ZZ facet_divisors;	
