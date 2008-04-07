@@ -31,10 +31,32 @@
 
 using namespace _4ti2_;
 
+static listVector *
+listVectors_from_VectorArray(VectorArray *facets,
+			     int numOfVars,
+			     int index_offset)
+{
+  int num_facets = facets->get_number();
+  vec_ZZ facet;
+  facet.SetLength(numOfVars);
+  listVector *result = NULL;
+  int i;
+  for (i = 0; i<num_facets; i++) {
+    int j;
+    for (j = 0; j<numOfVars; j++) {
+      mpz_class z = (*facets)[i][j + index_offset];
+      facet[j] = convert_mpz_to_ZZ(z);
+    }
+    result = new listVector(facet, result);
+  }
+  return result;
+}
+
 void
 dualizeCone_with_4ti2(listCone *cone, int numOfVars)
 {
   assert(cone->facets == NULL);
+  assert(cone->subspace_generators == NULL);
   int num_rays = lengthListVector(cone->rays);
   /* Create a matrix from the rays, with extra coordinates 
      at the front for slack variables.
@@ -59,21 +81,11 @@ dualizeCone_with_4ti2(listCone *cone, int numOfVars)
   RayAlgorithm algorithm;
   algorithm.compute(*matrix, *facets, *subspace, *rs);
 
-  assert(subspace->get_number() == 0); /* We assume full-dimensional
-					  cones. */
-  int num_facets = facets->get_number();
-  vec_ZZ facet;
-  facet.SetLength(numOfVars);
-  cone->facets = NULL;
-  int i;
-  for (i = 0; i<num_facets; i++) {
-    int j;
-    for (j = 0; j<numOfVars; j++) {
-      mpz_class z = (*facets)[i][j + num_rays];
-      facet[j] = convert_mpz_to_ZZ(z);
-    }
-    cone->facets = new listVector(facet, cone->facets);
-  }
+  cone->facets = listVectors_from_VectorArray(facets, numOfVars,
+					      /*index_offset:*/ num_rays);
+  cone->equalities = listVectors_from_VectorArray(subspace, numOfVars,
+						  /*index_offset:*/ num_rays);
+  
   delete facets;
   delete subspace;
   delete matrix;
@@ -81,4 +93,5 @@ dualizeCone_with_4ti2(listCone *cone, int numOfVars)
   /* Final swap data. */
   swap(cone->determinant, cone->dual_determinant);
   swap(cone->rays, cone->facets);
+  swap(cone->subspace_generators, cone->equalities);
 }
