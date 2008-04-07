@@ -232,10 +232,12 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   }
   else if (num_facets < max_facets) {
     // Use zsolve to compute the Hilbert basis.
+
+    int cone_dimension = params.Number_of_Variables - lengthListVector(t->equalities);
     
     //printCone(t, params.Number_of_Variables);
     LinearSystem ls
-      = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+      = facets_to_4ti2_zsolve_LinearSystem(t->facets, t->equalities, params.Number_of_Variables);
 
     //printLinearSystem(ls);
 
@@ -258,12 +260,13 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 	     << zsolve_time;
       }
     
-      if (num_hilberts < params.Number_of_Variables) {
+      if (num_hilberts < cone_dimension) {
 	// Sanity check.
 	cerr << "Too few Hilbert basis elements " << endl;
 	printCone(t, params.Number_of_Variables);
 	LinearSystem ls
-	  = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+	  = facets_to_4ti2_zsolve_LinearSystem(t->facets, t->equalities,
+					       params.Number_of_Variables);
 	printLinearSystem(ls);
 	fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
 	fprintVectorArray(stdout, ctx->Homs, false);
