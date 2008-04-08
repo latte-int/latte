@@ -19,10 +19,10 @@
 */
 
 // From 4ti2:
-#include "BitSet.h"
-#include "VectorArrayStream.h"
-#include "LatticeBasis.h"
-#include "RayAlgorithm.h"
+#include "groebner/BitSet.h"
+#include "groebner/VectorArrayStream.h"
+#include "groebner/LatticeBasis.h"
+#include "groebner/RayAlgorithm.h"
 
 #include "latte_gmp.h"
 #include "latte_4ti2.h"

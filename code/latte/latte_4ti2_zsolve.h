@@ -25,18 +25,11 @@
 
 #include "cone.h"
 
-extern "C" {
-#  include "libzsolve.h"
-  // These defines come from defs.h; undefine them again.
-#undef bool
-#undef true
-#undef false
-}
+#include "zsolve/LinearSystem.hpp"
 
 /* Create a 4ti2/zsolve LinearSystem representing the homogeneous
    inequalities given by FACETS. */
-LinearSystem
+_4ti2_zsolve_::LinearSystem<int> *
 facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars);
-
 
 #endif

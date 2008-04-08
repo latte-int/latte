@@ -23,6 +23,7 @@
 #include "latte_4ti2_zsolve.h"
 
 using namespace std;
+using namespace _4ti2_zsolve_;
 
 static int
 convert_ZZ_to_int(const ZZ &zz)
@@ -35,26 +36,29 @@ convert_ZZ_to_int(const ZZ &zz)
   return mpz_get_si(z.get_mpz_t());
 }
 
-LinearSystem
+LinearSystem<int> *
 facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars)
 {
   int num_facets = lengthListVector(facets);
-  Matrix matrix = createMatrix(numOfVars, num_facets);
+  VectorArray<int> matrix(/*height:*/ num_facets, /*width:*/ numOfVars);
   listVector *f;
   int row;
   for (f = facets, row = 0; f!=NULL; f=f->rest, row++) {
     int col;
     for (col = 0; col<numOfVars; col++) {
-      matrix->Data[row * matrix->Width + col] = convert_ZZ_to_int(f->first[col]);
+      matrix[row][col] = convert_ZZ_to_int(f->first[col]);
     }
   }
-  LinearSystem ls = createLinearSystem();
-  setLinearSystemMatrix(ls, matrix);
-  deleteMatrix(matrix);
-  Vector rhs = createZeroVector(num_facets);
-  setLinearSystemRHS(ls, rhs);
-  deleteVector(rhs);
-  setLinearSystemLimit(ls, -1, -MAXINT, MAXINT, true);
-  setLinearSystemEquationType(ls, -1, EQUATION_LESSEREQUAL, 0);
+  int *rhs = new int[num_facets];
+  for (row = 0; row<num_facets; row++)
+    rhs[row] = 0;
+  LinearSystem<int> *ls
+    = new LinearSystem<int> (/*matrix:*/ matrix, /*rhs:*/ rhs,
+			     /*free:*/ true,
+			     /*lower:*/ 1,
+			     /*upper:*/ -1);
+  delete[] rhs;
+  for (row = 0; row<num_facets; row++)
+    ls->get_relation(row) = Relation<int>::LesserEqual;
   return ls;
 }

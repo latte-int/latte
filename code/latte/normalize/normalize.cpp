@@ -1,6 +1,6 @@
 /* normalize.cpp -- Re-implementation of NORMALIZ
 	       
-   Copyright 2007 Matthias Koeppe
+   Copyright 2007, 2008 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -39,7 +39,11 @@
 #include "normalize/ReductionTest.h"
 
 // from 4ti2:
-#include "Globals.h"
+#include "groebner/Globals.h"
+
+// from 4ti2 zsolve:
+#include "zsolve/Options.h"
+#include "zsolve/DefaultController.hpp"
 
 using namespace std;
 
@@ -192,40 +196,65 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     // Use zsolve to compute the Hilbert basis.
     
     //printCone(t, params.Number_of_Variables);
-    LinearSystem ls
+    _4ti2_zsolve_::LinearSystem<int> *ls
       = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
 
     //printLinearSystem(ls);
 
-    ZSolveContext ctx
-      = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
-				      /* logcallback: */ NULL,
-				      /* backupEvent: */ (zsolve_time_limit
-							  ? check_timelimit
-							  : NULL));
-    ctx->BackupTime = zsolve_time_limit;
-    deleteLinearSystem(ls);
-    zsolve_time.start();
-    if (zsolve_time_limit == 0 || setjmp(timelimit_jmp_buf) == 0) {
-      zsolveSystem(ctx, /*appendnegatives:*/ true);
-      zsolve_time.stop();
-
-      int num_hilberts = ctx->Homs->Size;
-      if (verbosity > 0) {
-	cerr << num_hilberts << " Hilbert basis elements; "
-	     << zsolve_time;
-      }
+    // FIXME: Lame.
+    int argc = 3;
+    char *argv[3] = {"embedded_zsolve", "-q", "normalize_aux"};
+    _4ti2_zsolve_::Options options(argc, argv);
+    _4ti2_zsolve_::DefaultController<int> * controller
+      = new _4ti2_zsolve_::DefaultController<int>(&std::cout, NULL, options);
+    _4ti2_zsolve_::Algorithm<int> *zsolve_algo
+      = new _4ti2_zsolve_::Algorithm<int> (ls, controller);
+    delete ls;
     
-      if (num_hilberts < params.Number_of_Variables) {
+///     ZSolveContext ctx
+///       = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
+/// 				      /* logcallback: */ NULL,
+/// 				      /* backupEvent: */ (zsolve_time_limit
+/// 							  ? check_timelimit
+/// 							  : NULL));
+///     ctx->BackupTime = zsolve_time_limit;
+///     deleteLinearSystem(ls);
+    zsolve_time.start();
+///     if (zsolve_time_limit == 0 || setjmp(timelimit_jmp_buf) == 0) {
+
+    zsolve_algo->compute (/* backup_frequency: */ 0);
+    
+    zsolve_time.stop();
+
+    _4ti2_zsolve_::VectorArray <int> inhoms (zsolve_algo->get_result_variables ());
+    _4ti2_zsolve_::VectorArray <int> homs (zsolve_algo->get_result_variables ());
+    _4ti2_zsolve_::VectorArray <int> free (zsolve_algo->get_result_variables ());
+
+   
+    zsolve_algo->extract_zsolve_results (inhoms, homs, free);
+
+    if (verbosity >= 2) {
+      cout << "Inhoms: " << endl << inhoms;
+      cout << "Homs: " << endl << homs;
+      cout << "Frees: " << endl << free;
+    }
+    
+    int num_hilberts = homs.vectors();
+    if (verbosity > 0) {
+      cerr << num_hilberts << " Hilbert basis elements; "
+	   << zsolve_time;
+    }
+    
+    if (num_hilberts < params.Number_of_Variables) {
 	// Sanity check.
 	cerr << "Too few Hilbert basis elements " << endl;
 	printCone(t, params.Number_of_Variables);
-	LinearSystem ls
+	_4ti2_zsolve_::LinearSystem<int> *ls
 	  = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
-	printLinearSystem(ls);
-	fprintf(stdout, "%d %d\n\n", ctx->Homs->Size + ctx->Frees->Size, ctx->Homs->Variables);
-	fprintVectorArray(stdout, ctx->Homs, false);
-	fprintVectorArray(stdout, ctx->Frees, false);
+	cout << *ls;
+	fprintf(stdout, "%d %d\n\n", homs.vectors() + free.vectors(), homs.variables());
+	cout << homs;
+	cout << free;
 	abort();
       }
     
@@ -233,29 +262,31 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
       //fprintVectorArray(output, ctx->Frees, false);
       int i;
       bool any_new = false;
-      for (i = 0; i<ctx->Homs->Size; i++) {
-	if (insert_hilbert_basis_element(ctx->Homs->Data[i])) any_new = true;
+      for (i = 0; i<homs.vectors(); i++) {
+	if (insert_hilbert_basis_element(homs[i])) any_new = true;
       }
       if (any_new)
 	hil_file_writer->UpdateNumVectors();
     
-      deleteZSolveContext(ctx, true);
+      delete zsolve_algo;
+      delete controller;
     
       stats << zsolve_time.get_seconds() << "\t"
 	    << num_hilberts << endl;
     }
-    else {
-      /* Longjmp target -- the timelimit was reached. */
-      zsolve_time.stop();
-      stats << zsolve_time.get_seconds() << endl;
-      deleteZSolveContext(ctx, true);
-      if (verbosity > 0) {
-	cerr << "Spent too much time in zsolve, subdividing..." << endl;
-      }
-      RecursiveNormalizer rec(level + 1);
-      triangulateCone(t, params.Number_of_Variables, &params, rec);
-    }
-  }
+///     else {
+///       /* Longjmp target -- the timelimit was reached. */
+///       zsolve_time.stop();
+///       stats << zsolve_time.get_seconds() << endl;
+///       delete zsolve_algo;
+///       delete controller;
+///       if (verbosity > 0) {
+/// 	cerr << "Spent too much time in zsolve, subdividing..." << endl;
+///       }
+///       RecursiveNormalizer rec(level + 1);
+///       triangulateCone(t, params.Number_of_Variables, &params, rec);
+///     }
+//   }
   else {
     stats << endl;
     if (verbosity > 0) {
