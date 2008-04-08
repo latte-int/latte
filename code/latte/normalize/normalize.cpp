@@ -159,14 +159,30 @@ cone_unimodular(listCone *cone, int numOfVars)
   return abs(d) == 1;
 }
 
-#include <setjmp.h>
-int zsolve_time_limit = 0;
-jmp_buf timelimit_jmp_buf;
+struct ZSolveTimeLimitReached {};
 
-static void check_timelimit(struct zsolvecontext_t *zsolve)
+template <typename T> class NormalizController
+  : public _4ti2_zsolve_::DefaultController <T>
 {
-  longjmp(timelimit_jmp_buf, 1);
-}
+  double time_limit;
+public:
+  NormalizController (std::ostream* console, std::ofstream* log,
+		      const _4ti2_zsolve_::Options& options,
+		      double a_time_limit)
+    : _4ti2_zsolve_::DefaultController <T> (console, log, options),
+      time_limit(a_time_limit) {}
+  void log_status (size_t variable, const T& sum, const T& max_sum,
+		   const T& norm, size_t vectors, int backup_frequency,
+		   _4ti2_zsolve_::Timer& timer)
+  {
+    if (timer.get_elapsed_time() > time_limit) {
+      ZSolveTimeLimitReached reached;
+      throw reached;
+    }
+  }
+};
+
+int zsolve_time_limit = 0;
 
 static void
 handle_cone(listCone *t, int t_count, int t_total, int level)
@@ -253,44 +269,37 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     char *argv[3] = {"embedded_zsolve", "-q", "normalize_aux"};
     _4ti2_zsolve_::Options options(argc, argv);
     _4ti2_zsolve_::DefaultController<int> * controller
-      = new _4ti2_zsolve_::DefaultController<int>(&std::cout, NULL, options);
+      = new NormalizController<int>(&std::cout, NULL, options,
+				    zsolve_time_limit);
     _4ti2_zsolve_::Algorithm<int> *zsolve_algo
       = new _4ti2_zsolve_::Algorithm<int> (ls, controller);
     delete ls;
     
-///     ZSolveContext ctx
-///       = createZSolveContextFromSystem(ls, NULL/*LogFile*/, 0/*OLogging*/, -1/*OVerbose*/,
-/// 				      /* logcallback: */ NULL,
-/// 				      /* backupEvent: */ (zsolve_time_limit
-/// 							  ? check_timelimit
-/// 							  : NULL));
-///     ctx->BackupTime = zsolve_time_limit;
-///     deleteLinearSystem(ls);
-    zsolve_time.start();
-///     if (zsolve_time_limit == 0 || setjmp(timelimit_jmp_buf) == 0) {
+    try {
 
-    zsolve_algo->compute (/* backup_frequency: */ 0);
+      zsolve_time.start();
+
+      zsolve_algo->compute (/* backup_frequency: */ 0);
     
-    zsolve_time.stop();
+      zsolve_time.stop();
 
-    _4ti2_zsolve_::VectorArray <int> inhoms (zsolve_algo->get_result_variables ());
-    _4ti2_zsolve_::VectorArray <int> homs (zsolve_algo->get_result_variables ());
-    _4ti2_zsolve_::VectorArray <int> free (zsolve_algo->get_result_variables ());
+      _4ti2_zsolve_::VectorArray <int> inhoms (zsolve_algo->get_result_variables ());
+      _4ti2_zsolve_::VectorArray <int> homs (zsolve_algo->get_result_variables ());
+      _4ti2_zsolve_::VectorArray <int> free (zsolve_algo->get_result_variables ());
 
-   
-    zsolve_algo->extract_zsolve_results (inhoms, homs, free);
+      zsolve_algo->extract_zsolve_results (inhoms, homs, free);
 
-    if (verbosity >= 2) {
-      cout << "Inhoms: " << endl << inhoms;
-      cout << "Homs: " << endl << homs;
-      cout << "Frees: " << endl << free;
-    }
+      if (verbosity >= 2) {
+	cout << "Inhoms: " << endl << inhoms;
+	cout << "Homs: " << endl << homs;
+	cout << "Frees: " << endl << free;
+      }
     
-    int num_hilberts = homs.vectors();
-    if (verbosity > 0) {
-      cerr << num_hilberts << " Hilbert basis elements; "
-	   << zsolve_time;
-    }
+      int num_hilberts = homs.vectors();
+      if (verbosity > 0) {
+	cerr << num_hilberts << " Hilbert basis elements; "
+	     << zsolve_time;
+      }
     
       if (num_hilberts < cone_dimension) {
 	// Sanity check.
@@ -321,19 +330,19 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
       stats << zsolve_time.get_seconds() << "\t"
 	    << num_hilberts << endl;
     }
-///     else {
-///       /* Longjmp target -- the timelimit was reached. */
-///       zsolve_time.stop();
-///       stats << zsolve_time.get_seconds() << endl;
-///       delete zsolve_algo;
-///       delete controller;
-///       if (verbosity > 0) {
-/// 	cerr << "Spent too much time in zsolve, subdividing..." << endl;
-///       }
-///       RecursiveNormalizer rec(level + 1);
-///       triangulateCone(t, params.Number_of_Variables, &params, rec);
-///     }
-//   }
+    catch (ZSolveTimeLimitReached) {
+      /* The timelimit was reached. */
+      zsolve_time.stop();
+      stats << zsolve_time.get_seconds() << endl;
+      delete zsolve_algo;
+      delete controller;
+      if (verbosity > 0) {
+	cerr << "Spent too much time in zsolve, subdividing..." << endl;
+      }
+      RecursiveNormalizer rec(level + 1);
+      triangulateCone(t, params.Number_of_Variables, &params, rec);
+    }
+  }
   else {
     stats << endl;
     if (verbosity > 0) {
