@@ -248,6 +248,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     //printLinearSystem(ls);
 
     // FIXME: Lame.
+    optind = 1;			// getopt should parse from the beginning.
     int argc = 3;
     char *argv[3] = {"embedded_zsolve", "-q", "normalize_aux"};
     _4ti2_zsolve_::Options options(argc, argv);
