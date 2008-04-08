@@ -158,9 +158,12 @@ ReductionTestWithCPLEX::IsReducible(const vector<int> &v)
   int mipstat = CPXgetstat(env, lp);
   if (mipstat != CPXMIP_OPTIMAL) {
     cerr << "MIP solution status code: " << mipstat << endl;
-    cout << "MIP written out as repr-ip.lp" << endl;
     status = CPXwriteprob(env, lp, "repr-ip.lp", "LP");
-    if (status != 0) abort();
+    if (status != 0) {
+      cerr << "Cannot write repr-ip.lp" << endl;
+      abort();
+    }
+    cout << "MIP written out as repr-ip.lp" << endl;
     is_reducible = false;
   }
   else {

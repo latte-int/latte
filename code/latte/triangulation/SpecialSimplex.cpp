@@ -447,7 +447,7 @@ special_triangulation_with_subspace_avoiding_facets
 #else
   triangulate_cone_with_4ti2(cone, Parameters,
 			     special_height, &shd,
-			     numOfVars, *effective_consumer);
+			     *effective_consumer);
 #endif
 #endif
 }

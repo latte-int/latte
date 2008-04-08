@@ -21,9 +21,11 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <sstream>
 #include <cctype>
 #include <vector>
 #include <set>
+#include <list>
 #include <functional>
 
 #include "print.h"
@@ -35,6 +37,8 @@
 #include "timing.h"
 #include "ReadSubcones.h"
 #include "ReadLatteStyle.h"
+#include "vertices/cdd.h"
+#include "genFunction/piped.h"
 
 #include "normalize/ReductionTest.h"
 
@@ -52,19 +56,35 @@ IncrementalVectorFileWriter *hil_file_writer = NULL;
 ReductionTest *reduction_test = NULL;
 
 string filename;
+string subcones_filename;
 ofstream stats;
 BarvinokParameters params;
 int max_facets = INT_MAX;
 int verbosity = 1;
+ZZ max_determinant_for_enumeration;
 
 // Keeping track of the Hilbert basis candidates, to avoid duplicates
 
-vector<int> *v = NULL;
-
 std::set < vector<int> > known_hilbert_vectors;
 
-static bool insert_hilbert_basis_element(int *vec)
+static bool insert_hilbert_basis_element(const vector<int> &v)
 {
+  std::set<vector<int> >::const_iterator where = known_hilbert_vectors.find(v);
+  if (where == known_hilbert_vectors.end()) {
+    if (!reduction_test->IsReducible(v)) {
+      // Not known yet, so add it and print it. 
+      known_hilbert_vectors.insert(v);
+      hil_file_writer->WriteVector(v);
+      return true;
+    }
+  }
+  return false;
+}
+
+static bool insert_hilbert_basis_element(const int *vec)
+{
+  static vector<int> *v = NULL;
+
   int numOfVars = params.Number_of_Variables;
   if (v == NULL) v = new vector<int>(numOfVars);
 
@@ -72,17 +92,31 @@ static bool insert_hilbert_basis_element(int *vec)
   for (i = 0; i<numOfVars; i++) {
     (*v)[i] = vec[i];
   }
-  
-  std::set<vector<int> >::const_iterator where = known_hilbert_vectors.find(*v);
-  if (where == known_hilbert_vectors.end()) {
-    if (!reduction_test->IsReducible(*v)) {
-      // Not known yet, so add it and print it. 
-      known_hilbert_vectors.insert(*v);
-      hil_file_writer->WriteVector(*v);
-      return true;
-    }
+
+  return insert_hilbert_basis_element(*v);
+}
+
+// Computing (supersets) of Hilbert bases using LattE's enumeration
+// of the fundamental parallelepiped.
+
+static void
+enumerate_simplicial_cone_with_latte(listCone *cone)
+{
+  int numOfVars = params.Number_of_Variables;
+  listVector* points = pointsInParallelepiped(cone, numOfVars);
+  vector<int> v(numOfVars);
+  bool any_new = false;
+
+  listVector *point;
+  for (point = points; point != NULL; point = point->rest) {
+    int i;
+    for (i = 0; i<numOfVars; i++)
+      v[i] = convert_ZZ_to_int(point->first[i]);
+    any_new = any_new || insert_hilbert_basis_element(v);
   }
-  return false;
+  freeListVector(points);
+  if (any_new)
+    hil_file_writer->UpdateNumVectors();
 }
 
 // The recursive decomposition and Hilbert basis computation.
@@ -171,6 +205,8 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   dualization_time.stop();
   num_facets = lengthListVector(t->facets);
   if (verbosity > 0) {
+    if (t->determinant != 0)
+      cerr << ", determinant " << abs(t->determinant);
     cerr << ", " << num_facets << " facets; "
 	 << dualization_time;
   }
@@ -192,12 +228,22 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     // simplicial, unimodular cone: Do nothing.
     stats << endl;
   }
+  else if (num_rays == params.Number_of_Variables
+	   && abs(t->determinant) < max_determinant_for_enumeration) {
+    if (verbosity > 0) {
+      cerr << "Enumerating fundamental parallelepiped..." << flush;
+      enumerate_simplicial_cone_with_latte(t);
+      cerr << endl;
+    }
+  }
   else if (num_facets < max_facets) {
     // Use zsolve to compute the Hilbert basis.
+
+    int cone_dimension = params.Number_of_Variables - lengthListVector(t->equalities);
     
     //printCone(t, params.Number_of_Variables);
     _4ti2_zsolve_::LinearSystem<int> *ls
-      = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+      = facets_to_4ti2_zsolve_LinearSystem(t->facets, t->equalities, params.Number_of_Variables);
 
     //printLinearSystem(ls);
 
@@ -245,12 +291,12 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 	   << zsolve_time;
     }
     
-    if (num_hilberts < params.Number_of_Variables) {
+      if (num_hilberts < cone_dimension) {
 	// Sanity check.
 	cerr << "Too few Hilbert basis elements " << endl;
 	printCone(t, params.Number_of_Variables);
 	_4ti2_zsolve_::LinearSystem<int> *ls
-	  = facets_to_4ti2_zsolve_LinearSystem(t->facets, params.Number_of_Variables);
+	  = facets_to_4ti2_zsolve_LinearSystem(t->facets, t->equalities, params.Number_of_Variables);
 	cout << *ls;
 	fprintf(stdout, "%d %d\n\n", homs.vectors() + free.vectors(), homs.variables());
 	cout << homs;
@@ -299,12 +345,30 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 
 static void open_output_and_stats()
 {
-  hil_filename = filename + ".hil";
-  cerr << "Output goes to file `" << hil_filename << "'..." << endl;
+  string base_filename = filename;
+  if (subcones_filename.length() > 0) {
+    base_filename += "--subcones-";
+    size_t slash = subcones_filename.rfind('/');
+    if (slash == string::npos)
+      base_filename += subcones_filename;
+    else
+      base_filename += subcones_filename.substr(slash + 1);
+  }
+  
+  hil_filename = base_filename + ".hil";
+  if (verbosity > 0) {
+    cerr << "Output goes to file `" << hil_filename << "'..." << endl;
+  }
 
-  string stats_filename = filename + ".stats";
-  cerr << "Cone statistics go to file `" << stats_filename << "'..." << endl;
+  string stats_filename = base_filename + ".stats";
+  if (verbosity > 0) {
+    cerr << "Cone statistics go to file `" << stats_filename << "'..." << endl;
+  }
   stats.open(stats_filename.c_str());
+  if (!stats.good()) {
+    cerr << "Cannot write to file `" << stats_filename << "'..." << endl;
+    exit(1);
+  }
   stats << "# Level\tIndex\tRays\tFacets\tDet\tDualize\tZSolve\tHilberts" << endl;
 
   // Redirect 4ti2/qsolve output.
@@ -362,8 +426,91 @@ usage()
 	 << "  --only-triangulate                       Only triangulate, don't normalize" << endl
          << "  --no-initial-triangulation               Don't compute an initial triangulation," << endl
          << "                                           start recursive normalizer on input." << endl
-      ;
+	 << "  --triangulation-height-vector=4TI2-ROWVECTOR-FILE      Use this vector as a height vector." << endl
+	 << "  --triangulation-pull-rays=INDEX,...      Pull the rays that have these (1-based) indices." << endl
+	 << "  --max-determinant-for-enumeration=NUMBER Do not attempt to enumerate the lattice points of" << endl
+	 << "                                           the fundamental parallelepiped of simplicial cones" << endl
+	 << "                                           that have a larger determinant than this." << endl
+	 << "                                           (Default: Do not enumerate it at all, always use zsolve.)" << endl;
     reduction_test_factory.show_options(cerr);
+}
+
+static void check_stream(const istream &f, const char *fileName, const char *proc)
+{
+  if (!f.good()) {
+    cerr << "Read error on input file " << fileName << " in " << proc << "." << endl;
+    exit(1);
+  }
+};
+
+static vec_ZZ *
+read_4ti2_vector(const char *filename)
+{
+  ifstream f(filename);
+  check_stream(f, filename, "read_4ti2_vector");
+  int num_vectors, dimension;
+  f >> num_vectors >> dimension;
+  check_stream(f, filename, "read_4ti2_vector");
+  if (num_vectors != 1) {
+    cerr << "Too many vectors (rows) in file " << filename
+	 << "; it is supposed to contain only one vector."
+	 << endl;
+    exit(1);
+  }
+  int i;
+  vec_ZZ *result = new vec_ZZ;
+  result->SetLength(dimension);
+  for (i = 0; i<dimension; i++) {
+    f >> (*result)[i];
+    check_stream(f, filename, "read_4ti2_vector");
+  }
+  return result;
+}
+
+static list<int> *
+sscan_comma_separated_list(const char *s)
+{
+  list<int> *result = new list<int>;
+  string csl = s;
+  std::istringstream f(csl);
+  while (f.good()) {
+    int a;
+    f >> a;
+    result->push_back(a);
+    if (f.eof()) break;
+    char c;
+    f >> c;
+    if (c != ',') {
+      cerr << "Expected comma-separated list of integers" << endl;
+      exit(1);
+    }
+  }
+  return result;
+}
+
+static vec_ZZ *
+height_vector_from_pull_list(const listVector *rays, const list<int> * pull_list)
+{
+  vec_ZZ *result = new vec_ZZ;
+  int num_rays = lengthListVector(rays);
+  result->SetLength(num_rays);
+  list<int>::const_iterator i;
+  ZZ height;
+  height = 1;
+  if (pull_list->size() > 1) {
+    /* FIXME: lame lexicography */
+    cerr << "Warning: I am using lame lexicography here." << endl;
+  }
+  for (i = pull_list->begin(); i != pull_list->end(); ++i) {
+    int index = *i;
+    if (index <= 0 || index > num_rays) {
+      cerr << "Index out of range: " << index << endl;
+      exit(1);
+    }
+    (*result)[index - 1] = height;
+    height *= 1000;
+  }
+  return result;
 }
 
 int main(int argc, char **argv)
@@ -373,21 +520,20 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  cerr << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
-
   listCone *cone;
   bool create_triang_file = true;
-  string subcones_filename;
   bool have_subcones = false;
   string output_subcones_filename;
   bool have_output_subcones = false;
   bool normalize = true;
   bool triangulate_toplevel = true;
+  list<int> *triangulation_pull_rays = NULL;
   
   params.triangulation = BarvinokParameters::RegularTriangulationWith4ti2;
   params.dualization = BarvinokParameters::DualizationWith4ti2;
   params.nonsimplicial_subdivision = true;
 
+  max_determinant_for_enumeration = -1; // By default, don't use enumeration
   
   {
     int i;
@@ -411,6 +557,17 @@ int main(int argc, char **argv)
 	subcones_filename = string(argv[i] + 11);
 	have_subcones = true;
       }
+      else if (strncmp(argv[i], "--triangulation-height-vector=", 30) == 0) {
+	params.triangulation_prescribed_height_data
+	  = new prescribed_height_data;
+	params.triangulation_prescribed_height_data->special_heights = read_4ti2_vector(argv[i] + 30);
+	params.triangulation_prescribed_height_data->special_rays = NULL;
+      }
+      else if (strncmp(argv[i], "--triangulation-pull-rays=", 26) == 0) {
+	params.triangulation_prescribed_height_data
+	  = new prescribed_height_data;
+	triangulation_pull_rays = sscan_comma_separated_list(argv[i] + 26);
+      }
       else if (strncmp(argv[i], "--output-subcones=", 18) == 0) {
 	output_subcones_filename = string(argv[i] + 18);
 	have_output_subcones = true;
@@ -420,6 +577,16 @@ int main(int argc, char **argv)
       }
       else if (strncmp(argv[i], "--no-initial-triangulation", 12) == 0) {
 	triangulate_toplevel = false;
+      }
+      else if (strncmp(argv[i], "--max-determinant-for-enumeration=", 34) == 0) {
+	string s(argv[i] + 34);
+	std::istringstream f(s);
+	f >> max_determinant_for_enumeration;
+	
+	if (f.bad()) {
+	  cerr << "Expected integer for --max-determinant-for-enumeration, got " << s << endl;
+	  exit(1);
+	}
       }
       else if (strncmp(argv[i], "--help", 6) == 0) {
 	usage();
@@ -438,6 +605,9 @@ int main(int argc, char **argv)
       }
     }
   }
+
+  if (verbosity > 0)
+    cerr << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
 
   if (normalize)
     reduction_test = reduction_test_factory.CreateReductionTest();
@@ -471,7 +641,8 @@ int main(int argc, char **argv)
     }
     else {
       /* Try to read a 4ti2-style file. */
-      cerr << "Trying to read `" << filename << "' as a list of rays in 4ti2-style format." << endl;
+      if (verbosity > 0)
+	cerr << "Trying to read `" << filename << "' as a list of rays in 4ti2-style format." << endl;
       cone = read_cone_4ti2_format(filename);
     }
     params.Number_of_Variables = cone->rays->first.length();
@@ -484,6 +655,34 @@ int main(int argc, char **argv)
     }
   }
 
+  if (params.triangulation_prescribed_height_data) {
+    params.triangulation_prescribed_height_data->special_rays
+      = copyListVector(cone->rays);
+    
+    if (triangulation_pull_rays) {
+      params.triangulation_prescribed_height_data->special_heights
+	= height_vector_from_pull_list(params.triangulation_prescribed_height_data->special_rays,
+				       triangulation_pull_rays);
+    }
+    
+    if (lengthListVector(params.triangulation_prescribed_height_data->special_rays)
+	!= (*params.triangulation_prescribed_height_data->special_heights).length()) {
+      cerr << "Lengths of prescribed height vector and number of rays of master cone do not match."
+	   << endl;
+      exit(1);
+    }
+    if (verbosity > 0) {
+      cerr << "Using prescribed height vector: "
+	   << *params.triangulation_prescribed_height_data->special_heights << endl;
+    }
+#if 0
+    cerr << "for rays: " << endl;
+    printListVector(params.triangulation_prescribed_height_data->special_rays, params.Number_of_Variables);
+#endif
+  }
+
+  params.triangulation_assume_fulldim = false;
+  
   if (triangulate_toplevel) {
     // Send input cones through triangulation.
     ConeTransducer *triangulator = new TriangulatingConeTransducer(&params);
@@ -502,7 +701,9 @@ int main(int argc, char **argv)
 							output_subcones_filename);
 	producer->Produce(subcone_file_writer);
 	num_cones = subcone_file_writer.cone_count;
-	cerr << "Printed triangulation to subcones file `" << output_subcones_filename << "'." << endl;
+	if (verbosity > 0) {
+	  cerr << "Printed triangulation to subcones file `" << output_subcones_filename << "'." << endl;
+	}
       }
       producer = new SubconeReadingConeProducer(cone, output_subcones_filename, num_cones);
     }
@@ -515,7 +716,8 @@ int main(int argc, char **argv)
 	PrintingConeConsumer triang_file_writer(triang_filename);
 	producer->Produce(triang_file_writer);
 	num_cones = triang_file_writer.cone_count;
-	cerr << "Printed triangulation to file `" << triang_filename << "'." << endl;
+	if (verbosity > 0) 
+	  cerr << "Printed triangulation to file `" << triang_filename << "'." << endl;
       }
       producer = new ListConeReadingConeProducer(triang_filename, num_cones);
     }

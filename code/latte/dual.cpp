@@ -74,6 +74,8 @@ static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
   rationalVector *w;
   listVector *rays, *rays2, *facets, *endFacets;
 
+  assert(tmp->subspace_generators == NULL);
+  
   rays=tmp->rays;
   rays2=rays;
   len=lengthListVector(rays);
@@ -147,17 +149,15 @@ void computeDetAndFacetsOfSimplicialCone(listCone *cone, int numOfVars);
 
 void dualizeCone(listCone *tmp, int numOfVars, BarvinokParameters *params)
 {
-  if (tmp->rays != NULL && tmp->facets != NULL) {
-    /* Both rays and facets are already computed,
-       so just swap. */
+  if ((tmp->rays != NULL && tmp->facets != NULL)
+      /* Both rays and facets are already computed,
+	 so just swap. */
+      || (tmp->rays == NULL && tmp->facets != NULL)
+      /* Facets are already computed, so just swap, so we have a ray
+	 representation. */) {
     swap(tmp->determinant, tmp->dual_determinant);
     swap(tmp->rays, tmp->facets);
-  }
-  else if (tmp->rays == NULL && tmp->facets != NULL) {
-    /* Facets are already computed, so just swap, so we have a ray
-       representation. */
-    swap(tmp->determinant, tmp->dual_determinant);
-    swap(tmp->rays, tmp->facets);
+    swap(tmp->subspace_generators, tmp->equalities);
   }
   else if (lengthListVector(tmp->rays) == params->Number_of_Variables) {
     /* We assume full-dimensional cones, so this must be a simplicial
@@ -165,6 +165,7 @@ void dualizeCone(listCone *tmp, int numOfVars, BarvinokParameters *params)
     computeDetAndFacetsOfSimplicialCone(tmp, params->Number_of_Variables);
     swap(tmp->determinant, tmp->dual_determinant);
     swap(tmp->rays, tmp->facets);
+    swap(tmp->subspace_generators, tmp->equalities);
   }
   else {
     switch (params->dualization) {

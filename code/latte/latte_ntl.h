@@ -45,4 +45,7 @@ using namespace NTL_NAMESPACE;
 void
 InnerProductModulo(ZZ &result, const vec_ZZ &a, const vec_ZZ &b, const ZZ &module);
 
+int
+convert_ZZ_to_int(const ZZ &zz);
+
 #endif

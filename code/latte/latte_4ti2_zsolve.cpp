@@ -25,22 +25,15 @@
 using namespace std;
 using namespace _4ti2_zsolve_;
 
-static int
-convert_ZZ_to_int(const ZZ &zz)
-{
-  mpz_class z = convert_ZZ_to_mpz(zz);
-  if (abs(z) > INT_MAX) {
-    cerr << "Numbers too large for 4ti2 zsolve" << endl;
-    abort();
-  }
-  return mpz_get_si(z.get_mpz_t());
-}
-
 LinearSystem<int> *
-facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars)
+facets_to_4ti2_zsolve_LinearSystem(listVector *facets,
+				   listVector *equalities,
+				   int numOfVars)
 {
   int num_facets = lengthListVector(facets);
-  VectorArray<int> matrix(/*height:*/ num_facets, /*width:*/ numOfVars);
+  int num_equalities = lengthListVector(equalities);
+  VectorArray<int> matrix(/*height:*/ num_facets + num_equalities,
+			  /*width:*/ numOfVars);
   listVector *f;
   int row;
   for (f = facets, row = 0; f!=NULL; f=f->rest, row++) {
@@ -49,8 +42,14 @@ facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars)
       matrix[row][col] = convert_ZZ_to_int(f->first[col]);
     }
   }
-  int *rhs = new int[num_facets];
-  for (row = 0; row<num_facets; row++)
+  for (f = equalities; f!=NULL; f=f->rest, row++) {
+    int col;
+    for (col = 0; col<numOfVars; col++) {
+      matrix[row][col] = convert_ZZ_to_int(f->first[col]);
+    }
+  }
+  int *rhs = new int[num_facets + num_equalities];
+  for (row = 0; row<num_facets + num_equalities; row++)
     rhs[row] = 0;
   LinearSystem<int> *ls
     = new LinearSystem<int> (/*matrix:*/ matrix, /*rhs:*/ rhs,
@@ -60,5 +59,7 @@ facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars)
   delete[] rhs;
   for (row = 0; row<num_facets; row++)
     ls->get_relation(row) = Relation<int>::LesserEqual;
+  for (; row<num_facets + num_equalities; row++)
+    ls->get_relation(row) = Relation<int>::Equal;
   return ls;
 }

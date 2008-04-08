@@ -30,6 +30,8 @@
 /* Create a 4ti2/zsolve LinearSystem representing the homogeneous
    inequalities given by FACETS. */
 _4ti2_zsolve_::LinearSystem<int> *
-facets_to_4ti2_zsolve_LinearSystem(listVector *facets, int numOfVars);
+facets_to_4ti2_zsolve_LinearSystem(listVector *facets,
+				   listVector *equalities,
+				   int numOfVars);
 
 #endif

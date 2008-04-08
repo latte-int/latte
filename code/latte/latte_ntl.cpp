@@ -19,7 +19,9 @@
 */
 
 #include <cassert>
+#include <iostream>
 #include "latte_ntl.h"
+#include "latte_gmp.h"
 
 void
 InnerProductModulo(ZZ &result, const vec_ZZ &a, const vec_ZZ &b, const ZZ &module)
@@ -41,4 +43,15 @@ InnerProductModulo(ZZ &result, const vec_ZZ &a, const vec_ZZ &b, const ZZ &modul
     AddMod(result, result, p, module);
   }
 #endif
+}
+
+int
+convert_ZZ_to_int(const ZZ &zz)
+{
+  mpz_class z = convert_ZZ_to_mpz(zz);
+  if (abs(z) > INT_MAX) {
+    std::cerr << "Numbers too large for conversion to machine integer" << std::endl;
+    abort();
+  }
+  return mpz_get_si(z.get_mpz_t());
 }
