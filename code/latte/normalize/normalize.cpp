@@ -200,9 +200,9 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   dualizeCone(t, params.Number_of_Variables, &params); // just swaps back
   dualization_time.stop();
   num_facets = lengthListVector(t->facets);
-  if (t->determinant != 0)
-    cerr << ", determinant " << abs(t->determinant);
   if (verbosity > 0) {
+    if (t->determinant != 0)
+      cerr << ", determinant " << abs(t->determinant);
     cerr << ", " << num_facets << " facets; "
 	 << dualization_time;
   }
@@ -226,9 +226,11 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
   }
   else if (num_rays == params.Number_of_Variables
 	   && abs(t->determinant) < max_determinant_for_enumeration) {
-    cerr << "Enumerating fundamental parallelepiped..." << flush;
-    enumerate_simplicial_cone_with_latte(t);
-    cerr << endl;
+    if (verbosity > 0) {
+      cerr << "Enumerating fundamental parallelepiped..." << flush;
+      enumerate_simplicial_cone_with_latte(t);
+      cerr << endl;
+    }
   }
   else if (num_facets < max_facets) {
     // Use zsolve to compute the Hilbert basis.
@@ -324,10 +326,14 @@ static void open_output_and_stats()
   }
   
   hil_filename = base_filename + ".hil";
-  cerr << "Output goes to file `" << hil_filename << "'..." << endl;
+  if (verbosity > 0) {
+    cerr << "Output goes to file `" << hil_filename << "'..." << endl;
+  }
 
   string stats_filename = base_filename + ".stats";
-  cerr << "Cone statistics go to file `" << stats_filename << "'..." << endl;
+  if (verbosity > 0) {
+    cerr << "Cone statistics go to file `" << stats_filename << "'..." << endl;
+  }
   stats.open(stats_filename.c_str());
   if (!stats.good()) {
     cerr << "Cannot write to file `" << stats_filename << "'..." << endl;
@@ -484,8 +490,6 @@ int main(int argc, char **argv)
     exit(1);
   }
 
-  cerr << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
-
   listCone *cone;
   bool create_triang_file = true;
   bool have_subcones = false;
@@ -572,6 +576,9 @@ int main(int argc, char **argv)
     }
   }
 
+  if (verbosity > 0)
+    cerr << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
+
   if (normalize)
     reduction_test = reduction_test_factory.CreateReductionTest();
 
@@ -604,7 +611,8 @@ int main(int argc, char **argv)
     }
     else {
       /* Try to read a 4ti2-style file. */
-      cerr << "Trying to read `" << filename << "' as a list of rays in 4ti2-style format." << endl;
+      if (verbosity > 0)
+	cerr << "Trying to read `" << filename << "' as a list of rays in 4ti2-style format." << endl;
       cone = read_cone_4ti2_format(filename);
     }
     params.Number_of_Variables = cone->rays->first.length();
@@ -633,8 +641,10 @@ int main(int argc, char **argv)
 	   << endl;
       exit(1);
     }
-    cerr << "Using prescribed height vector: "
-	 << *params.triangulation_prescribed_height_data->special_heights << endl;
+    if (verbosity > 0) {
+      cerr << "Using prescribed height vector: "
+	   << *params.triangulation_prescribed_height_data->special_heights << endl;
+    }
 #if 0
     cerr << "for rays: " << endl;
     printListVector(params.triangulation_prescribed_height_data->special_rays, params.Number_of_Variables);
@@ -661,7 +671,9 @@ int main(int argc, char **argv)
 							output_subcones_filename);
 	producer->Produce(subcone_file_writer);
 	num_cones = subcone_file_writer.cone_count;
-	cerr << "Printed triangulation to subcones file `" << output_subcones_filename << "'." << endl;
+	if (verbosity > 0) {
+	  cerr << "Printed triangulation to subcones file `" << output_subcones_filename << "'." << endl;
+	}
       }
       producer = new SubconeReadingConeProducer(cone, output_subcones_filename, num_cones);
     }
@@ -674,7 +686,8 @@ int main(int argc, char **argv)
 	PrintingConeConsumer triang_file_writer(triang_filename);
 	producer->Produce(triang_file_writer);
 	num_cones = triang_file_writer.cone_count;
-	cerr << "Printed triangulation to file `" << triang_filename << "'." << endl;
+	if (verbosity > 0) 
+	  cerr << "Printed triangulation to file `" << triang_filename << "'." << endl;
       }
       producer = new ListConeReadingConeProducer(triang_filename, num_cones);
     }
