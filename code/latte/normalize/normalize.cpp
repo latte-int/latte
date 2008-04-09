@@ -175,7 +175,7 @@ public:
 		   const T& norm, size_t vectors, int backup_frequency,
 		   _4ti2_zsolve_::Timer& timer)
   {
-    if (timer.get_elapsed_time() > time_limit) {
+    if (time_limit != 0.0 && timer.get_elapsed_time() > time_limit) {
       ZSolveTimeLimitReached reached;
       throw reached;
     }
