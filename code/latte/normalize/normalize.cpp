@@ -60,7 +60,7 @@ string subcones_filename;
 ofstream stats;
 BarvinokParameters params;
 int max_facets = INT_MAX;
-int verbosity = 1;
+volatile int verbosity = 1;
 ZZ max_determinant_for_enumeration;
 
 // Keeping track of the Hilbert basis candidates, to avoid duplicates
@@ -429,7 +429,8 @@ usage()
 	 << "  --max-facets=N                           Subdivide further if more than N facets" << endl
          << "  --zsolve-time-limit=SECONDS              Subdivide further if computation of Hilbert" << endl
 	 << "                                           basis took longer than this number of seconds." << endl
-	 << "  --quiet                                  Do not show much output" << endl
+	 << "  --quiet                                  Do not show much output." << endl
+	 << "                                           Signals USR1 and USR2 can be used to control verbosity." << endl
 	 << "  --no-triang-file                         Do not create a .triang file" << endl
          << "  --subcones=INPUT-FILE.subcones           Read list of subcone indicators to handle" << endl
          << "  --output-subcones=OUTPUT-FILE.subcones   Write a list of toplevel subcones" << endl
@@ -523,8 +524,31 @@ height_vector_from_pull_list(const listVector *rays, const list<int> * pull_list
   return result;
 }
 
+#include <signal.h>
+
+static void increase_verbosity(int sig)
+{
+  verbosity++;
+  cerr << "Increased verbosity to " << verbosity << endl;
+}
+
+static void decrease_verbosity(int sig)
+{
+  verbosity--;
+  cerr << "Decreased verbosity to " << verbosity << endl;
+}
+
+void install_verbosity_control_signal_handlers()
+{
+  sigset(SIGUSR1, increase_verbosity);
+  sigset(SIGUSR2, decrease_verbosity);
+}
+
+
 int main(int argc, char **argv)
 {
+  install_verbosity_control_signal_handlers();
+
   if (argc < 2) {
     usage();
     exit(1);
