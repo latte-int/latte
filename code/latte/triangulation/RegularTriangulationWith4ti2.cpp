@@ -85,10 +85,26 @@ triangulate_cone_with_4ti2(listCone *cone,
 
     /* Compute random lifting. */
     int i;
+    mpq_class first_height;
+    bool seen_different_heights = false;
     for (i = 0; i<num_rays; i++) {
       mpq_class height;
       height_function(height.get_mpq_t(), rays_array[i]->first, height_function_data);
+      if (i == 0)
+	first_height = height;
+      else if (first_height != height)
+	seen_different_heights = true;
       (*matrix)[i][0] = height.get_num();
+    }
+
+    if (!seen_different_heights) {
+      /* This will be a trivial polyhedral subdivision, so just return
+	 a copy of the cone. */
+      cerr << "Lifting heights yield trivial polyhedral subdivision." << endl;
+      delete rs;
+      delete matrix;
+      consumer.ConsumeCone(copyCone(cone));
+      return;
     }
 
     /* Output of the file -- for debugging. */
