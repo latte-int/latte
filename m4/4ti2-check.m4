@@ -51,7 +51,7 @@ for FORTYTWO_HOME in ${FORTYTWO_HOME_PATH}
 #include "zsolve/VectorArray.hpp"
 ],
 [ _4ti2_::RayAlgorithm algorithm;
-  VectorArray<int> array; 
+  _4ti2_zsolve::VectorArray<int> array; 
 ],
 [	FORTYTWO_found="yes"
 	break
