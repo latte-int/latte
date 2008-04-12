@@ -100,7 +100,7 @@ triangulate_cone_with_4ti2(listCone *cone,
     if (!seen_different_heights) {
       /* This will be a trivial polyhedral subdivision, so just return
 	 a copy of the cone. */
-      cerr << "Lifting heights yield trivial polyhedral subdivision." << endl;
+      //cerr << "Lifting heights yield trivial polyhedral subdivision." << endl;
       delete rs;
       delete matrix;
       consumer.ConsumeCone(copyCone(cone));
