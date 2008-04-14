@@ -141,3 +141,18 @@ compose(ConeTransducer *a_transducer, ConeConsumer *a_consumer)
   return new CompositeConeConsumer(a_transducer, a_consumer);
 }
 
+ProgressPrintingConeTransducer::ProgressPrintingConeTransducer()
+  : count(0)
+{
+}
+
+int ProgressPrintingConeTransducer::ConsumeCone(listCone *cone)
+{
+  int result;
+  result = consumer->ConsumeCone(cone);
+  count++;
+  if (count % 1000 == 0) {
+    cerr << count << " cones done. \r";
+  }
+  return result;
+}

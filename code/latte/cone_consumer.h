@@ -130,4 +130,14 @@ compose(ConeTransducer *a_transducer, ConeTransducer *a_transducer);
 ConeConsumer *
 compose(ConeTransducer *a_transducer, ConeConsumer *a_consumer);
 
+// ProgressPrintingConeTransducer just counts cones
+// and emits progress messages
+
+class ProgressPrintingConeTransducer : public ConeTransducer {
+  int count;
+public:
+  ProgressPrintingConeTransducer();
+  int ConsumeCone(listCone *cone);
+};
+
 #endif
