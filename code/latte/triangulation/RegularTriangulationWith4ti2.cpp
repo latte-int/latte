@@ -45,7 +45,7 @@ cone_from_ray_BitSet(vector<listVector *> &rays,
   int j;
   for (i = rays.begin(), j = 0; i!=rays.end(); ++i, j++) {
     if (ray_set[j]) {
-      c->rays = new listVector((*i)->first, c->rays);
+      c->rays = new listVector((*i)->first, c->rays, (*i)->index_hint);
     }
   }
   return c;
@@ -98,8 +98,8 @@ triangulate_cone_with_4ti2(listCone *cone,
   {
     int i;
     for (i = 0; i<num_rays + 1; i++) {
-      (*matrix)[i][i + 1] = 1;
-      rs->set(i + 1);
+      (*matrix)[i][i] = 1;
+      rs->set(i);
     }
   }
 
@@ -110,16 +110,22 @@ triangulate_cone_with_4ti2(listCone *cone,
   int dim_0 = basis_0.get_number();
   cerr << "Basis_0: " << basis_0 << endl;
 #endif
+
+  int I_width = num_rays + 1;
   
   /* Extra row: `vertical' ray -- This kills all upper facets.
      See Verdoolaege, Woods, Bruynooghe, Cools (2005). */
-  (*matrix)[num_rays][0] = 1;
+  (*matrix)[num_rays][I_width] = 1;
 
   /* Put in the heights. */
   for (i = 0; i<num_rays; i++) {
-    (*matrix)[i][0] = heights[i];
+    (*matrix)[i][I_width] = heights[i];
   }
 
+#if 0
+  cerr << "Matrix: " << *matrix << endl;
+#endif
+  
     /* Output of the file -- for debugging. */
     if (Parameters->debug_triangulation) {
       std::ofstream file("lifted_cone_for_4ti2_triangulation");
@@ -127,11 +133,25 @@ triangulate_cone_with_4ti2(listCone *cone,
       print(file, *matrix, 0, lifted_dim);
       cerr << "Created file `lifted_cone_for_4ti2_triangulation'" << endl;
     }
-
-    VectorArray *facets = new VectorArray(0, matrix->get_size());
-    lattice_basis(*matrix, *facets);
 #if 0
-    cerr << "Basis: " << *facets << endl;
+    VectorArray *facets = new VectorArray(0, matrix->get_size());
+    lattice_basis(*matrix, *facets); // too slow.
+#else
+    int numvars_plus_1 = Parameters->Number_of_Variables + 1;
+    VectorArray *facets = new VectorArray(numvars_plus_1, matrix->get_size());
+    /* Our matrix is of the form (I w A), so the kernel has a basis of
+       the form ((-w -A)^T I). */
+    for (i = 0; i<numvars_plus_1; i++) {
+      int j;
+      for (j = 0; j < I_width; j++)
+	(*facets)[i][j] = - (*matrix)[j][I_width + i];
+      (*facets)[i][I_width + i] = 1;
+    }
+#endif
+#if 0
+    cerr << "Facets: " << *facets << endl;
+#endif
+#if 0
   /* Compute the dimension of the lifted vector configuration. */
     int dim_w = facets->get_number();
     if (dim_w == dim_0) {
