@@ -45,7 +45,7 @@ listVector *copyListVector(listVector *l)
   listVector *result = NULL;
   listVector **rest_p = &result;
   while (l != NULL) {
-    *rest_p = new listVector(l->first);
+    *rest_p = new listVector(l->first, 0, l->index_hint);
     rest_p = &(*rest_p)->rest;
     l = l->rest;
   }

@@ -30,9 +30,13 @@
 struct listVector {
   vec_ZZ first;
   struct listVector *rest;
-  listVector() : first(), rest(0) {}
-  listVector(const vec_ZZ &a_first, struct listVector *a_rest = 0) :
-    first(a_first), rest(a_rest) {}
+  int index_hint;		// Hack: store a index into a master
+				// cone here, for use with the
+				// subcones code.
+  listVector() : first(), rest(0), index_hint(-1) {}
+  listVector(const vec_ZZ &a_first, struct listVector *a_rest = 0,
+	     int a_index_hint = -1)
+    : first(a_first), rest(a_rest), index_hint(a_index_hint) {}
 };
 
 /* Return the length of the linked list of vectors. */
