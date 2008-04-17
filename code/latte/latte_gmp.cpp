@@ -82,9 +82,15 @@ mpz_vector
 convert_vec_ZZ_to_mpz_vector(const vec_ZZ &vec)
 {
   mpz_vector result(vec.length());
+  convert_vec_ZZ_to_mpz_vector(vec, result);
+  return result;   
+}
+
+void
+convert_vec_ZZ_to_mpz_vector(const vec_ZZ &vec, mpz_vector &result)
+{
   int j;
   for (j = 0; j<vec.length(); j++) {
     result[j] = convert_ZZ_to_mpz(vec[j]);
   }
-  return result;   
 }

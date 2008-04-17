@@ -52,5 +52,9 @@ convert_mpq_to_ZZ(mpq_t mpq);
 mpz_vector
 convert_vec_ZZ_to_mpz_vector(const vec_ZZ &vec);
 
+void
+convert_vec_ZZ_to_mpz_vector(const vec_ZZ &vec, mpz_vector &result);
+
+
 #endif
 
