@@ -72,6 +72,7 @@ public:
 private:
   IncrementalVectorFileWriter *file_writer;
   std::map<vector<mpz_class>, int> index_map;
+  vector< vec_ZZ > master_rays;
 };
 
 #endif

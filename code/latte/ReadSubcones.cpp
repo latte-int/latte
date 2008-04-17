@@ -54,7 +54,8 @@ static listCone *cone_from_ray_indicator(const vector<listVector *> &ray_array,
   unsigned int i;
   for (i = 0; i<ray_array.size(); i++) {
     if (ray_indicator[i]) {
-      result->rays = new listVector(ray_array[i]->first, result->rays);
+      result->rays = new listVector(ray_array[i]->first, result->rays,
+				    /* index hint: */ i);
     }
   }
   result->vertex = new Vertex(*master_cone->vertex);
@@ -205,7 +206,7 @@ IncrementalVectorFileWriter::UpdateNumVectors()
 
 SubconePrintingConeConsumer::SubconePrintingConeConsumer(const listCone *master_cone, 
 							 const std::string & filename)
-  : cone_count(0)
+  : cone_count(0), master_rays(lengthListVector(master_cone->rays))
 {
   listVector *ray;
   int index;
@@ -213,6 +214,7 @@ SubconePrintingConeConsumer::SubconePrintingConeConsumer(const listCone *master_
     std::map<vector<mpz_class>, int>::value_type p(convert_vec_ZZ_to_mpz_vector(ray->first), 
 						   index);
     index_map.insert(p);
+    master_rays[index] = ray->first;
   }
   file_writer = new IncrementalVectorFileWriter(filename, index);
 }
@@ -229,16 +231,23 @@ int SubconePrintingConeConsumer::ConsumeCone(listCone *cone)
   vector<bool> ray_indicator(num_master_rays);
   listVector *ray;
   for (ray = cone->rays; ray!=NULL; ray=ray->rest) {
-    vector<mpz_class> v = convert_vec_ZZ_to_mpz_vector(ray->first);
-    std::map<vector<mpz_class>, int>::iterator i
-      = index_map.find(v);
-    if (i == index_map.end()) {
-      cerr << "Cone has a ray that does not belong to the master cone; cannot print it as a subcone."
-	   << endl;
-      exit(1);
+    if (ray->index_hint >= 0
+	&& ray->index_hint < master_rays.size()
+	&& ray->first == master_rays[ray->index_hint])
+      ray_indicator[ray->index_hint] = true;
+    else {
+      // index_hint not available or wrong
+      vector<mpz_class> v = convert_vec_ZZ_to_mpz_vector(ray->first);
+      std::map<vector<mpz_class>, int>::iterator i
+	= index_map.find(v);
+      if (i == index_map.end()) {
+	cerr << "Cone has a ray that does not belong to the master cone; cannot print it as a subcone."
+	     << endl;
+	exit(1);
+      }
+      int index = (*i).second;
+      ray_indicator[index] = true;
     }
-    int index = (*i).second;
-    ray_indicator[index] = true;
   }
   file_writer->WriteVector(ray_indicator);
   freeCone(cone);
