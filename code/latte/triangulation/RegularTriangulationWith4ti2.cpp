@@ -61,6 +61,29 @@ triangulate_cone_with_4ti2(listCone *cone,
   // Copy rays into an array, so we can index them.
   int num_rays = lengthListVector(cone->rays);
   vector<listVector *> rays_array = ray_array(cone);
+  vector<mpz_class> heights(num_rays);
+  /* Compute the heights. */
+  int i;
+  mpq_class first_height;
+  bool seen_different_heights = false;
+  for (i = 0; i<num_rays; i++) {
+    mpq_class height;
+    height_function(height.get_mpq_t(), rays_array[i]->first, height_function_data);
+    if (i == 0)
+      first_height = height;
+    else if (first_height != height)
+      seen_different_heights = true;
+    heights[i] = height.get_num();
+  }
+
+  if (!seen_different_heights) {
+    /* This will be a trivial polyhedral subdivision, so just return
+       a copy of the cone. */
+    //cerr << "Trivial test: Lifting heights yield trivial polyhedral subdivision." << endl;
+    consumer.ConsumeCone(copyCone(cone));
+    return;
+  }
+  
   /* Create a matrix from the rays, with 1 extra coordinates 
      at the front for the lifting, and also slack variables.
      (4ti2 does not use a homogenization coordinate.) */
@@ -70,9 +93,6 @@ triangulate_cone_with_4ti2(listCone *cone,
     = rays_to_4ti2_VectorArray(cone->rays, Parameters->Number_of_Variables,
 			       /* num_homogenization_vars: */ 1 + 1 + num_rays,
 			       /* num_extra_rows: */ 1);
-  /* Extra row: `vertical' ray -- This kills all upper facets.
-     See Verdoolaege, Woods, Bruynooghe, Cools (2005). */
-  (*matrix)[num_rays][0] = 1;
   /* Add identity matrix for the slack variables (including a slack
      variable for the extra ray). */
   {
@@ -83,29 +103,22 @@ triangulate_cone_with_4ti2(listCone *cone,
     }
   }
 
-    /* Compute random lifting. */
-    int i;
-    mpq_class first_height;
-    bool seen_different_heights = false;
-    for (i = 0; i<num_rays; i++) {
-      mpq_class height;
-      height_function(height.get_mpq_t(), rays_array[i]->first, height_function_data);
-      if (i == 0)
-	first_height = height;
-      else if (first_height != height)
-	seen_different_heights = true;
-      (*matrix)[i][0] = height.get_num();
-    }
+  /* Compute the dimension of the unlifted vector configuration. */
+#if 0
+  VectorArray basis_0(0, matrix->get_size());
+  lattice_basis(*matrix, basis_0);
+  int dim_0 = basis_0.get_number();
+  cerr << "Basis_0: " << basis_0 << endl;
+#endif
+  
+  /* Extra row: `vertical' ray -- This kills all upper facets.
+     See Verdoolaege, Woods, Bruynooghe, Cools (2005). */
+  (*matrix)[num_rays][0] = 1;
 
-    if (!seen_different_heights) {
-      /* This will be a trivial polyhedral subdivision, so just return
-	 a copy of the cone. */
-      //cerr << "Lifting heights yield trivial polyhedral subdivision." << endl;
-      delete rs;
-      delete matrix;
-      consumer.ConsumeCone(copyCone(cone));
-      return;
-    }
+  /* Put in the heights. */
+  for (i = 0; i<num_rays; i++) {
+    (*matrix)[i][0] = heights[i];
+  }
 
     /* Output of the file -- for debugging. */
     if (Parameters->debug_triangulation) {
@@ -117,6 +130,20 @@ triangulate_cone_with_4ti2(listCone *cone,
 
     VectorArray *facets = new VectorArray(0, matrix->get_size());
     lattice_basis(*matrix, *facets);
+#if 0
+    cerr << "Basis: " << *facets << endl;
+  /* Compute the dimension of the lifted vector configuration. */
+    int dim_w = facets->get_number();
+    if (dim_w == dim_0) {
+      cerr << "Rank test: Lifting heights yield trivial polyhedral subdivision." << endl;
+      delete rs;
+      delete matrix;
+      delete facets;
+      consumer.ConsumeCone(copyCone(cone));
+      return;
+    }
+#endif
+
     VectorArray* subspace = new VectorArray(0, matrix->get_size());
     RayAlgorithm algorithm;
     algorithm.compute(*matrix, *facets, *subspace, *rs);
