@@ -124,7 +124,7 @@ listCone *appendListCones(listCone *A, listCone *B)
   }
 }
 
-listCone *copyCone(listCone *cone)
+listCone *copyCone(const listCone *cone)
 {
   listCone *copy = createListCone();
   copy->coefficient = cone->coefficient;
@@ -142,7 +142,7 @@ listCone *copyCone(listCone *cone)
   return copy;
 }
 
-int ambient_cone_dimension(listCone *cone)
+int ambient_cone_dimension(const listCone *cone)
 {
   if (cone == NULL) return 0;
   return cone->vertex->vertex->numerators().length();

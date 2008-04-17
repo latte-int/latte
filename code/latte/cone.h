@@ -91,9 +91,9 @@ void freeListCone(listCone *list);
 listCone *appendListCones(listCone *A, listCone *B);
 
 /* Copy a single cone. */
-listCone *copyCone(listCone *cone);
+listCone *copyCone(const listCone *cone);
 
 /* Deduce the ambient dimension of CONE from its data. */
-int ambient_cone_dimension(listCone *cone);
+int ambient_cone_dimension(const listCone *cone);
 
 #endif
