@@ -24,17 +24,23 @@
 mpz_class
 convert_ZZ_to_mpz(const ZZ &zz)
 {
+  mpz_class mpz;
+  convert_ZZ_to_mpz(zz, mpz);
+  return mpz;
+}
+
+void
+convert_ZZ_to_mpz(const ZZ &zz, mpz_class &mpz)
+{
   long size = NumBytes(zz);
   unsigned char *data = new unsigned char[size];
   int sig = sign(zz);
   BytesFromZZ(data, zz, size);
 
-  mpz_class mpz;
   mpz_import(mpz.get_mpz_t(), size, -1, 1, 1, 0, data);
   if (sig == -1)
     mpz = -mpz;
   delete[] data;
-  return mpz;
 }
 
 ZZ

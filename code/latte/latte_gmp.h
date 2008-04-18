@@ -37,6 +37,9 @@ typedef std::vector<mpz_class> mpz_vector;
 mpz_class
 convert_ZZ_to_mpz(const ZZ &zz);
 
+void
+convert_ZZ_to_mpz(const ZZ &zz, mpz_class &mpz);
+
 ZZ
 convert_mpz_to_ZZ(const mpz_class &mpz);
 
