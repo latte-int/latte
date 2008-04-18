@@ -34,4 +34,10 @@ rays_to_4ti2_VectorArray(listVector *rays, int numOfVars,
 			 int num_homogenization_vars = 0,
 			 int num_extra_rows = 0);
 
+/* Create a matrix whose columns are the RAYS.
+   Add NUM_EXTRA_ROWS extra rows, each set to zero. */
+_4ti2_::VectorArray *
+rays_to_transposed_4ti2_VectorArray(listVector *rays, int numOfVars,
+				    int num_extra_rows = 0);
+
 #endif

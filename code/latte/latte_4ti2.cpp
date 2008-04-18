@@ -32,12 +32,26 @@ rays_to_4ti2_VectorArray(listVector *rays, int numOfVars,
   int numOfVars_hom = numOfVars + num_homogenization_vars;
   VectorArray *va = new VectorArray(num_rays + num_extra_rows, numOfVars_hom);
   int i, j;
-  mpz_class x;
   listVector *ray;
   for (i = 0, ray = rays; i<num_rays; i++, ray = ray->rest) {
     for (j = 0; j<numOfVars; j++) {
-      x = convert_ZZ_to_mpz(ray->first[j]);
-      (*va)[i][j + num_homogenization_vars] = x;
+      convert_ZZ_to_mpz(ray->first[j], (*va)[i][j + num_homogenization_vars]);
+    }
+  }
+  return va;
+}
+
+VectorArray *
+rays_to_transposed_4ti2_VectorArray(listVector *rays, int numOfVars,
+				    int num_extra_rows)
+{
+  int num_rays = lengthListVector(rays);
+  VectorArray *va = new VectorArray(numOfVars + num_extra_rows, num_rays);
+  int i, j;
+  listVector *ray;
+  for (i = 0, ray = rays; i<num_rays; i++, ray = ray->rest) {
+    for (j = 0; j<numOfVars; j++) {
+      convert_ZZ_to_mpz(ray->first[j], (*va)[j][i]);
     }
   }
   return va;
