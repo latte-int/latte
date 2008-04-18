@@ -104,6 +104,9 @@ public:
   Timer dualize_time;
   Timer triangulate_time;
   Timer decompose_time;
+  int num_triangulations_with_trivial_heights;
+  int num_triangulations_with_dependent_heights;
+  int num_triangulations;
   // Constructor & destructor.
   BarvinokParameters();
   virtual ~BarvinokParameters();

@@ -68,7 +68,10 @@ BarvinokParameters::BarvinokParameters() :
   irrationalize_time("Time for irrationalizing general cones"),
   dualize_time("Time for dualizing general cones"),
   triangulate_time("Time for triangulating cones into simplicial cones"),
-  decompose_time("Time for Barvinok decomposition and residue calculation")
+  decompose_time("Time for Barvinok decomposition and residue calculation"),
+  num_triangulations_with_trivial_heights(0),
+  num_triangulations_with_dependent_heights(0),
+  num_triangulations(0)
 {}
 
 BarvinokParameters::~BarvinokParameters()
