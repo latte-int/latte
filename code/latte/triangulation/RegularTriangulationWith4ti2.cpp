@@ -25,6 +25,7 @@
 #include "groebner/VectorArrayStream.h"
 #include "groebner/LatticeBasis.h"
 #include "groebner/RayAlgorithm.h"
+#include "groebner/HermiteAlgorithm.h"
 
 // From LattE:
 #include "latte_4ti2.h"
@@ -51,6 +52,36 @@ cone_from_ray_BitSet(vector<listVector *> &rays,
   return c;
 }
 
+static bool
+lindep_heights_p(listCone *cone,
+		 BarvinokParameters *Parameters,
+		 const vector<mpz_class> &heights,
+		 bool print = false)
+{
+  int num_rays = lengthListVector(cone->rays);
+  /* Check for linearly dependent height vector. */
+  VectorArray *ray_column_matrix = rays_to_transposed_4ti2_VectorArray(cone->rays, Parameters->Number_of_Variables,
+								       /* extra_rows: */ 1);
+  if (print)
+    cout << "Before: " << endl << *ray_column_matrix << endl;
+  int rank = upper_triangle(*ray_column_matrix, Parameters->Number_of_Variables, num_rays);
+  if (print)
+    cout << "After: " << endl << *ray_column_matrix << endl;
+  int i;
+  for (i = 0; i<num_rays; i++)
+    (*ray_column_matrix)[rank][i] = heights[i];
+  if (print)
+    cout << "With heights: " << endl << *ray_column_matrix << endl;
+  int new_rank = upper_triangle(*ray_column_matrix, rank + 1, num_rays);
+  if (print)
+    cout << "Finally: " << endl << *ray_column_matrix << endl;
+  delete ray_column_matrix;
+  if (new_rank == rank)
+    return true;
+  else 
+    return false;
+}
+
 void
 triangulate_cone_with_4ti2(listCone *cone,
 			   BarvinokParameters *Parameters,
@@ -58,6 +89,7 @@ triangulate_cone_with_4ti2(listCone *cone,
 			   void *height_function_data,
 			   ConeConsumer &consumer)
 {
+  Parameters->num_triangulations++;
   // Copy rays into an array, so we can index them.
   int num_rays = lengthListVector(cone->rays);
   vector<listVector *> rays_array = ray_array(cone);
@@ -80,8 +112,19 @@ triangulate_cone_with_4ti2(listCone *cone,
     /* This will be a trivial polyhedral subdivision, so just return
        a copy of the cone. */
     //cerr << "Trivial test: Lifting heights yield trivial polyhedral subdivision." << endl;
+    Parameters->num_triangulations_with_trivial_heights++;
     consumer.ConsumeCone(copyCone(cone));
     return;
+  }
+
+  bool lindep_height = lindep_heights_p(cone, Parameters, heights, false);
+  if (lindep_height) {
+    //cerr << "Rank test: Lifting heights yield trivial polyhedral subdivision." << endl;
+    Parameters->num_triangulations_with_dependent_heights++;
+#ifndef DEBUG_RANKTEST
+    consumer.ConsumeCone(copyCone(cone));
+    return;
+#endif
   }
   
   /* Create a matrix from the rays, with 1 extra coordinates 
@@ -103,16 +146,8 @@ triangulate_cone_with_4ti2(listCone *cone,
     }
   }
 
-  /* Compute the dimension of the unlifted vector configuration. */
-#if 0
-  VectorArray basis_0(0, matrix->get_size());
-  lattice_basis(*matrix, basis_0);
-  int dim_0 = basis_0.get_number();
-  cerr << "Basis_0: " << basis_0 << endl;
-#endif
-
   int I_width = num_rays + 1;
-  
+
   /* Extra row: `vertical' ray -- This kills all upper facets.
      See Verdoolaege, Woods, Bruynooghe, Cools (2005). */
   (*matrix)[num_rays][I_width] = 1;
@@ -122,10 +157,6 @@ triangulate_cone_with_4ti2(listCone *cone,
     (*matrix)[i][I_width] = heights[i];
   }
 
-#if 0
-  cerr << "Matrix: " << *matrix << endl;
-#endif
-  
     /* Output of the file -- for debugging. */
     if (Parameters->debug_triangulation) {
       std::ofstream file("lifted_cone_for_4ti2_triangulation");
@@ -151,18 +182,6 @@ triangulate_cone_with_4ti2(listCone *cone,
 #if 0
     cerr << "Facets: " << *facets << endl;
 #endif
-#if 0
-  /* Compute the dimension of the lifted vector configuration. */
-    int dim_w = facets->get_number();
-    if (dim_w == dim_0) {
-      cerr << "Rank test: Lifting heights yield trivial polyhedral subdivision." << endl;
-      delete rs;
-      delete matrix;
-      delete facets;
-      consumer.ConsumeCone(copyCone(cone));
-      return;
-    }
-#endif
 
     VectorArray* subspace = new VectorArray(0, matrix->get_size());
     RayAlgorithm algorithm;
@@ -177,6 +196,7 @@ triangulate_cone_with_4ti2(listCone *cone,
 
     /* Walk through all facets.  (Ignore all equalities in *subspace.)
        */
+    int num_cones_created = 0;
     int num_equalities = subspace->get_number();
     int num_facets = facets->get_number();
     int true_dimension = Parameters->Number_of_Variables - num_equalities;
@@ -185,7 +205,7 @@ triangulate_cone_with_4ti2(listCone *cone,
     for (i = 0; i<num_facets; i++) {
       /* We ignore facets that are incident with the extra vertical
 	 ray.  */
-      if ((*facets)[i][0] != 0) {
+      if ((*facets)[i][I_width] != 0) {
 	/* All other facets give a face of the triangulation. */
 	/* Find incident rays.
 	   They are the rays whose corresponding slack variables are
@@ -193,7 +213,7 @@ triangulate_cone_with_4ti2(listCone *cone,
 	incidence.zero();
 	int j;
 	for (j = 0; j<num_rays; j++) {
-	  if ((*facets)[i][j + 1] == 0) {
+	  if ((*facets)[i][j] == 0) {
 	    /* Incident! */
 	    incidence.set(j);
 	  }
@@ -218,9 +238,20 @@ triangulate_cone_with_4ti2(listCone *cone,
 	}
 	else {
 	  consumer.ConsumeCone(c);
+	  num_cones_created++;
 	}
       }
     }
+
+#ifdef DEBUG_RANKTEST
+    if (lindep_height && num_cones_created != 1) {
+      cerr << "Created non-trivial subdivision, though heights were dependent?!" << endl;
+      cerr << "Matrix: " << endl << *matrix << endl;
+      lindep_heights_p(cone, Parameters, heights, true);
+      abort();
+    }
+#endif
+    
     delete facets;
     delete subspace;
     delete matrix;
