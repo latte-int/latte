@@ -83,6 +83,8 @@ listCone* createListCone() {
   z->equalities = 0;
   z->rest=0;
 
+  z->index_hint = -1;
+  
   return (z);
 }
 /* ----------------------------------------------------------------- */
@@ -139,6 +141,7 @@ listCone *copyCone(const listCone *cone)
   copy->subspace_generators = copyListVector(cone->subspace_generators);
   copy->equalities = copyListVector(cone->equalities);
   copy->rest = NULL;
+  copy->index_hint = cone->index_hint;
   return copy;
 }
 
