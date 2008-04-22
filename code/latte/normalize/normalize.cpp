@@ -387,6 +387,12 @@ static void open_output_and_stats()
   _4ti2_::out = &fortytwolog;
 }
 
+static void
+close_output_and_stats()
+{
+  stats.close();
+}
+
 static listCone *
 read_cone_cdd_format(const string &filename)
 {
@@ -563,7 +569,7 @@ public:
   }    
 };
 
-int main(int argc, char **argv)
+int normalize_main(int argc, char **argv)
 {
   install_verbosity_control_signal_handlers();
 
@@ -802,6 +808,7 @@ int main(int argc, char **argv)
     if (hil_file_writer) {
       // Update the number of vectors, close the file.
       delete hil_file_writer;
+      hil_file_writer = NULL;
     }
     delete reduction_test;
   }
@@ -813,6 +820,22 @@ int main(int argc, char **argv)
        << " non-trivial non-dependent heights)"
        << endl;
 
+  stats.close();
+  
   return 0;
 }
+
+
+int normalize_commandline(char *command)
+{
+  // Silly tokenizer for a command line
+  int argc;
+  char **argv = (char**) malloc(sizeof(char *) * 100);
+  argv[0] = strtok(command, " ");
+  for (argc = 1; argv[argc] = strtok(NULL, " "); argc++);
+  int retval = normalize_main(argc, argv);  
+  free(argv);
+  return retval;
+}
+
 

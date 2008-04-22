@@ -5,11 +5,11 @@ noinst_LIBRARIES =
 nodist_noinst_HEADERS =
 
 noinst_LIBRARIES += libnormaliz.a
-nodist_libnormaliz_a_SOURCES = ReductionTest.cpp
+nodist_libnormaliz_a_SOURCES = ReductionTest.cpp normalize.cpp
 nodist_noinst_HEADERS += ReductionTest.h
 AM_CPPFLAGS = -I$(srcdir)/..
 if HAVE_CPLEX
-nodist_libnormaliz_a_SOURCES += ReductionTestWithCPLEX.cpp
+nodist_libnormaliz_a_SOURCES += ReductionTestWithCPLEX.cpp 
 nodist_noinst_HEADERS += ReductionTestWithCPLEX.h
 endif
 
@@ -23,10 +23,13 @@ AM_CXXFLAGS += $(CPLEX_CFLAGS)
 endif
 
 bin_PROGRAMS += normaliz
-nodist_normaliz_SOURCES = normalize.cpp
+nodist_normaliz_SOURCES = normalize_main.cpp
 
 if HAVE_CPLEX
 bin_PROGRAMS += check-representation
 nodist_check_representation_SOURCES = check-representation.cpp
 endif
 
+bin_PROGRAMS += normaliz_wrapper
+nodist_normaliz_wrapper_SOURCES = normaliz_wrapper.cpp
+normaliz_wrapper_LDADD = $(LDADD) -l4ti2util
