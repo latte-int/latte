@@ -30,14 +30,17 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 #include <stdio.h>
 #include <string.h>
 
+// Stuff from lib4ti2util
 extern "C" {
-  // Stuff from lib4ti2util
 #include "util/myheader.h"
 #include "util/print.h"
 #include "util/orbit.h"
 #include "util/output.h"
 #include "util/vector.h"
 }
+
+// Silly interface to MK's normaliz
+int normalize_commandline(char *command);
 
 /* ----------------------------------------------------------------- */
 listVector* extractSmallCones(listVector **mainCones, int threshold,
@@ -97,9 +100,15 @@ listVector* extractSimplicialCones(listVector *simplicialCones,
 void runNormaliz(char *inFileName, char *outFileName, char *normaliz, 
 		 char *raysFileName, int rayToBePulled, int trivial) {
   char command[1000];
+  int retval;
 
 /*    strcpy(command,"/home/mkoeppe/w/latte/build-gcc411-64/dest/bin/"); */
-  strcpy(command,normaliz);
+
+  if (normaliz[0])
+    strcpy(command,normaliz);
+  else
+    strcpy(command, "dummy");
+  
   strcat(command," --quiet --no-triang-file --only-triangulate");
   strcat(command," --triangulation-pull-rays=");
   sprintf(command,"%s%d",command,rayToBePulled);
@@ -114,10 +123,19 @@ void runNormaliz(char *inFileName, char *outFileName, char *normaliz,
   }
   strcat(command," ");
   strcat(command,raysFileName);
-  strcat(command," >out.tmp");
-/*    printf("%s\n",command); */
-  system(command);
 
+  if (normaliz[0]) {
+    strcat(command," >out.tmp");
+    /*    printf("%s\n",command); */
+    retval = system(command);
+  }
+  else
+    retval = normalize_commandline(command);
+
+  if (retval != 0) {
+    fprintf(stderr, "Normaliz returned nonzero exit status.\n");
+    exit(1);
+  }
   return;
 }
 /* ----------------------------------------------------------------- */
@@ -127,8 +145,13 @@ listVector* checkCones(listVector *candidates,char *simplicialConesFileName,
   int numOfVars;
   listVector *HB, *tmp;
   char hilFileName[127],command[1000];
+  int retval;
 
-  strcpy(command,normaliz);
+  if (normaliz[0])
+    strcpy(command,normaliz);
+  else
+    strcpy(command, "dummy");
+
   strcat(command," --quiet --no-triang-file --reduction=cplex");
   strcat(command," --max-determinant-for-enumeration=10000");
   strcat(command," --reduction-rays-file=");
@@ -137,9 +160,19 @@ listVector* checkCones(listVector *candidates,char *simplicialConesFileName,
   strcat(command,simplicialConesFileName);
   strcat(command," ");
   strcat(command,raysFileName);
-  strcat(command," >out.tmp");
-  system(command);
 
+  if (normaliz[0]) {
+    strcat(command," >out.tmp");
+    /*    printf("%s\n",command); */
+    retval = system(command);
+  }
+  else
+    retval = normalize_commandline(command);
+  if (retval != 0) {
+    fprintf(stderr, "Normaliz returned nonzero exit status.\n");
+    exit(1);
+  }
+  
   strcpy(hilFileName,raysFileName);
   strcat(hilFileName,"--subcones-");
   strcat(hilFileName,simplicialConesFileName);
@@ -172,6 +205,8 @@ int main(int argc, char *argv[]) {
     smallConesOutFileName[127],trivialSmallConesOutFileName[127],
     simplicialConesFileName[127],action[127],normaliz[127];
 
+  normaliz[0] = '\0'; /* initialize... --mkoeppe */
+  
   setbuf(stdout,0);
 
   strcpy(raysFileName,argv[argc-1]);
