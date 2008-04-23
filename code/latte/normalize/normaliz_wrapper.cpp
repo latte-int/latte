@@ -152,7 +152,8 @@ listVector* checkCones(listVector *candidates,char *simplicialConesFileName,
   else
     strcpy(command, "dummy");
 
-  strcat(command," --quiet --no-triang-file --reduction=cplex");
+  strcat(command," --quiet --no-initial-triangulation");
+  strcat(command," --no-triang-file --reduction=cplex");
   strcat(command," --max-determinant-for-enumeration=10000");
   strcat(command," --reduction-rays-file=");
   strcat(command,raysFileName);
@@ -214,6 +215,7 @@ int main(int argc, char *argv[]) {
   strcat(symFileName,".sym.full");
   strcpy(simplicialConesFileName,argv[argc-1]);
   strcat(simplicialConesFileName,".simplicial");
+  strcpy(action,"pullall");
   rayToBePulled=0;
   threshold=-1;
   dimension=0;
@@ -318,6 +320,8 @@ int main(int argc, char *argv[]) {
 	    while (tmp) {
 	      (tmp->first)[2]=1;
 	      (tmp->first)[5]=1;
+	      (tmp->first)[14]=1;
+	      (tmp->first)[17]=1;
 	      tmp=tmp->rest;
 	    }
 	  }
@@ -327,6 +331,7 @@ int main(int argc, char *argv[]) {
 	      (tmp->first)[2]=1;
 	      (tmp->first)[5]=1;
 	      (tmp->first)[8]=1;
+	      (tmp->first)[14]=1;
 	      tmp=tmp->rest;
 	    }
 	  }
@@ -338,6 +343,8 @@ int main(int argc, char *argv[]) {
 	    while (tmp) {
 	      (tmp->first)[2]=0;
 	      (tmp->first)[5]=0;
+	      (tmp->first)[14]=0;
+	      (tmp->first)[17]=0;
 	      tmp=tmp->rest;
 	    }
 	  }
@@ -347,6 +354,7 @@ int main(int argc, char *argv[]) {
 	      (tmp->first)[2]=0;
 	      (tmp->first)[5]=0;
 	      (tmp->first)[8]=0;
+	      (tmp->first)[14]=0;
 	      tmp=tmp->rest;
 	    }
 	  }
@@ -397,12 +405,12 @@ int main(int argc, char *argv[]) {
 		     lengthListVector(trivialSmallCones));
 	      printf("non-trivial smallCones = %d -> ",
 		     lengthListVector(smallCones));
-	      smallCones=extractNonDominatedVectors(smallCones,mainOrbits,
-						    numOfVars);
-	      printf("uncovered = %d -> ",lengthListVector(smallCones));
 	      simplicialCones=extractSimplicialCones(simplicialCones,
 						     &smallCones,dimension,
 						     numOfVars);
+	      smallCones=extractNonDominatedVectors(smallCones,mainOrbits,
+						    numOfVars);
+	      printf("uncovered = %d -> ",lengthListVector(smallCones));
 	      printf("nonsimplicial = %d and ",lengthListVector(smallCones));
 	      printf("simplicial = %d\n",lengthListVector(simplicialCones));
 	      printListVectorToFile(simplicialConesFileName,simplicialCones,
