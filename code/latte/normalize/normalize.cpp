@@ -813,7 +813,7 @@ int normalize_main(int argc, char **argv)
     delete reduction_test;
   }
 
-  if (param.num_triangulations > 0) {
+  if (params.num_triangulations > 0) {
     cerr << "Computed " << params.num_triangulations << " subdivisions ("
 	 << params.num_triangulations_with_trivial_heights << " trivial heights, "
 	 << params.num_triangulations_with_dependent_heights << " dependent heights, "
