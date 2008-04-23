@@ -322,6 +322,7 @@ int main(int argc, char *argv[]) {
 	      (tmp->first)[5]=1;
 	      (tmp->first)[14]=1;
 	      (tmp->first)[17]=1;
+	      (tmp->first)[26]=1;
 	      tmp=tmp->rest;
 	    }
 	  }
@@ -345,6 +346,7 @@ int main(int argc, char *argv[]) {
 	      (tmp->first)[5]=0;
 	      (tmp->first)[14]=0;
 	      (tmp->first)[17]=0;
+	      (tmp->first)[26]=0;
 	      tmp=tmp->rest;
 	    }
 	  }
