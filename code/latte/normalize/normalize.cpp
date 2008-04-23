@@ -813,12 +813,14 @@ int normalize_main(int argc, char **argv)
     delete reduction_test;
   }
 
-  cerr << "Computed " << params.num_triangulations << " subdivisions ("
-       << params.num_triangulations_with_trivial_heights << " trivial heights, "
-       << params.num_triangulations_with_dependent_heights << " dependent heights, "
-       << params.num_triangulations - (params.num_triangulations_with_trivial_heights + params.num_triangulations_with_dependent_heights)
-       << " non-trivial non-dependent heights)"
-       << endl;
+  if (param.num_triangulations > 0) {
+    cerr << "Computed " << params.num_triangulations << " subdivisions ("
+	 << params.num_triangulations_with_trivial_heights << " trivial heights, "
+	 << params.num_triangulations_with_dependent_heights << " dependent heights, "
+	 << params.num_triangulations - (params.num_triangulations_with_trivial_heights + params.num_triangulations_with_dependent_heights)
+	 << " non-trivial non-dependent heights)"
+	 << endl;
+  }
 
   stats.close();
   
