@@ -251,7 +251,9 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 	   && abs(t->determinant) < max_determinant_for_enumeration) {
     if (verbosity > 0) {
       cerr << "Enumerating fundamental parallelepiped..." << flush;
-      enumerate_simplicial_cone_with_latte(t);
+    }
+    enumerate_simplicial_cone_with_latte(t);
+    if (verbosity > 0) {
       cerr << endl;
       stats << endl;
     }
