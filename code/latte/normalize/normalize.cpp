@@ -253,6 +253,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
       cerr << "Enumerating fundamental parallelepiped..." << flush;
       enumerate_simplicial_cone_with_latte(t);
       cerr << endl;
+      stats << endl;
     }
   }
   else if (num_facets < max_facets) {
