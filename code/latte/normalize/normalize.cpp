@@ -104,15 +104,18 @@ enumerate_simplicial_cone_with_latte(listCone *cone)
 {
   int numOfVars = params.Number_of_Variables;
   listVector* points = pointsInParallelepiped(cone, numOfVars);
+  //printListVector(points, numOfVars);
   vector<int> v(numOfVars);
   bool any_new = false;
 
   listVector *point;
   for (point = points; point != NULL; point = point->rest) {
     int i;
-    for (i = 0; i<numOfVars; i++)
+    for (i = 0; i<numOfVars; i++) {
       v[i] = convert_ZZ_to_int(point->first[i]);
-    any_new = any_new || insert_hilbert_basis_element(v);
+    }
+    if (insert_hilbert_basis_element(v))
+      any_new = true;
   }
   freeListVector(points);
   if (any_new)
