@@ -194,6 +194,13 @@ listVector* checkCones(listVector *candidates,char *simplicialConesFileName,
 
   return (candidates);
 }
+
+static void usage()
+{
+  fprintf(stderr, "usage: normaliz_wrapper [OPTIONS...] FILENAME\n");
+}
+
+
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
   int i,rayToBePulled,localRayToBePulled,dimension,numOfVars,threshold,
@@ -206,10 +213,16 @@ int main(int argc, char *argv[]) {
     smallConesOutFileName[127],trivialSmallConesOutFileName[127],
     simplicialConesFileName[127],action[127],normaliz[127];
 
+  if (argc < 2) {
+    usage();
+    exit(1);
+  }
+  
   normaliz[0] = '\0'; /* initialize... --mkoeppe */
   
   setbuf(stdout,0);
 
+  strcpy(action, "pullall"); /* default */
   strcpy(raysFileName,argv[argc-1]);
   strcpy(symFileName,argv[argc-1]);
   strcat(symFileName,".sym.full");
@@ -442,6 +455,10 @@ int main(int argc, char *argv[]) {
 	}
       }
     }  
+  }
+  else {
+    fprintf(stderr, "--action=%s not handled.\n", action);
+    exit(1);
   }
 
   return(0);
