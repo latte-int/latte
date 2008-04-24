@@ -296,6 +296,8 @@ int main(int argc, char *argv[]) {
 	tmp->rest=simplicialCones;
 	simplicialCones=mainCones;
 	mainCones=0;
+	printListVectorToFile(simplicialConesFileName,simplicialCones,
+			      numOfVars);
 	if (simplicialCones) { 
 	  candidates=checkCones(candidates,simplicialConesFileName,
 				raysFileName,raysFileName,normaliz);
