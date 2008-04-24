@@ -312,10 +312,10 @@ int main(int argc, char *argv[]) {
 	mainCones=readListVector(&numOfVars,mainConesOutFileName);
 	threshold=maximalNormInListVector(mainCones,numOfVars);
 	smallCones=extractSmallCones(&mainCones,threshold,numOfVars);
+	printListVectorToFile(mainConesInFileName,mainCones,numOfVars);
 	if (smallCones) {
 	  printf("main cones = %d, small cones = %d\n",
 		 lengthListVector(mainCones),lengthListVector(smallCones));
-	  printListVectorToFile(mainConesInFileName,mainCones,numOfVars);
 	  
 	  if (strncmp(mainConesInFileName,"346",3)==0) {
 	    tmp=mainCones;
