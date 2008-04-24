@@ -147,6 +147,8 @@ listVector* checkCones(listVector *candidates,char *simplicialConesFileName,
   char hilFileName[127],command[1000];
   int retval;
 
+  printf("Checking simplicial cones.\n");
+
   if (normaliz[0])
     strcpy(command,normaliz);
   else
@@ -162,6 +164,7 @@ listVector* checkCones(listVector *candidates,char *simplicialConesFileName,
   strcat(command," ");
   strcat(command,raysFileName);
 
+  printf("%s\n",command);
   if (normaliz[0]) {
     strcat(command," >out.tmp");
     /*    printf("%s\n",command); */
@@ -180,6 +183,10 @@ listVector* checkCones(listVector *candidates,char *simplicialConesFileName,
   strcat(hilFileName,".hil");
 
   HB=readListVector(&numOfVars,hilFileName);
+  if (HB) {
+    printf("New candidates for HB:\n");
+    printListVector(HB,numOfVars);
+  }
 
   if (HB) {
     tmp=HB;
@@ -209,7 +216,8 @@ int main(int argc, char *argv[]) {
   listVector *mainCones, *symmGroup, *smallCones, *trivialSmallCones, 
     *mainOrbits, *simplicialCones, *tmp, *candidates;
   char raysFileName[127],symFileName[127],mainConesInFileName[127],
-    mainConesOutFileName[127],smallConesInFileName[127],
+    mainConesInFileNameNumbered[127],mainConesOutFileName[127],
+    mainConesOutFileNameNumbered[127],smallConesInFileName[127],
     smallConesOutFileName[127],trivialSmallConesOutFileName[127],
     simplicialConesFileName[127],action[127],normaliz[127];
 
@@ -234,6 +242,8 @@ int main(int argc, char *argv[]) {
   dimension=0;
   strcpy(mainConesInFileName,"");
   strcpy(mainConesOutFileName,"");
+  strcpy(mainConesInFileNameNumbered,"");
+  strcpy(mainConesOutFileNameNumbered,"");
 
   for (i=1;i<argc-1;i++) {
     if (strncmp(argv[i], "--symmetry-file",15) == 0) {
@@ -265,9 +275,13 @@ int main(int argc, char *argv[]) {
   if (mainConesInFileName[0]=='\0') {
     strcpy(mainConesInFileName,argv[argc-1]);
     strcat(mainConesInFileName,".mainCones.in");
+    sprintf(mainConesInFileNameNumbered,"%s.%d",mainConesInFileName,1);
     v=createVector(numOfVars);
     for (i=0;i<numOfVars;i++) v[i]=1;
-    printListVectorToFile(mainConesInFileName,createListVector(v),numOfVars);
+    printListVectorToFile(mainConesInFileNameNumbered,createListVector(v),
+			  numOfVars);
+  } else {
+    sprintf(mainConesInFileNameNumbered,"%s.%d",mainConesInFileName,1);
   }
   if (mainConesOutFileName[0]=='\0') {
     strcpy(mainConesOutFileName,argv[argc-1]);
@@ -283,7 +297,7 @@ int main(int argc, char *argv[]) {
   printf("action = %s\n",action);
   printf("normaliz = %s\n",normaliz);
 
-  mainCones=readListVector(&numOfVars,mainConesInFileName);
+  mainCones=readListVector(&numOfVars,mainConesInFileNameNumbered);
   mainOrbits=0;
   smallCones=0;
   trivialSmallCones=0;
@@ -304,9 +318,6 @@ int main(int argc, char *argv[]) {
        printf("\n=======================================================\n\n");
       maxNorm=maximalNormInListVector(mainCones,numOfVars);
       if (maxNorm==dimension) {
-	tmp=mainCones;
-	while (tmp->rest) tmp=tmp->rest;
-	tmp->rest=simplicialCones;
 	simplicialCones=mainCones;
 	mainCones=0;
 	printListVectorToFile(simplicialConesFileName,simplicialCones,
@@ -314,18 +325,26 @@ int main(int argc, char *argv[]) {
 	if (simplicialCones) { 
 	  candidates=checkCones(candidates,simplicialConesFileName,
 				raysFileName,raysFileName,normaliz);
-
 	  freeAllOfListVector(simplicialCones);
 	  simplicialCones=0;
 	}
       } else {
 	printListVector(mainCones,numOfVars);
-	runNormaliz(mainConesInFileName,mainConesOutFileName,normaliz,
-		    raysFileName,rayToBePulled,0);
-	mainCones=readListVector(&numOfVars,mainConesOutFileName);
+	sprintf(mainConesInFileNameNumbered,"%s.%d",mainConesInFileName,
+		rayToBePulled);
+	sprintf(mainConesOutFileNameNumbered,"%s.%d",mainConesOutFileName,
+		rayToBePulled);
+	printListVectorToFile(mainConesInFileNameNumbered,mainCones,
+			      numOfVars);
+	runNormaliz(mainConesInFileNameNumbered,mainConesOutFileNameNumbered,
+		    normaliz,raysFileName,rayToBePulled,0);
+	mainCones=readListVector(&numOfVars,mainConesOutFileNameNumbered);
 	threshold=maximalNormInListVector(mainCones,numOfVars);
 	smallCones=extractSmallCones(&mainCones,threshold,numOfVars);
-	printListVectorToFile(mainConesInFileName,mainCones,numOfVars);
+
+	if (smallCones==0) {
+	  printf("No small cones.\n");
+	}
 	if (smallCones) {
 	  printf("main cones = %d, small cones = %d\n",
 		 lengthListVector(mainCones),lengthListVector(smallCones));
@@ -333,21 +352,21 @@ int main(int argc, char *argv[]) {
 	  if (strncmp(mainConesInFileName,"346",3)==0) {
 	    tmp=mainCones;
 	    while (tmp) {
-	      (tmp->first)[2]=1;
-	      (tmp->first)[5]=1;
-	      (tmp->first)[14]=1;
-	      (tmp->first)[17]=1;
-	      (tmp->first)[26]=1;
+	      if (rayToBePulled>2) (tmp->first)[2]=1;
+	      if (rayToBePulled>5) (tmp->first)[5]=1;
+	      if (rayToBePulled>14) (tmp->first)[14]=1;
+	      if (rayToBePulled>17) (tmp->first)[17]=1;
+	      if (rayToBePulled>26) (tmp->first)[26]=1;
 	      tmp=tmp->rest;
 	    }
 	  }
 	  if (strncmp(mainConesInFileName,"355",3)==0) {
 	    tmp=mainCones;
 	    while (tmp) {
-	      (tmp->first)[2]=1;
-	      (tmp->first)[5]=1;
-	      (tmp->first)[8]=1;
-	      (tmp->first)[17]=1;
+	      if (rayToBePulled>2) (tmp->first)[2]=1;
+	      if (rayToBePulled>5) (tmp->first)[5]=1;
+	      if (rayToBePulled>8) (tmp->first)[8]=1;
+	      if (rayToBePulled>17) (tmp->first)[17]=1;
 	      tmp=tmp->rest;
 	    }
 	  }
@@ -357,21 +376,21 @@ int main(int argc, char *argv[]) {
 	  if (strncmp(mainConesInFileName,"346",3)==0) {
 	    tmp=mainCones;
 	    while (tmp) {
-	      (tmp->first)[2]=0;
-	      (tmp->first)[5]=0;
-	      (tmp->first)[14]=0;
-	      (tmp->first)[17]=0;
-	      (tmp->first)[26]=0;
+	      if (rayToBePulled>2) (tmp->first)[2]=0;
+	      if (rayToBePulled>5) (tmp->first)[5]=0;
+	      if (rayToBePulled>14) (tmp->first)[14]=0;
+	      if (rayToBePulled>17) (tmp->first)[17]=0;
+	      if (rayToBePulled>26) (tmp->first)[26]=0;
 	      tmp=tmp->rest;
 	    }
 	  }
 	  if (strncmp(mainConesInFileName,"355",3)==0) {
 	    tmp=mainCones;
 	    while (tmp) {
-	      (tmp->first)[2]=0;
-	      (tmp->first)[5]=0;
-	      (tmp->first)[8]=0;
-	      (tmp->first)[17]=0;
+	      if (rayToBePulled>2) (tmp->first)[2]=0;
+	      if (rayToBePulled>5) (tmp->first)[5]=0;
+	      if (rayToBePulled>8) (tmp->first)[8]=0;
+	      if (rayToBePulled>17) (tmp->first)[17]=0;
 	      tmp=tmp->rest;
 	    }
 	  }
