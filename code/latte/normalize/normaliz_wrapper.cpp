@@ -220,7 +220,7 @@ int main(int argc, char *argv[]) {
     mainConesInFileNameNumbered[127],mainConesOutFileName[127],
     mainConesOutFileNameNumbered[127],smallConesInFileName[127],
     smallConesOutFileName[127],trivialSmallConesOutFileName[127],
-    simplicialConesFileName[127],redcutionRaysFileName[127],
+    simplicialConesFileName[127],reductionRaysFileName[127],
     action[127],normaliz[127];
 
   if (argc < 2) {
@@ -258,7 +258,7 @@ int main(int argc, char *argv[]) {
       } else if (strncmp(argv[i], "--simplicial-cones-file",23) == 0) {
 	strcpy(simplicialConesFileName,argv[i]+24);
       } else if (strncmp(argv[i], "--reduction-rays-file",21) == 0) {
-	strcpy(redcutionRaysFileName,argv[i]+22);
+	strcpy(reductionRaysFileName,argv[i]+22);
       } else if (strncmp(argv[i], "--triangulation-pull-rays",25) == 0) {
 	rayToBePulled=atoi(argv[i]+26);
       } else if (strncmp(argv[i], "--dimension",11) == 0) {
