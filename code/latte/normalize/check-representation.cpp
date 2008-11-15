@@ -112,7 +112,7 @@ int main(int argc, char **argv)
     }
   }
 
-  cout << "Checking that all vectors are generated over the nonnegative reals, and the nonnegative integers." << endl;
+  cout << "Checking that all vectors are generated over the nonnegative reals, and the nonnegative inetgers." << endl;
   vector<int> v(dim_vectors);
   int i;
   for (i = 0; i<num_vectors; i++) {

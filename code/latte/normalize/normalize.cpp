@@ -104,18 +104,15 @@ enumerate_simplicial_cone_with_latte(listCone *cone)
 {
   int numOfVars = params.Number_of_Variables;
   listVector* points = pointsInParallelepiped(cone, numOfVars);
-  //printListVector(points, numOfVars);
   vector<int> v(numOfVars);
   bool any_new = false;
 
   listVector *point;
   for (point = points; point != NULL; point = point->rest) {
     int i;
-    for (i = 0; i<numOfVars; i++) {
+    for (i = 0; i<numOfVars; i++)
       v[i] = convert_ZZ_to_int(point->first[i]);
-    }
-    if (insert_hilbert_basis_element(v))
-      any_new = true;
+    any_new = any_new || insert_hilbert_basis_element(v);
   }
   freeListVector(points);
   if (any_new)
@@ -251,11 +248,8 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 	   && abs(t->determinant) < max_determinant_for_enumeration) {
     if (verbosity > 0) {
       cerr << "Enumerating fundamental parallelepiped..." << flush;
-    }
-    enumerate_simplicial_cone_with_latte(t);
-    if (verbosity > 0) {
+      enumerate_simplicial_cone_with_latte(t);
       cerr << endl;
-      stats << endl;
     }
   }
   else if (num_facets < max_facets) {
@@ -391,12 +385,6 @@ static void open_output_and_stats()
   string fortytwolog_filename = "/dev/null"; //filename + ".4ti2log";
   static ofstream fortytwolog(fortytwolog_filename.c_str());
   _4ti2_::out = &fortytwolog;
-}
-
-static void
-close_output_and_stats()
-{
-  stats.close();
 }
 
 static listCone *
@@ -575,7 +563,7 @@ public:
   }    
 };
 
-int normalize_main(int argc, char **argv)
+int main(int argc, char **argv)
 {
   install_verbosity_control_signal_handlers();
 
@@ -814,36 +802,17 @@ int normalize_main(int argc, char **argv)
     if (hil_file_writer) {
       // Update the number of vectors, close the file.
       delete hil_file_writer;
-      hil_file_writer = NULL;
     }
     delete reduction_test;
   }
 
-  if (params.num_triangulations > 0) {
-    cerr << "Computed " << params.num_triangulations << " subdivisions ("
-	 << params.num_triangulations_with_trivial_heights << " trivial heights, "
-	 << params.num_triangulations_with_dependent_heights << " dependent heights, "
-	 << params.num_triangulations - (params.num_triangulations_with_trivial_heights + params.num_triangulations_with_dependent_heights)
-	 << " non-trivial non-dependent heights)"
-	 << endl;
-  }
+  cerr << "Computed " << params.num_triangulations << " subdivisions ("
+       << params.num_triangulations_with_trivial_heights << " trivial heights, "
+       << params.num_triangulations_with_dependent_heights << " dependent heights, "
+       << params.num_triangulations - (params.num_triangulations_with_trivial_heights + params.num_triangulations_with_dependent_heights)
+       << " non-trivial non-dependent heights)"
+       << endl;
 
-  stats.close();
-  
   return 0;
 }
-
-
-int normalize_commandline(char *command)
-{
-  // Silly tokenizer for a command line
-  int argc;
-  char **argv = (char**) malloc(sizeof(char *) * 100);
-  argv[0] = strtok(command, " ");
-  for (argc = 1; argv[argc] = strtok(NULL, " "); argc++);
-  int retval = normalize_main(argc, argv);  
-  free(argv);
-  return retval;
-}
-
 
