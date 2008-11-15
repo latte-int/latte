@@ -75,7 +75,6 @@ struct listCone {
   vec_ZZ facet_divisors;	
   listVector *latticePoints;
   vec_ZZ lattice_points_scalar_products;
-  int index_hint;
   struct listCone *rest;
 };
 

@@ -93,10 +93,8 @@ ReadSubcones(listCone *master_cone, int numOfVars,
       ray_indicator[j] = x;
     }
     check_stream(f, fileName, "ReadSubcones");
-    listCone *cone = cone_from_ray_indicator(rays, ray_indicator,
-					     master_cone);
-    cone->index_hint = i;
-    consumer.ConsumeCone(cone);
+    consumer.ConsumeCone(cone_from_ray_indicator(rays, ray_indicator,
+						 master_cone));
   }
 }
 
