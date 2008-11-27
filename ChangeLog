@@ -1,3 +1,109 @@
+2008-11-25  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	Version 1.2-mk-0.9.1
+
+2008-11-22  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	* configure.ac: Bump version number
+
+	* code/latte/triangulation/RegularTriangulationWith4ti2.cpp:
+	Special handling of trivial lifting heights.
+
+	* code/latte/cone_consumer.h: Fix function declaration for GCC
+	4.4. Reported by Zlatko Dimkovic.
+
+2008-11-15  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	* code/latte/barvinok/barvinok.cpp: Undefine SHOWDETS.
+
+	* code/latte/normalize/check-representation.cpp:
+	Fix typo in output text
+
+2008-04-07  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/normalize/normalize.cpp: Handle non-fulldimensional cones.
+
+	* code/latte/DualizationWith4ti2.cpp (dualizeCone_with_4ti2):
+	Handle non-fulldimensional cones.
+
+	* code/latte/normalize/ReductionTestWithCPLEX.cpp:
+	Improve diagnosis if repr-ip.lp cannot be written to.
+
+	* code/latte/latte_4ti2_zsolve.cpp, code/latte/latte_4ti2_zsolve.h (facets_to_4ti2_zsolve_LinearSystem):
+	Change interface, handle
+	non-fulldimensional cones.
+
+	* code/latte/dual.cpp (dualizeCone):
+	Handle "subspace_generators" and "equalities".
+	(dualizeCone_with_cdd): Assert cone is pointed.
+
+	* code/latte/cone.cpp, code/latte/cone.h (listCone):
+	Add slots "subspace_generators" and "equalities".
+
+2008-04-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/normalize/normalize.cpp:
+	Also use the name of the subcones file to construct the name of the
+	.hil and .stats file.
+
+	* code/latte/triangulation/triangulate.cpp:
+	Unless triangulation_assume_fulldim is true, don't assume cones with M
+	rays in ambient dimension M are simplicial.
+
+	* code/latte/normalize/normalize.cpp:
+	Handle lower-dimensional cones with M rays in ambient dimension M
+	properly -- don't assume they are full-dimensional and simplicial.
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h (BarvinokParameters):
+	New quirky parameter,
+	triangulation_assume_fulldim
+
+	* code/latte/triangulation/SpecialSimplex.cpp, code/latte/triangulation/BoundaryTriangulation.cpp, code/latte/triangulation/RegularTriangulationWith4ti2.cpp, code/latte/triangulation/RegularTriangulationWith4ti2.h (triangulate_cone_with_4ti2):
+	Remove unused cone_dimension argument.
+
+	* code/latte/ReadSubcones.cpp: Check whether writes are successful.
+
+2008-04-03  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/normalize/normalize.cpp:
+	Implement enumeration of fundamental parallelepiped.
+	New option, --max-determinant-for-enumeration.
+
+	* code/latte/latte_ntl.cpp, code/latte/latte_ntl.h, code/latte/latte_4ti2_zsolve.cpp (convert_ZZ_to_int):
+	Move from latte_4ti2_zsolve.cpp to latte_ntl.h, latte_ntl.cpp
+
+	* code/latte/cone.cpp, code/latte/cone.h: Some constification.
+
+	* code/latte/normalize/normalize.cpp:
+	New option --triangulation-pull-rays=INDEX,...
+
+2008-04-02  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/barvinok/barvinok.cpp, code/latte/barvinok/barvinok.h (triangulation_prescribed_height_data):
+	New slot.
+
+	* code/latte/normalize/normalize.cpp: New option,
+	--triangulation-height-vector=4TI2-ROWVECTOR-FILE
+
+	* code/latte/triangulation/RegularTriangulation.cpp, code/latte/triangulation/RegularTriangulation.h (prescribed_height):
+	New.
+
+	* code/latte/triangulation/RegularTriangulationWith4ti2.cpp:
+	New option, --debug-triangulation.
+
+	(random_regular_triangulation_with_4ti2): If
+	triangulation_prescribed_height_data is given, use it.
+
+	* code/latte/triangulation/triangulate.cpp:
+	New option, --debug-triangulation
+
+2008-03-04  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
+
+	* code/latte/ReadSubcones.cpp (ReadSubcones):
+	Call SetNumcones with the number read from the file.
+
+	* code/latte/normalize/normalize.cpp: Handle --help.
+
 2007-10-19  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/Residue.cpp, code/latte/RudyResNTL.cpp,
