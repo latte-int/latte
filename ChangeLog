@@ -1,3 +1,16 @@
+2008-12-15  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	Version 1.2-mk-0.9.2
+
+2008-12-15  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	* code/latte/genFunction/piped.cpp: 
+	* code/latte/latte_system.cpp: 
+	* code/latte/latte_ntl.cpp: Add some more headers, to make it
+	compiler on current GCCs. 
+
+	* code/latte/cone_consumer.h: Fix function declaration again, d'oh. 
+
 2008-11-25  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
 
 	Version 1.2-mk-0.9.1
