@@ -125,7 +125,7 @@ ConeProducer *
 compose(ConeProducer *a_producer, ConeTransducer *a_transducer);
 
 ConeTransducer *
-compose(ConeTransducer *a_transducer_1, ConeTransducer *a_transducer_1);
+compose(ConeTransducer *a_transducer_1, ConeTransducer *a_transducer_2);
 
 ConeConsumer *
 compose(ConeTransducer *a_transducer, ConeConsumer *a_consumer);
