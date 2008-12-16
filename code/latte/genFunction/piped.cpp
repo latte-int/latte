@@ -26,6 +26,7 @@
 #include "../vertices/cdd.h"
 #include <cassert>
 #include <string>
+#include <climits>
 
 #include "IntCombEnum.h"
 #include "matrix_ops.h" 

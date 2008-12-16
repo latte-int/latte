@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cassert>
+#include <climits>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
