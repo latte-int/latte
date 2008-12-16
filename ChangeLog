@@ -7,7 +7,7 @@
 	* code/latte/genFunction/piped.cpp: 
 	* code/latte/latte_system.cpp: 
 	* code/latte/latte_ntl.cpp: Add some more headers, to make it
-	compiler on current GCCs. 
+	compile on current GCCs. 
 
 	* code/latte/cone_consumer.h: Fix function declaration again, d'oh. 
 
