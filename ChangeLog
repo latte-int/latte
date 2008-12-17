@@ -1,3 +1,18 @@
+2008-12-17  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	Version 1.2-mk-0.9.3
+
+2008-12-17  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	* Bump version number.
+
+	* m4/ax_cc_maxopt.m4, m4/ax_cxx_maxopt.m4:
+	Don't play with CFLAGS on Mac OS X, it's easy to create Bus Errors
+	with some of the fancy CFLAGS.
+
+	* code/latte/barvinok/barvinok.cpp: Undefine SHOWDETS, to reduce
+	verbosity.
+
 2008-12-15  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
 
 	Version 1.2-mk-0.9.2
