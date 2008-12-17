@@ -102,8 +102,8 @@ noinst_HEADERS += VertexConesWith4ti2.h
 liblatte_a_SOURCES += DualizationWith4ti2.cpp
 noinst_HEADERS += DualizationWith4ti2.h
 
-liblatte_a_SOURCES += latte_4ti2_zsolve.cpp
-noinst_HEADERS += latte_4ti2_zsolve.h
+## liblatte_a_SOURCES += latte_4ti2_zsolve.cpp
+## noinst_HEADERS += latte_4ti2_zsolve.h
 endif
 
 bin_PROGRAMS += polyhedron-to-cones
