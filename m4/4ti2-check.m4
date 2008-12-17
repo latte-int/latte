@@ -38,22 +38,22 @@ for FORTYTWO_HOME in ${FORTYTWO_HOME_PATH}
 if test -r "$FORTYTWO_HOME/include/RayAlgorithm.h"; then
 	if test "x$FORTYTWO_HOME" != "x/usr" -a "x$FORTYTWO_HOME" != "x/usr/local"; then
 		FORTYTWO_CXXFLAGS="-I${FORTYTWO_HOME}/include -D__STDC_LIMIT_MACROS -D_4ti2_GMP_"
-		FORTYTWO_LIBS="-L${FORTYTWO_HOME}/lib -l4ti2gmp -lzsolve"
+		FORTYTWO_LIBS="-L${FORTYTWO_HOME}/lib -l4ti2gmp "
 	else
 		FORTYTWO_CXXFLAGS="-D__STDC_LIMIT_MACROS -D_4ti2_GMP_"
-		FORTYTWO_LIBS="-l4ti2gmp -lzsolve"
+		FORTYTWO_LIBS="-l4ti2gmp "
 	fi	
 	CXXFLAGS="${BACKUP_CXXFLAGS} ${FORTYTWO_CXXFLAGS} ${GMP_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${FORTYTWO_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK([
 #include "RayAlgorithm.h"
-extern "C" {
-  #include "libzsolve.h"
-}
+// extern "C" {
+//   #include "libzsolve.h"
+// }
 ],
 [ _4ti2_::RayAlgorithm algorithm;
-  ZSolveContext context;
+//  ZSolveContext context;
 ],
 [	FORTYTWO_found="yes"
 	break
