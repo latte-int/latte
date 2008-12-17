@@ -104,6 +104,15 @@ if test "$ac_test_CXXFLAGS" != "set"; then
 	;;
 
     gnu)
+      case ${host_os} in
+
+      darwin*)
+        # Be conservative, it's easy to create broken binaries on the Mac.
+	# --mkoeppe, Wed Dec 17 10:50:32 PST 2008
+	CXXFLAGS="-O3"
+	;;
+	
+      *)
      # default optimization flags for gcc on all systems
      CXXFLAGS="-O3 -fomit-frame-pointer"
 
@@ -118,6 +127,8 @@ if test "$ac_test_CXXFLAGS" != "set"; then
      AX_CHECK_COMPILER_FLAGS(-ffast-math, CXXFLAGS="$CXXFLAGS -ffast-math")
 
      AX_GCC_ARCHFLAG($acx_maxopt_portable)
+     ;;
+     esac
      ;;
   esac
 
