@@ -27,6 +27,7 @@
 #include <list>
 #include <cassert>
 #include "latte_system.h"
+#include "latte_relocatable.h"
 
 using namespace std;
 /* ----------------------------------------------------------------- */
@@ -642,7 +643,7 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
 
   cerr << "Computing vertices and edges with cdd...";
   cerr.flush();
-  system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
+  system_with_error_check(relocated_pathname(CDD_PATH) + " latte_cdd.ine > latte_cdd.out");
   cerr << "done." << endl;
 
   strcpy(command,"cp latte_cdd.ext ");

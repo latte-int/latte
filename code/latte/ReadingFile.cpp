@@ -29,6 +29,7 @@
 #include "rational.h"
 #include "timing.h"
 #include "latte_system.h"
+#include "latte_relocatable.h"
 #include "ReadingFile.h"
 
 /* ----------------------------------------------------------------- */
@@ -145,7 +146,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
   }
  
   int * NewIndex = NULL;
-  system_with_error_check(REDCHECK_PATH " Check_red > Check_red.out 2>&1");
+  system_with_error_check(relocated_pathname(REDCHECK_PATH) + " Check_red > Check_red.out 2>&1");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
   if(!in2){
@@ -155,7 +156,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
   while(tmpString != "H-representation") {
     in2 >> tmpString;
     if (in2.eof()) {
-      cerr << REDCHECK_PATH << " failed to create a non-redundant H-representation; "
+      cerr << relocated_pathname(REDCHECK_PATH) << " failed to create a non-redundant H-representation; "
 	   << "see `Check_red.out' for details." << endl;
       exit(1);
     }

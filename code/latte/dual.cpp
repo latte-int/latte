@@ -30,6 +30,7 @@
 #include "convert.h"
 #include <list>
 #include "latte_system.h"
+#include "latte_relocatable.h"
 
 #ifdef HAVE_FORTYTWO_LIB
 #include "DualizationWith4ti2.h"
@@ -102,7 +103,7 @@ static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
   out.close();
 
   /*      printf("Computing facets with cdd..."); */
-  system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
+  system_with_error_check(relocated_pathname(CDD_PATH) + " latte_cdd.ine > latte_cdd.out");
   /*      printf("done.\n"); */
 
   strcpy(cddInFileName,"latte_cdd.ext");

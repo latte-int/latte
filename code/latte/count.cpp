@@ -59,6 +59,8 @@
 #include "ReadPolyhedron.h"
 #include "ProjectUp.h"
 
+#include "gnulib/progname.h"
+
 static void
 usage(const char *progname)
 {
@@ -71,6 +73,8 @@ usage(const char *progname)
 int
 main(int argc, char *argv[])
 {
+  set_program_name(argv[0]);
+
   int i;
   unsigned int flags = 0, print_flag = 0, output_cone = 0;
   char printfile[127],
