@@ -8,9 +8,16 @@ AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
 AC_CONFIG_FILES([Makefile EXAMPLES/Makefile code/Makefile code/latte/Makefile code/latte/normalize/Makefile code/test-suite/Makefile code/latte/adjacency/Makefile code/lidia-include.h:code/lidia-include.hin])
 AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
+AC_CONFIG_FILES([code/gnulib/Makefile])
 AC_PROG_RANLIB
 AC_PROG_CC
 AC_PROG_CXX
+
+# For Gnulib relocatable-prog
+gl_EARLY
+gl_INIT
+RELOCATABLE_LIBRARY_PATH='$(libdir)'
+RELOCATABLE_CONFIG_H_DIR='$(top_builddir)/code'
 
 AC_LANG(C++)
 AX_CXX_MAXOPT
