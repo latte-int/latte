@@ -22,6 +22,7 @@
 #include <string.h>
 #include <stdio.h>
 
+#include "config.h"
 #include "barvinok/dec.h"
 #include "barvinok/barvinok.h"
 #include "barvinok/Triangulation.h"
@@ -51,8 +52,12 @@
 #include "convert.h"
 #include "latte_system.h"
 
+#include "gnulib/progname.h"
+
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
+  set_program_name(argv[0]);
+
   BarvinokParameters params;
 #ifdef SUN
   struct tms tms_buf;
