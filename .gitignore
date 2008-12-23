@@ -145,6 +145,8 @@ code/Makefile
 code/Makefile.in
 code/config.h
 code/config.hin
+code/gnulib/.deps
+code/gnulib/.dirstamp
 code/latte/*.er
 code/latte/*.qv
 code/latte/.deps
@@ -215,6 +217,8 @@ distro/dest
 doc/manual.pdf
 doc/manual.ps
 /install-sh
+m4/gnulib/.deps
+m4/gnulib/.dirstamp
 /missing
 /mkinstalldirs
 /numOfLatticePoints
