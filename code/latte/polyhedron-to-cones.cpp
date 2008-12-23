@@ -26,6 +26,8 @@
 #include "ReadPolyhedron.h"
 #include "print.h"
 
+#include "gnulib/progname.h"
+
 using namespace std;
 
 BarvinokParameters parameters;
@@ -34,6 +36,8 @@ string output_filename;
   
 int main(int argc, char *argv[])
 {
+  set_program_name(argv[0]);
+
   int i;
   for (i = 1; i<argc; i++) {
     if (read_polyhedron_data.parse_option(argv[i])) {}

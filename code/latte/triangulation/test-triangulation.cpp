@@ -27,6 +27,9 @@
 #include "TriangulationWithTOPCOM.h"
 #include "latte_cddlib.h"
 
+#include "config.h"
+#include "gnulib/progname.h"
+
 using namespace std;
 
 static void
@@ -53,6 +56,8 @@ print_triangulation(listCone *triang, int Number_of_Variables)
 
 int main(int argc, char **argv)
 {
+  set_program_name(argv[0]);
+
   if (argc < 2) {
     cerr << "usage: triangulate [OPTIONS] [LATTE-CONE-FILE | CDD-EXT-FILE.ext ] " << endl;
     show_standard_triangulation_options(cerr);

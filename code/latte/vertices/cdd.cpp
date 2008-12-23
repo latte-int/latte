@@ -691,7 +691,7 @@ listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix,
   createLrsExtFileToPostAnalysys(matrix, numOfVars + 1);
 
   cerr << "Computing edges with cdd...";
-  system_with_error_check(CDD_PATH " latte_cdd.ine > latte_cdd.out");
+  system_with_error_check(relocated_pathname(CDD_PATH) + " latte_cdd.ine > latte_cdd.out");
   cerr << "done.\n\n";
 
   strcpy(command,"cp latte_cdd.ext ");
@@ -766,7 +766,7 @@ rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
   if (verbose) {
     cerr << "Computing LP... "; cerr.flush();
   }
-  system_with_error_check(CDD_PATH " LP.ine > LP.out");
+  system_with_error_check(relocated_pathname(CDD_PATH) + " LP.ine > LP.out");
   if (verbose) {
     cerr << "done."; cerr.flush();
   }
