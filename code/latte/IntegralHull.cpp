@@ -35,6 +35,7 @@
 #include "rational.h"
 #include "ConeInfo.h"
 #include "latte_system.h"
+#include "latte_relocatable.h"
 
 using namespace std;
 int IntegralHull_Flag = 1;
@@ -585,7 +586,7 @@ listVector* GetHRepresentation(listVector* vertices, int numOfVars){
   OUT << "hull" << endl;
   OUT.close();
 
-  system_with_error_check(LRS_PATH " IH.ext > IH.ine");
+  system_with_error_check(relocated_pathname(LRS_PATH) + " IH.ext > IH.ine");
 
  ifstream in("IH.ine");
   if(!in){

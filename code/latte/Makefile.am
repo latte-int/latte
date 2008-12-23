@@ -15,8 +15,17 @@ latte2ine_SOURCES = latte2ine.cpp
 latte2ext_SOURCES = latte2ext.cpp
 
 LDADD = liblatte.a
+AM_CPPFLAGS = -I$(top_srcdir)/code
 AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(TOPCOM_CXXFLAGS) $(CDDLIB_CFLAGS) $(FORTYTWO_CXXFLAGS) $(GMP_CFLAGS)
 LIBS += $(NTL_LIBS) $(LIDIA_LIBS) $(TOPCOM_LIBS) $(CDDLIB_LIBS) $(FORTYTWO_LIBS) $(GMP_LIBS)
+AM_LDFLAGS = 
+
+# For Gnulib relocatable-prog
+AM_CPPFLAGS += -DINSTALLDIR=\"$(bindir)\"
+if RELOCATABLE_VIA_LD
+AM_LDFLAGS += `$(RELOCATABLE_LDFLAGS) $(bindir)`
+endif
+LDADD += ../gnulib/libgnu.a
 
 noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES =							\
@@ -30,6 +39,7 @@ liblatte_a_SOURCES =							\
 	banner.cpp convert.cpp						\
 	todd/gmp_pow.cpp todd/todd-expansion.cpp			\
 	latte_gmp.cpp latte_ntl.cpp latte_random.cpp latte_system.cpp	\
+	latte_relocatable.cpp						\
 	genFunction/IntCombEnum.cpp					\
 	genFunction/matrix_ops.cpp					\
 	ExponentialSubst.cpp ExponentialEhrhart.cpp			\
@@ -55,6 +65,7 @@ noinst_HEADERS =							\
 	todd/gmp_pow.h todd/todd-expansion.h				\
 	convert.h							\
 	latte_gmp.h latte_ntl.h	latte_ntl_integer.h			\
+	latte_relocatable.h						\
 	latte_random.h latte_system.h latte_cddlib.h			\
 	genFunction/IntCombEnum.h					\
 	genFunction/matrix_ops.h					\
@@ -139,7 +150,7 @@ bin_PROGRAMS += complete-boundary-triangulation
 nodist_complete_boundary_triangulation_SOURCES = triangulation/complete-boundary-triangulation.cpp 
 
 if HAVE_CPLEX
-AM_LDFLAGS = $(CPLEX_LDFLAGS)
+AM_LDFLAGS += $(CPLEX_LDFLAGS)
 AM_CXXFLAGS += $(CPLEX_CFLAGS)
 
 nodist_liblatte_a_SOURCES += triangulation/SpecialSimplex.cpp 

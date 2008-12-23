@@ -43,6 +43,7 @@
 #include "ReadingFile.h"
 #include "binarySearchIP.h"
 #include "latte_system.h"
+#include "latte_relocatable.h"
 
 void CheckEmpty(const char * Filename){
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
@@ -150,13 +151,13 @@ void CheckEmpty(const char * Filename){
      existence of the output file.
   */
   system_with_error_check("rm -f Check_emp.lps");
-  system_with_error_check(CDD_PATH " Check_emp.lp > Check_emp.out");
+  system_with_error_check(relocated_pathname(CDD_PATH) + " Check_emp.lp > Check_emp.out");
 
   int FLAG = 0;
 
   ifstream IN3("Check_emp.lps");
   if(!IN3){
-    cerr << CDD_PATH << " failed to create the file `Check_emp.lps'.  See `Check_emp.out'." << endl;
+    cerr << relocated_pathname(CDD_PATH) << " failed to create the file `Check_emp.lps'.  See `Check_emp.out'." << endl;
     exit(1);
   }
   while(IN3 >> tmpString){

@@ -38,6 +38,7 @@
 #include <stdio.h>
 #include "config.h"
 #include "latte_system.h"
+#include "latte_relocatable.h"
 
 using namespace std;
 
@@ -234,7 +235,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 
 			cerr << "Triangulation_Load_Save: File not present.  Calculation triangulation." << endl;
   			writeCDDextFileRudy(m,n,Mat);
-  			system_with_error_check(CDD_PATH " tri.ext > tri.out");
+  			system_with_error_check(relocated_pathname(CDD_PATH) + " tri.ext > tri.out");
   			system_with_error_check("rm -f tri.out");
 		}	
 		else
@@ -252,7 +253,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 	{
 
   			writeCDDextFileRudy(m,n,Mat);
-  			system_with_error_check(CDD_PATH " tri.ext > tri.out");
+  			system_with_error_check(relocated_pathname(CDD_PATH) + " tri.ext > tri.out");
   			system_with_error_check("rm -f tri.out");
 	}	
   
