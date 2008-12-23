@@ -198,6 +198,7 @@ code/test-suite/numOfUnimodularCones
 code/test-suite/set-max-cpu-time
 code/test-suite/totalTime
 /config.h.in
+/config.libpath
 /config.log
 /config.status
 /configure
@@ -216,11 +217,14 @@ distro/configure.lineno
 distro/dest
 doc/manual.pdf
 doc/manual.ps
+/install-reloc
 /install-sh
+/link-warning.h
 m4/gnulib/.deps
 m4/gnulib/.dirstamp
 /missing
 /mkinstalldirs
 /numOfLatticePoints
 /numOfUnimodularCones
+/reloc-ldflags
 /stamp-h1

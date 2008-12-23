@@ -1,4 +1,4 @@
-ACLOCAL_AMFLAGS = -I m4
+ACLOCAL_AMFLAGS = -I m4 -I m4/gnulib
 
 SUBDIRS = code EXAMPLES
 

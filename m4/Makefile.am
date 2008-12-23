@@ -11,3 +11,6 @@ EXTRA_DIST=					\
 	ax_cxx_maxopt.m4			\
 	ax_gcc_archflag.m4			\
 	ax_gcc_x86_cpuid.m4
+
+EXTRA_DIST += gnulib/gnulib-cache.m4
+
