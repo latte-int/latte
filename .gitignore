@@ -147,6 +147,7 @@ code/config.h
 code/config.hin
 code/gnulib/.deps
 code/gnulib/.dirstamp
+code/gnulib/Makefile.in
 code/latte/*.er
 code/latte/*.qv
 code/latte/.deps
