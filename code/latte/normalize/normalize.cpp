@@ -23,6 +23,7 @@
 #include <string>
 #include <sstream>
 #include <cctype>
+#include <climits>
 #include <vector>
 #include <set>
 #include <list>

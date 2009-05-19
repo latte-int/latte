@@ -21,6 +21,7 @@
 #include "config.h"
 #include "latte_relocatable.h"
 #include "gnulib/relocatable.h"
+#include <cstdlib>
 
 std::string relocated_pathname(const char *pathname)
 {

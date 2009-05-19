@@ -20,6 +20,8 @@
 
 #include <cstdlib>
 #include <cassert>
+#include <climits>
+#include <cstring>
 #include <string>
 #include <iostream>
 #include <fstream>

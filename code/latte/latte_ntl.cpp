@@ -20,6 +20,7 @@
 
 #include <cassert>
 #include <iostream>
+#include <climits>
 #include "latte_ntl.h"
 #include "latte_gmp.h"
 
