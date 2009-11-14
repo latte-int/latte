@@ -107,9 +107,10 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 vec_ZZ
 compute_sums_of_scalar_powers(listCone *cone,
 			      int numOfVars,
-			      const vec_ZZ &generic_vector)
+			      const vec_ZZ &generic_vector,
+			      BarvinokParameters *params)
 {
-  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector);
+  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector, params);
   vec_ZZ sum;
   int dimension = numOfVars;
   sum.SetLength(dimension + 1);
@@ -131,10 +132,11 @@ compute_sums_of_scalar_powers(listCone *cone,
 mpz_vector
 compute_sums_of_scalar_powers_mpz(listCone *cone,
 				  int numOfVars,
-				  const vec_ZZ &generic_vector)
+				  const vec_ZZ &generic_vector,
+				  BarvinokParameters *params)
 {
   vec_ZZ sums_of_scalar_powers_zz
-    = compute_sums_of_scalar_powers(cone, numOfVars, generic_vector);
+    = compute_sums_of_scalar_powers(cone, numOfVars, generic_vector, params);
   mpz_vector sums_of_scalar_powers(numOfVars + 1);
   {
     int i;
@@ -147,7 +149,8 @@ compute_sums_of_scalar_powers_mpz(listCone *cone,
 
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &generic_vector,
-				 listCone *cone, int numOfVars)
+				 listCone *cone, int numOfVars,
+				 BarvinokParameters *params)
 {
   mpq_vector weights
     = computeExponentialResidueWeights(generic_vector, cone, numOfVars);
@@ -156,8 +159,8 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
   mpq_class result = 0;
 #if 1
   /* Equivalent, but faster code: */
-  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector);
-  mpz_vector sum = compute_sums_of_scalar_powers_mpz(cone, numOfVars, generic_vector);
+  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector, params);
+  mpz_vector sum = compute_sums_of_scalar_powers_mpz(cone, numOfVars, generic_vector, params);
   for (k = 0; k<=dimension; k++)
     result += sum[k] * weights[k];
 #else
@@ -174,7 +177,7 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 }
 
 Integer
-computeExponentialResidue(listCone *cones, int numOfVars)
+computeExponentialResidue(listCone *cones, int numOfVars, BarvinokParameters *params)
 {
   listCone *cone;
   do {
@@ -183,7 +186,7 @@ computeExponentialResidue(listCone *cones, int numOfVars)
     result = 0;
     try {
       for (cone = cones; cone != NULL; cone = cone->rest) 
-	result += computeExponentialResidue_Single(generic_vector, cone, numOfVars);
+	result += computeExponentialResidue_Single(generic_vector, cone, numOfVars, params);
       //cerr << "Result: " << result << endl;
       assert(result.get_den()==1);
       return convert_mpz_to_ZZ(result.get_num());
@@ -199,7 +202,7 @@ int Exponential_Single_Cone_Parameters::ConsumeCone(listCone *cone)
   int status = 1;
   try {
     result += computeExponentialResidue_Single(generic_vector,
-					       cone, Number_of_Variables);
+					       cone, Number_of_Variables, this);
   } catch (NotGenericException) {
     status = -1;
   }

@@ -42,7 +42,7 @@ Exponential_Ehrhart_Parameters::ConsumeCone(listCone *cone)
     mpq_vector weights
       = computeExponentialResidueWeights(generic_vector, cone, numOfVars);
     mpz_vector sums_of_scalar_powers
-      = compute_sums_of_scalar_powers_mpz(cone, numOfVars, generic_vector);
+      = compute_sums_of_scalar_powers_mpz(cone, numOfVars, generic_vector, this);
     ZZ ehrhart_vertex_scalar_zz;
     InnerProduct(ehrhart_vertex_scalar_zz, generic_vector,
 		 cone->vertex->ehrhart_vertex);

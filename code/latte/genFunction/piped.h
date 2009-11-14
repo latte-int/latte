@@ -26,6 +26,8 @@
 #include "cone.h"
 #include "cone_consumer.h"
 #include <vector>
+#include "barvinok/barvinok.h"
+
 using namespace std;
 
 class PointsInParallelepipedGenerator {
@@ -39,8 +41,9 @@ protected:
   vec_ZZ facet_scale_factors;
   mat_ZZ Tau;
   vec_ZZ beta_mod_facet_divisors;
+  BarvinokParameters *params;
 public:
-  PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars);
+  PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars, BarvinokParameters *a_params);
   const vec_ZZ &GetMaxMultipliers();
   int *GetMaxMultipliers_int();
   /* Let n be the vector obtained from GetMaxMultipliers().
@@ -58,31 +61,35 @@ protected:
    const vec_ZZ &facet, int facet_index);
 };
 
-listVector* pointsInParallelepiped(listCone *cone, int numOfVars);
+listVector* pointsInParallelepiped(listCone *cone, int numOfVars, BarvinokParameters *a_params);
 
 /* Compute the latticePoints slot of CONE. */
-void computePointsInParallelepiped(listCone *cone, int numOfVars);
+void computePointsInParallelepiped(listCone *cone, int numOfVars, BarvinokParameters *a_params);
 
 /* For all cones in the linked list CONES, compute their latticePoints
    slot. */
-void computePointsInParallelepipeds(listCone *cones, int numOfVars);
+void computePointsInParallelepipeds(listCone *cones, int numOfVars, BarvinokParameters *a_params);
 
 class PointsScalarProductsGenerator : public PointsInParallelepipedGenerator {
   vec_ZZ generic_vector;
   vec_ZZ scaled_ray_scalar_products;
 public:
   PointsScalarProductsGenerator(const listCone *a_cone, int numOfVars,
-				const vec_ZZ &a_generic_vector);
+				const vec_ZZ &a_generic_vector, BarvinokParameters *a_params);
   ZZ GeneratePointScalarProduct(int *multipliers);
 };
 
 /* Compute the lattice_points_scalar_products slot of CONE. */
 void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
-					const vec_ZZ &generic_vector);
+					const vec_ZZ &generic_vector,
+					BarvinokParameters *params);
 
 class PointsInParallelepipedComputingConeTransducer : public ConeTransducer
 {
+  BarvinokParameters *params;
 public:
+  PointsInParallelepipedComputingConeTransducer(BarvinokParameters *a_params) :
+    params(a_params) {}
   int ConsumeCone(listCone *cone);
 };
 

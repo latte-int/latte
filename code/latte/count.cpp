@@ -47,6 +47,7 @@
 #include "Irrational.h"
 #include "ExponentialEhrhart.h"
 #include "triangulation/triangulate.h"
+#include "genFunction/matrix_ops.h"
 #ifdef HAVE_EXPERIMENTS
 #include "ExponentialApprox.h"
 #include "TrivialSubst.h"
@@ -184,6 +185,7 @@ main(int argc, char *argv[])
 	triangulation_specified = true;
     }
     else if (parse_standard_dualization_option(argv[i], params)) {}
+    else if (parse_standard_smith_option(argv[i], params)) {}
     else if (strncmp(argv[i], "--approximate", 7) == 0)
       approx = true;
     else if (strncmp(argv[i], "--sampling-factor=", 18) == 0)
@@ -223,6 +225,7 @@ main(int argc, char *argv[])
 	   << "  --exponential                            Use exponential substitution for specialization" << endl
 	   << "                                           (recommended for maxdet > 1)" << endl;
       cerr << "Algorithmic options for subproblems:" << endl;
+      show_standard_smith_option(cerr);
       show_standard_dualization_option(cerr);
       show_standard_triangulation_options(cerr);
       exit(0);
@@ -412,7 +415,7 @@ main(int argc, char *argv[])
       if (Poly->projecting_up_transducer)
 	writing_consumer = compose(Poly->projecting_up_transducer,
 				   writing_consumer);
-      writing_consumer = compose(new PointsInParallelepipedComputingConeTransducer,
+      writing_consumer = compose(new PointsInParallelepipedComputingConeTransducer(write_params),
 				 writing_consumer);
       write_params->SetConsumer(writing_consumer);
       cerr << "Writing multivariate generating function to `"
@@ -444,7 +447,7 @@ main(int argc, char *argv[])
 // 	cerr << "Decomposed cones: " << endl;
 //	printListCone(Poly->cones, Poly->numOfVars);
 	/* Compute points in parallelepipeds */
-	computePointsInParallelepipeds(Poly->cones, Poly->numOfVars);
+	computePointsInParallelepipeds(Poly->cones, Poly->numOfVars, params);
       }
       // Iterator through simplicial cones, DFS
       else {

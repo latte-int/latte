@@ -181,7 +181,7 @@ Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
 {
   //cerr << "barvinok_DFS: Calculating points in Parallelepiped" << endl;
   if ( (Flags & DUAL_APPROACH) == 0)
-    computePointsInParallelepiped(Cone, Number_of_Variables);
+    computePointsInParallelepiped(Cone, Number_of_Variables, this);
   //printListCone(Cone, Number_of_Variables);
 		
   if (Flags & DUAL_APPROACH)	

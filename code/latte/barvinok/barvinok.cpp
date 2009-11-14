@@ -57,6 +57,13 @@ BarvinokParameters::BarvinokParameters() :
   triangulation_assume_fulldim(true),
   dualization(DualizationWithCdd),
   shortvector(LatteLLL),
+  smithform(
+#ifdef HAVE_LIDIA
+	    LidiaSmithForm
+#else
+	    IlioSmithForm
+#endif
+	    ),
   max_determinant(0),
   File_Name(NULL),
   Number_of_Variables(0),

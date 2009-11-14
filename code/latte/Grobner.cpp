@@ -652,6 +652,9 @@ void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
   listVector *templistVec;
   listCone *cones, *tmp;
  listVector *matrix, *equations, *inequalities;
+
+ BarvinokParameters params;
+ 
  for(int i = 0; i < nn; i++){
  numOfVars = n;
  WriteGrobnerProblem(A, W, i + 1,  File, d, numOfVars);
@@ -674,7 +677,7 @@ void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
 
   while(tmp) 
     { 
-      tmp->latticePoints=pointsInParallelepiped(tmp,numOfVars);    
+      tmp->latticePoints=pointsInParallelepiped(tmp,numOfVars, &params);    
       tmp=tmp->rest;  
     }
   

@@ -104,7 +104,7 @@ static void
 enumerate_simplicial_cone_with_latte(listCone *cone)
 {
   int numOfVars = params.Number_of_Variables;
-  listVector* points = pointsInParallelepiped(cone, numOfVars);
+  listVector* points = pointsInParallelepiped(cone, numOfVars, &params);
   //printListVector(points, numOfVars);
   vector<int> v(numOfVars);
   bool any_new = false;

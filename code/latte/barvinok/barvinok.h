@@ -81,6 +81,12 @@ public:
     SubspaceAvoidingLLL    
   } ShortVectorType;
   ShortVectorType shortvector;
+  // The Smith form computation algorithm
+  typedef enum {
+    IlioSmithForm,
+    LidiaSmithForm
+  } SmithFormType;
+  SmithFormType smithform;
   // The maximum determinant of cones that we do not subdivide
   // further.  Set to 1 to subdivide until we reach unimodular cones
   // only.  Set to 0 (special case) to not subdivide at all. 

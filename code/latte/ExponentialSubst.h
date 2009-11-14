@@ -75,11 +75,13 @@ scalar_power(const vec_ZZ &generic_vector,
 vec_ZZ
 compute_sums_of_scalar_powers(listCone *cone,
 			      int numOfVars,
-			      const vec_ZZ &generic_vector);
+			      const vec_ZZ &generic_vector,
+			      BarvinokParameters *params);
 mpz_vector
 compute_sums_of_scalar_powers_mpz(listCone *cone,
 				  int numOfVars,
-				  const vec_ZZ &generic_vector);
+				  const vec_ZZ &generic_vector,
+				  BarvinokParameters *params);
 
   /* Compute the limit of the generating function for the integer points
    in CONE, whose "latticePoints" (in the fundamental parallelepiped)
@@ -90,12 +92,12 @@ compute_sums_of_scalar_powers_mpz(listCone *cone,
 */
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &lambda,
-				 listCone *cone, int numOfVars);
+				 listCone *cone, int numOfVars, BarvinokParameters *params);
 
 /* Likewise, but for the whole list of CONES, summing up the
    results. */
 ZZ
-computeExponentialResidue(listCone *cones, int numOfVars);
+computeExponentialResidue(listCone *cones, int numOfVars, BarvinokParameters *params);
 
 /* Likewise, but do simplicial triangulation and Barvinok
    decomposition, then perform it on the summands. */

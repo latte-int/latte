@@ -22,12 +22,34 @@
 #define MATRIX_OPS_H 
 
 #include "cone.h"
+#include "barvinok/barvinok.h"
+
+BarvinokParameters::SmithFormType
+smith_form_type_from_name(const char *name);
+
+void
+show_standard_smith_option(ostream &stream);
+
+bool
+parse_standard_smith_option(const char *arg,
+			    BarvinokParameters *params);
+
+
+
+
 
 mat_ZZ
-SmithNormalForm(const mat_ZZ &, mat_ZZ &, mat_ZZ &);
+SmithNormalFormLidia(const mat_ZZ &, mat_ZZ &, mat_ZZ &);
+
+/** mat_ZZ **/
+/** SmithNormalForm(listVector *, mat_ZZ &, mat_ZZ &); **/
 
 mat_ZZ
-SmithNormalForm(listVector *, mat_ZZ &, mat_ZZ &);
+SmithNormalFormIlio(const mat_ZZ &, mat_ZZ &, mat_ZZ &);
+
+mat_ZZ
+SmithNormalForm(const mat_ZZ &, mat_ZZ &, mat_ZZ &, BarvinokParameters *params);
+
 
 #endif
 

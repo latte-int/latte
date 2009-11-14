@@ -102,8 +102,9 @@ get_multipliers_from_snf(const mat_ZZ & snf)
    return n;
 }
 
-PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars) :
-  cone(a_cone)
+PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone *a_cone, int numOfVars,
+								 BarvinokParameters *a_params) :
+  cone(a_cone), params(a_params)
 {
   U = convert_listVector_to_mat_ZZ(cone->rays);
 
@@ -124,7 +125,7 @@ PointsInParallelepipedGenerator::PointsInParallelepipedGenerator(const listCone 
 
     //cerr << "Computing Smith-Normal form...\n";
     /* get Smith Normal form of matrix, Smith(U) = BUC */
-    snf_U = SmithNormalForm(U, B, C);
+    snf_U = SmithNormalForm(U, B, C, params);
 
 #ifdef CHECK_SNF
     {
@@ -314,9 +315,9 @@ are_points_unique(listVector *points)
 }
 
 listVector*
-pointsInParallelepiped(listCone *cone, int numOfVars)
+pointsInParallelepiped(listCone *cone, int numOfVars, BarvinokParameters *params)
 {
-  PointsInParallelepipedGenerator generator(cone, numOfVars);
+  PointsInParallelepipedGenerator generator(cone, numOfVars, params);
   int *n = generator.GetMaxMultipliers_int();
   /*
    * enumerate lattice points by taking all integer combinations
@@ -337,21 +338,21 @@ pointsInParallelepiped(listCone *cone, int numOfVars)
 
 /* ----------------------------------------------------------------- */
 
-void computePointsInParallelepiped(listCone *cone, int numOfVars)
+void computePointsInParallelepiped(listCone *cone, int numOfVars, BarvinokParameters *params)
 {
 #if 0
   if (abs(cone->determinant) != 1)
     cerr << "Processing cone with determinant " << cone->determinant << endl;
 #endif
-  cone->latticePoints = pointsInParallelepiped(cone, numOfVars);
+  cone->latticePoints = pointsInParallelepiped(cone, numOfVars, params);
 }
 
-void computePointsInParallelepipeds(listCone *cones, int numOfVars)
+void computePointsInParallelepipeds(listCone *cones, int numOfVars, BarvinokParameters *params)
 {
   listCone *tmp = cones;
   int Cones_Processed_Count = 0;
   while (tmp) {
-    computePointsInParallelepiped(tmp, numOfVars);
+    computePointsInParallelepiped(tmp, numOfVars, params);
     tmp=tmp->rest;
     Cones_Processed_Count++;
     if ((Cones_Processed_Count % 1000) == 0 )
@@ -362,8 +363,9 @@ void computePointsInParallelepipeds(listCone *cones, int numOfVars)
 /* ----------------------------------------------------------------- */
 
 PointsScalarProductsGenerator::PointsScalarProductsGenerator
-(const listCone *a_cone, int numOfVars, const vec_ZZ &a_generic_vector) :
-  PointsInParallelepipedGenerator(a_cone, numOfVars),
+(const listCone *a_cone, int numOfVars, const vec_ZZ &a_generic_vector,
+ BarvinokParameters *a_params) :
+  PointsInParallelepipedGenerator(a_cone, numOfVars, a_params),
   generic_vector(a_generic_vector)
 {
   scaled_ray_scalar_products.SetLength(numOfVars);
@@ -398,7 +400,8 @@ ZZ PointsScalarProductsGenerator::GeneratePointScalarProduct(int *multipliers)
 }
 
 void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
-					const vec_ZZ &generic_vector)
+					const vec_ZZ &generic_vector,
+					BarvinokParameters *params)
 {
   ZZ index = abs(cone->determinant);
   if (index > INT_MAX) {
@@ -421,7 +424,7 @@ void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
     }
   }
   else {
-    PointsScalarProductsGenerator generator(cone, numOfVars, generic_vector);
+    PointsScalarProductsGenerator generator(cone, numOfVars, generic_vector, params);
     int *n = generator.GetMaxMultipliers_int();
     /*
      * enumerate lattice points by taking all integer combinations
@@ -444,6 +447,7 @@ void computeLatticePointsScalarProducts(listCone *cone, int numOfVars,
 int
 PointsInParallelepipedComputingConeTransducer::ConsumeCone(listCone *cone)
 {
-  computePointsInParallelepiped(cone, cone->vertex->vertex->numerators().length());
+  computePointsInParallelepiped(cone, cone->vertex->vertex->numerators().length(),
+				params);
   return consumer->ConsumeCone(cone);
 }

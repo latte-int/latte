@@ -201,7 +201,7 @@ Write_Exponential_Sample_Formula_Single_Cone_Parameters::EvaluateCone(listCone *
   if (abs(cone->determinant) <= max_determinant) {
     /* Small cone, so do exact evaluation. */
     mpq_class result
-      = computeExponentialResidue_Single(generic_vector, cone, Number_of_Variables);
+      = computeExponentialResidue_Single(generic_vector, cone, Number_of_Variables, this);
     total_lower_bound += result;
     total_upper_bound += result;
     cerr << "* [" << abs(cone->determinant) << "], ";

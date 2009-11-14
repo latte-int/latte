@@ -491,7 +491,7 @@ int main(int argc, char *argv[]) {
 	int	Cones_Processed_Count = 0;
  	while (tmp) 
 	{
-	        tmp->latticePoints=pointsInParallelepiped(tmp, numOfVars);
+	  tmp->latticePoints=pointsInParallelepiped(tmp, numOfVars, &params);
     		tmp=tmp->rest;
 
 		Cones_Processed_Count++;
