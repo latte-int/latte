@@ -87,17 +87,9 @@ Keyword argument DST specifies output stream (default: standard-output) or a pat
 			  (coerce (poly:poly-points cyclotomic-polytope) 'list))
 		    nil))
 
-(defun write-cyclo-mprime-file (&rest primes)
-  (with-open-file (f (format nil "/home/mkoeppe/w/latte/EXAMPLES/beck/cyclo-mprime~{-~A~}" primes)
-		     :direction :output :if-exists :supersede)
-    (poly::write-poly-latte-vrep-format (m-prime (apply #'cyclotomic-polytope/prime-product primes)) 
-					:dst f)))  
-
 #|
-(write-cyclo-mprime-file 3 5)
-(write-cyclo-mprime-file 2 3 5)
-(write-cyclo-mprime-file 2 3 7)
-(write-cyclo-mprime-file 3 5 7)
-
+(with-open-file (f "/home/mkoeppe/w/latte/EXAMPLES/beck/cyclo-mprime-3-5-7" :direction :output
+		   :if-exists :supersede)
+  (poly::write-poly-latte-vrep-format (m-prime (cyclotomic-polytope/prime-product 3 5 7)) :dst f))
 
 |#
