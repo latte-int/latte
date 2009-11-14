@@ -62,7 +62,7 @@ make sure NTL is installed and specify its location with the option
 ])
 AC_CACHE_SAVE
 LB_CHECK_LIDIA(,,
-  AC_MSG_WARN([LiDIA not found.  We need LiDIA for computing Smith normal forms!]))
+  AC_MSG_WARN([LiDIA not found.  LiDIA has a Smith normal form procedure that is faster than the built-in one.]))
 AC_CACHE_SAVE
 
 # From CDD+
