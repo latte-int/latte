@@ -152,6 +152,9 @@ mat_ZZ SmithNormalFormIlio(const mat_ZZ& A, mat_ZZ& L, mat_ZZ& R)
    mat_ZZ copy1;
    copy1 = A;
 
+   L = ident_mat_ZZ(A.NumRows());
+   R = ident_mat_ZZ(A.NumRows());
+   
    diagonalizationIn(copy1, L, R, 0);
 
    int min = copy1.NumRows();
