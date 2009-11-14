@@ -136,25 +136,25 @@ my @files_nums = (
     "yoshida/tru_cube_latte::0",
     "yoshida/tru_simplex_latte::0",
     "yoshida/3x3x4_1.equ",
-    "yoshida/HD",
-    "yoshida/HD1",
-    "yoshida/HD10",
-    "yoshida/HD11",
-    "yoshida/HD12",
-    "yoshida/HD13",
-    "yoshida/HD14",
-    "yoshida/HD15",
-    "yoshida/HD16",
-    "yoshida/HD17",
-    "yoshida/HD18",
-    "yoshida/HD2",
-    "yoshida/HD3",
-    "yoshida/HD4",
-    "yoshida/HD5",
-    "yoshida/HD6",
-    "yoshida/HD7",
-    "yoshida/HD8",
-    "yoshida/HD9",
+##     "yoshida/HD",
+##     "yoshida/HD1",
+##     "yoshida/HD10",
+##     "yoshida/HD11",
+##     "yoshida/HD12",
+##     "yoshida/HD13",
+##     "yoshida/HD14",
+##     "yoshida/HD15",
+##     "yoshida/HD16",
+##     "yoshida/HD17",
+##     "yoshida/HD18",
+##     "yoshida/HD2",
+##     "yoshida/HD3",
+##     "yoshida/HD4",
+##     "yoshida/HD5",
+##     "yoshida/HD6",
+##     "yoshida/HD7",
+##     "yoshida/HD8",
+##     "yoshida/HD9",
     "yoshida/cube_test1",
     "yoshida/cube_test1.ine",
     "yoshida/cuww1_1.equ",
@@ -176,17 +176,18 @@ my @files_nums = (
     "yoshida/prob7_1.equ"
 );
 
-$MAXRUNTIME = 240;
+$MAXRUNTIME = 720;
 chop($LATTEDIR = `cd \`dirname $0\`; cd ../..; pwd`);
 $PARAMETERS = $ARGV[0];
-$OLDLATTEDIR = "~/s/latte-1.1";
+$OLDLATTEDIR = "/home/mkoeppe/s/latte-1.1";
 $OUTPUT_FILE_NAME = "$OLDLATTEDIR/numOfLatticePoints";
+$TIME_FILE_NAME = "$OLDLATTEDIR/totalTime";
 $COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; cd $OLDLATTEDIR; ./count $PARAMETERS ";
 
 $EXAMPLESDIR = "$LATTEDIR/EXAMPLES";
 chop($DATE = `/bin/date +%Y-%m-%d`);
 chop($HOSTNAME = `hostname`);
-$LOGDIR = "log-$DATE-latte-1.1-count $PARAMETERS-pid$$\@$HOSTNAME";
+$LOGDIR = "/home/mkoeppe/w/latte/results/log-$DATE-latte-1.1-count $PARAMETERS-pid$$\@$HOSTNAME";
 
 print "Logging to '$LOGDIR/log'\n";
 mkdir($LOGDIR);
@@ -202,51 +203,40 @@ foreach $file_num (@files_nums)
    $num_lattice_pts = $tmp[1];
 
    unlink($OUTPUT_FILE_NAME);
+   unlink($TIME_FILE_NAME);
    print "$file_name: \t";
    print SUMMARY "$file_name: \t";
+   ($user,$system,$oldcuser,$oldcsystem) = times;
    $ret_val = system( "($COMMAND $EXAMPLESDIR/$file_name ) >> log 2>&1 ");
+   ($user,$system,$newcuser,$newcsystem) = times;
+   my $elapsed_time = $newcuser + $newcsystem - ($oldcuser + $oldcsystem);
    if ($ret_val != 0) {
       print "ERROR STATUS $ret_val";
       print SUMMARY "ERROR STATUS $ret_val";
    } else {
-#      open IN, "<$OUTPUT_FILE_NAME";
-#      if (!IN) {
-#	  print "Can't open $OUTPUT_FILE_NAME";
-#	  print SUMMARY "Can't open $OUTPUT_FILE_NAME";
-#      }
-#      else {
-#	  $line = <IN>;
-#	      chomp $line;
-#	      # line should contain the number of lattice points
-#	      #print "Found numOfLatticePoints = $line\n";
-#	      print "Result: $line  ";
-#	      print SUMMARY "Result: $line  ";
-#	      if ($num_lattice_pts) {
-#		  if ($line != $num_lattice_pts) {
-#		      print "WRONG";
-#		      print SUMMARY "WRONG";
-#		  } else {
-#		      print "GOOD";
-#		      print SUMMARY "GOOD";
-#		      if (open IN, "<totalTime") {
-#			  $time = <IN>;
-#			  chomp $time;
-#			  print " Time: $time sec";
-#			  print SUMMARY " Time: $time sec";
-#		      }
-##		  }
-#	      }
-#	      else {
-#		  if (open IN, "<totalTime") {
-##		      $time = <IN>;
-#		      chomp $time;
-#		      print " Time: $time sec";
-#		      print SUMMARY " Time: $time sec";
-#		  }
-#	      }
-#	  close(IN);
-#      }
+       if (!open IN, "<$OUTPUT_FILE_NAME")  {
+	  print "Can't open $OUTPUT_FILE_NAME";
+	  print SUMMARY "Can't open $OUTPUT_FILE_NAME";
+      }
+      else {
+	  $line = <IN>;
+	  chomp $line;
+	      # line should contain the number of lattice points
+	      #print "Found numOfLatticePoints = $line\n";
+	      print "Result: $line  ";
+	      print SUMMARY "Result: $line  ";
+	      if ($num_lattice_pts) {
+		  if ($line != $num_lattice_pts) {
+		      print "WRONG";
+		      print SUMMARY "WRONG";
+		  } else {
+		      print "GOOD";
+		      print SUMMARY "GOOD";
+		  }
+	      }
+	  close(IN);
+     }
    }
-   print "\n";
-   print SUMMARY "\n";
+   printf " Time: %.2f sec\n", $elapsed_time;
+   printf SUMMARY " Time: %.2f sec\n", $elapsed_time;
 }

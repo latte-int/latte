@@ -167,5 +167,9 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
+check_PROGRAMS = ilio_test
+ilio_test_SOURCES = genFunction/ilio.cpp
+
+TESTS = $(check_PROGRAMS)
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
