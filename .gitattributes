@@ -1,4 +1,5 @@
 * text=auto !eol
+distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/lidia-2.2.0-2.patch -text svneol=unset#application/octet-stream
 distro/lidia-2.2.0.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
