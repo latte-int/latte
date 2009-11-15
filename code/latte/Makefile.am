@@ -1,9 +1,7 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
 SUBDIRS = adjacency . 
-if HAVE_EXPERIMENTS
 SUBDIRS += normalize
-endif
 
 bin_PROGRAMS = maximize minimize count ehrhart latte2ine latte2ext
 
