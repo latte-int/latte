@@ -1,6 +1,6 @@
-/* normalize.cpp -- Re-implementation of NORMALIZ
+/* normalize.cpp -- Compute a Hilbert basis of a cone, as introduced by NORMALIZ
 	       
-   Copyright 2007, 2008 Matthias Koeppe
+   Copyright 2007, 2008, 2009 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -405,14 +405,14 @@ read_cone_cdd_format(const string &filename)
 {
   FILE *in = fopen(filename.c_str(), "r");
   if (in == NULL) {
-    cerr << "normaliz: Unable to open CDD-style input file " << filename << endl;
+    cerr << "hilbert-from-rays: Unable to open CDD-style input file " << filename << endl;
     exit(1);
   }
   dd_MatrixPtr M;
   dd_ErrorType err=dd_NoError;
   M = dd_PolyFile2Matrix(in, &err);
   if (err!=dd_NoError) {
-    cerr << "normaliz: Parse error in CDD-style input file " << filename << endl;
+    cerr << "hilbert-from-rays: Parse error in CDD-style input file " << filename << endl;
     exit(1);
   }
   listCone *cone = cddlib_matrix_to_cone(M);
@@ -434,7 +434,7 @@ ReductionTestFactory reduction_test_factory;
 static void
 usage()
 {
-    cerr << "usage: normaliz [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang | 4TI2-STYLE-FILE.{rays,tra} } " << endl;
+    cerr << "usage: hilbert-from-rays [OPTIONS] { CDD-EXT-FILE.ext | LATTE-TRIANG-FILE.triang | 4TI2-STYLE-FILE.{rays,tra} } " << endl;
     cerr << "Options are: " << endl
 	 << "  --dualization={cdd,4ti2}" << endl;
     show_standard_triangulation_options(cerr);
@@ -678,7 +678,7 @@ int normalize_main(int argc, char **argv)
   }
 
   if (verbosity > 0)
-    cerr << "This is the joint LattE/4ti2 almost-NORMALIZ program." << endl;
+    cerr << "This is hilbert-from-rays, a part of LattE/4ti2." << endl;
 
   if (normalize)
     reduction_test = reduction_test_factory.CreateReductionTest();

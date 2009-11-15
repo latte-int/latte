@@ -2,14 +2,14 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 bin_PROGRAMS =
 noinst_LIBRARIES =
-nodist_noinst_HEADERS =
+noinst_HEADERS =
 
-noinst_LIBRARIES += libnormaliz.a
-nodist_libnormaliz_a_SOURCES = ReductionTest.cpp normalize.cpp
-nodist_noinst_HEADERS += ReductionTest.h
+noinst_LIBRARIES += libnormalize.a
+libnormalize_a_SOURCES = ReductionTest.cpp normalize.cpp
+noinst_HEADERS += ReductionTest.h
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = 
-LDADD = libnormaliz.a ../liblatte.a
+LDADD = libnormalize.a ../liblatte.a
 
 # For Gnulib relocatable-prog
 AM_CPPFLAGS += -DINSTALLDIR=\"$(bindir)\"
@@ -19,8 +19,8 @@ endif
 LDADD += ../../gnulib/libgnu.a
 
 if HAVE_CPLEX
-nodist_libnormaliz_a_SOURCES += ReductionTestWithCPLEX.cpp 
-nodist_noinst_HEADERS += ReductionTestWithCPLEX.h
+libnormalize_a_SOURCES += ReductionTestWithCPLEX.cpp 
+noinst_HEADERS += ReductionTestWithCPLEX.h
 endif
 
 AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(TOPCOM_CXXFLAGS) $(CDDLIB_CFLAGS) $(FORTYTWO_CXXFLAGS) $(GMP_CFLAGS)
@@ -31,14 +31,14 @@ AM_LDFLAGS+ = $(CPLEX_LDFLAGS)
 AM_CXXFLAGS += $(CPLEX_CFLAGS)
 endif
 
-bin_PROGRAMS += normaliz
-nodist_normaliz_SOURCES = normalize_main.cpp
+bin_PROGRAMS += hilbert-from-rays
+hilbert_from_rays_SOURCES = normalize_main.cpp
 
 if HAVE_CPLEX
 bin_PROGRAMS += check-representation
-nodist_check_representation_SOURCES = check-representation.cpp
+check_representation_SOURCES = check-representation.cpp
 endif
 
-bin_PROGRAMS += normaliz_wrapper
-nodist_normaliz_wrapper_SOURCES = normaliz_wrapper.cpp
-normaliz_wrapper_LDADD = $(LDADD) -l4ti2util
+bin_PROGRAMS += hilbert-from-rays-symm
+hilbert_from_rays_symm_SOURCES = normaliz_wrapper.cpp
+hilbert_from_rays_symm_LDADD = $(LDADD) -l4ti2util

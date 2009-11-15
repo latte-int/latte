@@ -22,7 +22,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 /* ----------------------------------------------------------------- */
 /*                                                                   */
-/* Deals with MK's normaliz under symmetry                           */
+/* Deals with MK's hilbert-from-rays under symmetry                  */
 /*                                                                   */
 /* Author   : Raymond Hemmecke                                       */
 /*                                                                   */
@@ -39,11 +39,11 @@ extern "C" {
 #include "util/vector.h"
 }
 
-// Silly interface to MK's normaliz
+// Silly interface to hilbert-from-rays
 int normalize_commandline(char *command);
 
 listVector* candidates;
-int callsToNormaliz;
+int callsToHilbert_From_Rays;
 
 /* ----------------------------------------------------------------- */
 listVector* myReadListVector(int *numOfVars, char *fileName) {
@@ -163,15 +163,15 @@ listVector* extractSimplicialCones(listVector *simplicialCones,
   return (simplicialCones);
 }
 /* ----------------------------------------------------------------- */
-void runNormaliz(char *inFileName, char *outFileName, char *normaliz, 
+void runHilbert_From_Rays(char *inFileName, char *outFileName, char *hilbert_from_rays, 
 		 char *raysFileName, int rayToBePulled, int trivial) {
   char command[1000];
   int retval;
 
 /*    strcpy(command,"/home/mkoeppe/w/latte/build-gcc411-64/dest/bin/"); */
 
-  if (normaliz[0])
-    strcpy(command,normaliz);
+  if (hilbert_from_rays[0])
+    strcpy(command,hilbert_from_rays);
   else
     strcpy(command, "dummy");
   
@@ -190,9 +190,10 @@ void runNormaliz(char *inFileName, char *outFileName, char *normaliz,
   strcat(command," ");
   strcat(command,raysFileName);
 
-  if (normaliz[0]) {
-    callsToNormaliz++;
-    printf("callsToNormaliz = %d\n",callsToNormaliz);
+  callsToHilbert_From_Rays++;
+  printf("Calls to hilbert-from-rays = %d\n",callsToHilbert_From_Rays);
+
+  if (hilbert_from_rays[0]) {
     strcat(command," >out.tmp");
     /*    printf("%s\n",command); */
     retval = system(command);
@@ -201,14 +202,14 @@ void runNormaliz(char *inFileName, char *outFileName, char *normaliz,
     retval = normalize_commandline(command);
 
   if (retval != 0) {
-    fprintf(stderr, "Normaliz returned nonzero exit status.\n");
+    fprintf(stderr, "Hilbert_From_Rays returned nonzero exit status.\n");
     exit(1);
   }
   return;
 }
 /* ----------------------------------------------------------------- */
 void checkCones(char *simplicialConesFileName,char *checkFileName, 
-		char* raysFileName, char *normaliz) {
+		char* raysFileName, char *hilbert_from_rays) {
   int numOfVars;
   listVector *HB, *tmp;
   char hilFileName[127],command[1000];
@@ -216,8 +217,8 @@ void checkCones(char *simplicialConesFileName,char *checkFileName,
 
   printf("Checking simplicial cones.\n");
 
-  if (normaliz[0])
-    strcpy(command,normaliz);
+  if (hilbert_from_rays[0])
+    strcpy(command,hilbert_from_rays);
   else
     strcpy(command, "dummy");
 
@@ -233,9 +234,10 @@ void checkCones(char *simplicialConesFileName,char *checkFileName,
   strcat(command,raysFileName);
 
   printf("%s\n",command);
-  if (normaliz[0]) {
-    callsToNormaliz++;
-    /*    printf("callsToNormaliz = %d\n",callsToNormaliz); */
+  callsToHilbert_From_Rays++;
+  
+  if (hilbert_from_rays[0]) {
+    /*    printf("callsToHilbert_From_Rays = %d\n",callsToHilbert_From_Rays); */
     strcat(command," >out.tmp");
     /*    printf("%s\n",command); */
     do {
@@ -249,7 +251,7 @@ void checkCones(char *simplicialConesFileName,char *checkFileName,
   else
     retval = normalize_commandline(command);
   if (retval != 0) {
-    fprintf(stderr, "Normaliz returned nonzero exit status.\n");
+    fprintf(stderr, "Hilbert_From_Rays returned nonzero exit status.\n");
     exit(1);
   }
   
@@ -283,7 +285,7 @@ void checkCones(char *simplicialConesFileName,char *checkFileName,
 listVector* locallyPullingRay(listVector* smallCones, listVector* mainOrbits, 
 			      char* smallConesInFileName, char* smallConesOutFileName, 
 			      char* trivialSmallConesOutFileName, char* simplicialConesFileName, 
-			      char* normaliz, char* raysFileName, int localRayToBePulled, 
+			      char* hilbert_from_rays, char* raysFileName, int localRayToBePulled, 
 			      int dimension, int numOfVars) {
 
   int i,k,len;
@@ -318,7 +320,7 @@ listVector* locallyPullingRay(listVector* smallCones, listVector* mainOrbits,
     }
   
     printf("Locally pulling ray = %d\n",localRayToBePulled);
-    runNormaliz(smallConesInFileName,smallConesOutFileName,normaliz,
+    runHilbert_From_Rays(smallConesInFileName,smallConesOutFileName,hilbert_from_rays,
                 raysFileName,localRayToBePulled,1);
     newSmallCones=myReadListVector(&numOfVars,smallConesOutFileName);
     trivialSmallCones=myReadListVector(&numOfVars,trivialSmallConesOutFileName);
@@ -348,7 +350,7 @@ listVector* locallyPullingRay(listVector* smallCones, listVector* mainOrbits,
       /*      printf("simplicial = %d\n",lengthListVector(simplicialCones)); */
       if (simplicialCones) { 
         myPrintListVectorToFile(simplicialConesFileName,simplicialCones,numOfVars);
-        checkCones(simplicialConesFileName,raysFileName,raysFileName,normaliz);
+        checkCones(simplicialConesFileName,raysFileName,raysFileName,hilbert_from_rays);
         freeAllOfListVector(simplicialCones);
 	simplicialCones=0;
       } 
@@ -359,7 +361,7 @@ listVector* locallyPullingRay(listVector* smallCones, listVector* mainOrbits,
 }
 /* ----------------------------------------------------------------- */
 listVector* pullOneRay(char* simplicialConesFileName, char* mainConesInFileName, 
-            char* mainConesOutFileName, char* normaliz, char* raysFileName, 
+            char* mainConesOutFileName, char* hilbert_from_rays, char* raysFileName, 
             listVector* mainCones, listVector* symmGroup,
             int rayToBePulled, int numOfVars, int dimension) {
   int maxNorm,threshold,localRayToBePulled;
@@ -385,7 +387,7 @@ listVector* pullOneRay(char* simplicialConesFileName, char* mainConesInFileName,
     mainCones=0;
     myPrintListVectorToFile(simplicialConesFileName,simplicialCones,numOfVars);
     if (simplicialCones) { 
-      checkCones(simplicialConesFileName,raysFileName,raysFileName,normaliz);
+      checkCones(simplicialConesFileName,raysFileName,raysFileName,hilbert_from_rays);
       freeAllOfListVector(simplicialCones);
       simplicialCones=0;
       return (mainCones);
@@ -398,8 +400,8 @@ listVector* pullOneRay(char* simplicialConesFileName, char* mainConesInFileName,
     myPrintListVectorToFile(mainConesInFileNameNumbered,mainCones,numOfVars);
     freeAllOfListVector(mainCones);
 
-    runNormaliz(mainConesInFileNameNumbered,mainConesOutFileNameNumbered,
-    		    normaliz,raysFileName,rayToBePulled,0);
+    runHilbert_From_Rays(mainConesInFileNameNumbered,mainConesOutFileNameNumbered,
+    		    hilbert_from_rays,raysFileName,rayToBePulled,0);
     mainCones=myReadListVector(&numOfVars,mainConesOutFileNameNumbered);
 
     threshold=maximalNormInListVector(mainCones,numOfVars);
@@ -421,7 +423,7 @@ listVector* pullOneRay(char* simplicialConesFileName, char* mainConesInFileName,
     						                 dimension,numOfVars);
       printf("simplicial = %d\n",lengthListVector(simplicialCones));
       if (simplicialCones) { 
-        checkCones(simplicialConesFileName,raysFileName,raysFileName,normaliz);
+        checkCones(simplicialConesFileName,raysFileName,raysFileName,hilbert_from_rays);
         freeAllOfListVector(simplicialCones);
         simplicialCones=0;
       }
@@ -440,7 +442,7 @@ listVector* pullOneRay(char* simplicialConesFileName, char* mainConesInFileName,
         localRayToBePulled++;
         smallCones=locallyPullingRay(smallCones,mainOrbits,smallConesInFileName,
 				     smallConesOutFileName,trivialSmallConesOutFileName,
-				     simplicialConesFileName,normaliz,raysFileName,localRayToBePulled,
+				     simplicialConesFileName,hilbert_from_rays,raysFileName,localRayToBePulled,
 				     dimension,numOfVars);
       }
     }
@@ -453,8 +455,8 @@ listVector* pullOneRay(char* simplicialConesFileName, char* mainConesInFileName,
 /* ----------------------------------------------------------------- */
 static void usage()
 {
-  fprintf(stderr, "new version\n");
-  fprintf(stderr, "usage: normaliz_wrapper [OPTIONS...] FILENAME\n");
+  //  fprintf(stderr, "new version\n");
+  fprintf(stderr, "usage: hilbert-from-rays-symm [OPTIONS...] FILENAME\n");
 }
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
@@ -468,16 +470,16 @@ int main(int argc, char *argv[]) {
     mainConesOutFileNameNumbered[127],smallConesInFileName[127],
     smallConesOutFileName[127],trivialSmallConesOutFileName[127],
     simplicialConesFileName[127],reductionRaysFileName[127],
-    action[127],normaliz[127];
+    action[127],hilbert_from_rays[127];
 
   if (argc < 2) {
     usage();
     exit(1);
   }
 
-  callsToNormaliz=0;  
+  callsToHilbert_From_Rays=0;  
 
-  normaliz[0] = '\0'; /* initialize... --mkoeppe */
+  hilbert_from_rays[0] = '\0'; /* initialize... --mkoeppe */
   
   setbuf(stdout,0);
 
@@ -516,8 +518,8 @@ int main(int argc, char *argv[]) {
 	threshold=atoi(argv[i]+23);
       } else if (strncmp(argv[i], "--action",8) == 0) {
 	strcpy(action,argv[i]+9);
-      } else if (strncmp(argv[i], "--normaliz",10) == 0) {
-	strcpy(normaliz,argv[i]+11);
+      } else if (strncmp(argv[i], "--hilbert-from-rays=",20) == 0) {
+	strcpy(hilbert_from_rays,argv[i]+20);
       } 
   }
   symmGroup=myReadListVector(&numOfVars,symFileName);
@@ -549,7 +551,7 @@ int main(int argc, char *argv[]) {
   printf("dimension = %d\n",dimension);
   printf("threshold = %d\n",threshold);
   printf("action = %s\n",action);
-  printf("normaliz = %s\n",normaliz);
+  printf("hilbert-from-rays = %s\n",hilbert_from_rays);
 
   mainCones=myReadListVector(&numOfVars,mainConesInFileNameNumbered);
   smallCones=0;
@@ -560,7 +562,7 @@ int main(int argc, char *argv[]) {
 
   if (strncmp(action,"pullRay",7)==0) {
     mainCones=pullOneRay(simplicialConesFileName,mainConesInFileName, 
-                         mainConesOutFileName,normaliz,raysFileName,mainCones, 
+                         mainConesOutFileName,hilbert_from_rays,raysFileName,mainCones, 
                          symmGroup,rayToBePulled,numOfVars,dimension);
   } else
   if (strncmp(action,"pullall",7)==0) {
@@ -568,7 +570,7 @@ int main(int argc, char *argv[]) {
     while (mainCones) {
       rayToBePulled++;
       mainCones=pullOneRay(simplicialConesFileName,mainConesInFileName, 
-                           mainConesOutFileName,normaliz,raysFileName,mainCones, 
+                           mainConesOutFileName,hilbert_from_rays,raysFileName,mainCones, 
                            symmGroup,rayToBePulled,numOfVars,dimension);
     }
   } else {
