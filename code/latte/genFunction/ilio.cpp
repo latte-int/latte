@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 	oldTime = GetTime();
 	X = SmithNormalFormIlio(M, L, R); 
 	nTime += (GetTime() - oldTime);
-      
+
 	ZZ g;
 	  
 	for (int i = 0; i < rdim; ++ i) {
@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
 	{
 	    if (M[i][i] != X[i][i]) { cerr << "Wrong diagonal values - " << M[i][i] << "=/=" << X[i][i] << endl; return 0; }
 	}
-	if (!IsZero(M - X))
+	if (M != X)
 	{
 	    cerr << "Incorrect transform matrices." << endl;
 	    cerr << "M is: " << endl;
@@ -133,19 +133,19 @@ int main(int argc, char *argv[])
 		}
 		cerr << endl;
 	    }
-	    M.kill(); L.kill(); R.kill(); X.kill();
+	    M.kill(); L.kill(); R.kill(); X.kill(); snf.kill();
 	    return 1;
 	}
 	if (abs(determinant(L)) != 1 || abs(determinant(R)) != 1)
 	{
-	    cerr << "Wrong determinant, " << determinant(L) << " and " << determinant(R) << endl;
-	    M.kill(); L.kill(); R.kill(); X.kill();
+	    cerr << "Wrong determinant, " << determinant(L) << " or " << determinant(R) << endl;
+	    M.kill(); L.kill(); R.kill(); X.kill(); snf.kill();
 	    return 1;
 	}
     }
     cout << "LiDIA total of " << lTime << "s. compared to NTL total of " << nTime << "s." << endl;
     
-    M.kill(); L.kill(); R.kill(); X.kill();
+    M.kill(); L.kill(); R.kill(); X.kill(); snf.kill();
     return 0; 
 }
 

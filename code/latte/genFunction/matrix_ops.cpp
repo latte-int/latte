@@ -140,334 +140,256 @@ mat_ZZ SmithNormalForm(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
    of the Iliopoulos algorithm, derived from linbox.
    Author: Stanislav Moreinis
 */
+using namespace NTL;
 
-static void eliminationRow(mat_ZZ& A, mat_ZZ& R, long offset); 
-static void eliminationCol(mat_ZZ& A, mat_ZZ& L, long offset); 
-static void diagonalizationIn(mat_ZZ& A, mat_ZZ& L, mat_ZZ& R, long offset); 
-static bool check(const mat_ZZ& A, long offset); 
-
-
-mat_ZZ SmithNormalFormIlio(const mat_ZZ& A, mat_ZZ& L, mat_ZZ& R)
+static bool check(const mat_ZZ& A, int offset)
 {
-   mat_ZZ copy1;
-   copy1 = A;
-
-   L = ident_mat_ZZ(A.NumRows());
-   R = ident_mat_ZZ(A.NumRows());
-   
-   diagonalizationIn(copy1, L, R, 0);
-
-   int min = copy1.NumRows();
-   int i, j;
-   
-   ZZ g;
-   
-   for (i = 0; i < min; ++ i) {
-              
-      for ( j = i + 1; j < min; ++ j) {
-              
-         if (IsOne(copy1[i][i]))  break;
-                 
-         else if (IsZero(copy1[j][j])) continue;
-         
-         else if (IsZero(copy1[i][i])) {
-            std::swap (copy1[i][i], copy1[j][j]);
-            //switching columns and rows of A effectively, since non diagonal entries are zero
-            vec_ZZ temp = L[j];
-            L[j] = L[i];
-            L[i] = temp;
-            for (int k = 0; k < R.NumRows(); k++)
-            {
-               temp[k] = R[k][j];
-               R[k][j] = R[k][i];
-               R[k][i] = temp[k];
-            }
-         }
-         
-         else {
-
-            ZZ x, y, myNeg;
-                                                            
-            XGCD (g, y, x, copy1[j][j], copy1[i][i]);
-            x /= g;
-            y /= g;
-
-            for (int k = 0; k < R.NumRows(); k++)
-            {
-               R[k][j] += x * R[k][i];
-               R[k][i] -= (copy1[i][i] / g) * R[k][j];
-            }
-
-            L[i] += y * L[j];
-            L[j] *= to_ZZ(-1);
-            L[j] -= (copy1[j][j] / g) * L[i];
-            L[j] *= to_ZZ(-1);
-            
-            copy1[j][j] = copy1[j][j] / g;
-            copy1[j][j] = copy1[j][j] * copy1[i][i];
-            copy1[i][i] = g;
-         }
-      }
-   }
-   
-   return copy1;
+    if (IsZero(A[offset][offset])) return true;
+    
+    ZZ tmp;
+    for (int row_p = offset + 1; row_p < A.NumCols(); ++ row_p ) {
+        rem(tmp, A[offset][row_p], A[offset][offset]);
+        if (!IsZero(tmp)) { return false; }
+    }
+    return true;
 }
 
-static void diagonalizationIn(mat_ZZ& A, mat_ZZ& L, mat_ZZ& R, long stuff)
+static void eliminationRow(mat_ZZ& A, mat_ZZ& R, int offset)
 {
-   for (int offset = 0; offset < A.NumRows(); offset++)
-   {
-      do {
-         eliminationRow(A, R, offset);
-         eliminationCol(A, L, offset);
-         
-         if (!IsZero(A[offset][offset]))
-         {
-            for (long i = offset + 1; i < A.NumRows(); i++)
-            {
-               if (!IsZero(A[i][offset]))
-               {
-                  L[i] -= (A[i][offset] / A[offset][offset]) * L[offset];
-                  A[i] -= (A[i][offset] / A[offset][offset]) * A[offset];
-               }
-                         
-               if (!IsZero(A[offset][i]))
-               {
-                  ZZ temp = A[offset][i] / A[offset][offset];
-                  for (int j = 0; j < R.NumRows(); j++)
-                  {
-                     R[j][i] -= temp * R[j][offset];
-                     A[j][i] -= temp * A[j][offset];
-                  }
-               }
-            }
-         }
+  ZZ r, x1, x2, y1, y2, g, s;
+  if (!IsZero(A[offset][offset]))
+  {
+    if (IsZero(A[offset][offset + 1]))
+    {
+      for (int i = 0; i < A.NumRows(); i++)
+      {
+	r = A[i][offset]; A[i][offset] = A[i][offset + 1]; A[i][offset + 1] = r;
+	r = R[i][offset]; R[i][offset] = R[i][offset + 1]; R[i][offset + 1] = r;
       }
-      while (!check(A, offset));
-   }
+    }
+    else
+    {
+      XGCD(r, x1, x2, A[offset][offset], A[offset][offset + 1]);
+      
+      y1 = A[offset][offset + 1] / r;
+      y2 = to_ZZ(-1) * A[offset][offset] / r;
+
+      for (int i = 0; i < A.NumRows(); i ++)
+      {
+	
+	g = y1 * R[i][offset] + y2 * R[i][offset + 1];
+	s = x1 * R[i][offset] + x2 * R[i][offset + 1];
+	R[i][offset] = g;
+	R[i][offset + 1] = s;
+	
+	g = y1 * A[i][offset] + y2 * A[i][offset + 1]; 
+	s = x1 * A[i][offset] + x2 * A[i][offset + 1];
+	A[i][offset] = g;
+	A[i][offset + 1] = s;
+      }
+    }
+  }
+  vec_ZZ t_Coeffs; t_Coeffs.SetLength(A.NumCols() - offset);
+
+  g = A[offset][A.NumCols() - 1]; //last element in row
+  t_Coeffs[A.NumCols() - offset - 1] = to_ZZ(1);
+  
+  for (int i = 2; i < A.NumCols() - offset; i++) //from second last element in row to first element off the diagonal
+  {
+    XGCD(g, r, s, A[offset][A.NumCols() - i], g);
+    t_Coeffs[A.NumCols() - offset - i] = r;
+    if (!IsOne(s)) { for (int j = A.NumCols() - offset - i + 1; j < A.NumCols() - offset; j++) {t_Coeffs[j] *= s;} } //multiply everything after the current element's coefficients
+  }
+    
+  for (int i = 0; i < A.NumRows(); i++)
+  {
+    for (int j = 1; j < A.NumCols() - offset; j++)
+    {
+      R[i][offset] += t_Coeffs[j] * R[i][offset + j];
+      A[i][offset] += t_Coeffs[j] * A[i][offset + j];
+    }
+  }
+
+  for (int j = offset + 1; j < A.NumCols(); j++)
+  {
+    if (!IsZero(A[offset][j]))
+    {
+      ZZ tmp = (A[offset][j] / g) * sign(A[offset][offset]);
+      for (int i = 0; i < A.NumRows(); i++)
+      {
+	R[i][j] -= tmp * R[i][offset];
+	A[i][j] -= tmp * A[i][offset];
+      }
+    }
+  }
+  t_Coeffs.kill();
 }
 
-static void eliminationCol(mat_ZZ& A, mat_ZZ& L, long offset)
+static void eliminationCol(mat_ZZ& A, mat_ZZ& L, int offset)
 {
-   if((A.NumRows() >= offset)) { return; }
-
-   if (!IsZero(A[offset][offset])) 
-   {
-      ZZ g, s, t, y1, y2, h;		
-                
-      XGCD(g, s, t, A[offset][offset], A[offset + 1][offset]);
-      XGCD(h, y2, y1, s, t);
-
-      y1 /= h*to_ZZ(-1); // gamma
-      y2 /= h; // alpha
-      if (IsZero(y1)) { y2 *= to_ZZ(-1); } //make sure one of them is negated ..
-
-      vec_ZZ tmp1, tmp2, tmp1B, tmp2B;
-      tmp1.SetLength(A.NumCols()); tmp2.SetLength(A.NumCols());
-      tmp1B.SetLength(L.NumCols()); tmp2B.SetLength(L.NumCols());	
+  ZZ r, x1, x2, y1, y2;
+  vec_ZZ tmp1, tmp2;
+  if (!IsZero(A[offset][offset]))
+  {
+    if (IsZero(A[offset + 1][offset]))
+    {
+      tmp1 = L[offset]; L[offset] = L[offset + 1]; L[offset + 1] = tmp1;
+      tmp1 = A[offset]; A[offset] = A[offset + 1]; A[offset + 1] = tmp1;
+    }
+    else
+    {
+      XGCD(r, x1, x2, A[offset][offset], A[offset + 1][offset]);
+      y1 = A[offset + 1][offset] / r;
+      y2 = to_ZZ(-1) * A[offset][offset] / r;
+  
+      tmp1 = y1 * L[offset] + y2 * L[offset + 1];
+      tmp2 = x1 * L[offset] + x2 * L[offset + 1];
+      L[offset] = tmp1;
+      L[offset + 1] = tmp2;
+      
       tmp1 = y1 * A[offset] + y2 * A[offset + 1];
-      tmp2 = s * A[offset] + t * A[offset + 1];
+      tmp2 = x1 * A[offset] + x2 * A[offset + 1];
       A[offset] = tmp1;
       A[offset + 1] = tmp2;
-
-      tmp1B = y1 * L[offset] + y2 * L[offset + 1];
-      tmp2B = s * L[offset] + t * L[offset + 1];
-      L[offset] = tmp1B;
-      L[offset + 1] = tmp2B;
-
-
-      if (!IsZero (A[offset][offset])) 
-      {
-         ZZ q = to_ZZ(-1) * A[offset][offset] / g;
-         A[offset] += q * A[offset + 1];
-         L[offset] += q * L[offset + 1]; 
-      }
-   
-      vec_ZZ tmp_v, tempCol;
-      tmp_v.SetLength(A.NumRows()); tempCol.SetLength(A.NumRows());			
-           
-      g = A[offset + 1][offset];
-      for (int i = 0; i < offset; i++) { tmp_v[i] = 0; }
-      tmp_v[offset] = to_ZZ(1);           
-      tmp_v[offset + 1] = to_ZZ(1);
-   
-      long p1 = offset + 2;
-      for(long col_p2 = offset + 2; col_p2 < A.NumRows(); ++ col_p2, ++ p1)
-      {
-         XGCD (g, s, tmp_v[p1], g, A[col_p2][offset]);
-         //at the end, g = A[0][m]*tmp_v[m] + A[0][m-1]*tmp_v[m-1] + ... + A[0][2]*tmp_v[2] + A[0][1] + 0					
-         if (!IsOne(s))
-         {
-            for (long p2 = offset + 1; p2 != p1; ++ p2) 
-            {
-                tmp_v[p2] *= (s / g);
-            }
-         }
-      }
-     
-      if (IsZero(g)) { return; }
-   
-      for (long tmp_c = offset; tmp_c < A.NumCols(); ++ tmp_c) 
-      {
-         tempCol[tmp_c] = 0;
-         for (int tmp_r = offset; tmp_r < A.NumRows(); ++ tmp_r)
-         {
-             tempCol[tmp_c] += A[tmp_r][tmp_c] * tmp_v[tmp_r];
-         }
-      }
-      for (long tmp_c = offset; tmp_c < A.NumCols(); ++ tmp_c)
-      {
-         A[offset][tmp_c] = tempCol[tmp_c];
-      }
-
-      L[offset] = tmp_v[offset] * L[offset];		
-      for (long tmp_rB = offset + 1; tmp_rB < L.NumRows(); ++ tmp_rB)
-      {
-         L[offset] += tmp_v[tmp_rB] * L[tmp_rB];
-      }
-   }
-   // A pivot is found
-   
-   ZZ g, tmp;
-   g = A[offset][offset];
-   if(IsZero(g)) { return; }
-   
-   long tmp_rB = offset + 1;
-   for (long tmp_r = offset + 1; tmp_r < A.NumCols(); ++ tmp_r, ++ tmp_rB)
-   {      
-      if (!IsZero(A[tmp_r][offset]))
-      {
-         tmp = A[tmp_r][offset] / g * to_ZZ(-1);
-         A[tmp_r] += tmp * A[offset];
-         L[tmp_rB] += tmp * L[offset];
-      }
-   }
+    }
+  }
+  
+  ZZ g, s;
+  vec_ZZ t_Coeffs; t_Coeffs.SetLength(A.NumRows() - offset);
+  
+  g = A[A.NumRows() - 1][offset]; //last element in row
+  t_Coeffs[A.NumRows() - offset - 1] = to_ZZ(1);
+  
+  for (int i = 2; i < A.NumRows() - offset; i++) //from second last element in row to first element off the diagonal
+  {
+    XGCD(g, r, s, A[A.NumRows() - i][offset], g);
+    t_Coeffs[A.NumRows() - offset - i] = r;
+    if (!IsOne(s)) { for (int j = A.NumRows() - offset - i + 1; j < A.NumRows() - offset; j++) {t_Coeffs[j] *= s;} } //multiply everything after the current element's coefficients
+  }
+    
+  for (int j = 1; j < A.NumCols() - offset; j++)
+  {
+    L[offset] += t_Coeffs[j] * L[offset + j];
+    A[offset] += t_Coeffs[j] * A[offset + j];
+  }
+  
+  for (int i = offset + 1; i < A.NumCols(); i++)
+  {
+    if (!IsZero(A[i][offset]))
+    {
+      s = (A[i][offset] / g) * sign(A[offset][offset]);
+      L[i] -= s * L[offset];
+      A[i] -= s * A[offset];
+    }
+  }
+  t_Coeffs.kill();
 }
 
-static void eliminationRow(mat_ZZ& A, mat_ZZ& R, long offset)
+static void diagonalizationIn(mat_ZZ& A, mat_ZZ& L, mat_ZZ& R)
 {
-   if (A.NumCols() >= offset) { return; }		
-
-   if (!IsZero(A[offset][offset])) {
-      ZZ y1, y2, g, h, s, t;
-      
-      XGCD(g, s, t, A[offset][offset], A[offset][offset + 1]);
-      XGCD(h, y2, y1, s, t);
-
-      y1 /= h*to_ZZ(-1); // gamma
-      y2 /= h; // alpha
-      if (IsZero(y1)) { y2 *= to_ZZ(-1); } //make sure one of them is negated ..
-      
-      vec_ZZ tmp1, tmp2, tmp1B, tmp2B;
-      tmp1.SetLength(A.NumRows()); tmp2.SetLength(A.NumRows());
-      tmp1B.SetLength(R.NumRows()); tmp2B.SetLength(R.NumRows());
-      for (long i = offset; i < A.NumRows(); i++)
+  for (int offset = 0; offset < A.NumRows() - 1; offset++)
+  {
+    do
+    {
+        eliminationRow(A, R, offset);
+        eliminationCol(A, L, offset);
+    }
+    while (!check(A, offset));
+    
+    if(A[offset][offset] < 0)
+    {
+      A[offset] *= to_ZZ(-1);
+      L[offset] *= to_ZZ(-1);
+    }
+    
+    if (!IsZero(A[offset][offset]))
+    {
+      for (int i = offset + 1; i < A.NumCols(); i++)
       {
-          tmp1[i] = A[i][offset] * y1 + A[i][offset + 1] * y2;
-          tmp2[i] = A[i][offset] * s + A[i][offset + 1] * t;
+	if (A[offset][i] != 0)
+	{
+	  ZZ tmp = (A[offset][i] / A[offset][offset]);
+	  for (int j = 0; j < A.NumRows(); j++)
+	  {
+	    R[j][i] -= tmp * R[j][offset];
+	    A[j][i] -= tmp * A[j][offset];
+	  }
+	}
       }
-      for (long i = 0; i < R.NumRows(); i++)
-      {
-          tmp1B[i] = R[i][offset] * y1 + R[i][offset + 1] * y2;
-          tmp2B[i] = R[i][offset] * s + R[i][offset + 1] * t;
-      }
-
-      for (long i = offset; i < A.NumRows(); i++)
-      {
-          A[i][offset] = tmp1[i];
-          A[i][offset + 1] = tmp2[i];
-      }
-      
-      for (long i = 0; i < R.NumRows(); i++)
-      {
-          R[i][offset] = tmp1B[i];
-          R[i][offset + 1] = tmp2B[i];
-      }
-
-      if (!IsZero (A[offset][offset])) {
-
-          ZZ q = (A[offset][offset] / g) * to_ZZ(-1);
-
-          for (long i = offset; i < A.NumRows(); i++)
-          {
-              A[i][offset] += q * A[i][offset + 1];
-          }
-          for (long i = 0; i < R.NumRows(); i++)
-          {
-              R[i][offset] += q * R[i][offset + 1];
-          }
-      }
-
-      vec_ZZ tmp_v;
-      tmp_v.SetLength(A.NumCols());
-      
-      g = A[offset][offset + 1];
-      for (long i = 0; i < R.NumCols(); ++ i) { if (i < offset) {tmp_v[i] = 0;} }
-      tmp_v[offset] = to_ZZ(1);
-      tmp_v[offset + 1] = to_ZZ(1);
-      long p1 = offset + 2;
-      for (long row_p2 = offset + 2; row_p2 < A.NumCols(); ++ row_p2, ++ p1) {
-              
-         XGCD(g, s, tmp_v[p1], g, A[offset][row_p2]); //g = s * A[0][1] + tmp_v[p1]*A[0][row_p2]
-         if (!IsOne(s))
-         {        
-            for (long p2 = offset + 1; p2 != p1; ++ p2) 
-            {
-               tmp_v[p2] *= (s / g);
-            }
-         }   
-      }
-      
-      if (IsZero(g)) { return; }
-      
-      for (long tmp_r = offset; tmp_r < A.NumRows(); ++ tmp_r) 
-      {
-         InnerProduct(A[tmp_r][offset], A[tmp_r], tmp_v);
-      }
-      
-      for (int i = 0; i < R.NumRows(); i++)
-      {
-         R[i][offset] = R[i][offset]*tmp_v[offset];
-         for (int j = offset + 1; j < R.NumCols(); j++)
-         {
-            R[i][offset] += R[i][j] * tmp_v[j];
-         }
-      }
-   }             
-   // after finding the pivot
-
-   ZZ g, tmp;
-   
-   g = A[offset][offset];
-   if(IsZero(g)) { return; }
-   long tmp_cB = offset + 1;
-   for (long tmp_c = offset + 1; tmp_c < A.NumCols(); ++ tmp_c, ++ tmp_cB)
-   {
-      // test if needing to update 
-      if (!IsZero (A[offset][tmp_c]))
-      {
-         tmp = A[offset][tmp_c] / g * to_ZZ(-1);
-         for (long i = offset; i < A.NumRows(); i++)
-         {
-            A[i][tmp_c] += tmp * A[i][offset];
-         }
-         for (long i = 0; i < R.NumRows(); i++)
-         {
-            R[i][tmp_cB] += tmp * R[i][offset];
-         }
-      }
-   }
+    }
+  }
+  if(A[A.NumRows() - 1][A.NumRows() - 1] < 0)
+  {
+    A[A.NumRows() - 1] *= to_ZZ(-1);
+    L[A.NumRows() - 1] *= to_ZZ(-1);
+  }
 }
 
-static bool check(const mat_ZZ& A, long offset)
+mat_ZZ SmithNormalFormIlio(const mat_ZZ& copy, mat_ZZ& L, mat_ZZ& R)
 {
-   ZZ tmp;
-   if (IsZero(A[offset][offset])) return true;
+  mat_ZZ A; A = copy;
+  ident(L, A.NumRows());
+  ident(R, A.NumRows());
 
-   for (int i = offset + 1; i < A.NumRows(); i++)
-   {
-     if (A[i][offset] != 0 || A[offset][i] != 0) { return false; }
-   }
-   return true;
+  diagonalizationIn(A, L, R);
+  int min = A.NumRows() <= A.NumCols() ? A.NumRows() : A.NumCols();
+  int i, j;
+  vec_ZZ temp;  
+  
+  for (i = 0; i < min; ++ i) {
+    
+    for ( j = i + 1; j < min; ++ j) {
+				    
+      if (IsOne(A[i][i]))  break;
+	      
+      else if (IsZero(A[j][j])) continue;
+      
+      else if (IsZero(A[i][i])) {
+	std::swap (A[i][i], A[j][j]);
+	//switching columns and rows of A effectively, since non diagonal entries are zero
+	temp = L[j];
+	L[j] = L[i];
+	L[i] = temp;
+	for (int k = 0; k < R.NumRows(); k++)
+	{
+	  temp[k] = R[k][j];
+	  R[k][j] = R[k][i];
+	}
+	for (int k = 0; k < R.NumRows(); k++)
+	{
+	  R[k][i] = temp[k];
+	}
+      }
+      
+      else {
+
+	ZZ x, y, g, myNeg;
+							
+	XGCD (g, y, x, A[j][j], A[i][i]);
+	
+	for (int k = 0; k < A.NumRows(); k++)
+	{
+	  R[k][j] += x * R[k][i];
+	  myNeg = R[k][i];
+	  R[k][i] = R[k][j];
+	  R[k][j] = myNeg;
+	  R[k][j] -= (A[i][i] / g) * R[k][i];
+	}
+	
+	L[i] += y * L[j];
+	L[j] *= to_ZZ(-1);
+	L[j] += (A[j][j] / g) * L[i];
+	
+	A[j][j] = A[j][j] / g;
+	
+	A[j][j] = A[j][j] * A[i][i];
+  
+	A[i][i] = g;
+	
+      }
+    }
+  }
+  
+  return A;
 }
 
