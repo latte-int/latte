@@ -47,5 +47,5 @@ void destroyPolynomial(polynomial &);
 void decompose(polynomial &, linearPoly &, int);
 string printForm(const linearPoly &);
 void destroyForm(linearPoly &);
-
+ZZ Power(const ZZ&a, const ZZ& e);
 #endif

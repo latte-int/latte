@@ -66,7 +66,7 @@ void loadPolynomial(polynomial &myPoly, const string line)
 	linearPoly lForm;
 	lForm.termCount = 0;
 	lForm.varCount = myPoly.varCount;
-	//need to allocate space for exponent blocks / coeff blocks?
+	
 	for (int i = 0; i < myPoly.termCount; i++)
 	{
 		decompose(myPoly, lForm, i);
@@ -79,10 +79,9 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 {
 	//INPUT: monomial specified by myPoly.coefficientBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
 	//	 			and myPoly.exponentBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
-	//OUTPUT: lForm now also contains the linear decomposition of this monomial
+	//OUTPUT: lForm now also contains the linear decomposition of this monomial (all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M)
 
-	//how to deal with ( 1 / |M|! ) ? maybe store inverse of coefficient?
-	cout << "Decomposing monomial " << mIndex << " into linear forms: " << printPolynomial(myPoly) << endl;
+	//cout << "Decomposing monomial " << mIndex << " into linear forms: " << printPolynomial(myPoly) << endl;
 
 	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
 	for (int i = 0; i < (mIndex / BLOCK_SIZE); i++) { expTmp = expTmp->next; coeffTmp = coeffTmp->next; }
@@ -94,11 +93,12 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 		totalDegree += expTmp->data[mIndex % BLOCK_SIZE][i];
 	}
 	formsCount--;
-	cout << "At most " << formsCount << " linear forms will be required for this decomposition." << endl;
-	cout << "Total degree is " << totalDegree << endl;
+	//cout << "At most " << formsCount << " linear forms will be required for this decomposition." << endl;
+	//cout << "Total degree is " << totalDegree << endl;
 
 	vec_ZZ p;
 	ZZ temp;
+	ZZ g;
 	bool found;
 	int myIndex;
 	p.SetLength(myPoly.varCount);
@@ -111,34 +111,47 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 			p[j] = i / temp;
 			temp *= (expTmp->data[mIndex % BLOCK_SIZE][j] + 1);
 		}
-		cout << "p is: " << p << endl;
-		//find gcd of all elements?
-		temp = p[0];
+		//cout << "p is: " << p << endl;
+		
+		//find gcd of all elements
+		g = p[0];
+		ZZ parity = totalDegree - p[0];
 		if (myPoly.varCount > 1)
 		{
 			for (int k = 1; k < myPoly.varCount; k++)
 			{
-				temp = GCD (temp, p[k]);
+				g = GCD (g, p[k]);
+				parity -= p[k];
 			}
 		}
-		cout << "GCD is " << temp << endl;
-		if (!IsOne(temp))
+		//cout << "GCD is " << g << endl;
+		
+		//calculate coefficient
+		temp = coeffTmp->data[mIndex % BLOCK_SIZE];
+		if (IsOdd(parity)) { temp *= -1; } // -1 ^ [|M| - (p[0] + p[1] + ... p[n])]
+		for (int j = 0; j < myPoly.varCount; j++) //calculate binomial coefficients
+		{
+			for (ZZ k = expTmp->data[mIndex % BLOCK_SIZE][j]; k > p[j]; k--) { temp *= k; } // M[j]! / p[j]!
+			for (ZZ k = expTmp->data[mIndex % BLOCK_SIZE][j] - p[j]; k > 1; k--) { temp /= k; } // 1 / (M[j] - p[j])!
+		}
+		
+		if (!IsOne(g))
 		{
 			for (int k = 0; k < myPoly.varCount; k++)
 			{
-				p[k] /= temp;
+				p[k] /= g;
 			}
-			temp = temp^totalDegree;
+			temp *= Power(g, totalDegree);
 		}
-		cout << "Normalized p is: " << p << endl;
-		// now, calculate and store the coefficient (multiplied by the GCD stored in temp) in front of the simplified linear form (assign it to temp)
+		//cout << "Normalized p is: " << p << endl;
+		//cout << "coefficient is " << temp << endl;
 		// is there a vector in lForm's exponent block equal to p?
 		// 	yes: add our coefficient to the existing one, we're done
 		//	no : allocate space for a new vec_ZZ, insert ours with our coefficient, done
 		lBlock* linForm; cBlock* linCoeff;
 		if (lForm.termCount > 0)
 		{
-			cout << lForm.termCount << " linear forms present" << endl;
+			//cout << lForm.termCount << " linear forms present" << endl;
 			linForm = lForm.lHead;
 			linCoeff = lForm.cHead;
 
@@ -165,43 +178,45 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 
 			if (!found) //nothing found
 			{
-				cout << "Didn't find compatible linear form, inserting term " << lForm.termCount << endl;
+				//cout << "Didn't find compatible linear form, inserting term " << lForm.termCount << endl;
 				if (lForm.termCount % BLOCK_SIZE == 0) //need to allocate a new block for coeffs and exponents
 				{
-					cout << "Allocating new block" << endl;
+					//cout << "Allocating new block" << endl;
 					linCoeff->next = (cBlock*) malloc (sizeof(cBlock));
 					linForm->next = (lBlock*) malloc (sizeof(lBlock));
 					linForm = linForm->next; linCoeff = linCoeff->next;
 					linForm->next = NULL; linCoeff->next = NULL;
 				}
-				linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.termCount);
-				cout << "Set Length" << endl;
-				VectorCopy(linForm->data[lForm.termCount % BLOCK_SIZE], p, myPoly.termCount);
+				linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount);
+				VectorCopy(linForm->data[lForm.termCount % BLOCK_SIZE], p, myPoly.varCount);
 				linForm->degree[lForm.termCount % BLOCK_SIZE] = totalDegree;
-				cout << "Copied vector" << endl;
 				linCoeff->data[lForm.termCount % BLOCK_SIZE] = temp;
+				//cout << "Added following term: [" << temp << ", [" << totalDegree << ", " << linForm->data[lForm.termCount % BLOCK_SIZE] << "]]" << endl;
 				lForm.termCount++;
-				cout << "Added term" << endl;
 			}
 			else //found this linear form
 			{
-				cout << "Found compatible linear form" << endl;
+				//cout << "Found compatible linear form" << endl;
 				linCoeff->data[myIndex % BLOCK_SIZE] += temp;
+				//cout << "Modified term: [" << linCoeff->data[myIndex % BLOCK_SIZE] << ", [" << linForm->degree[myIndex  % BLOCK_SIZE] << ", " << linForm->data[myIndex % BLOCK_SIZE] << "]]" << endl;
 			}
 		}
 		else
 		{
-			cout << "NULL head" << endl;
+			//cout << "NULL head" << endl;
 			lForm.cHead = (cBlock*) malloc (sizeof(cBlock));
 			lForm.lHead = (lBlock*) malloc (sizeof(lBlock));
 			linForm = lForm.lHead; linCoeff = lForm.cHead;
 			linForm->next = NULL; linCoeff->next = NULL;
-			VectorCopy(linForm->data[lForm.termCount % BLOCK_SIZE], p, myPoly.termCount);
+			linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount);
+			VectorCopy(linForm->data[lForm.termCount % BLOCK_SIZE], p, myPoly.varCount);
 			linForm->degree[lForm.termCount % BLOCK_SIZE] = totalDegree;
 			linCoeff->data[lForm.termCount % BLOCK_SIZE] = temp;
+			//cout << "Added following term: [" << temp << ", [" << totalDegree << ", " << linForm->data[lForm.termCount % BLOCK_SIZE] << "]]" << endl;
 			lForm.termCount++;
 		}
 	}
+	p.kill();
 }
 
 string printPolynomial(const polynomial &myPoly)
@@ -231,6 +246,22 @@ string printPolynomial(const polynomial &myPoly)
 	while (coeffTmp != NULL);
 	output << "]";
 	return output.str();
+}
+
+ZZ Power(const ZZ&a, const ZZ& e)
+{
+	if (e == 0) return to_ZZ(1);
+
+	long k = NumBits(e);
+     
+	ZZ res;
+	res = 1;
+     
+	for (long i = k-1; i >= 0; i--) {
+	   res = (res*res);
+	   if (bit(e, i) == 1) res = (res*a);
+	}
+	return res;
 }
 
 string printForm(const linearPoly &myForm)
