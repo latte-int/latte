@@ -165,6 +165,11 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
+bin_PROGRAMS += integrate
+integrate_SOURCES =	 integration/decompose.cpp
+integrate_SOURCES +=	 integration/PolyRep.cpp
+#integrate_SOURCES = integration/test.cpp
+
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 

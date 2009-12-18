@@ -11,7 +11,14 @@ NTL_CLIENT
 struct eBlock //used to store exponents
 {
 	eBlock* next;
-	vec_ZZ data[BLOCK_SIZE]; //each vec_ZZ contains n elements for an n-variable polynomial, max BLOCK_SIZE of these
+	vec_ZZ data[BLOCK_SIZE]; //each vec_ZZ contains n elements for an n-variable polynomial
+};
+
+struct lBlock //used to store linear forms
+{
+	lBlock* next;
+	vec_ZZ data[BLOCK_SIZE]; //each vec_ZZ contains n elements for an n-variable polynomial
+	ZZ degree[BLOCK_SIZE]; //for linear forms only
 };
 
 struct cBlock
@@ -23,14 +30,22 @@ struct cBlock
 struct polynomial
 {
 	int termCount, varCount;
-	eBlock* eHead; //for linear forms, coefficients of the linear form raised to a power M
-	cBlock* cHead; //coefficients of monomials or inverse of the coefficient of linear forms
-	bool linearForm;
+	eBlock* eHead; //variable exponents
+	cBlock* cHead; //monomial coefficients
+};
+
+struct linearPoly
+{
+	int termCount, varCount;
+	lBlock* lHead; //linear forms
+	cBlock* cHead; //linear form coefficients
 };
 
 void loadPolynomial(polynomial &, const string);
 string printPolynomial(const polynomial &);
 void destroyPolynomial(polynomial &);
-void decompose(polynomial &, polynomial &, int);
+void decompose(polynomial &, linearPoly &, int);
+string printForm(const linearPoly &);
+void destroyForm(linearPoly &);
 
 #endif
