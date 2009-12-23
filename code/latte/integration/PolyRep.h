@@ -8,13 +8,13 @@
 
 NTL_CLIENT
 
-struct eBlock //used to store exponents
+struct eBlock //used to store exponent vector
 {
 	eBlock* next;
 	vec_ZZ data[BLOCK_SIZE]; //each vec_ZZ contains n elements for an n-variable polynomial
 };
 
-struct lBlock //used to store linear forms
+struct lBlock //used to store linear forms (coefficient vector and degree)
 {
 	lBlock* next;
 	vec_ZZ data[BLOCK_SIZE]; //each vec_ZZ contains n elements for an n-variable polynomial
@@ -46,6 +46,7 @@ string printPolynomial(const polynomial &);
 void destroyPolynomial(polynomial &);
 void decompose(polynomial &, linearPoly &, int);
 string printForm(const linearPoly &);
+string printMapleForm(const linearPoly &);
 void destroyForm(linearPoly &);
 ZZ Power(const ZZ&a, const ZZ& e);
 #endif

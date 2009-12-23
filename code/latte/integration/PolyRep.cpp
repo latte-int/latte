@@ -71,7 +71,10 @@ void loadPolynomial(polynomial &myPoly, const string line)
 	{
 		decompose(myPoly, lForm, i);
 	}
-	cout << "Decomposed linear forms are: " << printForm(lForm) << endl;
+	cout << "Linear decomposition is: " << printForm(lForm) << endl;
+	
+	cout << "Maple expression is: " << endl;
+	cout << printMapleForm(lForm) << endl;
 	destroyForm(lForm);
 }
 
@@ -104,14 +107,37 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 	p.SetLength(myPoly.varCount);
 	for (ZZ i = to_ZZ(1); i <= formsCount; i++)
 	{
-		p[myPoly.varCount - 1] = i % (expTmp->data[mIndex % BLOCK_SIZE][myPoly.varCount- 1] + 1);
+		cout << "i is " << i << endl;
+		/*p[myPoly.varCount - 1] = i % (expTmp->data[mIndex % BLOCK_SIZE][myPoly.varCount- 1] + 1);
 		temp = expTmp->data[mIndex % BLOCK_SIZE][myPoly.varCount - 1] + 1;
 		for (int j = myPoly.varCount - 2; j >= 0; j--)
 		{
 			p[j] = i / temp;
 			temp *= (expTmp->data[mIndex % BLOCK_SIZE][j] + 1);
+		}*/
+		temp = i;
+		for (int j = 0; j < myPoly.varCount; j++) //keep going
+		{
+			if (IsZero(expTmp->data[mIndex % BLOCK_SIZE][j]))
+			{
+				p[j] = to_ZZ(0);
+			}
+			else
+			{
+				if (expTmp->data[mIndex % BLOCK_SIZE][j] >= temp)
+				{
+					p[j] = temp;
+					temp = to_ZZ(0);
+					break;
+				}
+				else
+				{
+					p[j] = temp % (expTmp->data[mIndex % BLOCK_SIZE][j] + 1);
+					temp /= (expTmp->data[mIndex % BLOCK_SIZE][j] + 1);
+				}
+			}
 		}
-		//cout << "p is: " << p << endl;
+		cout << "p is: " << p << endl;
 		
 		//find gcd of all elements
 		g = p[0];
@@ -290,6 +316,33 @@ string printForm(const linearPoly &myForm)
 	}
 	while (coeffTmp != NULL);
 	output << "]";
+	return output.str();
+}
+
+string printMapleForm(const linearPoly &myForm)
+{
+	stringstream output (stringstream::in | stringstream::out);
+	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
+	int termCount = 0;
+	do
+	{
+		for (int i = 0; i < BLOCK_SIZE && termCount < myForm.termCount; i++)
+		{
+			output << "(" << coeffTmp->data[i] << "/factorial(" << formTmp->degree[i] << "))*("; // divide coefficient by |M|!
+			for (int j = 0; j < myForm.varCount; j++)
+			{
+				output << formTmp->data[i][j] << "*x[" << j + 1 << "]";
+				if (j + 1 < myForm.varCount)
+				{ output << " + "; }
+			}
+			output << ")^" << formTmp->degree[i];
+			if (termCount + 1 < myForm.termCount)
+			{ output << " + "; }
+			termCount++;
+		}
+		coeffTmp = coeffTmp->next; formTmp = formTmp->next;
+	}
+	while (coeffTmp != NULL);
 	return output.str();
 }
 

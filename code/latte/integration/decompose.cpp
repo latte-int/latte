@@ -1,7 +1,10 @@
+#define COEFF_MAX 10000
+
 #include "PolyRep.h"
 
 #include <iostream>
 #include <fstream>
+#include <NTL/ZZ.h>
 
 using namespace std;
 
@@ -21,5 +24,38 @@ int main(int argc, char *argv[])
 		destroyPolynomial(myPoly);
 	}
 	myStream.close();
+	/*
+	//now, some testing
+	srand ( time(NULL) );
+	SetSeed( to_ZZ(rand()) );
+	ZZ degree = RandomBnd(300);
+	int numVars = rand() % 50;
+	int termCount = rand() % 1000;
+	
+	cout << "Creating random polynomial of degree " << degree << " with " << numVars << " variables." << endl;
+	stringstream output (stringstream::in | stringstream::out);
+	output << "[";
+	do
+	{
+		for (int i = 0; i < BLOCK_SIZE && termCount > -1; i++)
+		{
+			output << "[" << RandomBnd(COEFF_MAX) << ",[";
+			for (int j = 0; j < myPoly.varCount; j++)
+			{
+				output << expTmp->data[i][j];
+				if (j + 1 < myPoly.varCount)
+				{ output << ","; }
+			}
+			output << "]]";
+			if (termCount != 0)
+			{ output << ","; }
+			termCount--;
+		}
+		coeffTmp = coeffTmp->next; expTmp = expTmp->next;
+	}
+	while (coeffTmp != NULL);
+	output << "]";
+	loadPolynomial(myPoly, output.str());
+	*/
 	return 0; 
 }

@@ -120,7 +120,7 @@ class multipoly
       void print()                              //printing polynomial by convention
              {
                   head *tt=nil->link;
-                  if (tt==nil) {cout<<"0"; return;}; 
+                  if (tt==nil) {cout<<"0"<<endl; return;}; 
                   while (tt!=nil) 
                   { 
                        bool init=1;
