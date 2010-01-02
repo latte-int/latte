@@ -24,6 +24,7 @@ void loadPolynomial(polynomial &myPoly, const string line)
 	bool exponents = false;
 	int termIndex, varIndex;
 	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
+	expTmp->data = new vec_ZZ[BLOCK_SIZE]; coeffTmp->data = new ZZ[BLOCK_SIZE];
 	termIndex = 0;
 	while (index < line.length() - 1)
 	{
@@ -53,6 +54,8 @@ void loadPolynomial(polynomial &myPoly, const string line)
 				coeffTmp->next = (cBlock*) malloc (sizeof(cBlock));
 				expTmp = expTmp->next; coeffTmp = coeffTmp->next;
 				expTmp->next = NULL; coeffTmp->next = NULL;
+				expTmp->data = new vec_ZZ[BLOCK_SIZE];
+				coeffTmp->data = new ZZ[BLOCK_SIZE];
 			}
 			temp = line.substr(index + 1, line.find(",", index) - index - 1);
 			index += temp.length() + 2;
@@ -62,20 +65,6 @@ void loadPolynomial(polynomial &myPoly, const string line)
 	}
 	myPoly.termCount = termCount;
 	myPoly.varCount = varCount;
-
-	linearPoly lForm;
-	lForm.termCount = 0;
-	lForm.varCount = myPoly.varCount;
-	
-	for (int i = 0; i < myPoly.termCount; i++)
-	{
-		decompose(myPoly, lForm, i);
-	}
-	cout << "Linear decomposition is: " << printForm(lForm) << endl;
-	
-	cout << "Maple expression is: " << endl;
-	cout << printMapleForm(lForm) << endl;
-	destroyForm(lForm);
 }
 
 void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
@@ -99,53 +88,33 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 	//cout << "At most " << formsCount << " linear forms will be required for this decomposition." << endl;
 	//cout << "Total degree is " << totalDegree << endl;
 
-	vec_ZZ p;
+	vec_ZZ p, counter;
 	ZZ temp;
 	ZZ g;
 	bool found;
 	int myIndex;
+	counter.SetLength(myPoly.varCount);
 	p.SetLength(myPoly.varCount);
 	for (ZZ i = to_ZZ(1); i <= formsCount; i++)
 	{
-		cout << "i is " << i << endl;
-		/*p[myPoly.varCount - 1] = i % (expTmp->data[mIndex % BLOCK_SIZE][myPoly.varCount- 1] + 1);
-		temp = expTmp->data[mIndex % BLOCK_SIZE][myPoly.varCount - 1] + 1;
-		for (int j = myPoly.varCount - 2; j >= 0; j--)
+		//cout << "i is " << i << endl;
+		counter[0] += to_ZZ(1);
+		for (int j = 0; counter[j] > expTmp->data[mIndex % BLOCK_SIZE][j]; j++)
 		{
-			p[j] = i / temp;
-			temp *= (expTmp->data[mIndex % BLOCK_SIZE][j] + 1);
-		}*/
-		temp = i;
-		for (int j = 0; j < myPoly.varCount; j++) //keep going
-		{
-			if (IsZero(expTmp->data[mIndex % BLOCK_SIZE][j]))
-			{
-				p[j] = to_ZZ(0);
-			}
-			else
-			{
-				if (expTmp->data[mIndex % BLOCK_SIZE][j] >= temp)
-				{
-					p[j] = temp;
-					temp = to_ZZ(0);
-					break;
-				}
-				else
-				{
-					p[j] = temp % (expTmp->data[mIndex % BLOCK_SIZE][j] + 1);
-					temp /= (expTmp->data[mIndex % BLOCK_SIZE][j] + 1);
-				}
-			}
+			counter[j] = to_ZZ(0);
+			counter[j+1] += to_ZZ(1);
 		}
-		cout << "p is: " << p << endl;
+		//cout << "counter is: " << counter << endl;
 		
 		//find gcd of all elements
-		g = p[0];
-		ZZ parity = totalDegree - p[0];
+		g = counter[0];
+		ZZ parity = totalDegree - counter[0];
+		p[0] = counter[0];
 		if (myPoly.varCount > 1)
 		{
 			for (int k = 1; k < myPoly.varCount; k++)
 			{
+				p[k] = counter[k];
 				g = GCD (g, p[k]);
 				parity -= p[k];
 			}
@@ -178,51 +147,54 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 		if (lForm.termCount > 0)
 		{
 			//cout << lForm.termCount << " linear forms present" << endl;
-			linForm = lForm.lHead;
-			linCoeff = lForm.cHead;
-
+			linForm = lForm.lHead; linCoeff = lForm.cHead; found = false;
+			
 			//check for compatible form here
-			found = false;
-			do
+			for (int i = 0; !found && i < lForm.termCount; i++)
 			{
-				for (int i = 0; i < BLOCK_SIZE; i++)
+				if (i > 0 && i % BLOCK_SIZE == 0)
 				{
-					if (linForm->data[i].length() == 0) //reached end
+					linForm = linForm->next, linCoeff = linCoeff->next;
+				}
+				
+				if (linForm->degree[i % BLOCK_SIZE] == totalDegree)
+				{
+					if (linForm->data[i % BLOCK_SIZE] == p)
 					{
-						break;
-					}
-					if (linForm->degree[i] == totalDegree)
-					{
-						if (linForm->data[i] == p)
-						{
-							myIndex = i; found = true; break;
-						}
+						myIndex = i; found = true; break;
 					}
 				}
+				
+				if (i == lForm.termCount) { break; }
 			}
-			while (linCoeff->next != NULL && !found);
 
 			if (!found) //nothing found
 			{
-				//cout << "Didn't find compatible linear form, inserting term " << lForm.termCount << endl;
+				//cout << "Didn't find compatible linear form, inserting term " << lForm.termCount + 1 << endl;
 				if (lForm.termCount % BLOCK_SIZE == 0) //need to allocate a new block for coeffs and exponents
 				{
 					//cout << "Allocating new block" << endl;
 					linCoeff->next = (cBlock*) malloc (sizeof(cBlock));
 					linForm->next = (lBlock*) malloc (sizeof(lBlock));
+					//cout << "alloc finished" << endl;
 					linForm = linForm->next; linCoeff = linCoeff->next;
 					linForm->next = NULL; linCoeff->next = NULL;
+					//cout << "set up pointers" << endl;
+					linForm->data = new vec_ZZ[BLOCK_SIZE]; linForm->degree = new ZZ[BLOCK_SIZE]; linCoeff->data = new ZZ[BLOCK_SIZE];
 				}
 				linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount);
+				//cout << "set length" << endl;
 				VectorCopy(linForm->data[lForm.termCount % BLOCK_SIZE], p, myPoly.varCount);
+				//cout << "copied vector" << endl;
 				linForm->degree[lForm.termCount % BLOCK_SIZE] = totalDegree;
+				//cout << "set degree" << endl;
 				linCoeff->data[lForm.termCount % BLOCK_SIZE] = temp;
 				//cout << "Added following term: [" << temp << ", [" << totalDegree << ", " << linForm->data[lForm.termCount % BLOCK_SIZE] << "]]" << endl;
 				lForm.termCount++;
 			}
 			else //found this linear form
 			{
-				//cout << "Found compatible linear form" << endl;
+				//cout << "Found compatible linear form at " << myIndex << endl;
 				linCoeff->data[myIndex % BLOCK_SIZE] += temp;
 				//cout << "Modified term: [" << linCoeff->data[myIndex % BLOCK_SIZE] << ", [" << linForm->degree[myIndex  % BLOCK_SIZE] << ", " << linForm->data[myIndex % BLOCK_SIZE] << "]]" << endl;
 			}
@@ -234,6 +206,7 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 			lForm.lHead = (lBlock*) malloc (sizeof(lBlock));
 			linForm = lForm.lHead; linCoeff = lForm.cHead;
 			linForm->next = NULL; linCoeff->next = NULL;
+			linForm->data = new vec_ZZ[BLOCK_SIZE];  linForm->degree = new ZZ[BLOCK_SIZE]; linCoeff->data = new ZZ[BLOCK_SIZE];
 			linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount);
 			VectorCopy(linForm->data[lForm.termCount % BLOCK_SIZE], p, myPoly.varCount);
 			linForm->degree[lForm.termCount % BLOCK_SIZE] = totalDegree;
@@ -243,6 +216,7 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 		}
 	}
 	p.kill();
+	counter.kill();
 }
 
 string printPolynomial(const polynomial &myPoly)
@@ -292,10 +266,34 @@ ZZ Power(const ZZ&a, const ZZ& e)
 
 string printForm(const linearPoly &myForm)
 {
+	cout << "Printing form with " << myForm.termCount << " terms." << endl;
 	stringstream output (stringstream::in | stringstream::out);
 	output << "[";
 	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
-	int termCount = 0;
+	
+	for (int i = 0; i < myForm.termCount; i++)
+	{
+		if (i > 0 && i % BLOCK_SIZE == 0)
+		{
+			formTmp = formTmp->next;
+			coeffTmp = coeffTmp->next;
+		}
+		
+		for (int k = 0; k < BLOCK_SIZE && i < myForm.termCount; k++, i++)
+		{
+			output << "[" << coeffTmp->data[i] << ",[" << formTmp->degree[i] << ",[";
+			for (int j = 0; j < myForm.varCount; j++)
+			{
+				output << formTmp->data[k][j];
+				if (j + 1 < myForm.varCount)
+				{ output << ","; }
+			}
+			output << "]]]";
+			if (i	 + 1 < myForm.termCount)
+			{ output << ","; }
+		}
+	}
+	/*
 	do
 	{
 		for (int i = 0; i < BLOCK_SIZE && termCount < myForm.termCount; i++)
@@ -314,7 +312,7 @@ string printForm(const linearPoly &myForm)
 		}
 		coeffTmp = coeffTmp->next; formTmp = formTmp->next;
 	}
-	while (coeffTmp != NULL);
+	while (coeffTmp != NULL);*/
 	output << "]";
 	return output.str();
 }
@@ -323,26 +321,26 @@ string printMapleForm(const linearPoly &myForm)
 {
 	stringstream output (stringstream::in | stringstream::out);
 	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
-	int termCount = 0;
-	do
+	cout << "there are " << myForm.termCount << " terms." << endl;
+	for (int i = 0; i < myForm.termCount; i++)
 	{
-		for (int i = 0; i < BLOCK_SIZE && termCount < myForm.termCount; i++)
+		if (i > 0 && i % BLOCK_SIZE == 0)
 		{
-			output << "(" << coeffTmp->data[i] << "/factorial(" << formTmp->degree[i] << "))*("; // divide coefficient by |M|!
-			for (int j = 0; j < myForm.varCount; j++)
-			{
-				output << formTmp->data[i][j] << "*x[" << j + 1 << "]";
-				if (j + 1 < myForm.varCount)
-				{ output << " + "; }
-			}
-			output << ")^" << formTmp->degree[i];
-			if (termCount + 1 < myForm.termCount)
-			{ output << " + "; }
-			termCount++;
+			formTmp = formTmp->next;
+			coeffTmp = coeffTmp->next;
 		}
-		coeffTmp = coeffTmp->next; formTmp = formTmp->next;
+		
+		output << "(" << coeffTmp->data[i % BLOCK_SIZE] << "/factorial(" << formTmp->degree[i % BLOCK_SIZE] << "))*("; // divide coefficient by |M|!
+		for (int j = 0; j < myForm.varCount; j++)
+		{
+			output << formTmp->data[i % BLOCK_SIZE][j] << "*x[" << j + 1 << "]";
+			if (j + 1 < myForm.varCount)
+			{ output << " + "; }
+		}
+		output << ")^" << formTmp->degree[i % BLOCK_SIZE];
+		if (i + 1 < myForm.termCount)
+		{ output << " + "; }
 	}
-	while (coeffTmp != NULL);
 	return output.str();
 }
 
@@ -353,17 +351,11 @@ void destroyForm(linearPoly &myPoly)
 	int termCount = 0;
 	do
 	{
-		for (int i = 0; i < BLOCK_SIZE && termCount < myPoly.termCount; i++)
-		{
-			expTmp->data[i].kill();
-			coeffTmp->data[i].kill();
-			termCount++;
-		}
 		oldExp = expTmp; oldCoeff = coeffTmp;
 		expTmp = expTmp->next;
 		coeffTmp = coeffTmp->next;
-		free (oldExp);
-		free (oldCoeff);
+		delete [] oldExp;
+		delete [] oldCoeff;
 	}
 	while (coeffTmp != NULL);
 	myPoly.lHead = NULL;
@@ -375,20 +367,13 @@ void destroyPolynomial(polynomial &myPoly)
 {
 	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
 	eBlock* oldExp = NULL; cBlock* oldCoeff = NULL;
-	int termCount = 0;
 	do
 	{
-		for (int i = 0; i < BLOCK_SIZE && termCount < myPoly.termCount; i++)
-		{
-			expTmp->data[i].kill();
-			coeffTmp->data[i].kill();
-			termCount++;
-		}
 		oldExp = expTmp; oldCoeff = coeffTmp;
 		expTmp = expTmp->next;
 		coeffTmp = coeffTmp->next;
-		free (oldExp);
-		free (oldCoeff);
+		delete [] oldExp;
+		delete [] oldCoeff;
 	}
 	while (coeffTmp != NULL);
 	myPoly.eHead = NULL;

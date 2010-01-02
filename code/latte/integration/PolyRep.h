@@ -11,20 +11,20 @@ NTL_CLIENT
 struct eBlock //used to store exponent vector
 {
 	eBlock* next;
-	vec_ZZ data[BLOCK_SIZE]; //each vec_ZZ contains n elements for an n-variable polynomial
+	vec_ZZ* data; //each vec_ZZ contains n elements for an n-variable polynomial
 };
 
 struct lBlock //used to store linear forms (coefficient vector and degree)
 {
 	lBlock* next;
-	vec_ZZ data[BLOCK_SIZE]; //each vec_ZZ contains n elements for an n-variable polynomial
-	ZZ degree[BLOCK_SIZE]; //for linear forms only
+	vec_ZZ* data; //each vec_ZZ contains n elements for an n-variable polynomial
+	ZZ* degree; //for linear forms only
 };
 
 struct cBlock
 {
 	cBlock* next;
-	ZZ data[BLOCK_SIZE];
+	ZZ* data;
 };
 
 struct polynomial
