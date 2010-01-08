@@ -1,12 +1,14 @@
 * text=auto !eol
 code/latte/integration/PolyRep.cpp -text
 code/latte/integration/PolyRep.h -text
+code/latte/integration/decint.cpp -text
 code/latte/integration/decompose.cpp -text
 code/latte/integration/decomposeTest.mpl -text
 code/latte/integration/integrate.cpp -text
 code/latte/integration/multipoly.h -text
 code/latte/integration/multipoly.txt -text
 code/latte/integration/myIntegration.h -text
+code/latte/integration/newIntegration.h -text
 code/latte/integration/test.cpp -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
