@@ -124,7 +124,7 @@ SmithNormalFormLidia(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
 // }
 
 #else
-mat_ZZ SmithNormalForm(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
+mat_ZZ SmithNormalFormLidia(const mat_ZZ & U, mat_ZZ & B, mat_ZZ & C) {
   cout << "SmithNormalForm: This build is configured without LiDIA. " << endl;
   exit(1);
 }
