@@ -12,7 +12,7 @@ NTL_CLIENT
 
 void print_Integrate(int d, const linearPoly &lForm , string &line)
 {
-  ZZ v,de,sum,lcm,total,g,a,b,counter,m,tem;
+  ZZ v,de,sum,lcm,total,g,a,b,counter,m,tem,coe;
 	int i,j,index,k,t;
 	vec_ZZ inner_Pro,sum_Nu,sum_De,l;
 	vec_vec_ZZ s;
@@ -20,7 +20,6 @@ void print_Integrate(int d, const linearPoly &lForm , string &line)
 	//convert the string into a vec_vec_ZZ
  	s.SetLength(d+1);
 	index=1;
-	cout<<line<<endl;
 	for (i=0;i<=d;i++)
 	{
 		temp=line.substr(index,line.find("]",index)-index+1);
@@ -37,9 +36,9 @@ void print_Integrate(int d, const linearPoly &lForm , string &line)
 		s[i][d-1]=to_ZZ(subtemp.c_str());
 		index=line.find("]",index)+2;
 	};
-	inner_Pro.SetLength(d);
-	sum_Nu.SetLength(d);
-	sum_De.SetLength(d);
+	inner_Pro.SetLength(d+1);
+	sum_Nu.SetLength(d+1);
+	sum_De.SetLength(d+1);
 	l.SetLength(d);
 	lcm=1; //least common multiple
 	total=0; //total numerator
@@ -53,19 +52,20 @@ void print_Integrate(int d, const linearPoly &lForm , string &line)
 	k=-1;
 	a=0;
 	b=0;
+	cout<<"The polynomial is decomposed to "<<lForm.termCount<<" terms."<<endl;
 	for (counter=0;counter<lForm.termCount;counter++)
 	{
 		k++;
 		if ((k>0)&&(k % BLOCK_SIZE==0)) {temForm=temForm->next;temCoef=temCoef->next;k=0;}
-		
 		for (i=0;i<d;i++) l[i]=temForm->data[k][i];
 		m=temForm->degree[k];
+		coe=temCoef->data[k];
 		de=1;
 		total=0;
 		lcm=1;
-		for (i=1;i<=d;i++)
+		for (i=1;i<=d+m;i++)
 		{
-			de=de*(m+j);
+			de=de*i;
 		};
 		for (i=0;i<=d;i++)
 		{
@@ -76,7 +76,7 @@ void print_Integrate(int d, const linearPoly &lForm , string &line)
 		{
 			sum_Nu[i]=1;for (j=0;j<m+d;j++) sum_Nu[i]=sum_Nu[i]*inner_Pro[i];
 			sum_De[i]=1;for (j=0;j<=d;j++) if (i!=j) sum_De[i]=sum_De[i]*(inner_Pro[i]-inner_Pro[j]);
-			if (sum_De[i]==0) {cout<<"l is not regular!"; return ;}; //irregular
+			if (sum_De[i]==0) {cout<<l<<"is not regular!"; return ;}; //irregular
 			lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));
 		};
 		for (i=0;i<=d;i++)
@@ -84,7 +84,7 @@ void print_Integrate(int d, const linearPoly &lForm , string &line)
 			total+=sum_Nu[i]*(lcm/sum_De[i]);
 		};
 		lcm=lcm*de;
-		total=total*v;
+		total=total*v*coe;
 		if (a==0) {a=total;b=lcm;}
 		else {tem=b*lcm/GCD(b,lcm);a=a*tem/b+total*tem/lcm;b=tem;};	
 		g=GCD(a,b);
