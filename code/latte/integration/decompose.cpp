@@ -10,7 +10,7 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	if (argc < 3) { cout << "Usage: ./integrate fileIn fileOut" << endl; return 1; }
+	/*if (argc < 3) { cout << "Usage: ./integrate fileIn fileOut" << endl; return 1; }
 	string line;
 	polynomial myPoly;
 	linearPoly lForm;
@@ -58,6 +58,6 @@ int main(int argc, char *argv[])
 	cout << "Total time to decompose " << count << " polynomials: " << decomposeTime << ", avg is " << decomposeTime / count << endl;
 
 	myStream.close();
-	outStream.close();
+	outStream.close();*/
 	return 0; 
 }

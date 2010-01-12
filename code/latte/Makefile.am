@@ -173,6 +173,12 @@ integrate_SOURCES +=	 integration/PolyRep.cpp
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 
-TESTS = $(check_PROGRAMS)
+check_PROGRAMS += integrate_test
+integrate_test_SOURCES = integration/integrateTest.cpp
+integrate_test_SOURCES += integration/PolyRep.cpp
+
+TESTS = integration/testIntegration.sh
+#TESTS += ilio_test
+
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add

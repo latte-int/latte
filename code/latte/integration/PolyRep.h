@@ -27,26 +27,28 @@ struct cBlock
 	ZZ* data;
 };
 
-struct polynomial
+struct monomialSum
 {
 	int termCount, varCount;
 	eBlock* eHead; //variable exponents
 	cBlock* cHead; //monomial coefficients
 };
 
-struct linearPoly
+struct linFormSum
 {
 	int termCount, varCount;
 	lBlock* lHead; //linear forms
 	cBlock* cHead; //linear form coefficients
 };
 
-void loadPolynomial(polynomial &, const string);
-string printPolynomial(const polynomial &);
-void destroyPolynomial(polynomial &);
-void decompose(polynomial &, linearPoly &, int);
-string printForm(const linearPoly &);
-string printMapleForm(const linearPoly &);
-void destroyForm(linearPoly &);
+void loadMonomials(monomialSum&, const string);
+string printMonomials(const monomialSum&);
+void destroyMonomials(monomialSum&);
+
+void loadLinForms(linFormSum&, const string);
+string printLinForms(const linFormSum&);
+void destroyLinForms(linFormSum&);
+
+void decompose(monomialSum&, linFormSum&, int);
 ZZ Power(const ZZ&a, const ZZ& e);
 #endif

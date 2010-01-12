@@ -98,13 +98,15 @@ Y;
 end:
 
 local polyCount:=10:
-local bigConstant:=10:
+local bigConstant:=10000:
 local numTerms:=10:
 local dimension:=5:
 local myDegree:=10:
 local errors, curTerm, termCount, formList, termList, curPoly, myPolys, myList, myForms:
+local myTime, temp:
 
 #get polynomials
+myTime:=0:
 for myIndex from 1 to polyCount do
   curPoly:=random_sparse_homogeneous_polynomial_with_degree(bigConstant, dimension, myDegree, numTerms);
   if type(curPoly,`+`) then myList:=convert(curPoly,list) else myList:=[curPoly] end if;
@@ -120,21 +122,26 @@ for myIndex from 1 to polyCount do
     formList[myIndex]:=ListTools[FlattenOnce]([formList[myIndex], [[constants, termList]]]);
   od;
   myPolys[myIndex]:=curPoly;
+  temp:=time();
   myForms[myIndex]:={op(list_integral_via_waring(formList[myIndex]))};
+  myTime:=myTime + time() - temp:
 od:
+myTime:=myTime / polyCount:
 
 #write to file
-polyFile:=fopen("code/latte/integration/randomPolys.txt",WRITE,TEXT):
+polyFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
 for i from 1 to polyCount do
   writeline(polyFile, StringTools[DeleteSpace](convert(formList[i], string)));
 od:
 close(polyFile):
 
 #run the integrate program
-system("code/latte/integrate code/latte/integration/randomPolys.txt code/latte/integration/forms.txt"):
+system("./integrate_test integration/randomPolys.txt integration/forms.txt"):
+
+print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
 
 #read forms in maple notation
-formFile:=fopen("code/latte/integration/forms.txt",READ,TEXT):
+formFile:=fopen("integration/forms.txt",READ,TEXT):
 formList[1]:=readline(formFile):
 i:=1:
 while (formList[i] <> 0) do
@@ -152,4 +159,4 @@ for i from 1 to polyCount do
    if {op(myForms[i])} <> {op(parse(formList[i]))} then errors:=errors + 1 end if;
 od:
 
-if errors = 0 then print("No tests failed.") else print(StringTools[Join]([convert(errors,string),"tests failed."], " ")); end if;
+print(StringTools[Join]([convert(errors,string),"tests failed."], " "));

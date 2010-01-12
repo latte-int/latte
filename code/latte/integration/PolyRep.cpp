@@ -2,9 +2,12 @@
 #include <stdio.h>
 #include <sstream>
 
-void loadPolynomial(polynomial &myPoly, const string line)
+//Loads a string by parsing it as a sum of monomials
+//monomial sum: c_{1}*(x_{1}^e_{1}...x_{varCount}^e_{varCount}) + ...
+//nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
+void loadMonomials(monomialSum &myPoly, const string line)
 {
-	//cout << "Loading polynomial `" << line << "'" << endl;
+	//cout << "Loading monomial sum `" << line << "'" << endl;
 	int varCount = 1;
 	string temp = line.substr(line.find(",[") + 2, line.find("]],") - (line.find(",[") + 2));
 	for (int i = 0; i < temp.length(); i++)
@@ -18,7 +21,6 @@ void loadPolynomial(polynomial &myPoly, const string line)
 	myPoly.eHead->next = NULL;
 	myPoly.cHead = (cBlock*) malloc (sizeof(cBlock));
 	myPoly.cHead->next = NULL;
-	//still need to ensure that terms are sorted by exponent?
 
 	int index = 1; char *exps, *myTok;
 	bool exponents = false;
@@ -67,27 +69,196 @@ void loadPolynomial(polynomial &myPoly, const string line)
 	myPoly.varCount = varCount;
 }
 
-void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
+//Prints a nested list representation of our sum of monomials
+//monomial sum: c_{1}*(x_{1}^e_{1}...x_{varCount}^e_{varCount}) + ...
+//nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
+string printMonomials(const monomialSum &myPoly)
 {
-	//INPUT: monomial specified by myPoly.coefficientBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
-	//	 			and myPoly.exponentBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
-	//OUTPUT: lForm now also contains the linear decomposition of this monomial (all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M)
+	stringstream output (stringstream::in | stringstream::out);
+	output << "[";
+	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
+	int termCount = 0;
+	do
+	{
+		for (int i = 0; i < BLOCK_SIZE && termCount < myPoly.termCount; i++)
+		{
+			output << "[" << coeffTmp->data[i] << ",[";
+			for (int j = 0; j < myPoly.varCount; j++)
+			{
+				output << expTmp->data[i][j];
+				if (j + 1 < myPoly.varCount)
+				{ output << ","; }
+			}
+			output << "]]";
+			if (termCount + 1 < myPoly.termCount)
+			{ output << ","; }
+			termCount++;
+		}
+		coeffTmp = coeffTmp->next; expTmp = expTmp->next;
+	}
+	while (coeffTmp != NULL);
+	output << "]";
+	return output.str();
+}
 
+//Deallocates space and nullifies internal pointers and counters
+void destroyMonomials(monomialSum &myPoly)
+{
+	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
+	eBlock* oldExp = NULL; cBlock* oldCoeff = NULL;
+	do
+	{
+		oldExp = expTmp; oldCoeff = coeffTmp;
+		expTmp = expTmp->next;
+		coeffTmp = coeffTmp->next;
+		delete [] oldExp;
+		delete [] oldCoeff;
+	}
+	while (coeffTmp != NULL);
+	myPoly.eHead = NULL;
+	myPoly.cHead = NULL;
+	myPoly.termCount = myPoly.varCount = 0;
+}
+
+//Loads a string by parsing it as a sum of linear forms
+//linear form: (c_{1} / d_{1}!)[(p_{1}*x_{1} + ... p_{varCount}*x_{varCount})^d_{1}] + ...
+//nested list: [[c_{1}, [d_{1}, [p_{1}, p_{2}, ..., p_{varCount}]], .. ]
+void loadLinForms(linFormSum &myPoly, const string)
+{
+	int varCount = 1;
+	string temp = line.substr(line.find(",[") + 2, line.find("]],") - (line.find(",[") + 2));
+	for (int i = 0; i < temp.length(); i++)
+	{ varCount += (temp.at(i) == ','); }
+	int termCount = 1; //this is 1 + occurences of "]," in line
+	for (int i = 2; i < line.length() - 1; i++) //first 2 characters are "[["
+	{
+		if (line.at(i) == ']' && line.at(i+1) == ',') { termCount++; }
+	}
+	cout << "linear form has dimension " << varCount << " and " << termCount << " terms." << endl;
+	myPoly.lHead = (lBlock*) malloc (sizeof(lBlock));
+	myPoly.lHead->next = NULL;
+	myPoly.cHead = (cBlock*) malloc (sizeof(cBlock));
+	myPoly.cHead->next = NULL;
+
+	int index = 1; char *exps, *myTok;
+	bool exponents = false;
+	int termIndex, varIndex;
+	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
+	expTmp->data = new vec_ZZ[BLOCK_SIZE]; coeffTmp->data = new ZZ[BLOCK_SIZE];
+	termIndex = 0;
+	while (index < line.length() - 1)
+	{
+		if (exponents)
+		{
+			temp = line.substr(index + 1, line.find("]]", index) - index - 1);
+			index += temp.length() + 4;
+			exps = (char*) malloc (sizeof(char) * temp.length());
+			strcpy(exps, temp.c_str());
+			myTok = strtok(exps, ",");
+			expTmp->data[termIndex % BLOCK_SIZE].SetLength(varCount);
+			varIndex = 0;
+			while (myTok != NULL)
+			{
+				expTmp->data[termIndex % BLOCK_SIZE][varIndex++] = to_ZZ(myTok);
+				myTok = strtok (NULL, ",");
+			}
+			exponents = false;
+			termIndex++;
+			free (exps);
+		}
+		else
+		{
+			if (termIndex > 0 && termIndex % BLOCK_SIZE == 0)
+			{
+				expTmp->next = (eBlock*) malloc (sizeof(eBlock));
+				coeffTmp->next = (cBlock*) malloc (sizeof(cBlock));
+				expTmp = expTmp->next; coeffTmp = coeffTmp->next;
+				expTmp->next = NULL; coeffTmp->next = NULL;
+				expTmp->data = new vec_ZZ[BLOCK_SIZE];
+				coeffTmp->data = new ZZ[BLOCK_SIZE];
+			}
+			temp = line.substr(index + 1, line.find(",", index) - index - 1);
+			index += temp.length() + 2;
+			coeffTmp->data[termIndex % BLOCK_SIZE] = to_ZZ(temp.c_str());
+			exponents = true;
+		}
+	}
+	myPoly.termCount = termCount;
+	myPoly.varCount = varCount;
+}
+
+//Prints a nested list representation of our sum of linear forms
+//linear form: (c_{1} / d_{1}!)[(p_{1}*x_{1} + ... p_{varCount}*x_{varCount})^d_{1}] + ...
+//nested list: [[c_{1}, [d_{1}, [p_{1}, p_{2}, ..., p_{varCount}]], .. ]
+string printLinForms(const linFormSum &myForm)
+{
+	//cout << "Printing form with " << myForm.termCount << " terms." << endl;
+	stringstream output (stringstream::in | stringstream::out);
+	output << "[";
+	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
+	for (int i = 0; i < myForm.termCount; i++) //loop through each monomial
+	{
+		if (i > 0 && i % BLOCK_SIZE == 0)
+		{
+			formTmp = formTmp->next;
+			coeffTmp = coeffTmp->next;
+		}
+		
+		output << "[" << coeffTmp->data[i % BLOCK_SIZE] << ", [" << formTmp->degree[i % BLOCK_SIZE] << ", [";
+		for (int j = 0; j < myForm.varCount; j++)
+		{
+			output << formTmp->data[i % BLOCK_SIZE][j];
+			if (j + 1 < myForm.varCount)
+			{ output << ", "; }
+		}
+		output << "]]]";
+		if (i + 1 < myForm.termCount)
+		{ output << ", "; }
+	}
+	output << "]";
+	return output.str();
+}
+
+//Deallocates space and nullifies internal pointers and counters
+void destroyLinForms(linFormSum &myPoly)
+{
+	lBlock* expTmp = myPoly.lHead; cBlock* coeffTmp = myPoly.cHead;
+	lBlock* oldExp = NULL; cBlock* oldCoeff = NULL;
+	int termCount = 0;
+	do
+	{
+		oldExp = expTmp; oldCoeff = coeffTmp;
+		expTmp = expTmp->next;
+		coeffTmp = coeffTmp->next;
+		delete [] oldExp;
+		delete [] oldCoeff;
+	}
+	while (coeffTmp != NULL);
+	myPoly.lHead = NULL;
+	myPoly.cHead = NULL;
+	myPoly.termCount = myPoly.varCount = 0;
+}
+
+
+//INPUT: monomial specified by myPoly.coefficientBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
+//	and myPoly.exponentBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
+//OUTPUT: lForm now also contains the linear decomposition of this monomial 
+//	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
+void decompose(monomialSum &myPoly, linFormSum &lForm, int mIndex)
+{
 	//cout << "Decomposing monomial " << mIndex << " into linear forms: " << printPolynomial(myPoly) << endl;
 
 	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
 	for (int i = 0; i < (mIndex / BLOCK_SIZE); i++) { expTmp = expTmp->next; coeffTmp = coeffTmp->next; }
-	if (IsZero(expTmp->data[mIndex % BLOCK_SIZE])) //exponents are all 0, this is a constant term
+	if (IsZero(expTmp->data[mIndex % BLOCK_SIZE])) //exponents are all 0, this is a constant term - linear form is already known
 	{
-		cout << "something about constants" << endl;
-		//search for a constant term linear form?
+		//search for a constant term linear form
 		lBlock* linForm; cBlock* linCoeff;
 		ZZ temp = coeffTmp->data[mIndex % BLOCK_SIZE];
 		bool found;
 		int myIndex;
 		if (lForm.termCount > 0)
 		{
-			//cout << lForm.termCount << " linear forms present" << endl;
 			linForm = lForm.lHead; linCoeff = lForm.cHead; found = false;
 			
 			//check for compatible form here
@@ -140,7 +311,7 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 				//cout << "Modified term: [" << linCoeff->data[myIndex % BLOCK_SIZE] << ", [" << linForm->degree[myIndex  % BLOCK_SIZE] << ", " << linForm->data[myIndex % BLOCK_SIZE] << "]]" << endl;
 			}
 		}
-		else
+		else //no constant linear form, creating one
 		{
 			//cout << "NULL head" << endl;
 			lForm.cHead = (cBlock*) malloc (sizeof(cBlock));
@@ -299,35 +470,6 @@ void decompose(polynomial &myPoly, linearPoly &lForm, int mIndex)
 	counter.kill();
 }
 
-string printPolynomial(const polynomial &myPoly)
-{
-	stringstream output (stringstream::in | stringstream::out);
-	output << "[";
-	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
-	int termCount = 0;
-	do
-	{
-		for (int i = 0; i < BLOCK_SIZE && termCount < myPoly.termCount; i++)
-		{
-			output << "[" << coeffTmp->data[i] << ",[";
-			for (int j = 0; j < myPoly.varCount; j++)
-			{
-				output << expTmp->data[i][j];
-				if (j + 1 < myPoly.varCount)
-				{ output << ","; }
-			}
-			output << "]]";
-			if (termCount + 1 < myPoly.termCount)
-			{ output << ","; }
-			termCount++;
-		}
-		coeffTmp = coeffTmp->next; expTmp = expTmp->next;
-	}
-	while (coeffTmp != NULL);
-	output << "]";
-	return output.str();
-}
-
 ZZ Power(const ZZ&a, const ZZ& e)
 {
 	if (e == 0) return to_ZZ(1);
@@ -344,36 +486,8 @@ ZZ Power(const ZZ&a, const ZZ& e)
 	return res;
 }
 
-string printForm(const linearPoly &myForm)
-{
-	cout << "Printing form with " << myForm.termCount << " terms." << endl;
-	stringstream output (stringstream::in | stringstream::out);
-	output << "[";
-	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
-	for (int i = 0; i < myForm.termCount; i++) //loop through each monomial
-	{
-		if (i > 0 && i % BLOCK_SIZE == 0)
-		{
-			formTmp = formTmp->next;
-			coeffTmp = coeffTmp->next;
-		}
-		
-		output << "[" << coeffTmp->data[i % BLOCK_SIZE] << ", [" << formTmp->degree[i % BLOCK_SIZE] << ", [";
-		for (int j = 0; j < myForm.varCount; j++)
-		{
-			output << formTmp->data[i % BLOCK_SIZE][j];
-			if (j + 1 < myForm.varCount)
-			{ output << ", "; }
-		}
-		output << "]]]";
-		if (i + 1 < myForm.termCount)
-		{ output << ", "; }
-	}
-	output << "]";
-	return output.str();
-}
-
-string printMapleForm(const linearPoly &myForm)
+/*
+string printMapleExpr(const linFormSum &myForm)
 {
 	stringstream output (stringstream::in | stringstream::out);
 	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
@@ -399,40 +513,4 @@ string printMapleForm(const linearPoly &myForm)
 	}
 	return output.str();
 }
-
-void destroyForm(linearPoly &myPoly)
-{
-	lBlock* expTmp = myPoly.lHead; cBlock* coeffTmp = myPoly.cHead;
-	lBlock* oldExp = NULL; cBlock* oldCoeff = NULL;
-	int termCount = 0;
-	do
-	{
-		oldExp = expTmp; oldCoeff = coeffTmp;
-		expTmp = expTmp->next;
-		coeffTmp = coeffTmp->next;
-		delete [] oldExp;
-		delete [] oldCoeff;
-	}
-	while (coeffTmp != NULL);
-	myPoly.lHead = NULL;
-	myPoly.cHead = NULL;
-	myPoly.termCount = myPoly.varCount = 0;
-}
-
-void destroyPolynomial(polynomial &myPoly)
-{
-	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
-	eBlock* oldExp = NULL; cBlock* oldCoeff = NULL;
-	do
-	{
-		oldExp = expTmp; oldCoeff = coeffTmp;
-		expTmp = expTmp->next;
-		coeffTmp = coeffTmp->next;
-		delete [] oldExp;
-		delete [] oldCoeff;
-	}
-	while (coeffTmp != NULL);
-	myPoly.eHead = NULL;
-	myPoly.cHead = NULL;
-	myPoly.termCount = myPoly.varCount = 0;
-}
+*/

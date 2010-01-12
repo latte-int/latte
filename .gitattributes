@@ -9,6 +9,7 @@ code/latte/integration/multipoly.h -text
 code/latte/integration/myIntegration.h -text
 code/latte/integration/newIntegration.h -text
 code/latte/integration/test.cpp -text
+code/latte/integration/testIntegration.sh -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
