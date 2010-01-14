@@ -66,7 +66,7 @@ void loadMonomials(monomialSum &monomials, const string line)
 
 	monomials.termCount = termIndex;
 	monomials.varCount = varCount;
-	cout << "Loaded " << monomials.termCount << " monomials of dimension " << monomials.varCount << endl;
+	//cout << "Loaded " << monomials.termCount << " monomials of dimension " << monomials.varCount << endl;
 }
 
 //Prints a nested list representation of our sum of monomials
@@ -192,7 +192,7 @@ void loadLinForms(linFormSum &forms, const string line)
 
 	forms.termCount = termIndex;
 	forms.varCount = varCount;
-	cout << "Loaded " << forms.termCount << " terms of dimension " << forms.varCount << endl;
+	//cout << "Loaded " << forms.termCount << " terms of dimension " << forms.varCount << endl;
 }
 
 //Prints a nested list representation of our sum of linear forms

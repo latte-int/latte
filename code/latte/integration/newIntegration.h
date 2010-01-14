@@ -58,7 +58,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, vec_vec_ZZ s,ZZ m, ZZ coe, ZZ v, int d, ZZ d
 	{
 		sum_Nu[i]=1;for (j=0;j<m+d;j++) sum_Nu[i]=sum_Nu[i]*inner_Pro[i];
 		sum_De[i]=1;for (j=0;j<=d;j++) if (i!=j) sum_De[i]=sum_De[i]*(inner_Pro[i]-inner_Pro[j]);
-		if (sum_De[i]==0) {cout<<l<<"is not regular!"; return ;}; //irregular
+		if (sum_De[i]==0) {cout<<l<<"is not regular!"<<endl; b = to_ZZ(0); return ;}; //irregular
 		lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));
 	};
 	for (i=0;i<=d;i++)
@@ -183,6 +183,7 @@ void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 			de=de*i;
 		};
 		update(numerator,denominator,l,s,m,coe,v,d,de);
+		if (IsZero(denominator)) { return; } //irregular
 	}
 	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};
 };	

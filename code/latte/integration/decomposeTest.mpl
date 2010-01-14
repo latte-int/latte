@@ -106,9 +106,9 @@ end:
 local polyCount:=10:
 local bigConstant:=10000:
 local numTerms:=10:
-local dimension:=5:
-local myDegree:=10:
-local errors, curTerm, termCount, formList, termList, curPoly, myPolys, myList, myForms, mySimplices:
+local dimension:=2:
+local myDegree:=40:
+local errors, curTerm, termCount, formList, termList, curPoly, myPolys, myList, myForms, mySimplices, myResults:
 local myTime, temp:
 
 #get polynomials
@@ -151,10 +151,12 @@ print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decompos
 #read forms in maple notation
 formFile:=fopen("integration/forms.txt",READ,TEXT):
 formList[1]:=readline(formFile):
+myResults[1]:=readline(formFile):
 i:=1:
 while (formList[i] <> 0) do
   i:=i+1:
   formList[i]:=readline(formFile):
+  myResults[i]:=readline(formFile): #integral result
 od:
 close(formFile):
 
