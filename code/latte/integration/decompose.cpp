@@ -10,10 +10,10 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	/*if (argc < 3) { cout << "Usage: ./integrate fileIn fileOut" << endl; return 1; }
+	if (argc < 3) { cout << "Usage: ./integrate fileIn fileOut" << endl; return 1; }
 	string line;
-	polynomial myPoly;
-	linearPoly lForm;
+	monomialSum myPoly;
+	linFormSum lForm;
 	ifstream myStream (argv[1]);
 	ofstream outStream(argv[2]);
 	float startTime, loadTime, decomposeTime;
@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 		if (!line.empty())
 		{
 		startTime = time(NULL);
-		loadPolynomial(myPoly, line);
+		loadMonomials(myPoly, line);
 		loadTime += (time(NULL) - startTime);
 		
 		//cout << "The following polynomial has " << myPoly.termCount << " terms containing " << myPoly.varCount << " variables: " << endl;
@@ -45,12 +45,12 @@ int main(int argc, char *argv[])
 		}
 		cout << endl;
 		//cout << "About to print linear form to file" << endl;
-		outStream << printForm(lForm) << endl; //print to output file
+		outStream << printLinForms(lForm) << endl; //print to output file
 		
 		//cout << "Maple expression is: " << endl;
 		//outStream << printMapleForm(lForm) << endl; //let's print this instead
-		destroyForm(lForm);
-		destroyPolynomial(myPoly);
+		destroyLinForms(lForm);
+		destroyMonomials(myPoly);
 		count++;
 		}
 	}
@@ -58,6 +58,6 @@ int main(int argc, char *argv[])
 	cout << "Total time to decompose " << count << " polynomials: " << decomposeTime << ", avg is " << decomposeTime / count << endl;
 
 	myStream.close();
-	outStream.close();*/
+	outStream.close();
 	return 0; 
 }

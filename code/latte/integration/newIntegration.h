@@ -15,6 +15,7 @@ void convertToSimplex(int d, vec_vec_ZZ &s, ZZ &v, string line)
 	int index,i,t,j;
 	string temp,subtemp;
  	s.SetLength(d+1);
+	cout<<line<<endl;
 	index=1;
 	for (i=0;i<=d;i++)
 	{
@@ -123,12 +124,13 @@ void integrateList(string line, string line2)
 	cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
 };
 
-void integrateFlatVector(int d, const linFormSum &lForm , string line)
+void integrateFlatVector(const linFormSum &lForm , string line)
 {
   ZZ v,a,b,de,counter,m,tem,coe;
-	int i,j,index,k;
+	int i,j,index,k,d;
 	vec_ZZ l;
 	vec_vec_ZZ s;
+	d=lForm.varCount;
 	convertToSimplex(d,s,v,line);//convert the string into a vec_vec_ZZ
 	l.SetLength(d);
 	lBlock* temForm=lForm.lHead;
