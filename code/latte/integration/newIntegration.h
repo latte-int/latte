@@ -123,7 +123,7 @@ void integrateList(string line, string line2)
 	cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
 };
 
-void integrateFlatVector(int d, const linearPoly &lForm , string line)
+void integrateFlatVector(int d, const linFormSum &lForm , string line)
 {
   ZZ v,a,b,de,counter,m,tem,coe;
 	int i,j,index,k;
@@ -153,4 +153,36 @@ void integrateFlatVector(int d, const linearPoly &lForm , string line)
 	}
 	if (b<0) {b=-b;a=-a;};
 	cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
+};
+
+void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms , string line)
+{
+  ZZ v,de,counter,m,tem,coe;
+	int i,j,index,k;
+	int d = forms.varCount;
+	vec_ZZ l;
+	vec_vec_ZZ s;
+	convertToSimplex(d,s,v,line);//convert the string into a vec_vec_ZZ
+	l.SetLength(d);
+	lBlock* temForm=forms.lHead;
+	cBlock* temCoef=forms.cHead;
+	k=-1;
+	numerator=0;
+	denominator=0;
+	//cout<<"The polynomial is decomposed to "<<forms.termCount<<" terms."<<endl;
+	for (counter=0;counter<forms.termCount;counter++)
+	{
+		k++;
+		if ((k>0)&&(k % BLOCK_SIZE==0)) {temForm=temForm->next;temCoef=temCoef->next;k=0;}
+		for (i=0;i<d;i++) l[i]=temForm->data[k][i];
+		m=temForm->degree[k];
+		coe=temCoef->data[k];
+		de=1;
+		for (i=1;i<=d+m;i++)
+		{
+			de=de*i;
+		};
+		update(numerator,denominator,l,s,m,coe,v,d,de);
+	}
+	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};
 };	

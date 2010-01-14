@@ -5,68 +5,68 @@
 //Loads a string by parsing it as a sum of monomials
 //monomial sum: c_{1}*(x_{1}^e_{1}...x_{varCount}^e_{varCount}) + ...
 //nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
-void loadMonomials(monomialSum &myPoly, const string line)
+void loadMonomials(monomialSum &monomials, const string line)
 {
-	//cout << "Loading monomial sum `" << line << "'" << endl;
-	int varCount = 1;
-	string temp = line.substr(line.find(",[") + 2, line.find("]],") - (line.find(",[") + 2));
-	for (int i = 0; i < temp.length(); i++)
-	{ varCount += (temp.at(i) == ','); }
-	int termCount = 1; //this is 1 + occurences of "]," in line
-	for (int i = 2; i < line.length() - 1; i++) //first 2 characters are "[["
-	{
-		if (line.at(i) == ']' && line.at(i+1) == ',') { termCount++; }
-	}
-	myPoly.eHead = (eBlock*) malloc (sizeof(eBlock));
-	myPoly.eHead->next = NULL;
-	myPoly.cHead = (cBlock*) malloc (sizeof(cBlock));
-	myPoly.cHead->next = NULL;
+	int termIndex = 0;
+	int lastPos = 0;
+	int varCount = 0;
+	int k;
+	int flag = 0; //0 means we expect coefficient, 1 means we expect exponent vector
+	
+	for (int i = 0; line[i] != ']'; i++)
+	{ varCount += (line[i] == ','); } 
+	//varCount is now the number of commas in the monomial, same as number of variables
+	if (varCount < 1)
+	{ cout << "There are " << varCount << " variables, bailing." << endl; return; }
 
-	int index = 1; char *exps, *myTok;
-	bool exponents = false;
-	int termIndex, varIndex;
-	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
-	expTmp->data = new vec_ZZ[BLOCK_SIZE]; coeffTmp->data = new ZZ[BLOCK_SIZE];
-	termIndex = 0;
-	while (index < line.length() - 1)
+	//at least one record requires at least one block
+	monomials.eHead = (eBlock*) malloc (sizeof(eBlock));
+	monomials.eHead->next = NULL;
+	monomials.cHead = (cBlock*) malloc (sizeof(cBlock));
+	monomials.cHead->next = NULL;
+
+	eBlock* expBlock = monomials.eHead;
+	cBlock* coefBlock = monomials.cHead;
+	expBlock->data = new vec_ZZ[BLOCK_SIZE];
+	coefBlock->data = new ZZ[BLOCK_SIZE];
+
+	for (int i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
 	{
-		if (exponents)
+		if (line [i] == '[')
 		{
-			temp = line.substr(index + 1, line.find("]]", index) - index - 1);
-			index += temp.length() + 4;
-			exps = (char*) malloc (sizeof(char) * temp.length());
-			strcpy(exps, temp.c_str());
-			myTok = strtok(exps, ",");
-			expTmp->data[termIndex % BLOCK_SIZE].SetLength(varCount);
-			varIndex = 0;
-			while (myTok != NULL)
-			{
-				expTmp->data[termIndex % BLOCK_SIZE][varIndex++] = to_ZZ(myTok);
-				myTok = strtok (NULL, ",");
-			}
-			exponents = false;
-			termIndex++;
-			free (exps);
+		switch (flag)
+		{
+			case 0: //coefficient
+				lastPos = i + 1; 
+				for (; line[i] != ','; i++);
+				coefBlock->data[termIndex % BLOCK_SIZE] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+				flag = 1;
+				break;
+			case 1: //exponent vector
+				expBlock->data[termIndex % BLOCK_SIZE].SetLength(varCount);
+				k = 0;
+				for (i++; line[i] != ']'; i++)
+				{
+					if (line[i] != ' ')
+					{
+						lastPos = i;
+						for (; line[i] != ',' && line[i] != ']'; i++);
+						expBlock->data[termIndex % BLOCK_SIZE][k++] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+					}
+				}
+				termIndex++;
+				flag = 0;
+				break;
+			default: //error
+				cout << "Flag is " << flag << ", bailing." << endl;
+				return;
 		}
-		else
-		{
-			if (termIndex > 0 && termIndex % BLOCK_SIZE == 0)
-			{
-				expTmp->next = (eBlock*) malloc (sizeof(eBlock));
-				coeffTmp->next = (cBlock*) malloc (sizeof(cBlock));
-				expTmp = expTmp->next; coeffTmp = coeffTmp->next;
-				expTmp->next = NULL; coeffTmp->next = NULL;
-				expTmp->data = new vec_ZZ[BLOCK_SIZE];
-				coeffTmp->data = new ZZ[BLOCK_SIZE];
-			}
-			temp = line.substr(index + 1, line.find(",", index) - index - 1);
-			index += temp.length() + 2;
-			coeffTmp->data[termIndex % BLOCK_SIZE] = to_ZZ(temp.c_str());
-			exponents = true;
 		}
 	}
-	myPoly.termCount = termCount;
-	myPoly.varCount = varCount;
+
+	monomials.termCount = termIndex;
+	monomials.varCount = varCount;
+	cout << "Loaded " << monomials.termCount << " monomials of dimension " << monomials.varCount << endl;
 }
 
 //Prints a nested list representation of our sum of monomials
@@ -123,68 +123,76 @@ void destroyMonomials(monomialSum &myPoly)
 //Loads a string by parsing it as a sum of linear forms
 //linear form: (c_{1} / d_{1}!)[(p_{1}*x_{1} + ... p_{varCount}*x_{varCount})^d_{1}] + ...
 //nested list: [[c_{1}, [d_{1}, [p_{1}, p_{2}, ..., p_{varCount}]], .. ]
-void loadLinForms(linFormSum &myPoly, const string)
+void loadLinForms(linFormSum &forms, const string line)
 {
-	int varCount = 1;
-	string temp = line.substr(line.find(",[") + 2, line.find("]],") - (line.find(",[") + 2));
-	for (int i = 0; i < temp.length(); i++)
-	{ varCount += (temp.at(i) == ','); }
-	int termCount = 1; //this is 1 + occurences of "]," in line
-	for (int i = 2; i < line.length() - 1; i++) //first 2 characters are "[["
-	{
-		if (line.at(i) == ']' && line.at(i+1) == ',') { termCount++; }
-	}
-	cout << "linear form has dimension " << varCount << " and " << termCount << " terms." << endl;
-	myPoly.lHead = (lBlock*) malloc (sizeof(lBlock));
-	myPoly.lHead->next = NULL;
-	myPoly.cHead = (cBlock*) malloc (sizeof(cBlock));
-	myPoly.cHead->next = NULL;
+	int termIndex = 0;
+	int lastPos = 0;
+	int varCount = 0;
+	int k;
+	int flag = 0; //0 means we expect coefficient, 1 means we expect degree, 2 means we expect coefficient vector
+	
+	for (int i = 0; line[i] != ']'; i++)
+	{ varCount += (line[i] == ','); } 
+	//varCount is now the number of commas in a linear form - there is 1 less variable;
+	varCount--;
+	if (varCount < 1)
+	{ cout << "There are " << varCount << " variables, bailing." << endl; return; }
 
-	int index = 1; char *exps, *myTok;
-	bool exponents = false;
-	int termIndex, varIndex;
-	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
-	expTmp->data = new vec_ZZ[BLOCK_SIZE]; coeffTmp->data = new ZZ[BLOCK_SIZE];
-	termIndex = 0;
-	while (index < line.length() - 1)
+	//at least one record requires at least one block
+	forms.lHead = (lBlock*) malloc (sizeof(lBlock));
+	forms.lHead->next = NULL;
+	forms.cHead = (cBlock*) malloc (sizeof(cBlock));
+	forms.cHead->next = NULL;
+
+	lBlock* formBlock = forms.lHead;
+	cBlock* coefBlock = forms.cHead;
+	formBlock->data = new vec_ZZ[BLOCK_SIZE];
+	formBlock->degree = new ZZ[BLOCK_SIZE];
+	coefBlock->data = new ZZ[BLOCK_SIZE];
+
+	for (int i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
 	{
-		if (exponents)
+		if (line [i] == '[')
 		{
-			temp = line.substr(index + 1, line.find("]]", index) - index - 1);
-			index += temp.length() + 4;
-			exps = (char*) malloc (sizeof(char) * temp.length());
-			strcpy(exps, temp.c_str());
-			myTok = strtok(exps, ",");
-			expTmp->data[termIndex % BLOCK_SIZE].SetLength(varCount);
-			varIndex = 0;
-			while (myTok != NULL)
-			{
-				expTmp->data[termIndex % BLOCK_SIZE][varIndex++] = to_ZZ(myTok);
-				myTok = strtok (NULL, ",");
-			}
-			exponents = false;
-			termIndex++;
-			free (exps);
+		switch (flag)
+		{
+			case 0: //coefficient
+				lastPos = i + 1; 
+				for (; line[i] != ','; i++);
+				coefBlock->data[termIndex % BLOCK_SIZE] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+				flag = 1;
+				break;
+			case 1: //degree
+				lastPos = i + 1;
+				for (; line[i] != ','; i++);
+				formBlock->degree[termIndex % BLOCK_SIZE] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+				flag = 2;
+				break;
+			case 2: //coefficient vector
+				formBlock->data[termIndex % BLOCK_SIZE].SetLength(varCount);
+				k = 0;
+				for (i++; line[i] != ']'; i++)
+				{
+					if (line[i] != ' ')
+					{
+						lastPos = i;
+						for (; line[i] != ',' && line[i] != ']'; i++);
+						formBlock->data[termIndex % BLOCK_SIZE][k++] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+					}
+				}
+				termIndex++;
+				flag = 0;
+				break;
+			default: //error
+				cout << "Flag is " << flag << ", bailing." << endl;
+				return;
 		}
-		else
-		{
-			if (termIndex > 0 && termIndex % BLOCK_SIZE == 0)
-			{
-				expTmp->next = (eBlock*) malloc (sizeof(eBlock));
-				coeffTmp->next = (cBlock*) malloc (sizeof(cBlock));
-				expTmp = expTmp->next; coeffTmp = coeffTmp->next;
-				expTmp->next = NULL; coeffTmp->next = NULL;
-				expTmp->data = new vec_ZZ[BLOCK_SIZE];
-				coeffTmp->data = new ZZ[BLOCK_SIZE];
-			}
-			temp = line.substr(index + 1, line.find(",", index) - index - 1);
-			index += temp.length() + 2;
-			coeffTmp->data[termIndex % BLOCK_SIZE] = to_ZZ(temp.c_str());
-			exponents = true;
 		}
 	}
-	myPoly.termCount = termCount;
-	myPoly.varCount = varCount;
+
+	forms.termCount = termIndex;
+	forms.varCount = varCount;
+	cout << "Loaded " << forms.termCount << " terms of dimension " << forms.varCount << endl;
 }
 
 //Prints a nested list representation of our sum of linear forms

@@ -97,12 +97,18 @@ od;
 Y;
 end:
 
+lattice_random_simplex:=proc(d,N) local R,U;
+  R := rand(N):
+  U:=proc()[seq(R(),i=1..d)] end proc:
+  [ seq(U(), i=1..d+1) ];
+end:
+
 local polyCount:=10:
 local bigConstant:=10000:
 local numTerms:=10:
 local dimension:=5:
 local myDegree:=10:
-local errors, curTerm, termCount, formList, termList, curPoly, myPolys, myList, myForms:
+local errors, curTerm, termCount, formList, termList, curPoly, myPolys, myList, myForms, mySimplices:
 local myTime, temp:
 
 #get polynomials
@@ -122,6 +128,7 @@ for myIndex from 1 to polyCount do
     formList[myIndex]:=ListTools[FlattenOnce]([formList[myIndex], [[constants, termList]]]);
   od;
   myPolys[myIndex]:=curPoly;
+  mySimplices[myIndex]:=lattice_random_simplex(dimension, bigConstant);
   temp:=time();
   myForms[myIndex]:={op(list_integral_via_waring(formList[myIndex]))};
   myTime:=myTime + time() - temp:
@@ -131,7 +138,8 @@ myTime:=myTime / polyCount:
 #write to file
 polyFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
 for i from 1 to polyCount do
-  writeline(polyFile, StringTools[DeleteSpace](convert(formList[i], string)));
+  writeline(polyFile, convert(formList[i], string));
+  writeline(polyFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
 od:
 close(polyFile):
 
