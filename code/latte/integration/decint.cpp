@@ -9,13 +9,6 @@
 
 using namespace std;
 
-void delSpace(string &line)
-{
-	for (int i=0;i<line.length();i++)
-	{
-		while ((i<line.length())&&(line.at(i)==32)) {line.erase(i,1);};
-	};
-};
 int main(int argc, char *argv[])
 {
 	if (argc < 3) { cout << "Usage: ./integrate fileIn polynomial (or linear)" << endl; return 1; };
@@ -40,7 +33,8 @@ int main(int argc, char *argv[])
 		cout << endl;
  		cout << "The polynomial is:" <<line<<endl;
 		cout << "Integrating by decomposition" << endl;
-		myStream >> line2;	//line2 is the simplex for example, [[0,0],[1,2],[2,3]]
+		getline(myStream,line2);	//line2 is the simplex for example, [[0,0],[1,2],[2,3]]
+		delSpace(line2);
 		integrateFlatVector(lForm, line2);
 		destroyLinForms(lForm);
 		destroyMonomials(myPoly);

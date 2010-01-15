@@ -10,6 +10,15 @@ using namespace std;
 
 NTL_CLIENT
 
+
+void delSpace(string &line)
+{
+	for (int i=0;i<line.length();i++)
+	{
+		while ((i<line.length())&&(line.at(i)==32)) {line.erase(i,1);};
+	};
+};
+
 void convertToSimplex(int d, vec_vec_ZZ &s, ZZ &v, string line)
 {
 	int index,i,t,j;
