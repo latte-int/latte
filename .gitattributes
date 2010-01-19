@@ -5,6 +5,7 @@ code/latte/integration/decint.cpp -text
 code/latte/integration/decompose.cpp -text
 code/latte/integration/decomposeTest.mpl -text
 code/latte/integration/integrate.cpp -text
+code/latte/integration/integrateTest.cpp -text
 code/latte/integration/myIntegration.h -text
 code/latte/integration/newIntegration.h -text
 code/latte/integration/testIntegration.sh -text
