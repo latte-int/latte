@@ -76,7 +76,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,ZZ m, ZZ coe, ZZ de)
 	{
 		sum_Nu[i]=1;for (j=0;j<m+mySimplex.d;j++) sum_Nu[i]=sum_Nu[i]*inner_Pro[i];
 		sum_De[i]=1;for (j=0;j<=mySimplex.d;j++) if (i!=j) sum_De[i]=sum_De[i]*(inner_Pro[i]-inner_Pro[j]);
-		if (sum_De[i]==0) {cout<<"Warning!"<<l<<" is not regular! Aborted."<<endl; exit(1);}; //irregular
+		if (sum_De[i]==0) {cout<<"Warning!"<<l<<" is not regular! Aborted."<<endl; /*exit(1);*/ b = to_ZZ(0); return;}; //irregular
 		lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));
 	};
 	for (i=0;i<=mySimplex.d;i++)

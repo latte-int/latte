@@ -16,5 +16,5 @@ struct simplexZZ
 void delSpace(string &line);
 void convertToSimplex(simplexZZ &mySimplex, string line);
 void integrateList(ZZ &a, ZZ &b, string line, simplexZZ mySimplex);
-void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms , simplexZZ mySimplex);
+void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms, simplexZZ mySimplex);
 #endif

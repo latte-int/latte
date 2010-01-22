@@ -7,8 +7,6 @@
 
 using namespace std;
 
-NTL_CLIENT
-
 int main(int argc, char *argv[])
 {
 	if (argc < 3) { cout << "Usage: " << argv[0] << " fileIn fileOut [decompose]" << endl; return 1; }
@@ -23,16 +21,16 @@ int main(int argc, char *argv[])
 	if (!myStream.is_open()) { cout << "Error opening file " << argv[1] << ", please make sure it is spelled correctly." << endl; return 1; }
 	int polyCount = 0;
 	int dimension;
-	ZZ degree = to_ZZ(-1);
+	int degree = -1;
 	int irregularForms = 0;
 	float loadTime, decomposeTime, integrateTime = 0.0f;
-	Timer myTimer("Simplex Integration");
+	Timer myTimer("Integration timer");
 	while (!myStream.eof())
 	{
 		getline(myStream, line, '\n');
 		if (!line.empty())
 		{
-			if (polynomial)
+			if (polynomial) //reading polynomial
 			{
 				if (decomposing) //input is sum of monomials that we decompose into sum of linear forms
 				{
@@ -40,6 +38,12 @@ int main(int argc, char *argv[])
 					loadMonomials(monomials, line);
 					myTimer.stop();
 					loadTime += myTimer.get_seconds();
+
+					if (monomials.termCount == 0 || monomials.varCount == 0)
+					{
+						cout << "Error: loaded invalid monomial sum.";
+						return 1;
+					}
 
 					forms.termCount = 0;
 					dimension = forms.varCount = monomials.varCount;
@@ -54,13 +58,20 @@ int main(int argc, char *argv[])
 						decomposeTime += myTimer.get_seconds();
 					}
 					cout << endl;
+					
+					if (forms.termCount == 0)
+					{
+						cout << "Error: no terms in decomposition to sum of linear forms.";
+						return 1;	
+					}
+					
 					outStream << printLinForms(forms) << endl;
-					if (degree == to_ZZ(-1))
+					if (degree == -1) //degree is calculated only once
 					{
 						degree = 0;
 						for (int i = 0; i < monomials.varCount; i++)
 						{
-							degree += monomials.eHead->data[0][i];
+							degree += monomials.eHead->data[i];
 						}
 					}
 					destroyMonomials(monomials);
@@ -71,16 +82,23 @@ int main(int argc, char *argv[])
 					loadLinForms(forms, line);
 					myTimer.stop();
 					loadTime += myTimer.get_seconds();
+					if (forms.termCount == 0 || forms.varCount == 0)
+					{
+						cout << "Error: loaded invalid sum of linear forms.";
+						return 1;	
+					}
 				}
 				polynomial = false;
 				//cout << "Loaded into " << forms.termCount << " linear forms" << endl;
 			}
-			else
+			else //reading simplex
 			{
 				//integrate here
 				ZZ numerator, denominator;
+				simplexZZ mySimplex;
+				convertToSimplex(mySimplex, line);
 				myTimer.start();
-				integrateFlatVector(numerator, denominator, forms, line);
+				integrateFlatVector(numerator, denominator, forms, mySimplex);
 				myTimer.stop();
 				if (IsZero(denominator)) //irregular
 				{	

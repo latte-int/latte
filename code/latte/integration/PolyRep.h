@@ -11,20 +11,22 @@ NTL_CLIENT
 struct eBlock //used to store exponent vector
 {
 	eBlock* next;
-	vec_ZZ* data; //each vec_ZZ contains n elements for an n-variable polynomial
+	int* data; //represents 2D array of ints, storing an exponent vector for each monomial
+	//in reality, it's 1D array of length dimension*BLOCK_SIZE
 };
 
 struct lBlock //used to store linear forms (coefficient vector and degree)
 {
 	lBlock* next;
-	vec_ZZ* data; //each vec_ZZ contains n elements for an n-variable polynomial
-	ZZ* degree; //for linear forms only
+	vec_ZZ* data; //represents 2D array of ints, storing a coefficient vector for each linear form
+	//in reality, it's 1D array of length dimension*BLOCK_SIZE
+	int degree[BLOCK_SIZE]; //total degree of each linear form
 };
 
 struct cBlock
 {
 	cBlock* next;
-	ZZ* data;
+	ZZ* data; //this stores the monomial coefficient for each monomial
 };
 
 struct monomialSum

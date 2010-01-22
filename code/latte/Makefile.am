@@ -165,17 +165,23 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
+bin_PROGRAMS += decompose
+decompose_SOURCES =     integration/decompose.cpp
+decompose_SOURCES +=    integration/PolyRep.cpp
+
 bin_PROGRAMS += integrate
-integrate_SOURCES =	 integration/decompose.cpp
-integrate_SOURCES +=	 integration/PolyRep.cpp
+integrate_SOURCES =     integration/decint.cpp
+integrate_SOURCES +=    integration/PolyRep.cpp
+integrate_SOURCES +=    integration/newIntegration.cpp
 #integrate_SOURCES = integration/test.cpp
 
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 
 check_PROGRAMS += integrate_test
-integrate_test_SOURCES = integration/integrateTest.cpp
-integrate_test_SOURCES += integration/PolyRep.cpp
+integrate_test_SOURCES =    integration/integrateTest.cpp
+integrate_test_SOURCES +=   integration/PolyRep.cpp
+integrate_test_SOURCES +=   integration/newIntegration.cpp
 
 TESTS = integration/testIntegration.sh
 #TESTS += ilio_test

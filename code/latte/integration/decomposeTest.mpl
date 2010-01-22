@@ -391,11 +391,11 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
 end:
 
 
-local polyCount:=1:
+local polyCount:=100:
 local bigConstant:=10000:
 local numTerms:=10:
-local dimension:=6:
-local myDegree:=15:
+local dimension:=10:
+local myDegree:=5:
 local errors, myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults, curForms, curTerm, curSet:
 local myTime, temp, intTime, L:
 
@@ -455,9 +455,6 @@ close(formFile):
 #compare the forms
 errors:=0:
 for i from 1 to polyCount do
-#we can use the line below to make maple expand our linear forms and compare them to the original polynomial
-#  if myPolys[i] = simplify(parse(formList[i])) then print("All Clear") else print("Issue here.") end if;
-#  if {op(myForms[i])} = {op(parse(formList[i]))} then print("Equal") else print("Not Equal") end if;
   #print(parse(myLinForms[i]));
   curForms:=Array(parse(myLinForms[i])):
   #print(mapleLinForms[i]);
@@ -479,10 +476,12 @@ for i from 1 to polyCount do
       print(curTerm minus mapleLinForms[i], mapleLinForms[i] minus curTerm);
       errors:=errors + 1;
     else
-      if mapleResults[i] <> myResults[i][1] / myResults[i][2] then
-        print("Integral calculation mismatch.");
-        print(mapleResults[i], myResults[i][1] / myResults[i][2]);
-        errors:=errors + 1;
+      if myResults[i][2] <> 0 then
+        if mapleResults[i] <> myResults[i][1] / myResults[i][2] then
+          print("Integral calculation mismatch.");
+          print(mapleResults[i], myResults[i][1] / myResults[i][2]);
+          errors:=errors + 1;
+        end if;
       end if;
     end if;
   end if;  
