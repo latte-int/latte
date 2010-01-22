@@ -7,6 +7,7 @@ code/latte/integration/decomposeTest.mpl -text
 code/latte/integration/integrate.cpp -text
 code/latte/integration/integrateTest.cpp -text
 code/latte/integration/myIntegration.h -text
+code/latte/integration/newIntegration.cpp -text
 code/latte/integration/newIntegration.h -text
 code/latte/integration/testIntegration.sh -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
