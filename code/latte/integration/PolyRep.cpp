@@ -5,31 +5,28 @@
 //Loads a string by parsing it as a sum of monomials
 //monomial sum: c_{1}*(x_{1}^e_{1}...x_{varCount}^e_{varCount}) + ...
 //nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
-void loadMonomials(monomialSum &monomials, const string line)
+void loadMonomials(monomialSum &monomials, const string &line)
 {
-	int termIndex = 0;
-	int lastPos = 0;
+	monomials.termCount = 0;
+	MonomialLoadConsumer<ZZ> *myLoader = new MonomialLoadConsumer<ZZ>();	
+	myLoader->setMonomialSum(monomials);
+	parseMonomials(myLoader, line);
+}
+
+void parseMonomials(MonomialConsumer<ZZ>* consumer, const string &line)
+{
 	int varCount = 0;
-	int k;
-	int flag = 0; //0 means we expect coefficient, 1 means we expect exponent vector
-	
 	for (int i = 0; line[i] != ']'; i++)
-	{ varCount += (line[i] == ','); } 
-	//varCount is now the number of commas in the monomial, same as number of variables
+	{ varCount += (line[i] == ','); }
 	if (varCount < 1)
 	{ cout << "There are " << varCount << " variables, bailing." << endl; return; }
-	cout << varCount << " variables." << endl;
-
-	//at least one record requires at least one block
-	monomials.eHead = (eBlock*) malloc (sizeof(eBlock));
-	monomials.eHead->next = NULL;
-	monomials.cHead = (cBlock*) malloc (sizeof(cBlock));
-	monomials.cHead->next = NULL;
-
-	eBlock* expBlock = monomials.eHead;
-	cBlock* coefBlock = monomials.cHead;
-	expBlock->data = new int[varCount * BLOCK_SIZE];
-	coefBlock->data = new ZZ[BLOCK_SIZE];
+	consumer->setDimension(varCount);
+	
+	int termIndex, lastPos, expIndex, flag;
+	termIndex = lastPos = flag = 0; //0 means we expect coefficient, 1 means we expect exponent vector
+	
+	int *exponents = new int[varCount];
+	ZZ coefficient;
 
 	for (int i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
 	{
@@ -40,22 +37,21 @@ void loadMonomials(monomialSum &monomials, const string line)
 			case 0: //coefficient
 				lastPos = i + 1; 
 				for (; line[i] != ','; i++);
-				coefBlock->data[termIndex % BLOCK_SIZE] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+				coefficient = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
 				flag = 1;
 				break;
 			case 1: //exponent vector
-				k = varCount * (termIndex % BLOCK_SIZE); //0 for the 1st term, varCount for the 2nd, etc.
+				expIndex = 0;
 				for (i++; line[i] != ']'; i++)
 				{
 					if (line[i] != ' ')
 					{
 						lastPos = i;
 						for (; line[i] != ',' && line[i] != ']'; i++);
-						expBlock->data[k++] = atoi(line.substr(lastPos, i - lastPos).c_str());
-						
+						exponents[expIndex++] = atoi(line.substr(lastPos, i - lastPos).c_str());
 					}
 				}
-				termIndex++;
+				consumer->ConsumeMonomial(coefficient, exponents);
 				flag = 0;
 				break;
 			default: //error
@@ -65,9 +61,84 @@ void loadMonomials(monomialSum &monomials, const string line)
 		}
 	}
 
-	monomials.termCount = termIndex;
-	monomials.varCount = varCount;
-	//cout << "Loaded " << monomials.termCount << " monomials of dimension " << monomials.varCount << endl;
+	delete [] exponents;
+}
+
+// Attempts to find a monomial in monomialSum with same exponents as those passed in
+// if found, the monomial coefficient in monomialSum is multiplied by the one passed in
+// if not found, a new monomial term is added and monomialSum's termCount is incremented
+// if monomialSum is empty, this sets formSum's eHead and cHead variables
+template <class T>
+void insertMonomial(const T& coefficient, int* exponents, monomialSum& monomials)
+{
+	bool found;
+	int myIndex;
+	eBlock* myExps; cBlock<T>* myCoeffs;
+	
+	if (monomials.termCount > 0)
+	{
+		myExps = monomials.eHead; myCoeffs = monomials.cHead; found = false;
+		
+		//check for compatible monomial here 
+		for (int i = 0; !found && i < monomials.termCount; i++)
+		{
+			if (i > 0 && i % BLOCK_SIZE == 0)
+			{
+				myExps = myExps->next, myCoeffs = myCoeffs->next;
+			}
+			
+			found = true;
+			for (int j = 0; j < monomials.varCount; j++)
+			{
+				if (myExps->data[(i % BLOCK_SIZE)*monomials.varCount + j] != exponents[j])
+				{ found = false; break; }
+			}
+			if (found)
+			{
+				myIndex = i; break;
+			}
+			
+			if (i == monomials.termCount) { break; }
+		}
+		
+		if (!found) //nothing found
+		{
+			if (monomials.termCount % BLOCK_SIZE == 0) //need to allocate a new block for coeffs and exponents
+			{
+				myCoeffs->next = (cBlock<T>*) malloc (sizeof(cBlock<T>));
+				myExps->next = (eBlock*) malloc (sizeof(eBlock));
+				myExps = myExps->next; myCoeffs = myCoeffs->next;
+				myExps->next = NULL; myCoeffs->next = NULL;
+				myExps->data = new int[monomials.varCount * BLOCK_SIZE];
+				myCoeffs->data = new T[BLOCK_SIZE];
+			}
+			for (int j = 0; j < monomials.varCount; j++)
+			{
+				myExps->data[(monomials.termCount % BLOCK_SIZE)*monomials.varCount + j] = exponents[j];
+			}
+			myCoeffs->data[monomials.termCount % BLOCK_SIZE] = coefficient;
+			monomials.termCount++;
+		}
+		else //found this linear form
+		{
+			myCoeffs->data[myIndex % BLOCK_SIZE] += coefficient;
+		}
+	}
+	else
+	{
+		monomials.cHead = (cBlock<T>*) malloc (sizeof(cBlock<T>));
+		monomials.eHead = (eBlock*) malloc (sizeof(eBlock));
+		myExps = monomials.eHead; myCoeffs = monomials.cHead;
+		myExps->next = NULL; myCoeffs->next = NULL;
+		myExps->data = new int[monomials.varCount * BLOCK_SIZE];
+		myCoeffs->data = new T[BLOCK_SIZE];
+		for (int j = 0; j < monomials.varCount; j++)
+		{
+			myExps->data[(monomials.termCount % BLOCK_SIZE)*monomials.varCount + j] = exponents[j];
+		}
+		myCoeffs->data[monomials.termCount % BLOCK_SIZE] = coefficient;
+		monomials.termCount++;
+	}
 }
 
 //Prints a nested list representation of our sum of monomials
@@ -77,7 +148,7 @@ string printMonomials(const monomialSum &myPoly)
 {
 	stringstream output (stringstream::in | stringstream::out);
 	output << "[";
-	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
+	eBlock* expTmp = myPoly.eHead; cBlock<ZZ>* coeffTmp = myPoly.cHead;
 	int termCount = 0;
 	do
 	{
@@ -105,8 +176,8 @@ string printMonomials(const monomialSum &myPoly)
 //Deallocates space and nullifies internal pointers and counters
 void destroyMonomials(monomialSum &myPoly)
 {
-	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
-	eBlock* oldExp = NULL; cBlock* oldCoeff = NULL;
+	eBlock* expTmp = myPoly.eHead; cBlock<ZZ>* coeffTmp = myPoly.cHead;
+	eBlock* oldExp = NULL; cBlock<ZZ>* oldCoeff = NULL;
 	do
 	{
 		oldExp = expTmp; oldCoeff = coeffTmp;
@@ -121,10 +192,18 @@ void destroyMonomials(monomialSum &myPoly)
 	myPoly.termCount = myPoly.varCount = 0;
 }
 
+
+void loadLinForms(linFormSum &forms, const string line)
+{
+	forms.termCount = 0;
+	FormLoadConsumer<ZZ> *myLoader = new FormLoadConsumer<ZZ>();	
+	myLoader->setFormSum(forms);
+	parseLinForms(myLoader, line);
+}
 //Loads a string by parsing it as a sum of linear forms
 //linear form: (c_{1} / d_{1}!)[(p_{1}*x_{1} + ... p_{varCount}*x_{varCount})^d_{1}] + ...
 //nested list: [[c_{1}, [d_{1}, [p_{1}, p_{2}, ..., p_{varCount}]], .. ]
-void loadLinForms(linFormSum &forms, const string line)
+void parseLinForms(FormSumConsumer<ZZ>* consumer, const string& line)
 {
 	int termIndex = 0;
 	int lastPos = 0;
@@ -138,17 +217,12 @@ void loadLinForms(linFormSum &forms, const string line)
 	varCount--;
 	if (varCount < 1)
 	{ cout << "There are " << varCount << " variables, bailing." << endl; return; }
-
-	//at least one record requires at least one block
-	forms.lHead = (lBlock*) malloc (sizeof(lBlock));
-	forms.lHead->next = NULL;
-	forms.cHead = (cBlock*) malloc (sizeof(cBlock));
-	forms.cHead->next = NULL;
-
-	lBlock* formBlock = forms.lHead;
-	cBlock* coefBlock = forms.cHead;
-	formBlock->data = new vec_ZZ[BLOCK_SIZE];
-	coefBlock->data = new ZZ[BLOCK_SIZE];
+	consumer->setDimension(varCount);
+	
+	vec_ZZ coefs;
+	coefs.SetLength(varCount);
+	int degree;
+	ZZ coefficient;
 
 	for (int i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
 	{
@@ -159,17 +233,16 @@ void loadLinForms(linFormSum &forms, const string line)
 			case 0: //coefficient
 				lastPos = i + 1; 
 				for (; line[i] != ','; i++);
-				coefBlock->data[termIndex % BLOCK_SIZE] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+				coefficient = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
 				flag = 1;
 				break;
 			case 1: //degree
 				lastPos = i + 1;
 				for (; line[i] != ','; i++);
-				formBlock->degree[termIndex % BLOCK_SIZE] = atoi(line.substr(lastPos, i - lastPos).c_str());
+				degree = atoi(line.substr(lastPos, i - lastPos).c_str());
 				flag = 2;
 				break;
 			case 2: //coefficient vector
-				formBlock->data[termIndex % BLOCK_SIZE].SetLength(varCount);
 				k = 0;
 				for (i++; line[i] != ']'; i++)
 				{
@@ -177,10 +250,10 @@ void loadLinForms(linFormSum &forms, const string line)
 					{
 						lastPos = i;
 						for (; line[i] != ',' && line[i] != ']'; i++);
-						formBlock->data[termIndex % BLOCK_SIZE][k++] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
+						coefs[k++] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
 					}
 				}
-				termIndex++;
+				consumer->ConsumeLinForm(coefficient, degree, coefs);
 				flag = 0;
 				break;
 			default: //error
@@ -189,9 +262,85 @@ void loadLinForms(linFormSum &forms, const string line)
 		}
 		}
 	}
+}
 
-	forms.termCount = termIndex;
-	forms.varCount = varCount;
+// Attempts to find a linear form in formSum with same degree and coefficients as those passed in
+// if found, the linear form coefficient in formSum is incremented by coef
+// if not found, a new linear form term is added and formSum's termCount is incremented
+// if formSum is empty, this sets formSum's lHead and cHead variables
+template <class T>
+void insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, linFormSum& formSum)
+{
+	bool found;
+	int myIndex;
+	lBlock* linForm; cBlock<T>* linCoeff;
+	
+	if (formSum.termCount > 0)
+	{
+		//cout << lForm.termCount << " linear forms present" << endl;
+		linForm = formSum.lHead; linCoeff = formSum.cHead; found = false;
+		
+		//check for compatible form here 
+		for (int i = 0; !found && i < formSum.termCount; i++)
+		{
+			if (i > 0 && i % BLOCK_SIZE == 0)
+			{
+				linForm = linForm->next, linCoeff = linCoeff->next;
+			}
+			
+			if (linForm->degree[i % BLOCK_SIZE] == degree)
+			{
+				found = true;
+				for (int j = 0; j < formSum.varCount; j++)
+				{
+					if (linForm->data[i % BLOCK_SIZE][j] != coeffs[j])
+					{ found = false; break; }
+				}
+				if (found)
+				{
+					myIndex = i; break;
+				}
+			}
+			
+			if (i == formSum.termCount) { break; }
+		}
+		
+		if (!found) //nothing found
+		{
+			if (formSum.termCount % BLOCK_SIZE == 0) //need to allocate a new block for coeffs and exponents
+			{
+				linCoeff->next = (cBlock<T>*) malloc (sizeof(cBlock<T>));
+				linForm->next = (lBlock*) malloc (sizeof(lBlock));
+				linForm = linForm->next; linCoeff = linCoeff->next;
+				linForm->next = NULL; linCoeff->next = NULL;
+				linForm->data = new vec_ZZ[BLOCK_SIZE];
+				linCoeff->data = new T[BLOCK_SIZE];
+			}
+			linForm->data[formSum.termCount % BLOCK_SIZE].SetLength(formSum.varCount);
+			VectorCopy(linForm->data[formSum.termCount % BLOCK_SIZE], coeffs, formSum.varCount);
+			linForm->degree[formSum.termCount % BLOCK_SIZE] = degree;
+			linCoeff->data[formSum.termCount % BLOCK_SIZE] = coef;
+			formSum.termCount++;
+		}
+		else //found this linear form
+		{
+			linCoeff->data[myIndex % BLOCK_SIZE] += coef;
+		}
+	}
+	else
+	{
+		formSum.cHead = (cBlock<T>*) malloc (sizeof(cBlock<T>));
+		formSum.lHead = (lBlock*) malloc (sizeof(lBlock));
+		linForm = formSum.lHead; linCoeff = formSum.cHead;
+		linForm->next = NULL; linCoeff->next = NULL;
+		linForm->data = new vec_ZZ[BLOCK_SIZE];
+		linCoeff->data = new T[BLOCK_SIZE];
+		linForm->data[formSum.termCount % BLOCK_SIZE].SetLength(formSum.varCount);
+		VectorCopy(linForm->data[formSum.termCount % BLOCK_SIZE], coeffs, formSum.varCount);
+		linForm->degree[formSum.termCount % BLOCK_SIZE] = degree;
+		linCoeff->data[formSum.termCount % BLOCK_SIZE] = coef;
+		formSum.termCount++;
+	}
 }
 
 //Prints a nested list representation of our sum of linear forms
@@ -201,7 +350,7 @@ string printLinForms(const linFormSum &myForm)
 {
 	stringstream output (stringstream::in | stringstream::out);
 	output << "[";
-	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
+	lBlock* formTmp = myForm.lHead; cBlock<ZZ>* coeffTmp = myForm.cHead;
 	for (int i = 0; i < myForm.termCount; i++)
 	{
 		if (i > 0 && i % BLOCK_SIZE == 0)
@@ -228,8 +377,8 @@ string printLinForms(const linFormSum &myForm)
 //Deallocates space and nullifies internal pointers and counters
 void destroyLinForms(linFormSum &myPoly)
 {
-	lBlock* expTmp = myPoly.lHead; cBlock* coeffTmp = myPoly.cHead;
-	lBlock* oldExp = NULL; cBlock* oldCoeff = NULL;
+	lBlock* expTmp = myPoly.lHead; cBlock<ZZ>* coeffTmp = myPoly.cHead;
+	lBlock* oldExp = NULL; cBlock<ZZ>* oldCoeff = NULL;
 	int termCount = 0;
 	do
 	{
@@ -252,75 +401,19 @@ void destroyLinForms(linFormSum &myPoly)
 //	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
 void decompose(monomialSum &myPoly, linFormSum &lForm, int mIndex)
 {
-	eBlock* expTmp = myPoly.eHead; cBlock* coeffTmp = myPoly.cHead;
+	eBlock* expTmp = myPoly.eHead; cBlock<ZZ>* coeffTmp = myPoly.cHead;
 	for (int i = 0; i < (mIndex / BLOCK_SIZE); i++) { expTmp = expTmp->next; coeffTmp = coeffTmp->next; }
+	
 	bool constantTerm = true;
 	for (int i = (mIndex * myPoly.varCount); i < ((mIndex + 1) * myPoly.varCount); i++) { if (expTmp->data[i] != 0) { constantTerm = false; break; }}
+	vec_ZZ myExps; myExps.SetLength(lForm.varCount);
 	if (constantTerm) //exponents are all 0, this is a constant term - linear form is already known
 	{
-		//search for a constant term linear form
-		lBlock* linForm; cBlock* linCoeff;
-		ZZ temp = coeffTmp->data[mIndex % BLOCK_SIZE];
-		bool found;
-		int myIndex;
-		if (lForm.termCount > 0)
-		{
-			linForm = lForm.lHead; linCoeff = lForm.cHead; found = false;
-			
-			//check for compatible form here
-			for (int i = 0; !found && i < lForm.termCount; i++)
-			{
-				if (i > 0 && i % BLOCK_SIZE == 0)
-				{
-					linForm = linForm->next, linCoeff = linCoeff->next;
-				}
-				
-				if (linForm->degree[i % BLOCK_SIZE] == 0)
-				{
-					if (IsZero(linForm->data[i % BLOCK_SIZE]))
-					{
-						myIndex = i; found = true; break;
-					}
-				}
-				
-				if (i == lForm.termCount) { break; }
-			}
-
-			if (!found) //nothing found
-			{
-				if (lForm.termCount % BLOCK_SIZE == 0) //need to allocate a new block for coeffs and exponents
-				{
-					linCoeff->next = (cBlock*) malloc (sizeof(cBlock));
-					linForm->next = (lBlock*) malloc (sizeof(lBlock));
-					linForm = linForm->next; linCoeff = linCoeff->next;
-					linForm->next = NULL; linCoeff->next = NULL;
-					linForm->data = new vec_ZZ[BLOCK_SIZE];
-					linCoeff->data = new ZZ[BLOCK_SIZE];
-				}
-				linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount); //should be initialized to default ZZ, which is 0
-				linForm->degree[lForm.termCount % BLOCK_SIZE] = 0;
-				linCoeff->data[lForm.termCount % BLOCK_SIZE] = temp;
-				lForm.termCount++;
-			}
-			else //found this linear form
-			{
-				linCoeff->data[myIndex % BLOCK_SIZE] += temp;
-			}
-		}
-		else //no constant linear form, creating one
-		{
-			lForm.cHead = (cBlock*) malloc (sizeof(cBlock));
-			lForm.lHead = (lBlock*) malloc (sizeof(lBlock));
-			linForm = lForm.lHead; linCoeff = lForm.cHead;
-			linForm->next = NULL; linCoeff->next = NULL;
-			linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount); //should be initialized to default ZZ, which is 0
-			linCoeff->data = new ZZ[BLOCK_SIZE];
-			linForm->degree[lForm.termCount % BLOCK_SIZE] = 0;
-			linCoeff->data[lForm.termCount % BLOCK_SIZE] = temp;
-			lForm.termCount++;
-		}
+		for (int j = 0; j < lForm.varCount; j++) { myExps[j] = 0; }
+		insertLinForm<ZZ>(coeffTmp->data[mIndex % BLOCK_SIZE], 0, myExps, lForm);
 		return;
 	}
+	
 	ZZ formsCount = to_ZZ(expTmp->data[(mIndex % BLOCK_SIZE) * myPoly.varCount] + 1);
 	int totalDegree = expTmp->data[(mIndex % BLOCK_SIZE) * myPoly.varCount];
 	for (int i = 1; i < myPoly.varCount; i++)
@@ -384,113 +477,52 @@ void decompose(monomialSum &myPoly, linFormSum &lForm, int mIndex)
 			temp *= power_ZZ(g, totalDegree);
 		}
 		//cout << "coefficient is " << temp << endl;
-		// is there a vector in lForm's exponent block equal to p?
-		// 	yes: add our coefficient to the existing one, we're done
-		//	no : allocate space for a new vec_ZZ, insert ours with our coefficient, done
-		lBlock* linForm; cBlock* linCoeff;
-		if (lForm.termCount > 0)
-		{
-			//cout << lForm.termCount << " linear forms present" << endl;
-			linForm = lForm.lHead; linCoeff = lForm.cHead; found = false;
-			
-			//check for compatible form here
-			for (int i = 0; !found && i < lForm.termCount; i++)
-			{
-				if (i > 0 && i % BLOCK_SIZE == 0)
-				{
-					linForm = linForm->next, linCoeff = linCoeff->next;
-				}
-				
-				if (linForm->degree[i % BLOCK_SIZE] == totalDegree)
-				{
-					found = true;
-					for (int j = 0; j < myPoly.varCount; j++)
-					{
-						if (linForm->data[i % BLOCK_SIZE][j] != p[j])
-						{ found = false; break; }
-					}
-					if (found)
-					{
-						myIndex = i; break;
-					}
-				}
-				
-				if (i == lForm.termCount) { break; }
-			}
-
-			if (!found) //nothing found
-			{
-				if (lForm.termCount % BLOCK_SIZE == 0) //need to allocate a new block for coeffs and exponents
-				{
-					linCoeff->next = (cBlock*) malloc (sizeof(cBlock));
-					linForm->next = (lBlock*) malloc (sizeof(lBlock));
-					linForm = linForm->next; linCoeff = linCoeff->next;
-					linForm->next = NULL; linCoeff->next = NULL;
-					linForm->data = new vec_ZZ[BLOCK_SIZE];
-					linCoeff->data = new ZZ[BLOCK_SIZE];
-				}
-				linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount);
-				for (int j = 0; j < myPoly.varCount; j++)
-				{
-					linForm->data[lForm.termCount % BLOCK_SIZE][j] = p[j];
-				}
-				linForm->degree[lForm.termCount % BLOCK_SIZE] = totalDegree;
-				linCoeff->data[lForm.termCount % BLOCK_SIZE] = temp;
-				lForm.termCount++;
-			}
-			else //found this linear form
-			{
-				linCoeff->data[myIndex % BLOCK_SIZE] += temp;
-			}
-		}
-		else
-		{
-			lForm.cHead = (cBlock*) malloc (sizeof(cBlock));
-			lForm.lHead = (lBlock*) malloc (sizeof(lBlock));
-			linForm = lForm.lHead; linCoeff = lForm.cHead;
-			linForm->next = NULL; linCoeff->next = NULL;
-			linForm->data = new vec_ZZ[BLOCK_SIZE];
-			linCoeff->data = new ZZ[BLOCK_SIZE];
-			linForm->data[lForm.termCount % BLOCK_SIZE].SetLength(myPoly.varCount);
-			for (int j = 0; j < myPoly.varCount; j++)
-			{
-				linForm->data[lForm.termCount % BLOCK_SIZE][j] = p[j];
-			}
-			linForm->degree[lForm.termCount % BLOCK_SIZE] = totalDegree;
-			linCoeff->data[lForm.termCount % BLOCK_SIZE] = temp;
-			lForm.termCount++;
-		}
+		for (int i = 0; i < myPoly.varCount; i++) { myExps[i] = p[i]; }
+		insertLinForm<ZZ>(temp, totalDegree, myExps, lForm);
 	}
 	delete [] p;
 	delete [] counter;
-	delete [] binomCoeffs
+	delete [] binomCoeffs;
 }
 
-/*
-string printMapleExpr(const linFormSum &myForm)
+// Multipies two monomial sums, storing the result in the third one
+// Any values stored in result will be overwritten
+// result is every term in the product of two monomial sums whose exponents are greater than min and lower than max.
+// min, max point to int arrays of length result.varCount
+template <class T>
+void multiply(const monomialSum& first, const monomialSum& second, monomialSum& result, int* min, int* max)
 {
-	stringstream output (stringstream::in | stringstream::out);
-	lBlock* formTmp = myForm.lHead; cBlock* coeffTmp = myForm.cHead;
-	cout << "there are " << myForm.termCount << " terms." << endl;
-	for (int i = 0; i < myForm.termCount; i++)
+	if (first.termCount == 0 || second.termCount == 0) { cout << "Only one monomial sum given, aborting."; return; }
+	
+	eBlock* firstExp = first.eHead; cBlock<T>* firstCoef = first.cHead;
+	eBlock* secondExp = second.eHead; cBlock<T>* secondCoef = second.cHead;
+	
+	int* exponents = new int[result.varCount];
+	bool valid;
+	for (int i = 0; i < first.termCount; i++)
 	{
-		if (i > 0 && i % BLOCK_SIZE == 0)
+		if (i > 0 && i % BLOCK_SIZE == 0) //this block is done, get next one
 		{
-			formTmp = formTmp->next;
-			coeffTmp = coeffTmp->next;
+			firstExp = firstExp->next; firstCoef = firstCoef->next;
+		}
+		for (int j = 0; j < second.termCount; j++)
+		{
+			if (j > 0 && j % BLOCK_SIZE == 0) //this block is done, get next one
+			{
+				secondExp = secondExp->next; secondCoef = secondCoef->next;
+			}
+			valid = true;
+			for (int k = 0; k < result.varCount; k++)
+			{
+				exponents[k] = firstExp->data[(i % BLOCK_SIZE)*first.varCount + k] + secondExp->data[(j % BLOCK_SIZE)*second.varCount + k];
+				if (exponents[k] < min[k] || exponents[k] > max[k]) {valid = false; break; }
+			}
+			if (valid) //all exponents are within range
+			{
+				insertMonomial<T>(firstCoef->data[i % BLOCK_SIZE] * secondCoef->data[j % BLOCK_SIZE], exponents, result);
+			}
 		}
 		
-		output << "(" << coeffTmp->data[i % BLOCK_SIZE] << "/factorial(" << formTmp->degree[i % BLOCK_SIZE] << "))*("; // divide coefficient by |M|!
-		for (int j = 0; j < myForm.varCount; j++)
-		{
-			output << formTmp->data[i % BLOCK_SIZE][j] << "*x[" << j + 1 << "]";
-			if (j + 1 < myForm.varCount)
-			{ output << " + "; }
-		}
-		output << ")^" << formTmp->degree[i % BLOCK_SIZE];
-		if (i + 1 < myForm.termCount)
-		{ output << " + "; }
 	}
-	return output.str();
+	delete [] exponents;
 }
-*/

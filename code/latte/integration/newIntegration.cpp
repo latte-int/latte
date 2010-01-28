@@ -117,7 +117,7 @@ void integrateList(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
 		for (i=1;i<=mySimplex.d;i++)
 		{
 			de=de*(m+i);
-		};
+		}; //buggy? compare to lines 166-170 in integrateFlatVector
 		t=temp.find("[",t)+1;
 		temp=temp.substr(t,temp.length()-t+1);
 		c=0;
@@ -147,7 +147,7 @@ void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<endl;exit(1);};
 	l.SetLength(mySimplex.d);
 	lBlock* temForm=forms.lHead;
-	cBlock* temCoef=forms.cHead;
+	cBlock<ZZ>* temCoef=forms.cHead;
 	k=-1;
 	numerator=0;
 	denominator=0;
