@@ -62,16 +62,16 @@ public:
   virtual int getDimension() = 0;
 };
 
-//string parsing
 void loadMonomials(monomialSum&, const string&);
+//string parsing
 void parseMonomials(MonomialConsumer<ZZ>*, const string&);
 //data structure operations
 template <class T> void insertMonomial(const T&, int*, monomialSum&);
 string printMonomials(const monomialSum&);
 void destroyMonomials(monomialSum&);
 
-//string parsing
 void loadLinForms(linFormSum&, const string);
+//string parsing
 void parseLinForms(FormSumConsumer<ZZ>*, const string&);
 //data structure operations
 template <class T> void insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, linFormSum&);

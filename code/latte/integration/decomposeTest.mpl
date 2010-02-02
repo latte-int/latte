@@ -391,7 +391,7 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
 end:
 
 
-local polyCount:=10:
+local polyCount:=50:
 local bigConstant:=10000:
 local numTerms:=5:
 local dimension:=5:

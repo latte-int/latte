@@ -9,7 +9,6 @@ using namespace std;
 
 NTL_CLIENT
 
-
 void delSpace(string &line)
 {
 	for (int i=0;i<line.length();i++)

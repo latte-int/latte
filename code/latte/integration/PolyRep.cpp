@@ -8,7 +8,7 @@
 void loadMonomials(monomialSum &monomials, const string &line)
 {
 	monomials.termCount = 0;
-	MonomialLoadConsumer<ZZ> *myLoader = new MonomialLoadConsumer<ZZ>();	
+	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();	
 	myLoader->setMonomialSum(monomials);
 	parseMonomials(myLoader, line);
 }
@@ -196,7 +196,7 @@ void destroyMonomials(monomialSum &myPoly)
 void loadLinForms(linFormSum &forms, const string line)
 {
 	forms.termCount = 0;
-	FormLoadConsumer<ZZ> *myLoader = new FormLoadConsumer<ZZ>();	
+	FormLoadConsumer<ZZ>* myLoader = new FormLoadConsumer<ZZ>();	
 	myLoader->setFormSum(forms);
 	parseLinForms(myLoader, line);
 }
