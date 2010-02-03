@@ -198,10 +198,12 @@ code/test-suite/numOfLatticePoints
 code/test-suite/numOfUnimodularCones
 code/test-suite/set-max-cpu-time
 code/test-suite/totalTime
+/config.guess
 /config.h.in
 /config.libpath
 /config.log
 /config.status
+/config.sub
 /configure
 /depcomp
 distro/*.tar.gz
