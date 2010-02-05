@@ -93,9 +93,9 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,ZZ m, ZZ coe, ZZ de)
 	b=b/g;};
 }
 
-void integrateList(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
+void integrateListString(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
 {
-	ZZ de,counter,m,tem,coe;
+	/*ZZ de,counter,m,tem,coe;
 	int c,t,tt,i,j,index,k;
 	vec_ZZ l;
 	string temp,subtemp;
@@ -136,9 +136,16 @@ void integrateList(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
 		index=line.find("]]]",index)+5;
 	};
 	if (b<0) {b=-b;a=-a;};
+	*/
+	linFormSum forms;
+	forms.termCount = 0;
+	FormLoadConsumer<ZZ>* myLoader = new FormLoadConsumer<ZZ>();	
+	myLoader->setFormSum(monomials);
+	parseLinForms(myLoader, line);
+	integrateList(a,b,forms,mySimplex);
 };
 
-void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms , simplexZZ mySimplex)
+void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
 {
   ZZ v,de,counter,m,tem,coe;
 	int i,j,index,k;
@@ -168,3 +175,33 @@ void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 	}
 	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};
 };	
+
+void integrateFlatVectorString(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
+{
+	monomialSum monomials;
+	monomials.termCount = 0;
+	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();	
+	myLoader->setMonomialSum(monomials);
+	parseMonomials(myLoader, line);
+	integrateFlatVector(a,b,monomials, mySimplex);
+};
+
+void integrateFlatVector(ZZ &a, ZZ &b, const monomialSum &monomials, const simplexZZ &mySimplex)
+{
+	linFormSum lForm;
+	lForm.termCount = 0;
+	lForm.varCount = myPoly.varCount;		
+	cout << "Decomposing";
+	for (int i = 0; i < myPoly.termCount; i++)
+	{
+		cout << ".";
+		decompose(myPoly, lForm, i);
+	};
+	cout << endl;
+ 	cout << "The polynomial is:" <<line<<endl;
+	cout << "Integrating by decomposition" << endl;
+	integrateList(a,b,lForm, mySimplex);
+	cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
+	destroyLinForms(lForm);
+	destroyMonomials(myPoly);
+};
