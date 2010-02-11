@@ -183,8 +183,13 @@ integrate_test_SOURCES =    integration/integrateTest.cpp
 integrate_test_SOURCES +=   integration/PolyRep.cpp
 integrate_test_SOURCES +=   integration/newIntegration.cpp
 
-TESTS = integration/testIntegration.sh
-#TESTS += ilio_test
+check_PROGRAMS += multiply_test
+multiply_test_SOURCES =    integration/multiplyTest.cpp
+multiply_test_SOURCES +=   integration/PolyRep.cpp
+
+TESTS =  integration/testIntegration.sh
+TESTS += integration/testMultiply.sh
+TESTS += ilio_test
 
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add

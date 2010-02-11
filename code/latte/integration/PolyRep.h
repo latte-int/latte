@@ -79,8 +79,8 @@ string printLinForms(const linFormSum&);
 void destroyLinForms(linFormSum&);
 
 void decompose(monomialSum&, linFormSum&, int);
-template <class T> void multiply(monomialSum&, monomialSum&, int* low, int* high);
 
+//consumers for loading data structures
 template <class T> class MonomialLoadConsumer : public MonomialConsumer<T> {
 public:
   MonomialLoadConsumer() {}
@@ -105,4 +105,5 @@ public:
 private:
   linFormSum* formSum;
 };
+
 #endif
