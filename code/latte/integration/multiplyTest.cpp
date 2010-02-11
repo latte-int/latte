@@ -55,8 +55,8 @@ int main(int argc, char *argv[])
 				high = new int[secondPoly.varCount];
 				for (int i = 0; i < secondPoly.varCount; i++)
 				{
-					low[i] = 0;
-					high[i] = 100;
+					low[i] = INT_MIN;
+					high[i] = INT_MAX;
 				}
 				product.varCount = secondPoly.varCount;
 				multiply<ZZ>(firstPoly, secondPoly, product, low, high);
