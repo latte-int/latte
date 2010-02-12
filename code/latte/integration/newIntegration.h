@@ -3,6 +3,7 @@
 #include <NTL/vec_vec_ZZ.h>
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
+#include "PolyRep.h"
 
 NTL_CLIENT
 
@@ -97,6 +98,8 @@ void FormIntegrateConsumer<T>::getResults(ZZ& num, ZZ& den)
 
 void delSpace(string &line);
 void convertToSimplex(simplexZZ &mySimplex, string line);
-void integrateList(ZZ &a, ZZ &b, string line, simplexZZ mySimplex);
-void integrateFlatVector(ZZ& numerator, ZZ& denominator, const linFormSum &forms, simplexZZ mySimplex);
+void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
+void integrateList(ZZ &a, ZZ &b, const linFormSum &forms, const simplexZZ &mySimplex);
+void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
+void integrateFlatVector(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
 #endif

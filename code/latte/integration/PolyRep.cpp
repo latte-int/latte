@@ -5,6 +5,26 @@
 //Loads a string by parsing it as a sum of monomials
 //monomial sum: c_{1}*(x_{1}^e_{1}...x_{varCount}^e_{varCount}) + ...
 //nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
+ZZ Power_ZZ(ZZ a, int b)					//power function
+{
+	if (b==0) return to_ZZ(1);
+	int bi[20];
+	int digit=0;
+	while (b>0) 
+	{
+		digit++;
+		bi[digit-1]=b % 2;
+		b=b/2;
+	};
+	ZZ t=a;
+	for (int i=digit-2;i>=0;i--)
+	{
+		t*=t;
+		if (bi[i]==1) t*=a;
+	};
+	return t;
+}
+
 void loadMonomials(monomialSum &monomials, const string &line)
 {
 	monomials.termCount = 0;
@@ -253,6 +273,7 @@ void parseLinForms(FormSumConsumer<ZZ>* consumer, const string& line)
 						coefs[k++] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
 					}
 				}
+				for (int j=1;j<=degree;j++) coefficient=coefficient*j;
 				consumer->ConsumeLinForm(coefficient, degree, coefs);
 				flag = 0;
 				break;

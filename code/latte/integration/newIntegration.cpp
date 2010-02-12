@@ -1,5 +1,6 @@
 #include "PolyRep.h"
 #include "newIntegration.h"
+#include "residue.h"
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
 #include <NTL/mat_ZZ.h>
@@ -56,7 +57,7 @@ void convertToSimplex(simplexZZ &mySimplex, string line)
 	mySimplex.v=determinant(matt);if (mySimplex.v<0) mySimplex.v=-mySimplex.v;
 };
 
-void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,ZZ m, ZZ coe, ZZ de)
+void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de)
 {
 	ZZ sum,lcm,total,g,tem;
 	int i,j;
@@ -75,8 +76,19 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,ZZ m, ZZ coe, ZZ de)
 	{
 		sum_Nu[i]=1;for (j=0;j<m+mySimplex.d;j++) sum_Nu[i]=sum_Nu[i]*inner_Pro[i];
 		sum_De[i]=1;for (j=0;j<=mySimplex.d;j++) if (i!=j) sum_De[i]=sum_De[i]*(inner_Pro[i]-inner_Pro[j]);
-		if (sum_De[i]==0) {cout<<"Warning!"<<l<<" is not regular! Aborted."<<endl; /*exit(1);*/ b = to_ZZ(0); return;}; //irregular
-		lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));
+		if ((sum_Nu[i]<0)&&(sum_De[i]<0)) {sum_Nu[i]=-sum_Nu[i];sum_De[i]=-sum_De[i];};
+		if (sum_De[i]==0)
+		{
+			cout<<l<<" is not regular! Computing residue:";
+			vec_ZZ ProDiff;
+			ProDiff.SetLength(mySimplex.d+1);
+			for (j=0;j<=mySimplex.d;j++) ProDiff[j]=inner_Pro[i]-inner_Pro[j];
+			//cout<<"The inner product difference is"<<ProDiff<<" inner product at vertex is "<<inner_Pro[i]<<". Now compute residue:"<<endl;
+			computeResidue(mySimplex.d,m,ProDiff,inner_Pro[i],sum_Nu[i],sum_De[i]);
+		} //irregular
+		else cout<<l<<" is regular:";
+		cout<<sum_Nu[i]<<"/"<<sum_De[i]<<endl;
+		if (sum_De[i]!=0) {lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));};
 	};
 	for (i=0;i<=mySimplex.d;i++)
 	{
@@ -93,7 +105,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,ZZ m, ZZ coe, ZZ de)
 	b=b/g;};
 }
 
-void integrateListString(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
+void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 {
 	/*ZZ de,counter,m,tem,coe;
 	int c,t,tt,i,j,index,k;
@@ -140,15 +152,17 @@ void integrateListString(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
 	linFormSum forms;
 	forms.termCount = 0;
 	FormLoadConsumer<ZZ>* myLoader = new FormLoadConsumer<ZZ>();	
-	myLoader->setFormSum(monomials);
+	myLoader->setFormSum(forms);
 	parseLinForms(myLoader, line);
 	integrateList(a,b,forms,mySimplex);
+	cout<<"destroying...";
+	destroyLinForms(forms);
 };
 
 void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
 {
-  ZZ v,de,counter,m,tem,coe;
-	int i,j,index,k;
+  ZZ v,de,counter,tem,coe;
+	int i,j,index,k,m;
 	vec_ZZ l;
 	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<endl;exit(1);};
 	l.SetLength(mySimplex.d);
@@ -176,32 +190,31 @@ void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , con
 	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};
 };	
 
-void integrateFlatVectorString(ZZ &a, ZZ &b, string line, simplexZZ mySimplex)
+void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 {
 	monomialSum monomials;
 	monomials.termCount = 0;
 	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();	
 	myLoader->setMonomialSum(monomials);
 	parseMonomials(myLoader, line);
+	cout<<"polynomial is"<<line<<endl;
 	integrateFlatVector(a,b,monomials, mySimplex);
+	cout<<"destroying...";
+	destroyMonomials(monomials);
 };
 
-void integrateFlatVector(ZZ &a, ZZ &b, const monomialSum &monomials, const simplexZZ &mySimplex)
+void integrateFlatVector(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ &mySimplex)
 {
 	linFormSum lForm;
 	lForm.termCount = 0;
-	lForm.varCount = myPoly.varCount;		
+	lForm.varCount = monomials.varCount;		
 	cout << "Decomposing";
-	for (int i = 0; i < myPoly.termCount; i++)
+	for (int i = 0; i < monomials.termCount; i++)
 	{
 		cout << ".";
-		decompose(myPoly, lForm, i);
+		decompose(monomials, lForm, i);
 	};
 	cout << endl;
- 	cout << "The polynomial is:" <<line<<endl;
 	cout << "Integrating by decomposition" << endl;
 	integrateList(a,b,lForm, mySimplex);
-	cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
-	destroyLinForms(lForm);
-	destroyMonomials(myPoly);
 };

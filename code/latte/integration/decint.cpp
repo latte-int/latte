@@ -2,6 +2,7 @@
 
 #include "PolyRep.h"
 #include "newIntegration.h"
+#include "residue.h"
 
 #include <iostream>
 #include <fstream>
@@ -13,8 +14,6 @@ int main(int argc, char *argv[])
 {
 	if (argc < 3) { cout << "Usage: ./integrate fileIn polynomial (or linear)" << endl; return 1; };
 	string line,line2,ll;
-	monomialSum myPoly;
-	linFormSum lForm;
 	simplexZZ mySimplex;
 	ZZ a,b;
 	int d;
@@ -25,7 +24,7 @@ int main(int argc, char *argv[])
 	if (!strcmp("polynomial",argv[2])) 
 	{
 		getline(myStream,line);
-		delSpace(line);
+	/*	delSpace(line);
 		loadMonomials(myPoly, line);
 		lForm.termCount = 0;
 		lForm.varCount = myPoly.varCount;		
@@ -37,14 +36,12 @@ int main(int argc, char *argv[])
 		};
 		cout << endl;
  		cout << "The polynomial is:" <<line<<endl;
-		cout << "Integrating by decomposition" << endl;
+	*/	cout << "Integrating by decomposition" << endl;
 		getline(myStream,line2);	//line2 is the simplex for example, [[0,0],[1,2],[2,3]]
 		delSpace(line2);
 		convertToSimplex(mySimplex,line2);
-		integrateFlatVector(a,b,lForm, mySimplex);
+		integrateFlatVectorString(a,b,line, mySimplex);
 		cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
-		destroyLinForms(lForm);
-		destroyMonomials(myPoly);
 	}
 	else if (!strcmp("linear",argv[2])) 
 	{
@@ -54,7 +51,7 @@ int main(int argc, char *argv[])
 		delSpace(line2);
 		cout << "The linear form is:"<<line<<endl;
 		convertToSimplex(mySimplex,line2);
-		integrateList(a,b,line, mySimplex);
+		integrateListString(a,b,line, mySimplex);
 		cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
 	};
 	myStream.close();
