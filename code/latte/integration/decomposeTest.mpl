@@ -390,110 +390,222 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
                                                    M, 1);
 end:
 
-
-local polyCount:=100:
-local bigConstant:=5:
-local numTerms:=1:
-local dimension:=2:
-local myDegree:=1:
-local errors, myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults, curForms, curTerm, curSet:
-local myTime, temp, intTime, L:
-
-#myMonomials:=Array(1):
-#mySimplices:=Array(1):
-#myLinForms:=Array(1):
-#mapleLinForms:=Array(1):
-#myResults:=Array(1):
-#mapleResults:=Array(1):
-
-
-#get polynomials
-myTime:=0:
-intTime:=0:
-for myIndex from 1 to polyCount do
-  myMonomials[myIndex]:=random_sparse_homogeneous_polynomial_with_degree(bigConstant, dimension, myDegree, numTerms);
-  mySimplices[myIndex]:=lattice_random_simplex(dimension, bigConstant);
-  temp:=time():
-  mapleLinForms[myIndex]:=list_integral_via_waring(myMonomials[myIndex]):
-  myTime:=myTime + time() - temp:
-  temp:=time():
-  mapleResults[myIndex]:=0:
-  for formIndex from 1 to nops(mapleLinForms[myIndex]) do
-    mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
-  od:
-  intTime:=intTime + time() - temp:
-od:
-myTime:=myTime / polyCount:
-intTime:=intTime / polyCount:
-
-#write to file
-polyFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
-for i from 1 to polyCount do
-  writeline(polyFile, convert(myMonomials[i], string));
-  writeline(polyFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
-od:
-close(polyFile):
-
-#run the integrate program
-system("./integrate_test integration/randomPolys.txt integration/forms.txt"):
-
-print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
-print(StringTools[Join]([convert(intTime,string),"s. avg. spent on Maple integration."], " "));
-
-#read forms in maple notation
-formFile:=fopen("integration/forms.txt",READ,TEXT):
-myLinForms[1]:=readline(formFile):
-myResults[1]:=readline(formFile):
-i:=1:
-while (myLinForms[i] <> 0) do
-  i:=i+1:
-  myLinForms[i]:=readline(formFile): #decomposition into linear forms
-  myResults[i]:=readline(formFile): #integral result
-od:
-close(formFile):
-
-#compare the forms
-errors:=0:
-errorFile:=fopen("integration/errors.log",WRITE,TEXT):
-for i from 1 to polyCount do
-  #print(parse(myLinForms[i]));
-  curForms:=Array(parse(myLinForms[i])):
-  #print(mapleLinForms[i]);
-  myResults[i]:=parse(myResults[i]):
-  if nops(parse(myLinForms[i])) <> nops(mapleLinForms[i]) then
-    print("Different number of powers of linear forms.");
-    print(nops(parse(myLinForms[i])), nops(mapleLinForms[i]));
-    errors:= errors + 1;
-  else
-    mapleLinForms[i]:=convert(mapleLinForms[i], 'set');
-    curTerm:={};
-    for j from 1 to nops(parse(myLinForms[i])) do
-      #print(curForms[j][1], curForms[j][2][1]);
-      curTerm:=curTerm union {[curForms[j][1] / curForms[j][2][1]!, curForms[j][2]]};
-      #print({[curForms[j][1] / curForms[j][2][1]!, curForms[j][2]]});
-    od:
-    if curTerm <> mapleLinForms[i] then
-      print("Powers of linear forms don't match.");
-      print(curTerm minus mapleLinForms[i], mapleLinForms[i] minus curTerm);
-      errors:=errors + 1;
+test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing)
+  local errors, wrong:
+  local myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults:
+  local curForms, curTerm, curSet:
+  local myIndex, formIndex, i, j:
+  local myTime, temp, intTime, L:
+  local inputFile, outputFile, errorFile:
+  
+  #get polynomials
+  myTime:=0:
+  intTime:=0:
+  for myIndex from 1 to polyCount do
+    mySimplices[myIndex]:=lattice_random_simplex(dimension, bigConstant);
+    if decomposing = 1 then
+      myMonomials[myIndex]:=random_sparse_homogeneous_polynomial_with_degree(bigConstant, dimension, myDegree, numTerms);
+      temp:=time():
+      mapleLinForms[myIndex]:=list_integral_via_waring(myMonomials[myIndex]):
+      myTime:=myTime + time() - temp:
+      temp:=time():
     else
-      if myResults[i][2] <> 0 then
-        if mapleResults[i] <> simplify(myResults[i][1] / myResults[i][2]) then
-          writeline(errorFile, "Integral calculation mismatch.");
-          writeline(errorFile, "Forms:");
-          writeline(errorFile, convert(mapleLinForms[i], string));
-          writeline(errorFile, "Simplex:");
-          writeline(errorFile, convert(mySimplices[i], string));
-          writeline(errorFile, "Maple result:");
-          writeline(errorFile, convert(mapleResults[i], string));
-          writeline(errorFile, "C++ result:");
-          writeline(errorFile, convert(simplify(myResults[i][1] / myResults[i][2]), string));
+      #mapleLinForms[myIndex]:=get_random_lin_forms(bigConstant, dimension, myDegree, numTerms(?)):
+    end if:
+    mapleResults[myIndex]:=0:
+    for formIndex from 1 to nops(mapleLinForms[myIndex]) do
+      mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
+    od:
+    intTime:=intTime + time() - temp:
+  od:
+  myTime:=myTime / polyCount:
+  intTime:=intTime / polyCount:
+  
+  #write to file
+  if decomposing = 1 then
+    inputFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
+    for i from 1 to polyCount do
+      writeline(inputFile, convert(myMonomials[i], string));
+      writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
+    od:
+    close(inputFile):
+    
+    #run the integrate program
+    system("./integrate_test integration/randomPolys.txt integration/forms.txt 1"):
+    
+    print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
+    
+    #read forms in maple notation
+    outputFile:=fopen("integration/forms.txt",READ,TEXT):
+    myLinForms[1]:=readline(outputFile):
+    myResults[1]:=readline(outputFile):
+    i:=1:
+    while (myLinForms[i] <> 0) do
+      i:=i+1:
+      myLinForms[i]:=readline(outputFile): #decomposition into linear forms
+      myResults[i]:=readline(outputFile): #integral result
+    od:
+    close(outputFile):
+  else
+    inputFile:=fopen("integration/randomForms.txt",WRITE,TEXT):
+    for i from 1 to polyCount do
+      writeline(inputFile, convert(myLinForms[i], string));
+      writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
+    od:
+    close(inputFile):
+    
+    #run the integrate program
+    system("./integrate_test integration/randomForms.txt integration/results.txt 0"):
+    
+    #read results
+    outputFile:=fopen("integration/results.txt",READ,TEXT):
+    myResults[1]:=readline(outputFile):
+    i:=1:
+    while (myResults[i] <> 0) do
+      i:=i+1:
+      myResults[i]:=readline(outputFile): #integral result
+    od:
+    close(outputFile):
+  end if:
+  print(StringTools[Join]([convert(intTime,string),"s. avg. spent on Maple integration."], " "));
+  
+  #compare the forms
+  errors:=0:
+  errorFile:=fopen("integration/errors.log",APPEND,TEXT):
+  for i from 1 to polyCount do
+    #print(parse(myLinForms[i]));
+    curForms:=Array(parse(myLinForms[i])):
+    #print(mapleLinForms[i]);
+    myResults[i]:=parse(myResults[i]):
+    wrong:=0: #prevents double counting errors, hopefully
+    if decomposing = 1 then #check that decomposition is correct
+      if nops(parse(myLinForms[i])) <> nops(mapleLinForms[i]) then
+        print("Different number of powers of linear forms.");
+        print(nops(parse(myLinForms[i])), nops(mapleLinForms[i]));
+        errors:= errors + 1;
+        wrong:=1:
+      else
+        mapleLinForms[i]:=convert(mapleLinForms[i], 'set');
+        curTerm:={};
+        for j from 1 to nops(parse(myLinForms[i])) do
+          #print(curForms[j][1], curForms[j][2][1]);
+          curTerm:=curTerm union {[curForms[j][1] / curForms[j][2][1]!, curForms[j][2]]};
+          #print({[curForms[j][1] / curForms[j][2][1]!, curForms[j][2]]});
+        od:
+        if curTerm <> mapleLinForms[i] then
+          print("Powers of linear forms don't match.");
+          print(curTerm minus mapleLinForms[i], mapleLinForms[i] minus curTerm);
           errors:=errors + 1;
-        end if;
-      end if;
-    end if;
-  end if;  
-od:
-close(errorFile):
+          wrong:=1:
+        end if:
+      end if:
+    end if:
+    if wrong = 0 then
+      if mapleResults[i] <> simplify(myResults[i][1] / myResults[i][2]) then
+        writeline(errorFile, "Integral calculation mismatch.");
+        writeline(errorFile, "Forms:");
+        writeline(errorFile, convert(mapleLinForms[i], string));
+        writeline(errorFile, "Simplex:");
+        writeline(errorFile, convert(mySimplices[i], string));
+        writeline(errorFile, "Maple result:");
+        writeline(errorFile, convert(mapleResults[i], string));
+        writeline(errorFile, "C++ result:");
+        writeline(errorFile, convert(simplify(myResults[i][1] / myResults[i][2]), string));
+        errors:=errors + 1;
+      end if:
+    end if;  
+  od:
+  close(errorFile):
+  
+  print(StringTools[Join]([convert(errors,string),"tests failed."], " "));
+end:
 
-print(StringTools[Join]([convert(errors,string),"tests failed."], " "));
+local benchmarks:
+local myDim, myDegree:
+benchmarks:=fopen("integration/benchmarks.txt",WRITE,TEXT):
+errorFile:=fopen("integration/errors.log",WRITE,TEXT):
+close(errorFile):
+writeline(benchmarks, "Integration of monomial sums over random simplices (average time over 50 random monomials)"):
+writeline(benchmarks, ""):
+writeline(benchmarks, "                                   Degree                                             "):
+writeline(benchmarks, "     _________________________________________________________________________________"):
+writeline(benchmarks, "  n  |       1         2         5         10        20        30        40"):
+writeline(benchmarks, "______________________________________________________________________________________"):
+fprintf(benchmarks, "%3.3s  |", "2"):
+close(benchmarks):
+for myDim from 2 to 40 do
+  for myDegree from 1 to 40 do
+    #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
+    test_integration(50, 100, 1, myDim, myDegree, 1):
+    if myDegree = 2 then
+      myDegree:= 4:
+    elif myDegree = 5 then
+      myDegree:=9:
+    elif myDegree = 10 then
+      myDegree:=19:
+    elif myDegree = 20 then
+      myDegree:=29:
+    elif myDegree = 30 then
+      myDegree:=39:
+    end if:
+  od:
+  if myDim = 8 then
+      myDim:= 9:
+  elif myDim = 10 then
+    myDim:=14:
+  elif myDim = 15 then
+    myDim:=19:
+  elif myDim = 20 then
+    myDim:=29:
+  elif myDim = 30 then
+    myDim:=39:
+  end if:
+  benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+  writeline(benchmarks, ""):
+  fprintf(benchmarks, "%3.3s  |", convert(myDim + 1, string)):
+  close(benchmarks):
+od:
+
+benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+writeline(benchmarks, "Integration of a power of a linear form over random simplices (average time over 50 random forms)"):
+writeline(benchmarks, ""):
+writeline(benchmarks, "                                   Degree                                             "):
+writeline(benchmarks, "     _________________________________________________________________________________"):
+writeline(benchmarks, "  n  |       2        10        20         50       100       300      1000"):
+writeline(benchmarks, "______________________________________________________________________________________"):
+fprintf(benchmarks, "%3.3s  |", "2"):
+close(benchmarks):
+for myDim from 10 to 400 do
+  for myDegree from 2 to 1000 do
+    #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
+    test_integration(50, 100, 1, myDim, myDegree, 0):
+    if myDegree = 2 then
+      myDegree:= 9:
+    elif myDegree = 10 then
+      myDegree:=19:
+    elif myDegree = 20 then
+      myDegree:=49:
+    elif myDegree = 50 then
+      myDegree:=99:
+    elif myDegree = 100 then
+      myDegree:=299:
+    elif myDegree = 300 then
+      myDegree:=999:
+    end if:
+  od:
+  if myDim = 10 then
+      myDim:= 19:
+  elif myDim = 20 then
+    myDim:=49:
+  elif myDim = 50 then
+    myDim:=99:
+  elif myDim = 100 then
+    myDim:=299:
+  elif myDim = 300 then
+    myDim:=399:
+  end if:
+  benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+  writeline(benchmarks, ""):
+  fprintf(benchmarks, "%3.3s  |", convert(myDim + 1, string)):
+  close(benchmarks):
+od:

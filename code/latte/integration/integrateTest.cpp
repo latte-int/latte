@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 					integrator->getResults(a, b);
 					if (IsZero(b))
 					{ irregularForms++; }
-					cout << "Irregular: " << printLinForms(forms) << " over " << line << endl;
+					//cout << "Irregular: " << printLinForms(forms) << " over " << line << endl;
 				}
 				else
 				{
@@ -143,12 +143,15 @@ int main(int argc, char *argv[])
 		}
 	}
 	if (decomposing) { cout << "Dimension " << dimension << ", degree " << degree << ". " << irregularForms << " forms were irregular." << endl; }
-	cout << "Total time to load " << polyCount << " polynomials: " << loadTime << ", avg. is " << loadTime / polyCount << endl;
+	/*cout << "Total time to load " << polyCount << " polynomials: " << loadTime << ", avg. is " << loadTime / polyCount << endl;
 	if (decomposing) { cout << "Total time to decompose " << polyCount << " polynomials: " << decomposeTime << ", avg. is " << decomposeTime / polyCount << endl; }
 	cout << "Total time to integrate " << polyCount << " polynomials: " << integrateTime << ", avg. is " << integrateTime / polyCount << endl;
 	cout << "Total time to integrate " << polyCount << " linear forms: " << parseIntegrate << ", avg. is " << parseIntegrate / polyCount << endl;
-	cout << "Total time is " << (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) << ", avg. is " << (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) / polyCount << endl;
-
+	cout << "Total time is " << (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) << ", avg. is " << (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) / polyCount << endl;*/
+	FILE* benchmarks = fopen("integration/benchmarks.txt","a");
+	fprintf(benchmarks, "%10.2f", (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) / polyCount);
+	fclose(benchmarks);
+	
 	delete integrator;
 	myStream.close();
 	outStream.close();
