@@ -52,6 +52,26 @@ void enumerate(const int &s[50], int i, int k, int n, const ZZ &p, const ZZ &t, 
          s[i]=j;enumerate(s,i+1,k,n-j,p,t,index,counter,a,b);
      };
 };*/
+ZZ Power_ZZ(ZZ a, int b)					//power function
+{
+	if (b==0) return to_ZZ(1);
+	int bi[20];
+	int digit=0;
+	while (b>0) 
+	{
+		digit++;
+		bi[digit-1]=b % 2;
+		b=b/2;
+	};
+	ZZ t=a;
+	for (int i=digit-2;i>=0;i--)
+	{
+		t*=t;
+		if (bi[i]==1) t*=a;
+	};
+	return t;
+}
+
 ZZ AChooseB(int a,int b)
 {
 	ZZ t=to_ZZ(1);

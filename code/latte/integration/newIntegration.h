@@ -65,7 +65,7 @@ void FormIntegrateConsumer<T>::update(vec_ZZ l,int m, ZZ coe, ZZ de)
 	{
 		sum_Nu[i]=1;for (j=0;j<m+mySimplex->d;j++) sum_Nu[i]=sum_Nu[i]*inner_Pro[i];
 		sum_De[i]=1;for (j=0;j<=mySimplex->d;j++) if (i!=j) sum_De[i]=sum_De[i]*(inner_Pro[i]-inner_Pro[j]);
-		if (sum_De[i]==0) {cout<<"Warning!"<<l<<" is not regular! Aborted."<<endl; /*exit(1);*/ denominator = to_ZZ(0); return;}; //irregular
+		if (sum_De[i]==0) {denominator = to_ZZ(0); return;}; //irregular
 		lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));
 	};
 	for (i=0;i<=mySimplex->d;i++)
@@ -98,8 +98,10 @@ void FormIntegrateConsumer<T>::getResults(ZZ& num, ZZ& den)
 
 void delSpace(string &line);
 void convertToSimplex(simplexZZ &mySimplex, string line);
+//the below should be changed to more comprehensible names - for example, integrateForms + integrateStringForms?
 void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
 void integrateList(ZZ &a, ZZ &b, const linFormSum &forms, const simplexZZ &mySimplex);
+//this does decomposition, then calls the above functions. why is this needed?
 void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
 void integrateFlatVector(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
 #endif

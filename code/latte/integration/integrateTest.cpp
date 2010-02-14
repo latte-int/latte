@@ -52,16 +52,16 @@ int main(int argc, char *argv[])
 					dimension = forms.varCount = monomials.varCount;
 		
 					float thisTime = time(NULL);
-					cout << "Decomposing " << printMonomials(monomials);
+					//cout << "Decomposing " << printMonomials(monomials);
 					myTimer.start();
 					for (int i = 0; i < monomials.termCount; i++)
 					{
-						cout << ".";
+						//cout << ".";
 						decompose(monomials, forms, i);
 					}
 					myTimer.stop();
 					decomposeTime += myTimer.get_seconds();
-					cout << endl;
+					//cout << endl;
 					
 					if (forms.termCount == 0)
 					{
@@ -69,8 +69,8 @@ int main(int argc, char *argv[])
 						return 1;	
 					}
 					
-					outStream << printLinForms(forms) << endl;
 					testForms = printLinForms(forms);
+					outStream << testForms << endl;
 					if (degree == -1) //degree is calculated only once
 					{
 						degree = 0;
@@ -106,29 +106,21 @@ int main(int argc, char *argv[])
 				if (decomposing)
 				{
 					myTimer.start();
-					integrateFlatVector(numerator, denominator, forms, mySimplex);
+					integrateList(numerator, denominator, forms, mySimplex);
 					myTimer.stop();
 					integrateTime += myTimer.get_seconds();
-					if (IsZero(denominator)) //irregular
-					{	
-						irregularForms++;
-					}
-					else //quick and dirty sanity check
-					{
-						cout << "Verifying by integrating linear forms from string..." << endl;
-						integrator->setSimplex(mySimplex);
-						myTimer.start();
-						parseLinForms(integrator, testForms);
-						myTimer.stop();
-						parseIntegrate += myTimer.get_seconds();
-						ZZ a, b;
-						integrator->getResults(a, b);
-						if (a != numerator || b != denominator)
-						{
-							cout << "Expected [" << numerator << " / " << denominator << "], ";
-							cout << "got [" << a << " / " << b << "]" << endl;
-						}
-					}
+					
+					//check irregularity
+					integrator->setSimplex(mySimplex);
+					myTimer.start();
+					parseLinForms(integrator, testForms);
+					myTimer.stop();
+					parseIntegrate += myTimer.get_seconds();
+					ZZ a, b;
+					integrator->getResults(a, b);
+					if (IsZero(b))
+					{ irregularForms++; }
+					cout << "Irregular: " << printLinForms(forms) << " over " << line << endl;
 				}
 				else
 				{

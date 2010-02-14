@@ -173,7 +173,7 @@ bin_PROGRAMS += integrate
 integrate_SOURCES =     integration/decint.cpp
 integrate_SOURCES +=    integration/PolyRep.cpp
 integrate_SOURCES +=    integration/newIntegration.cpp
-#integrate_SOURCES = integration/test.cpp
+integrate_SOURCES +=    integration/residue.cpp
 
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
@@ -182,6 +182,7 @@ check_PROGRAMS += integrate_test
 integrate_test_SOURCES =    integration/integrateTest.cpp
 integrate_test_SOURCES +=   integration/PolyRep.cpp
 integrate_test_SOURCES +=   integration/newIntegration.cpp
+integrate_test_SOURCES +=   integration/residue.cpp
 
 check_PROGRAMS += multiply_test
 multiply_test_SOURCES =    integration/multiplyTest.cpp

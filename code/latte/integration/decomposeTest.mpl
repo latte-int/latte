@@ -391,11 +391,11 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
 end:
 
 
-local polyCount:=50:
-local bigConstant:=10000:
-local numTerms:=5:
-local dimension:=5:
-local myDegree:=10:
+local polyCount:=100:
+local bigConstant:=5:
+local numTerms:=1:
+local dimension:=2:
+local myDegree:=1:
 local errors, myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults, curForms, curTerm, curSet:
 local myTime, temp, intTime, L:
 
@@ -454,6 +454,7 @@ close(formFile):
 
 #compare the forms
 errors:=0:
+errorFile:=fopen("integration/errors.log",WRITE,TEXT):
 for i from 1 to polyCount do
   #print(parse(myLinForms[i]));
   curForms:=Array(parse(myLinForms[i])):
@@ -477,14 +478,22 @@ for i from 1 to polyCount do
       errors:=errors + 1;
     else
       if myResults[i][2] <> 0 then
-        if mapleResults[i] <> myResults[i][1] / myResults[i][2] then
-          print("Integral calculation mismatch.");
-          print(mapleResults[i], myResults[i][1] / myResults[i][2]);
+        if mapleResults[i] <> simplify(myResults[i][1] / myResults[i][2]) then
+          writeline(errorFile, "Integral calculation mismatch.");
+          writeline(errorFile, "Forms:");
+          writeline(errorFile, convert(mapleLinForms[i], string));
+          writeline(errorFile, "Simplex:");
+          writeline(errorFile, convert(mySimplices[i], string));
+          writeline(errorFile, "Maple result:");
+          writeline(errorFile, convert(mapleResults[i], string));
+          writeline(errorFile, "C++ result:");
+          writeline(errorFile, convert(simplify(myResults[i][1] / myResults[i][2]), string));
           errors:=errors + 1;
         end if;
       end if;
     end if;
   end if;  
 od:
+close(errorFile):
 
 print(StringTools[Join]([convert(errors,string),"tests failed."], " "));

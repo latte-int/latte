@@ -106,6 +106,4 @@ private:
   linFormSum* formSum;
 };
 
-ZZ Power_ZZ(ZZ a, int b);
-
 #endif
