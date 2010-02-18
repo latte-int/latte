@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 		delSpace(line);
 		getline(myStream,line2);
 		delSpace(line2);
-		cout<<"The linear form is:"<<line<<endl<<"Integrated over"<<line2<<endl;		
+		//cout<<"The linear form is:"<<line<<endl<<"Integrated over"<<line2<<endl;		
 		convertToSimplex(mySimplex,line2);
 		integrateListString(a,b,line, mySimplex);
 		cout<<"The desired integral is equal to:"<<a<<"/"<<b<<endl;
