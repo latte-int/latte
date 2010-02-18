@@ -67,12 +67,16 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de)
 	sum_De.SetLength(mySimplex.d+1);
 	total=0;
 	lcm=1;
+	bool repeat[50];
 	for (i=0;i<=mySimplex.d;i++)
 	{
-		sum=0; for (j=0;j<mySimplex.d;j++) {sum=sum+l[j]*mySimplex.s[i][j];};
+		sum=0; for (j=0;j<mySimplex.d;j++) sum=sum+l[j]*mySimplex.s[i][j];
 		inner_Pro[i]=sum;
+		repeat[i]=0;
+		for (j=0;j<i;j++) if (inner_Pro[j]==inner_Pro[i]) {repeat[i]=1;break;};
 	};//stores inner product for use
 	for (i=0;i<=mySimplex.d;i++)
+	if (!repeat[i])
 	{
 		sum_Nu[i]=1;for (j=0;j<m+mySimplex.d;j++) sum_Nu[i]=sum_Nu[i]*inner_Pro[i];
 		sum_De[i]=1;for (j=0;j<=mySimplex.d;j++) if (i!=j) sum_De[i]=sum_De[i]*(inner_Pro[i]-inner_Pro[j]);
@@ -91,6 +95,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de)
 		if (sum_De[i]!=0) {lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));};
 	};
 	for (i=0;i<=mySimplex.d;i++)
+	if (!repeat[i])
 	{
 		total+=sum_Nu[i]*(lcm/sum_De[i]);
 	};
