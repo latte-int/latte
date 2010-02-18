@@ -110,7 +110,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 			//so far I've been doing book keeping stuff, i.e. how many different differences of each kind are there? index stores the differences and counter stores the multiplicity. 0th entry means 0 itself. It is very important because it's the multiplicity of a vertex itself.
 			//actual calculations, I want the appropriate coefficient in a product of one polynomial and some power series. (everything is truncated).
      nu=1;de=1;
-     for (i=1;i<=counter[0];i++) nu*=i;
+     //for (i=1;i<=counter[0];i++) nu*=i;
      for (j=1;j<=k-1;j++) de=de*Power_ZZ(index[j],counter[j]+counter[0]);
      monomialSum m1;
      monomialSum sub;					//sub is the substitution for m1, which alternatively stores the product for each other
