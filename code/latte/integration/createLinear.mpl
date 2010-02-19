@@ -1,4 +1,5 @@
 with(LinearAlgebra):
+//This function takes in degree, dimension and some bounds, creates a random linear form
 random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,maxcoef,componentmax,maxterm)
 local temp,l,termcount,i,j,R;
 R:=rand(maxterm);
@@ -17,6 +18,7 @@ l:=[op(l),temp];
 od;
 end:
 
+//This function can take in a specified multiplicity and produce a desired simplex plus linear form. But it only produces one term.
 random_linform_given_multiplicity:=proc(m,d,maxcoef,vertexmax,k,multiplicity)
 local l,temp,i,j,str,t,simplex,mat,R,singular;
 l:=[];str:=[];R:=rand(vertexmax);
