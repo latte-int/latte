@@ -22,8 +22,8 @@ public:
   void ConsumeLinForm(const ZZ& coefficient, int degree, const vec_ZZ& coefs);
   void setFormSum(const string& myForms) { linForms = myForms; }
   string getFormSum() { return linForms; }
-  void setDimension(int dimension) { }//also stored in mySimplex
-  int getDimension() {}
+  void setDimension(int dimension) { mySimplex->d = dimension; }//also stored in mySimplex
+  int getDimension() { return mySimplex->d; }
   void setSimplex(simplexZZ& simplex) { mySimplex = &simplex; numerator = to_ZZ(0); denominator = to_ZZ(0); }
   void getResults(ZZ& num, ZZ& den);
   ~FormIntegrateConsumer() {}

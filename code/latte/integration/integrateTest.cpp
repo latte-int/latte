@@ -7,12 +7,18 @@
 
 using namespace std;
 
+void timedOut()
+{
+
+}
+
 int main(int argc, char *argv[])
 {
-	if (argc < 3) { cout << "Usage: " << argv[0] << " fileIn fileOut [decompose]" << endl; return 1; }
-	bool decomposing = true; //decomposing by default
+	if (argc < 4) { cout << "Usage: " << argv[0] << " fileIn fileOut decompose [timeout]" << endl; return 1; }
+	bool decomposing = (strcmp(argv[3], "1") == 0);
 	bool polynomial = true; //file is assumed to alternate between polynomial and the simplex
-	if (argc == 4) { decomposing = (strcmp(argv[3], "1") == 0); };
+	float timeout = -1.0f;
+	if (argc == 5) { timeout = strtod(argv[4], NULL); };
 	string line;
 	monomialSum monomials;
 	linFormSum forms;
@@ -33,6 +39,21 @@ int main(int argc, char *argv[])
 		getline(myStream, line, '\n');
 		if (!line.empty())
 		{
+			if (timeout > 0 && integrateTime > timeout)
+			{
+					delete integrator;
+					myStream.close();
+					outStream.close();
+					FILE* myFile = fopen(argv[2],"w"); //overwriting results file
+					fprintf(myFile, "Error");
+					fclose(myFile);
+										
+					cout << "Integration timed out." << endl;
+					myFile = fopen("integration/benchmarks.txt","a");
+					fprintf(myFile, "%10s", "--");
+					fclose(myFile);
+					return 1;
+			}
 			if (polynomial) //reading polynomial
 			{
 				if (decomposing) //input is sum of monomials that we decompose into sum of linear forms
@@ -104,23 +125,27 @@ int main(int argc, char *argv[])
 				//integrate here
 				ZZ numerator, denominator;
 				if (decomposing)
-				{
-					myTimer.start();
-					integrateList(numerator, denominator, forms, mySimplex);
-					myTimer.stop();
-					integrateTime += myTimer.get_seconds();
-					
-					//check irregularity
+				{			
+					//check irregularity, timeouts
 					integrator->setSimplex(mySimplex);
 					myTimer.start();
 					parseLinForms(integrator, testForms);
 					myTimer.stop();
+					/*if (integrator->getDimension() == -1) //we timed out
+					{
+						timedOut();
+						return;
+					}*/
 					parseIntegrate += myTimer.get_seconds();
 					ZZ a, b;
 					integrator->getResults(a, b);
 					if (IsZero(b))
 					{ irregularForms++; }
 					//cout << "Irregular: " << printLinForms(forms) << " over " << line << endl;
+					myTimer.start();
+					integrateList(numerator, denominator, forms, mySimplex);
+					myTimer.stop();
+					integrateTime += myTimer.get_seconds();
 				}
 				else
 				{

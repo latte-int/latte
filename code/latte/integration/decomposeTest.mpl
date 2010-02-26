@@ -409,20 +409,13 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
       temp:=time():
       mapleLinForms[myIndex]:=list_integral_via_waring(myMonomials[myIndex]):
       myTime:=myTime + time() - temp:
-      temp:=time():
     else
       #print(myDegree, dimension, bigConstant, bigConstant, numTerms);
       mapleLinForms[myIndex]:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms):
       print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
     end if:
-    mapleResults[myIndex]:=0:
-    for formIndex from 1 to nops(mapleLinForms[myIndex]) do
-      mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
-    od:
-    intTime:=intTime + time() - temp:
   od:
   myTime:=myTime / polyCount:
-  intTime:=intTime / polyCount:
   
   #write to file
   if decomposing = 1 then
@@ -432,15 +425,19 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
       writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
     od:
     close(inputFile):
+    print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
     
     #run the integrate program
-    system("./integrate_test integration/randomPolys.txt integration/forms.txt 1"):
-    
-    print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
+    system("./integrate_test integration/randomPolys.txt integration/forms.txt 1 10.0"):
     
     #read forms in maple notation
     outputFile:=fopen("integration/forms.txt",READ,TEXT):
     myLinForms[1]:=readline(outputFile):
+    if (myLinForms[1] = "Error") then
+      print("Integration timed out.");
+      close(outputFile):
+      return:
+    end if:
     myResults[1]:=readline(outputFile):
     i:=1:
     while (myLinForms[i] <> 0) do
@@ -463,6 +460,11 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     #read results
     outputFile:=fopen("integration/results.txt",READ,TEXT):
     myResults[1]:=readline(outputFile):
+    if (myResults[1] = "Error") then
+      print("Integration timed out.");
+      close(outputFile):
+      return:
+    end if:
     i:=1:
     while (myResults[i] <> 0) do
       i:=i+1:
@@ -470,6 +472,17 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     od:
     close(outputFile):
   end if:
+  
+  for myIndex from 1 to polyCount do
+    mapleResults[myIndex]:=0:
+    temp:=time():
+    for formIndex from 1 to nops(mapleLinForms[myIndex]) do
+      mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
+    od:
+    intTime:=intTime + time() - temp:
+    print(StringTools[Join](["Integrating", convert(intTime,string)], ":"));
+  od:
+  intTime:=intTime / polyCount:
   print(StringTools[Join]([convert(intTime,string),"s. avg. spent on Maple integration."], " "));
   
   #compare the forms
@@ -539,8 +552,7 @@ close(benchmarks):
 for myDim from 2 to 40 do
   for myDegree from 1 to 40 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    #test_integration(50, 1000, 1, myDim, myDegree, 1):
-    test_integration(50, 100, 1, myDim, myDegree, 0):
+    test_integration(50, 1000, 1, myDim, myDegree, 1):
     if myDegree = 2 then
       myDegree:= 4:
     elif myDegree = 5 then
@@ -582,7 +594,7 @@ close(benchmarks):
 for myDim from 10 to 400 do
   for myDegree from 2 to 1000 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    test_integration(50, 100, 1, myDim, myDegree, 0):
+    test_integration(5, 100, 1, myDim, myDegree, 0):
     if myDegree = 2 then
       myDegree:= 9:
     elif myDegree = 10 then
