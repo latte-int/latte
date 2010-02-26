@@ -60,7 +60,7 @@ str:=[R()-trunc(maxcoef/2),str];
 str:=[op(str),simplex];
 end:
 
-random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(4,3,50,6,10);
-random_linform_given_multiplicity(4,4,50,30,1,[5]);
+#random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(4,3,50,6,10);
+#random_linform_given_multiplicity(4,4,50,30,1,[5]);
 
 

@@ -1,5 +1,6 @@
 with(linalg):with(LinearAlgebra):
 with(numapprox,laurent):
+read("integration/createLinear.mpl"):
 # Integral of a  power of a linear form over a simplex.
 # Our Notations;
 
@@ -410,7 +411,9 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
       myTime:=myTime + time() - temp:
       temp:=time():
     else
-      #mapleLinForms[myIndex]:=get_random_lin_forms(bigConstant, dimension, myDegree, numTerms(?)):
+      #print(myDegree, dimension, bigConstant, bigConstant, numTerms);
+      mapleLinForms[myIndex]:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms):
+      print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
     end if:
     mapleResults[myIndex]:=0:
     for formIndex from 1 to nops(mapleLinForms[myIndex]) do
@@ -536,7 +539,8 @@ close(benchmarks):
 for myDim from 2 to 40 do
   for myDegree from 1 to 40 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    test_integration(50, 100, 1, myDim, myDegree, 1):
+    #test_integration(50, 1000, 1, myDim, myDegree, 1):
+    test_integration(50, 100, 1, myDim, myDegree, 0):
     if myDegree = 2 then
       myDegree:= 4:
     elif myDegree = 5 then
@@ -569,11 +573,11 @@ od:
 benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
 writeline(benchmarks, "Integration of a power of a linear form over random simplices (average time over 50 random forms)"):
 writeline(benchmarks, ""):
-writeline(benchmarks, "                                   Degree                                             "):
-writeline(benchmarks, "     _________________________________________________________________________________"):
-writeline(benchmarks, "  n  |       2        10        20         50       100       300      1000"):
-writeline(benchmarks, "______________________________________________________________________________________"):
-fprintf(benchmarks, "%3.3s  |", "2"):
+writeline(benchmarks, "                                    Degree                                             "):
+writeline(benchmarks, "      _________________________________________________________________________________"):
+writeline(benchmarks, "   n  |       2        10        20         50       100       300      1000"):
+writeline(benchmarks, "_______________________________________________________________________________________"):
+fprintf(benchmarks, "%4.4s  |", "10"):
 close(benchmarks):
 for myDim from 10 to 400 do
   for myDegree from 2 to 1000 do
