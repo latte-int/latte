@@ -3,7 +3,7 @@ with(LinearAlgebra):
 random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,maxcoef,componentmax,maxterm)
 local temp,l,termcount,i,j,R;
 R:=rand(maxterm);
-termcount:=R();
+termcount:=R() + 1;
 l:=[];
 for i from 1 to termcount do
 temp:=[];

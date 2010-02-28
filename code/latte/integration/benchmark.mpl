@@ -406,15 +406,13 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     mySimplices[myIndex]:=lattice_random_simplex(dimension, bigConstant);
     if decomposing = 1 then
       myMonomials[myIndex]:=random_sparse_homogeneous_polynomial_with_degree(bigConstant, dimension, myDegree, numTerms);
-      temp:=time():
-      mapleLinForms[myIndex]:=list_integral_via_waring(myMonomials[myIndex]):
-      myTime:=myTime + time() - temp:
     else
+      #print(myDegree, dimension, bigConstant, bigConstant, numTerms);
       mapleLinForms[myIndex]:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms):
+      print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
     end if:
   od:
-  myTime:=myTime / polyCount:
-  
+
   #write to file
   if decomposing = 1 then
     inputFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
@@ -423,130 +421,147 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
       writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
     od:
     close(inputFile):
-    #print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
-    
+
     #run the integrate program
-    system("./integrate_test integration/randomPolys.txt integration/forms.txt 1 0 10.0"):
-    
-    #read forms in maple notation
-    outputFile:=fopen("integration/forms.txt",READ,TEXT):
-    myLinForms[1]:=readline(outputFile):
-    if (myLinForms[1] = "Error") then
+    system("./integrate_test integration/randomPolys.txt integration/log.tmp 1 1"):
+
+    outputFile:=fopen("integration/log.tmp",READ,TEXT):
+    curTerm:= readline(outputFile):
+    if (curTerm = "Error") then
       print("Integration timed out.");
       close(outputFile):
-      return:
+      return -1:
     end if:
-    myResults[1]:=readline(outputFile):
-    i:=1:
-    while (myLinForms[i] <> 0) do
-      i:=i+1:
-      myLinForms[i]:=readline(outputFile): #decomposition into linear forms
-      myResults[i]:=readline(outputFile): #integral result
-    od:
     close(outputFile):
   else
     inputFile:=fopen("integration/randomForms.txt",WRITE,TEXT):
     for i from 1 to polyCount do
-      writeline(inputFile, convert(mapleLinForms[i], string));
+      writeline(inputFile, convert(myLinForms[i], string));
       writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
     od:
     close(inputFile):
     
     #run the integrate program
-    system("./integrate_test integration/randomForms.txt integration/results.txt 0 0"):
+    system("./integrate_test integration/randomForms.txt integration/log.tmp 0 1"):
     
-    #read results
-    outputFile:=fopen("integration/results.txt",READ,TEXT):
-    myResults[1]:=readline(outputFile):
-    if (myResults[1] = "Error") then
+    outputFile:=fopen("integration/log.tmp",READ,TEXT):
+    curTerm:= readline(outputFile):
+    if (curTerm = "Error") then
       print("Integration timed out.");
       close(outputFile):
-      return:
+      return -1:
     end if:
-    i:=1:
-    while (myResults[i] <> 0) do
-      i:=i+1:
-      myResults[i]:=readline(outputFile): #integral result
-    od:
     close(outputFile):
   end if:
-  
-  for myIndex from 1 to polyCount do
-    mapleResults[myIndex]:=0:
-    temp:=time():
-    for formIndex from 1 to nops(mapleLinForms[myIndex]) do
-      mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
-    od:
-    intTime:=intTime + time() - temp:
-    #print(StringTools[Join](["Integrating", convert(intTime,string)], ":"));
-  od:
-  intTime:=intTime / polyCount:
-  #print(StringTools[Join]([convert(intTime,string),"s. avg. spent on Maple integration."], " "));
-  
-  #compare the forms
-  errors:=0:
-  errorFile:=fopen("integration/errors.log",APPEND,TEXT):
-  for i from 1 to polyCount do
-    #print(parse(myLinForms[i]));
-    if decomposing = 1 then
-      curForms:=Array(parse(myLinForms[i])):
-    end if:
-    #print(mapleLinForms[i]);
-    myResults[i]:=parse(myResults[i]):
-    wrong:=0: #prevents double counting errors, hopefully
-    if decomposing = 1 then #check that decomposition is correct
-      if nops(parse(myLinForms[i])) <> nops(mapleLinForms[i]) then
-        print("Different number of powers of linear forms.");
-        print(nops(parse(myLinForms[i])), nops(mapleLinForms[i]));
-        errors:= errors + 1;
-        wrong:=1:
-      else
-        mapleLinForms[i]:=convert(mapleLinForms[i], 'set');
-        curTerm:={};
-        for j from 1 to nops(parse(myLinForms[i])) do
-          #print(curForms[j][1], curForms[j][2][1]);
-          curTerm:=curTerm union {[curForms[j][1] / curForms[j][2][1]!, curForms[j][2]]};
-          #print({[curForms[j][1] / curForms[j][2][1]!, curForms[j][2]]});
-        od:
-        if curTerm <> mapleLinForms[i] then
-          print("Powers of linear forms don't match.");
-          print(curTerm minus mapleLinForms[i], mapleLinForms[i] minus curTerm);
-          errors:=errors + 1;
-          wrong:=1:
-        end if:
-      end if:
-    end if:
-    if wrong = 0 then
-      if mapleResults[i] <> simplify(myResults[i][1] / myResults[i][2]) then
-        writeline(errorFile, "Integral calculation mismatch.");
-        writeline(errorFile, "Forms:");
-        writeline(errorFile, convert(mapleLinForms[i], string));
-        writeline(errorFile, "Simplex:");
-        writeline(errorFile, convert(mySimplices[i], string));
-        writeline(errorFile, "Maple result:");
-        writeline(errorFile, convert(mapleResults[i], string));
-        writeline(errorFile, "C++ result:");
-        writeline(errorFile, convert(simplify(myResults[i][1] / myResults[i][2]), string));
-        errors:=errors + 1;
-      end if:
-    end if;  
-  od:
-  close(errorFile):
-  
-  print(StringTools[Join]([convert(errors,string),"tests failed."], " "));
 end:
 
-local benchmarks:
-local myDim, myDegree:
-errorFile:=fopen("integration/errors.log",WRITE,TEXT):
-close(errorFile):
-
-for myDim from 2 to 5 do
-  for myDegree from 1 to 10 do
+local benchmarks, result:
+local myDim, myDegree, timedOut:
+benchmarks:=fopen("integration/benchmarks.txt",WRITE,TEXT):
+writeline(benchmarks, "Average integration time of a random monomial by decomposition (i.e. Table 6) with a sample size of 50"):
+writeline(benchmarks, ""):
+writeline(benchmarks, "                                                           Degree                                                    "):
+writeline(benchmarks, "     ______________________________________________________________________________________________________________"):
+writeline(benchmarks, "  n  |       1         2         5         10        20        30        40        50        100       200      300"):
+writeline(benchmarks, "___________________________________________________________________________________________________________________"):
+fprintf(benchmarks, "%3.3s  |", "2"):
+close(benchmarks):
+for myDim from 2 to 50 do
+  timedOut:= 0:
+  for myDegree from 1 to 300 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    test_integration(10, 1000, 1, myDim, myDegree, 1):
-    test_integration(10, 1000, 1, myDim, myDegree, 0):
+    if timedOut = 0 then
+      result:= test_integration(50, 1000, 1, myDim, myDegree, 1):
+      if result = -1 then
+       timedOut:= 1:
+      end if:
+    else
+      benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+      fprintf(benchmarks, "%10s", "--"):
+      close(benchmarks):
+    end if:
+    if myDegree = 2 then
+      myDegree:= 4:
+    elif myDegree = 5 then
+      myDegree:=9:
+    elif myDegree = 10 then
+      myDegree:=19:
+    elif myDegree = 20 then
+      myDegree:=29:
+    elif myDegree = 30 then
+      myDegree:=39:
+    elif myDegree = 40 then
+      myDegree:=49:
+    elif myDegree = 50 then
+      myDegree:=99:
+    elif myDegree = 100 then
+      myDegree:=199:
+    elif myDegree = 200 then
+      myDegree:=299:
+    end if:
   od:
+  if myDim = 8 then
+      myDim:= 9:
+  elif myDim = 10 then
+    myDim:=14:
+  elif myDim = 15 then
+    myDim:=19:
+  elif myDim = 20 then
+    myDim:=29:
+  elif myDim = 30 then
+    myDim:=39:
+  elif myDim = 40 then
+    myDim:=49:
+  end if:
+  benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+  writeline(benchmarks, ""):
+  fprintf(benchmarks, "%3.3s  |", convert(myDim + 1, string)):
+  close(benchmarks):
 od:
 
- 
+benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+writeline(benchmarks, "Integration of a power of a linear form over random simplices (average time over 50 random forms)"):
+writeline(benchmarks, ""):
+writeline(benchmarks, "                                            Degree                                     "):
+writeline(benchmarks, "      _________________________________________________________________________________"):
+writeline(benchmarks, "   n  |       2        10        20         50       100       300      1000"):
+writeline(benchmarks, "_______________________________________________________________________________________"):
+fprintf(benchmarks, "%4.4s  |", "10"):
+close(benchmarks):
+for myDim from 10 to 400 do
+  for myDegree from 2 to 1000 do
+    #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
+    result:= test_integration(5, 100, 1, myDim, myDegree, 0):
+    if result = -1 then
+      myDegree:=1000:
+    end if:
+    if myDegree = 2 then
+      myDegree:= 9:
+    elif myDegree = 10 then
+      myDegree:=19:
+    elif myDegree = 20 then
+      myDegree:=49:
+    elif myDegree = 50 then
+      myDegree:=99:
+    elif myDegree = 100 then
+      myDegree:=299:
+    elif myDegree = 300 then
+      myDegree:=999:
+    end if:
+  od:
+  if myDim = 10 then
+      myDim:= 19:
+  elif myDim = 20 then
+    myDim:=49:
+  elif myDim = 50 then
+    myDim:=99:
+  elif myDim = 100 then
+    myDim:=299:
+  elif myDim = 300 then
+    myDim:=399:
+  end if:
+  benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+  writeline(benchmarks, ""):
+  fprintf(benchmarks, "%3.3s  |", convert(myDim + 1, string)):
+  close(benchmarks):
+od:
