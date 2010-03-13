@@ -20,6 +20,7 @@ void delSpace(string &line)
 
 void convertToSimplex(simplexZZ &mySimplex, string line)
 {
+	delSpace(line);
 	int index,i,t,j,c;
 	string temp,subtemp;
 	t=2;mySimplex.d=1;

@@ -1,4 +1,7 @@
 with(LinearAlgebra):
+random_linearform_given_degree_dimension_maxcoef_maxterm:=proc(m,d,maxcoef,maxterm)
+	random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(m,d,maxcoef,maxcoef,maxterm);
+end:
 #This function takes in degree, dimension and some bounds, creates a random linear form
 random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,maxcoef,componentmax,maxterm)
 local temp,l,termcount,i,j,R;

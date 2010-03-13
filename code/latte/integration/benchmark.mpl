@@ -357,8 +357,6 @@ random_sparse_homogeneous_polynomial_with_degree_5:=proc(d,M)
     floor(evalf(root(binomial(M+d-1, d-1), 1))));
 end:
 
-
-
 random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars:=
 proc(N,d,eff_num_vars,M,r) 
   local p, R;
@@ -391,7 +389,12 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
                                                    M, 1);
 end:
 
-test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing)
+get_table13_entry:=proc(N,d, M, r)
+	random_sparse_homogeneous_polynomial_with_degree_6(d, M);
+end:
+
+test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen)
+  global filename:
   local errors, wrong:
   local myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults:
   local curForms, curTerm, curSet:
@@ -399,23 +402,24 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   local myTime, temp, intTime, L:
   local inputFile, outputFile, errorFile:
   
+  print(randomGen(bigConstant, dimension, myDegree, numTerms)):
   #get polynomials
   myTime:=0:
   intTime:=0:
   for myIndex from 1 to polyCount do
     mySimplices[myIndex]:=lattice_random_simplex(dimension, bigConstant);
     if decomposing = 1 then
-      myMonomials[myIndex]:=random_sparse_homogeneous_polynomial_with_degree(bigConstant, dimension, myDegree, numTerms);
+      myMonomials[myIndex]:=randomGen(bigConstant, dimension, myDegree, numTerms);
     else
       #print(myDegree, dimension, bigConstant, bigConstant, numTerms);
-      mapleLinForms[myIndex]:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms):
-      print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
+      mapleLinForms[myIndex]:=randomGen(myDegree, dimension, bigConstant, bigConstant, numTerms):
+      #print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
     end if:
   od:
 
   #write to file
   if decomposing = 1 then
-    inputFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
+    inputFile:=fopen("integration/input.tmp",WRITE,TEXT):
     for i from 1 to polyCount do
       writeline(inputFile, convert(myMonomials[i], string));
       writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
@@ -423,9 +427,10 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     close(inputFile):
 
     #run the integrate program
-    system("./integrate_test integration/randomPolys.txt integration/log.tmp 1 1"):
+#print(StringTools[Join](["./integrate_test -b", filename, "-t 600 integration/input.tmp integration/output.tmp"], " ")):
+    system(StringTools[Join](["./integrate_test -m -b", filename, "-t 600 integration/input.tmp integration/output.tmp"], " ")):
 
-    outputFile:=fopen("integration/log.tmp",READ,TEXT):
+    outputFile:=fopen("integration/output.tmp",READ,TEXT):
     curTerm:= readline(outputFile):
     if (curTerm = "Error") then
       print("Integration timed out.");
@@ -434,17 +439,17 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     end if:
     close(outputFile):
   else
-    inputFile:=fopen("integration/randomForms.txt",WRITE,TEXT):
+    inputFile:=fopen("integration/input.tmp",WRITE,TEXT):
     for i from 1 to polyCount do
-      writeline(inputFile, convert(myLinForms[i], string));
+      writeline(inputFile, convert(mapleLinForms[i], string));
       writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
     od:
     close(inputFile):
     
     #run the integrate program
-    system("./integrate_test integration/randomForms.txt integration/log.tmp 0 1"):
+    system(StringTools[Join](["./integrate_test -b", filename, "-t 600 integration/input.tmp integration/output.tmp"], " ")):
     
-    outputFile:=fopen("integration/log.tmp",READ,TEXT):
+    outputFile:=fopen("integration/output.tmp",READ,TEXT):
     curTerm:= readline(outputFile):
     if (curTerm = "Error") then
       print("Integration timed out.");
@@ -455,14 +460,16 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   end if:
 end:
 
+draw_table6:=proc()
+global filename:
 local benchmarks, result:
 local myDim, myDegree, timedOut:
-benchmarks:=fopen("integration/benchmarks.txt",WRITE,TEXT):
+benchmarks:=fopen(filename,WRITE,TEXT):
 writeline(benchmarks, "Average integration time of a random monomial by decomposition (i.e. Table 6) with a sample size of 50"):
 writeline(benchmarks, ""):
-writeline(benchmarks, "                                                           Degree                                                    "):
+
 writeline(benchmarks, "     ______________________________________________________________________________________________________________"):
-writeline(benchmarks, "  n  |       1         2         5         10        20        30        40        50        100       200      300"):
+writeline(benchmarks, "  n  |       1         2         5         10        20        30        40        50         100       200      300"):
 writeline(benchmarks, "___________________________________________________________________________________________________________________"):
 fprintf(benchmarks, "%3.3s  |", "2"):
 close(benchmarks):
@@ -471,12 +478,12 @@ for myDim from 2 to 50 do
   for myDegree from 1 to 300 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
     if timedOut = 0 then
-      result:= test_integration(50, 1000, 1, myDim, myDegree, 1):
+      result:= test_integration(50, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
       if result = -1 then
        timedOut:= 1:
       end if:
     else
-      benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+      benchmarks:=fopen(filename,APPEND,TEXT):
       fprintf(benchmarks, "%10s", "--"):
       close(benchmarks):
     end if:
@@ -513,14 +520,19 @@ for myDim from 2 to 50 do
   elif myDim = 40 then
     myDim:=49:
   end if:
-  benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+  benchmarks:=fopen(filename,APPEND,TEXT):
   writeline(benchmarks, ""):
   fprintf(benchmarks, "%3.3s  |", convert(myDim + 1, string)):
   close(benchmarks):
 od:
+end:
 
-benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
-writeline(benchmarks, "Integration of a power of a linear form over random simplices (average time over 50 random forms)"):
+draw_table5:=proc()
+global filename:
+local benchmarks, result:
+local myDim, myDegree, timedOut:
+benchmarks:=fopen(filename,WRITE,TEXT):
+writeline(benchmarks, "Average integration time of one power of a linear form over random simplices (average time over 50 random forms)"):
 writeline(benchmarks, ""):
 writeline(benchmarks, "                                            Degree                                     "):
 writeline(benchmarks, "      _________________________________________________________________________________"):
@@ -528,10 +540,20 @@ writeline(benchmarks, "   n  |       2        10        20         50       100 
 writeline(benchmarks, "_______________________________________________________________________________________"):
 fprintf(benchmarks, "%4.4s  |", "10"):
 close(benchmarks):
-for myDim from 10 to 400 do
+for myDim from 10 to 1000 do
+  timedOut:= 0:
   for myDegree from 2 to 1000 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    result:= test_integration(5, 100, 1, myDim, myDegree, 0):
+    if timedOut = 0 then
+      result:= test_integration(50, 100, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_maxterm):
+      if result = -1 then
+       timedOut:= 1:
+      end if:
+    else
+      benchmarks:=fopen(filename,APPEND,TEXT):
+      fprintf(benchmarks, "%10s", "--"):
+      close(benchmarks):
+    end if:
     if result = -1 then
       myDegree:=1000:
     end if:
@@ -559,9 +581,143 @@ for myDim from 10 to 400 do
     myDim:=299:
   elif myDim = 300 then
     myDim:=399:
+  elif myDim = 400 then
+    myDim:=999:
   end if:
-  benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+  benchmarks:=fopen(filename,APPEND,TEXT):
+  writeline(benchmarks, ""):
+  fprintf(benchmarks, "%4.4s  |", convert(myDim + 1, string)):
+  close(benchmarks):
+od:
+end:
+
+draw_table10:=proc()
+global filename:
+local benchmarks, result:
+local myDim, myDegree, timedOut:
+benchmarks:=fopen(filename,WRITE,TEXT):
+writeline(benchmarks, "Average integration time of a random dense homogeneous polynomial of prescribed degree by decomposition into linear forms (average time over 50 random forms)"):
+writeline(benchmarks, ""):
+writeline(benchmarks, "     ______________________________________________________________________________________________________________"):
+writeline(benchmarks, "  n  |       1         2         5         10        20        30        40        50         100       200      300"):
+writeline(benchmarks, "___________________________________________________________________________________________________________________"):
+fprintf(benchmarks, "%3.3s  |", "2"):
+close(benchmarks):
+for myDim from 2 to 50 do
+  timedOut:= 0:
+  for myDegree from 1 to 300 do
+    #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
+    if timedOut = 0 then
+      result:= test_integration(50, 1000, 1, myDim, myDegree, 1):
+      if result = -1 then
+       timedOut:= 1:
+      end if:
+    else
+      benchmarks:=fopen(filename,APPEND,TEXT):
+      fprintf(benchmarks, "%10s", "--"):
+      close(benchmarks):
+    end if:
+    if myDegree = 2 then
+      myDegree:= 4:
+    elif myDegree = 5 then
+      myDegree:=9:
+    elif myDegree = 10 then
+      myDegree:=19:
+    elif myDegree = 20 then
+      myDegree:=29:
+    elif myDegree = 30 then
+      myDegree:=39:
+    elif myDegree = 40 then
+      myDegree:=49:
+    elif myDegree = 50 then
+      myDegree:=99:
+    elif myDegree = 100 then
+      myDegree:=199:
+    elif myDegree = 200 then
+      myDegree:=299:
+    end if:
+  od:
+  if myDim = 8 then
+      myDim:= 9:
+  elif myDim = 10 then
+    myDim:=14:
+  elif myDim = 15 then
+    myDim:=19:
+  elif myDim = 20 then
+    myDim:=29:
+  elif myDim = 30 then
+    myDim:=39:
+  elif myDim = 40 then
+    myDim:=49:
+  end if:
+  benchmarks:=fopen(filename,APPEND,TEXT):
   writeline(benchmarks, ""):
   fprintf(benchmarks, "%3.3s  |", convert(myDim + 1, string)):
   close(benchmarks):
 od:
+end:
+
+draw_table13:=proc()
+global filename:
+local benchmarks, result:
+local myDim, myDegree, timedOut:
+benchmarks:=fopen(filename,WRITE,TEXT):
+writeline(benchmarks, "Average integration time of a monomial of prescribed degree with 2 effective variables by decomposition (average time over 50 random forms)"):
+writeline(benchmarks, ""):
+writeline(benchmarks, "                                            Degree                                     "):
+writeline(benchmarks, "      _________________________________________________________________________________"):
+writeline(benchmarks, "   n  |       2        10        20         50       100       300      1000"):
+writeline(benchmarks, "_______________________________________________________________________________________"):
+fprintf(benchmarks, "%4.4s  |", "10"):
+close(benchmarks):
+for myDim from 10 to 1000 do
+  timedOut:= 0:
+  for myDegree from 2 to 1000 do
+    #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
+    if timedOut = 0 then
+      result:= test_integration(50, 100, 1, myDim, myDegree, 1, get_table13_entry):
+      if result = -1 then
+       timedOut:= 1:
+      end if:
+    else
+      benchmarks:=fopen(filename,APPEND,TEXT):
+      fprintf(benchmarks, "%10s", "--"):
+      close(benchmarks):
+    end if:
+    if result = -1 then
+      myDegree:=1000:
+    end if:
+    if myDegree = 2 then
+      myDegree:= 9:
+    elif myDegree = 10 then
+      myDegree:=19:
+    elif myDegree = 20 then
+      myDegree:=49:
+    elif myDegree = 50 then
+      myDegree:=99:
+    elif myDegree = 100 then
+      myDegree:=299:
+    elif myDegree = 300 then
+      myDegree:=999:
+    end if:
+  od:
+  if myDim = 10 then
+      myDim:= 19:
+  elif myDim = 20 then
+    myDim:=49:
+  elif myDim = 50 then
+    myDim:=99:
+  elif myDim = 100 then
+    myDim:=299:
+  elif myDim = 300 then
+    myDim:=399:
+  elif myDim = 400 then
+    myDim:=999:
+  end if:
+  benchmarks:=fopen(filename,APPEND,TEXT):
+  writeline(benchmarks, ""):
+  fprintf(benchmarks, "%4.4s  |", convert(myDim + 1, string)):
+  close(benchmarks):
+od:
+end:
+

@@ -14,61 +14,89 @@ void timedOut()
 
 int main(int argc, char *argv[])
 {
-	if (argc < 5) { cout << "Usage: " << argv[0] << " fileIn fileOut decompose benchmark [timeout]" << endl; return 1; }
-	bool decomposing = (strcmp(argv[3], "1") == 0);
-	bool benchmarks = (strcmp(argv[4], "1") == 0);
-	bool polynomial = true; //file is assumed to alternate between polynomial and the simplex
-	float timeout = -1.0f;
-	float lastTime;
-	if (argc == 6) { timeout = strtod(argv[5], NULL); };
+	if (argc < 2)
+	{
+		cout << "Usage: " << argv[0] << " [options] inFile outFile" << endl; return 1;
+	}
+	bool options = true;
+	bool decomposing = false;
+	bool benchmarking = false;
+	char benchFile[128];
+	float myTimeout = 0.0f;
+	ifstream inFile;
+	ofstream outFile;
+	
+	for (int i = 1; i < argc; i++)
+	{
+		if (options)
+		{
+			if (strncmp(argv[i], "-", 1) != 0)
+			{
+				options = false;
+				if (argc < (i + 2)) //has to be one more file after this
+				{
+					cout << "Usage: " << argv[0] << " [options] inFile outFile" << endl; return 1;
+				}
+				inFile.open(argv[i], ios::in);
+				if (!inFile.is_open()) { cout << "Error: cannot open " << argv[i] << ", please try again." << endl; return 1; }
+			}
+			else
+			{
+				if (strcmp(argv[i], "-m") == 0) //monomial
+				{
+					decomposing = true;
+				}
+				else if (strcmp(argv[i], "-b") == 0) //benchmark
+				{
+					i++;
+					strncpy (benchFile, argv[i], 128);
+					benchmarking = true;
+				}
+				else if (strcmp(argv[i], "-t") == 0) //timeout
+				{
+					i++;
+					myTimeout = atof(argv[i]);
+				}
+			}
+		}
+		else
+		{
+			outFile.open(argv[i], ios::out);
+			if (!outFile.is_open()) { cout << "Error: cannot open " << argv[i] << ", please try again." << endl; return 1; }
+		}
+	}
+	if (options) { cout << "Usage: " << argv[0] << " [options] inFile outFile" << endl; return 1; }
+
+	bool polynomial = true; //file is assumed to alternate between polynomial and its simplex
+
+	float tempTime, iterationTime;
 	string line;
 	monomialSum monomials;
 	linFormSum forms;
-	ifstream myStream (argv[1], ios::in);
-	ofstream outStream(argv[2], ios::out);
-	if (!myStream.is_open() || !outStream.is_open()) { cout << "Error opening file " << argv[1] << ", please make sure it is spelled correctly." << endl; return 1; }
+
 	int polyCount = 0;
-	int dimension;
-	int degree = -1;
-	int irregularForms = 0;
-	float loadTime, decomposeTime, integrateTime, parseIntegrate;
-	loadTime = decomposeTime = integrateTime = parseIntegrate = 0.0f;
+	float loadTime, decomposeTime, integrateTime;
+	loadTime = decomposeTime = integrateTime = 0.0f;
 	Timer myTimer("Integration timer");
-	FormIntegrateConsumer<ZZ> *integrator = new FormIntegrateConsumer<ZZ>();
-	string testForms;
-	while (!myStream.eof())
+	FormIntegrateConsumer<ZZ> *integrator;
+	if (!decomposing) { integrator = new FormIntegrateConsumer<ZZ>(); }
+
+	while (!inFile.eof())
 	{
-		getline(myStream, line, '\n');
+		getline(inFile, line, '\n');
 		if (!line.empty())
 		{
-			if (timeout > 0 && myTimer.get_seconds() > timeout)
+			cout << "read" << endl;
+			if (polynomial) //reading form
 			{
-					delete integrator;
-					myStream.close();
-					outStream.close();
-					
-					FILE* myFile = fopen(argv[2],"w"); //overwriting results file
-					fprintf(myFile, "Error");
-					fclose(myFile);
-											
-					cout << "Integration timed out." << endl;
-					if (benchmarks)
-					{
-						myFile = fopen("integration/benchmarks.txt","a");
-						fprintf(myFile, "%10s", "--");
-						fclose(myFile);
-					}
-					return 1;
-			}
-			if (polynomial) //reading polynomial
-			{
+				iterationTime = myTimer.get_seconds();
 				if (decomposing) //input is sum of monomials that we decompose into sum of linear forms
 				{
-					lastTime = myTimer.get_seconds();
+					tempTime = myTimer.get_seconds();
 					myTimer.start();
 					loadMonomials(monomials, line);
 					myTimer.stop();
-					loadTime += (myTimer.get_seconds() - lastTime);
+					loadTime += (myTimer.get_seconds() - tempTime);
 
 					if (monomials.termCount == 0 || monomials.varCount == 0)
 					{
@@ -77,9 +105,9 @@ int main(int argc, char *argv[])
 					}
 
 					forms.termCount = 0;
-					dimension = forms.varCount = monomials.varCount;
+					forms.varCount = monomials.varCount;
 		
-					lastTime = myTimer.get_seconds();
+					tempTime = myTimer.get_seconds();
 					myTimer.start();
 					for (int i = 0; i < monomials.termCount; i++)
 					{
@@ -87,7 +115,7 @@ int main(int argc, char *argv[])
 						decompose(monomials, forms, i);
 					}
 					myTimer.stop();
-					decomposeTime += (myTimer.get_seconds() - lastTime);
+					decomposeTime += (myTimer.get_seconds() - tempTime);
 					//cout << endl;
 					
 					if (forms.termCount == 0)
@@ -95,35 +123,14 @@ int main(int argc, char *argv[])
 						cout << "Error: no terms in decomposition to sum of linear forms.";
 						return 1;	
 					}
-					
-					testForms = printLinForms(forms);
-					outStream << testForms << endl;
-					if (degree == -1) //degree is calculated only once
-					{
-						degree = 0;
-						for (int i = 0; i < monomials.varCount; i++)
-						{
-							degree += monomials.eHead->data[i];
-						}
-					}
+
 					destroyMonomials(monomials);
 				}
 				else //input is just linear forms
 				{
-					lastTime = myTimer.get_seconds();
-					myTimer.start();
-					loadLinForms(forms, line);
-					myTimer.stop();
-					loadTime += (myTimer.get_seconds() - lastTime);
-					if (forms.termCount == 0 || forms.varCount == 0)
-					{
-						cout << "Error: loaded invalid sum of linear forms.";
-						return 1;	
-					}
 					integrator->setFormSum(line);
 				}
 				polynomial = false;
-				//cout << "Loaded into " << forms.termCount << " linear forms" << endl;
 			}
 			else //reading simplex
 			{
@@ -133,80 +140,64 @@ int main(int argc, char *argv[])
 				ZZ numerator, denominator;
 				if (decomposing)
 				{
-					//check irregularity, timeouts
-					integrator->setSimplex(mySimplex);
-					lastTime = myTimer.get_seconds();
-					myTimer.start();
-					parseLinForms(integrator, testForms);
-					myTimer.stop();
-					if ((myTimer.get_seconds() - lastTime) > 600) //we timed out
-					{
-						delete integrator;
-						myStream.close();
-						outStream.close();
-						FILE* myFile = fopen(argv[2],"w"); //overwriting results file
-						fprintf(myFile, "Error");
-						fclose(myFile);
-												
-						cout << "Integration timed out." << endl;
-						if (benchmarks)
-						{
-							myFile = fopen("integration/benchmarks.txt","a");
-							fprintf(myFile, "%10s", "--");
-							fclose(myFile);
-						}
-						return 1;
-					}
-					parseIntegrate += (myTimer.get_seconds() - lastTime);
-					ZZ a, b;
-					integrator->getResults(a, b);
-					if (IsZero(b))
-					{ irregularForms++; }
-					//cout << "Irregular: " << printLinForms(forms) << " over " << line << endl;
-					lastTime = myTimer.get_seconds();
+					tempTime = myTimer.get_seconds();
 					myTimer.start();
 					integrateList(numerator, denominator, forms, mySimplex);
 					myTimer.stop();
-					integrateTime += (myTimer.get_seconds() - lastTime);
+					integrateTime += (myTimer.get_seconds() - tempTime);
+					destroyLinForms(forms);
 				}
 				else
 				{
 					integrator->setSimplex(mySimplex);
-					lastTime = myTimer.get_seconds();
+					tempTime = myTimer.get_seconds();
 					myTimer.start();
 					parseLinForms(integrator, integrator->getFormSum());
 					myTimer.stop();
 					integrator->getResults(numerator, denominator);
-					if (IsZero(denominator)) //irregular
-					{	
-						irregularForms++;
-					}
-					integrateTime += (myTimer.get_seconds() - lastTime);
+					integrateTime += (myTimer.get_seconds() - tempTime);
 				}
-				outStream << "[" << numerator << "," << denominator << "]" << endl;
-				destroyLinForms(forms);
+				outFile << "[" << numerator << "," << denominator << "]" << endl;
 				polyCount++;
 				polynomial = true;
+				if (benchmarking) { cout << "Sample took " << myTimer.get_seconds() - iterationTime << "s." << endl; }
+				if (myTimeout > 0.001 && (myTimer.get_seconds() - iterationTime) > myTimeout) //we timed out
+				{
+					delete integrator;
+					inFile.close();
+					
+					outFile.seekp(0, ios_base::beg);
+					outFile.write("Error\n", 6);
+					outFile.close();
+					
+					//FILE* myFile = fopen(,"w"); //overwriting results file
+					//fprintf(myFile, "Error");
+					//fclose(myFile);
+											
+					cout << "Integration timed out." << endl;
+					if (benchmarking)
+					{
+						FILE* myFile = fopen(strtok(benchFile, " "),"a");
+						fprintf(myFile, "%10s", "--");
+						fclose(myFile);
+					}
+					return 1;
+				}
 			}
 		}
 	}
-	if (decomposing) { cout << "Dimension " << dimension << ", degree " << degree << ". " << irregularForms << " forms were irregular." << endl; }
-	cout << "Total time " << (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) << endl;
-	cout << "	avg " << (float)(decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) / polyCount << endl;
-	/*cout << "Total time to load " << polyCount << " polynomials: " << loadTime << ", avg. is " << loadTime / polyCount << endl;
-	if (decomposing) { cout << "Total time to decompose " << polyCount << " polynomials: " << decomposeTime << ", avg. is " << decomposeTime / polyCount << endl; }
-	cout << "Total time to integrate " << polyCount << " polynomials: " << integrateTime << ", avg. is " << integrateTime / polyCount << endl;
-	cout << "Total time to integrate " << polyCount << " linear forms: " << parseIntegrate << ", avg. is " << parseIntegrate / polyCount << endl;
-	cout << "Total time is " << (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) << ", avg. is " << (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) / polyCount << endl;*/
-	if (benchmarks)
+
+	if (benchmarking)
 	{
-		FILE* benchmarks = fopen("integration/benchmarks.txt","a");
-		fprintf(benchmarks, "%10.2f", (decomposing ? loadTime + integrateTime + decomposeTime : loadTime + integrateTime) / polyCount);
+		cout << "Total time " << (decomposing ? loadTime + integrateTime + decomposeTime : integrateTime) << endl;
+		cout << "       avg " << (decomposing ? loadTime + integrateTime + decomposeTime : integrateTime) / (polyCount + 0.0) << endl;
+		FILE* benchmarks = fopen(strtok(benchFile, " "),"a");
+		fprintf(benchmarks, "%10.2f", (decomposing ? loadTime + integrateTime + decomposeTime : integrateTime) / polyCount);
 		fclose(benchmarks);
 	}
 	
-	delete integrator;
-	myStream.close();
-	outStream.close();
+	if (!decomposing) { delete integrator; }
+	inFile.close();
+	outFile.close();
 	return 0; 
 }

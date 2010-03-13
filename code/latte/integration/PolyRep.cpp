@@ -292,15 +292,16 @@ void insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, linFormSum& 
 			
 			if (linForm->degree[i % BLOCK_SIZE] == degree)
 			{
-				found = true;
-				for (int j = 0; j < formSum.varCount; j++)
+				//found = true;
+				if (linForm->data[i % BLOCK_SIZE] == coeffs)
+				/*for (int j = 0; j < formSum.varCount; j++)
 				{
 					if (linForm->data[i % BLOCK_SIZE][j] != coeffs[j])
 					{ found = false; break; }
 				}
-				if (found)
+				if (found)*/
 				{
-					myIndex = i; break;
+					found = true; myIndex = i; break;
 				}
 			}
 			

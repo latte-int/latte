@@ -392,6 +392,7 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
 end:
 
 test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing)
+  global totalErrors:
   local errors, wrong:
   local myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults:
   local curForms, curTerm, curSet:
@@ -426,7 +427,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     #print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
     
     #run the integrate program
-    system("./integrate_test integration/randomPolys.txt integration/forms.txt 1 0 10.0"):
+    system("./integrate_test -m integration/randomPolys.txt integration/forms.txt"):
     
     #read forms in maple notation
     outputFile:=fopen("integration/forms.txt",READ,TEXT):
@@ -453,7 +454,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     close(inputFile):
     
     #run the integrate program
-    system("./integrate_test integration/randomForms.txt integration/results.txt 0 0"):
+    system("./integrate_test integration/randomForms.txt integration/results.txt"):
     
     #read results
     outputFile:=fopen("integration/results.txt",READ,TEXT):
@@ -533,20 +534,24 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   od:
   close(errorFile):
   
+  totalErrors:= totalErrors + errors:
   print(StringTools[Join]([convert(errors,string),"tests failed."], " "));
 end:
 
+global totalErrors:
 local benchmarks:
 local myDim, myDegree:
 errorFile:=fopen("integration/errors.log",WRITE,TEXT):
 close(errorFile):
 
-for myDim from 2 to 5 do
-  for myDegree from 1 to 10 do
+totalErrors:= 0:
+for myDim from 2 to 7 do
+  for myDegree from 2 to 10 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
     test_integration(10, 1000, 1, myDim, myDegree, 1):
     test_integration(10, 1000, 1, myDim, myDegree, 0):
   od:
 od:
+print(StringTools[Join]([convert(totalErrors,string),"total errors."], " "));
 
  
