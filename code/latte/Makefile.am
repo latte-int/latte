@@ -175,6 +175,12 @@ integrate_SOURCES +=    integration/PolyRep.cpp
 integrate_SOURCES +=    integration/newIntegration.cpp
 integrate_SOURCES +=    integration/residue.cpp
 
+bin_PROGRAMS += integrate_demo
+integrate_demo_SOURCES =    integration/integrateDemo.cpp
+integrate_demo_SOURCES +=   integration/PolyRep.cpp
+integrate_demo_SOURCES +=   integration/newIntegration.cpp
+integrate_demo_SOURCES +=   integration/residue.cpp
+
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 
@@ -188,9 +194,23 @@ check_PROGRAMS += multiply_test
 multiply_test_SOURCES =    integration/multiplyTest.cpp
 multiply_test_SOURCES +=   integration/PolyRep.cpp
 
-TESTS =  integration/testIntegration.sh
-TESTS += integration/testMultiply.sh
-TESTS += ilio_test
+#TESTS =  integration/testIntegration.sh
+#TESTS += integration/testMultiply.sh
+#TESTS += ilio_test
+
+bench-table5: 
+	integration/benchmark.sh 5 integration/table5.txt
+bench-table6: 
+	integration/benchmark.sh 6 integration/table6.txt
+bench-table10: 
+	integration/benchmark.sh 10 integration/table10.txt
+bench-table11: 
+	integration/benchmark.sh 11 integration/table11.txt
+bench-table13: 
+	integration/benchmark.sh 13 integration/table13.txt
+bench-all:
+	bench-table5 bench-table6 bench-table10 bench-table11 bench-table13
+.PHONY: bench-all bench-table5 bench-table6 bench-table10 bench-table11 bench-table13
 
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
