@@ -390,7 +390,7 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
 end:
 
 get_table13_entry:=proc(N,d, M, r)
-	random_sparse_homogeneous_polynomial_with_degree_6(d, M);
+  random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars(N, d, min(2, d), M, r):
 end:
 
 test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen)

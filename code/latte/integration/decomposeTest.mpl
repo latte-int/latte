@@ -206,72 +206,6 @@ lattice_random_simplex:=proc(d,N) local R,U;
   [ seq(U(), i=1..d+1) ];
 end:
 
-## Computing a uniformly random monomial
-## of prescribed degree.
-
-## The number of compositions of M into n non-negative integers can be
-## computed by the Maple function numcomp(M+n, n).
-## There is the recursion numbcomp(M+n, n) = sum(numbcomp(M+n-1-i, n-1), i
-## = 0...M), obtained by running the first number (m_1) from 0 to M.
-## 
-## So you can choose the first number m_1 between 0 and M with
-## probabilities given by how many random choices there are. Then recurse
-## to choose the remaining numbers.
-
-### This is very very slow. --Matthias
-
-## partial_sums := proc(degree, dimension)
-##   #option remember;
-##   counts := [ seq(numbcomp(degree+dimension-1-i, dimension-1),
-##                     i = 0..degree) ];
-##     #print(["counts", counts]);
-##     total_count := add(c, c in counts);
-##     #print(["total_count", total_count]);
-##     pos := rand(total_count)();
-##     #print(["pos", pos]);
-##     partial := 0;
-##     partials := [];
-##     choice := -1;
-##     for i from 0 to degree do
-##       #print(i);
-##       partial := partial + counts[i+1];
-##       partials := [ op(partials), partial ];
-##       #print(partial);
-##     od;
-##   partials;
-## end:
-
-## random_monomial_of_given_degree := proc(dimension, degree)
-##   local x;
-##   #print("random_monomial_of_given_degree", dimension, degree);
-##   if dimension = 1 then
-##     [degree]
-##   elif dimension = 2 then
-##     x := rand(degree + 1)();
-##     [x, degree - x]
-##   else
-##     partials := partial_sums(degree, dimension);
-##     total_count := partials[degree+1];
-##     #print(["total_count", total_count]);
-##     pos := rand(total_count)();
-##     #print(["pos", pos]);
-##     choice := -1;
-##     for i from 0 to degree do
-##       #print(i);
-##       partial := partials[i+1];
-##       #print(partial);
-##       if pos < partial then
-##         choice := i;
-##         break;
-##       end if;
-##     od;
-##     assert(choice >= 0);
-##     [ choice, 
-##       op(random_monomial_of_given_degree(dimension - 1, degree - choice)) ]
-##   end if
-## end:
-
-
 ## Converting from Maple polynomials to our sparse format
 
 polynomial_to_sparsepoly := proc(p, dimension)
@@ -290,32 +224,6 @@ polynomial_to_sparsepoly := proc(p, dimension)
       exponents);
 end:
 
-#polynomial_to_sparsepoly(x[1]*x[2]^2+2*x[2]-3*x[1], 2);
-
-# We rather use a built-in procedure of Maple,
-# and convert the result to our format.
-
-##
-## Creating random polynomials in sparse format
-##
-
-# N - use coefficients up to this number
-# d - dimension
-# M - degree
-# r - number of monomials
-## random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r) 
-##   local MM, out,R,U,A,m,coe,k,mono;out:=[];
-##   out:=[];
-##   R := rand(N):
-##   U:=proc()[seq(R(),i=1..r)] end proc:
-##   A:= U();#print(U);
-##   for k from 1 to r do
-##   mono := random_monomial_of_given_degree(d,M);
-##   out:=[op(out),[A[k],mono]];
-##   od;
-##   out;
-## end:
-
 random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r) 
   local p, R;
   ## Give up if too large polynomials requested
@@ -328,71 +236,8 @@ random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r)
   polynomial_to_sparsepoly(p, d);
 end:
 
-##random_sparse_homogeneous_polynomial_with_degree(100000, 50, 1000, 1);
-
-
-# One monomial
-random_sparse_homogeneous_polynomial_with_degree_1:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree(100, d, M, 1);
-end:
-
-# Very sparse
-random_sparse_homogeneous_polynomial_with_degree_2:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree(100, d, M, d+M);
-end:
-
-
-random_sparse_homogeneous_polynomial_with_degree_3:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree(100, d, M, 
-    floor(evalf(root(binomial(M+d-1, d-1), 4))));
-end:
-
-random_sparse_homogeneous_polynomial_with_degree_4:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree(100, d, M, 
-    floor(evalf(root(binomial(M+d-1, d-1), 2))));
-end:
-
-random_sparse_homogeneous_polynomial_with_degree_5:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree(100, d, M, 
-    floor(evalf(root(binomial(M+d-1, d-1), 1))));
-end:
-
-
-
-random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars:=
-proc(N,d,eff_num_vars,M,r) 
-  local p, R;
-  ## Give up if too large polynomials requested
-  if (r > 500000) then
-    error "Too large a polynomial requested"
-  fi;
-  R := rand(N);
-  p := randpoly([ seq(x[i], i=1..eff_num_vars) ], 
-                homogeneous, degree = M, terms = r, coeffs = proc() R() + 1; end);
-  polynomial_to_sparsepoly(p, d);
-end:
-
-# One monomial, constant (2/4/6) number of effective variables!
-random_sparse_homogeneous_polynomial_with_degree_6:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars(100, d, 
-                                                        min(2, d),
-                                                   M, 1);
-end:
-
-random_sparse_homogeneous_polynomial_with_degree_7:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars(100, d, 
-                                                        min(4, d),
-                                                   M, 1);
-end:
-
-random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
-  random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars(100, d, 
-                                                        min(6, d),
-                                                   M, 1);
-end:
-
-test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing)
-  global totalErrors:
+test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen)
+  global filename, totalErrors:
   local errors, wrong:
   local myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults:
   local curForms, curTerm, curSet:
@@ -400,37 +245,36 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   local myTime, temp, intTime, L:
   local inputFile, outputFile, errorFile:
   
+  #print(randomGen(bigConstant, dimension, myDegree, numTerms)):
   #get polynomials
   myTime:=0:
   intTime:=0:
   for myIndex from 1 to polyCount do
     mySimplices[myIndex]:=lattice_random_simplex(dimension, bigConstant);
     if decomposing = 1 then
-      myMonomials[myIndex]:=random_sparse_homogeneous_polynomial_with_degree(bigConstant, dimension, myDegree, numTerms);
-      temp:=time():
-      mapleLinForms[myIndex]:=list_integral_via_waring(myMonomials[myIndex]):
-      myTime:=myTime + time() - temp:
+      myMonomials[myIndex]:=randomGen(bigConstant, dimension, myDegree, numTerms);
     else
-      mapleLinForms[myIndex]:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms):
+      #print(myDegree, dimension, bigConstant, bigConstant, numTerms);
+      mapleLinForms[myIndex]:=randomGen(myDegree, dimension, bigConstant, bigConstant, numTerms):
+      #print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
     end if:
   od:
-  myTime:=myTime / polyCount:
-  
+
   #write to file
   if decomposing = 1 then
-    inputFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
+    inputFile:=fopen("integration/check_in.tmp",WRITE,TEXT):
     for i from 1 to polyCount do
       writeline(inputFile, convert(myMonomials[i], string));
       writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
+      mapleLinForms[i]:=list_integral_via_waring(myMonomials[i]):
     od:
     close(inputFile):
-    #print(StringTools[Join]([convert(myTime,string),"s. avg. spent on Maple decomposition."], " "));
-    
+
     #run the integrate program
-    system("./integrate_test -m integration/randomPolys.txt integration/forms.txt"):
-    
-    #read forms in maple notation
-    outputFile:=fopen("integration/forms.txt",READ,TEXT):
+#print(StringTools[Join](["./integrate_test", filename, "-t 600 integration/check_in.tmp integration/check_out.tmp"):
+    system("./integrate_test -m -t 600 integration/check_in.tmp integration/check_out.tmp"):
+
+    outputFile:=fopen("integration/check_out.tmp",READ,TEXT):
     myLinForms[1]:=readline(outputFile):
     if (myLinForms[1] = "Error") then
       print("Integration timed out.");
@@ -446,7 +290,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     od:
     close(outputFile):
   else
-    inputFile:=fopen("integration/randomForms.txt",WRITE,TEXT):
+    inputFile:=fopen("integration/check_in.tmp",WRITE,TEXT):
     for i from 1 to polyCount do
       writeline(inputFile, convert(mapleLinForms[i], string));
       writeline(inputFile, StringTools[DeleteSpace](convert(mySimplices[i], string)));
@@ -454,10 +298,9 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     close(inputFile):
     
     #run the integrate program
-    system("./integrate_test integration/randomForms.txt integration/results.txt"):
+    system("./integrate_test -t 600 integration/check_in.tmp integration/check_out.tmp"):
     
-    #read results
-    outputFile:=fopen("integration/results.txt",READ,TEXT):
+    outputFile:=fopen("integration/check_out.tmp",READ,TEXT):
     myResults[1]:=readline(outputFile):
     if (myResults[1] = "Error") then
       print("Integration timed out.");
@@ -471,7 +314,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     od:
     close(outputFile):
   end if:
-  
+
   for myIndex from 1 to polyCount do
     mapleResults[myIndex]:=0:
     temp:=time():
@@ -548,8 +391,8 @@ totalErrors:= 0:
 for myDim from 2 to 7 do
   for myDegree from 2 to 10 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    test_integration(10, 1000, 1, myDim, myDegree, 1):
-    test_integration(10, 1000, 1, myDim, myDegree, 0):
+    test_integration(10, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
+    test_integration(10, 1000, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm):
   od:
 od:
 print(StringTools[Join]([convert(totalErrors,string),"total errors."], " "));

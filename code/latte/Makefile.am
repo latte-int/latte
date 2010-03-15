@@ -194,7 +194,7 @@ check_PROGRAMS += multiply_test
 multiply_test_SOURCES =    integration/multiplyTest.cpp
 multiply_test_SOURCES +=   integration/PolyRep.cpp
 
-#TESTS =  integration/testIntegration.sh
+TESTS =  integration/testIntegration.sh
 #TESTS += integration/testMultiply.sh
 #TESTS += ilio_test
 

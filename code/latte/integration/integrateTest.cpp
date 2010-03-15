@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 		getline(inFile, line, '\n');
 		if (!line.empty())
 		{
-			cout << "read" << endl;
+			
 			if (polynomial) //reading form
 			{
 				iterationTime = myTimer.get_seconds();
@@ -123,6 +123,9 @@ int main(int argc, char *argv[])
 						cout << "Error: no terms in decomposition to sum of linear forms.";
 						return 1;	
 					}
+					
+					if (!benchmarking)
+					{ outFile << printLinForms(forms) << endl; }
 
 					destroyMonomials(monomials);
 				}
