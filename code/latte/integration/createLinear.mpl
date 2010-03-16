@@ -122,4 +122,4 @@ od;
 close(inputFile);
 end:
 #random_linform_given_multiplicity(2,2,1,10,2,[2,1]);
-generate_random_linear_with_random_multiplicity(2,10,8,20,20,"integration/randomForms.txt");
+#generate_random_linear_with_random_multiplicity(2,10,8,20,20,"integration/randomForms.txt");
