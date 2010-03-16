@@ -95,7 +95,7 @@ for d from dim1 to dim2 do
       l:=l-t;
     od;
     p:=[op(p),l];
-    print(p);
+    #print(p);
     str:=random_linform_given_multiplicity(m,d,maxcoef,maxver,k,p);    
     #print(str);
     writeline(inputFile,convert(str[1],string));
@@ -103,7 +103,7 @@ for d from dim1 to dim2 do
   od;
   #print("dimension ",d, "identical products testing");
   p:=[d+1];
-  print(p);
+  #print(p);
   str:=random_linform_given_multiplicity(m,d,maxcoef,maxver,1,p);
   #print(str);
   #writeline(inputFile, str);
@@ -112,7 +112,7 @@ for d from dim1 to dim2 do
   #print("dimension ",d, "distinct products testing"):
   p:=[];
   for j from 1 to d+1 do p:=[op(p),1];od;  
-  print(p);
+  #print(p);
   str:=random_linform_given_multiplicity(m,d,maxcoef,maxver,d+1,p);
   #print(str);
   #writeline(inputFile, str);

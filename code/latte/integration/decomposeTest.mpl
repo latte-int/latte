@@ -391,10 +391,12 @@ totalErrors:= 0:
 for myDim from 2 to 7 do
   for myDegree from 2 to 10 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
+    print(StringTools[Join](["Integrating monomials of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
     test_integration(10, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
+    print(StringTools[Join](["Integrating powers of linear forms of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
     test_integration(10, 1000, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm):
   od:
 od:
-print(StringTools[Join]([convert(totalErrors,string),"total errors."], " "));
+print(StringTools[Join]([convert(totalErrors,string),"total errors."], " ")):
 
  
