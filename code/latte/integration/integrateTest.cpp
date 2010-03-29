@@ -1,4 +1,4 @@
-#include "PolyRep.h"
+#include "PolyTrie.h"
 #include "newIntegration.h"
 #include "../timing.h"
 #include <iostream>
@@ -138,9 +138,9 @@ int main(int argc, char *argv[])
 			else //reading simplex
 			{
 				simplexZZ mySimplex;
-				convertToSimplex(mySimplex, line);
-				//integrate here
-				ZZ numerator, denominator;
+				//convertToSimplex(mySimplex, line);
+				//don't actually integrate here
+				/*ZZ numerator, denominator;
 				if (decomposing)
 				{
 					tempTime = myTimer.get_seconds();
@@ -160,10 +160,10 @@ int main(int argc, char *argv[])
 					integrator->getResults(numerator, denominator);
 					integrateTime += (myTimer.get_seconds() - tempTime);
 				}
-				outFile << "[" << numerator << "," << denominator << "]" << endl;
+				outFile << "[" << numerator << "," << denominator << "]" << endl;*/
 				polyCount++;
 				polynomial = true;
-				if (benchmarking) { cout << "Sample took " << myTimer.get_seconds() - iterationTime << "s." << endl; }
+				/*if (benchmarking) { cout << "Sample took " << myTimer.get_seconds() - iterationTime << "s." << endl; }
 				if (myTimeout > 0.001 && (myTimer.get_seconds() - iterationTime) > myTimeout) //we timed out
 				{
 					delete integrator;
@@ -185,7 +185,7 @@ int main(int argc, char *argv[])
 						fclose(myFile);
 					}
 					return 1;
-				}
+				}*/
 			}
 		}
 	}

@@ -1,4 +1,4 @@
-#include "PolyRep.h"
+#include "PolyTrie.h"
 #include "newIntegration.h"
 #include "residue.h"
 #include <NTL/vec_ZZ.h>
@@ -167,7 +167,13 @@ void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 
 void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
 {
-  ZZ v,de,counter,tem,coe;
+	Integrator* myIntegrator = new Integrator();
+	myIntegrator->init(&forms, &mySimplex);
+	myIntegrator->setDimension(forms.varCount);
+	myIntegrator->enumTrie(forms.myForms);
+	myIntegrator->getResults(numerator, denominator);
+	delete myIntegrator;
+	/*ZZ v,de,counter,tem,coe;
 	int i,j,index,k,m;
 	vec_ZZ l;
 	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<endl;exit(1);};
@@ -193,7 +199,7 @@ void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , con
 		update(numerator,denominator,l,mySimplex,m,coe,de);
 		if (IsZero(denominator)) { return; } //irregular
 	}
-	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};
+	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};*/
 };	
 
 void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)

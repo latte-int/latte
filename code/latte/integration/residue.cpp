@@ -1,7 +1,7 @@
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
 
-#include "PolyRep.h"
+#include "PolyTrie.h"
 #include "multiply.h"
 
 /*void addToFraction(const int &s[50],int n, const ZZ &t, const int &index[50], const int &counter[50], ZZ &a, ZZ &b)
@@ -139,8 +139,17 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 	if (i % 2==1) {multiply<ZZ>(m1,m2,sub,mindeg,maxdeg);}//cout<<"times "<<printMonomials(m2)<<" gives "<<printMonomials(sub)<<endl;}
 	else {multiply<ZZ>(sub,m2,m1,mindeg,maxdeg);}//cout<<"times "<<printMonomials(m2)<<"gives "<<printMonomials(m1)<<endl;};
      };
-     ZZ findCoeff;	
-     eBlock* myExps; cBlock<ZZ>* myCoeffs;
+     ZZ findCoeff;
+     if (k % 2) //m1
+     {
+	//search m1 for the first term whose exponent vector is equal to [counter[0]]
+     }
+     else //sub
+     {
+	//search sub for the first term whose exponent vector is equal to [counter[0]]
+     }
+     /*
+      eBlock* myExps; cBlock<ZZ>* myCoeffs;
      if (k % 2==1) 					//choose which one to pick result from
      {myExps = m1.eHead; myCoeffs = m1.cHead;
 	     for (i=0;i<m1.termCount;i++)
@@ -162,7 +171,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 		};
 		if (myExps->data[i % BLOCK_SIZE]== counter[0]) {findCoeff=myCoeffs->data[i % BLOCK_SIZE];break;};
       	};
-      };
+      };*/
 	
 	
       a=nu*findCoeff;

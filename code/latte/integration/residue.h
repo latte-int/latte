@@ -2,7 +2,7 @@
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
 
-#include "PolyRep.h"
+#include "PolyTrie.h"
 #include "multiply.h"
 //void addToFraction(const int &s[50],int n, const ZZ &t, const int &index[50], const int &counter[50], ZZ &a, ZZ &b);
 //void enumerate(const int &s[50], int i, int k, int n, const ZZ &p, const ZZ &t, const int &index[50], const int &counter[50], ZZ &a, ZZ &b);

@@ -43,11 +43,11 @@ random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r)
   #polynomial_to_sparsepoly(p, d);
 end:
 
-local polyCount:=100:
-local bigConstant:=100000:
-local numTerms:=5:
-local dimension:=10:
-local myDegree:=20:
+local polyCount:=2:
+local bigConstant:=10:
+local numTerms:=100:
+local dimension:=100:
+local myDegree:=100:
 local errors, myPolys, myResults:
 local curPoly:
 local temp:

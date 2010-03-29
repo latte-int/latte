@@ -1,4 +1,4 @@
-#include "PolyRep.h"
+#include "PolyTrie.h"
 #include "newIntegration.h"
 #include "../timing.h"
 #include <iostream>
@@ -74,6 +74,8 @@ int main(int argc, char *argv[])
 					loadTime += (myTimer.get_seconds() - lastTime);
 					outStream << "Loaded monomials in " << myTimer.get_seconds() - lastTime << "s." << endl;
 
+					cout << printMonomials(monomials) << endl;
+	
 					if (monomials.termCount == 0 || monomials.varCount == 0)
 					{
 						cout << "Error: loaded invalid monomial sum." << endl;
@@ -86,15 +88,12 @@ int main(int argc, char *argv[])
 					cout << "Decomposing into sum of linear forms..." << endl;
 					lastTime = myTimer.get_seconds();
 					myTimer.start();
-					for (int i = 0; i < monomials.termCount; i++)
-					{
-						decompose(monomials, forms, i);
-					}
+					decompose(monomials, forms, 0);
 					myTimer.stop();
 					decomposeTime += (myTimer.get_seconds() - lastTime);
 					outStream << "Decomposition finished in " << myTimer.get_seconds() - lastTime << "s." << endl;
 					
-					if (forms.termCount == 0)
+					if (forms.termCount == 0 || forms.varCount == 0)
 					{
 						cout << "Error: no terms in decomposition to sum of linear forms.";
 						return 1;	
@@ -105,6 +104,22 @@ int main(int argc, char *argv[])
 				{
 					cout << "Reading sum of powers of linear forms..." << endl;
 					if (options) { outStream << line << endl; }
+					
+					/*lastTime = myTimer.get_seconds();
+					myTimer.start();
+					loadLinForms(forms, line);
+					myTimer.stop();
+					loadTime += (myTimer.get_seconds() - lastTime);
+					outStream << "Loaded forms in " << myTimer.get_seconds() - lastTime << "s." << endl;
+
+					cout << printLinForms(forms) << endl;
+	
+					if (forms.varCount == 0)
+					{
+						cout << "Error: loaded invalid form sum." << endl;
+						return 1;
+					}
+					destroyLinForms(forms);*/
 					integrator->setFormSum(line);
 				}
 				polynomial = false;

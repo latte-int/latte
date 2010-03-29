@@ -177,7 +177,7 @@ integrate_SOURCES +=    integration/residue.cpp
 
 bin_PROGRAMS += integrate_demo
 integrate_demo_SOURCES =    integration/integrateDemo.cpp
-integrate_demo_SOURCES +=   integration/PolyRep.cpp
+integrate_demo_SOURCES +=   integration/PolyTrie.cpp
 integrate_demo_SOURCES +=   integration/newIntegration.cpp
 integrate_demo_SOURCES +=   integration/residue.cpp
 
@@ -186,16 +186,16 @@ ilio_test_SOURCES = genFunction/ilio.cpp
 
 check_PROGRAMS += integrate_test
 integrate_test_SOURCES =    integration/integrateTest.cpp
-integrate_test_SOURCES +=   integration/PolyRep.cpp
+integrate_test_SOURCES +=   integration/PolyTrie.cpp
 integrate_test_SOURCES +=   integration/newIntegration.cpp
 integrate_test_SOURCES +=   integration/residue.cpp
 
 check_PROGRAMS += multiply_test
 multiply_test_SOURCES =    integration/multiplyTest.cpp
-multiply_test_SOURCES +=   integration/PolyRep.cpp
+multiply_test_SOURCES +=   integration/PolyTrie.cpp
 
 TESTS =  integration/testIntegration.sh
-#TESTS += integration/testMultiply.sh
+TESTS += integration/testMultiply.sh
 #TESTS += ilio_test
 
 bench-table5: 

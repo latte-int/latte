@@ -1,6 +1,5 @@
 #define COEFF_MAX 10000
 
-#include "PolyRep.h"
 #include "newIntegration.h"
 #include "residue.h"
 
