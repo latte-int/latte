@@ -1,8 +1,11 @@
 * text=auto !eol
 code/latte/integration/PolyRep.cpp -text
 code/latte/integration/PolyRep.h -text
+code/latte/integration/PolyTrie.cpp -text
+code/latte/integration/PolyTrie.h -text
 code/latte/integration/benchmark.mpl -text
 code/latte/integration/benchmark.sh -text
+code/latte/integration/burstTrie.h -text
 code/latte/integration/createLinear.mpl -text
 code/latte/integration/decint.cpp -text
 code/latte/integration/decompose.cpp -text
