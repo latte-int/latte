@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 					cout << "Decomposing into sum of linear forms..." << endl;
 					lastTime = myTimer.get_seconds();
 					myTimer.start();
-					decompose(monomials, forms, 0);
+					decompose(monomials, forms);
 					myTimer.stop();
 					decomposeTime += (myTimer.get_seconds() - lastTime);
 					outStream << "Decomposition finished in " << myTimer.get_seconds() - lastTime << "s." << endl;

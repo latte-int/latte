@@ -30,14 +30,14 @@ template <class T> struct cBlock
 	T* data; //this stores the monomial coefficient for each monomial
 };
 
-struct monomialSum
+struct _monomialSum
 {
 	int termCount, varCount;
 	eBlock* eHead; //variable exponents
 	cBlock<ZZ>* cHead; //monomial coefficients over ZZ
 };
 
-struct linFormSum
+struct _linFormSum
 {
 	int termCount, varCount;
 	lBlock* lHead; //linear forms
@@ -45,7 +45,7 @@ struct linFormSum
 };
 
 //define base consumers to enable flexible string parsing
-template <class T> class MonomialConsumer {
+template <class T> class _MonomialConsumer {
 public:
   // Take monomial and consume it.
   virtual void ConsumeMonomial(const T&, int*) = 0;
@@ -53,7 +53,7 @@ public:
   virtual int getDimension() = 0;
 };
 
-template <class T> class FormSumConsumer {
+template <class T> class _FormSumConsumer {
 public:
   // Take linear form and consume it.
   //virtual int ConsumeLinForm(const T&, int, int*) = 0;
@@ -62,48 +62,48 @@ public:
   virtual int getDimension() = 0;
 };
 
-void loadMonomials(monomialSum&, const string&);
+void _loadMonomials(_monomialSum&, const string&);
 //string parsing
-void parseMonomials(MonomialConsumer<ZZ>*, const string&);
+void _parseMonomials(_MonomialConsumer<ZZ>*, const string&);
 //data structure operations
-template <class T> void insertMonomial(const T&, int*, monomialSum&);
-string printMonomials(const monomialSum&);
-void destroyMonomials(monomialSum&);
+template <class T> void _insertMonomial(const T&, int*, _monomialSum&);
+string _printMonomials(const _monomialSum&);
+void _destroyMonomials(_monomialSum&);
 
-void loadLinForms(linFormSum&, const string);
+void _loadLinForms(_linFormSum&, const string);
 //string parsing
-void parseLinForms(FormSumConsumer<ZZ>*, const string&);
+void _parseLinForms(_FormSumConsumer<ZZ>*, const string&);
 //data structure operations
-template <class T> void insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, linFormSum&);
-string printLinForms(const linFormSum&);
-void destroyLinForms(linFormSum&);
+template <class T> void _insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, _linFormSum&);
+string _printLinForms(const _linFormSum&);
+void _destroyLinForms(_linFormSum&);
 
-void decompose(monomialSum&, linFormSum&, int);
+void _decompose(_monomialSum&, _linFormSum&, int);
 
 //consumers for loading data structures
-template <class T> class MonomialLoadConsumer : public MonomialConsumer<T> {
+template <class T> class _MonomialLoadConsumer : public _MonomialConsumer<T> {
 public:
-  MonomialLoadConsumer() {}
+  _MonomialLoadConsumer() {}
   // Take monomial and consume it.
-  void ConsumeMonomial(const T& coef, int* exps) { insertMonomial<ZZ>(coef, exps, *monomials); }
-  void setMonomialSum(monomialSum& mySum) { monomials = &mySum; }
+  void ConsumeMonomial(const T& coef, int* exps) { _insertMonomial<ZZ>(coef, exps, *monomials); }
+  void setMonomialSum(_monomialSum& mySum) { monomials = &mySum; }
   void setDimension(int dimension) { if (monomials) { monomials->varCount = dimension; } }
   int getDimension() { if (monomials) { return monomials->varCount; } else { return 0; } }
 private:
-  monomialSum* monomials;
+  _monomialSum* monomials;
 };
 
-template <class T> class FormLoadConsumer : public FormSumConsumer<T> {
+template <class T> class _FormLoadConsumer : public _FormSumConsumer<T> {
 public:
-  FormLoadConsumer() {}
+  _FormLoadConsumer() {}
   // Take linear form and consume it.
-  void ConsumeLinForm(const T& coefficient, int degree, const vec_ZZ& coefs) { insertLinForm<ZZ>(coefficient, degree, coefs, *formSum); }
-  void setFormSum(linFormSum& myForms) { formSum = &myForms; }
+  void ConsumeLinForm(const T& coefficient, int degree, const vec_ZZ& coefs) { _insertLinForm<ZZ>(coefficient, degree, coefs, *formSum); }
+  void setFormSum(_linFormSum& myForms) { formSum = &myForms; }
   void setDimension(int dimension) { if (formSum) { formSum->varCount = dimension; } }
   int getDimension() { if (formSum) { return formSum->varCount; } else { return 0; } }
-  ~FormLoadConsumer() {}
+  ~_FormLoadConsumer() {}
 private:
-  linFormSum* formSum;
+  _linFormSum* formSum;
 };
 
 #endif

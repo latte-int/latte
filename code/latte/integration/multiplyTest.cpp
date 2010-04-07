@@ -1,4 +1,5 @@
 #include "multiply.h"
+#include "../timing.h"
 #include <iostream>
 #include <fstream>
 #include <NTL/ZZ.h>
@@ -18,7 +19,7 @@ int main(int argc, char *argv[])
 	string testForms;
 	int *low, *high;
 	
-	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();	
+	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();
 	
 	while (!myStream.eof())
 	{
@@ -33,9 +34,10 @@ int main(int argc, char *argv[])
 
 				if (firstPoly.termCount == 0 || firstPoly.varCount == 0)
 				{
-					cout << "Error: loaded invalid monomial sum." << endl;
+					cout << "1Error: loaded invalid monomial sum." << endl;
 					return 1;
 				}
+				
 				first = false;
 			}
 			else //second polynomial
@@ -46,28 +48,33 @@ int main(int argc, char *argv[])
 
 				if (secondPoly.termCount == 0 || secondPoly.varCount == 0)
 				{
-					cout << "Error: loaded invalid monomial sum." << endl;
+					cout << "2Error: loaded invalid monomial sum." << endl;
 					return 1;
 				}
+				else
+				{ product.varCount = secondPoly.varCount; }
+				
+
 				first = true;
 				
-				low = new int[secondPoly.varCount];
-				high = new int[secondPoly.varCount];
-				for (int i = 0; i < secondPoly.varCount; i++)
+				low = new int[product.varCount];
+				high = new int[product.varCount];
+				for (int i = 0; i < product.varCount; i++)
 				{
 					low[i] = INT_MIN;
 					high[i] = INT_MAX;
 				}
-				product.varCount = secondPoly.varCount;
+				
 				multiply<ZZ>(firstPoly, secondPoly, product, low, high);
-				delete[] low;
-				delete[] high;
 
 				outStream << printMonomials(product) << endl;
 
 				destroyMonomials(firstPoly);
 				destroyMonomials(secondPoly);
 				destroyMonomials(product);
+				
+				delete[] low;
+				delete[] high;
 			}
 		}
 	}

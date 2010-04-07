@@ -6,16 +6,17 @@
 //monomial sum: c_{1}*(x_{1}^e_{1}...x_{varCount}^e_{varCount}) + ...
 //nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
 
-void loadMonomials(monomialSum &monomials, const string &line)
+void _loadMonomials(_monomialSum &monomials, const string &line)
 {
 	monomials.termCount = 0;
-	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();	
+	_MonomialLoadConsumer<ZZ>* myLoader = new _MonomialLoadConsumer<ZZ>();	
 	myLoader->setMonomialSum(monomials);
-	parseMonomials(myLoader, line);
+	_parseMonomials(myLoader, line);
 }
 
-void parseMonomials(MonomialConsumer<ZZ>* consumer, const string &line)
+void _parseMonomials(_MonomialConsumer<ZZ>* consumer, const string &line)
 {
+	cout << "Old parse" << endl;
 	int varCount = 0;
 	for (int i = 0; line[i] != ']'; i++)
 	{ varCount += (line[i] == ','); }
@@ -61,16 +62,17 @@ void parseMonomials(MonomialConsumer<ZZ>* consumer, const string &line)
 		}
 		}
 	}
+	cout << "Finished parsing" << endl;
 
 	delete [] exponents;
 }
 
-// Attempts to find a monomial in monomialSum with same exponents as those passed in
-// if found, the monomial coefficient in monomialSum is multiplied by the one passed in
-// if not found, a new monomial term is added and monomialSum's termCount is incremented
-// if monomialSum is empty, this sets formSum's eHead and cHead variables
+// Attempts to find a monomial in _monomialSum with same exponents as those passed in
+// if found, the monomial coefficient in _monomialSum is multiplied by the one passed in
+// if not found, a new monomial term is added and _monomialSum's termCount is incremented
+// if _monomialSum is empty, this sets formSum's eHead and cHead variables
 template <class T>
-void insertMonomial(const T& coefficient, int* exponents, monomialSum& monomials)
+void _insertMonomial(const T& coefficient, int* exponents, _monomialSum& monomials)
 {
 	bool found;
 	int myIndex;
@@ -145,7 +147,7 @@ void insertMonomial(const T& coefficient, int* exponents, monomialSum& monomials
 //Prints a nested list representation of our sum of monomials
 //monomial sum: c_{1}*(x_{1}^e_{1}...x_{varCount}^e_{varCount}) + ...
 //nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
-string printMonomials(const monomialSum &myPoly)
+string _printMonomials(const _monomialSum &myPoly)
 {
 	stringstream output (stringstream::in | stringstream::out);
 	output << "[";
@@ -175,7 +177,7 @@ string printMonomials(const monomialSum &myPoly)
 }
 
 //Deallocates space and nullifies internal pointers and counters
-void destroyMonomials(monomialSum &myPoly)
+void _destroyMonomials(_monomialSum &myPoly)
 {
 	eBlock* expTmp = myPoly.eHead; cBlock<ZZ>* coeffTmp = myPoly.cHead;
 	eBlock* oldExp = NULL; cBlock<ZZ>* oldCoeff = NULL;
@@ -184,8 +186,8 @@ void destroyMonomials(monomialSum &myPoly)
 		oldExp = expTmp; oldCoeff = coeffTmp;
 		expTmp = expTmp->next;
 		coeffTmp = coeffTmp->next;
-		delete [] oldExp;
-		delete [] oldCoeff;
+		free(oldExp);
+		free(oldCoeff);
 	}
 	while (coeffTmp != NULL);
 	myPoly.eHead = NULL;
@@ -194,17 +196,17 @@ void destroyMonomials(monomialSum &myPoly)
 }
 
 
-void loadLinForms(linFormSum &forms, const string line)
+void _loadLinForms(_linFormSum &forms, const string line)
 {
 	forms.termCount = 0;
-	FormLoadConsumer<ZZ>* myLoader = new FormLoadConsumer<ZZ>();	
+	_FormLoadConsumer<ZZ>* myLoader = new _FormLoadConsumer<ZZ>();	
 	myLoader->setFormSum(forms);
-	parseLinForms(myLoader, line);
+	_parseLinForms(myLoader, line);
 }
 //Loads a string by parsing it as a sum of linear forms
 //linear form: (c_{1} / d_{1}!)[(p_{1}*x_{1} + ... p_{varCount}*x_{varCount})^d_{1}] + ...
 //nested list: [[c_{1}, [d_{1}, [p_{1}, p_{2}, ..., p_{varCount}]], .. ]
-void parseLinForms(FormSumConsumer<ZZ>* consumer, const string& line)
+void _parseLinForms(_FormSumConsumer<ZZ>* consumer, const string& line)
 {
 	int termIndex = 0;
 	int lastPos = 0;
@@ -254,7 +256,7 @@ void parseLinForms(FormSumConsumer<ZZ>* consumer, const string& line)
 						coefs[k++] = to_ZZ(line.substr(lastPos, i - lastPos).c_str());
 					}
 				}
-				for (int j = 1; j <= degree; j++) { coefficient *= j; } //in linFormSum, coefficient is assumed to be divided by the factorial of the form degree
+				for (int j = 1; j <= degree; j++) { coefficient *= j; } //in _linFormSum, coefficient is assumed to be divided by the factorial of the form degree
 				consumer->ConsumeLinForm(coefficient, degree, coefs);
 				flag = 0;
 				break;
@@ -271,7 +273,7 @@ void parseLinForms(FormSumConsumer<ZZ>* consumer, const string& line)
 // if not found, a new linear form term is added and formSum's termCount is incremented
 // if formSum is empty, this sets formSum's lHead and cHead variables
 template <class T>
-void insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, linFormSum& formSum)
+void _insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, _linFormSum& formSum)
 {
 	bool found;
 	int myIndex;
@@ -349,7 +351,7 @@ void insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, linFormSum& 
 //Prints a nested list representation of our sum of linear forms
 //linear form: (c_{1} / d_{1}!)[(p_{1}*x_{1} + ... p_{varCount}*x_{varCount})^d_{1}] + ...
 //nested list: [[c_{1}, [d_{1}, [p_{1}, p_{2}, ..., p_{varCount}]], .. ]
-string printLinForms(const linFormSum &myForm)
+string _printLinForms(const _linFormSum &myForm)
 {
 	stringstream output (stringstream::in | stringstream::out);
 	output << "[";
@@ -378,7 +380,7 @@ string printLinForms(const linFormSum &myForm)
 }
 
 //Deallocates space and nullifies internal pointers and counters
-void destroyLinForms(linFormSum &myPoly)
+void _destroyLinForms(_linFormSum &myPoly)
 {
 	lBlock* expTmp = myPoly.lHead; cBlock<ZZ>* coeffTmp = myPoly.cHead;
 	lBlock* oldExp = NULL; cBlock<ZZ>* oldCoeff = NULL;
@@ -388,8 +390,8 @@ void destroyLinForms(linFormSum &myPoly)
 		oldExp = expTmp; oldCoeff = coeffTmp;
 		expTmp = expTmp->next;
 		coeffTmp = coeffTmp->next;
-		delete [] oldExp;
-		delete [] oldCoeff;
+		free(oldExp);
+		free(oldCoeff);
 	}
 	while (coeffTmp != NULL);
 	myPoly.lHead = NULL;
@@ -402,7 +404,7 @@ void destroyLinForms(linFormSum &myPoly)
 //	and myPoly.exponentBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
 //OUTPUT: lForm now also contains the linear decomposition of this monomial 
 //	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
-void decompose(monomialSum &myPoly, linFormSum &lForm, int mIndex)
+void _decompose(_monomialSum &myPoly, _linFormSum &lForm, int mIndex)
 {
 	eBlock* expTmp = myPoly.eHead; cBlock<ZZ>* coeffTmp = myPoly.cHead;
 	for (int i = 0; i < (mIndex / BLOCK_SIZE); i++) { expTmp = expTmp->next; coeffTmp = coeffTmp->next; }
@@ -413,7 +415,7 @@ void decompose(monomialSum &myPoly, linFormSum &lForm, int mIndex)
 	if (constantTerm) //exponents are all 0, this is a constant term - linear form is already known
 	{
 		for (int j = 0; j < lForm.varCount; j++) { myExps[j] = 0; }
-		insertLinForm<ZZ>(coeffTmp->data[mIndex % BLOCK_SIZE], 0, myExps, lForm);
+		_insertLinForm<ZZ>(coeffTmp->data[mIndex % BLOCK_SIZE], 0, myExps, lForm);
 		return;
 	}
 	
@@ -481,7 +483,7 @@ void decompose(monomialSum &myPoly, linFormSum &lForm, int mIndex)
 		}
 		//cout << "coefficient is " << temp << endl;
 		for (int i = 0; i < myPoly.varCount; i++) { myExps[i] = p[i]; }
-		insertLinForm<ZZ>(temp, totalDegree, myExps, lForm);
+		_insertLinForm<ZZ>(temp, totalDegree, myExps, lForm);
 	}
 	delete [] p;
 	delete [] counter;

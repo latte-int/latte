@@ -109,11 +109,12 @@ int main(int argc, char *argv[])
 		
 					tempTime = myTimer.get_seconds();
 					myTimer.start();
-					for (int i = 0; i < monomials.termCount; i++)
-					{
+					//for (int i = 0; i < monomials.termCount; i++)
+					//{
 						//cout << ".";
-						decompose(monomials, forms, i);
-					}
+					//	decompose(monomials, forms, i);
+					//}
+					decompose(monomials, forms);
 					myTimer.stop();
 					decomposeTime += (myTimer.get_seconds() - tempTime);
 					//cout << endl;
@@ -138,6 +139,7 @@ int main(int argc, char *argv[])
 			else //reading simplex
 			{
 				simplexZZ mySimplex;
+				if (decomposing) { destroyLinForms(forms); }
 				//convertToSimplex(mySimplex, line);
 				//don't actually integrate here
 				/*ZZ numerator, denominator;

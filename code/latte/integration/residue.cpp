@@ -120,7 +120,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
      {
 	c=AChooseB(M+d,i)*Power_ZZ(p,M+d-i);
 	e[0]=i;
-	insertMonomial<ZZ>(c,e,m1);
+	//insertMonomial<ZZ>(c,e,m1); ADD THIS BACK IN
      };
      //cout<<printMonomials(m1)<<endl;
      for (i=1;i<k;i++)
@@ -132,7 +132,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 		c=AChooseB(counter[i]+j-1,j)*Power_ZZ(index[i],counter[0]-j);
 		if (j % 2==1) c=-c;
 		e[0]=j;
-		insertMonomial<ZZ>(c,e,m2);
+		//insertMonomial<ZZ>(c,e,m2); THIS TOO
 	};
 	mindeg[0]=0;
 	maxdeg[0]=counter[0];

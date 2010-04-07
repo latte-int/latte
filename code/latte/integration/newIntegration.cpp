@@ -155,24 +155,24 @@ void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 	};
 	if (b<0) {b=-b;a=-a;};
 	*/
-	linFormSum forms;
+	/*linFormSum forms;
 	forms.termCount = 0;
 	FormLoadConsumer<ZZ>* myLoader = new FormLoadConsumer<ZZ>();	
 	myLoader->setFormSum(forms);
 	parseLinForms(myLoader, line);
 	integrateList(a,b,forms,mySimplex);
 	cout<<"destroying...";
-	destroyLinForms(forms);
+	destroyLinForms(forms);*/
 };
 
 void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
 {
-	Integrator* myIntegrator = new Integrator();
+	/*Integrator* myIntegrator = new Integrator();
 	myIntegrator->init(&forms, &mySimplex);
 	myIntegrator->setDimension(forms.varCount);
 	myIntegrator->enumTrie(forms.myForms);
 	myIntegrator->getResults(numerator, denominator);
-	delete myIntegrator;
+	delete myIntegrator;*/
 	/*ZZ v,de,counter,tem,coe;
 	int i,j,index,k,m;
 	vec_ZZ l;
@@ -204,7 +204,7 @@ void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , con
 
 void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 {
-	monomialSum monomials;
+	/*monomialSum monomials;
 	monomials.termCount = 0;
 	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();	
 	myLoader->setMonomialSum(monomials);
@@ -212,12 +212,12 @@ void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySim
 	cout<<"polynomial is"<<line<<endl;
 	integrateFlatVector(a,b,monomials, mySimplex);
 	cout<<"destroying...";
-	destroyMonomials(monomials);
+	destroyMonomials(monomials);*/
 };
 
 void integrateFlatVector(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ &mySimplex)
 {
-	linFormSum lForm;
+	/*linFormSum lForm;
 	lForm.termCount = 0;
 	lForm.varCount = monomials.varCount;		
 	cout << "Decomposing";
@@ -228,5 +228,5 @@ void integrateFlatVector(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ &
 	};
 	cout << endl;
 	cout << "Integrating by decomposition" << endl;
-	integrateList(a,b,lForm, mySimplex);
+	integrateList(a,b,lForm, mySimplex);*/
 };

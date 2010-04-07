@@ -277,7 +277,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     outputFile:=fopen("integration/check_out.tmp",READ,TEXT):
     myLinForms[1]:=readline(outputFile):
     if (myLinForms[1] = "Error") then
-      print("Integration timed out.");
+      print("Integration timed out."):
       close(outputFile):
       return:
     end if:

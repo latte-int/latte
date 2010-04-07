@@ -11,14 +11,14 @@ NTL_CLIENT
 struct monomialSum
 {
 	int termCount, varCount;
-	burstTrie<ZZ, int>* myMonomials;
+	BurstTrie<ZZ, int>* myMonomials;
 };
 
 //linear forms: sort on degree first, then the form coefficients
 struct linFormSum
 {
 	int termCount, varCount;
-	burstTrie<ZZ, ZZ>* myForms;
+	BurstTrie<ZZ, ZZ>* myForms;
 };
 
 //define base consumers to enable flexible string parsing
@@ -43,7 +43,7 @@ void loadMonomials(monomialSum&, const string&);
 //string parsing
 void parseMonomials(MonomialConsumer<ZZ>*, const string&);
 //data structure operations
-template <class T> void insertMonomial(const T&, int*, monomialSum&);
+void insertMonomial(const ZZ&, int*, monomialSum&);
 string printMonomials(const monomialSum&);
 void destroyMonomials(monomialSum&);
 
@@ -51,15 +51,11 @@ void loadLinForms(linFormSum&, const string);
 //string parsing
 void parseLinForms(FormSumConsumer<ZZ>*, const string&);
 //data structure operations
-template <class T>
-void insertLinForm(const T& coef, int degree, const vec_ZZ& coeffs, linFormSum&);
+void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&);
 string printLinForms(const linFormSum&);
 void destroyLinForms(linFormSum&);
 
-void decompose(monomialSum&, linFormSum&, int);
-template <class T, class S>
-void decompose(monomialSum&, linFormSum&, term<T, S>*);
-template <class T, class S>
+void decompose(monomialSum&, linFormSum&, BurstTerm<ZZ, int>*);
 void decompose(monomialSum &myPoly, linFormSum &lForm);
 
 //consumers for loading data structures
@@ -67,7 +63,7 @@ template <class T> class MonomialLoadConsumer : public MonomialConsumer<T> {
 public:
   MonomialLoadConsumer() {}
   // Take monomial and consume it.
-  void ConsumeMonomial(const T& coef, int* exps) { insertMonomial<ZZ>(coef, exps, *monomials); }
+  void ConsumeMonomial(const T& coef, int* exps) { insertMonomial(coef, exps, *monomials); }
   void setMonomialSum(monomialSum& mySum) { monomials = &mySum; }
   void setDimension(int dimension) { if (monomials) { monomials->varCount = dimension; } }
   int getDimension() { if (monomials) { return monomials->varCount; } else { return 0; } }
@@ -79,7 +75,7 @@ template <class T> class FormLoadConsumer : public FormSumConsumer<T> {
 public:
   FormLoadConsumer() {}
   // Take linear form and consume it.
-  void ConsumeLinForm(const T& coefficient, int degree, const vec_ZZ& coefs) { insertLinForm<ZZ>(coefficient, degree, coefs, *formSum); }
+  void ConsumeLinForm(const T& coefficient, int degree, const vec_ZZ& coefs) { insertLinForm(coefficient, degree, coefs, *formSum); }
   void setFormSum(linFormSum& myForms) { formSum = &myForms; }
   void setDimension(int dimension) { if (formSum) { formSum->varCount = dimension; } }
   int getDimension() { if (formSum) { return formSum->varCount; } else { return 0; } }
@@ -88,6 +84,7 @@ private:
   linFormSum* formSum;
 };
 
+/*
 class Decomposer: public TrieIterator<ZZ, int> {
     public:
     monomialSum* input;
@@ -186,13 +183,12 @@ class Decomposer: public TrieIterator<ZZ, int> {
 		}
 		//cout << "coefficient is " << temp << endl;
 		for (int i = 0; i < myPoly.varCount; i++) { myExps[i] = p[i]; }
-		cout << "inserting linear form sum " << endl;
 		insertLinForm(temp, totalDegree, myExps, lForm);
 	}
 	delete [] p;
 	delete [] counter;
 	delete [] binomCoeffs;
     }
-};
+};*/
 
 #endif

@@ -165,9 +165,9 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
-bin_PROGRAMS += decompose
-decompose_SOURCES =     integration/decompose.cpp
-decompose_SOURCES +=    integration/PolyRep.cpp
+#bin_PROGRAMS += decompose
+#decompose_SOURCES =     integration/decompose.cpp
+#decompose_SOURCES +=    integration/PolyRep.cpp
 
 bin_PROGRAMS += integrate
 integrate_SOURCES =     integration/decint.cpp
@@ -191,11 +191,16 @@ integrate_test_SOURCES +=   integration/newIntegration.cpp
 integrate_test_SOURCES +=   integration/residue.cpp
 
 check_PROGRAMS += multiply_test
-multiply_test_SOURCES =    integration/multiplyTest.cpp
-multiply_test_SOURCES +=   integration/PolyTrie.cpp
+multiply_test_SOURCES =    integration/PolyTrie.cpp
+multiply_test_SOURCES +=   integration/multiplyTest.cpp
 
-TESTS =  integration/testIntegration.sh
-TESTS += integration/testMultiply.sh
+check_PROGRAMS += compare
+compare_SOURCES = integration/versusMode.cpp
+compare_SOURCES += integration/PolyTrie.cpp
+compare_SOURCES += integration/PolyRep.cpp
+
+TESTS =  integration/testMultiply.sh
+#TESTS += integration/testIntegration.sh
 #TESTS += ilio_test
 
 bench-table5: 

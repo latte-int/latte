@@ -43,20 +43,24 @@ random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r)
   #polynomial_to_sparsepoly(p, d);
 end:
 
-local polyCount:=2:
-local bigConstant:=10:
-local numTerms:=100:
-local dimension:=100:
-local myDegree:=100:
-local errors, myPolys, myResults:
-local curPoly:
-local temp:
+local myPolys, myResults, myIndex:
+local benchmarks:
+local myDim, myDegree:
+errorFile:=fopen("integration/errors.log",WRITE,TEXT):
+close(errorFile):
+local polyCount:=10:
+local temp, polyFile, formFile, i:
 
-#get polynomials and write to file
+myIndex:=1:
 polyFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
-for i from 1 to 2*polyCount do
-  myPolys[i]:=random_sparse_homogeneous_polynomial_with_degree(bigConstant, dimension, myDegree, numTerms);
-  writeline(polyFile, convert(polynomial_to_sparsepoly(myPolys[i], dimension), string));
+for myDim from 10 to 30 do
+  for i from myIndex to myIndex + 2*polyCount - 1 do
+  #polyCount, bigConstant, numTerms, dimension, myDegree
+  print(StringTools[Join](["Multiplying monomials of dimension", convert(myDim,string)], " ")):
+  myPolys[i]:=random_sparse_homogeneous_polynomial_with_degree(1000, myDim, myDim*3, 10);
+  writeline(polyFile, convert(polynomial_to_sparsepoly(myPolys[i], myDim), string));
+  myIndex:=myIndex+1:
+  od:
 od:
 close(polyFile):
 
@@ -75,9 +79,11 @@ close(formFile):
 
 #compare the forms
 errors:=0:
-for i from 1 to polyCount do
+myIndex:=1:
+for myDim from 10 to 30 do
+  for i from myIndex to polyCount - 1 do
   curPoly:=expand(myPolys[2*i - 1] * myPolys[2*i]);
-  curPoly:=polynomial_to_sparsepoly(curPoly, dimension);
+  curPoly:=polynomial_to_sparsepoly(curPoly, myDim);
   if nops(curPoly) <> nops(parse(myResults[i])) then
     print("Different number of terms.");
     print(nops(curPoly), nops(myResults[i]));
@@ -90,7 +96,11 @@ for i from 1 to polyCount do
       print(curPoly, myResults[i]);
       errors:=errors + 1;
     end if;
-  end if;  
+  end if;
+  myIndex:=myIndex+1:
+  od:
 od:
 
-print(StringTools[Join]([convert(errors,string),"tests failed."], " "));
+if errors <> 0 then
+print("Multiply error!"):
+end if;
