@@ -337,9 +337,9 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     if decomposing = 1 then
       curForms:=Array(parse(myLinForms[i])):
     end if:
-    print("curForms", curForms):
+    #print("curForms", curForms):
     
-    print(mapleLinForms[i]);
+    #print(mapleLinForms[i]);
     #myResults[i]:=parse(myResults[i]):
     wrong:=0: #prevents double counting errors, hopefully
     if decomposing = 1 then #check that decomposition is correct

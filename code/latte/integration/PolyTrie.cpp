@@ -283,6 +283,7 @@ string printLinForms(const linFormSum &myForm)
 //Deallocates space and nullifies internal pointers and counters
 void destroyLinForms(linFormSum &myPoly)
 {
+	cout << "Destroying trie" << endl;
 	delete myPoly.myForms;
 	myPoly.myForms = NULL;
 	myPoly.termCount = myPoly.varCount = 0;
@@ -295,7 +296,6 @@ void destroyLinForms(linFormSum &myPoly)
 void decompose(monomialSum &myPoly, linFormSum &lForm)
 {
 	BurstTerm<ZZ, int>* temp = new BurstTerm<ZZ, int>(myPoly.varCount);
-	lForm.myForms = new BurstTrie<ZZ, ZZ>();
 	BurstTrie<ZZ, int>* myTrie = myPoly.myMonomials;
 	myTrie->begin();
 	

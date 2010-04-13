@@ -27,7 +27,7 @@ public:
     BurstTerm(int myLength)
     {
         length = myLength;
-	exps = NULL;
+	exps = new S[length];
     }
     
     BurstTerm(const T& newCoef, S* newExps, int start, int myLength, int myDegree)
@@ -52,14 +52,20 @@ public:
     bool lessThan(BurstTerm<T, S>* other, bool &equal)
     {
         equal = false;
+	if (degree < other->degree) { return true; }
+	if (degree > other->degree) { return false; }
         for (int i = 0; i < length && i < other->length; i++)
         {
 	    //cout << "Comparing " << exps[i] << " v. " << other->exps[i] << endl;
             if (exps[i] < other->exps[i]) { return true; }
             if (exps[i] > other->exps[i]) { return false; }
         }
+	assert (length == other->length);
+	/*
+	 * too general, shouldn't be encountered
         if (length < other->length) { return true; }
         if (length > other->length) { return false; }
+	*/
         equal = true;
         return false;
     }
@@ -350,12 +356,13 @@ public:
             return false;
         }
         
-        S* myExps = new S[newTerm->length];
+        //S* myExps = new S[newTerm->length];
+	S* myExps = newTerm->exps;
         BurstTerm<T, S>* storedTerm = getTerm(myExps, 0); 
         if (storedTerm == NULL)
 	{
 	    //cout << "Advancing container (max is " << range[1] << ")" << endl;
-	    delete[] myExps;
+	    //delete [] myExps;
 	    termIndex = 0;
 	    do
 	    {
@@ -375,8 +382,8 @@ public:
         {
 	    myExps[newTerm->length - storedTerm->length + i] = storedTerm->exps[i];
         }
-	if (newTerm->exps) { delete [] newTerm->exps; }
-	newTerm->exps = myExps;
+	//if (newTerm->exps) { delete [] newTerm->exps; }
+	//newTerm->exps = myExps;
         newTerm->degree = storedTerm->degree;
         return true;
     }

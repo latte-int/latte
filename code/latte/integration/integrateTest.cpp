@@ -139,6 +139,7 @@ int main(int argc, char *argv[])
 			else //reading simplex
 			{
 				simplexZZ mySimplex;
+				cout << "reading simplex" << endl;
 				if (decomposing) { destroyLinForms(forms); }
 				//convertToSimplex(mySimplex, line);
 				//don't actually integrate here
