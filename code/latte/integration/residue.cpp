@@ -1,57 +1,8 @@
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
-
 #include "PolyTrie.h"
 #include "multiply.h"
 
-/*void addToFraction(const int &s[50],int n, const ZZ &t, const int &index[50], const int &counter[50], ZZ &a, ZZ &b)
-{
-     ZZ de,nu;
-     de=1;nu=1;
-     int i,j,w;
-     j=1;
-     for (i=0;i<=k;i++)
-     {
-         for (w=1;w<=s[i];w++)
-         {
-             nu*=j;j++;
-             de*=w;
-         };
-     };
-     nu/=de;de=1;
-     if (((n-s[0])%2)==1) nu=-nu;
-     for (i=0;i<s[0];i++) nu*=(t-i);
-     for (i=1;i<k;i++)
-     {
-          for (j=1;j<s[i];j++) nu*=(counter[i]+j);
-     };
-     nu*=Power(p,t-s[0]);
-     for (i=1;i<=k;i++)
-     {
-	de*=Power(index[i],counter[i]+s[i]);
-     };
-     ZZ g=GCD(nu,de);
-     nu=nu/g;
-     de=de/g;
-     if (b==0) {a=nu;b=de;return;};
-     ZZ lcm=b*de/GCD(b,de);
-     a=a*lcm/b+nu*lcm/de;
-     b=lcm;
-     g=GCD(a,b);
-     a=a/g;
-     b=b/g;
-     if ((a<0)||(b<0)) {a=-a;b=-b;};
-}
-
-     
-void enumerate(const int &s[50], int i, int k, int n, const ZZ &p, const ZZ &t, const int &index[50], const int &counter[50], ZZ &a, ZZ &b)
-{
-     if (i==k) {s[i]=n; addToFraction(s,n,t,index,counter,a,b); return;};
-     for (int j=0;j<=n;j++)
-     {
-         s[i]=j;enumerate(s,i+1,k,n-j,p,t,index,counter,a,b);
-     };
-};*/
 ZZ Power_ZZ(ZZ a, int b)					//power function
 {
 	if (b==0) return to_ZZ(1);
@@ -85,9 +36,8 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 {
      if (p==0) {a=0;b=1; return;}; //vertex vanishes, return 0;
      int k,i,j;
-     int counter[50];//counter counts number of appearances of each index[i]
+     int counter[1000];//counter counts number of appearances of each index[i]
      vec_ZZ index;//collecting different terms in the innerProDiff passed in
-     int s[50]; //s is the array we use to enumerate all possible weak decompostitions of counter[0]
      bool found;
      ZZ de,nu,c,g;
      int e[1];
@@ -120,7 +70,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
      {
 	c=AChooseB(M+d,i)*Power_ZZ(p,M+d-i);
 	e[0]=i;
-	//insertMonomial<ZZ>(c,e,m1); ADD THIS BACK IN
+	insertMonomial(c,e,m1); 
      };
      //cout<<printMonomials(m1)<<endl;
      for (i=1;i<k;i++)
@@ -132,15 +82,15 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 		c=AChooseB(counter[i]+j-1,j)*Power_ZZ(index[i],counter[0]-j);
 		if (j % 2==1) c=-c;
 		e[0]=j;
-		//insertMonomial<ZZ>(c,e,m2); THIS TOO
+		insertMonomial(c,e,m2); 
 	};
 	mindeg[0]=0;
 	maxdeg[0]=counter[0];
 	if (i % 2==1) {multiply<ZZ>(m1,m2,sub,mindeg,maxdeg);}//cout<<"times "<<printMonomials(m2)<<" gives "<<printMonomials(sub)<<endl;}
 	else {multiply<ZZ>(sub,m2,m1,mindeg,maxdeg);}//cout<<"times "<<printMonomials(m2)<<"gives "<<printMonomials(m1)<<endl;};
      };
-     ZZ findCoeff;
-     if (k % 2) //m1
+     ZZ findCoeff=to_ZZ(0);
+/*     if (k % 2) //m1
      {
 	//search m1 for the first term whose exponent vector is equal to [counter[0]]
      }
@@ -148,7 +98,6 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
      {
 	//search sub for the first term whose exponent vector is equal to [counter[0]]
      }
-     /*
       eBlock* myExps; cBlock<ZZ>* myCoeffs;
      if (k % 2==1) 					//choose which one to pick result from
      {myExps = m1.eHead; myCoeffs = m1.cHead;
@@ -172,11 +121,20 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 		if (myExps->data[i % BLOCK_SIZE]== counter[0]) {findCoeff=myCoeffs->data[i % BLOCK_SIZE];break;};
       	};
       };*/
+	BurstTerm<ZZ,int>* temp;
+	BurstTrie<ZZ,int>* myTrie;
+	if (k % 2==1) {temp=new BurstTerm<ZZ,int>(m1.varCount);	myTrie=m1.myMonomials;}
+	else {temp=new BurstTerm<ZZ, int>(sub.varCount); myTrie=sub.myMonomials;};
+	myTrie->begin();
+	while (myTrie->nextTerm(temp))
+	{
+		if (temp->exps[0]==counter[0])	{findCoeff=temp->coef;break;};		
+	};	
 	
 	
       a=nu*findCoeff;
       b=de;
       g=GCD(a,b);
-      if (g!=0) {a=a/g;b=b/g;};      
+      if (g!=0) {a=a/g;b=b/g;};    
       return;
 };

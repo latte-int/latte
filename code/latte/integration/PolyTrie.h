@@ -56,7 +56,7 @@ string printLinForms(const linFormSum&);
 void destroyLinForms(linFormSum&);
 
 void decompose(monomialSum&, linFormSum&, BurstTerm<ZZ, int>*);
-void decompose(monomialSum &myPoly, linFormSum &lForm);
+void decompose(monomialSum&, linFormSum&);
 
 //consumers for loading data structures
 template <class T> class MonomialLoadConsumer : public MonomialConsumer<T> {

@@ -1,4 +1,5 @@
 #include "PolyTrie.h"
+#include "burstTrie.h"
 #include "newIntegration.h"
 #include "residue.h"
 #include <NTL/vec_ZZ.h>
@@ -68,13 +69,13 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de)
 	sum_De.SetLength(mySimplex.d+1);
 	total=0;
 	lcm=1;
-	bool repeat[50];
+	bool repeat[1000];
 	for (i=0;i<=mySimplex.d;i++)
 	{
 		sum=0; for (j=0;j<mySimplex.d;j++) sum=sum+l[j]*mySimplex.s[i][j];
 		inner_Pro[i]=sum;
 		repeat[i]=0;
-		for (j=0;j<i;j++) if (inner_Pro[j]==inner_Pro[i]) {repeat[i]=1;break;};
+		for (j=0;j<i;j++) if (inner_Pro[j]==inner_Pro[i]) {repeat[i]=1;break;};//record repetitions
 	};//stores inner product for use
 	for (i=0;i<=mySimplex.d;i++)
 	if (!repeat[i])
@@ -96,7 +97,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de)
 		if (sum_De[i]!=0) {lcm=lcm*sum_De[i]/(GCD(lcm,sum_De[i]));};
 	};
 	for (i=0;i<=mySimplex.d;i++)
-	if (!repeat[i])
+	if ((!repeat[i])&&(sum_De[i]!=0))
 	{
 		total+=sum_Nu[i]*(lcm/sum_De[i]);
 	};
@@ -110,10 +111,10 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de)
 	a=a/g;
 	b=b/g;};
 }
-
-void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
+/*
+void integrateLinFormSumString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 {
-	/*ZZ de,counter,m,tem,coe;
+	ZZ de,counter,m,tem,coe;
 	int c,t,tt,i,j,index,k;
 	vec_ZZ l;
 	string temp,subtemp;
@@ -154,18 +155,14 @@ void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 		index=line.find("]]]",index)+5;
 	};
 	if (b<0) {b=-b;a=-a;};
-	*/
-	/*linFormSum forms;
-	forms.termCount = 0;
-	FormLoadConsumer<ZZ>* myLoader = new FormLoadConsumer<ZZ>();	
-	myLoader->setFormSum(forms);
-	parseLinForms(myLoader, line);
-	integrateList(a,b,forms,mySimplex);
+	linFormSum forms;
+	loadLinForms(forms, line);
+	integrateLinFormSum(a,b,forms,mySimplex);
 	cout<<"destroying...";
-	destroyLinForms(forms);*/
+	destroyLinForms(forms);
 };
-
-void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
+*/
+void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
 {
 	/*Integrator* myIntegrator = new Integrator();
 	myIntegrator->init(&forms, &mySimplex);
@@ -173,12 +170,14 @@ void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , con
 	myIntegrator->enumTrie(forms.myForms);
 	myIntegrator->getResults(numerator, denominator);
 	delete myIntegrator;*/
-	/*ZZ v,de,counter,tem,coe;
+	ZZ v,de,counter,tem,coe;
 	int i,j,index,k,m;
 	vec_ZZ l;
-	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<endl;exit(1);};
+	//cout<<mySimplex<<endl;
+	//printMonomials(forms);cout<<endl;
+	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<forms.varCount<<"<>"<<mySimplex.d<<endl;exit(1);};
 	l.SetLength(mySimplex.d);
-	lBlock* temForm=forms.lHead;
+	/* lBlock* temForm=forms.lHead;
 	cBlock<ZZ>* temCoef=forms.cHead;
 	k=-1;
 	numerator=0;
@@ -200,33 +199,47 @@ void integrateList(ZZ& numerator, ZZ& denominator, const linFormSum &forms , con
 		if (IsZero(denominator)) { return; } //irregular
 	}
 	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};*/
+	//cout<<printLinForms(forms)<<endl;
+	BurstTerm<ZZ, ZZ>* temp = new BurstTerm<ZZ, ZZ>(forms.varCount);
+	BurstTrie<ZZ, ZZ>* myTrie = forms.myForms;
+	myTrie->begin();
+	while (myTrie->nextTerm(temp))
+	{
+		coe=temp->coef;m=temp->degree;
+		l.SetLength(temp->length);
+		for (j=0;j<temp->length;j++)
+		{
+			l[j]=temp->exps[j];
+		}
+		de=1;
+		for (i=1;i<=mySimplex.d+m;i++)
+		{
+			de=de*i;
+		};
+		//cout<<coe<<" "<<m<<" "<<l<<" "<<de<<" "<<numerator<<"/"<<denominator<<endl;
+		update(numerator,denominator,l,mySimplex,m,coe,de);
+	};
+	delete temp;
+	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};
 };	
 
-void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
+/*void integrateMonomialSumString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex)
 {
-	/*monomialSum monomials;
-	monomials.termCount = 0;
-	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();	
-	myLoader->setMonomialSum(monomials);
-	parseMonomials(myLoader, line);
+	monomialSum monomials;
+	loadMonomials(monomials, line);
 	cout<<"polynomial is"<<line<<endl;
-	integrateFlatVector(a,b,monomials, mySimplex);
+	integrateMonomialSum(a,b,monomials, mySimplex);
 	cout<<"destroying...";
-	destroyMonomials(monomials);*/
+	destroyMonomials(monomials);
 };
-
-void integrateFlatVector(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ &mySimplex)
+*/
+void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ &mySimplex)
 {
-	/*linFormSum lForm;
-	lForm.termCount = 0;
-	lForm.varCount = monomials.varCount;		
-	cout << "Decomposing";
-	for (int i = 0; i < monomials.termCount; i++)
-	{
-		cout << ".";
-		decompose(monomials, lForm, i);
-	};
-	cout << endl;
-	cout << "Integrating by decomposition" << endl;
-	integrateList(a,b,lForm, mySimplex);*/
+	linFormSum forms;
+	forms.termCount = 0;
+	forms.varCount = monomials.varCount;		
+	//cout << "Decomposing: "<<endl;
+	decompose(monomials, forms);
+	//cout << "Integrating by decomposition" << endl;
+	integrateLinFormSum(a,b,forms, mySimplex);
 };

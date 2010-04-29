@@ -316,56 +316,56 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   end if:
 
   #not doing the maple side to save time, comment lines below back in when integration works
-  #for myIndex from 1 to polyCount do
-  #  mapleResults[myIndex]:=0:
+  for myIndex from 1 to polyCount do
+    mapleResults[myIndex]:=0:
   #  temp:=time():
-  #  for formIndex from 1 to nops(mapleLinForms[myIndex]) do
-  #    mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
-  #  od:
+    for formIndex from 1 to nops(mapleLinForms[myIndex]) do
+      mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
+    od:
   #  intTime:=intTime + time() - temp:
-  #  #print(StringTools[Join](["Integrating", convert(intTime,string)], ":"));
-  #od:
+    #print(StringTools[Join](["Integrating", convert(intTime,string)], ":"));
+  od:
   
-  intTime:=intTime / polyCount:
+  #intTime:=intTime / polyCount:
   #print(StringTools[Join]([convert(intTime,string),"s. avg. spent on Maple integration."], " "));
   
   #compare the forms
   errors:=0:
-  errorFile:=fopen("integration/errors.log",APPEND,TEXT):
-  for i from 1 to polyCount do
+  #errorFile:=fopen("integration/errors.log",APPEND,TEXT):
+  #for i from 1 to polyCount do
     #print(myLinForms[i]);
-    if decomposing = 1 then
-      curForms:=Array(parse(myLinForms[i])):
-    end if:
+    #if decomposing = 1 then
+    #  curForms:=Array(parse(myLinForms[i])):
+    #end if:
     #print("curForms", curForms):
     
     #print(mapleLinForms[i]);
     #myResults[i]:=parse(myResults[i]):
-    wrong:=0: #prevents double counting errors, hopefully
-    if decomposing = 1 then #check that decomposition is correct
-      if nops(parse(myLinForms[i])) <> nops(mapleLinForms[i]) then
-        print("Different number of powers of linear forms.");
-        print(myLinForms[i]);
-        print(mapleLinForms[i]);
-        errors:= errors + 1;
-        wrong:=1:
-      else
-        mapleLinForms[i]:=convert(mapleLinForms[i], 'set');
-        curTerm:={};
-        for j from 1 to nops(parse(myLinForms[i])) do
-          #print(curForms[j][1], curForms[j][2][1]);
-          curTerm:=curTerm union {[curForms[j][1] / factorial(curForms[j][2][1]), curForms[j][2]]};
-          #print({[curForms[j][1] / factorial(curForms[j][2][1]), curForms[j][2]]});
-        od:
-        if curTerm <> mapleLinForms[i] then
-          print("Powers of linear forms don't match.");
-          print(curTerm);
-          print(mapleLinForms[i]);
-          errors:=errors + 1;
-          wrong:=1:
-        end if:
-      end if:
-    end if:
+    #wrong:=0: #prevents double counting errors, hopefully
+    #if decomposing = 1 then #check that decomposition is correct
+    #  if nops(parse(myLinForms[i])) <> nops(mapleLinForms[i]) then
+    #    print("Different number of powers of linear forms.");
+    #    print(myLinForms[i]);
+    #    print(mapleLinForms[i]);
+    #    errors:= errors + 1;
+    #    wrong:=1:
+    #  else
+    #    mapleLinForms[i]:=convert(mapleLinForms[i], 'set');
+    #    curTerm:={};
+    #    for j from 1 to nops(parse(myLinForms[i])) do
+    #      #print(curForms[j][1], curForms[j][2][1]);
+    #      curTerm:=curTerm union {[curForms[j][1] / factorial(curForms[j][2][1]), curForms[j][2]]};
+    #      #print({[curForms[j][1] / factorial(curForms[j][2][1]), curForms[j][2]]});
+    #    od:
+    #    if curTerm <> mapleLinForms[i] then
+    #      print("Powers of linear forms don't match.");
+    #      print(curTerm);
+    #      print(mapleLinForms[i]);
+    #      errors:=errors + 1;
+    #      wrong:=1:
+    #    end if:
+    #  end if:
+    #end if:
     #below compares maple results to the ones read in from the c++ output
     #if wrong = 0 then
     #  if mapleResults[i] <> simplify(myResults[i][1] / myResults[i][2]) then
@@ -391,22 +391,22 @@ end:
 global totalErrors:
 local benchmarks:
 local myDim, myDegree:
-errorFile:=fopen("integration/errors.log",WRITE,TEXT):
-close(errorFile):
-
+#errorFile:=fopen("integration/errors.log",WRITE,TEXT):
+#close(errorFile):
 totalErrors:= 0:
-for myDim from 2 to 7 do
-  for myDegree from 2 to 10 do
+#for myDim from 2 to 2 do
+#  for myDegree from 2 to 2 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    print(StringTools[Join](["Integrating monomials of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
-    test_integration(10, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
+    #print(StringTools[Join](["Integrating monomials of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
+    #test_integration(10, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
     #print(StringTools[Join](["Integrating powers of linear forms of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
     #test_integration(10, 1000, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm):
-    if (totalErrors > 0) then
-      quit:
-    end if:
-  od:
-od:
+    #if (totalErrors > 0) then
+    #  quit:
+    #end if:
+#  od:
+#od:
+print(integral_power_linear_form([[0],[1]],1,1,[1]);
 print(StringTools[Join]([convert(totalErrors,string),"total errors."], " ")):
 
  

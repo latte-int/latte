@@ -327,8 +327,8 @@ void decompose(monomialSum &myPoly, linFormSum &lForm, BurstTerm<ZZ, int>* myTer
 		totalDegree +=  myTerm->exps[i];
 	}
 	formsCount--;
-	cout << "At most " << formsCount << " linear forms will be required for this decomposition." << endl;
-	cout << "Total degree is " << totalDegree << endl;
+	//cout << "At most " << formsCount << " linear forms will be required for this decomposition." << endl;
+	//cout << "Total degree is " << totalDegree << endl;
 	
 	int* p = new int[myPoly.varCount];
 	int* counter = new int[myPoly.varCount];

@@ -99,12 +99,12 @@ void FormIntegrateConsumer<T>::getResults(ZZ& num, ZZ& den)
 }
 
 void delSpace(string &line);
-void convertToSimplex(simplexZZ &mySimplex, string line);
+void convertToSimplex(simplexZZ&, string);
 //the below should be changed to more comprehensible names - for example, integrateForms + integrateStringForms?
-void integrateListString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
-void integrateList(ZZ &a, ZZ &b, const linFormSum &forms, const simplexZZ &mySimplex);
+void integrateLinFormSumString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
+void integrateLinFormSum(ZZ &a, ZZ &b, const linFormSum &forms, const simplexZZ &mySimplex);
 //this does decomposition, then calls the above functions. why is this needed?
-void integrateFlatVectorString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
-void integrateFlatVector(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
+void integrateMonomialSumString(ZZ &a, ZZ &b, string line, const simplexZZ &mySimplex);
+void integrateMonomialSum(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
 
 #endif
