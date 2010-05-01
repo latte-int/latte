@@ -27,6 +27,7 @@ code/latte/integration/residue.h -text
 code/latte/integration/testIntegration.sh -text
 code/latte/integration/testMultiply.sh -text
 code/latte/integration/versusMode.cpp -text
+code/latte/polyintegration.tex -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
