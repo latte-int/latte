@@ -194,6 +194,8 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 	}
 	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};*/
 	//cout<<printLinForms(forms)<<endl;
+	numerator=0;
+	denominator=0;
 	BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
 	it->setTrie(forms.myForms, forms.varCount);
 	it->begin();

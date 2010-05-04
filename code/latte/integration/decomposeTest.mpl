@@ -394,8 +394,8 @@ local myDim, myDegree:
 errorFile:=fopen("integration/errors.log",WRITE,TEXT):
 close(errorFile):
 totalErrors:= 0:
-for myDim from 2 to 2 do
-  for myDegree from 2 to 2 do
+for myDim from 2 to 20 do
+  for myDegree from 2 to 20 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
     print(StringTools[Join](["Integrating monomials of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
     test_integration(10, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):

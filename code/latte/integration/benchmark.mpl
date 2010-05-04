@@ -393,6 +393,10 @@ get_table13_entry:=proc(N,d, M, r)
   random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars(N, d, min(2, d), M, r):
 end:
 
+random_linearform_given_degree_dimension_maxcoef_maxterm:=proc(N,d, M, r)
+  random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(N, d, M, r, 1):
+end:
+
 test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen)
   global filename:
   local errors, wrong:
@@ -413,7 +417,8 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     else
       #print(myDegree, dimension, bigConstant, bigConstant, numTerms);
       mapleLinForms[myIndex]:=randomGen(myDegree, dimension, bigConstant, bigConstant, numTerms):
-      #print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
+      #print(randomGen(myDegree, dimension, bigConstant, bigConstant, numTerms));
+      #print(mapleLinForms[myIndex]):
     end if:
   od:
 
@@ -447,6 +452,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     close(inputFile):
     
     #run the integrate program
+    print(StringTools[Join](["./integrate_test -b", filename, "-t 600 integration/input.tmp integration/output.tmp"], " ")):
     system(StringTools[Join](["./integrate_test -b", filename, "-t 600 integration/input.tmp integration/output.tmp"], " ")):
     
     outputFile:=fopen("integration/output.tmp",READ,TEXT):
@@ -545,7 +551,7 @@ for myDim from 10 to 1000 do
   for myDegree from 2 to 1000 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
     if timedOut = 0 then
-      result:= test_integration(50, 100, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_maxterm):
+      result:= test_integration(500, 100, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_maxterm):
       if result = -1 then
        timedOut:= 1:
       end if:

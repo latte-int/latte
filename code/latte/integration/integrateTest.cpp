@@ -7,11 +7,6 @@
 
 using namespace std;
 
-void timedOut()
-{
-
-}
-
 int main(int argc, char *argv[])
 {
 	if (argc < 2)
@@ -165,7 +160,7 @@ int main(int argc, char *argv[])
 				outFile << "[" << numerator << "," << denominator << "]" << endl;
 				polyCount++;
 				polynomial = true;
-				if (benchmarking) { cout << "Sample took " << myTimer.get_seconds() - iterationTime << "s." << endl; }
+				//if (benchmarking) { cout << "Sample took " << myTimer.get_seconds() - iterationTime << "s." << endl; }
 				if (myTimeout > 0.001 && (myTimer.get_seconds() - iterationTime) > myTimeout) //we timed out
 				{
 					delete integrator;
