@@ -1,7 +1,7 @@
 #ifndef BURSTTRIE_H
 #define BURSTTRIE_H
 
-#define BURST_MAX 10
+#define BURST_MAX 2
 #include <NTL/ZZ.h>
 #include <NTL/vec_ZZ.h>
 #include <stdio.h>
@@ -11,6 +11,9 @@
 #define BT_DEBUG 1
 
 NTL_CLIENT
+
+template <class T, class S> class BurstTrie;
+template <class T, class S> class BTrieIterator;
 
 struct trieElem
 {
@@ -32,7 +35,6 @@ public:
     
     BurstTerm(const T& newCoef, S* newExps, int start, int myLength, int myDegree)
     {
-	//cout << "Creating term: ";
         degree = myDegree;
         length = myLength - start;
         exps = new S[length];
@@ -78,20 +80,18 @@ public:
     int degree;
 };
 
-template <class T, class S> class BurstTrie;
-
 template <class T, class S>
-class BurstCont
+class BurstContainer
 {
 public:
-    BurstCont()
+    BurstContainer()
     {
 	//cout << "New container" << endl;
         firstTerm = NULL;
         termCount = 0;
     }
     
-    ~BurstCont()
+    ~BurstContainer()
     {
 	//cout << "Destroying container (" << termCount << " terms) ..." << endl;
         BurstTerm<T, S> *temp, *old;
@@ -181,6 +181,7 @@ public:
     }
     
     int termCount;
+    friend class BTrieIterator<T, S>;
 private:
     BurstTerm<T, S>* firstTerm;
 };
@@ -191,7 +192,7 @@ class BurstTrie
 public:
     BurstTrie()
     {
-        curIndex = -1;
+        //curIndex = -1;
         range = NULL;
         firstElem = NULL;
     }
@@ -213,7 +214,7 @@ public:
                 }
                 else
                 {
-                    delete (BurstCont<T, S>*)temp->myVal;
+                    delete (BurstContainer<T, S>*)temp->myVal;
                 }
                 old = temp->next;
                 //destroy trieElem
@@ -239,7 +240,7 @@ public:
             range[0] = range[1] = newExps[0];
             firstElem = (trieElem*)malloc(sizeof(trieElem));
             firstElem->next = NULL;
-            firstElem->myVal = new BurstCont<T, S>();
+            firstElem->myVal = new BurstContainer<T, S>();
             firstElem->isTrie = false;
         }
         else
@@ -257,7 +258,7 @@ public:
         }
         else
         {
-	    BurstCont<T, S>* temp = (BurstCont<T, S>*)curElem->myVal;
+	    BurstContainer<T, S>* temp = (BurstContainer<T, S>*)curElem->myVal;
 	    //cout << "Trie element is a container (" << temp->termCount << " elements)" << endl;
             if (temp->termCount == BURST_MAX && myLength > 1)
             {
@@ -265,19 +266,6 @@ public:
                 BurstTrie<T, S>* newTrie = temp->burst();
 		//cout << "Burst trie created, deleting container" << endl;
                 delete temp;
-    /*BurstTerm<ZZ, int>* abcd = new BurstTerm<ZZ, int>(myLength - start - 1);
-    newTrie->begin();
-    int i = 0;
-    while (newTrie->nextTerm(abcd))
-    {
-        cout << "Term " << i++ << ": " << abcd->coef;
-        for (int j = 0; j < abcd->length; j++)
-	{
-		cout << ", " << abcd->exps[j];
-	}
-	cout << endl;
-    }
-    delete abcd;*/
                 curElem->isTrie = true;
                 curElem->myVal = newTrie;
                 newTrie->insertTerm(newCoef, newExps, start + 1, myLength, myDegree);
@@ -296,7 +284,7 @@ public:
 	    trieElem *temp = (trieElem*)malloc(sizeof(trieElem)); //new first element for myVal
 	    trieElem *old = temp;
             temp->next = NULL;
-            temp->myVal = new BurstCont<T, S>();
+            temp->myVal = new BurstContainer<T, S>();
 	    temp->isTrie = false;
             for (S i = myVal + 1; i < range[0]; i++)
             {
@@ -307,7 +295,7 @@ public:
                 //set pointer
                 temp->next = NULL;
                 //allocate container
-                temp->myVal = new BurstCont<T, S>();
+                temp->myVal = new BurstContainer<T, S>();
                 temp->isTrie = false;
             }
             temp->next = firstElem;
@@ -325,130 +313,155 @@ public:
                 temp->next = (trieElem*)malloc(sizeof(trieElem));
                 temp = temp->next;
                 temp->next = NULL;
-                temp->myVal = new BurstCont<T, S>();
+                temp->myVal = new BurstContainer<T, S>();
                 temp->isTrie = false;
             }
             range[1] = myVal;
         }
     }
-    
-    void begin()
-    {
-        curIndex = -1;
-	trieElem *temp = firstElem;
-        while (temp != NULL)
-        {
-            if (temp->isTrie)
-            {
-                ((BurstTrie<T, S>*)temp->myVal)->begin();
-            }
-            temp = temp->next;
-        }
-    }
-    
-    bool nextTerm(BurstTerm<T, S>* newTerm)
-    {
-        if (curIndex == -1)
-        { curIndex = range[0]; termIndex = 0; }
-        
-        if (curIndex > range[1])
-        {
-            return false;
-        }
-        
-        //S* myExps = new S[newTerm->length];
-	S* myExps = newTerm->exps;
-        BurstTerm<T, S>* storedTerm = getTerm(myExps, 0); 
-        if (storedTerm == NULL)
-	{
-	    //cout << "Advancing container (max is " << range[1] << ")" << endl;
-	    //delete [] myExps;
-	    termIndex = 0;
-	    do
-	    {
-		curIndex++;
-		//cout << "Checking container " << curIndex << endl;
-	    }
-	    while (curIndex <= range[1] && !nextTerm(newTerm));
-	    if (curIndex > range[1])
-	    { return false; }
-	    else
-	    { return true; }
-	}
-        newTerm->coef = storedTerm->coef;
-	newTerm->degree = storedTerm->degree;      
-        
-        for (int i = 0; i < storedTerm->length; i++)
-        {
-	    myExps[newTerm->length - storedTerm->length + i] = storedTerm->exps[i];
-        }
-	//if (newTerm->exps) { delete [] newTerm->exps; }
-	//newTerm->exps = myExps;
-        newTerm->degree = storedTerm->degree;
-        return true;
-    }
-    
-    BurstTerm<T, S>* getTerm(S* myExps, int myDepth)
-    {
-        trieElem *temp = firstElem;
-	BurstTerm<T, S>* storedTerm;
-        for (S i = range[0]; i < curIndex; i++)
-        { temp = temp->next; }
-        
-	//cout << "Checking trie element" << endl;
-        if (temp->isTrie)
-        {
-            //update prefix
-	    //cout << "Updating prefix to " << curIndex << endl;
-	    myExps[myDepth] = curIndex;
-	    //cout << "Fetching stored term at index " << ((BurstTrie<T, S>*)temp->myVal)->curIndex << endl;
-	    //check iterators
-	    if (((BurstTrie<T, S>*)temp->myVal)->curIndex == -1)
-	    {
-		((BurstTrie<T, S>*)temp->myVal)->curIndex = ((BurstTrie<T, S>*)temp->myVal)->range[0];
-		//cout << "Resetting child trie to " << ((BurstTrie<T, S>*)temp->myVal)->curIndex << endl;
-		((BurstTrie<T, S>*)temp->myVal)->termIndex = 0;
-	    }
-	    //get stored term
-            storedTerm = ((BurstTrie<T, S>*)temp->myVal)->getTerm(myExps, myDepth + 1);
-	    if (storedTerm == NULL)
-	    {
-		curIndex++; termIndex = 0;
-		if (curIndex <= range[1])
-		{ return getTerm(myExps, myDepth); }
-		else
-		{ return NULL; }
-	    }
-            return storedTerm;
-        }
-        else
-        {
-	    //cout << "Found container at trie element " << curIndex << endl;
-            myExps[myDepth] = curIndex;
-            if (termIndex < ((BurstCont<T, S>*)temp->myVal)->termCount)
-            {
-		//cout << "Fetching stored term " << termIndex << endl;
-		storedTerm = ((BurstCont<T, S>*)temp->myVal)->getTerm(termIndex);
-		termIndex++; return storedTerm;
-	    }
-            else
-            {
-		curIndex++; termIndex = 0;
-		if (curIndex <= range[1])
-		{ return getTerm(myExps, myDepth); }
-		else
-		{ return NULL; }
-	    }
-        }
-    }
 
+    friend class BTrieIterator<T, S>;
 private:
     S* range; //S can be a class or a primitve
     trieElem *firstElem; //first element in the trie
-    
-    //iteration markers
-    int termIndex;
-    S curIndex;
+};
+
+template <class T, class S>
+class BTrieIterator
+{
+public:
+	BTrieIterator()
+	{
+		curTerm = NULL;
+	}
+	
+	void setTrie(BurstTrie<T, S>* trie, int myDim)
+	{
+		assert (myDim > 0);
+		myTrie = trie;
+		dimension = myDim;
+		triePath = new trieElem*[dimension];
+		
+		if (curTerm) { delete curTerm; }
+		curTerm = new BurstTerm<T, S>(dimension);
+	}
+	
+	void begin()
+	{
+		//cout << "Starting iteration" << endl;
+		curDepth = -1;
+		storedTerm = NULL;
+	}
+	
+	BurstContainer<T, S>* nextContainer()
+	{
+		//cout << "Next container at depth " << curDepth << endl;
+		trieElem* nextElem;
+		if (curDepth < 0)
+		{
+			curDepth++;
+			nextElem = triePath[0] = myTrie->firstElem;
+			curTerm->exps[0] = myTrie->range[0];
+			//cout << "!exp 0: " << curTerm->exps[0] << endl;
+		}
+		else
+		{
+			nextElem = triePath[curDepth]->next;
+			curTerm->exps[curDepth]++;
+			while (nextElem)
+			{
+				//cout << "exp " << curDepth << ": " << curTerm->exps[curDepth] << endl;
+				if (nextElem->isTrie)
+				{
+					
+					//cout << "trie found" << endl;
+					break;
+				}
+				if (((BurstContainer<T, S>*)nextElem->myVal)->termCount > 0)
+				{
+					//cout << "container found - " << ((BurstContainer<T, S>*)nextElem->myVal)->termCount << endl;
+					break;
+				}
+				//cout << "Skipping trie element " << curTerm->exps[curDepth] << endl;
+				nextElem = nextElem->next;
+				curTerm->exps[curDepth]++;
+			}
+			triePath[curDepth] = nextElem;
+		}
+		
+		if (!nextElem) //end of trie, move back up
+		{
+			//cout << "end of trie at depth " << curDepth << endl;
+			if (curDepth == 0) { return NULL; }
+			curDepth--;
+			return nextContainer();
+		}
+		
+		return firstContainer(nextElem);
+	}
+	
+	BurstContainer<T, S>* firstContainer(trieElem* myElem)
+	{
+		//cout << "Looking for container at depth " << curDepth << endl;
+		if (myElem->isTrie)
+		{
+			curDepth++;
+			triePath[curDepth] = ((BurstTrie<T, S>*)myElem->myVal)->firstElem;
+			curTerm->exps[curDepth] = ((BurstTrie<T, S>*)myElem->myVal)->range[0];
+			return firstContainer( ((BurstTrie<T, S>*)myElem->myVal)->firstElem );
+		}
+		else
+		{
+			//cout << "Container found." << endl;
+			return ((BurstContainer<T, S>*)myElem->myVal);
+		}
+	}
+	
+	BurstTerm<T, S>* nextTerm()
+	{
+		//cout << "Next term at depth " << curDepth << endl;
+		if (!storedTerm) //end of container
+		{
+			//cout << "Advancing container" << endl;
+			BurstContainer<T, S>* curContainer = nextContainer();
+			if (curContainer)
+			{ storedTerm = curContainer->firstTerm; }
+			else
+			{ return NULL; }
+			
+		}
+
+		for (int i = curDepth + 1; i < dimension; i++)
+		{
+			curTerm->exps[i] = storedTerm->exps[i - curDepth - 1];
+		}
+		curTerm->coef = storedTerm->coef;
+		curTerm->degree = storedTerm->degree;
+		storedTerm = storedTerm->next;
+		//cout << "got term w/coef " << curTerm->coef << endl;
+		return curTerm;
+	}
+
+	BurstTerm<T, S>* getTerm()
+	{
+		return curTerm;
+	}
+	
+	~BTrieIterator()
+	{
+		if (curTerm)
+		{ delete curTerm; }
+		delete [] triePath;
+	}
+	
+private:
+	BurstTrie<T, S>* myTrie; //trie to iterate over
+	BurstTerm<T, S>* curTerm; //shared buffer to store values
+	int dimension;
+	
+	BurstTerm<T, S>* storedTerm; //pointer to next stored term in current container
+	trieElem** triePath;
+	int curDepth;
 };
 
 #endif

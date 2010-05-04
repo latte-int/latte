@@ -83,22 +83,6 @@ void insertMonomial(const ZZ& coefficient, int* exponents, monomialSum& monomial
 		curTrie = monomials.myMonomials;
 	}
 	
-	//int termLength = monomials.varCount - 1;
-	//while (termLength >= 1 && exponents[termLength] == 0) { termLength--; }
-	//if (PT_DEBUG) { cout << "Exponent vector length is " << termLength << endl;
-	//cout << "Sorting on: " << exponents[0] << endl;
-	//cout << "Bounds are [" << curTrie->range[0] << ", " << curTrie->range[1] << "]" << endl; }
-	
-	/*term<T, int>* curTerm = (term<T, int>*) malloc (sizeof(term<T, int>));
-	curTerm->coef = new T(coefficient);
-	curTerm->expCount = termLength + 1;
-	curTerm->exponents = new int[curTerm->expCount];
-	for (int i = 0; i < curTerm->expCount; i++)
-	{ curTerm->exponents[i] = exponents[i]; } //copy exponent values
-	curTerm->degree = -1;*/
-		
-	//trieInsert(curTrie, curTerm);
-	//destroyTerm(curTerm);
 	curTrie->insertTerm(coefficient, exponents, 0, monomials.varCount, -1);
 		
 	monomials.termCount++;
@@ -109,12 +93,14 @@ void insertMonomial(const ZZ& coefficient, int* exponents, monomialSum& monomial
 //nested lists: [[c_{1}, [e_{1}, e_{2}, ..., e_{varCount}]], .. ]
 string printMonomials(const monomialSum &myPoly)
 {
-	BurstTerm<ZZ, int>* temp = new BurstTerm<ZZ, int>(myPoly.varCount);
-	BurstTrie<ZZ, int>* myTrie = myPoly.myMonomials;
-	myTrie->begin();
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	BurstTerm<ZZ, int>* temp;
+	it->setTrie(myPoly.myMonomials, myPoly.varCount);
+	it->begin();
 	int i = 0;
 	stringstream output (stringstream::in | stringstream::out);
-	while (myTrie->nextTerm(temp))
+	temp = it->nextTerm();
+	do
 	{
 		if (output.str() != "")
 		{ output << ", "; }
@@ -126,8 +112,10 @@ string printMonomials(const monomialSum &myPoly)
 			{ output << ", "; }
 		}
 		output << "]]";
+		temp = it->nextTerm();
 	}
-	delete temp;
+	while (temp);
+	delete it;
 	return "[" + output.str() + "]";
 }
 
@@ -229,23 +217,7 @@ void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&
 	{
 		curTrie = formSum.myForms;
 	}
-	
-	/*int termLength = formSum.varCount - 1;
-	while (termLength >= 1 && IsZero(coeffs[termLength])) { termLength--; }
-	if (PT_DEBUG) { cout << "Term of length " << termLength << endl;
-	cout << "Sorting on: " << coeffs[0] << endl;
-	cout << "Bounds are [" << curTrie->range[0] << ", " << curTrie->range[1] << "]" << endl; }
-	
-	term<T, ZZ>* curTerm = (term<T, ZZ>*) malloc (sizeof(term<T, ZZ>));
-	curTerm->coef = new T(coef);
-	curTerm->expCount = termLength + 1;
-	curTerm->exponents = new ZZ[curTerm->expCount];
-	for (int i = 0; i < curTerm->expCount; i++)
-	{ curTerm->exponents[i] = coeffs[i]; } //copy exponent values
-	curTerm->degree = degree;
-		
-	trieInsert(curTrie, curTerm);
-	destroyTerm(curTerm);*/
+
 	ZZ* exps = new ZZ[formSum.varCount];
 	for (int i = 0; i < formSum.varCount; i++) { exps[i] = coeffs[i]; }
 	curTrie->insertTerm(coef, exps, 0, formSum.varCount, degree);
@@ -258,12 +230,14 @@ void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&
 //nested list: [[c_{1}, [d_{1}, [p_{1}, p_{2}, ..., p_{varCount}]], .. ]
 string printLinForms(const linFormSum &myForm)
 {
-	BurstTerm<ZZ, ZZ>* temp = new BurstTerm<ZZ, ZZ>(myForm.varCount);
-	BurstTrie<ZZ, ZZ>* myTrie = myForm.myForms;
-	myTrie->begin();
-	int i = 0;
+	BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
+	BurstTerm<ZZ, ZZ>* temp;
+	it->setTrie(myForm.myForms, myForm.varCount);
+	it->begin();
+
 	stringstream output (stringstream::in | stringstream::out);
-	while (myTrie->nextTerm(temp))
+	temp = it->nextTerm();
+	do
 	{
 		if (output.str() != "")
 		{ output << ", "; }
@@ -275,8 +249,10 @@ string printLinForms(const linFormSum &myForm)
 			{ output << ", "; }
 		}
 		output << "]]]";
+		temp = it->nextTerm();
 	}
-	delete temp;
+	while(temp);
+	delete it;
 	return "[" + output.str() + "]";
 }
 
@@ -295,16 +271,20 @@ void destroyLinForms(linFormSum &myPoly)
 //	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
 void decompose(monomialSum &myPoly, linFormSum &lForm)
 {
-	BurstTerm<ZZ, int>* temp = new BurstTerm<ZZ, int>(myPoly.varCount);
-	BurstTrie<ZZ, int>* myTrie = myPoly.myMonomials;
-	myTrie->begin();
+	BurstTerm<ZZ, int>* temp; 
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+
+	it->setTrie(myPoly.myMonomials, myPoly.varCount);
+	it->begin();
 	
-	while (myTrie->nextTerm(temp))
+	temp = it->nextTerm();
+	do
 	{
 		decompose(myPoly, lForm, temp);
+		temp = it->nextTerm();
 	}
+	while (temp);
 	
-	delete temp;
 	//delete myPoly.myMonomials;
 }
 

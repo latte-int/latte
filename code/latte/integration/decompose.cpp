@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
 		loadMonomials(myPoly, line);
 		loadTime += (time(NULL) - startTime);
 		
-		//cout << "The following polynomial has " << myPoly.termCount << " terms containing " << myPoly.varCount << " variables: " << endl;
-		//cout << printPolynomial(myPoly) << endl;
+		cout << "The following polynomial has " << myPoly.termCount << " terms containing " << myPoly.varCount << " variables: " << endl;
+		cout << printPolynomial(myPoly) << endl;
 		
 		lForm.termCount = 0;
 		lForm.varCount = myPoly.varCount;

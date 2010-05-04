@@ -5,149 +5,6 @@
 
 #define mult_DEBUG 0
 
-/*class TermMultiplier: public TrieIterator<ZZ, int> {
-    public:
-    burstTrie<ZZ, int>* myParent;
-    term<ZZ, int>* myTerm;
-    int* min;
-    int* max;
-        
-    void init(burstTrie<ZZ, int>* parent, term<ZZ, int>* term, int* myMin, int* myMax)
-    {
-	if (mult_DEBUG) { cout << "INIT: Term Multiplier" << endl; }
-	if (!parent && mult_DEBUG) { cout << "NULL PARENT" << endl; }
-	myParent = parent;
-	myTerm = term;
-	if (mult_DEBUG) { cout << "Init with term: [" << *myTerm->coef << ", [";
-	for (int i = 0; i < myTerm->expCount; i++)
-	{ cout << myTerm->exponents[i] << ", "; }
-	cout << "]]" << endl; }
-	min = myMin;
-	max = myMax;
-    }
-    
-    int addExp(int a, int b, int i)
-    {
-	if ((a + b) > max[i]) { return max[i]; }
-	if ((a + b) < min[i]) { return min[i]; }
-	return a + b;
-    }
-    
-    void consumeTerm(term<ZZ, int>* thisTerm) //insert thisTerm*myTerm into myParent
-    {
-	if (mult_DEBUG) { cout << "Multiplying terms..." << endl;
-	cout << "Enumerated term: [" << *thisTerm->coef << ", [";
-	for (int i = 0; i < thisTerm->expCount; i++)
-	{ cout << thisTerm->exponents[i] << ", "; }
-	cout << "]]" << endl; }
-	term<ZZ, int>* newTerm = (term<ZZ, int>*) malloc(sizeof(term<ZZ, int>));
-	newTerm->coef = new ZZ((*thisTerm->coef) * (*myTerm->coef));
-	if (mult_DEBUG) { cout << "New coef is " << *newTerm->coef << endl; }
-	newTerm->expCount = dimension;
-	if (mult_DEBUG) { cout  << "exp count is " << newTerm->expCount << endl; }
-	newTerm->exponents = new int[dimension];
-	if (mult_DEBUG) { cout << "Depth is " << curDepth << endl; }
-	int i = 0;
-	for (; i < curDepth; i++) //sorted values
-	{
-		if (mult_DEBUG) { cout << "1. Adding " << curPrefix[i] << endl; }
-		newTerm->exponents[i] = addExp(myTerm->exponents[i], curPrefix[i], i);
-	}
-	for (; i < thisTerm->expCount + curDepth; i++) //stored exps
-	{
-		if (mult_DEBUG) { cout << "2. Adding " << thisTerm->exponents[i - curDepth] << endl; }
-		newTerm->exponents[i] = addExp(myTerm->exponents[i], thisTerm->exponents[i - curDepth], i);
-	}
-	for ( ; i < dimension; i++) //trailing zeroes
-	{
-		if (mult_DEBUG) { cout << "3. Adding 0" << endl; }
-		newTerm->exponents[i] = addExp(myTerm->exponents[i], 0, i);
-	}
-        newTerm->degree = -1;
-	if (mult_DEBUG) { cout << "Finished, inserting.." << endl; }
-	
-	trieInsert(myParent, newTerm);
-	if (mult_DEBUG) { cout << "Finished" << endl; }
-    }
-};
-
-class TrieMultiplier: public TrieIterator<ZZ, int> {
-    public:
-    burstTrie<ZZ, int>* myTrie;
-    burstTrie<ZZ, int>* result;
-    TermMultiplier* myMultiplier;
-    int* min;
-    int* max;
-     
-    burstTrie<ZZ, int>* getProduct()
-    {
-	return result;
-    } 
-     
-    void init(burstTrie<ZZ, int>* first, int* myMin, int* myMax)
-    {
-	if (mult_DEBUG) { cout << "INIT: Trie Multiplier" << endl; }
-        myTrie = first;
-	
-	if (mult_DEBUG) { cout << "Creating product trie" << endl; }
-	result = (burstTrie<ZZ, int>*) malloc (sizeof(burstTrie<ZZ, int>));
-	if (mult_DEBUG) { cout << "Creating range" << endl; }
-	result->range = new int[2];
-	if (mult_DEBUG) { cout << "Setting upper and lower bound to 0" << endl; }
-	result->range[0] = 0;
-	result->range[1] = 0;
-	if (mult_DEBUG) { cout << "Creating first container" << endl; }
-	result->firstCont = createContainer<ZZ, int>();
-	
-	myMultiplier = new TermMultiplier();
-	myMultiplier->curPrefix = NULL;
-	myMultiplier->setDimension(dimension);
-	min = myMin;
-	max = myMax;
-    }
-    
-    void consumeTerm(term<ZZ, int>* myTerm) //for each term in the first monomial sum, multiply it by everything in the second
-    {
-	if (mult_DEBUG) { cout << "Multiplying trie by term .. " << endl; }
-	term<ZZ, int>* newTerm = (term<ZZ, int>*) malloc(sizeof(term<ZZ, int>));
-	newTerm->coef = new ZZ(*myTerm->coef);
-	if (mult_DEBUG) { cout << "New coef is " << *newTerm->coef << endl; }
-	newTerm->expCount = dimension;
-	if (mult_DEBUG) { cout  << "exp count is " << newTerm->expCount << endl; }
-	newTerm->exponents = new int[dimension];
-	int i = 0;
-	for (; i < curDepth; i++) //sorted values
-	{
-		if (mult_DEBUG) { cout << "1. Setting to " << curPrefix[i] << endl; }
-		newTerm->exponents[i] = curPrefix[i];
-	}
-	for (; i < myTerm->expCount + curDepth; i++) //stored exps
-	{
-		if (mult_DEBUG) { cout << "2. Setting to " << myTerm->exponents[i - curDepth] << endl; }
-		newTerm->exponents[i] = myTerm->exponents[i - curDepth];
-	}
-	for (; i < dimension; i++) //trailing zeroes
-	{
-		newTerm->exponents[i] = 0;
-	}
-        newTerm->degree = -1;
-	myMultiplier->init(result, newTerm, min, max);
-	if (mult_DEBUG) { cout << "Created term .." << endl; }
-	myMultiplier->enumTrie(myTrie);
-	if (mult_DEBUG) { cout << "Destroying.." << endl; }
-	destroyTerm(newTerm);
-    }
-    
-    void finish()
-    {
-	delete myMultiplier;
-	myMultiplier = NULL;
-	destroyTrie(result);
-	result = NULL;
-    }
-};*/
-
-
 // Multipies two monomial sums, storing the result in the third one
 // Any values stored in result will be overwritten
 // result is every term in the product of two monomial sums whose exponents are greater than min and lower than max.
@@ -155,54 +12,227 @@ class TrieMultiplier: public TrieIterator<ZZ, int> {
 template <class T>
 void multiply(monomialSum& first, monomialSum& second, monomialSum& result, int* min, int* max)
 {
-	BurstTerm<ZZ, int>* term1 = new BurstTerm<ZZ, int>(first.varCount);
-	BurstTerm<ZZ, int>* term2 = new BurstTerm<ZZ, int>(second.varCount);
-	BurstTrie<ZZ, int>* trie1 = first.myMonomials;
-	BurstTrie<ZZ, int>* trie2 = second.myMonomials;
-	result.myMonomials = new BurstTrie<ZZ, int>();
-	trie1->begin();
-	int* exps = new int[result.varCount];
-
-	bool valid;
-	while (trie1->nextTerm(term1))
+	result.myMonomials = new BurstTrie<T, int>();
+	int* resExps = new int[result.varCount];
+	
+	BurstTerm<T, int> *firstTerm, *secondTerm;
+	
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	it->setTrie(first.myMonomials, first.varCount);
+	it->begin();
+	
+	BTrieIterator<ZZ, int>* it2 = new BTrieIterator<ZZ, int>();
+	it2->setTrie(second.myMonomials, second.varCount);
+	it2->begin();
+	
+	int i;
+	while (firstTerm = it->nextTerm())
 	{
-		trie2->begin();
-		while(trie2->nextTerm(term2))
+		while (secondTerm = it2->nextTerm())
 		{
-			valid = true;
-			for (int i = 0; i < result.varCount; i++)
+			for (i = 0; i < result.varCount; i++)
 			{
-				exps[i] = term1->exps[i] + term2->exps[i];
-				if (exps[i] < min[i] || exps[i] > max[i])
-				{
-					valid = false; break;
-				}
+				resExps[i] = firstTerm->exps[i] + secondTerm->exps[i];
+				if (resExps[i] < min[i] || resExps[i] > max[i]) { break; }
 			}
-			if (valid) { result.myMonomials->insertTerm(term1->coef * term2->coef, exps, 0, result.varCount, -1); }
+			
+			if (i == result.varCount)
+			{
+				result.myMonomials->insertTerm(firstTerm->coef * secondTerm->coef, resExps, 0, result.varCount, -1);
+			}
+		}
+		it2->begin();
+	}
+	
+	/*
+	 
+	
+	//wlog, first has more terms than second
+	if (second.termCount > first.termCount)
+	{ return multiply<T>(second, first, result, min, max); }
+	
+	cout << first.termCount << " and " << second.termCount << " terms" << endl;
+	
+	result.myMonomials = new BurstTrie<T, int>();
+	int* resExps1 = new int[result.varCount];
+	
+	BurstTerm<T, int> *fTerm1, *fTerm2;
+	
+	if (second.termCount == 1)
+	{
+		BTrieIterator<T, int>* it = new BTrieIterator<T, int>();
+		it->setTrie(first.myMonomials, first.varCount);
+		it->begin();
+		fTerm1 = it->nextTerm();
+		
+		BTrieIterator<T, int>* it2 = new BTrieIterator<T, int>();
+		it2->setTrie(second.myMonomials, second.varCount);
+		it2->begin();
+		fTerm2 = it2->nextTerm();
+		
+		int i;
+		while (fTerm1)
+		{
+			for (i = 0; i < result.varCount; i++)
+			{
+				resExps1[i] = fTerm1->exps[i] + fTerm2->exps[i];
+				if (resExps1[i] < min[i] || resExps1[i] > max[i]) { break; }
+			}
+			if (i == result.varCount)
+			{ result.myMonomials->insertTerm(fTerm1->coef * fTerm2->coef, resExps1, 0, result.varCount, -1); }
+			fTerm1 = it->nextTerm();
+		}
+		
+	}
+	else
+	{
+		fTerm1 = fTerm2 = NULL;
+		
+		int* resExps2 = new int[result.varCount];
+		bool valid1, valid2;
+		int state;
+		
+		BTrieIterator<T, int>* it = new BTrieIterator<T, int>();
+		it->setTrie(second.myMonomials, second.varCount);
+		it->begin();
+		
+		BTrieIterator<T, int>** iterators = new BTrieIterator<T, int>*[second.termCount];
+		BurstTerm<T, int> ** iteratorTerms = new BurstTerm<T, int> *[second.termCount];
+		int itIndex = 0;
+		for (int i = 0; i < second.termCount; i++)
+		{
+			iterators[i] = new BTrieIterator<T, int>();
+			iterators[i]->setTrie(first.myMonomials, first.varCount);
+			iterators[i]->begin();
+			
+			iteratorTerms[i] = new BurstTerm<T, int>(result.varCount);
+			BurstTerm<T, int>* temp = it->nextTerm();
+			iteratorTerms[i]->coef = temp->coef;
+			memcpy(iteratorTerms[i]->exps, temp->exps, sizeof(temp->exps));
+		}
+		delete it;
+		
+		while (itIndex < second.termCount)
+		{
+			
 		}
 	}
-	delete term1;
-	delete term2;
-	delete [] exps;
-	/*if (first.termCount == 0 || second.termCount == 0) { cout << "Only one monomial sum given, aborting."; return; }
-	if (mult_DEBUG) { cout << "Dimensions are " << first.varCount << " x " << second.varCount << " = " << result.varCount << endl;
-	cout << "Printing tree one" << endl;
-	TriePrinter<T, int>* myPrinter = new TriePrinter<T, int>();
-	myPrinter->setDimension(first.varCount);
-	cout << myPrinter->printTrie(first.myMonomials) << endl;
-	cout << "Printing two" << endl;
-	cout << myPrinter->printTrie(second.myMonomials) << endl;
-	delete myPrinter; 
-	cout << "Multiplying ..." << endl; }
-	TrieMultiplier* genie = new TrieMultiplier();
-	genie->setDimension(result.varCount);
-	genie->init(first.myMonomials, min, max);
-	genie->enumTrie(second.myMonomials);
-	if (mult_DEBUG) { cout << "Finished" << endl; }
-	result.myMonomials = genie->getProduct();
 	
-	genie->finish();
-	delete genie;*/
+	
+	
+	
+	curTerm = it->nextTerm(); 
+	nextTerm = it->nextTerm();
+	
+	if (!nextTerm) //only one term
+	{
+		cout << "one term" << endl;
+		BTrieIterator<ZZ, int>* it2 = new BTrieIterator<T, int>();
+		it2->setTrie(first.myMonomials, first.varCount);
+		it2->begin();
+		nextTerm = it2->nextTerm();
+		do
+		{
+			int i;
+			for (i = 0; i < result.varCount; i++)
+			{
+				res1 = nextTerm->exps[i] + curTerm->exps[i];
+				if (res1 < min[i] || res1 > max[i]) { break; }
+				resExps[i] = res1;
+				cout << nextTerm->exps[i] << ", " << curTerm->exps[i] << "; ";
+			}
+			cout << endl;
+			if (i == result.varCount)
+			{
+				result.myMonomials->insertTerm(nextTerm->coef * curTerm->coef, resExps, 0, result.varCount, -1);
+			}
+			nextTerm = it2->nextTerm();
+		}
+		while (nextTerm);
+		
+		delete it2;
+		delete it;
+		delete resExps;
+		return;
+	}
+	
+	BTrieIterator<T, int>** iterators = new BTrieIterator<T, int>*[second.termCount];
+	int itIndex = 0;
+	for (int i = 0; i < second.termCount; i++)
+	{
+		iterators[i] = new BTrieIterator<T, int>();
+		iterators[i]->setTrie(first.myMonomials, first.varCount);
+		iterators[i]->begin();
+	}
+	
+	while (itIndex < second.termCount)
+	{
+		if (!fTerm1)
+		{ fTerm1 = iterators[itIndex]->nextTerm(); }
+		
+		if (fTerm1)
+		{
+			if (!fTerm2)
+			{ fTerm2 = iterators[(itIndex + 1) % second.termCount]->nextTerm(); }
+			
+			int i;
+			for (i = 0; i < result.varCount; i++)
+			{
+				res1 = fTerm1->exps[i] + curTerm->exps[i];
+				res2 = fTerm2->exps[i] + nextTerm->exps[i];
+				if (res1 < res2)
+				{
+					resExps[i] = res1;
+					break;
+				}
+				else if (res2 < res1)
+				{
+					resExps[i] = res2;
+					break;
+				}
+				else //equal
+				{
+					resExps[i] = res1;
+				}
+			}
+			
+			if (res1 < res2 || i == result.varCount) //don't advance down
+			{
+				for (; i < result.varCount; i++)
+				{
+					resExps[i] = fTerm1->exps[i] + curTerm->exps[i];
+				}
+				//insert fTerm1 * curTerm
+				result.myMonomials->insertTerm(fTerm1->coef * curTerm->coef, resExps, 0, result.varCount, -1);
+				fTerm1 = NULL;
+			}
+			else
+			{
+				for (; i < result.varCount; i++)
+				{
+					resExps[i] = fTerm1->exps[i] + curTerm->exps[i];
+				}
+				//insert fTerm1 * curTerm
+				result.myMonomials->insertTerm(fTerm1->coef * curTerm->coef, resExps, 0, result.varCount, -1);
+				for (int j = 0; j < result.varCount; j++)
+				{
+					resExps[j] = fTerm2->exps[j] + nextTerm->exps[j];
+				}
+				//insert fTerm2 * nextTerm
+				result.myMonomials->insertTerm(fTerm2->coef * nextTerm->coef, resExps, 0, result.varCount, -1);
+				fTerm1 = fTerm2 = NULL;
+				itIndex++; //advancing down
+				if (itIndex == second.termCount) { itIndex = 0; it->begin(); }
+			}
+		}
+		else
+		{
+			fTerm1 = fTerm2;
+			itIndex++;
+			curTerm = nextTerm;
+			nextTerm = it->nextTerm();
+		}
+	}*/
 }
 
 

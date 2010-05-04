@@ -123,10 +123,22 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
       };*/
 	BurstTerm<ZZ,int>* temp;
 	BurstTrie<ZZ,int>* myTrie;
-	if (k % 2==1) {temp=new BurstTerm<ZZ,int>(m1.varCount);	myTrie=m1.myMonomials;}
-	else {temp=new BurstTerm<ZZ, int>(sub.varCount); myTrie=sub.myMonomials;};
-	myTrie->begin();
-	while (myTrie->nextTerm(temp))
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	if (k % 2 == 1)
+	{
+		temp=new BurstTerm<ZZ,int>(m1.varCount);
+		myTrie=m1.myMonomials;
+		it->setTrie(myTrie, m1.varCount);
+	}
+	else
+	{
+		temp=new BurstTerm<ZZ, int>(sub.varCount);
+		myTrie=sub.myMonomials;
+		it->setTrie(myTrie, sub.varCount);
+	}	
+	it->begin();
+	
+	while (temp = it->nextTerm())
 	{
 		if (temp->exps[0]==counter[0])	{findCoeff=temp->coef;break;};		
 	};	

@@ -190,33 +190,33 @@ randomFormCount:=10;
 end:
 #generate_random_linear_with_random_multiplicity(2,10,8,20,20,"integration/randomForms.txt");
 
-local benchmarks, result:
-local myDim, myDegree, timedOut:
-benchmarks:=fopen("integration/benchmarks.txt",WRITE,TEXT):
-writeline(benchmarks, "Average integration time of a linear form with specified multiplicity with a sample size of 50"):
-writeline(benchmarks, ""):
-writeline(benchmarks, ""):
-writeline(benchmarks, "                                                                Degree                                                            "):
-close(benchmarks):
-for myDim from 70 to 1000 do
-benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
-writeline(benchmarks,""):
-writeline(benchmarks,""):
-fprintf(benchmarks, "      %3.3s                        |       1         2         5         10        20        30        40        50        100       200       300",convert(myDim,string)):
-writeline(benchmarks,""):
-  close(benchmarks):
-  generate_random_linear_with_random_multiplicity(myDim,20,20):
-  if myDim=70 then myDim:=79:fi:
-  if myDim=80 then myDim:=89:fi:
-  if myDim=90 then myDim:=99:fi:
-  if myDim=100 then myDim:=199:fi:
-  if myDim=200 then myDim:=299:fi:
-  if myDim=300 then myDim:=399:fi:
-  if myDim=400 then myDim:=499:fi:
-  if myDim=500 then myDim:=599:fi:
-  if myDim=600 then myDim:=699:fi:
-  if myDim=700 then myDim:=799:fi:
-  if myDim=800 then myDim:=899:fi:
-  if myDim=900 then myDim:=999:fi:
-od:
+#local benchmarks, result:
+#local myDim, myDegree, timedOut:
+#benchmarks:=fopen("integration/benchmarks.txt",WRITE,TEXT):
+#writeline(benchmarks, "Average integration time of a linear form with specified multiplicity with a sample size of 50"):
+#writeline(benchmarks, ""):
+#writeline(benchmarks, ""):
+#writeline(benchmarks, "                                                                Degree                                                            "):
+#close(benchmarks):
+#for myDim from 70 to 1000 do
+#benchmarks:=fopen("integration/benchmarks.txt",APPEND,TEXT):
+#writeline(benchmarks,""):
+#writeline(benchmarks,""):
+#fprintf(benchmarks, "      %3.3s                        |       1         2         5         10        20        30        40        50        100       200       300",convert(myDim,string)):
+#writeline(benchmarks,""):
+#  close(benchmarks):
+#  generate_random_linear_with_random_multiplicity(myDim,20,20):
+#  if myDim=70 then myDim:=79:fi:
+#  if myDim=80 then myDim:=89:fi:
+#  if myDim=90 then myDim:=99:fi:
+#  if myDim=100 then myDim:=199:fi:
+#  if myDim=200 then myDim:=299:fi:
+#  if myDim=300 then myDim:=399:fi:
+#  if myDim=400 then myDim:=499:fi:
+#  if myDim=500 then myDim:=599:fi:
+#  if myDim=600 then myDim:=699:fi:
+#  if myDim=700 then myDim:=799:fi:
+#  if myDim=800 then myDim:=899:fi:
+#  if myDim=900 then myDim:=999:fi:
+#od:
 

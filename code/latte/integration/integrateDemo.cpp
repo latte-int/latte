@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
 				{
 					lastTime = myTimer.get_seconds();
 					myTimer.start();
-					integrateList(numerator, denominator, forms, mySimplex);
+					integrateLinFormSum(numerator, denominator, forms, mySimplex);
 					myTimer.stop();
 					integrateTime += (myTimer.get_seconds() - lastTime);
 					destroyLinForms(forms);

@@ -164,12 +164,6 @@ void integrateLinFormSumString(ZZ &a, ZZ &b, string line, const simplexZZ &mySim
 */
 void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
 {
-	/*Integrator* myIntegrator = new Integrator();
-	myIntegrator->init(&forms, &mySimplex);
-	myIntegrator->setDimension(forms.varCount);
-	myIntegrator->enumTrie(forms.myForms);
-	myIntegrator->getResults(numerator, denominator);
-	delete myIntegrator;*/
 	ZZ v,de,counter,tem,coe;
 	int i,j,index,k,m;
 	vec_ZZ l;
@@ -200,10 +194,12 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 	}
 	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};*/
 	//cout<<printLinForms(forms)<<endl;
-	BurstTerm<ZZ, ZZ>* temp = new BurstTerm<ZZ, ZZ>(forms.varCount);
-	BurstTrie<ZZ, ZZ>* myTrie = forms.myForms;
-	myTrie->begin();
-	while (myTrie->nextTerm(temp))
+	BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
+	it->setTrie(forms.myForms, forms.varCount);
+	it->begin();
+	
+	BurstTerm<ZZ, ZZ>* temp;
+	while (temp = it->nextTerm())
 	{
 		coe=temp->coef;m=temp->degree;
 		l.SetLength(temp->length);

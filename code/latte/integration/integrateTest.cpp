@@ -139,16 +139,15 @@ int main(int argc, char *argv[])
 			else //reading simplex
 			{
 				simplexZZ mySimplex;
-				cout << "reading simplex" << endl;
-				if (decomposing) { destroyLinForms(forms); }
-				//convertToSimplex(mySimplex, line);
-				//don't actually integrate here
-				/*ZZ numerator, denominator;
+				//cout << "reading simplex" << endl;
+				//if (decomposing) { destroyLinForms(forms); }
+				convertToSimplex(mySimplex, line);
+				ZZ numerator, denominator;
 				if (decomposing)
 				{
 					tempTime = myTimer.get_seconds();
 					myTimer.start();
-					integrateList(numerator, denominator, forms, mySimplex);
+					integrateLinFormSum(numerator, denominator, forms, mySimplex);
 					myTimer.stop();
 					integrateTime += (myTimer.get_seconds() - tempTime);
 					destroyLinForms(forms);
@@ -163,10 +162,10 @@ int main(int argc, char *argv[])
 					integrator->getResults(numerator, denominator);
 					integrateTime += (myTimer.get_seconds() - tempTime);
 				}
-				outFile << "[" << numerator << "," << denominator << "]" << endl;*/
+				outFile << "[" << numerator << "," << denominator << "]" << endl;
 				polyCount++;
 				polynomial = true;
-				/*if (benchmarking) { cout << "Sample took " << myTimer.get_seconds() - iterationTime << "s." << endl; }
+				if (benchmarking) { cout << "Sample took " << myTimer.get_seconds() - iterationTime << "s." << endl; }
 				if (myTimeout > 0.001 && (myTimer.get_seconds() - iterationTime) > myTimeout) //we timed out
 				{
 					delete integrator;
@@ -188,7 +187,7 @@ int main(int argc, char *argv[])
 						fclose(myFile);
 					}
 					return 1;
-				}*/
+				}
 			}
 		}
 	}

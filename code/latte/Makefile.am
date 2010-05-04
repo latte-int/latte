@@ -177,22 +177,22 @@ triangulate_SOURCES = triangulation/test-triangulation.cpp
 #integrate_SOURCES += integration/multiply.h
 #integrate_SOURCES +=     integration/timing.cpp
 
-bin_PROGRAMS += BurstIntegrate
-BurstIntegrate_SOURCES = integration/burstint.cpp
-BurstIntegrate_SOURCES += integration/newIntegration.cpp
-BurstIntegrate_SOURCES += integration/PolyRep.cpp
-BurstIntegrate_SOURCES += integration/PolyTrie.cpp
-BurstIntegrate_SOURCES += integration/residue.cpp
-BurstIntegrate_SOURCES += integration/multiply.h
+#bin_PROGRAMS += BurstIntegrate
+#BurstIntegrate_SOURCES = integration/burstint.cpp
+#BurstIntegrate_SOURCES += integration/newIntegration.cpp
+#BurstIntegrate_SOURCES += integration/PolyRep.cpp
+#BurstIntegrate_SOURCES += integration/PolyTrie.cpp
+#BurstIntegrate_SOURCES += integration/residue.cpp
+#BurstIntegrate_SOURCES += integration/multiply.h
 
-bin_PROGRAMS += BurstTest
-BurstTest_SOURCES = integration/burstTest.cpp
-BurstTest_SOURCES += integration/newIntegration.cpp
-BurstTest_SOURCES += integration/PolyRep.cpp
-BurstTest_SOURCES += integration/PolyTrie.cpp
-BurstTest_SOURCES += integration/residue.cpp
-BurstTest_SOURCES += integration/multiply.h
-BurstTest_SOURCES += integration/timing.cpp
+#bin_PROGRAMS += BurstTest
+#BurstTest_SOURCES = integration/burstTest.cpp
+#BurstTest_SOURCES += integration/newIntegration.cpp
+#BurstTest_SOURCES += integration/PolyRep.cpp
+#BurstTest_SOURCES += integration/PolyTrie.cpp
+#BurstTest_SOURCES += integration/residue.cpp
+#BurstTest_SOURCES += integration/multiply.h
+#BurstTest_SOURCES += integration/timing.cpp
 
 bin_PROGRAMS += integrate_demo
 integrate_demo_SOURCES =    integration/integrateDemo.cpp
@@ -219,7 +219,7 @@ compare_SOURCES += integration/PolyTrie.cpp
 compare_SOURCES += integration/PolyRep.cpp
 
 TESTS =  integration/testMultiply.sh
-#TESTS += integration/testIntegration.sh
+TESTS += integration/testIntegration.sh
 #TESTS += ilio_test
 
 bench-table5: 

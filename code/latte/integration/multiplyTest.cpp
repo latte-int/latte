@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
 				if (firstPoly.termCount == 0 || firstPoly.varCount == 0)
 				{
-					cout << "1Error: loaded invalid monomial sum." << endl;
+					cout << "Error: loaded invalid monomial sum." << endl;
 					return 1;
 				}
 				
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
 				if (secondPoly.termCount == 0 || secondPoly.varCount == 0)
 				{
-					cout << "2Error: loaded invalid monomial sum." << endl;
+					cout << "Error: loaded invalid monomial sum." << endl;
 					return 1;
 				}
 				else
@@ -64,6 +64,7 @@ int main(int argc, char *argv[])
 					low[i] = INT_MIN;
 					high[i] = INT_MAX;
 				}
+				
 				
 				multiply<ZZ>(firstPoly, secondPoly, product, low, high);
 
