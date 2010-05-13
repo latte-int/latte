@@ -86,8 +86,8 @@ int main(int argc, char *argv[])
                         oldMult += myTime;
 			cout << myTime << " vs. ";
 			
-			_it->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount);
-			_it2->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount);
+			_it->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount, _myPoly.termCount);
+			_it2->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount, _myPoly.termCount);
 			myTime = myTimer.get_seconds();
                         myTimer.start();
                         multiply<ZZ>(_it, _it2, _myProduct, low, high);

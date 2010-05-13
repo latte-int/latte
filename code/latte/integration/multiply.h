@@ -46,15 +46,17 @@ void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, _monomialSu
 	//result.myMonomials = new BurstTrie<T, int>();
 	int* resExps = new int[result.varCount];
 	
-	term<T, int> *firstTerm, *secondTerm;
-	
 	it->begin();
 	it2->begin();
+
+	term<T, int> *firstTerm = it->nextTerm();
+	term<T, int> *secondTerm = it2->nextTerm();
 	
 	int i;
-	while (firstTerm = it->nextTerm())
+	ZZ prod;
+	while (firstTerm)
 	{
-		while (secondTerm = it2->nextTerm())
+		while (secondTerm)
 		{
 			for (i = 0; i < result.varCount; i++)
 			{
@@ -64,10 +66,13 @@ void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, _monomialSu
 			
 			if (i == result.varCount)
 			{
-				_insertMonomial(firstTerm->coef * secondTerm->coef, resExps, result);
+				prod = firstTerm->coef * secondTerm->coef;
+				_insertMonomial(prod, resExps, result);
 			}
+			secondTerm = it2->nextTerm();
 		}
 		it2->begin();
+		firstTerm = it->nextTerm();
 	}
 }
 

@@ -116,10 +116,11 @@ public:
 		blockIndex = 0; curCoeff = NULL; curExp = NULL;
 	}
 	
-	void setLists(eBlock* eHead, cBlock<T>* cHead, int myDim)
+	void setLists(eBlock* eHead, cBlock<T>* cHead, int myDim, int numTerms)
 	{
 		assert (myDim > 0);
 		dimension = myDim;
+		termCount = numTerms;
 		
 		coeffHead = cHead; expHead = eHead;
 		curTerm.exps = new S[dimension];
@@ -129,28 +130,31 @@ public:
 	
 	void begin()
 	{
-		blockIndex = 0;
+		blockIndex = termIndex = 0;
 		curCoeff = coeffHead; curExp = expHead;
 	}
 	
 	term<T, S>* nextTerm()
 	{
-		if (!curCoeff || !curExp) { return NULL; }
+		if (!curCoeff || !curExp || termIndex == termCount) { return NULL; }
 		
 		if (blockIndex < BLOCK_SIZE)
 		{
-			curTerm.coef = curCoeff->data[blockIndex];
-			for (int i = dimension*blockIndex; i < dimension*blockIndex + dimension; i++)
+			curTerm.coef = to_ZZ(curCoeff->data[blockIndex]);
+			for (int i = 0; i < dimension; i++)
 			{
-				curTerm.exps[i] = curExp->data[i];
+				curTerm.exps[i] = curExp->data[i + dimension*blockIndex];
 			}
 			blockIndex++;
+			termIndex++;
+			return &curTerm;
 		}
 		else
 		{
 			curCoeff = curCoeff->next;
 			curExp = curExp->next;
 			blockIndex = 0;
+			return nextTerm();
 		}
 	}
 
@@ -167,12 +171,14 @@ public:
 private:
 	term<T, S> curTerm; //shared buffer to store values
 	int dimension;
+	int termCount;
 	
 	cBlock<T>* curCoeff;
 	eBlock* curExp;
 	
 	cBlock<T>* coeffHead;
 	eBlock* expHead;
+	int termIndex;
 	int blockIndex;
 };
 

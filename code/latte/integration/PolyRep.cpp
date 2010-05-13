@@ -16,7 +16,6 @@ void _loadMonomials(_monomialSum &monomials, const string &line)
 
 void _parseMonomials(_MonomialConsumer<ZZ>* consumer, const string &line)
 {
-	cout << "Old parse" << endl;
 	int varCount = 0;
 	for (int i = 0; line[i] != ']'; i++)
 	{ varCount += (line[i] == ','); }
@@ -62,7 +61,6 @@ void _parseMonomials(_MonomialConsumer<ZZ>* consumer, const string &line)
 		}
 		}
 	}
-	cout << "Finished parsing" << endl;
 
 	delete [] exponents;
 }
