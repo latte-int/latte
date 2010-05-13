@@ -1,3 +1,8 @@
+/*
+The main procedure multiplies every successive pair of polynomials and records the result.
+Called in multiplyTest.mpl as part of make check
+*/
+
 #include "multiply.h"
 #include "../timing.h"
 #include <iostream>
@@ -20,6 +25,8 @@ int main(int argc, char *argv[])
 	int *low, *high;
 	
 	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	BTrieIterator<ZZ, int>* it2 = new BTrieIterator<ZZ, int>();
 	
 	while (!myStream.eof())
 	{
@@ -65,8 +72,9 @@ int main(int argc, char *argv[])
 					high[i] = INT_MAX;
 				}
 				
-				
-				multiply<ZZ>(firstPoly, secondPoly, product, low, high);
+				it->setTrie(firstPoly.myMonomials, firstPoly.varCount);
+				it2->setTrie(secondPoly.myMonomials, secondPoly.varCount);
+				multiply<ZZ>(it, it2, product, low, high);
 
 				outStream << printMonomials(product) << endl;
 

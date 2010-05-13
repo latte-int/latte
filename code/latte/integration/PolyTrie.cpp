@@ -94,7 +94,7 @@ void insertMonomial(const ZZ& coefficient, int* exponents, monomialSum& monomial
 string printMonomials(const monomialSum &myPoly)
 {
 	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
-	BurstTerm<ZZ, int>* temp;
+	term<ZZ, int>* temp;
 	it->setTrie(myPoly.myMonomials, myPoly.varCount);
 	it->begin();
 	int i = 0;
@@ -231,7 +231,7 @@ void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&
 string printLinForms(const linFormSum &myForm)
 {
 	BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
-	BurstTerm<ZZ, ZZ>* temp;
+	term<ZZ, ZZ>* temp;
 	it->setTrie(myForm.myForms, myForm.varCount);
 	it->begin();
 
@@ -271,7 +271,7 @@ void destroyLinForms(linFormSum &myPoly)
 //	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
 void decompose(monomialSum &myPoly, linFormSum &lForm)
 {
-	BurstTerm<ZZ, int>* temp; 
+	term<ZZ, int>* temp; 
 	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 
 	it->setTrie(myPoly.myMonomials, myPoly.varCount);
@@ -288,7 +288,7 @@ void decompose(monomialSum &myPoly, linFormSum &lForm)
 	//delete myPoly.myMonomials;
 }
 
-void decompose(monomialSum &myPoly, linFormSum &lForm, BurstTerm<ZZ, int>* myTerm)
+void decompose(monomialSum &myPoly, linFormSum &lForm, term<ZZ, int>* myTerm)
 {
 	vec_ZZ myExps; myExps.SetLength(lForm.varCount);
 	

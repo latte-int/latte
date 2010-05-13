@@ -86,8 +86,20 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 	};
 	mindeg[0]=0;
 	maxdeg[0]=counter[0];
-	if (i % 2==1) {multiply<ZZ>(m1,m2,sub,mindeg,maxdeg);}//cout<<"times "<<printMonomials(m2)<<" gives "<<printMonomials(sub)<<endl;}
-	else {multiply<ZZ>(sub,m2,m1,mindeg,maxdeg);}//cout<<"times "<<printMonomials(m2)<<"gives "<<printMonomials(m1)<<endl;};
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	BTrieIterator<ZZ, int>* it2 = new BTrieIterator<ZZ, int>();
+	if (i % 2==1)
+	{
+		it->setTrie(m1.myMonomials, m1.varCount);
+		it2->setTrie(m2.myMonomials, m2.varCount);
+		multiply<ZZ>(it, it2,sub,mindeg,maxdeg);
+	}//cout<<"times "<<printMonomials(m2)<<" gives "<<printMonomials(sub)<<endl;}
+	else
+	{
+		it->setTrie(sub.myMonomials,sub.varCount);
+		it2->setTrie(m2.myMonomials, m2.varCount);
+		multiply<ZZ>(it, it2,m1,mindeg,maxdeg);
+	}//cout<<"times "<<printMonomials(m2)<<"gives "<<printMonomials(m1)<<endl;};
      };
      ZZ findCoeff=to_ZZ(0);
 /*     if (k % 2) //m1
@@ -137,10 +149,10 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 		it->setTrie(myTrie, sub.varCount);
 	}	
 	it->begin();
-	
-	while (temp = it->nextTerm())
+	term<ZZ, int>* storedTerm;
+	while (storedTerm = it->nextTerm())
 	{
-		if (temp->exps[0]==counter[0])	{findCoeff=temp->coef;break;};		
+		if (storedTerm->exps[0]==counter[0])	{findCoeff=storedTerm->coef;break;};		
 	};	
 	
 	

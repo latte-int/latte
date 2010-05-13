@@ -55,7 +55,7 @@ void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&
 string printLinForms(const linFormSum&);
 void destroyLinForms(linFormSum&);
 
-void decompose(monomialSum&, linFormSum&, BurstTerm<ZZ, int>*);
+void decompose(monomialSum&, linFormSum&, term<ZZ, int>*);
 void decompose(monomialSum&, linFormSum&);
 
 //consumers for loading data structures

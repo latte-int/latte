@@ -34,6 +34,12 @@ int main(int argc, char *argv[])
 	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();
 	_MonomialLoadConsumer<ZZ>* _myLoader = new _MonomialLoadConsumer<ZZ>();
 	
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	BTrieIterator<ZZ, int>* it2 = new BTrieIterator<ZZ, int>();
+	
+	BlockIterator<ZZ, int>* _it = new BlockIterator<ZZ, int>();
+	BlockIterator<ZZ, int>* _it2 = new BlockIterator<ZZ, int>();
+	
 	while (!myStream.eof())
 	{
 		getline(myStream, line, '\n');
@@ -78,12 +84,26 @@ int main(int argc, char *argv[])
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
                         oldMult += myTime;
+			cout << myTime << " vs. ";
+			
+			_it->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount);
+			_it2->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount);
+			myTime = myTimer.get_seconds();
+                        myTimer.start();
+                        multiply<ZZ>(_it, _it2, _myProduct, low, high);
+                        myTimer.stop();
+                        myTime = myTimer.get_seconds() - myTime;
+			cout << myTime << endl;
+                        //oldMult += myTime;
                         //cout << "Old Algorithm @ dimension " << _myProduct.varCount << ":" <<  myTime << "s. " << endl;
                         _destroyMonomials(_myProduct);
                                     
+				    
+			it->setTrie(myPoly.myMonomials, myPoly.varCount);
+			it2->setTrie(myPoly.myMonomials, myPoly.varCount);
                         myTime = myTimer.get_seconds();
                         myTimer.start();
-                        multiply<ZZ>(myPoly, myPoly, myProduct, low, high);
+                        multiply<ZZ>(it, it2, myProduct, low, high);
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
                         newMult += myTime;
@@ -119,13 +139,15 @@ cout << endl;
                         newDecomp += myTime;
                         destroyLinForms(myForms);
                     }
-		    destroyMonomials(myPoly);
-                    _destroyMonomials(_myPoly);
+		    //destroyMonomials(myPoly);
+                    //_destroyMonomials(_myPoly);
 		}
 	}
 
 	delete myLoader;
 	delete _myLoader;
+	delete it; delete it2;
+	delete _it; delete _it2;
 	myStream.close();
        cout << "Comparing @ dimension " << dimension << " (old vs. new) " << endl;
        if (option == 1) { cout << "Squaring polynomials: " << oldMult << " vs. " << newMult << endl; }

@@ -1,3 +1,7 @@
+/*
+Defines the BurstTrie class, used for storing monomials and powers of linear forms, as well as iterators over them
+*/
+
 #ifndef BURSTTRIE_H
 #define BURSTTRIE_H
 
@@ -15,6 +19,17 @@ NTL_CLIENT
 template <class T, class S> class BurstTrie;
 template <class T, class S> class BTrieIterator;
 
+//Generic struct used by base iterator
+template <class T, class S>
+struct term
+{
+	T coef;
+	S* exps;
+	int length;
+	int degree;
+};
+
+//abstraction used in burst tries to allow tries to contain either tries or terms as children
 struct trieElem
 {
     bool isTrie;
@@ -327,12 +342,21 @@ private:
 };
 
 template <class T, class S>
-class BTrieIterator
+class PolyIterator
+{
+public:
+	virtual void begin() = 0;
+	virtual term<T, S>* nextTerm() = 0;
+	virtual term<T, S>* getTerm() = 0;
+};
+
+template <class T, class S>
+class BTrieIterator : public PolyIterator<T, S>
 {
 public:
 	BTrieIterator()
 	{
-		curTerm = NULL;
+
 	}
 	
 	void setTrie(BurstTrie<T, S>* trie, int myDim)
@@ -341,9 +365,8 @@ public:
 		myTrie = trie;
 		dimension = myDim;
 		triePath = new trieElem*[dimension];
-		
-		if (curTerm) { delete curTerm; }
-		curTerm = new BurstTerm<T, S>(dimension);
+		curTerm.exps = new S[dimension];
+		curTerm.length = dimension;
 	}
 	
 	void begin()
@@ -361,16 +384,16 @@ public:
 		{
 			curDepth++;
 			nextElem = triePath[0] = myTrie->firstElem;
-			curTerm->exps[0] = myTrie->range[0];
-			//cout << "!exp 0: " << curTerm->exps[0] << endl;
+			curTerm.exps[0] = myTrie->range[0];
+			//cout << "!exp 0: " << curTerm.exps[0] << endl;
 		}
 		else
 		{
 			nextElem = triePath[curDepth]->next;
-			curTerm->exps[curDepth]++;
+			curTerm.exps[curDepth]++;
 			while (nextElem)
 			{
-				//cout << "exp " << curDepth << ": " << curTerm->exps[curDepth] << endl;
+				//cout << "exp " << curDepth << ": " << curTerm.exps[curDepth] << endl;
 				if (nextElem->isTrie)
 				{
 					
@@ -382,9 +405,9 @@ public:
 					//cout << "container found - " << ((BurstContainer<T, S>*)nextElem->myVal)->termCount << endl;
 					break;
 				}
-				//cout << "Skipping trie element " << curTerm->exps[curDepth] << endl;
+				//cout << "Skipping trie element " << curTerm.exps[curDepth] << endl;
 				nextElem = nextElem->next;
-				curTerm->exps[curDepth]++;
+				curTerm.exps[curDepth]++;
 			}
 			triePath[curDepth] = nextElem;
 		}
@@ -407,7 +430,7 @@ public:
 		{
 			curDepth++;
 			triePath[curDepth] = ((BurstTrie<T, S>*)myElem->myVal)->firstElem;
-			curTerm->exps[curDepth] = ((BurstTrie<T, S>*)myElem->myVal)->range[0];
+			curTerm.exps[curDepth] = ((BurstTrie<T, S>*)myElem->myVal)->range[0];
 			return firstContainer( ((BurstTrie<T, S>*)myElem->myVal)->firstElem );
 		}
 		else
@@ -417,7 +440,7 @@ public:
 		}
 	}
 	
-	BurstTerm<T, S>* nextTerm()
+	term<T, S>* nextTerm()
 	{
 		//cout << "Next term at depth " << curDepth << endl;
 		if (!storedTerm) //end of container
@@ -433,30 +456,29 @@ public:
 
 		for (int i = curDepth + 1; i < dimension; i++)
 		{
-			curTerm->exps[i] = storedTerm->exps[i - curDepth - 1];
+			curTerm.exps[i] = storedTerm->exps[i - curDepth - 1];
 		}
-		curTerm->coef = storedTerm->coef;
-		curTerm->degree = storedTerm->degree;
+		curTerm.coef = storedTerm->coef;
+		curTerm.degree = storedTerm->degree;
 		storedTerm = storedTerm->next;
 		//cout << "got term w/coef " << curTerm->coef << endl;
-		return curTerm;
+		return &curTerm;
 	}
 
-	BurstTerm<T, S>* getTerm()
+	term<T, S>* getTerm()
 	{
-		return curTerm;
+		return &curTerm;
 	}
 	
 	~BTrieIterator()
 	{
-		if (curTerm)
-		{ delete curTerm; }
 		delete [] triePath;
+		delete [] curTerm.exps;
 	}
 	
 private:
 	BurstTrie<T, S>* myTrie; //trie to iterate over
-	BurstTerm<T, S>* curTerm; //shared buffer to store values
+	term<T, S> curTerm; //shared buffer to store values
 	int dimension;
 	
 	BurstTerm<T, S>* storedTerm; //pointer to next stored term in current container

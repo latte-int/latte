@@ -1,3 +1,7 @@
+/*
+Provides interactive console tool for decomposition and/or integration over arbitrary simplices
+*/
+
 #include "PolyTrie.h"
 #include "newIntegration.h"
 #include "../timing.h"

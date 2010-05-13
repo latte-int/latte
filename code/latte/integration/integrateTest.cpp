@@ -1,3 +1,8 @@
+/*
+Performs (and times, for benchmarking) decomposition and/or integration on the inputs over their corresponding simplices
+Used by decomposeTest.mpl in make check as well as benchmark.mpl for benchmark generation
+*/
+
 #include "PolyTrie.h"
 #include "newIntegration.h"
 #include "../timing.h"

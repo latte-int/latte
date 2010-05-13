@@ -5,6 +5,7 @@
 #define BLOCK_SIZE 64
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
+#include "burstTrie.h"
 
 NTL_CLIENT
 
@@ -104,6 +105,75 @@ public:
   ~_FormLoadConsumer() {}
 private:
   _linFormSum* formSum;
+};
+
+template <class T, class S>
+class BlockIterator : public PolyIterator<T, S>
+{
+public:
+	BlockIterator()
+	{
+		blockIndex = 0; curCoeff = NULL; curExp = NULL;
+	}
+	
+	void setLists(eBlock* eHead, cBlock<T>* cHead, int myDim)
+	{
+		assert (myDim > 0);
+		dimension = myDim;
+		
+		coeffHead = cHead; expHead = eHead;
+		curTerm.exps = new S[dimension];
+		curTerm.length = dimension;
+		curTerm.degree = -1;
+	}
+	
+	void begin()
+	{
+		blockIndex = 0;
+		curCoeff = coeffHead; curExp = expHead;
+	}
+	
+	term<T, S>* nextTerm()
+	{
+		if (!curCoeff || !curExp) { return NULL; }
+		
+		if (blockIndex < BLOCK_SIZE)
+		{
+			curTerm.coef = curCoeff->data[blockIndex];
+			for (int i = dimension*blockIndex; i < dimension*blockIndex + dimension; i++)
+			{
+				curTerm.exps[i] = curExp->data[i];
+			}
+			blockIndex++;
+		}
+		else
+		{
+			curCoeff = curCoeff->next;
+			curExp = curExp->next;
+			blockIndex = 0;
+		}
+	}
+
+	term<T, S>* getTerm()
+	{
+		return &curTerm;
+	}
+	
+	~BlockIterator()
+	{
+		delete [] curTerm.exps;
+	}
+	
+private:
+	term<T, S> curTerm; //shared buffer to store values
+	int dimension;
+	
+	cBlock<T>* curCoeff;
+	eBlock* curExp;
+	
+	cBlock<T>* coeffHead;
+	eBlock* expHead;
+	int blockIndex;
 };
 
 #endif

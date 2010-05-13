@@ -200,7 +200,7 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 	it->setTrie(forms.myForms, forms.varCount);
 	it->begin();
 	
-	BurstTerm<ZZ, ZZ>* temp;
+	term<ZZ, ZZ>* temp;
 	while (temp = it->nextTerm())
 	{
 		coe=temp->coef;m=temp->degree;
