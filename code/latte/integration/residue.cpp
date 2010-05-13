@@ -3,7 +3,7 @@
 #include "PolyTrie.h"
 #include "multiply.h"
 
-ZZ Power_ZZ(ZZ a, int b)					//power function
+ZZ Power_ZZ(ZZ a, int b)					//power function computes a^b
 {
 	if (b==0) return to_ZZ(1);
 	int bi[20];
@@ -32,6 +32,7 @@ ZZ AChooseB(int a,int b)
 	{t=t*(a-i+1)/i;};
 	return t;
 }		
+//This function is called when a vertex is irregular. The function computes the residue at the irregular vertex
 void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a, ZZ &b)
 {
      if (p==0) {a=0;b=1; return;}; //vertex vanishes, return 0;
@@ -63,7 +64,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
      //for (i=1;i<=counter[0];i++) nu*=i;
      for (j=1;j<=k-1;j++) de=de*Power_ZZ(index[j],counter[j]+counter[0]);
      monomialSum m1;
-     monomialSum sub;					//sub is the substitution for m1, which alternatively stores the product for each other
+     monomialSum sub;				//sub is the substitution for m1, which alternatively stores the product for each other
      m1.varCount=1;m1.termCount=0;
      sub.varCount=1;sub.termCount=0;
      for (i=0;i<=counter[0];i++) 
@@ -72,7 +73,6 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 	e[0]=i;
 	insertMonomial(c,e,m1); 
      };
-     //cout<<printMonomials(m1)<<endl;
      for (i=1;i<k;i++)
      {
 	monomialSum m2;
@@ -102,7 +102,8 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 	}//cout<<"times "<<printMonomials(m2)<<"gives "<<printMonomials(m1)<<endl;};
      };
      ZZ findCoeff=to_ZZ(0);
-/*     if (k % 2) //m1
+/*    This part does the same thing as the uncommented part following this, but using the original block structure for multiplication
+ if (k % 2) //m1
      {
 	//search m1 for the first term whose exponent vector is equal to [counter[0]]
      }
@@ -133,7 +134,9 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a
 		if (myExps->data[i % BLOCK_SIZE]== counter[0]) {findCoeff=myCoeffs->data[i % BLOCK_SIZE];break;};
       	};
       };*/
-	BurstTerm<ZZ,int>* temp;
+
+//The following part is trying to find a monomial that has the degree we want and returns its coefficient to findCoeff
+      	BurstTerm<ZZ,int>* temp;
 	BurstTrie<ZZ,int>* myTrie;
 	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 	if (k % 2 == 1)

@@ -1,6 +1,6 @@
 #define COEFF_MAX 10000
 
-#include "PolyTrie.h"
+#include "PolyRep.h"
 #include "newIntegration.h"
 #include "../timing.h"
 #include <iostream>
@@ -11,8 +11,9 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-	if (argc < 3) { cout << "Usage: " << argv[0] << " fileIn fileOut" << endl; return 1; }
-	linFormSum forms;
+	if (argc < 3) { cout << "Usage: " << argv[0] << " fileIn fileOut IntegrateMode (polynomial/linear)" << endl; return 1; }
+	_linFormSum _forms;
+	_monomialSum _monomials;
         simplexZZ mySimplex;
 	ifstream myStream (argv[1], ios::in);
 	ofstream outStream(argv[2], ios::out);
@@ -31,14 +32,21 @@ int main(int argc, char *argv[])
  		if ((line.length()==0)||(line2.length()==0)) break;
 		lastTime = myTimer.get_seconds();
 		myTimer.start();
-   		loadLinForms(forms, line);
+		if (!strcmp(argv[3],"linear"))
+   		{_loadLinForms(_forms, line);
 		convertToSimplex(mySimplex,line2);
-		integrateLinFormSum(a, b, forms, mySimplex);
+		_integrateLinFormSum(a, b, _forms, mySimplex);
+		}
+		else if (!strcmp(argv[3],"polynomial"))
+		{_loadMonomials(_monomials, line);
+		convertToSimplex(mySimplex, line2);
+		//_integrateMonomialSum(a,b,_monomials, mySimplex);
+		};
                 outStream<<a<<"/"<<b<<endl;
 		myTimer.stop();	
 		newTime = myTimer.get_seconds();
 		FILE* markFile = fopen("integration/mark.txt","w");
-		if (newTime-lastTime>10) 
+		if ( ((!strcmp(argv[3],"linear"))&&(newTime-lastTime>10)) || ((!strcmp(argv[3],"polynomial"))&&(newTime-lastTime>600)) )
 		{
 			FILE* myFile = fopen("integration/benchmarksh.txt","a");
 			fprintf(myFile, "%10.4f", newTime-lastTime);

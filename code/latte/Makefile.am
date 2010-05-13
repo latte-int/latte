@@ -165,10 +165,6 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
-#bin_PROGRAMS += decompose
-#decompose_SOURCES =     integration/decompose.cpp
-#decompose_SOURCES +=    integration/PolyRep.cpp
-
 #bin_PROGRAMS += integrate
 #integrate_SOURCES = integration/decint.cpp
 #integrate_SOURCES += integration/newIntegration.cpp

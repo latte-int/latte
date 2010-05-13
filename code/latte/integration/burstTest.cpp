@@ -9,9 +9,11 @@
 
 using namespace std;
 
+//This main function takes in a number of polynomial-simplex or liear-form-simplex pairs and integrate them.
+
 int main(int argc, char *argv[])
 {
-	if (argc < 4) {cout<<"Usage: "<< argv[0] <<" fileIn fileOut IntegrateMode (polynomial/linear)" <<endl; return 1;};
+	if (argc < 4) {cout<<"Usage: "<< argv[0] <<" fileIn fileOut IntegrateMode (polynomial/linear)" <<endl; return 1;}; //usage of the function
 	linFormSum forms;
 	monomialSum myPoly;
 	simplexZZ mySimplex;
@@ -32,7 +34,6 @@ int main(int argc, char *argv[])
 		polyCount++;
 		if (!strcmp(argv[3],"polynomial")) 
 		{
-			//cout<<"integrating polynomial "<<line<<" w.r.t."<<line2<<endl;
 			a=0;b=0;
 			loadMonomials(myPoly, line);
 			convertToSimplex(mySimplex, line2);
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
 			if (newTime-lastTime>600) 
 			{
 				FILE* myFile = fopen("integration/burstbench1.txt","a");
+				//timeout
 				fprintf(myFile, "%10.4f", newTime-lastTime);
 				fclose(myFile);
 				fprintf(markFile, "1");
@@ -56,7 +58,6 @@ int main(int argc, char *argv[])
 		}
 		else if (!strcmp(argv[3],"linear"))
 		{
-			//cout<<"integrating linear "<<line<<"w.r.t."<<line2<<endl;
 			a=0;b=0;
 			loadLinForms(forms, line);
 			convertToSimplex(mySimplex, line2);
@@ -71,6 +72,7 @@ int main(int argc, char *argv[])
 			{
 				FILE* myFile = fopen("integration/burstbench1.txt","a");
 				fprintf(myFile, "%10.4f", newTime-lastTime);
+				//timeout
 				fclose(myFile);
 				fprintf(markFile, "1");
 				fclose(markFile);
@@ -83,10 +85,12 @@ int main(int argc, char *argv[])
 	hisStream.close();
 
 	loadTime = loadTime/polyCount;
+	//writes average integration time to file burstbench1.txt
 	FILE* myFile = fopen("integration/burstbench1.txt","a");
         if (loadTime<0) loadTime=-loadTime;
 	fprintf(myFile, "%10.4f", loadTime);
 	fclose(myFile);
+	//time is not out
         FILE* markFile=fopen("integration/mark.txt","w");
 	fprintf(markFile, "0");
 	fclose(markFile);
