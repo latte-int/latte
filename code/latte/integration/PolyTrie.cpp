@@ -269,18 +269,18 @@ void destroyLinForms(linFormSum &myPoly)
 //	and myPoly.exponentBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
 //OUTPUT: lForm now also contains the linear decomposition of this monomial 
 //	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
-void decompose(monomialSum &myPoly, linFormSum &lForm)
+void decompose(BTrieIterator<ZZ, int>* it, linFormSum &lForm)
 {
 	term<ZZ, int>* temp; 
-	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	//BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 
-	it->setTrie(myPoly.myMonomials, myPoly.varCount);
+	//it->setTrie(myPoly.myMonomials, myPoly.varCount);
 	it->begin();
 	
 	temp = it->nextTerm();
 	do
 	{
-		decompose(myPoly, lForm, temp);
+		decompose(temp, lForm);
 		temp = it->nextTerm();
 	}
 	while (temp);
@@ -288,7 +288,7 @@ void decompose(monomialSum &myPoly, linFormSum &lForm)
 	//delete myPoly.myMonomials;
 }
 
-void decompose(monomialSum &myPoly, linFormSum &lForm, term<ZZ, int>* myTerm)
+void decompose(term<ZZ, int>* myTerm, linFormSum &lForm)
 {
 	vec_ZZ myExps; myExps.SetLength(lForm.varCount);
 	
@@ -310,14 +310,14 @@ void decompose(monomialSum &myPoly, linFormSum &lForm, term<ZZ, int>* myTerm)
 	//cout << "At most " << formsCount << " linear forms will be required for this decomposition." << endl;
 	//cout << "Total degree is " << totalDegree << endl;
 	
-	int* p = new int[myPoly.varCount];
-	int* counter = new int[myPoly.varCount];
-	ZZ* binomCoeffs = new ZZ[myPoly.varCount]; //for calculating the product of binomial coefficients for each linear form
+	int* p = new int[lForm.varCount];
+	int* counter = new int[lForm.varCount];
+	ZZ* binomCoeffs = new ZZ[lForm.varCount]; //for calculating the product of binomial coefficients for each linear form
 
 	ZZ temp;
 	int g;
 	int myIndex;
-	for (int i = 0; i < myPoly.varCount; i++) { counter[i] = 0; binomCoeffs[i] = to_ZZ(1); }
+	for (int i = 0; i < lForm.varCount; i++) { counter[i] = 0; binomCoeffs[i] = to_ZZ(1); }
 	for (ZZ i = to_ZZ(1); i <= formsCount; i++)
 	{
 		//cout << "i is " << i << endl;
@@ -337,9 +337,9 @@ void decompose(monomialSum &myPoly, linFormSum &lForm, term<ZZ, int>* myTerm)
 		int parity = totalDegree - counter[0];
 		p[0] = counter[0];
 		temp = binomCoeffs[0];
-		if (myPoly.varCount > 1)
+		if (lForm.varCount > 1)
 		{
-			for (int k = 1; k < myPoly.varCount; k++)
+			for (int k = 1; k < lForm.varCount; k++)
 			{
 				p[k] = counter[k];
 				g = GCD (g, p[k]);
@@ -354,14 +354,14 @@ void decompose(monomialSum &myPoly, linFormSum &lForm, term<ZZ, int>* myTerm)
 		
 		if (g != 1)
 		{
-			for (int k = 0; k < myPoly.varCount; k++)
+			for (int k = 0; k < lForm.varCount; k++)
 			{
 				p[k] /= g;
 			}
 			temp *= power_ZZ(g, totalDegree);
 		}
 		//cout << "coefficient is " << temp << endl;
-		for (int i = 0; i < myPoly.varCount; i++) { myExps[i] = p[i]; }
+		for (int i = 0; i < lForm.varCount; i++) { myExps[i] = p[i]; }
 		insertLinForm(temp, totalDegree, myExps, lForm);
 	}
 	delete [] p;

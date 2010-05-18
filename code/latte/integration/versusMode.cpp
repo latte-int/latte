@@ -131,9 +131,10 @@ cout << endl;
                         _destroyLinForms(_myForms);                        
                         
                         myForms.termCount = 0;
+			it->setTrie(myPoly.myMonomials, myPoly.varCount);
                         myTime = myTimer.get_seconds();
                         myTimer.start();
-                        decompose(myPoly, myForms);
+                        decompose(it, myForms);
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
                         newDecomp += myTime;

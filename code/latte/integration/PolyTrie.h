@@ -55,8 +55,8 @@ void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&
 string printLinForms(const linFormSum&);
 void destroyLinForms(linFormSum&);
 
-void decompose(monomialSum&, linFormSum&, term<ZZ, int>*);
-void decompose(monomialSum&, linFormSum&);
+void decompose(term<ZZ, int>*, linFormSum&);
+void decompose(BTrieIterator<ZZ, int>* it, linFormSum&);
 
 //consumers for loading data structures
 template <class T> class MonomialLoadConsumer : public MonomialConsumer<T> {

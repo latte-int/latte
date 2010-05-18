@@ -122,12 +122,6 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 	vec_ZZ l;
 	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<forms.varCount<<"<>"<<mySimplex.d<<endl;exit(1);};
 	l.SetLength(mySimplex.d);
-<<<<<<< .mine
-	BurstTerm<ZZ, ZZ>* temp = new BurstTerm<ZZ, ZZ>(forms.varCount);
-	BurstTrie<ZZ, ZZ>* myTrie = forms.myForms;
-	myTrie->begin();
-	while (myTrie->nextTerm(temp))			//this means traversing the data structure
-=======
 	numerator=0;
 	denominator=0;
 	BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
@@ -136,7 +130,6 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms
 	
 	term<ZZ, ZZ>* temp;
 	while (temp = it->nextTerm())
->>>>>>> .r1060
 	{
 		coe=temp->coef;m=temp->degree;		//obtain coefficient, power
 		l.SetLength(temp->length);		//obtain exponent vector
@@ -190,8 +183,11 @@ void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ 
 {
 	linFormSum forms;
 	forms.termCount = 0;
-	forms.varCount = monomials.varCount;		
-	decompose(monomials, forms);				//decomposition
+	forms.varCount = monomials.varCount;
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	it->setTrie(monomials.myMonomials, monomials.varCount);
+	decompose(it, forms);				//decomposition
+	delete it;
 	integrateLinFormSum(a,b,forms, mySimplex);
 };
 void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials, const simplexZZ &mySimplex)
@@ -199,6 +195,6 @@ void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials, const simplexZ
 	_linFormSum forms;
 	forms.termCount = 0;
 	forms.varCount = monomials.varCount;		
-	for (int i=0;i<monomials.termCount;i++) _decompose(monomials, forms, i);
+	//for (int i=0;i<monomials.termCount;i++) _decompose(monomials, forms, i);
 	_integrateLinFormSum(a,b,forms, mySimplex);
 };

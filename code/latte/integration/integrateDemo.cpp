@@ -59,6 +59,7 @@ int main(int argc, char *argv[])
 	FormIntegrateConsumer<ZZ> *integrator;
 	if (!decomposing) { integrator = new FormIntegrateConsumer<ZZ>(); }
 
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 	while (!inStream.eof())
 	{
 		getline(inStream, line, '\n');
@@ -90,9 +91,12 @@ int main(int argc, char *argv[])
 					forms.varCount = monomials.varCount;
 		
 					cout << "Decomposing into sum of linear forms..." << endl;
+					
+					it->setTrie(monomials.myMonomials, monomials.varCount);
+					
 					lastTime = myTimer.get_seconds();
 					myTimer.start();
-					decompose(monomials, forms);
+					decompose(it, forms);
 					myTimer.stop();
 					decomposeTime += (myTimer.get_seconds() - lastTime);
 					outStream << "Decomposition finished in " << myTimer.get_seconds() - lastTime << "s." << endl;
@@ -162,6 +166,7 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
+	delete it;
 	
 	outStream << "Processed " << polyCount;
 	if (decomposing)

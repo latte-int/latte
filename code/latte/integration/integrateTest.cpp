@@ -81,6 +81,7 @@ int main(int argc, char *argv[])
 	FormIntegrateConsumer<ZZ> *integrator;
 	if (!decomposing) { integrator = new FormIntegrateConsumer<ZZ>(); }
 
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 	while (!inFile.eof())
 	{
 		getline(inFile, line, '\n');
@@ -114,7 +115,8 @@ int main(int argc, char *argv[])
 						//cout << ".";
 					//	decompose(monomials, forms, i);
 					//}
-					decompose(monomials, forms);
+					it->setTrie(monomials.myMonomials, monomials.varCount);
+					decompose(it, forms);
 					myTimer.stop();
 					decomposeTime += (myTimer.get_seconds() - tempTime);
 					//cout << endl;
