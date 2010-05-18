@@ -190,11 +190,11 @@ void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ 
 	delete it;
 	integrateLinFormSum(a,b,forms, mySimplex);
 };
-void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials, const simplexZZ &mySimplex)
+/*void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials, const simplexZZ &mySimplex)
 {
 	_linFormSum forms;
 	forms.termCount = 0;
 	forms.varCount = monomials.varCount;		
 	//for (int i=0;i<monomials.termCount;i++) _decompose(monomials, forms, i);
 	_integrateLinFormSum(a,b,forms, mySimplex);
-};
+};*/

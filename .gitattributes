@@ -19,7 +19,6 @@ code/latte/integration/integrateTest.cpp -text
 code/latte/integration/multiply.h -text
 code/latte/integration/multiplyTest.cpp -text
 code/latte/integration/multiplyTest.mpl -text
-code/latte/integration/myIntegration.h -text
 code/latte/integration/newIntegration.cpp -text
 code/latte/integration/newIntegration.h -text
 code/latte/integration/residue.cpp -text
@@ -28,6 +27,7 @@ code/latte/integration/testIntegration.sh -text
 code/latte/integration/testMultiply.sh -text
 code/latte/integration/versusMode.cpp -text
 code/latte/polyintegration.tex -text
+code/latte/shortmemo.doc -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream

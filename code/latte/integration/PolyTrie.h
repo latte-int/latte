@@ -72,7 +72,7 @@ private:
 };
 
 template <class T> class FormLoadConsumer : public FormSumConsumer<T> {
-public:
+pulic:
   FormLoadConsumer() {}
   // Take linear form and consume it.
   void ConsumeLinForm(const T& coefficient, int degree, const vec_ZZ& coefs) { insertLinForm(coefficient, degree, coefs, *formSum); }
