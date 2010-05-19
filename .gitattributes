@@ -8,6 +8,7 @@ code/latte/integration/benchmark.mpl -text
 code/latte/integration/benchmark.sh -text
 code/latte/integration/burstTest.cpp -text
 code/latte/integration/burstTrie.h -text
+code/latte/integration/compareTimes.mpl -text
 code/latte/integration/createLinear.mpl -text
 code/latte/integration/decint.cpp -text
 code/latte/integration/decompose.cpp -text
