@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
                         oldMult += myTime;
-			cout << myTime << " vs. ";
+			//cout << myTime << " vs. ";
 			
 			_it->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount, _myPoly.termCount);
 			_it2->setLists(_myPoly.eHead, _myPoly.cHead, _myPoly.varCount, _myPoly.termCount);
@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
                         multiply<ZZ>(_it, _it2, _myProduct, low, high);
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
-			cout << myTime << endl;
+			//cout << myTime << endl;
                         //oldMult += myTime;
                         //cout << "Old Algorithm @ dimension " << _myProduct.varCount << ":" <<  myTime << "s. " << endl;
                         _destroyMonomials(_myProduct);
@@ -118,13 +118,11 @@ int main(int argc, char *argv[])
                         _myForms.termCount = 0;
                         myTime = myTimer.get_seconds();
                         myTimer.start();
-cout << "Decomposing" << endl;
+
                         for (int i = 0; i < _myPoly.termCount; i++)
                         {
-cout << ". ";
                             _decompose(_myPoly, _myForms, i);
                         }
-cout << endl;
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
                         oldDecomp += myTime;

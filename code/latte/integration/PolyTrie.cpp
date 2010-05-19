@@ -259,7 +259,6 @@ string printLinForms(const linFormSum &myForm)
 //Deallocates space and nullifies internal pointers and counters
 void destroyLinForms(linFormSum &myPoly)
 {
-	cout << "Destroying trie" << endl;
 	delete myPoly.myForms;
 	myPoly.myForms = NULL;
 	myPoly.termCount = myPoly.varCount = 0;

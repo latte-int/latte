@@ -80,7 +80,7 @@ void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, _monomialSu
 template <class T>
 void _multiply(_monomialSum& first, _monomialSum& second, _monomialSum& result, int* min, int* max)
 {
-	cout << "Old multiply" << endl;
+	//cout << "Old multiply" << endl;
 	eBlock* firstExp = first.eHead; cBlock<T>* firstCoef = first.cHead;
 	eBlock* secondExp; cBlock<T>* secondCoef;
 	
