@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
 	if (!decomposing) { integrator = new FormIntegrateConsumer<ZZ>(); }
 
 	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	BTrieIterator<ZZ, ZZ>* it2 = new BTrieIterator<ZZ, ZZ>();
 	while (!inFile.eof())
 	{
 		getline(inFile, line, '\n');
@@ -147,9 +148,10 @@ int main(int argc, char *argv[])
 				ZZ numerator, denominator;
 				if (decomposing)
 				{
+					it2->setTrie(forms.myForms, forms.varCount);
 					tempTime = myTimer.get_seconds();
 					myTimer.start();
-					integrateLinFormSum(numerator, denominator, forms, mySimplex);
+					integrateLinFormSum(numerator, denominator, it2, mySimplex);
 					myTimer.stop();
 					integrateTime += (myTimer.get_seconds() - tempTime);
 					destroyLinForms(forms);

@@ -1,3 +1,4 @@
+#include "newIntegration.h"
 #include "multiply.h"
 #include "PolyTrie.h"
 #include "PolyRep.h"
@@ -28,8 +29,8 @@ int main(int argc, char *argv[])
 	float myTime;
 	Timer myTimer("");
         
-        float oldMult, oldDecomp, newMult, newDecomp;
-        oldMult = oldDecomp = newMult = newDecomp = 0.0f;
+        float oldMult, oldDecomp, newMult, newDecomp, oldInt, newInt;
+        oldMult = oldDecomp = newMult = newDecomp = oldInt = newInt = 0.0f;
 	
 	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();
 	_MonomialLoadConsumer<ZZ>* _myLoader = new _MonomialLoadConsumer<ZZ>();
@@ -37,8 +38,13 @@ int main(int argc, char *argv[])
 	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 	BTrieIterator<ZZ, int>* it2 = new BTrieIterator<ZZ, int>();
 	
-	BlockIterator<ZZ, int>* _it = new BlockIterator<ZZ, int>();
-	BlockIterator<ZZ, int>* _it2 = new BlockIterator<ZZ, int>();
+	MBlockIterator<ZZ>* _it = new MBlockIterator<ZZ>();
+	MBlockIterator<ZZ>* _it2 = new MBlockIterator<ZZ>();
+	
+	LBlockIterator<ZZ>* it_ = new LBlockIterator<ZZ>();
+	BTrieIterator<ZZ, ZZ>* it2_ = new BTrieIterator<ZZ, ZZ>();
+	
+	ZZ numerator, denominator;
 	
 	while (!myStream.eof())
 	{
@@ -126,6 +132,18 @@ int main(int argc, char *argv[])
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
                         oldDecomp += myTime;
+			
+			simplexZZ mySimplex;
+			getline(myStream, line, '\n');
+			convertToSimplex(mySimplex, line);			
+			
+			it_->setLists(_myForms.lHead, _myForms.cHead, _myForms.varCount, _myForms.termCount);
+			myTime = myTimer.get_seconds();
+			myTimer.start();
+			integrateLinFormSum(numerator, denominator, it_, mySimplex);
+			myTimer.stop();
+			oldInt += (myTimer.get_seconds() - myTime);
+			
                         _destroyLinForms(_myForms);                        
                         
                         myForms.termCount = 0;
@@ -136,10 +154,16 @@ int main(int argc, char *argv[])
                         myTimer.stop();
                         myTime = myTimer.get_seconds() - myTime;
                         newDecomp += myTime;
+			
+			it2_->setTrie(myForms.myForms, myForms.varCount);
+			myTime = myTimer.get_seconds();
+			myTimer.start();
+			integrateLinFormSum(numerator, denominator, it2_, mySimplex);
+			myTimer.stop();
+			newInt += (myTimer.get_seconds() - myTime);
+			
                         destroyLinForms(myForms);
                     }
-		    //destroyMonomials(myPoly);
-                    //_destroyMonomials(_myPoly);
 		}
 	}
 
@@ -147,9 +171,10 @@ int main(int argc, char *argv[])
 	delete _myLoader;
 	delete it; delete it2;
 	delete _it; delete _it2;
+	delete it_; delete it2_;
 	myStream.close();
        cout << "Comparing @ dimension " << dimension << " (old vs. new) " << endl;
        if (option == 1) { cout << "Squaring polynomials: " << oldMult << " vs. " << newMult << endl; }
-       else if (option == 2) { cout << "Decomposing: " << oldDecomp << " vs. " << newDecomp << endl; }
+       else if (option == 2) { cout << "Decomposing: " << oldDecomp << " vs. " << newDecomp << endl << "Integrating: " << oldInt << " vs. " << newInt << endl; }
 	return 0; 
 }

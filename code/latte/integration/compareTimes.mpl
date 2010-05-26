@@ -43,17 +43,30 @@ random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r)
   #polynomial_to_sparsepoly(p, d);
 end:
 
+with(combinat):
+
+lattice_random_simplex:=proc(d,N) local R,U;
+  R := rand(N):
+  U:=proc()[seq(R(),i=1..d)] end proc:
+  [ seq(U(), i=1..d+1) ];
+end:
+
 local benchmarks:
 local polyCount:=50:
 local myDim, myDegree:
 errorFile:=fopen("integration/errors.log",WRITE,TEXT):
 close(errorFile):
 
+local bigConstant:=10000:
+local myDegree:=10:
+local multTerms:=50:
+local intTerms:=5:
+
 for myDim from 1 to 10 do
   print(StringTools[Join](["Multiplying monomials of dimension", convert(myDim*5,string)], " ")):
   polyFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
   for i from 1 to polyCount do
-    writeline(polyFile, convert(polynomial_to_sparsepoly(random_sparse_homogeneous_polynomial_with_degree(10000, myDim*5, 10, 50), myDim*5), string)); 
+    writeline(polyFile, convert(polynomial_to_sparsepoly(random_sparse_homogeneous_polynomial_with_degree(bigConstant, myDim*5, myDegree, multTerms), myDim*5), string)); 
   od:
   close(polyFile):
   system("./compare -m integration/randomPolys.txt"):
@@ -63,7 +76,8 @@ for myDim from 1 to 10 do
   print(StringTools[Join](["Decomposing monomials of dimension", convert(myDim,string)], " ")):
   polyFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
   for i from 1 to polyCount do
-    writeline(polyFile, convert(polynomial_to_sparsepoly(random_sparse_homogeneous_polynomial_with_degree(10000, myDim, 10, 5), myDim), string)); 
+    writeline(polyFile, convert(polynomial_to_sparsepoly(random_sparse_homogeneous_polynomial_with_degree(bigConstant, myDim, myDegree, intTerms), myDim), string));
+    writeline(polyFile, StringTools[DeleteSpace](convert(lattice_random_simplex(myDim, bigConstant), string)));
   od:
   close(polyFile):
   system("./compare -d integration/randomPolys.txt"):  

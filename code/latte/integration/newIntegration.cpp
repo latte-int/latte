@@ -115,17 +115,17 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de)
 };
 
 //This function computes a given fraction a/b, the integral of the linear form forms, over the simplex mySimplex
-void integrateLinFormSum(ZZ& numerator, ZZ& denominator, const linFormSum &forms , const simplexZZ &mySimplex)
+void integrateLinFormSum(ZZ& numerator, ZZ& denominator, PolyIterator<ZZ, ZZ>* it, const simplexZZ &mySimplex)
 {
 	ZZ v,de,counter,tem,coe;
 	int i,j,index,k,m;
 	vec_ZZ l;
-	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<forms.varCount<<"<>"<<mySimplex.d<<endl;exit(1);};
+	//if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<forms.varCount<<"<>"<<mySimplex.d<<endl;exit(1);};
 	l.SetLength(mySimplex.d);
 	numerator=0;
 	denominator=0;
-	BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
-	it->setTrie(forms.myForms, forms.varCount);
+	//BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
+	//it->setTrie(forms.myForms, forms.varCount);
 	it->begin();
 	
 	term<ZZ, ZZ>* temp;
@@ -188,7 +188,9 @@ void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ 
 	it->setTrie(monomials.myMonomials, monomials.varCount);
 	decompose(it, forms);				//decomposition
 	delete it;
-	integrateLinFormSum(a,b,forms, mySimplex);
+	BTrieIterator<ZZ, ZZ>* it2 = new BTrieIterator<ZZ, ZZ>();
+	it2->setTrie(forms.myForms, forms.varCount);
+	integrateLinFormSum(a,b,it2, mySimplex);
 };
 /*void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials, const simplexZZ &mySimplex)
 {

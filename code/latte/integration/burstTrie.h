@@ -19,16 +19,6 @@ NTL_CLIENT
 template <class T, class S> class BurstTrie;
 template <class T, class S> class BTrieIterator;
 
-//Generic struct used by base iterator
-template <class T, class S>
-struct term
-{
-	T coef;
-	S* exps;
-	int length;
-	int degree;
-};
-
 //abstraction used in burst tries to allow tries to contain either tries or terms as children
 struct trieElem
 {
@@ -341,149 +331,16 @@ private:
     trieElem *firstElem; //first element in the trie
 };
 
-template <class T, class S>
-class PolyIterator
+struct monomialSum
 {
-public:
-	virtual void begin() = 0;
-	virtual term<T, S>* nextTerm() = 0;
-	virtual term<T, S>* getTerm() = 0;
+	int termCount, varCount;
+	BurstTrie<ZZ, int>* myMonomials;
 };
 
-template <class T, class S>
-class BTrieIterator : public PolyIterator<T, S>
+//linear forms: sort on degree first, then the form coefficients
+struct linFormSum
 {
-public:
-	BTrieIterator()
-	{
-
-	}
-	
-	void setTrie(BurstTrie<T, S>* trie, int myDim)
-	{
-		assert (myDim > 0);
-		myTrie = trie;
-		dimension = myDim;
-		triePath = new trieElem*[dimension];
-		curTerm.exps = new S[dimension];
-		curTerm.length = dimension;
-	}
-	
-	void begin()
-	{
-		//cout << "Starting iteration" << endl;
-		curDepth = -1;
-		storedTerm = NULL;
-	}
-	
-	BurstContainer<T, S>* nextContainer()
-	{
-		//cout << "Next container at depth " << curDepth << endl;
-		trieElem* nextElem;
-		if (curDepth < 0)
-		{
-			curDepth++;
-			nextElem = triePath[0] = myTrie->firstElem;
-			curTerm.exps[0] = myTrie->range[0];
-			//cout << "!exp 0: " << curTerm.exps[0] << endl;
-		}
-		else
-		{
-			nextElem = triePath[curDepth]->next;
-			curTerm.exps[curDepth]++;
-			while (nextElem)
-			{
-				//cout << "exp " << curDepth << ": " << curTerm.exps[curDepth] << endl;
-				if (nextElem->isTrie)
-				{
-					
-					//cout << "trie found" << endl;
-					break;
-				}
-				if (((BurstContainer<T, S>*)nextElem->myVal)->termCount > 0)
-				{
-					//cout << "container found - " << ((BurstContainer<T, S>*)nextElem->myVal)->termCount << endl;
-					break;
-				}
-				//cout << "Skipping trie element " << curTerm.exps[curDepth] << endl;
-				nextElem = nextElem->next;
-				curTerm.exps[curDepth]++;
-			}
-			triePath[curDepth] = nextElem;
-		}
-		
-		if (!nextElem) //end of trie, move back up
-		{
-			//cout << "end of trie at depth " << curDepth << endl;
-			if (curDepth == 0) { return NULL; }
-			curDepth--;
-			return nextContainer();
-		}
-		
-		return firstContainer(nextElem);
-	}
-	
-	BurstContainer<T, S>* firstContainer(trieElem* myElem)
-	{
-		//cout << "Looking for container at depth " << curDepth << endl;
-		if (myElem->isTrie)
-		{
-			curDepth++;
-			triePath[curDepth] = ((BurstTrie<T, S>*)myElem->myVal)->firstElem;
-			curTerm.exps[curDepth] = ((BurstTrie<T, S>*)myElem->myVal)->range[0];
-			return firstContainer( ((BurstTrie<T, S>*)myElem->myVal)->firstElem );
-		}
-		else
-		{
-			//cout << "Container found." << endl;
-			return ((BurstContainer<T, S>*)myElem->myVal);
-		}
-	}
-	
-	term<T, S>* nextTerm()
-	{
-		//cout << "Next term at depth " << curDepth << endl;
-		if (!storedTerm) //end of container
-		{
-			//cout << "Advancing container" << endl;
-			BurstContainer<T, S>* curContainer = nextContainer();
-			if (curContainer)
-			{ storedTerm = curContainer->firstTerm; }
-			else
-			{ return NULL; }
-			
-		}
-
-		for (int i = curDepth + 1; i < dimension; i++)
-		{
-			curTerm.exps[i] = storedTerm->exps[i - curDepth - 1];
-		}
-		curTerm.coef = storedTerm->coef;
-		curTerm.degree = storedTerm->degree;
-		storedTerm = storedTerm->next;
-		//cout << "got term w/coef " << curTerm->coef << endl;
-		return &curTerm;
-	}
-
-	term<T, S>* getTerm()
-	{
-		return &curTerm;
-	}
-	
-	~BTrieIterator()
-	{
-		delete [] triePath;
-		delete [] curTerm.exps;
-	}
-	
-private:
-	BurstTrie<T, S>* myTrie; //trie to iterate over
-	term<T, S> curTerm; //shared buffer to store values
-	int dimension;
-	
-	BurstTerm<T, S>* storedTerm; //pointer to next stored term in current container
-	trieElem** triePath;
-	int curDepth;
+	int termCount, varCount;
+	BurstTrie<ZZ, ZZ>* myForms;
 };
-
 #endif

@@ -60,6 +60,7 @@ int main(int argc, char *argv[])
 	if (!decomposing) { integrator = new FormIntegrateConsumer<ZZ>(); }
 
 	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	BTrieIterator<ZZ, ZZ>* it2 = new BTrieIterator<ZZ, ZZ>();
 	while (!inStream.eof())
 	{
 		getline(inStream, line, '\n');
@@ -142,9 +143,10 @@ int main(int argc, char *argv[])
 				cout << "Integrating..." << endl;
 				if (decomposing)
 				{
+					it2->setTrie(forms.myForms, forms.varCount);
 					lastTime = myTimer.get_seconds();
 					myTimer.start();
-					integrateLinFormSum(numerator, denominator, forms, mySimplex);
+					integrateLinFormSum(numerator, denominator, it2, mySimplex);
 					myTimer.stop();
 					integrateTime += (myTimer.get_seconds() - lastTime);
 					destroyLinForms(forms);

@@ -16,6 +16,12 @@ struct simplexZZ
 	ZZ v;
 };
 
+void delSpace(string &line);
+void convertToSimplex(simplexZZ&, string);
+void integrateLinFormSum(ZZ &a, ZZ &b, PolyIterator<ZZ, ZZ>* it, const simplexZZ &mySimplex);
+void _integrateLinFormSum(ZZ &a, ZZ &b, const _linFormSum &forms, const simplexZZ &mySimplex);
+void integrateMonomialSum(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
+void _integrateMonomialSum(ZZ &numerator, ZZ &denominator, _monomialSum &monomials, const simplexZZ &mySimplex);
 
 template <class T>
 class FormIntegrateConsumer : public FormSumConsumer<T> {
@@ -115,10 +121,4 @@ void FormIntegrateConsumer<T>::getResults(ZZ& num, ZZ& den)
 	}
 }
 
-void delSpace(string &line);
-void convertToSimplex(simplexZZ&, string);
-void integrateLinFormSum(ZZ &a, ZZ &b, const linFormSum &forms, const simplexZZ &mySimplex);
-void _integrateLinFormSum(ZZ &a, ZZ &b, const _linFormSum &forms, const simplexZZ &mySimplex);
-void integrateMonomialSum(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
-void _integrateMonomialSum(ZZ &numerator, ZZ &denominator, _monomialSum &monomials, const simplexZZ &mySimplex);
 #endif

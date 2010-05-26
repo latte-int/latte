@@ -1,5 +1,6 @@
 #ifndef MULTIPLY_H
 #define MULTIPLY_H
+#include "iterators.h"
 #include "PolyTrie.h"
 #include "PolyRep.h"
 

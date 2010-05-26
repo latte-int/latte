@@ -213,6 +213,8 @@ check_PROGRAMS += compare
 compare_SOURCES = integration/versusMode.cpp
 compare_SOURCES += integration/PolyTrie.cpp
 compare_SOURCES += integration/PolyRep.cpp
+compare_SOURCES += integration/newIntegration.cpp
+compare_SOURCES += integration/residue.cpp
 
 TESTS =  integration/testMultiply.sh
 TESTS += integration/testIntegration.sh
