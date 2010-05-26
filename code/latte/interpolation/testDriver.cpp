@@ -13,6 +13,10 @@
 #include <gmp.h>
 #include <gmpxx.h>
 
+#define MAXDEG 35 //max degree of a poly.
+#define PNEG .5 //prop of a neg coeff.
+#define MAXCOEF 20000 //max coeff
+
 
 
 using namespace std;
@@ -65,9 +69,84 @@ int gcd ( int a, int b )
 }
 
 
+void test1Poly()
+{
+
+	int degree = rand()% MAXDEG + 1;
+	cout << "degree=" << degree << "\n";
+	vector<mpq_class> poly;
+	for(int i = 0; i <= degree; ++i)
+	{
+		int num = rand() % MAXCOEF;
+		if ( rand() < RAND_MAX * PNEG)
+			num = -1 * num;
+		poly.push_back(mpq_class(num, rand() % MAXCOEF +1));
+		poly[i].canonicalize();
+	}//make a poly.
+	
+	//for(int i = 0; i < (int) poly.size(); ++i)
+	//	cout << poly[i] << "x^" << i << " ";
+	//cout << endl;
+	
+	PolynomialInt p(degree);
+	PolynomialInt pCopy(degree);
+	vector<mpq_class> allX(degree); //keep track of points added so far.
+	for(int i = 0; i <= degree; ++i)
+	{
+	
+		mpq_class x; 
+		bool notFound = true;
+		while ( notFound)
+		{
+			x = mpq_class(rand() % MAXCOEF, rand() % MAXCOEF+1);
+			x.canonicalize();
+			for(int j = 0; j < (int) allX.size(); ++j)
+				if (x == allX[j])
+					notFound = false;
+			if ( notFound == false)
+				notFound = true; //try again.
+			else
+			{
+				allX.push_back(x);
+				break; //this x works.
+			}//else
+		}//while
+		if ( rand() < RAND_MAX * PNEG)
+			x = x * (-1);
+		mpq_class temp = evaluatePoly(x, poly);
+		temp.canonicalize();
+		p.addPoint(x, temp);
+		//cout << "  (" << x << ", " << temp << ") \n";
+		
+	}//add some points.	
+
+	pCopy = p;
+	p.GE();
+	vector<mpq_class> ans = p.getSolutionVector();
+	if (poly.size() != ans.size() )
+	{
+		cerr << "answer != poly" << endl;
+		exit(1);
+	}
+	for(int i = 0; i < (int) poly.size(); ++i)
+		if ( poly[i] != ans[i])
+		{
+			cerr << "i=" << i << ", " << poly[i] << " != " << ans[i] << endl;
+			for(int k = 0; k < (int) poly.size(); ++k)
+				cout << " " << poly[k] << " == " << ans[k] << "\n"; 
+			p.printMatrix();
+			cout << "\n" << endl;
+			pCopy.printMatrix();		
+			exit(1);
+		}
+
+}//test1Poly()
+
+
 
 int main()
 {
+	srand(44);
 
 	//c style 
     int polyTopC[] = {4, 5, -20, 4, -8, 9};
@@ -127,6 +206,14 @@ cout << "hello world" << endl;
    	p.printMatrix();
    	p.GE();
    	p.printMatrix();
+	
+	cout << "testing one poly" << endl;
+	
+	for(int k = 0; k < 100000; ++k)
+	{
+		test1Poly();
+		cout << "k=" << k << "\n";
+	}
 	
 	
 	return 0;

@@ -40,6 +40,9 @@ public:
 	vector<mpq_class> getSolutionVector();
 	
 	void printMatrix();
+	
+	PolynomialInt & operator=(const PolynomialInt & rhs);
+	
 
 };//PolynomialInt
 

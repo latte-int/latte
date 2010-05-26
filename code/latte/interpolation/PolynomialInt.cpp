@@ -88,6 +88,9 @@ void PolynomialInt::timesRow(int row, mpq_class value)
 void PolynomialInt::GE()
 {
 
+	PolynomialInt copy(rowSize - 1);
+	copy = *this;
+	
 	int perfectRow = 0; //the row with only zeros on the left.
 	int currentColumn = 0; 
     while( currentColumn < colSize && perfectRow < rowSize)
@@ -118,7 +121,12 @@ void PolynomialInt::GE()
 
         if(matrix[perfectRow][currentColumn] == 0 )
         {
-            cerr << "GE:assert matirx[perfectRow][currentColumn= != 0" << endl;
+            cerr << "GE:assert matirx[perfectRow][currentColumn] != 0" << endl;
+            cout << "perfectRow = " << perfectRow << ", curCol=" << currentColumn << endl;
+            cout << "row, col size=" << rowSize << ", " << colSize << endl;
+            printMatrix();
+            cout << "origional matirx\n";
+            copy.printMatrix();
             exit(1);
         }
         
@@ -169,16 +177,20 @@ void PolynomialInt::GE()
 vector<mpq_class> PolynomialInt::getSolutionVector()
 {
 	vector<mpq_class> answer(rowSize);
-	if (! isSingular() )
+	if ( isSingular() )
 	{
 		cerr << "ops, there is a nullspace!" << endl;
+		printMatrix();
 		exit(1);
 	}
 	
 	for(int i = 0; i < rowSize; ++i)
-		answer[i] = matrix[i][colSize+1];
-		
+	{
+		answer[i] = matrix[i][colSize];
+		//cout << "answer[i] = " << matrix[i][colSize] << "\n";
+	}
 	return answer;
+	
 }//getSolutionVector
 
 
@@ -196,6 +208,7 @@ void PolynomialInt::addMultRows(mpq_class value, int fromRow, int toRow)
 
 void PolynomialInt::printMatrix()
 {
+	cout << "PRINT MATRIX\n";
 	for(int row = 0; row < rowSize; ++row)
 	{
 		for(int col = 0; col <= colSize; ++col)
@@ -224,3 +237,33 @@ bool PolynomialInt::isSingular()
 				return true;
 	return false;
 }
+
+
+
+PolynomialInt & PolynomialInt::operator=(const PolynomialInt & rhs)
+{
+
+	if (this == &rhs)      // Same object?
+      return *this;        // Yes, so skip assignment, and just return *this.
+
+	
+	colSize = rhs.colSize;
+	rowSize = rhs.rowSize;
+	initCounter = rhs.initCounter;
+	
+	matrix = new mpq_class*[rowSize];
+	for(int row = 0; row < rowSize; ++row)
+	{
+		matrix[row] = new mpq_class[colSize + 1]; // [A | b}
+		for(int col = 0; col <= colSize; ++col)
+		{
+			//mpq_init(matrix[row][col]);
+			matrix[row][col] = rhs.matrix[row][col];
+		}
+	}
+	
+	
+	
+
+}
+	
