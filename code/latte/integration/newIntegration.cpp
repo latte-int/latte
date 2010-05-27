@@ -149,36 +149,6 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, PolyIterator<ZZ, ZZ>* i
 	if (denominator<0) {denominator *= to_ZZ(-1); numerator *= to_ZZ(-1);};
 };
 
-//this is the old block data structure integration
-void _integrateLinFormSum(ZZ& numerator, ZZ& denominator, const _linFormSum &forms , const simplexZZ &mySimplex)
-{
-	ZZ v,de,counter,tem,coe;
-	int i,j,index,k,m;
-	vec_ZZ l;
-	if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<forms.varCount<<"<>"<<mySimplex.d<<endl;exit(1);};
-	l.SetLength(mySimplex.d);
-
-	lBlock* formTmp = forms.lHead; cBlock<ZZ>* coeffTmp = forms.cHead;
-	for (int i = 0; i < forms.termCount; i++)
-	{
-		if (i > 0 && i % BLOCK_SIZE == 0)			//just a different way of traversing the data structure
-		{
-			formTmp = formTmp->next;
-			coeffTmp = coeffTmp->next;
-		}
-		coe=coeffTmp->data[i % BLOCK_SIZE];m=formTmp->degree[i % BLOCK_SIZE];
-		for (int j = 0; j < forms.varCount; j++)
-		{
-			l[j]=formTmp->data[i % BLOCK_SIZE][j];
-		}
-		de=1;
-		for (int j=1;j<=mySimplex.d+m;j++)
-		{
-			de=de*j;
-		};
-		update(numerator,denominator,l,mySimplex,m,coe,de);
-	};
-};
 void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ &mySimplex)//integrate a polynomial stored as a Burst Trie
 {
 	linFormSum forms;
