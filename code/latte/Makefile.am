@@ -165,56 +165,57 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
-#bin_PROGRAMS += integrate
-#integrate_SOURCES = integration/decint.cpp
-#integrate_SOURCES += integration/newIntegration.cpp
-#integrate_SOURCES += integration/PolyRep.cpp
-#integrate_SOURCES += integration/residue.cpp
-#integrate_SOURCES += integration/multiply.h
-#integrate_SOURCES +=     integration/timing.cpp
-
-#bin_PROGRAMS += BurstIntegrate
-#BurstIntegrate_SOURCES = integration/burstint.cpp
-#BurstIntegrate_SOURCES += integration/newIntegration.cpp
-#BurstIntegrate_SOURCES += integration/PolyRep.cpp
-#BurstIntegrate_SOURCES += integration/PolyTrie.cpp
-#BurstIntegrate_SOURCES += integration/residue.cpp
-#BurstIntegrate_SOURCES += integration/multiply.h
-
-#bin_PROGRAMS += BurstTest
-#BurstTest_SOURCES = integration/burstTest.cpp
-#BurstTest_SOURCES += integration/newIntegration.cpp
-#BurstTest_SOURCES += integration/PolyRep.cpp
-#BurstTest_SOURCES += integration/PolyTrie.cpp
-#BurstTest_SOURCES += integration/residue.cpp
-#BurstTest_SOURCES += integration/multiply.h
-#BurstTest_SOURCES += integration/timing.cpp
-
-bin_PROGRAMS += integrate_demo
-integrate_demo_SOURCES =    integration/integrateDemo.cpp
-integrate_demo_SOURCES +=   integration/PolyTrie.cpp
-integrate_demo_SOURCES +=   integration/newIntegration.cpp
-integrate_demo_SOURCES +=   integration/residue.cpp
 
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 
+
+
+################ INTEGRATION ####################
+
+
+noinst_LIBRARIES += liblatteintegration.a
+
+liblatteintegration_a_SOURCES = 		\
+	integration/PolyRep.cpp			\
+	integration/residue.cpp			\
+	integration/timing.cpp			\
+	integration/newIntegration.cpp		\
+	integration/PolyTrie.cpp
+
+noinst_HEADERS +=				\
+	integration/multiply.h			\
+	integration/iterators.h			\
+	integration/consumers.h			\
+	integration/PolyRep.h			\
+	integration/PolyTrie.h			\
+	integration/newIntegration.h		\
+	integration/burstTrie.h			\
+	integration/residue.h
+
+bin_PROGRAMS += BlockIntegrate
+BlockIntegrate_SOURCES = integration/blockInt.cpp
+BlockIntegrate_LDADD = liblatteintegration.a
+
+bin_PROGRAMS += BurstIntegrate
+BurstIntegrate_SOURCES = integration/burstInt.cpp
+BurstIntegrate_LDADD = liblatteintegration.a
+
+bin_PROGRAMS += integrate_demo
+integrate_demo_SOURCES =    integration/integrateDemo.cpp
+integrate_demo_LDADD = liblatteintegration.a
+
 check_PROGRAMS += integrate_test
 integrate_test_SOURCES =    integration/integrateTest.cpp
-integrate_test_SOURCES +=   integration/PolyTrie.cpp
-integrate_test_SOURCES +=   integration/newIntegration.cpp
-integrate_test_SOURCES +=   integration/residue.cpp
+integrate_test_LDADD = liblatteintegration.a
 
 check_PROGRAMS += multiply_test
 multiply_test_SOURCES =    integration/PolyTrie.cpp
-multiply_test_SOURCES +=   integration/multiplyTest.cpp
+multiply_test_LDADD = liblatteintegration.a
 
 check_PROGRAMS += compare
 compare_SOURCES = integration/versusMode.cpp
-compare_SOURCES += integration/PolyTrie.cpp
-compare_SOURCES += integration/PolyRep.cpp
-compare_SOURCES += integration/newIntegration.cpp
-compare_SOURCES += integration/residue.cpp
+compare_LDADD = liblatteintegration.a
 
 TESTS =  integration/testMultiply.sh
 TESTS += integration/testIntegration.sh
