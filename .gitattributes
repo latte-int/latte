@@ -3,8 +3,8 @@ code/latte/interpolation/.deps/.dirstamp -text
 code/latte/interpolation/.deps/PolynomialInt.Po -text
 code/latte/interpolation/.deps/testDriver.Po -text
 code/latte/interpolation/.dirstamp -text
-code/latte/interpolation/PolynomialInt.cpp -text
-code/latte/interpolation/PolynomialInt.h -text
+code/latte/interpolation/PolynomialInterpolation.cpp -text
+code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream

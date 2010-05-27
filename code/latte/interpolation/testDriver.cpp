@@ -9,145 +9,27 @@
 #include <cstdlib>
 #include <vector>
 #include <iomanip>
-#include "PolynomialInt.h"
+#include "PolynomialInterpolation.h"
 #include <gmp.h>
 #include <gmpxx.h>
 
-#define MAXDEG 35 //max degree of a poly.
-#define PNEG .5 //prop of a neg coeff.
-#define MAXCOEF 20000 //max coeff
+#define MAXDEG 40 		//max degree of a poly.
+#define PNEG .5 		//prop of a neg coeff.
+#define MAXCOEF 200000 	//max coeff
 
 
 
 using namespace std;
 
+
 mpq_class evaluatePoly(mpq_class const & xValue, vector<mpq_class>  const & poly);
-//void evaluatePoly(mpq_t &answer, mpq_t xValue, vector<mpq_class> const &poly);
-
-
-bool isReduced(mpq_class r)
-{
-	mpz_class a(r.get_num()), b(r.get_den());
-
-/*	if (false && mpz_cmp(a.get_mpz_t(), b.get_mpz_t()) )
-	{
-		mpz_class temp(a);
-		a = b;
-		b = temp;
-	}
-*/
-
-	//cout << "find gcd of " << a << ", " << b;
-
-	mpz_class c;
-
-    while(1)
-    {
-		c = a%b;
-		if(c==0)
-		{
-			//cout << " = " << b << endl;
-			return b == 1 || b == -1;
-		}
-
-		a = b;
-		b = c;
-    }
-
-
-
-
-}
-
-int gcd ( int a, int b )
-{
-  int c;
-  while ( a != 0 ) {
-     c = a; a = b%a;  b = c;
-  }
-  return b;
-}
-
-
-void test1Poly()
-{
-
-	int degree = rand()% MAXDEG + 1;
-	cout << "degree=" << degree << "\n";
-	vector<mpq_class> poly;
-	for(int i = 0; i <= degree; ++i)
-	{
-		int num = rand() % MAXCOEF;
-		if ( rand() < RAND_MAX * PNEG)
-			num = -1 * num;
-		poly.push_back(mpq_class(num, rand() % MAXCOEF +1));
-		poly[i].canonicalize();
-	}//make a poly.
-	
-	//for(int i = 0; i < (int) poly.size(); ++i)
-	//	cout << poly[i] << "x^" << i << " ";
-	//cout << endl;
-	
-	PolynomialInt p(degree);
-	PolynomialInt pCopy(degree);
-	vector<mpq_class> allX(degree); //keep track of points added so far.
-	for(int i = 0; i <= degree; ++i)
-	{
-	
-		mpq_class x; 
-		bool notFound = true;
-		while ( notFound)
-		{
-			x = mpq_class(rand() % MAXCOEF, rand() % MAXCOEF+1);
-			x.canonicalize();
-			for(int j = 0; j < (int) allX.size(); ++j)
-				if (x == allX[j])
-					notFound = false;
-			if ( notFound == false)
-				notFound = true; //try again.
-			else
-			{
-				allX.push_back(x);
-				break; //this x works.
-			}//else
-		}//while
-		if ( rand() < RAND_MAX * PNEG)
-			x = x * (-1);
-		mpq_class temp = evaluatePoly(x, poly);
-		temp.canonicalize();
-		p.addPoint(x, temp);
-		//cout << "  (" << x << ", " << temp << ") \n";
-		
-	}//add some points.	
-
-	pCopy = p;
-	p.GE();
-	vector<mpq_class> ans = p.getSolutionVector();
-	if (poly.size() != ans.size() )
-	{
-		cerr << "answer != poly" << endl;
-		exit(1);
-	}
-	for(int i = 0; i < (int) poly.size(); ++i)
-		if ( poly[i] != ans[i])
-		{
-			cerr << "i=" << i << ", " << poly[i] << " != " << ans[i] << endl;
-			for(int k = 0; k < (int) poly.size(); ++k)
-				cout << " " << poly[k] << " == " << ans[k] << "\n"; 
-			p.printMatrix();
-			cout << "\n" << endl;
-			pCopy.printMatrix();		
-			exit(1);
-		}
-
-}//test1Poly()
-
-
+bool isReduced(mpq_class r);
+void test1Poly();
 
 int main()
 {
 	srand(44);
-
+/*
 	//c style 
     int polyTopC[] = {4, 5, -20, 4, -8, 9};
     int polyBotC[] = {1, 2,   1, 3,  5, 10};
@@ -192,7 +74,7 @@ int main()
 
 cout << "hello world" << endl;
 	
-	PolynomialInt p(POLYSIZE -1);
+	PolynomialInterpolation p(POLYSIZE -1);
 	for(int i = 0; i < POLYSIZE; ++i)
 	{
 
@@ -208,19 +90,20 @@ cout << "hello world" << endl;
    	p.printMatrix();
 	
 	cout << "testing one poly" << endl;
-	
+*/
 	for(int k = 0; k < 100000; ++k)
 	{
-		test1Poly();
 		cout << "k=" << k << "\n";
-	}
-	
+		test1Poly();
+	}//test many different random poly.
 	
 	return 0;
-
 }//main
 
 
+/**
+ * 	returns f(xValue), where f is the polynomial given by poly. poly[i] is the coeff of x^i.
+ */
 mpq_class evaluatePoly(mpq_class const & xValue, vector<mpq_class>  const & poly)
 {
 	mpq_class power, sum;
@@ -230,52 +113,124 @@ mpq_class evaluatePoly(mpq_class const & xValue, vector<mpq_class>  const & poly
 	sum.canonicalize();
 	power.canonicalize();
 
-	/*
-	cout << "xValue = " << xValue << endl;
-	cout << "evalutatePoly::poly = ";
-	for (int i = 0; i < poly.size(); ++i)
-		cout << poly[i] << " ";
-	cout << endl;
-	*/
-
-
 	for( int i = poly.size() - 1; i > 0; --i)
 	{
 		sum = (sum + poly[i])* xValue;
-		//sum = (sum + poly[i]);
-		//sum.canonicalize();
-		//sum = sum * xValue;
 		sum.canonicalize();
 		if ( ! isReduced(sum))
 		{
 			cout << "ops, not in reduced form: " << sum << endl;
 			exit(1);
 		}
-
-	}
+	}//for i
 	mpq_class finalSum = sum + poly[0];
 	finalSum.canonicalize();
 	return finalSum;
-	//return sum + poly[0];
-}
+}//evaluatePoly
 
-/*
-void evaluatePoly(mpq_t &answer, mpq_t xValue, vector<mpq_t> const &poly)
+
+
+//checks to see gcd(r.num, r.den) = 1.
+bool isReduced(mpq_class r)
 {
-	mpq_t power, sum;
-	mpq_init(power);
-	mpq_init(sum);
-	mpq_set_ui(power, 1, 1);
-	
-	mpq_t temp;
-	mpq_init(temp);
-	for(unsigned  int i = 0; i < poly.size(); ++i)
-	{
-		mpq_mul(temp, poly[i], power);
-		mpq_add(sum, sum, temp);
-		mpq_mul(power, power, xValue);
-	}
-	mpq_set(answer, sum);
-}
+	mpz_class a(r.get_num()), b(r.get_den());
+	mpz_class c;
 
-*/
+    while(1)
+    {
+		c = a%b;
+		if(c==0)
+		{
+			return b == 1 || b == -1;
+		}
+
+		a = b;
+		b = c;
+    }//while
+}//isReduced
+
+
+/*	Randomly generate polynomials, and create the coefficient matirx. Then solves the matrix and
+ *  	makes sure the returnd answer is the same as the polynomial we randomly generated.
+ *
+ * 	The polynomials have a max degree of MAXDEG and each coefficient is negative with prob. PNEG..
+ * 		and coefficients are limited by MAXCOEF.
+ */
+void test1Poly()
+{
+
+	int degree = rand()% MAXDEG + 1;
+	cout << "degree=" << degree << "\n";
+	vector<mpq_class> poly;
+
+	//make a poly of finite degree.
+	for(int i = 0; i <= degree; ++i)
+	{
+		int num = rand() % MAXCOEF;
+		if ( rand() < RAND_MAX * PNEG)
+			num = -1 * num;
+		poly.push_back(mpq_class(num, rand() % MAXCOEF +1));
+		poly[i].canonicalize();
+	}//for i
+	;
+
+	PolynomialInterpolation p(degree);
+	PolynomialInterpolation pCopy(degree); //pCopy is printed as the origional matrix if there is an error.
+	vector<mpq_class> allX(degree); //keep track of points added so far.
+
+	//insert degree+1 many unique points (x, f(x)).
+	for(int i = 0; i <= degree; ++i)
+	{
+		mpq_class x;
+		bool notFound = true;
+
+		//make sure we did not already picked/inserted this x.
+		while ( notFound)
+		{
+			x = mpq_class(rand() % MAXCOEF, rand() % MAXCOEF+1);
+			x.canonicalize();
+			for(int j = 0; j < (int) allX.size(); ++j)
+				if (x == allX[j])
+					notFound = false;
+			if ( notFound == false)
+				notFound = true; //try again.
+			else
+			{
+				allX.push_back(x);
+				break; //this x works.
+			}//else
+		}//while
+
+		//make the coefficient negative.
+		if ( rand() < RAND_MAX * PNEG)
+			x = x * (-1);
+
+		mpq_class temp = evaluatePoly(x, poly);
+		temp.canonicalize();
+		p.addPoint(x, temp);
+	}//add some points.
+
+	pCopy = p;
+	p.GE();
+	vector<mpq_class> ans = p.getSolutionVector();
+	
+	//check answer has the correct size/degree
+	if (poly.size() != ans.size() )
+	{
+		cerr << "answer != poly" << endl;
+		exit(1);
+	}
+
+	//check answer has the correct coefficients.
+	for(int i = 0; i < (int) poly.size(); ++i)
+		if ( poly[i] != ans[i])
+		{
+			cerr << "i=" << i << ", " << poly[i] << " != " << ans[i] << endl;
+			for(int k = 0; k < (int) poly.size(); ++k)
+				cout << " " << poly[k] << " == " << ans[k] << "\n";
+			p.printMatrix();
+			cout << "\n" << endl;
+			pCopy.printMatrix();
+			exit(1);
+		}
+}//test1Poly()

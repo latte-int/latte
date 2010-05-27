@@ -93,7 +93,7 @@ interpolation/testDriver.o interpolation/testDriver.o:  \
   /usr/include/c++/4.2/bits/stl_vector.h \
   /usr/include/c++/4.2/bits/stl_bvector.h \
   /usr/include/c++/4.2/bits/vector.tcc /usr/include/c++/4.2/iomanip \
-  /usr/include/c++/4.2/functional interpolation/PolynomialInt.h \
+  /usr/include/c++/4.2/functional interpolation/PolynomialInterpolation.h \
   /homes/home01/m/mkoeppe/public/latte-current/include/gmp.h \
   /homes/home01/m/mkoeppe/public/latte-current/include/gmpxx.h \
   /usr/include/c++/4.2/stdexcept /usr/include/c++/4.2/cfloat \
@@ -388,7 +388,7 @@ interpolation/testDriver.o interpolation/testDriver.o:  \
 
 /usr/include/c++/4.2/functional:
 
-interpolation/PolynomialInt.h:
+interpolation/PolynomialInterpolation.h:
 
 /homes/home01/m/mkoeppe/public/latte-current/include/gmp.h:
 
