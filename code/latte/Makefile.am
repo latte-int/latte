@@ -165,6 +165,10 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
+bin_PROGRAMS += myTest
+myTest_SOURCES = interpolation/testDriver.cpp
+myTest_SOURCES += interpolation/PolynomialInterpolation.cpp
+
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 
