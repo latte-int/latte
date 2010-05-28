@@ -1,0 +1,9 @@
+#!/bin/bash
+if [ $# != 2 ]
+then
+echo "Usage: ehrhart2 dim file"
+fi
+echo $1 > input.txt
+./ehrhart $1 $2 2> /dev/null | cut -dt -f1 >> input.txt
+./ehrhart3 < input.txt
+rm -f input.txt

@@ -1,4 +1,6 @@
 * text=auto !eol
+code/latte/ehrhart2 -text
+code/latte/ehrhart3.cpp -text
 code/latte/interpolation/.deps/.dirstamp -text
 code/latte/interpolation/.deps/PolynomialInt.Po -text
 code/latte/interpolation/.deps/testDriver.Po -text
