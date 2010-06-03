@@ -9,7 +9,6 @@ code/latte/integration/benchmark.sh -text
 code/latte/integration/blockInt.cpp -text
 code/latte/integration/blockReps.h -text
 code/latte/integration/burstInt.cpp -text
-code/latte/integration/burstTest.cpp -text
 code/latte/integration/burstTrie.h -text
 code/latte/integration/compareTimes.mpl -text
 code/latte/integration/consumers.h -text
