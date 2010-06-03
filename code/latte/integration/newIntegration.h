@@ -5,6 +5,8 @@
 #include <NTL/ZZ.h>
 #include "PolyTrie.h"
 #include "PolyRep.h"
+//#include "PolyRep.cpp"
+//#include "PolyTrie.cpp"
 #include "residue.h"
 
 NTL_CLIENT

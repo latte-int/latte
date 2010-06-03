@@ -201,6 +201,14 @@ bin_PROGRAMS += BurstIntegrate
 BurstIntegrate_SOURCES = integration/burstInt.cpp
 BurstIntegrate_LDADD = liblatteintegration.a
 
+bin_PROGRAMS += BurstBench
+BurstBench_SOURCES = integration/burstBench.cpp
+BurstBench_LDADD = liblatteintegration.a
+
+bin_PROGRAMS += BlockBench
+BlockBench_SOURCES = integration/blockBench.cpp
+BlockBench_LDADD = liblatteintegration.a
+
 bin_PROGRAMS += integrate_demo
 integrate_demo_SOURCES =    integration/integrateDemo.cpp
 integrate_demo_LDADD = liblatteintegration.a

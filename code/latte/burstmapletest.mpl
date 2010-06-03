@@ -125,9 +125,9 @@ writeline(benchmarks, "                                            Degree       
 writeline(benchmarks, "      _________________________________________________________________________________"):
 writeline(benchmarks, "   n  |       2        10        20         50       100       300      1000"):
 writeline(benchmarks, "_______________________________________________________________________________________"):
-fprintf(benchmarks, "%4.4s  |", "1000"):
+fprintf(benchmarks, "%4.4s  |", "10"):
 close(benchmarks):
-for myDim from 1000 to 1000 do
+for myDim from 10 to 1000 do
   timedOut:= 0:
   for myDegree from 2 to 1000 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
@@ -188,9 +188,9 @@ writeline(benchmarks, ""):
 writeline(benchmarks, "     ______________________________________________________________________________________________________________"):
 writeline(benchmarks, "  n  |       1         2         5         10        20        30        40        50         100       200      300"):
 writeline(benchmarks, "___________________________________________________________________________________________________________________"):
-fprintf(benchmarks, "%3.3s  |", "6"):
+fprintf(benchmarks, "%3.3s  |", "1"):
 close(benchmarks):
-for myDim from 6 to 50 do
+for myDim from 1 to 50 do
   timedOut:= 0:
   for myDegree from 1 to 300 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
@@ -244,7 +244,7 @@ for myDim from 6 to 50 do
 od:
 end:
 
-draw_table5():
+#draw_table5():
 draw_table10():
 
 

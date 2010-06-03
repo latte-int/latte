@@ -8,16 +8,15 @@ code/latte/integration/benchmark.mpl -text
 code/latte/integration/benchmark.sh -text
 code/latte/integration/blockInt.cpp -text
 code/latte/integration/blockReps.h -text
+code/latte/integration/burstInt.cpp -text
 code/latte/integration/burstTest.cpp -text
 code/latte/integration/burstTrie.h -text
 code/latte/integration/compareTimes.mpl -text
 code/latte/integration/consumers.h -text
 code/latte/integration/createLinear.mpl -text
-code/latte/integration/decint.cpp -text
 code/latte/integration/decompose.cpp -text
 code/latte/integration/decomposeTest.mpl -text
 code/latte/integration/demo_readme.txt -text
-code/latte/integration/integrate.cpp -text
 code/latte/integration/integrateDemo.cpp -text
 code/latte/integration/integrateTest.cpp -text
 code/latte/integration/iterators.h -text

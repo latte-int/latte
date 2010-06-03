@@ -1,5 +1,6 @@
 
 #include "newIntegration.h"
+#include "iterators.h"
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
 #include <NTL/mat_ZZ.h>
@@ -124,10 +125,7 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, PolyIterator<ZZ, ZZ>* i
 	l.SetLength(mySimplex.d);
 	numerator=0;
 	denominator=0;
-	//BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();
-	//it->setTrie(forms.myForms, forms.varCount);
 	it->begin();
-	
 	term<ZZ, ZZ>* temp;
 	while (temp = it->nextTerm())
 	{
@@ -142,7 +140,6 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator, PolyIterator<ZZ, ZZ>* i
 		{
 			de=de*i;			
 		};					//de is (d+m)!. Note this is different from the factor in the paper because in our 								storage of a linear form, any coefficient is automatically adjusted by m!
-
 		update(numerator,denominator,l,mySimplex,m,coe,de);//We are ready to compute the integral of one linear form over the simplex
 	};
 	delete temp;
@@ -162,11 +159,13 @@ void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials, const simplexZZ 
 	it2->setTrie(forms.myForms, forms.varCount);
 	integrateLinFormSum(a,b,it2, mySimplex);
 };
-/*void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials, const simplexZZ &mySimplex)
+void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials, const simplexZZ &mySimplex)
 {
 	_linFormSum forms;
 	forms.termCount = 0;
 	forms.varCount = monomials.varCount;		
-	//for (int i=0;i<monomials.termCount;i++) _decompose(monomials, forms, i);
-	_integrateLinFormSum(a,b,forms, mySimplex);
-};*/
+	for (int i=0;i<monomials.termCount;i++) _decompose(monomials, forms, i);
+	LBlockIterator<ZZ>* it_ = new LBlockIterator<ZZ>();
+	it_->setLists(forms.lHead, forms.cHead, forms.varCount, forms.termCount);
+	integrateLinFormSum(a,b,it_, mySimplex);
+};

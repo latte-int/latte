@@ -1,18 +1,19 @@
 #define COEFF_MAX 10000
 
-#include "PolyRep.h"
 #include "newIntegration.h"
+#include "PolyTrie.h"
 #include <iostream>
 #include <fstream>
 #include <NTL/ZZ.h>
-
 using namespace std;
+
+//This main function takes in a number of polynomial-simplex or liear-form-simplex pairs and integrate them.
 
 int main(int argc, char *argv[])
 {
 	if (argc < 4) {cout<<"Usage: "<< argv[0] <<" fileIn fileOut IntegrateMode (polynomial/linear)" <<endl; return 1;}; //usage of the function
-	_linFormSum forms;
-	_monomialSum myPoly;
+	linFormSum forms;
+	monomialSum myPoly;
 	simplexZZ mySimplex;
 	ifstream myStream (argv[1]);
 	ofstream hisStream (argv[2]);
@@ -28,19 +29,19 @@ int main(int argc, char *argv[])
 		if (!strcmp(argv[3],"polynomial")) 
 		{
 			a=0;b=0;
-			_loadMonomials(myPoly, line);
+			loadMonomials(myPoly, line);
 			convertToSimplex(mySimplex, line2);
-			_integrateMonomialSum(a, b, myPoly, mySimplex);
+			integrateMonomialSum(a, b, myPoly, mySimplex);
 			hisStream<<a<<endl<<b<<endl;
 		}
 		else if (!strcmp(argv[3],"linear"))
 		{
 			a=0;b=0;
-			_loadLinForms(forms, line);
+			loadLinForms(forms, line);
+			BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();			
+			it->setTrie(forms.myForms, forms.varCount);
 			convertToSimplex(mySimplex, line2);
-			LBlockIterator<ZZ>* it_ = new LBlockIterator<ZZ>();
-			it_->setLists(forms.lHead, forms.cHead, forms.varCount, forms.termCount);
-			integrateLinFormSum(a, b, it_, mySimplex);
+			integrateLinFormSum(a, b, it, mySimplex);
 			hisStream<<a<<endl<<b<<endl;
 		};
 	};
