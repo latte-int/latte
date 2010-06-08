@@ -389,6 +389,10 @@ random_sparse_homogeneous_polynomial_with_degree_8:=proc(d,M)
                                                    M, 1);
 end:
 
+get_table10_entry:=proc(N,d, M, r)
+  random_sparse_homogeneous_polynomial_with_degree_5(d, M):
+end:
+
 get_table13_entry:=proc(N,d, M, r)
   random_sparse_homogeneous_polynomial_with_degree_and_eff_num_vars(N, d, min(2, d), M, r):
 end:
@@ -614,7 +618,7 @@ for myDim from 2 to 50 do
   for myDegree from 1 to 300 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
     if timedOut = 0 then
-      result:= test_integration(50, 1000, 1, myDim, myDegree, 1):
+      result:= test_integration(50, 100, 1, myDim, myDegree, 1, get_table10_entry):
       if result = -1 then
        timedOut:= 1:
       end if:

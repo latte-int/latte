@@ -76,45 +76,4 @@ void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, _monomialSu
 		firstTerm = it->nextTerm();
 	}
 }
-
-
-template <class T>
-void _multiply(_monomialSum& first, _monomialSum& second, _monomialSum& result, int* min, int* max)
-{
-	//cout << "Old multiply" << endl;
-	eBlock* firstExp = first.eHead; cBlock<T>* firstCoef = first.cHead;
-	eBlock* secondExp; cBlock<T>* secondCoef;
-	
-	int* exponents = new int[result.varCount];
-	bool valid;
-	result.termCount = 0;
-	for (int i = 0; i < first.termCount; i++)
-	{
-		if (i > 0 && i % BLOCK_SIZE == 0) //this block is done, get next one
-		{
-			firstExp = firstExp->next; firstCoef = firstCoef->next;
-		}
-		secondExp = second.eHead;
-		secondCoef = second.cHead;
-		for (int j = 0; j < second.termCount; j++)
-		{
-			if (j > 0 && j % BLOCK_SIZE == 0) //this block is done, get next one
-			{
-				secondExp = secondExp->next; secondCoef = secondCoef->next;
-			}
-			valid = true;
-			for (int k = 0; k < result.varCount; k++)
-			{
-				exponents[k] = firstExp->data[(i % BLOCK_SIZE)*first.varCount + k] + secondExp->data[(j % BLOCK_SIZE)*second.varCount + k];
-				//if (exponents[k] < min[k] || exponents[k] > max[k]) {valid = false; break; }
-			}
-			if (valid) //all exponents are within range
-			{
-				_insertMonomial<T>(firstCoef->data[i % BLOCK_SIZE] * secondCoef->data[j % BLOCK_SIZE], exponents, result);
-			}
-		}
-		
-	}
-	delete [] exponents;
-}
 #endif
