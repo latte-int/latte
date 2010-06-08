@@ -179,7 +179,7 @@ noinst_LIBRARIES += liblatteintegration.a
 liblatteintegration_a_SOURCES = 		\
 	integration/PolyRep.cpp			\
 	integration/residue.cpp			\
-	integration/timing.cpp			\
+	timing.cpp			\
 	integration/newIntegration.cpp		\
 	integration/PolyTrie.cpp
 
@@ -201,13 +201,13 @@ bin_PROGRAMS += BurstIntegrate
 BurstIntegrate_SOURCES = integration/burstInt.cpp
 BurstIntegrate_LDADD = liblatteintegration.a
 
-bin_PROGRAMS += BurstBench
-BurstBench_SOURCES = integration/burstBench.cpp
-BurstBench_LDADD = liblatteintegration.a
+#bin_PROGRAMS += BurstBench
+#BurstBench_SOURCES = integration/burstBench.cpp
+#BurstBench_LDADD = liblatteintegration.a
 
-bin_PROGRAMS += BlockBench
-BlockBench_SOURCES = integration/blockBench.cpp
-BlockBench_LDADD = liblatteintegration.a
+#bin_PROGRAMS += BlockBench
+#BlockBench_SOURCES = integration/blockBench.cpp
+#BlockBench_LDADD = liblatteintegration.a
 
 bin_PROGRAMS += integrate_demo
 integrate_demo_SOURCES =    integration/integrateDemo.cpp
@@ -227,7 +227,6 @@ compare_LDADD = liblatteintegration.a
 
 TESTS =  integration/testMultiply.sh
 TESTS += integration/testIntegration.sh
-#TESTS += ilio_test
 
 bench-table5: 
 	integration/benchmark.sh 5 integration/table5.txt
