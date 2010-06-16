@@ -8,6 +8,16 @@ code/latte/interpolation/.dirstamp -text
 code/latte/interpolation/PolynomialInterpolation.cpp -text
 code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
+code/latte/testEhrhart/.deps/.dirstamp -text
+code/latte/testEhrhart/.deps/BuildRandomEdgePolytope.Po -text
+code/latte/testEhrhart/.deps/BuildRandomPolytope.Po -text
+code/latte/testEhrhart/.deps/Driver.Po -text
+code/latte/testEhrhart/.dirstamp -text
+code/latte/testEhrhart/BuildRandomEdgePolytope.cpp -text
+code/latte/testEhrhart/BuildRandomEdgePolytope.h -text
+code/latte/testEhrhart/BuildRandomPolytope.cpp -text
+code/latte/testEhrhart/BuildRandomPolytope.h -text
+code/latte/testEhrhart/Driver.cpp -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
