@@ -5,5 +5,10 @@ echo "Usage: ehrhart2 dim file"
 fi
 echo $1 > input.txt
 ./ehrhart $1 $2 2> /dev/null | cut -dt -f1 >> input.txt
+if [ $? == 0 ]
+then
 ./ehrhart3 < input.txt
+else
+echo "problem in ehrhart"
+fi
 rm -f input.txt
