@@ -12,7 +12,7 @@ using namespace std;
  * the answer back and displays the result */
 
 int main(int argc, char *argv[]){
-	unsigned int deg;
+	unsigned int deg, count = 0;
 	vector<mpq_class> vec;
 	mpq_class i = 0, temp = 0;
 	cin >> deg;
@@ -23,10 +23,12 @@ int main(int argc, char *argv[]){
 		p.addPoint(i++, temp);
 	}
 	vec = p.solve();
-	cout << vec[deg] << "t^" << deg;
-	for(int i = deg - 1; i > -1; i--){
-		cout << " + " << vec[i] << "t^" << i;
+	for(int i = deg; i > 0; i--){
+		cout << " + " << vec[i] << "*t^" << i;
+		if(vec[i] < 0)
+			count++;
 	}
-	cout << endl;
+	cout << " + 1" << endl;
+	cout << "Number of negative coefficients: " << count << endl;
 	return 0;
 }
