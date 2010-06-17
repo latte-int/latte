@@ -1,14 +1,42 @@
 #!/bin/bash
-if [ $# != 2 ]
+if [ $# -lt 2 ]
 then
-echo "Usage: ehrhart2 dim file"
+	echo "Usage: ehrhart2 dim file [options]"
+	exit 0
+fi
+	root=0
+	save=0
+	forcesave=0
+if [ $# -gt 2 ]
+
+then
+	if [ $3 == "-r" ]
+	then
+		root=1
+	fi
 fi
 echo $1 > input.txt
 ./ehrhart $1 $2 2> /dev/null | cut -dt -f1 >> input.txt
-if [ $? == 0 ]
+if [ $? -eq 0 ]
 then
-./ehrhart3 < input.txt
+	./ehrhart3 < input.txt > ehrhart.txt
 else
-echo "problem in ehrhart"
+	echo "problem in ehrhart (probably a segfault)"
+	rm -f input.txt
+	exit 0
 fi
-rm -f input.txt
+if [ $root ]
+then
+	echo -n "p = [" > commands.txt
+	head -1 ehrhart.txt | tr -d [*+^] | sed -e s/t[0-9]*//g >> commands.txt
+	echo " ]" >> commands.txt
+	echo "roots(p)" >> commands.txt
+	echo "save ans.txt ans -ascii" >> commands.txt
+	echo "exit" >> commands.txt
+	matlab < commands.txt > /dev/null
+fi
+cat ans.txt >> ehrhart.txt
+cat ehrhart.txt 
+rm -f input.txt commands.txt ans.txt 
+#ehrhart.txt
+#still working on getting the saving, for now, manually save if you want
