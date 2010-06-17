@@ -1,12 +1,12 @@
 testEhrhart/Driver.o testEhrhart/Driver.o: testEhrhart/Driver.cpp \
-  testEhrhart/BuildRandomPolytope.h /usr/include/c++/4.2/iomanip \
+  /usr/include/c++/4.2/iostream \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/c++config.h \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/os_defines.h \
   /usr/include/features.h /usr/include/sys/cdefs.h \
   /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
   /usr/include/gnu/stubs-64.h \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/cpu_defines.h \
-  /usr/include/c++/4.2/istream /usr/include/c++/4.2/ios \
+  /usr/include/c++/4.2/ostream /usr/include/c++/4.2/ios \
   /usr/include/c++/4.2/iosfwd \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/c++locale.h \
   /usr/include/c++/4.2/cstring /usr/include/c++/4.2/cstddef \
@@ -86,10 +86,11 @@ testEhrhart/Driver.o testEhrhart/Driver.o: testEhrhart/Driver.cpp \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/time_members.h \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/messages_members.h \
   /usr/include/c++/4.2/bits/basic_ios.tcc \
-  /usr/include/c++/4.2/bits/istream.tcc /usr/include/c++/4.2/locale \
+  /usr/include/c++/4.2/bits/ostream.tcc /usr/include/c++/4.2/locale \
   /usr/include/c++/4.2/bits/locale_facets.tcc \
-  /usr/include/c++/4.2/typeinfo /usr/include/c++/4.2/ostream \
-  /usr/include/c++/4.2/bits/ostream.tcc /usr/include/c++/4.2/functional \
+  /usr/include/c++/4.2/typeinfo /usr/include/c++/4.2/istream \
+  /usr/include/c++/4.2/bits/istream.tcc testEhrhart/BuildRandomPolytope.h \
+  /usr/include/c++/4.2/iomanip /usr/include/c++/4.2/functional \
   /usr/include/c++/4.2/fstream \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/basic_file.h \
   /usr/include/c++/4.2/bits/fstream.tcc /usr/include/c++/4.2/vector \
@@ -102,11 +103,10 @@ testEhrhart/Driver.o testEhrhart/Driver.o: testEhrhart/Driver.cpp \
   /usr/include/c++/4.2/stdexcept /usr/include/c++/4.2/cfloat \
   /usr/lib/gcc/x86_64-linux-gnu/4.2.4/include/float.h \
   /homes/home01/m/mkoeppe/public/latte-current/include/gmp.h \
-  testEhrhart/BuildRandomEdgePolytope.h /usr/include/c++/4.2/iostream
+  testEhrhart/BuildRandomEdgePolytope.h testEhrhart/GraphMaker.h \
+  testEhrhart/BuildGraphPolytope.h
 
-testEhrhart/BuildRandomPolytope.h:
-
-/usr/include/c++/4.2/iomanip:
+/usr/include/c++/4.2/iostream:
 
 /usr/include/c++/4.2/x86_64-linux-gnu/bits/c++config.h:
 
@@ -124,7 +124,7 @@ testEhrhart/BuildRandomPolytope.h:
 
 /usr/include/c++/4.2/x86_64-linux-gnu/bits/cpu_defines.h:
 
-/usr/include/c++/4.2/istream:
+/usr/include/c++/4.2/ostream:
 
 /usr/include/c++/4.2/ios:
 
@@ -370,7 +370,7 @@ testEhrhart/BuildRandomPolytope.h:
 
 /usr/include/c++/4.2/bits/basic_ios.tcc:
 
-/usr/include/c++/4.2/bits/istream.tcc:
+/usr/include/c++/4.2/bits/ostream.tcc:
 
 /usr/include/c++/4.2/locale:
 
@@ -378,9 +378,13 @@ testEhrhart/BuildRandomPolytope.h:
 
 /usr/include/c++/4.2/typeinfo:
 
-/usr/include/c++/4.2/ostream:
+/usr/include/c++/4.2/istream:
 
-/usr/include/c++/4.2/bits/ostream.tcc:
+/usr/include/c++/4.2/bits/istream.tcc:
+
+testEhrhart/BuildRandomPolytope.h:
+
+/usr/include/c++/4.2/iomanip:
 
 /usr/include/c++/4.2/functional:
 
@@ -416,4 +420,6 @@ testEhrhart/BuildRandomPolytope.h:
 
 testEhrhart/BuildRandomEdgePolytope.h:
 
-/usr/include/c++/4.2/iostream:
+testEhrhart/GraphMaker.h:
+
+testEhrhart/BuildGraphPolytope.h:

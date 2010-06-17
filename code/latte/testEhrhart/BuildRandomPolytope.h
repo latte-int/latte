@@ -32,6 +32,7 @@ protected:
     double probNegative;
     int dim;				//dim of the polytope found by polymake
     vector< vector<mpq_class> > facets;
+    int numAffineHull;
 public:
     BuildRandomPolytope(int ambient_dim);
 	

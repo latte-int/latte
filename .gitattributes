@@ -13,11 +13,15 @@ code/latte/testEhrhart/.deps/BuildRandomEdgePolytope.Po -text
 code/latte/testEhrhart/.deps/BuildRandomPolytope.Po -text
 code/latte/testEhrhart/.deps/Driver.Po -text
 code/latte/testEhrhart/.dirstamp -text
+code/latte/testEhrhart/BuildGraphPolytope.cpp -text
+code/latte/testEhrhart/BuildGraphPolytope.h -text
 code/latte/testEhrhart/BuildRandomEdgePolytope.cpp -text
 code/latte/testEhrhart/BuildRandomEdgePolytope.h -text
 code/latte/testEhrhart/BuildRandomPolytope.cpp -text
 code/latte/testEhrhart/BuildRandomPolytope.h -text
 code/latte/testEhrhart/Driver.cpp -text
+code/latte/testEhrhart/GraphMaker.cpp -text
+code/latte/testEhrhart/GraphMaker.h -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream

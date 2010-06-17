@@ -3,6 +3,8 @@
  *
  *  Created on: June 15, 2010
  *      Author: bedutra
+ *
+ *  Computes the Ehrhart poly for hypersimplices(n, k).
  */
 
 #ifndef BUILD_RANDOM_EDGE_POLYTOPE_H_

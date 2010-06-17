@@ -49,18 +49,18 @@ void BuildRandomEdgePolytope::addToPoints(
 			currentPoint[k + 1] = 1;
 			list.push_back(currentPoint);
 			
-			cout << "just added:";
-			for(int s = 0; s < (int) currentPoint.size(); ++s ) cout << currentPoint[s] << ' ';
-			cout << endl;
+			//cout << "just added:";
+			//for(int s = 0; s < (int) currentPoint.size(); ++s ) cout << currentPoint[s] << ' ';
+			//cout << endl;
 		}//for each shift
 	
 	}//move last one over and stop recursion
 	else
 	{
 		addToPoints(list, currentPoint, base + 1);
-		cout << "just finished processing point";
-		for(int s = 0; s < (int) currentPoint.size(); ++s ) cout << currentPoint[s] << ' ';
-		cout << " , going to start shifting" << endl;
+		//cout << "just finished processing point";
+		//for(int s = 0; s < (int) currentPoint.size(); ++s ) cout << currentPoint[s] << ' ';
+		//cout << " , going to start shifting" << endl;
 			
 		
 		int numberOfShifts = (ambientDim - lastOne - 1);
@@ -70,9 +70,9 @@ void BuildRandomEdgePolytope::addToPoints(
 			for(int j = base + 1; j <= lastOne + 1; ++j)
 				currentPoint[j] = 1;
 				
-			cout << "shifted point:";
-			for(int s = 0; s < (int) currentPoint.size(); ++s ) cout << currentPoint[s] << ' ';
-			cout << endl;
+			//cout << "shifted point:";
+			//for(int s = 0; s < (int) currentPoint.size(); ++s ) cout << currentPoint[s] << ' ';
+			//cout << endl;
 			
 			base = base + 1;
 			lastOne = lastOne + 1;
@@ -103,10 +103,12 @@ void BuildRandomEdgePolytope::buildPolymakeFile()
 	addToPoints(points, starter, 0, true);
 	for(int k = 0; k < (int) points.size(); k++)
 	{
+		file << 1 << ' ';
 		for(int i = 0; i < ambientDim; ++i)
-			cout << points[k][i] << " ";
-		cout << endl;
+			file << points[k][i] << " ";
+		file << endl;
 	}//for k
+
 	
 	
 	
