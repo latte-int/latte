@@ -167,6 +167,19 @@ triangulate_SOURCES = triangulation/test-triangulation.cpp
 
 bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
+ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
+
+bin_PROGRAMS += myTest
+myTest_SOURCES = interpolation/PolynomialInterpolation.cpp
+myTest_SOURCES += interpolation/testDriver.cpp
+
+bin_PROGRAMS += TestEhrhart
+TestEhrhart_SOURCES = testEhrhart/BuildRandomPolytope.cpp
+TestEhrhart_SOURCES += testEhrhart/Driver.cpp
+TestEhrhart_SOURCES += testEhrhart/BuildRandomEdgePolytope.cpp
+TestEhrhart_SOURCES += testEhrhart/GraphMaker.cpp
+TestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
+
 
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
