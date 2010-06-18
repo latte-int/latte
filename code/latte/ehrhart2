@@ -1,31 +1,71 @@
 #!/bin/bash
-if [ $# -lt 2 ]
+
+save () {
+	echo "Saving the Ehrhart polynomial file and the LattE file that generated it."
+	tag=`date | tr -d [\ :]`
+	cp ehrhart.txt savedfiles/ehrhart.$tag$2
+	cp $1 savedfiles/latte.$tag$2
+	clean
+}
+
+clean () {
+	rm -f input.txt commands.txt ans.txt ehrhart.txt
+}
+
+if [[ $1 =~ options ]]
 then
-	echo "Usage: ehrhart2 dim file [options]"
+	echo "-r: calculates the roots of the ehrhart polynomial and appends it to the automatically generated ehrhart file"
+	echo "-s: saves the ehrhart and latte files if a coefficient of the ehrhart polynomial is negative"
+	echo "-R: invokes the -r option and saves the latte abd ehrhart files if the real part of a root is positive"
+	echo "-S: forces a save of the ehrhart and latte files"
 	exit 0
 fi
-	root=0
-	save=0
-	forcesave=0
-if [ $# -gt 2 ]
 
+if [[ $# -lt 2 ]]
 then
-	if [ $3 == "-r" ]
+	echo "Usage: ehrhart2 dim file [options]"
+	echo "Type ehrhart2 -options for option descriptions"
+	exit 0
+fi
+
+root=0
+save=0
+rootsave=0
+forcesave=0
+
+if [[ $# -gt 2 ]]
+then
+	if [[ $3 =~ r ]]
 	then
 		root=1
 	fi
+	if [[ $3 =~ R ]]
+	then
+		root=1
+		rootsave=1
+	fi
+	if [[ $3 =~ s ]]
+	then
+		save=1
+	fi
+	if [[ $3 =~ S ]]
+	then
+		forcesave=1
+	fi
 fi
+
 echo $1 > input.txt
 ./ehrhart $1 $2 2> /dev/null | cut -dt -f1 >> input.txt
 if [ $? -eq 0 ]
 then
 	./ehrhart3 < input.txt > ehrhart.txt
 else
-	echo "problem in ehrhart (probably a segfault)"
+	echo "problem in ehrhart (probably a segfault or interrupt)"
 	rm -f input.txt
 	exit 0
 fi
-if [ $root ]
+
+if [[ $root -eq 1 ]]
 then
 	echo -n "p = [" > commands.txt
 	head -1 ehrhart.txt | tr -d [*+^] | sed -e s/t[0-9]*//g >> commands.txt
@@ -34,9 +74,33 @@ then
 	echo "save ans.txt ans -ascii" >> commands.txt
 	echo "exit" >> commands.txt
 	matlab < commands.txt > /dev/null
+	cat ans.txt >> ehrhart.txt
 fi
-cat ans.txt >> ehrhart.txt
+
 cat ehrhart.txt 
-rm -f input.txt commands.txt ans.txt 
-#ehrhart.txt
-#still working on getting the saving, for now, manually save if you want
+
+if [[ forcesave -eq 1 ]]
+then
+	save $2 S
+fi
+
+if [[ save -eq 1 ]]
+then
+	if [[ `head -1 ehrhart.txt | grep /-/` != "" ]]
+	then
+		save $2 s
+	fi
+fi
+
+if [[ rootsave -eq 1 ]]
+then
+	if [[ `cat ehrhart.txt | grep -e '/^  -/'` != "" ]]
+	then
+		save $2 r
+	fi
+fi
+
+clean
+# when saving, the file gets appended with the date (sans spaces and colons) and the option which caused the save
+# S > s > R is the precedence of option tags (a forced save overrides all and, arbitrarily, having a negative
+# coefficient in the Ehrhart polynomial is more important than having a positive real part of a root
