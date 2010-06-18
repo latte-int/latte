@@ -173,12 +173,12 @@ bin_PROGRAMS += myTest
 myTest_SOURCES = interpolation/PolynomialInterpolation.cpp
 myTest_SOURCES += interpolation/testDriver.cpp
 
-bin_PROGRAMS += TestEhrhart
-TestEhrhart_SOURCES = testEhrhart/BuildRandomPolytope.cpp
-TestEhrhart_SOURCES += testEhrhart/Driver.cpp
-TestEhrhart_SOURCES += testEhrhart/BuildRandomEdgePolytope.cpp
-TestEhrhart_SOURCES += testEhrhart/GraphMaker.cpp
-TestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
+bin_PROGRAMS += myTestEhrhart
+myTestEhrhart_SOURCES = testEhrhart/BuildRandomPolytope.cpp
+myTestEhrhart_SOURCES += testEhrhart/Driver.cpp
+myTestEhrhart_SOURCES += testEhrhart/BuildRandomEdgePolytope.cpp
+myTestEhrhart_SOURCES += testEhrhart/GraphMaker.cpp
+myTestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
 
 
 check_PROGRAMS = ilio_test
