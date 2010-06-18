@@ -67,14 +67,44 @@ fi
 
 if [[ $root -eq 1 ]]
 then
-	echo -n "p = [" > commands.txt
-	head -1 ehrhart.txt | tr -d [*+^] | sed -e s/t[0-9]*//g >> commands.txt
-	echo " ]" >> commands.txt
-	echo "roots(p)" >> commands.txt
+	echo -n "p = sym('" > commands.txt
+	#head -1 ehrhart.txt | tr -d [*+^] | sed -e s/t[0-9]*//g >> commands.txt
+	head -1 ehrhart.txt  | sed s/\$/\'\)\;/g  >> commands.txt
+	echo "syms t;" >> commands.txt
+	echo "fptr = fopen('ehrhart.matlabroots.txt', 'w'); %will delete old data; maybe use 'a'?" >> commands.txt
+	echo "theRoots = solve(p);" >> commands.txt
+	echo "" >> commands.txt
+	echo "for i = 1:length(theRoots)" >> commands.txt
+	echo "	if imag(theRoots(i)) ~= 0" >> commands.txt
+	echo "     fprintf(fptr, '%f  %fi => %f\n', double(real(theRoots(i))), double(imag(theRoots(i))), double(subs(p, t, theRoots(i))));" >> commands.txt
+	echo "  else" >> commands.txt
+	echo "     fprintf(fptr, '%f => %f\n', double(theRoots(i)), double(subs(p, t, theRoots(i))));" >> commands.txt
+	echo "  end% if complex number"  >> commands.txt
+	echo "end%for i" >> commands.txt
+	echo "" >> commands.txt
+	echo "fclose(fptr);" >> commands.txt
 	echo "save ans.txt ans -ascii" >> commands.txt
 	echo "exit" >> commands.txt
 	matlab < commands.txt > /dev/null
-	cat ans.txt >> ehrhart.txt
+	cat ehrhart.matlabroots.txt >> ehrhart.txt
+
+
+	#now in maple
+	echo "Digits:=1000;" > commands.txt
+	echo -n "p :=" >> commands.txt
+	head -1 ehrhart.txt >> commands.txt
+	echo ":" >> commands.txt
+	echo "ans := fsolve(p = 0, t, complex):" >> commands.txt
+	echo "for x in ans do printf(\"%f =\> %f\\n\", x, subs(t = x, p)); od;" >> commands.txt
+
+
+	cat commands.txt
+	echo "************" >> ehrhart.txt
+	echo "Now in maple" >> ehrhart.txt
+
+
+	maple < commands.txt >> ehrhart.txt
+	
 fi
 
 cat ehrhart.txt 
@@ -92,15 +122,20 @@ then
 	fi
 fi
 
-if [[ rootsave -eq 1 ]]
-then
-	if [[ `cat ehrhart.txt | grep -e '/^  -/'` != "" ]]
-	then
-		save $2 r
-	fi
-fi
+#if [[ rootsave -eq 1 ]]
+#then
+#	then
+#		save $2 r
+#	fi
+#fi
 
-clean
+#clean
 # when saving, the file gets appended with the date (sans spaces and colons) and the option which caused the save
 # S > s > R is the precedence of option tags (a forced save overrides all and, arbitrarily, having a negative
 # coefficient in the Ehrhart polynomial is more important than having a positive real part of a root
+
+
+
+
+
+
