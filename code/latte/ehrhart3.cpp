@@ -28,6 +28,10 @@ int main(int argc, char *argv[]){
 		if(vec[i] < 0)
 			count++;
 	}
+	if ( vec[0] != mpq_class(1))
+	{
+		cout << "ehrhart3:: vec[0] = " << vec[0] << " != 1" << endl;
+	}//check to make sure there was no errors
 	cout << " + 1" << endl;
 	cout << "Number of negative coefficients: " << count << endl;
 	return 0;
