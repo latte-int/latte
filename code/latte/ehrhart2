@@ -14,21 +14,24 @@ clean () {
 
 if [[ $1 =~ options ]]
 then
-	echo "-r: calculates the roots of the ehrhart polynomial and appends it to the automatically generated ehrhart file"
+	echo "-m: uses matlab to calculate the roots of the ehrhart polynomial and appends it to the ehrhart file"
+	echo "-M: uses maple to calculate the roots of the ehrhart polynomial and appends it to the ehrhart file"
+	echo "-r: equivalent to -mM"
 	echo "-s: saves the ehrhart and latte files if a coefficient of the ehrhart polynomial is negative"
-	echo "-R: invokes the -r option and saves the latte abd ehrhart files if the real part of a root is positive"
+	echo "-R: invokes the -r option and saves the latte and ehrhart files if the real part of a root is positive"
 	echo "-S: forces a save of the ehrhart and latte files"
 	exit 0
 fi
 
 if [[ $# -lt 2 ]]
 then
-	echo "Usage: ehrhart2 dim file [options]"
+	echo "Usage: ehrhart2 dim file [options] [comment string]"
 	echo "Type ehrhart2 -options for option descriptions"
 	exit 0
 fi
 
-root=0
+matlab=0
+maple=0
 save=0
 rootsave=0
 forcesave=0
@@ -37,11 +40,13 @@ if [[ $# -gt 2 ]]
 then
 	if [[ $3 =~ r ]]
 	then
-		root=1
+		matlab=1
+		maple=1
 	fi
 	if [[ $3 =~ R ]]
 	then
-		root=1
+		matlab=1
+		maple=1
 		rootsave=1
 	fi
 	if [[ $3 =~ s ]]
@@ -65,7 +70,7 @@ else
 	exit 0
 fi
 
-if [[ $root -eq 1 ]]
+if [[ $matlab -eq 1 ]]
 then
 	echo -n "p = sym('" > commands.txt
 	#head -1 ehrhart.txt | tr -d [*+^] | sed -e s/t[0-9]*//g >> commands.txt
@@ -87,9 +92,10 @@ then
 	echo "exit" >> commands.txt
 	matlab < commands.txt > /dev/null
 	cat ehrhart.matlabroots.txt >> ehrhart.txt
+fi
 
-
-	#now in maple
+if [[ $maple -eq 1 ]]
+then
 	echo "Digits:=1000;" > commands.txt
 	echo -n "p :=" >> commands.txt
 	head -1 ehrhart.txt >> commands.txt
@@ -97,22 +103,15 @@ then
 	echo "ans := fsolve(p = 0, t, complex):" >> commands.txt
 	echo "appendto(\"ehrhart.txt\");" >> commands.txt
 	echo "for x in ans do printf(\"%f =\> %Zf\\n\", x, subs(t = x, p)); od;" >> commands.txt
-
-
-	cat commands.txt
 	echo "************" >> ehrhart.txt
-	echo "Now in maple" >> ehrhart.txt
-
-
-	maple < commands.txt > /dev/null   # >> ehrhart.txt
-
-	
+	maple < commands.txt > /dev/null
 	grep -v "^>" ehrhart.txt > ehrhart.txt.temp 
 	mv ehrhart.txt.temp  ehrhart.txt
-	
 fi
 
 cat ehrhart.txt 
+
+echo $4 >> ehrhart.txt
 
 if [[ forcesave -eq 1 ]]
 then
@@ -127,20 +126,15 @@ then
 	fi
 fi
 
-#if [[ rootsave -eq 1 ]]
-#then
-#	then
-#		save $2 r
-#	fi
-#fi
+if [[ rootsave -eq 1 ]]
+then
+	if [[ `cat ehrhart.txt | grep /^[0-9]/` != "" ]]
+	then
+		save $2 R
+	fi
+fi
 
 #clean
 # when saving, the file gets appended with the date (sans spaces and colons) and the option which caused the save
 # S > s > R is the precedence of option tags (a forced save overrides all and, arbitrarily, having a negative
 # coefficient in the Ehrhart polynomial is more important than having a positive real part of a root
-
-
-
-
-
-
