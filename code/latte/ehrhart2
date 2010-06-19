@@ -95,7 +95,8 @@ then
 	head -1 ehrhart.txt >> commands.txt
 	echo ":" >> commands.txt
 	echo "ans := fsolve(p = 0, t, complex):" >> commands.txt
-	echo "for x in ans do printf(\"%f =\> %f\\n\", x, subs(t = x, p)); od;" >> commands.txt
+	echo "appendto(\"ehrhart.txt\");" >> commands.txt
+	echo "for x in ans do printf(\"%f =\> %Zf\\n\", x, subs(t = x, p)); od;" >> commands.txt
 
 
 	cat commands.txt
@@ -103,7 +104,11 @@ then
 	echo "Now in maple" >> ehrhart.txt
 
 
-	maple < commands.txt >> ehrhart.txt
+	maple < commands.txt > /dev/null   # >> ehrhart.txt
+
+	
+	grep -v "^>" ehrhart.txt > ehrhart.txt.temp 
+	mv ehrhart.txt.temp  ehrhart.txt
 	
 fi
 
