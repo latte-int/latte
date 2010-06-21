@@ -4,6 +4,7 @@ bin_PROGRAMS =
 noinst_LIBRARIES =
 noinst_HEADERS =
 
+if HAVE_FORTYTWO_LIB
 noinst_LIBRARIES += libnormalize.a
 libnormalize_a_SOURCES = ReductionTest.cpp normalize.cpp
 noinst_HEADERS += ReductionTest.h
@@ -42,3 +43,5 @@ endif
 bin_PROGRAMS += hilbert-from-rays-symm
 hilbert_from_rays_symm_SOURCES = normaliz_wrapper.cpp
 hilbert_from_rays_symm_LDADD = $(LDADD) -l4ti2util
+
+endif
