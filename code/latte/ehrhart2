@@ -3,9 +3,10 @@
 save () {
 	echo "Saving the Ehrhart polynomial file and the LattE file that generated it."
 	tag=`date | tr -d [\ :]`
-	cp ehrhart.txt savedfiles/ehrhart.$tag$2
-	cp $1 savedfiles/latte.$tag$2
-	clean
+	cp ehrhart.txt savedfiles/ehrhart.$tag.$2
+	cp $1 savedfiles/latte.$tag.$2
+	#clean
+	exit 0
 }
 
 clean () {
@@ -69,44 +70,22 @@ else
 	rm -f input.txt
 	exit 0
 fi
-
+ 
 if [[ $matlab -eq 1 ]]
 then
-	echo -n "p = sym('" > commands.txt
-	#head -1 ehrhart.txt | tr -d [*+^] | sed -e s/t[0-9]*//g >> commands.txt
-	head -1 ehrhart.txt  | sed s/\$/\'\)\;/g  >> commands.txt
-	echo "syms t;" >> commands.txt
-	echo "fptr = fopen('ehrhart.matlabroots.txt', 'w'); %will delete old data; maybe use 'a'?" >> commands.txt
-	echo "theRoots = solve(p);" >> commands.txt
-	echo "" >> commands.txt
-	echo "for i = 1:length(theRoots)" >> commands.txt
-	echo "	if imag(theRoots(i)) ~= 0" >> commands.txt
-	echo "     fprintf(fptr, '%f  %fi => %f\n', double(real(theRoots(i))), double(imag(theRoots(i))), double(subs(p, t, theRoots(i))));" >> commands.txt
-	echo "  else" >> commands.txt
-	echo "     fprintf(fptr, '%f => %f\n', double(theRoots(i)), double(subs(p, t, theRoots(i))));" >> commands.txt
-	echo "  end% if complex number"  >> commands.txt
-	echo "end%for i" >> commands.txt
-	echo "" >> commands.txt
-	echo "fclose(fptr);" >> commands.txt
-	echo "save ans.txt ans -ascii" >> commands.txt
-	echo "exit" >> commands.txt
-	matlab < commands.txt > /dev/null
+	matlab < ehrhart3.matlabCommands.txt > /dev/null
+	echo "*************" >> ehrhart.txt
+	echo "MATLAB ROOTS:" >> ehrhart.txt
 	cat ehrhart.matlabroots.txt >> ehrhart.txt
 fi
 
 if [[ $maple -eq 1 ]]
 then
-	echo "Digits:=1000;" > commands.txt
-	echo -n "p :=" >> commands.txt
-	head -1 ehrhart.txt >> commands.txt
-	echo ":" >> commands.txt
-	echo "ans := fsolve(p = 0, t, complex):" >> commands.txt
-	echo "appendto(\"ehrhart.txt\");" >> commands.txt
-	echo "for x in ans do printf(\"%f =\> %Zf\\n\", x, subs(t = x, p)); od;" >> commands.txt
+
+	maple < ehrhart3.mapleCommands.txt > /dev/null
 	echo "************" >> ehrhart.txt
-	maple < commands.txt > /dev/null
-	grep -v "^>" ehrhart.txt > ehrhart.txt.temp 
-	mv ehrhart.txt.temp  ehrhart.txt
+	echo "MAPLE ROOTS:" >> ehrhart.txt
+	cat ehrhart.mapleroots.txt >> ehrhart.txt
 fi
 
 cat ehrhart.txt 
@@ -115,22 +94,22 @@ echo $4 >> ehrhart.txt
 
 if [[ forcesave -eq 1 ]]
 then
-	save $2 S
+	save $2 always
 fi
 
 if [[ save -eq 1 ]]
 then
-	if [[ `head -1 ehrhart.txt | grep /-/` != "" ]]
+	if [[ `head -2 ehrhart.txt | tail -1 |  grep [1-9]` != "" ]]
 	then
-		save $2 s
+		save $2 negCoeff
 	fi
 fi
 
 if [[ rootsave -eq 1 ]]
 then
-	if [[ `cat ehrhart.txt | grep /^[0-9]/` != "" ]]
+	if [[ `cat ehrhart.matlabroots.txt | grep ^[0-9]` != "" ]]
 	then
-		save $2 R
+		save $2 posRoot
 	fi
 fi
 
