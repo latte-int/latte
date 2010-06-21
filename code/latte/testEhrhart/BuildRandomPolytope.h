@@ -28,6 +28,7 @@ protected:
     int ambientDim; 		//dim of space the poly lives in.
     string fileName; 		//file name for polymake
     string latteFile;		//file name for latte
+    string PolytopeComments;//describes the current polytope (example: "edge poly of a line graph of 30 nodes")
     int maxInteger;
     double probNegative;
     int dim;				//dim of the polytope found by polymake
@@ -46,6 +47,8 @@ public:
 
 
 	void printFacetEquationsForLattE();
+
+	void setComments(const string& newComments);
 };//BuildRandomPolytope
 
 

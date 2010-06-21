@@ -12,7 +12,9 @@ using namespace std;
 
 BuildRandomEdgePolytope::BuildRandomEdgePolytope(int ambient_dim, int numones): BuildRandomPolytope(ambient_dim), numOnes(numones)
 {
-
+	stringstream ss;
+	ss << "A hypersimplex(" << ambientDim << ", " << numOnes << ")."; //caller should call setComments for a better label.
+	PolytopeComments = ss.str();
 }//buildRandomEdgePolytope
 
 

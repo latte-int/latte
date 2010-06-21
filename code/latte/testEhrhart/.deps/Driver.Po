@@ -89,15 +89,15 @@ testEhrhart/Driver.o testEhrhart/Driver.o: testEhrhart/Driver.cpp \
   /usr/include/c++/4.2/bits/ostream.tcc /usr/include/c++/4.2/locale \
   /usr/include/c++/4.2/bits/locale_facets.tcc \
   /usr/include/c++/4.2/typeinfo /usr/include/c++/4.2/istream \
-  /usr/include/c++/4.2/bits/istream.tcc testEhrhart/BuildRandomPolytope.h \
+  /usr/include/c++/4.2/bits/istream.tcc /usr/include/c++/4.2/sstream \
+  /usr/include/c++/4.2/bits/sstream.tcc testEhrhart/BuildRandomPolytope.h \
   /usr/include/c++/4.2/iomanip /usr/include/c++/4.2/functional \
   /usr/include/c++/4.2/fstream \
   /usr/include/c++/4.2/x86_64-linux-gnu/bits/basic_file.h \
   /usr/include/c++/4.2/bits/fstream.tcc /usr/include/c++/4.2/vector \
   /usr/include/c++/4.2/bits/stl_vector.h \
   /usr/include/c++/4.2/bits/stl_bvector.h \
-  /usr/include/c++/4.2/bits/vector.tcc /usr/include/c++/4.2/sstream \
-  /usr/include/c++/4.2/bits/sstream.tcc \
+  /usr/include/c++/4.2/bits/vector.tcc \
   /homes/home01/m/mkoeppe/public/latte-current/include/gmp.h \
   /homes/home01/m/mkoeppe/public/latte-current/include/gmpxx.h \
   /usr/include/c++/4.2/stdexcept /usr/include/c++/4.2/cfloat \
@@ -382,6 +382,10 @@ testEhrhart/Driver.o testEhrhart/Driver.o: testEhrhart/Driver.cpp \
 
 /usr/include/c++/4.2/bits/istream.tcc:
 
+/usr/include/c++/4.2/sstream:
+
+/usr/include/c++/4.2/bits/sstream.tcc:
+
 testEhrhart/BuildRandomPolytope.h:
 
 /usr/include/c++/4.2/iomanip:
@@ -401,10 +405,6 @@ testEhrhart/BuildRandomPolytope.h:
 /usr/include/c++/4.2/bits/stl_bvector.h:
 
 /usr/include/c++/4.2/bits/vector.tcc:
-
-/usr/include/c++/4.2/sstream:
-
-/usr/include/c++/4.2/bits/sstream.tcc:
 
 /homes/home01/m/mkoeppe/public/latte-current/include/gmp.h:
 

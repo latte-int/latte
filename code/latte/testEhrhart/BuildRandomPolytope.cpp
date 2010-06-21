@@ -17,9 +17,11 @@ BuildRandomPolytope::BuildRandomPolytope(int ambient_dim)
 	ss << time(0);
 	//fileName = "BuildRandomPolytope." + ss.str() + ".temp";
 	fileName = "BuildRandomPolytope.temp"; //for now, keep the file names the same (for debugging)
+	PolytopeComments = "Random edge polytope"; //default label. caller should call setComments for a better label.
 	maxInteger = 50;
 	probNegative = .5;
 	numAffineHull = 0;
+
 }//buildRandomPolytope
 
 /**
@@ -184,7 +186,7 @@ void BuildRandomPolytope::findEhrhardPolynomial()
 	
 	stringstream d;
 	d << dim;
-	string command = "./ehrhart2 " + d.str() + " " + latteFile.c_str();
+	string command = "./ehrhart2 " + d.str() + " " + latteFile.c_str() + " -Rs " + "\"" + PolytopeComments.c_str()+ "\"";
 	cout << "findEhrhardPolynomial(): ehrhart calling: " << command.c_str() << endl;
 	system(command.c_str());
 }//findEhrhardPolynomial
@@ -234,4 +236,11 @@ void BuildRandomPolytope::printFacetEquationsForLattE()
 	}//if there are affine hulls!
 	file.close();
 }//printFacetEuationsForLatte()
+
+
+void BuildRandomPolytope::setComments(const string& newComments)
+{
+	PolytopeComments = newComments;
+}//setComments
+
 	

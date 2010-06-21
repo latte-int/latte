@@ -12,7 +12,7 @@ using namespace std;
 
 BuildGraphPolytope::BuildGraphPolytope(): BuildRandomPolytope(0)
 {
-
+	PolytopeComments = "A graph polytope. "; //caller should call setComments for a better label.
 }//buildRandomPolytope
 
 void BuildGraphPolytope::buildPolymakeFile(const vector< vector<int> > &edges, PolytopeType polytopeType)
