@@ -128,7 +128,7 @@ void GraphMaker::makeCircleWithCenter(const int size, const int offset)
 //cout << "edges.cap() =" << edges.capacity() << endl;
 	for(int k = 0; k < numVertex - 2; k++)
 	{
-		cout << "k=" << k << "numVertex=" << numVertex << endl;
+		//cout << "k=" << k << "numVertex=" << numVertex << endl;
 		cout << "edges[k].zize() = " << edges[k].size() << endl;
 		edges[k].push_back(k + 1);
 	}
@@ -214,6 +214,7 @@ void GraphMaker::makeRandomConnectedGraph(const int size, const int edgeCount)
 	makeRandomSpanningTree();
 	currentEdgeCount = numVertex -1;
 
+	cout << "spanning tree:" << endl;
 	printEdges();
 	//cout << "now filling rest of quota" << endl;
 
@@ -233,7 +234,9 @@ void GraphMaker::makeRandomConnectedGraph(const int size, const int edgeCount)
 
 	}//while, keep adding more edges.
 
-
+	//cout << "full graph" << endl;
+	//printEdges();
+	
 }//makeRandomConnectedGraph()
 
 
@@ -255,6 +258,7 @@ void GraphMaker::makeRandomSpanningTree()
 		//move the vertex we wish to add to the end of the unusedVertices vector (by end, I mean to lastUnused).
 		// 	lastUnused will be decremented later, so we will never see it again!
 		swap(unusedVertices[currentUnusedVertexIndex], unusedVertices[lastUnused]);
+		usedVertices.push_back(unusedVertices[lastUnused]);
 
 		//now add the edge (currentusedVertex, unusedVertices[lastUnused]) to the graph, saving the smaller in the outer vertex.
 		addEdgeInOrder(currentUsedVertex, unusedVertices[lastUnused]);
@@ -275,7 +279,7 @@ void GraphMaker::makeRandomSpanningTree()
 
 void GraphMaker::printEdges() const
 {
-	cout << "numVertex =" << numVertex << endl;
+	cout << "numVertex=" << numVertex << endl;
 	for(int i = 0; i < numVertex; ++i)
 	{
 		for(int k = 0; k < (int) edges[i].size(); ++k)
