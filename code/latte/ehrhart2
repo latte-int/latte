@@ -2,15 +2,18 @@
 
 save () {
 	echo "Saving the Ehrhart polynomial file and the LattE file that generated it."
-	tag=`date | tr -d [\ :]`
+	echo "Save code: "$2
+	tag=`date | sed s/\ /./g | sed s/:/-/g`
+
+#	tag=`date | tr -d [\ :]`
 	cp ehrhart.txt savedfiles/ehrhart.$tag.$2
 	cp $1 savedfiles/latte.$tag.$2
-	#clean
+	clean
 	exit 0
 }
 
 clean () {
-	rm -f input.txt commands.txt ans.txt ehrhart.txt
+	rm -f input.txt ehrhart.txt ehrhart.matlabroots.txt ehrhart.mapleroots.txt ehrhart3.matlabCommands.txt ehrhart3.mapleCommands.txt
 }
 
 if [[ $1 =~ options ]]
