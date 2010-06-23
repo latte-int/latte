@@ -15,6 +15,9 @@ code/latte/testEhrhart/.deps/Driver.Po -text
 code/latte/testEhrhart/.dirstamp -text
 code/latte/testEhrhart/BuildGraphPolytope.cpp -text
 code/latte/testEhrhart/BuildGraphPolytope.h -text
+code/latte/testEhrhart/BuildHypersimplexEdgePolytope.cpp -text
+code/latte/testEhrhart/BuildHypersimplexEdgePolytope.h -text
+code/latte/testEhrhart/BuildHypersimplexEdgePolytope.o -text
 code/latte/testEhrhart/BuildRandomEdgePolytope.cpp -text
 code/latte/testEhrhart/BuildRandomEdgePolytope.h -text
 code/latte/testEhrhart/BuildRandomPolytope.cpp -text
