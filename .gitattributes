@@ -11,15 +11,11 @@ code/latte/interpolation/testDriver.cpp -text
 code/latte/testEhrhart/.deps/.dirstamp -text
 code/latte/testEhrhart/.deps/BuildRandomEdgePolytope.Po -text
 code/latte/testEhrhart/.deps/BuildRandomPolytope.Po -text
-code/latte/testEhrhart/.deps/Driver.Po -text
 code/latte/testEhrhart/.dirstamp -text
 code/latte/testEhrhart/BuildGraphPolytope.cpp -text
 code/latte/testEhrhart/BuildGraphPolytope.h -text
 code/latte/testEhrhart/BuildHypersimplexEdgePolytope.cpp -text
 code/latte/testEhrhart/BuildHypersimplexEdgePolytope.h -text
-code/latte/testEhrhart/BuildHypersimplexEdgePolytope.o -text
-code/latte/testEhrhart/BuildRandomEdgePolytope.cpp -text
-code/latte/testEhrhart/BuildRandomEdgePolytope.h -text
 code/latte/testEhrhart/BuildRandomPolytope.cpp -text
 code/latte/testEhrhart/BuildRandomPolytope.h -text
 code/latte/testEhrhart/Driver.cpp -text

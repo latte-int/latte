@@ -237,7 +237,9 @@ void BuildRandomPolytope::printFacetEquationsForLattE()
 	file.close();
 }//printFacetEuationsForLatte()
 
-
+/**
+ * This string is passed to ehrhart2 and is printed in the log files to make things easier to read.
+ */
 void BuildRandomPolytope::setComments(const string& newComments)
 {
 	PolytopeComments = newComments;

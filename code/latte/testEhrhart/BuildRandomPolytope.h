@@ -29,11 +29,11 @@ protected:
     string fileName; 		//file name for polymake
     string latteFile;		//file name for latte
     string PolytopeComments;//describes the current polytope (example: "edge poly of a line graph of 30 nodes")
-    int maxInteger;
-    double probNegative;
+    int maxInteger;			//when making random points, take elements in  |x| in [0, maxInteger)
+    double probNegative;	//when making random points, probNegative percent of them should be negative.
     int dim;				//dim of the polytope found by polymake
-    vector< vector<mpq_class> > facets;
-    int numAffineHull;
+    vector< vector<mpq_class> > facets; //facets of the polytope found by polymake
+    int numAffineHull;		//number of affine hull facets found by polymake (saved at the end of the facets vector)
 public:
     BuildRandomPolytope(int ambient_dim);
 	

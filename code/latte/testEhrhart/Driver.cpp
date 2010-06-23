@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include "BuildRandomPolytope.h"
-#include "BuildRandomEdgePolytope.h"
+#include "BuildHypersimplexEdgePolytope.h"
 #include "GraphMaker.h"
 #include "BuildGraphPolytope.h"
 
@@ -37,7 +37,7 @@ void doEdge()
 
 	cout << "Enter: n (vector lenght) k (number of ones) >> ";
 	cin >> n >> k;
-	BuildRandomEdgePolytope rPoly(n, k);
+	BuildHypersimplexEdgePolytope rPoly(n, k);
 	
 	rPoly.buildPolymakeFile();
 	//rPoly.callPolymake();
@@ -57,7 +57,7 @@ void doGraphs()
 	string type;
 	stringstream comments;
 
-	cout << "graph type (l, cir, circ, or check, randC) >> ";
+	cout << "graph type \n(l, cir, circ, or check, rand[CD], petersen, petersenFun, my, kneser) >> ";
 	cin >> type;
 
 	if ( type == "l")
@@ -93,8 +93,39 @@ void doGraphs()
 		cout << "size edgeCount >> ";
 		cin >> numVertx >> offset;
 		g.makeRandomConnectedGraph(numVertx, offset);
-		comments << "Random graph with " << numVertx << " nodes and " << offset << " many edges. ";
+		comments << "Random connected graph with " << numVertx << " nodes and " << offset << " many edges. ";
 	}//if random connected graph.
+	else if (type == "randD")
+	{
+		cout << "size edgeCount >> ";
+		cin >> numVertx >> offset;
+		g.makeRandomDisconnectedGraph(numVertx, offset);
+		comments << "Random disconnected graph with " << numVertx << " nodes and " << offset << " many edges. ";
+	}//if random dis-connnected graph.
+	else if ( type == "petersen")
+	{
+		g.makePetersenGraph();
+		comments << "Petersen graph.";
+	}//if petersen
+	else if (type == "petersenFun")
+	{
+		cout << "num >> ";
+		cin >> numVertx;
+		g.makePetersenFunGraph(numVertx);
+		comments << "A Fun Peterson Graph";
+	}//if petersen fun (need to read source, this funtion will change now and then)
+	else if (type == "my")
+	{
+		g.makeYourOwnGraph();
+		comments << "User defined edge-graph. ";
+	}//if user defined graph.
+	else if (type == "kneser")
+	{
+		cout << " setSize subSetSize >> ";
+		cin >> numVertx >> offset;
+		g.makeKneserGraph(numVertx, offset);
+		comments << "Kneser graph with " << offset << " in " << numVertx << ".";
+	}// if kneser
 	else
 	{
 		cout << "ops, that is not a graph type, calling exit" << endl;
@@ -148,26 +179,40 @@ void doAuto()
 */	
 
 
-	for(int i = 15; i <= 30; ++i)
-		for(int j = i; j <= i+10; ++j)
+
+
+
+	//already did i=[15,30], j=[i, i+10] untill i = 17, j= 24 for connected edge graphs.
+	
+	
+	for(int i = 15; i <= 40; i = i + 5)
+		for(int j = i+3; j <= i+9; j = j + 3)
 		{
 			stringstream comments;
 			BuildGraphPolytope gPoly;
 			GraphMaker g;
 			
-			comments << "doing random graph of size " << i << " and edge " << j << " with edge encoding" ;
+			comments << "Random disconnected graph with " << i << " nodes and " << j << " edges. ";
 			cout << "***********************************\n" << comments.str() << endl;
-			g.makeRandomConnectedGraph(i, j);
+			g.makeRandomDisconnectedGraph(i, j);
+			g.printEdges();
 			gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::EDGE);
 			gPoly.setComments(comments.str());
 			gPoly.findEhrhardPolynomial();
 		}//rand graph
-		
-		
-		
 
-	for(int i = 15; i <= 30; ++i)
-		for(int j = i; j <= i+10; ++j)
+		stringstream comments2;
+		BuildGraphPolytope gPoly2;
+		GraphMaker g2;
+		g2.makePetersenFunGraph(2);
+		comments2 << "A Fun Peterson Graph";
+		gPoly2.buildPolymakeFile(g2.getEdges(), BuildGraphPolytope::EDGE);
+		gPoly2.setComments(comments.str());
+		gPoly2.findEhrhardPolynomial();
+
+/*
+	for(int i = 3; i <= 30; i = i + 5)
+		for(int j = i; j <= i+0; ++j)
 		{
 			stringstream comments;
 			BuildGraphPolytope gPoly;
@@ -179,15 +224,18 @@ void doAuto()
 			gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::SYMMETRIC_EDGE);
 			gPoly.setComments(comments.str());
 			gPoly.findEhrhardPolynomial();
-		}//rand graph		
+		}//rand graph
+*/		
+
+
 }//doAuto
 
 int main()
 {
 	string type;
 	
-	doAuto();
-	return 0;
+	//doAuto();
+	//return 0;
 
 	cout << "run type: (rand, edge, graph) >> ";
 	cin >> type;

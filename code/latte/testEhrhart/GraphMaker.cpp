@@ -5,10 +5,10 @@
  *      Author: bedutra
  */
 
-#include <iostream>
-#include <algorithm>
+
 
 #include "GraphMaker.h"
+#include "BuildHypersimplexEdgePolytope.h" //needed to make Kneser Graph.
 
 using namespace std;
 
@@ -170,6 +170,68 @@ void GraphMaker::makeCircleGraph(const int size)
 	edges[0].push_back(numVertex -1);
 }//makeCircleGraph()
 
+/**
+ *	Kneser graph KG(n,k) is the graph whose vertices correspond to the k-element subsets of a set of n elements, and where two vertices are connected if and only if the two corresponding sets are disjoint
+ */
+void GraphMaker::makeKneserGraph(const int setSize, const int subSetSize)
+{
+	BuildHypersimplexEdgePolytope hPoly(setSize, subSetSize);
+	vector< vector<int> > points;
+	vector<int> startingPoint;
+	bool match;
+
+
+	if (subSetSize > (setSize +1)/2)
+	{
+		cout << "subsetSize too large, no edges can exist" << endl;
+		return;
+	}//too large.
+
+	numVertex = nchoosek(setSize, subSetSize);
+	edges.clear();
+	edges.resize(numVertex);
+
+	if ( setSize <= subSetSize)
+	{
+		cout << "subset size is too big" << endl;
+		return;
+	}//if too big.
+
+	//set the starting point to 11111....11000....0.
+	startingPoint.resize(setSize);
+	for(int i = 0; i < subSetSize; ++i)
+		startingPoint[i] = 1;
+	for(int i = subSetSize; i < setSize; ++i)
+		startingPoint[i] = 0;
+
+	hPoly.addToPoints(points, startingPoint, 0, true);
+	//ok, points now contains all subsets of size subSetSize from a set of setSize.
+
+//	for(int i = 0; i < points.size(); ++i)
+//	{
+//		cout << i << ") ";
+//		for(int k = 0; k < setSize; ++k)
+//			cout << " " << points[i][k];
+//		cout << endl;
+//	}//print points out.
+
+	for(int i = 0; i < points.size(); ++i)
+		for(int k = i + 1; k < points.size(); ++k)
+		{
+			match = false;
+			for(int curElement = 0; curElement < setSize && ! match; ++curElement)
+				if ( points[i][curElement] == 1 && points[i][curElement] == points[k][curElement])
+					match = true;
+
+			if ( match == false)
+			{
+				//cout << "match = " << match << endl;
+				edges[i].push_back(k);
+			}
+		}//for k. check to see if point[i] and point[k] intercept.
+}//makeKneserGraph
+
+
 
 /**
  * Make a graph in the form: 0-1-2-3-4-5
@@ -195,6 +257,115 @@ void GraphMaker::makeLinearGraph(const int size)
 }//makeLinearGraph
 
 
+/**
+ * Makes the classical well-known Petersen Graph (10 vertices) starting at vertex 0.
+ */
+void GraphMaker::makePetersenGraph()
+{
+	numVertex = 10;
+	edges.clear();
+	edges.resize(numVertex);
+
+	makePetersenSubGraph(0);
+}//makePertersonGraph
+
+/**
+ * This function could change over time.
+ */
+void GraphMaker::makePetersenFunGraph(const int num)
+{
+	edges.clear();
+	numVertex = 10 * num;
+	edges.resize(10 * num);
+
+	//make a couble disjoing petersen graphs.
+	for(int i = 0; i < num; ++i)
+		makePetersenSubGraph(i*10);
+
+}//makePetersenFunGraph
+
+/**
+ *  Makes a petersen graph starting at vertex startVertex
+ *  This is helpful if you want to add a Petersen graph to an existing graph.
+ */
+void GraphMaker::makePetersenSubGraph(const int startVertex)
+{
+	for(int i = startVertex; i < startVertex + 4; ++i)
+		edges[i].push_back(i+1);
+	edges[startVertex].push_back(startVertex + 4);
+
+	for(int i = startVertex; i < startVertex + 5; ++i)
+		edges[i].push_back(i + 5);
+	for(int i = startVertex + 5; i < startVertex + 8; ++i)
+		edges[i].push_back(i + 2);
+	for(int i = startVertex + 5; i < startVertex + 7; ++i)
+		edges[i].push_back(i + 3);
+}//makePertersonSubGraph
+
+/**
+ * Will make two (simple) graphs of size/2 with edgeCount/2 edges that are not connected to each other.
+ * These two graphs may or may not further be connected.
+ */
+void GraphMaker::makeRandomDisconnectedGraph(const int size, const int edgeCount)
+{
+
+	int vertexG1, vertexG2, edgeG1, edgeG2; //size and edgeCount of graph 1 and 2
+	int v1, v2, currentEdgeCount;
+
+	if ( size < 4)
+	{
+		cout << "please give a size larger than 4";
+		return;
+	}
+
+	numVertex = size;
+	edges.clear();
+	edges.resize(numVertex);
+
+	//find the size and edgeCount of the first graph.
+	vertexG1 = (int)((size + 1 )/2); //round up.
+	vertexG2 = size / 2;
+
+	//find the size and edgeCount of the 2nd graph.
+	edgeG1 = (int)((edgeCount + 1 )/2); //round up.
+	edgeG2 = edgeCount / 2;
+
+	cout << vertexG1 << "::" << edgeG1 << ", " << vertexG2 << "::" << edgeG2 << endl;
+	currentEdgeCount = 0;
+	while ( currentEdgeCount < edgeG1)
+	{
+		v1 = rand() % vertexG1;
+		v2 = rand() % vertexG1;
+		if ( v1 == v2) continue; //try again. Keep the graph simple.
+
+		if ( addEdgeInOrder(v1, v2) == true)
+		{
+			//cout << "1) v1=" << v1 << ", v2=" << v2 << endl;
+			++currentEdgeCount;
+		}
+	}//while not done making graph.
+
+//cout << "got here" << endl;
+	currentEdgeCount = 0;
+	while ( currentEdgeCount < edgeG2)
+	{
+		v1 = (rand() % vertexG2) + vertexG1;
+		v2 = (rand() % vertexG2) + vertexG1 ;
+
+		if ( v1 == v2) continue; //try again. Keep the graph simple.
+
+		if ( addEdgeInOrder(v1, v2) == true)
+		{
+			//cout << "2) v1=" << v1 << ", v2=" << v2 << endl;
+			++currentEdgeCount;
+		}
+	}//while not done making graph.
+
+}//makeRandomDisconnectedGraph
+
+/**
+ * Makes a random connected simple graph.
+ */
 void GraphMaker::makeRandomConnectedGraph(const int size, const int edgeCount)
 {
 	int v1, v2, currentEdgeCount = 0;
@@ -240,6 +411,9 @@ void GraphMaker::makeRandomConnectedGraph(const int size, const int edgeCount)
 }//makeRandomConnectedGraph()
 
 
+/**
+ * Make sure the graph is connected.
+ */
 void GraphMaker::makeRandomSpanningTree()
 {
 	vector<int> unusedVertices(numVertex-1);
@@ -262,21 +436,77 @@ void GraphMaker::makeRandomSpanningTree()
 
 		//now add the edge (currentusedVertex, unusedVertices[lastUnused]) to the graph, saving the smaller in the outer vertex.
 		addEdgeInOrder(currentUsedVertex, unusedVertices[lastUnused]);
-		/*
-		if ( currentUsedVertex <= unusedVertices[lastUnused])
-		{
-			edges[currentUnusedVertex].push_back(unusedVertices[lastUnused]);
-		}//add (currentusedVertex, unusedVertices[lastUnused]) to edges
-		else
-		{
-			edges[unusedVertices[lastUnused]].push_back(currentUsedVertex);
-		}//add (unusedVertices[lastUnused], currentusedVertex) to edges
-		*/
 		--lastUnused;
 	}//while
 }//makeRandomSpanningTree()
 
 
+/*
+ * Ask the user for input. Does not require the end graph to be connected or simple.
+ */
+void GraphMaker::makeYourOwnGraph()
+{
+	int v1, v2;
+
+	cout << "One past the largest graph vertex number >> ";
+	cin >> numVertex;
+
+	edges.clear();
+	edges.resize(numVertex);
+	for(int i = 0; i < numVertex; ++i) edges[i].clear();
+
+	while (true)
+	{
+		cout << "Enter -1 or vertex_1 vertex_2 >> ";
+		cin >> v1;
+		if ( v1 == -1)
+			break;
+		cin >> v2;
+
+		if ( v1 >= numVertex || v2 >= numVertex || v1 < 0 || v2 < 0)
+		{
+			cout << "vertex number too large or too small" << endl;
+			continue;
+		}//if too large/small
+
+		if ( false == addEdgeInOrder(v1, v2))
+			cout << "That edge already exists" << endl;
+	}//add another edge.
+
+}//makeYourOwnGraph()
+
+
+/**
+ * returns "n choose k"
+ */
+int GraphMaker::nchoosek(const int n1, const int k1)
+{
+	mpz_class n(n1), k(k1), topProduct(1), bottomProduct(1);
+	mpq_class ans;
+	if ( n1 < k1 )
+	{
+		cout << "nchoosek() bad input" << endl;
+		return -1;
+	}//error
+
+	for(mpz_class i(0); i < k; ++i)
+	{
+		topProduct *= ( n - i);
+	}
+	for(mpz_class i(1); i <= k; ++i)
+	{
+		bottomProduct *= i;
+	}
+
+	ans = mpq_class(topProduct, bottomProduct);
+	ans.canonicalize();
+
+	return ((int) ans.get_num().get_si());
+}//nchoosek()
+
+/**
+ * Prints the current edges.
+ */
 void GraphMaker::printEdges() const
 {
 	cout << "numVertex=" << numVertex << endl;
