@@ -172,11 +172,11 @@ ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 bin_PROGRAMS += myTest
 myTest_SOURCES = interpolation/PolynomialInterpolation.cpp
 myTest_SOURCES += interpolation/testDriver.cpp
-
+ 
 bin_PROGRAMS += myTestEhrhart
-myTestEhrhart_SOURCES = testEhrhart/BuildRandomPolytope.cpp
-myTestEhrhart_SOURCES += testEhrhart/Driver.cpp
-myTestEhrhart_SOURCES += testEhrhart/BuildRandomEdgePolytope.cpp
+myTestEhrhart_SOURCES = testEhrhart/Driver.cpp
+myTestEhrhart_SOURCES += testEhrhart/BuildRandomPolytope.cpp
+myTestEhrhart_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
 myTestEhrhart_SOURCES += testEhrhart/GraphMaker.cpp
 myTestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
 
