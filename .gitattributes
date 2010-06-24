@@ -21,6 +21,7 @@ code/latte/testEhrhart/BuildRandomPolytope.h -text
 code/latte/testEhrhart/Driver.cpp -text
 code/latte/testEhrhart/GraphMaker.cpp -text
 code/latte/testEhrhart/GraphMaker.h -text
+code/latte/valuation/Driver.cpp -text
 code/latte/volume/Driver.cpp -text
 code/latte/volume/PolytopeVolume.cpp -text
 code/latte/volume/PolytopeVolume.h -text

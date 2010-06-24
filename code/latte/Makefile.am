@@ -181,6 +181,13 @@ myTestEhrhart_SOURCES += testEhrhart/GraphMaker.cpp
 myTestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
 
 
+
+bin_PROGRAMS += ValuationComputation
+ValuationComputation_SOURCES = valuation/Driver.cpp
+
+
+
+
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 
