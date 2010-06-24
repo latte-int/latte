@@ -21,6 +21,9 @@ code/latte/testEhrhart/BuildRandomPolytope.h -text
 code/latte/testEhrhart/Driver.cpp -text
 code/latte/testEhrhart/GraphMaker.cpp -text
 code/latte/testEhrhart/GraphMaker.h -text
+code/latte/volume/Driver.cpp -text
+code/latte/volume/PolytopeVolume.cpp -text
+code/latte/volume/PolytopeVolume.h -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
