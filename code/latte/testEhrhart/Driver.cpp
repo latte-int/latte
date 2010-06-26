@@ -178,14 +178,37 @@ void doAuto()
 	}//line graphs.
 */	
 
+//try two disconnected petersen graphs.
+	stringstream comments2;
+	BuildGraphPolytope gPoly2;
+	GraphMaker g2;
+	g2.makePetersenFunGraph(2);
+	comments2 << "A Fun Peterson Graph";
+	gPoly2.buildPolymakeFile(g2.getEdges(), BuildGraphPolytope::EDGE);
+	gPoly2.setComments(comments2.str());
+	gPoly2.findEhrhardPolynomial();
 
+	for(int i = 5; i <= 20; i = i + 1)
+		for(int j = 1; j <= i/2; j = j + 1)
+		{
+			stringstream comments;
+			BuildGraphPolytope gPoly;
+			GraphMaker g;
 
+			comments << "Kneser graph with " << j << " < " << i << ". ";
+			cout << "***********************************\n" << comments.str() << endl;
+			g.makeKneserGraph(i, j);
+			g.printEdges();
+			gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::EDGE);
+			gPoly.setComments(comments.str());
+			gPoly.findEhrhardPolynomial();
+		}//rand graph
 
 
 	//already did i=[15,30], j=[i, i+10] untill i = 17, j= 24 for connected edge graphs.
 	
 	
-	for(int i = 15; i <= 40; i = i + 5)
+	for(int i = 35; i <= 40; i = i + 5)
 		for(int j = i+3; j <= i+9; j = j + 3)
 		{
 			stringstream comments;
@@ -201,14 +224,6 @@ void doAuto()
 			gPoly.findEhrhardPolynomial();
 		}//rand graph
 
-		stringstream comments2;
-		BuildGraphPolytope gPoly2;
-		GraphMaker g2;
-		g2.makePetersenFunGraph(2);
-		comments2 << "A Fun Peterson Graph";
-		gPoly2.buildPolymakeFile(g2.getEdges(), BuildGraphPolytope::EDGE);
-		gPoly2.setComments(comments.str());
-		gPoly2.findEhrhardPolynomial();
 
 /*
 	for(int i = 3; i <= 30; i = i + 5)
@@ -234,8 +249,8 @@ int main()
 {
 	string type;
 	
-	//doAuto();
-	//return 0;
+	doAuto();
+	return 0;
 
 	cout << "run type: (rand, edge, graph) >> ";
 	cin >> type;

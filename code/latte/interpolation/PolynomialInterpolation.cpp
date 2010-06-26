@@ -1,5 +1,5 @@
 /*
- * polynomial.cpp
+ * PolynomialInterpolation.cpp
  *
  *  Created on: May 13, 2010
  *      Author: bedutra
@@ -70,6 +70,34 @@ void PolynomialInterpolation::addPoint(mpq_class x, mpq_class f)
 	matrix[initCounter][colSize] = f;
 	initCounter++;
 }//addPoint
+
+
+/*	Returns f(xValue) where f is a polynomial. poly[i] is the coefficient of x^i.
+ *
+ */
+mpq_class PolynomialInterpolation::evaluatePoly(mpq_class const & xValue, vector<mpq_class>  const & poly)
+{
+	mpq_class power, sum;
+	sum = 0;
+	power = 1;
+
+	sum.canonicalize();
+	power.canonicalize();
+
+	for( int i = poly.size() - 1; i > 0; --i)
+	{
+		sum = (sum + poly[i])* xValue;
+		//sum.canonicalize();
+		//if ( ! isReduced(sum) )
+		//{
+		//	cout << "ops, not in reduced form: " << sum << endl;
+		//	exit(1);
+		//}
+	}//for i
+	mpq_class finalSum = sum + poly[0];
+	finalSum.canonicalize();
+	return finalSum;
+}//evaluates.
 
 
 void PolynomialInterpolation::GE()

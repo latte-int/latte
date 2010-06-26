@@ -30,7 +30,7 @@ public:
 
 	void addMultRows(mpq_class &value, int fromRow,  int toRow);
 	void addPoint(mpq_class x, mpq_class f);
-
+	mpq_class evaluatePoly(mpq_class const & xValue, vector<mpq_class>  const & poly);
 	void GE();
 	vector<mpq_class> getSolutionVector();
 	void printMatrix() const;
