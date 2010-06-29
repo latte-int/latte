@@ -88,6 +88,16 @@ public:
     else
       compute_integer_scale();
   }
+
+  void getEntry(const int i , ZZ &numer, ZZ &denom)
+  {
+	if ( i < enumerator.length())
+	{
+		numer = enumerator[i];
+		denom = denominator[i];
+	}//get data
+  }//getEntry
+
   void set_numerator(int i, const ZZ &numer) {
     enumerator[i] = numer;
     compute_integer_scale();
