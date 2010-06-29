@@ -56,7 +56,9 @@ struct Vertex {
   Vertex(rationalVector *v) : vertex(v) {}
   Vertex(const Vertex &v) : vertex(new rationalVector(*v.vertex)),
 			    ehrhart_vertex(v.ehrhart_vertex) {}
-  ~Vertex() { delete vertex; }
+  Vertex() { vertex = 0; }
+  ~Vertex() { if (vertex) delete vertex; }
+
 };
 
 struct listCone {
