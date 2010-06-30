@@ -21,6 +21,7 @@
 #include "barvinok/dec.h"
 #include "valuation/PolytopeValuation.h"
 #include <NTL/vec_ZZ.h>
+#include <NTL/vec_RR.h>
 #include "rational.h"
 #include "cone.h"
 

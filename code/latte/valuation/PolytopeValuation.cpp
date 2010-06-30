@@ -58,39 +58,42 @@ void PolytopeValuation::convertToOneCone()
 	listVector * masterList = new listVector;
 
 
-	//FIXME: rays are integer, but vertex are rational. Will need to chagne this.
-	//cout << "BUILDING THE RAYS" << endl;
+
 	for (listCone * currentCone = poly->cones; currentCone; currentCone
 			= currentCone->rest)
 	{
 		vec_ZZ buildRay; //buildRay = [1, old-vertex]
 		ZZ nume, denom;
 		buildRay.SetLength(poly->numOfVars + 1);
-		buildRay[0] = 1;
 
 
+		ZZ scaleFactor; //not used, but need to pass into scaleRationalVectorToInteger().
+		vec_ZZ integerVertex = scaleRationalVectorToInteger(currentCone->vertex->vertex, poly->numOfVars, scaleFactor);
+
+		buildRay[0] = scaleFactor; //1 * scaleFactor.
 		for (int i = 0; i < poly->numOfVars; ++i)
 		{
 
-			currentCone->vertex->vertex->getEntry(i, nume, denom); //get vertex[i] = nume/denome.
-			if (denom != 1 || denom == 0)
-			{
-				cerr
-						<< "Converting from rational vector to vector failed because denom. = "
-						<< denom << endl;
-				exit(1);
-			}//if error.
+			//currentCone->vertex->vertex->getEntry(i, nume, denom); //get vertex[i] = nume/denome.
+			//if (denom != 1 || denom == 0)
+			//{
+			//	cerr
+			//			<< "Converting from rational vector to vector failed because denom. = "
+			//			<< denom << endl;
+			//	exit(1);
+			//}//if error.
 
-			buildRay[i + 1] = nume;
+			//buildRay[i + 1] = nume;
+			buildRay[i + 1] = integerVertex[i];
 		}//for i
 
-		//cout << buildRay << endl;
+		cout << buildRay << endl;
 
 		masterList->first = buildRay;
 		masterList = appendVectorToListVector(buildRay, masterList);
 	}//for currentCone
 
-	//	cout << "END  BUILDING THE RAYS" << endl;
+		cout << "END  BUILDING THE RAYS" << endl;
 
 	oneCone->rest = 0;
 	oneCone->rays = masterList->rest; //ignore masterList->first, so just return the rest and NOT masterList.
@@ -105,25 +108,50 @@ void PolytopeValuation::convertToOneCone()
 RR PolytopeValuation::findDetermiantForVolume(const listCone * oneSimplex) const
 {
 	int i, numOfRays;
-	mat_ZZ mat;
+	mat_RR mat;
 	listVector *tmp;
+
+	vec_RR head;
+	vec_RR tail;
+
+	head.SetLength(poly->numOfVars + 1);
+	tail.SetLength(poly->numOfVars + 1);
+
 
 	numOfRays = lengthListVector(oneSimplex->rays);
 
 	mat.SetDims(numOfRays - 1, poly->numOfVars);
+
 
 	tmp = oneSimplex->rays;
 	vec_ZZ startingRay = tmp->first;
 	for (i = 1; i < numOfRays; i++)
 	{
 		tmp = tmp->rest;
-		vec_ZZ endingRay = tmp->first - startingRay; //FIXME: must convert to vect_RR by dividing by leading element (to get the form [1 old vertex])
+
+		for(int k = 0; k < (tmp->first).length(); ++k)
+		{
+			head[k] = to_RR((tmp->first)[k]);
+			tail[k] = to_RR(startingRay[k]);
+		}//convert from ZZ to RR vectors.
+
+		//RR inverse1, inverse2;
+		//inverse1 = 1 / to_RR((tmp->first)[0]);
+		//inverse2 = 1 / to_RR(startingRay[0]);
+
+		//If head and tail are two vectors, head - tail is a vector from tail to head
+		// so endingRay is a vector from the starting vertex (corresponding to startingRay) to all the other vertices.
+		head = (head)*(1 / to_RR((tmp->first)[0]));
+		tail = (tail)*(1 / to_RR(startingRay[0])); //must convert to vect_RR by dividing by leading element (to get the form [1 old vertex])
+
+		vec_RR endingRay =  head - tail;
+
 
 		for(int j = 1; j < poly->numOfVars + 1 ; ++j)
 			mat[i - 1][j - 1] = endingRay[j];
-	}
+	}//for i.
 
-	return to_RR(determinant(mat))/to_RR(factorial(numOfRays -1));
+	return (determinant(mat))/to_RR((factorial(numOfRays -1)));
 }//findDetermiantForVolume
 
 RR PolytopeValuation::findVolume()
