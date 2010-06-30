@@ -22,9 +22,12 @@
 #include "rational.h"
 #include <cstdlib>
 #include <ctime>
+#include "cone.h"
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
 #include <NTL/mat_ZZ.h>
+#include "testEhrhart/BuildRandomPolytope.h"
+
 
 using namespace std;
 

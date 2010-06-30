@@ -15,14 +15,23 @@ BuildRandomPolytope::BuildRandomPolytope(int ambient_dim)
 	ambientDim = ambient_dim;
 	stringstream ss;
 	ss << time(0);
-	//fileName = "BuildRandomPolytope." + ss.str() + ".temp";
-	fileName = "BuildRandomPolytope.temp"; //for now, keep the file names the same (for debugging)
+	fileName = "BuildRandomPolytope." + ss.str() + ".temp";
+	//fileName = "BuildRandomPolytope.temp"; //for now, keep the file names the same (for debugging)
 	PolytopeComments = "Random edge polytope"; //default label. caller should call setComments for a better label.
 	maxInteger = 50;
 	probNegative = .5;
 	numAffineHull = 0;
 
 }//buildRandomPolytope
+
+
+BuildRandomPolytope::~BuildRandomPolytope()
+{
+	string command = "rm -f " + fileName;
+	system(command.c_str());
+	command = "rm -f " + latteFile;
+	system(command.c_str());
+}//deconstructor.
 
 /**
  * Generates random points.
@@ -176,6 +185,12 @@ void BuildRandomPolytope::convertFacetEquations()
 }//convertFacetEquations();
 
 
+const string & BuildRandomPolytope::getLatteFile() const
+{
+	return latteFile;
+}//getLatteFile();
+
+
 /**
  * Assume: buildPolymakeFile() was called first.
  * Calls ehrhart2 to get and print the Ehrhart poly!
@@ -205,6 +220,18 @@ void BuildRandomPolytope::findFacetEquations()
 	printFacetEquationsForLattE();
 	
 }//findFacetEquations
+
+
+/**
+ * Prints the polytope's volume. We do not currently save or use this information.
+ * This method allows us to check our valuation/volume computation in /valuation
+ */
+void findVolumeWithPolymake()
+{
+
+
+
+}//findVolumeWithPolymake()
 
 /**
  * Prints a file containing the equations of the polytope for Latte.

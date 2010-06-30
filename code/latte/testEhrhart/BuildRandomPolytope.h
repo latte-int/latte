@@ -36,14 +36,17 @@ protected:
     int numAffineHull;		//number of affine hull facets found by polymake (saved at the end of the facets vector)
 public:
     BuildRandomPolytope(int ambient_dim);
+    ~BuildRandomPolytope();
 	
 	//A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
 	void buildPolymakeFile(const int numPoints);
 	void callPolymake();
 	void convertFacetEquations();
+	const string & getLatteFile() const;
 	void findEhrhardPolynomial();
 	void findFacetEquations();
+	void findVolumeWithPolymake();
 
 
 	void printFacetEquationsForLattE();
