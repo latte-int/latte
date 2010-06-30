@@ -35,6 +35,8 @@ void PolytopeValuation::convertToOneCone()
 		cout << "Polyhedron* is not defined" << endl;
 		exit(1);
 	}//error.
+	if ( polytopeAsOneCone)
+		return ; //already did computation.
 
 	listCone * oneCone = new listCone();
 	oneCone->coefficient = 1;
@@ -98,14 +100,51 @@ void PolytopeValuation::convertToOneCone()
 	oneCone->rest = 0;
 	oneCone->rays = masterList->rest; //ignore masterList->first, so just return the rest and NOT masterList.
 
-	if ( polytopeAsOneCone) delete polytopeAsOneCone;
+
 	polytopeAsOneCone = oneCone; //finally, save the result.
 }//convertToOneCone
 
 
+RationalNTL PolytopeValuation::findDetermiantForVolume(const listCone * oneSimplex) const
+{
+	int i, numOfRays;
+	mat_ZZ mat;
 
 
-RR PolytopeValuation::findDetermiantForVolume(const listCone * oneSimplex) const
+	vec_ZZ head;
+	vec_ZZ tail;
+	ZZ numerator, denominator;
+	numerator = 1;
+	denominator = 1;
+
+
+	head.SetLength(poly->numOfVars + 1);
+	tail.SetLength(poly->numOfVars + 1);
+
+
+	numOfRays = lengthListVector(oneSimplex->rays);
+
+	mat.SetDims(numOfRays, poly->numOfVars+1);
+
+
+
+
+	i = 0;
+	for(listVector * currentRay = oneSimplex->rays; currentRay; currentRay = currentRay->rest)
+	{
+		for (int k = 0; k < poly->numOfVars +1; ++k)
+			mat[i][k] = ((currentRay->first)[k]);
+		numerator *= (currentRay->first)[0];
+		++i;
+	}//for currentRay
+
+	numerator = numerator * abs(determinant(mat));
+	denominator = factorial(numOfRays -1);
+	return RationalNTL(numerator, denominator);
+}//findDetermiantForVolume
+
+
+RR PolytopeValuation::findDetermiantForVolume_old(const listCone * oneSimplex) const
 {
 	int i, numOfRays;
 	mat_RR mat;
@@ -151,26 +190,40 @@ RR PolytopeValuation::findDetermiantForVolume(const listCone * oneSimplex) const
 			mat[i - 1][j - 1] = endingRay[j];
 	}//for i.
 
-	return (determinant(mat))/to_RR((factorial(numOfRays -1)));
+	return abs((determinant(mat))/to_RR((factorial(numOfRays -1))));
 }//findDetermiantForVolume
 
-RR PolytopeValuation::findVolume()
+RationalNTL PolytopeValuation::findVolume()
 {
-	RR sum;
-	sum = 0;
+	RationalNTL sum;
 
 	convertToOneCone();
 	triangulatePolytopeCone();
 
 	for (listCone * oneSimplex = triangulatedPoly; oneSimplex; oneSimplex = oneSimplex->rest)
 	{
-		sum += abs(findDetermiantForVolume(oneSimplex));
+		sum.add(findDetermiantForVolume(oneSimplex));
 	}
 
 	return sum;
 
 }//findVolume
 
+RR PolytopeValuation::findVolume_old()
+{
+	RR sum;
+
+	convertToOneCone();
+	triangulatePolytopeCone();
+
+	for (listCone * oneSimplex = triangulatedPoly; oneSimplex; oneSimplex = oneSimplex->rest)
+	{
+		sum += (findDetermiantForVolume_old(oneSimplex));
+	}
+
+	return sum;
+
+}//findVolume
 
 
 ZZ  PolytopeValuation::factorial(const int n)
@@ -185,6 +238,8 @@ ZZ  PolytopeValuation::factorial(const int n)
 
 void PolytopeValuation::triangulatePolytopeCone()
 {
+	if ( triangulatedPoly)
+		return ; //allready did computation.
 	parameters->Number_of_Variables = poly->numOfVars + 1;
 	triangulatedPoly = triangulateCone(polytopeAsOneCone, poly->numOfVars + 1, parameters);
 }//triangulateCone()

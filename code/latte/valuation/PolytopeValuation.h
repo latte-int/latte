@@ -48,8 +48,10 @@ public:
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone
-	RR findDetermiantForVolume(const listCone * oneSimplex) const;
-	RR findVolume();		 //finds the volume of the Polyhedron.
+	RationalNTL findDetermiantForVolume(const listCone * oneSimplex) const;
+	RR findDetermiantForVolume_old(const listCone * oneSimplex) const;
+	RationalNTL findVolume();		 //finds the volume of the Polyhedron.
+	RR findVolume_old();
 	ZZ static factorial(const int n);
 	void triangulatePolytopeCone();  //convert polytopeAsOneCone to triangulatedPoly
 
