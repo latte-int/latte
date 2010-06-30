@@ -13,7 +13,7 @@ save () {
 }
 
 clean () {
-	rm -f input.$1.txt ehrhart.$1.txt ehrhart.matlabroots.txt ehrhart.mapleroots.txt ehrhart3.matlabCommands.txt ehrhart3.mapleCommands.txt
+	echo "not cleaning!" #rm -f input.$1.txt ehrhart.$1.txt ehrhart.matlabroots.txt ehrhart.mapleroots.txt ehrhart3.matlabCommands.txt ehrhart3.mapleCommands.txt
 }
 
 if [[ $1 =~ options ]]
