@@ -96,7 +96,7 @@ void computeUniVolume(Polyhedron * poly) {
 			cout << "xi: " << tempDenom << endl;
 		}//for every ray
 
-		num = simplicialCone->coefficient * num;
+		tempNum = simplicialCone->coefficient * tempNum;
 		add(num, denom, tempNum, tempDenom);
 	}//for every simple cone.
 	for (int i = 2; i <= poly->numOfVars; i++) {
@@ -106,7 +106,7 @@ void computeUniVolume(Polyhedron * poly) {
 	num /= tempNum;
 	denom /= tempNum;
 
-	cout << "VOLUME: " << endl << -num << endl << endl;
+	cout << "VOLUME: " << endl << num << endl << endl;
 	if (denom != 1)
 		cout << "/" << endl << endl << denom;
 	cout << endl;
