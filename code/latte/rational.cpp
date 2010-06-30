@@ -87,6 +87,57 @@ rationalVector* normalizeRationalVector(rationalVector *z, int numOfVars) {
   return (z);
 }
 
+/* ------------------------------------------------------- */
+RationalNTL::RationalNTL()
+{
+	denominator = 1; //num = 0
+}
+
+RationalNTL::RationalNTL(const ZZ &num, const ZZ& denom): numerator(num), denominator(denom)
+{
+	canonicalize();
+}
+
+
+
+
+void RationalNTL::canonicalize()
+{
+	ZZ gcd = GCD(numerator, denominator);
+	if ( gcd != 1)
+	{
+		numerator /= gcd;
+		denominator/= gcd;
+	}//if can divide.
+
+}//canonicalize
+
+
+void RationalNTL::add(const ZZ &num, const ZZ& denom)
+{
+
+	numerator = numerator * denom + num * denominator;
+	denominator *= denom;
+	canonicalize();
+}//add
+
+
+void RationalNTL::add(const RationalNTL & rationalNTL)
+{
+	add(rationalNTL.numerator, rationalNTL.denominator);
+}//add
+
+RR RationalNTL::to_RR() const
+{
+	return NTL::to_RR(numerator) / NTL::to_RR(denominator);
+}
+
+ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
+{
+	out << rationalNTL.numerator << "/" << rationalNTL.denominator;
+	return out;
+}
+
 /* ----------------------------------------------------------------- */
 static ZZ
 lcm(const ZZ& a, const ZZ& b)

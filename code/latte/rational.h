@@ -30,6 +30,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+
 using namespace std;
 
 class HugInt{
@@ -89,7 +90,7 @@ public:
       compute_integer_scale();
   }
 
-  void getEntry(const int i , ZZ &numer, ZZ &denom)
+  void getEntry(const int i , ZZ &numer, ZZ &denom) const
   {
 	if ( i < enumerator.length())
 	{
@@ -117,6 +118,28 @@ public:
      gcd(numerator, denominator) = 1. */
   friend void canonicalizeRationalVector(rationalVector *vec,
 					 int numOfVars);
+};
+
+
+/**
+ * RationalNTL is a wrapper for ZZ fractions.
+ * I could not find a similar class in the NTL or Latte lib (I did not want to use a rationalVector...it might be confusing for others to
+ * read because the vector would only be holding one element.)
+ * --Brandon July 30, 2010.
+ */
+class RationalNTL
+{
+public:
+	ZZ numerator, denominator;
+	RationalNTL();
+	RationalNTL(const ZZ &num, const ZZ& denom);
+	void canonicalize();							// reduces the fraction to lowest terms.
+	void add(const ZZ &num, const ZZ& denom);		// adds fractions and then reduces them.
+	void add(const RationalNTL & rationalNTL);
+	RR to_RR()	const;								// converts the fraction to a float.
+
+	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
+
 };
 
 rationalVector* createRationalVector(int);
