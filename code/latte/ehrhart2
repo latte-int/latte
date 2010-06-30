@@ -6,8 +6,8 @@ save () {
 	tag=`date | sed s/\ /./g | sed s/:/-/g`
 
 #	tag=`date | tr -d [\ :]`
-	cp ehrhart.txt savedfiles/ehrhart.$tag.$2
-	cp $1 savedfiles/latte.$tag.$2
+	cp ehrhart.$3.txt savedfiles/ehrhart.$3.$2
+	cp $1 savedfiles/latte.$3.$2
 	clean
 	exit 0
 }
@@ -39,6 +39,7 @@ maple=0
 save=0
 rootsave=0
 forcesave=0
+dateStamp=`date | sed s/\ /./g | sed s/:/-/g`
 
 if [[ $# -gt 2 ]]
 then
@@ -63,48 +64,54 @@ then
 	fi
 fi
 
-echo $1 > input.txt
-./ehrhart $1 $2 2> /dev/null | cut -dt -f1 >> input.txt
+echo $1 > input.$dateStamp.txt
+echo "calling ehrhart "$1 $2 
+
+./ehrhart $1 $2 2> /dev/null | cut -dt -f1 >> input.$dateStamp.txt
+
+echo "Finding polynomial to"
+cat input.$dateStamp.txt
+
 if [ $? -eq 0 ]
 then
-	./ehrhart3 < input.txt > ehrhart.txt
+	./ehrhart3 < ./input.$dateStamp.txt > ehrhart.$dateStamp.txt
 else
 	echo "problem in ehrhart (probably a segfault or interrupt)"
-	rm -f input.txt
+	rm -f input.$dateStamp.txt
 	exit 0
 fi
  
 if [[ $matlab -eq 1 ]]
 then
 	matlab < ehrhart3.matlabCommands.txt > /dev/null
-	echo "*************" >> ehrhart.txt
-	echo "MATLAB ROOTS:" >> ehrhart.txt
-	cat ehrhart.matlabroots.txt >> ehrhart.txt
+	echo "*************" >> ehrhart.$dateStamp.txt
+	echo "MATLAB ROOTS:" >> ehrhart.$dateStamp.txt
+	cat ehrhart.matlabroots.txt >> ehrhart.$dateStamp.txt
 fi
 
 if [[ $maple -eq 1 ]]
 then
 
 	maple < ehrhart3.mapleCommands.txt > /dev/null
-	echo "************" >> ehrhart.txt
-	echo "MAPLE ROOTS:" >> ehrhart.txt
-	cat ehrhart.mapleroots.txt >> ehrhart.txt
+	echo "************" >> ehrhart.$dateStamp.txt
+	echo "MAPLE ROOTS:" >> ehrhart.$dateStamp.txt
+	cat ehrhart.mapleroots.txt >> ehrhart.$dateStamp.txt
 fi
 
-cat ehrhart.txt 
+cat ehrhart.$dateStamp.txt 
 
-echo $4 >> ehrhart.txt
+echo $4 >> ehrhart.$dateStamptxt
 
 if [[ forcesave -eq 1 ]]
 then
-	save $2 always
+	save $2 always $dateStamp
 fi
 
 if [[ save -eq 1 ]]
 then
-	if [[ `head -2 ehrhart.txt | tail -1 |  grep [1-9]` != "" ]]
+	if [[ `head -2 ehrhart.$dateStamp.txt | tail -1 |  grep [1-9]` != "" ]]
 	then
-		save $2 negCoeff
+		save $2 negCoeff $dateStamp
 	fi
 fi
 
@@ -112,10 +119,11 @@ if [[ rootsave -eq 1 ]]
 then
 	if [[ `cat ehrhart.matlabroots.txt | grep ^[0-9]` != "" ]]
 	then
-		save $2 posRoot
+		save $2 posRoot $dateStamp
 	fi
 fi
 
+rm -f  input.$dateStamp.txt > /dev/null
 #clean
 # when saving, the file gets appended with the date (sans spaces and colons) and the option which caused the save
 # S > s > R is the precedence of option tags (a forced save overrides all and, arbitrarily, having a negative
