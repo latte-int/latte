@@ -185,6 +185,7 @@ myTestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
 bin_PROGRAMS += ValuationComputation
 ValuationComputation_SOURCES = valuation/Driver.cpp
 ValuationComputation_SOURCES += valuation/PolytopeValuation.cpp
+ValuationComputation_SOURCES += testEhrhart/BuildRandomPolytope.cpp
 
 
 
