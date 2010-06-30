@@ -8,12 +8,12 @@ save () {
 #	tag=`date | tr -d [\ :]`
 	cp ehrhart.$3.txt savedfiles/ehrhart.$3.$2
 	cp $1 savedfiles/latte.$3.$2
-	clean
+	clean $3
 	exit 0
 }
 
 clean () {
-	rm -f input.txt ehrhart.txt ehrhart.matlabroots.txt ehrhart.mapleroots.txt ehrhart3.matlabCommands.txt ehrhart3.mapleCommands.txt
+	rm -f input.$1.txt ehrhart.$1.txt ehrhart.matlabroots.txt ehrhart.mapleroots.txt ehrhart3.matlabCommands.txt ehrhart3.mapleCommands.txt
 }
 
 if [[ $1 =~ options ]]
@@ -123,8 +123,8 @@ then
 	fi
 fi
 
-rm -f  input.$dateStamp.txt > /dev/null
-#clean
+
+clean $dateStamp
 # when saving, the file gets appended with the date (sans spaces and colons) and the option which caused the save
 # S > s > R is the precedence of option tags (a forced save overrides all and, arbitrarily, having a negative
 # coefficient in the Ehrhart polynomial is more important than having a positive real part of a root
