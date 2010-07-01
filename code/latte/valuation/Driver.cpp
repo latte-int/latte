@@ -185,11 +185,6 @@ RR findVolume(listCone * triangulatedPolytope, const int numOfVars)
 
 
 
-
-
-
-
-
 /* -------------------------------------------------------------- */
 //dots 2 ve_ZZ's
 ZZ dot(vec_ZZ& a, vec_ZZ& b) {
@@ -403,12 +398,12 @@ int main(int argc, char *argv[]) {
 	if ( argc > 2 )
 	{
 		buildPolytope = new BuildRandomPolytope(atoi(argv[1]));
-		buildPolytope->buildPolymakeFile(atoi(argv[2]));
 		buildPolytope->setComments("Making random integer polytope for volume testing");
-
-		buildPolytope->findFacetEquations();
-		//buildPolytope->findEhrhardPolynomial();
-
+		buildPolytope->buildPolymakeFile(atoi(argv[2]));	//make the file
+		buildPolytope->callPolymake();						//run polymake
+		buildPolytope->findVolumeWithPolymake();			//run polymake for the volume
+		buildPolytope->convertFacetEquations();				//fix facet equations
+		buildPolytope->printFacetEquationsForLattE();		//make latte file.
 
 	    read_polyhedron_data.filename = buildPolytope->getLatteFile();
 	    read_polyhedron_data.expect_filename = false;
@@ -426,7 +421,7 @@ int main(int argc, char *argv[]) {
 	}//for i.
 
 	Polyhedron *poly = read_polyhedron_data.read_polyhedron(&parameters);
-	cout << "Finished reading poly. data." << endl;
+	//cout << "Finished reading poly. data." << endl;
 	if (buildPolytope)
 		delete buildPolytope;
 

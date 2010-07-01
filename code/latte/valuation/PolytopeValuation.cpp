@@ -89,13 +89,13 @@ void PolytopeValuation::convertToOneCone()
 			buildRay[i + 1] = integerVertex[i];
 		}//for i
 
-		cout << buildRay << endl;
+		//cout << buildRay << endl;
 
 		masterList->first = buildRay;
 		masterList = appendVectorToListVector(buildRay, masterList);
 	}//for currentCone
 
-		cout << "END  BUILDING THE RAYS" << endl;
+		//cout << "END  BUILDING THE RAYS" << endl;
 
 	oneCone->rest = 0;
 	oneCone->rays = masterList->rest; //ignore masterList->first, so just return the rest and NOT masterList.
