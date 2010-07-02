@@ -323,19 +323,19 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 	mat_ZZ mat;
 	ZZ det = ZZ();
 	mat.SetDims(numOfVars, numOfVars);
-//	listCone *triangulatedCones;
+	listCone *triangulatedCones;
 
 	c.SetLength(numOfVars);
 	for (int i = 0; i < numOfVars; i++)
 		c[i] = rand() % 10000;
 
-//	for (listCone *currentCone = inputCones; currentCone; currentCone
-//			= currentCone->rest)
-//	{
-//		triangulatedCones
-//				= triangulateCone(currentCone, numOfVars, &parameters);
+	for (listCone *currentCone = inputCones; currentCone; currentCone
+			= currentCone->rest)
+	{
+		triangulatedCones
+				= triangulateCone(currentCone, numOfVars, &parameters);
 
-		for (listCone * simplicialCone = inputCones /*triangulatedCones*/; simplicialCone; simplicialCone
+		for (listCone * simplicialCone = /*inputCones*/ triangulatedCones; simplicialCone; simplicialCone
 				= simplicialCone->rest)
 		{
 
@@ -374,7 +374,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 			add(num, denom, tempNum, tempDenom);
 		}//for every simple cone in the cone
 
-//	}//for every cone
+	}//for every cone
 	for (int i = 2; i <= numOfVars; i++)
 	{
 		denom *= i;
@@ -494,7 +494,6 @@ int main(int argc, char *argv[])
 	strcpy(maximum, "no");
 	strcpy(minimize, "no");
 	strcpy(decompose, "yes");
-//	strcpy(dualApproach, "yes");
 	strcpy(dualApproach, "no");
 	strcpy(equationsPresent, "no");
 	strcpy(assumeUnimodularCones, "no");
@@ -1040,8 +1039,8 @@ int main(int argc, char *argv[])
 				}
 			}
 		}
-
-		/* Compute points in parallelepipeds, unless we already did using memsave version!  */
+/*
+		/* Compute points in parallelepipeds, unless we already did using memsave version!
 
 		if (Memory_Save[0] == 'n')
 		{ //hit
@@ -1252,7 +1251,7 @@ int main(int argc, char *argv[])
 			 cerr <<"Time: " << GetTime() << " sec." << endl;
 			 exit(0);
 			 }
-			 }else{*/
+			 }else{
 			if (Memory_Save[0] == 'n')
 			{//hit
 
@@ -1357,7 +1356,7 @@ int main(int argc, char *argv[])
 
 	cerr << "Computation done. " << endl;
 	cerr << "Time: " << GetTime() << " sec\n\n";
-
+*/
 	return (0);
 #endif
 	BuildRandomPolytope *buildPolytope = 0;
@@ -1444,5 +1443,5 @@ int main(int argc, char *argv[])
 	//computeTriangVolume(poly);
 	//printRationalFunction(poly);
 	return 0;
-}
+}}
 
