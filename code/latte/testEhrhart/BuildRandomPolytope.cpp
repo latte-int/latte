@@ -27,10 +27,15 @@ BuildRandomPolytope::BuildRandomPolytope(int ambient_dim)
 
 BuildRandomPolytope::~BuildRandomPolytope()
 {
-	string command = "rm -f " + fileName;
-	system(command.c_str());
-	command = "rm -f " + latteFile;
-	system(command.c_str());
+	stringstream command;
+	command << "rm -f " << fileName.c_str();
+	cout << "Deleting file " << command.str().c_str() << endl;
+	system(command.str().c_str());
+	command.str("");
+	command.clear();
+	command << "rm -f " << latteFile.c_str();
+	cout << "Deleting file " << command.str().c_str() << endl;
+	system(command.str().c_str());
 }//deconstructor.
 
 /**
@@ -226,10 +231,11 @@ void BuildRandomPolytope::findFacetEquations()
  * Prints the polytope's volume. We do not currently save or use this information.
  * This method allows us to check our valuation/volume computation in /valuation
  */
-void findVolumeWithPolymake()
+void BuildRandomPolytope::findVolumeWithPolymake()
 {
-
-
+	stringstream command; //used stringstream instead of sting because of a weird compile error.
+	command << "polymake " << fileName.c_str() << " VOLUME ";
+	system(command.str().c_str());
 
 }//findVolumeWithPolymake()
 
