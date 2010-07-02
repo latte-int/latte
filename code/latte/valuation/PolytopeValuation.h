@@ -32,16 +32,16 @@ using namespace std;
 
 class PolytopeValuation
 {
-
-	Polyhedron *poly;				//lists of vertex-ray pairs.
+	listCone * vertexRayCones;		//list of  vertex-ray pairs.
 	BarvinokParameters *parameters; //Barvinok Parameters.
 	listCone * polytopeAsOneCone;	//From poly, create one code with vertex=[0,0...0], rays={[1, v] | v is a vertex of the polytope}
 	listCone * triangulatedPoly;	//The triangulation of polytopeAsOneCone.
-
+	int numOfVars;
 
 
 public:
 	PolytopeValuation(Polyhedron *p, BarvinokParameters *bp);
+	PolytopeValuation(listCone *vertexraycones, int numofvars, BarvinokParameters *bp);
 	virtual ~PolytopeValuation();
 
 
