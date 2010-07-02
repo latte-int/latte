@@ -345,35 +345,30 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 
 			//raise f(vertex) to the power of the dimension
 			tempNum = dot(vert, c);
-			tempNum = power(tempNum, numOfVars);
-			tempDenom = power(tempDenom, numOfVars);
+			tempNum = power(tempNum, poly->numOfVars);
+			tempDenom = power(tempDenom, poly->numOfVars);
 
 			int col = 0;
 
 			for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
-					= currentRay->rest, col++)
-			{
+					= currentRay->rest, col++) {
+				//divide by the dot product of c and the ray
+				tempDenom *= -1 * dot(c, currentRay->first);
 
 				//generate matrix
-				for (int row = 0; row < numOfVars; row++)
-				{
+				for (int row = 0; row < poly->numOfVars; row++) {
 					mat[row][col] = currentRay->first[row];
 				}//for every component of the ray
 
 			}//for every ray in the simple cone
 
-			//solve for gammas, det of rays
-			solve(det, ans, mat, c);
+			//get the determinant
+			determinant(det, mat);
 
-			//divide by the absolute value of the determinant
-			tempDenom *= abs(det);
+			//multiply by the absolute value of the determinant
+			tempNum *= abs(det);
 
-			//divide by the multiplication of the gammas
-			tempNum *= power(det, numOfVars);
-			for (int i = 0; i < numOfVars; i++)
-			{
-				tempDenom *= ans[i];
-			}
+			//add current term to the running total
 			//cout << "adding " << tempNum << " / " << tempDenom << " to " << num
 			//		<< " / " << denom << endl;
 			add(num, denom, tempNum, tempDenom);
