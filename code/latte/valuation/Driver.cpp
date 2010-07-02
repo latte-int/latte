@@ -243,71 +243,12 @@ void add(ZZ& num1, ZZ& denom1, ZZ& num2, ZZ& denom2)
 	}//if negative.
 }
 
-void computeUniVolume(listCone * triangulatedCones, int numOfVars)
-{
-	srand((unsigned) time(0));
-	vec_ZZ c = vec_ZZ();
-	//listCone * triangulatedCones;
-	c.SetLength(numOfVars);
-	for (int i = 0; i < numOfVars; i++)
-		c[i] = rand() % 10000;
-	ZZ valutation = ZZ();
-	ZZ num = ZZ();
-	ZZ denom = ZZ();
-	denom = 1;
-	ZZ tempNum = ZZ();
-	ZZ tempDenom = ZZ();
-	vec_ZZ vert = vec_ZZ();
-	//	triangulatedCones = decomposeCones(poly->cones, false, parameters);
-	//	cout << "c: ";
-	//	for (int i = 0; i < poly->numOfVars; i++) {
-	//		out << c[i] << " ";
-	//	}
-	//	cout << endl;
-	for (listCone * simplicialCone = triangulatedCones; simplicialCone; simplicialCone
-			= simplicialCone->rest)
-	{
-		tempDenom = 1;
-		vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
-							numOfVars, tempDenom);
-		//		for (int i = 0; i < poly->numOfVars; i++) {
-		//			cout << vert[i] << " ";
-		//		}
-		//		cout << endl;
-
-		//		cout << "eta: " << tempNum << endl;
-		tempNum = dot(vert, c);
-		tempNum = power(tempNum, numOfVars);
-		tempDenom = power(tempDenom, numOfVars);
-
-		for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
-				= currentRay->rest)
-		{
-			//			for (int i = 0; i < poly->numOfVars; i++) {
-			//				cout << currentRay->first[i] << " ";
-			//			}
-			//			cout << endl;
-			tempDenom *= -1 * dot(currentRay->first, c);
-			//			cout << "xi: " << tempDenom << endl;
-		}//for every ray
-
-		tempNum = simplicialCone->coefficient * tempNum;
-		add(num, denom, tempNum, tempDenom);
-	}//for every simple cone.
-	for (int i = 2; i <= numOfVars; i++)
-	{
-		denom *= i;
-	}
-	tempNum = GCD(num, denom);
-	num /= tempNum;
-	denom /= tempNum;
-
-	cout << "computeUniVolume(): VOLUME: " << endl << num << endl << endl;
-	if (denom != 1)
-		cout << "/" << endl << endl << denom;
-	cout << endl;
-}
-
+/* computes the volume of a polytope using the lawrence forumla
+ * takes into account the coefficient given to a cone when decomposed into unimodular cones
+ * thus it works on all inputs
+ * @input: a listCone of the cones and the nnumber of variables (dimension of the space)
+ * @return: printing out the volume
+ */
 void computeTriangVolume(listCone * inputCones, int numOfVars)
 {
 	srand((unsigned) time(0));
@@ -323,22 +264,22 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 	mat_ZZ mat;
 	ZZ det = ZZ();
 	mat.SetDims(numOfVars, numOfVars);
-	listCone *triangulatedCones;
+//	listCone *triangulatedCones;
 
 	c.SetLength(numOfVars);
 	for (int i = 0; i < numOfVars; i++)
 		c[i] = rand() % 10000;
 
-	for (listCone *currentCone = inputCones; currentCone; currentCone
-			= currentCone->rest)
-	{
-		triangulatedCones
-				= triangulateCone(currentCone, numOfVars, &parameters);
+//	for (listCone *currentCone = inputCones; currentCone; currentCone
+//			= currentCone->rest)
+//	{
+//		triangulatedCones
+//				= triangulateCone(currentCone, numOfVars, &parameters);
 
-		for (listCone * simplicialCone = /*inputCones*/ triangulatedCones; simplicialCone; simplicialCone
+		for (listCone * simplicialCone = inputCones /*triangulatedCones*/; simplicialCone; simplicialCone
 				= simplicialCone->rest)
 		{
-
+			//printConeToFile(cout, simplicialCone, numOfVars);
 			//find vertex
 			vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
 					numOfVars, tempDenom);
@@ -366,7 +307,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 			determinant(det, mat);
 
 			//multiply by the absolute value of the determinant
-			tempNum *= abs(det);
+			tempNum *= abs(det) * simplicialCone->coefficient;
 
 			//add current term to the running total
 			//cout << "adding " << tempNum << " / " << tempDenom << " to " << num
@@ -374,7 +315,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 			add(num, denom, tempNum, tempDenom);
 		}//for every simple cone in the cone
 
-	}//for every cone
+//	}//for every cone
 	for (int i = 2; i <= numOfVars; i++)
 	{
 		denom *= i;
@@ -389,7 +330,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 	cout << endl << to_RR(num) / to_RR(denom) << endl;
 }
 
-void printRationalFunction(Polyhedron * poly)
+/*void printRationalFunction(Polyhedron * poly)
 {
 	listCone * triangulatedCones;
 	vec_ZZ vert = vec_ZZ();
@@ -441,7 +382,8 @@ void printRationalFunction(Polyhedron * poly)
 	}//for every simple cone.
 	cout << ") / ( " << poly->numOfVars << "!";
 	cout << " )" << endl;
-}
+}*/
+
 /* ----------------------------------------------------------------- */
 
 int main(int argc, char *argv[])
@@ -967,7 +909,7 @@ int main(int argc, char *argv[])
 				file << "after call to decompsost cones " << endl;
 				for (listCone * c = cones; c; c = c->rest)
 					printConeToFile(file, c, numOfVars);
-				computeUniVolume(cones, numOfVars);
+				//computeUniVolume(cones, numOfVars);
 				computeTriangVolume(cones, numOfVars);
 
 				//cout << "PRINTING DECOMPOSED CONES THAT SHOULD BE UNIMODULAR" << endl;
@@ -1017,7 +959,7 @@ int main(int argc, char *argv[])
 						cones = decomposeCones(cones, numOfVars, flags,
 								fileName, 1, true,
 								BarvinokParameters::DualDecomposition);
-						computeUniVolume(cones, numOfVars);
+						//computeUniVolume(cones, numOfVars);
 						computeTriangVolume(cones, numOfVars);
 
 						//int k = 0;
