@@ -345,8 +345,8 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 
 			//raise f(vertex) to the power of the dimension
 			tempNum = dot(vert, c);
-			tempNum = power(tempNum, poly->numOfVars);
-			tempDenom = power(tempDenom, poly->numOfVars);
+			tempNum = power(tempNum, numOfVars);
+			tempDenom = power(tempDenom, numOfVars);
 
 			int col = 0;
 
@@ -356,7 +356,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 				tempDenom *= -1 * dot(c, currentRay->first);
 
 				//generate matrix
-				for (int row = 0; row < poly->numOfVars; row++) {
+				for (int row = 0; row < numOfVars; row++) {
 					mat[row][col] = currentRay->first[row];
 				}//for every component of the ray
 
@@ -494,7 +494,7 @@ int main(int argc, char *argv[])
 	strcpy(maximum, "no");
 	strcpy(minimize, "no");
 	strcpy(decompose, "yes");
-	//	strcpy(dualApproach, "yes");
+//	strcpy(dualApproach, "yes");
 	strcpy(dualApproach, "no");
 	strcpy(equationsPresent, "no");
 	strcpy(assumeUnimodularCones, "no");
