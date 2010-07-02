@@ -211,19 +211,7 @@ RR findVolume(listCone * triangulatedPolytope, const int numOfVars)
 
 }
 
-/* -------------------------------------------------------------- */
-//dots 2 ve_ZZ's
-ZZ dot(vec_ZZ& a, vec_ZZ& b)
-{
-	ZZ ans = ZZ();
-	assert(a.length() == b.length());
-	for (int i = 0; i < a.length(); i++)
-	{
-		ans += a[i] * b[i];
-	}
-	return ans;
-}
-
+/* --------------------------------------------------------------*/
 //overwrites the num and denom of the first number (the first 2 variables passed in)
 //wih the value of adding it to the second number (the next 2 slots)
 void add(ZZ& num1, ZZ& denom1, ZZ& num2, ZZ& denom2)
@@ -285,7 +273,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 					numOfVars, tempDenom);
 
 			//raise f(vertex) to the power of the dimension
-			tempNum = dot(vert, c);
+			tempNum = vert * c;
 			tempNum = power(tempNum, numOfVars);
 			tempDenom = power(tempDenom, numOfVars);
 
@@ -294,7 +282,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 			for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
 					= currentRay->rest, col++) {
 				//divide by the dot product of c and the ray
-				tempDenom *= -1 * dot(c, currentRay->first);
+				tempDenom *= -1 * c * currentRay->first;
 
 				//generate matrix
 				for (int row = 0; row < numOfVars; row++) {
@@ -316,10 +304,7 @@ void computeTriangVolume(listCone * inputCones, int numOfVars)
 		}//for every simple cone in the cone
 
 //	}//for every cone
-	for (int i = 2; i <= numOfVars; i++)
-	{
-		denom *= i;
-	}
+	denom *= factorial(numOfVars);
 	tempNum = GCD(num, denom);
 	num /= tempNum;
 	denom /= tempNum;
