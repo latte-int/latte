@@ -131,11 +131,14 @@ class RationalNTL
 {
 public:
 	ZZ numerator, denominator;
-	RationalNTL();
+	RationalNTL();									//initialize to 0
 	RationalNTL(const ZZ &num, const ZZ& denom);
-	void canonicalize();							// reduces the fraction to lowest terms.
+	void canonicalize();							// reduces the fraction to lowest terms, and makes
+													//	the denominator positive.
 	void add(const ZZ &num, const ZZ& denom);		// adds fractions and then reduces them.
 	void add(const RationalNTL & rationalNTL);
+	void mult(const ZZ &num, const ZZ &denum);		// mult. two fractions and then reduces them.
+	void mult(const RationalNTL & rationalNTL);
 	RR to_RR()	const;								// converts the fraction to a float.
 
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);

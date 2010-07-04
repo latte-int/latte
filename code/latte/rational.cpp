@@ -100,9 +100,17 @@ RationalNTL::RationalNTL(const ZZ &num, const ZZ& denom): numerator(num), denomi
 
 
 
-
+/**
+ * factors out common terms and makes the denominator positive.
+ */
 void RationalNTL::canonicalize()
 {
+	if ( denominator < 0)
+	{
+		denominator *= -1;
+		numerator *= -1;
+	}//make denominator positive.
+
 	ZZ gcd = GCD(numerator, denominator);
 	if ( gcd != 1)
 	{
@@ -127,6 +135,25 @@ void RationalNTL::add(const RationalNTL & rationalNTL)
 	add(rationalNTL.numerator, rationalNTL.denominator);
 }//add
 
+
+
+void RationalNTL::mult(const ZZ &num, const ZZ &denum)
+{
+	numerator *= num;
+	denominator *= denum;
+	canonicalize();
+}
+
+
+
+void RationalNTL::mult(const RationalNTL & rationalNTL)
+{
+	mult(rationalNTL.numerator, rationalNTL.denominator);
+}
+
+
+
+
 RR RationalNTL::to_RR() const
 {
 	return NTL::to_RR(numerator) / NTL::to_RR(denominator);
@@ -134,7 +161,10 @@ RR RationalNTL::to_RR() const
 
 ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
 {
-	out << rationalNTL.numerator << "/" << rationalNTL.denominator;
+	out << rationalNTL.numerator;
+
+	if ( rationalNTL.denominator != 1)
+		cout << "/" << rationalNTL.denominator;
 	return out;
 }
 
