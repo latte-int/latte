@@ -9,7 +9,6 @@
 
 using namespace std;
 
-
 BuildRandomPolytope::BuildRandomPolytope(int ambient_dim)
 {
 	ambientDim = ambient_dim;
@@ -19,6 +18,7 @@ BuildRandomPolytope::BuildRandomPolytope(int ambient_dim)
 	//fileName = "BuildRandomPolytope.temp"; //for now, keep the file names the same (for debugging)
 	PolytopeComments = "Random edge polytope"; //default label. caller should call setComments for a better label.
 	maxInteger = 50;
+	integerPoints = true;
 	probNegative = .5;
 	numAffineHull = 0;
 
@@ -39,33 +39,47 @@ BuildRandomPolytope::~BuildRandomPolytope()
 }//deconstructor.
 
 /**
- * Generates random points.
+ * Generates random integer points if integerPoints is true and rational points otherwise.
  * @parm int numPoints: number of random points to include.
  */
 void BuildRandomPolytope::buildPolymakeFile(const int numPoints)
 {
 	ofstream file;
-	
+
 	file.open(fileName.c_str());
 	file << "POINTS" << endl;
-	
+
 	srand(time(0)); //after testing, change to just srand();
-	for(int k = 0; k < numPoints; ++k)
+	for (int k = 0; k < numPoints; ++k)
 	{
 		file << 1 << ' ';
-		for(int vectorElm = 0; vectorElm < ambientDim; ++vectorElm)
+
+		for (int vectorElm = 0; vectorElm < ambientDim; ++vectorElm)
 		{
 
-			int number = rand() % maxInteger;
-			if ( rand() < RAND_MAX * probNegative)
-				number = -1 * number;
-			file << number << ' ';
+			int numerator = rand() % maxInteger;
+			int denominator = 1;
+			if (integerPoints == false && k != 0) //make sure we have at least one integer point in the polytope (be forcing one integer vertex).
+			{
+				denominator = rand() % maxInteger;
+				if ( denominator == 0)
+					denominator = 1;
+				numerator /= gcd(numerator, denominator);
+				denominator /= gcd(numerator, denominator);
+			}//if want rational ponts.
+
+			if (rand() < RAND_MAX * probNegative)
+				numerator = -1 * numerator;
+			if (denominator == 1)
+				file << numerator << ' ';
+			else
+				file << numerator << "/" << denominator << ' ';
 		}//vectorElm
 		file << endl;
 	}//for k
-	
+
 	file.close();
-	
+
 	//ambientDim += 1;
 
 }//BuildRandomPolytope
@@ -83,30 +97,31 @@ void BuildRandomPolytope::callPolymake()
 	command = "polymake " + fileName + " FACETS";
 	system(command.c_str());
 	cout << "callPolymake(): polymake finished, now reading from file" << endl;
-	
+
 	//next, read the polymake file.
 	ifstream file;
 	string line;
 	file.open(fileName.c_str());
-	for(getline(file, line, '\n'); line != "DIM"; getline(file, line, '\n'))
+	for (getline(file, line, '\n'); line != "DIM"; getline(file, line, '\n'))
 		;
 	file >> dim;
-	
-	for(getline(file, line, '\n'); line != "AMBIENT_DIM"; getline(file, line, '\n'))
+
+	for (getline(file, line, '\n'); line != "AMBIENT_DIM"; getline(file, line,
+	        '\n'))
 		;
 	file >> ambientDim;
 
-	for(getline(file, line, '\n'); line != "FACETS"; getline(file, line, '\n'))
+	for (getline(file, line, '\n'); line != "FACETS"; getline(file, line, '\n'))
 		;
-		
-		
+
 	facets.clear();
-	
-	string term;	
+
+	string term;
 	file >> term;
-	do {
+	do
+	{
 		vector<mpq_class> oneFacet;
-		for(int i = 0; i < ambientDim+1; ++i)
+		for (int i = 0; i < ambientDim + 1; ++i)
 		{
 			oneFacet.push_back(mpq_class(term));
 			file >> term;
@@ -116,17 +131,17 @@ void BuildRandomPolytope::callPolymake()
 		//	cout << oneFacet[i] << ", ";
 		//cout << endl;
 		facets.push_back(oneFacet);
-	} while ( term != "AFFINE_HULL");
-	
+	} while (term != "AFFINE_HULL");
+
 	file.ignore(10000, '\n');
 
 	getline(file, line, '\n');
-	while ( line != "")
+	while (line != "")
 	{
 		stringstream ss(line);
 		vector<mpq_class> oneFacet;
 
-		for(int k = 0; k < ambientDim+1; ++k)
+		for (int k = 0; k < ambientDim + 1; ++k)
 		{
 			ss >> term;
 			oneFacet.push_back(mpq_class(term));
@@ -145,39 +160,39 @@ void BuildRandomPolytope::callPolymake()
 void BuildRandomPolytope::convertFacetEquations()
 {
 
-
-	for(int i = 0; i < (int) facets.size(); ++i)
+	for (int i = 0; i < (int) facets.size(); ++i)
 	{
 		mpz_class product(1);
-		
+
 		//find the prod. of all the denominators
-		for(int k = 0; k < ambientDim+1; ++k)
+		for (int k = 0; k < ambientDim + 1; ++k)
 		{
 			product = product * facets[i][k].get_den();
 		}//for k
-		
-		mpz_class currentGCD(facets[i][0]*product);
+
+		mpz_class currentGCD(facets[i][0] * product);
 		mpz_t ans;
 		mpz_init(ans);
-		for(int k = 0; k < ambientDim+1; ++k)
+		for (int k = 0; k < ambientDim + 1; ++k)
 		{
 			facets[i][k] = product * facets[i][k];
-			if ( facets[i][k] != mpq_class(0))
+			if (facets[i][k] != mpq_class(0))
 			{
-				mpz_gcd(ans, currentGCD.get_mpz_t(), facets[i][k].get_num_mpz_t());
+				mpz_gcd(ans, currentGCD.get_mpz_t(),
+				        facets[i][k].get_num_mpz_t());
 				currentGCD = mpz_class(ans);
 			}//if
 		}//for k	
-		
+
 		if (currentGCD != mpz_class(1))
 		{
-			for(int k = 0; k < ambientDim+1; ++k)
+			for (int k = 0; k < ambientDim + 1; ++k)
 			{
-				facets[i][k] = facets[i][k] / currentGCD;	
+				facets[i][k] = facets[i][k] / currentGCD;
 			}//for k	
 		}//divide by the gcd
 	}//for i
-	
+
 	//check everything looks ok.
 	//for(int i = 0; i < (int) facets.size(); ++i)
 	//{
@@ -189,6 +204,25 @@ void BuildRandomPolytope::convertFacetEquations()
 
 }//convertFacetEquations();
 
+
+/**
+ * Regular GCD. m, n > 0;
+ */
+int BuildRandomPolytope::gcd(int m, int n) const
+{
+	while (m > 0)
+	{ /* invariant: gcd(m,n)=g */
+		if (n > m)
+		{
+			int t = m;
+			m = n;
+			n = t;
+		} /* swap */
+		/* m >= n > 0 */
+		m -= n;
+	}
+	return n;
+}//gcd
 
 const string & BuildRandomPolytope::getLatteFile() const
 {
@@ -203,11 +237,13 @@ const string & BuildRandomPolytope::getLatteFile() const
 void BuildRandomPolytope::findEhrhardPolynomial()
 {
 	findFacetEquations();
-	
+
 	stringstream d;
 	d << dim;
-	string command = "./ehrhart2 " + d.str() + " " + latteFile.c_str() + " -Rs " + "\"" + PolytopeComments.c_str()+ "\"";
-	cout << "findEhrhardPolynomial(): ehrhart calling: " << command.c_str() << endl;
+	string command = "./ehrhart2 " + d.str() + " " + latteFile.c_str()
+	        + " -Rs " + "\"" + PolytopeComments.c_str() + "\"";
+	cout << "findEhrhardPolynomial(): ehrhart calling: " << command.c_str()
+	        << endl;
 	system(command.c_str());
 }//findEhrhardPolynomial
 
@@ -221,9 +257,9 @@ void BuildRandomPolytope::findFacetEquations()
 	callPolymake();
 
 	convertFacetEquations();
-	
+
 	printFacetEquationsForLattE();
-	
+
 }//findFacetEquations
 
 
@@ -246,22 +282,22 @@ void BuildRandomPolytope::findVolumeWithPolymake()
 void BuildRandomPolytope::printFacetEquationsForLattE()
 {
 	ofstream file;
-	
+
 	latteFile = fileName + ".latte";
 	file.open(latteFile.c_str());
-	
-	file << facets.size() << " " << ambientDim+1 << endl;
-	for(int i = 0; i < (int) facets.size(); ++i)
+
+	file << facets.size() << " " << ambientDim + 1 << endl;
+	for (int i = 0; i < (int) facets.size(); ++i)
 	{
-		for(int k = 0; k < ambientDim+1; ++k)
+		for (int k = 0; k < ambientDim + 1; ++k)
 			file << facets[i][k] << " ";
 		file << endl;
 	}//for i
 
-	if ( numAffineHull > 0)
+	if (numAffineHull > 0)
 	{
-		file << "linearity " << numAffineHull << " " ;
-		for(int i = facets.size() - numAffineHull; i < facets.size(); ++i)
+		file << "linearity " << numAffineHull << " ";
+		for (int i = facets.size() - numAffineHull; i < facets.size(); ++i)
 		{
 			file << i + 1 << " ";
 		}//for the affine hull equations.
@@ -278,4 +314,10 @@ void BuildRandomPolytope::setComments(const string& newComments)
 	PolytopeComments = newComments;
 }//setComments
 
-	
+
+void BuildRandomPolytope::setIntegerPoints(bool t)
+{
+	integerPoints = t;
+}//setIntegerPoints()
+
+

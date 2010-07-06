@@ -17,6 +17,7 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 	vertexRayCones(p->cones), parameters(bp), polytopeAsOneCone(NULL), triangulatedPoly(NULL), freeVertexRayCones(0), freePolytopeAsOneCone(0), freeTriangulatedPoly(0)
 {
 	numOfVars = p->numOfVars;
+	srand(time(0));
 }
 
 /**
@@ -30,6 +31,7 @@ PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType, int num
 		vertexRayCones = cones;
 	else if (coneType == TriangulatedCones)
 		triangulatedPoly = cones;
+	srand(time(0));
 }
 
 
@@ -173,7 +175,6 @@ RationalNTL PolytopeValuation::findVolumeUsingDeterminant(const listCone * oneSi
 RationalNTL PolytopeValuation::findVolumeUsingLarence() const
 {
 	cout << "findVolumeUsingLarence() is called" << endl;
-	srand((unsigned) time(0));
 	RationalNTL answer;
 
 	vec_ZZ c = vec_ZZ();
@@ -299,7 +300,7 @@ ZZ  PolytopeValuation::factorial(const int n)
 void PolytopeValuation::triangulatePolytopeCone()
 {
 	if ( triangulatedPoly)
-		return ; //allready did computation.
+		return ; //all ready did computation.
 	if ( polytopeAsOneCone == NULL)
 	{
 		cout << "PolytopeValuation::triangulatePolytopeCone(): there is no cone to triangulate" << endl;
@@ -309,5 +310,6 @@ void PolytopeValuation::triangulatePolytopeCone()
 
 	parameters.Number_of_Variables = numOfVars + 1;
 	triangulatedPoly = triangulateCone(polytopeAsOneCone, numOfVars + 1, &parameters);
+	//parameters.Number_of_Variables = numOfVars; //convert back. This is not really needed.
 	freeTriangulatedPoly = 1; //Delete this in the deconstructor.
 }//triangulateCone()

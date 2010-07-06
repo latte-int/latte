@@ -179,7 +179,7 @@ void doAuto()
 */	
 
 //try two disconnected petersen graphs.
-	stringstream comments2;
+/*	stringstream comments2;
 	BuildGraphPolytope gPoly2;
 	GraphMaker g2;
 	g2.makePetersenFunGraph(2);
@@ -187,8 +187,8 @@ void doAuto()
 	gPoly2.buildPolymakeFile(g2.getEdges(), BuildGraphPolytope::EDGE);
 	gPoly2.setComments(comments2.str());
 	gPoly2.findEhrhardPolynomial();
-
-	for(int i = 5; i <= 20; i = i + 1)
+*/
+	for(int i = 5; i <= 50; i = i + 1)
 		for(int j = 1; j <= i/2; j = j + 1)
 		{
 			stringstream comments;

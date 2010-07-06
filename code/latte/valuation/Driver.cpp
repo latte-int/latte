@@ -137,17 +137,14 @@ string output_filename;
 void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		const char *valuationAlg)
 {
-
+	RationalNTL ans1, ans2;
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
 	{
 		PolytopeValuation polytopeValuation(cones,
 				PolytopeValuation::VertexRayCones,
 				myParameters.Number_of_Variables, myParameters);
-		RationalNTL rVolume = polytopeValuation.findVolume(
-				PolytopeValuation::DeterminantVolume);
-		cout << "VOLUME (ehrhart)" << rVolume << " = " << rVolume.to_RR()
-				<< endl;
+		ans1 = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
 	}
 
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
@@ -168,15 +165,21 @@ void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		PolytopeValuation polytopeValuation(cones,
 				PolytopeValuation::TriangulatedCones,
 				myParameters.Number_of_Variables, myParameters);
-		polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
+		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
 		//computeTriangVolume(cones, myParameters.Number_of_Variables);
+	}
+
+	if ( strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
+	{
+		cout << "Driver.cpp: the two methods are different." << ans1 << "!=" << ans2 << endl;
+		exit(1);
 	}
 
 }//computeVolume
 
-int main(int argc, char *argv[])
+int mainValuationDriver(char *argv[], int argc)
 {
-#if 1
+
 	set_program_name(argv[0]);
 
 	BarvinokParameters params;
@@ -188,7 +191,7 @@ int main(int argc, char *argv[])
 	unsigned int flags = 0, print_flag = 0, output_cone = 0;
 	vec_ZZ dim, v, w;
 	int oldnumofvars;
-	vec_ZZ *generators;
+	vec_ZZ *generators = 0;
 	char fileName[127], invocation[127], decompose[10], equationsPresent[10],
 			assumeUnimodularCones[127], dualApproach[127], taylor[127],
 			printfile[127], rationalCone[127], nonneg[127], Memory_Save[127],
@@ -197,11 +200,11 @@ int main(int argc, char *argv[])
 			maximum[127], Singlecone[127], LRS[127], Vrepresentation[127],
 			dilation[127], minimize[127], binary[127], interior[127];
 	char valuationType[127], valuationAlg[127];
-	listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays,
-			*matrixTmp;
+	listVector *matrix = 0, *equations = 0, *inequalities = 0, *rays = 0, *endRays = 0, *tmpRays = 0,
+			*matrixTmp = 0;
 	vec_ZZ cost;
-	listVector *templistVec;
-	listCone *cones, *tmp, *tmpcones;
+	listVector *templistVec = 0;
+	listCone *cones = 0, *tmp = 0, *tmpcones = 0;
 
 	latte_banner(cerr);
 
@@ -220,7 +223,7 @@ int main(int argc, char *argv[])
 	strcpy(dilation, "no");
 	strcpy(binary, "no");
 	strcpy(Singlecone, "no");
-	strcpy(removeFiles, "no");
+	strcpy(removeFiles, "yes");
 	strcpy(grobner, "no");
 	strcpy(maximum, "no");
 	strcpy(minimize, "no");
@@ -275,12 +278,14 @@ int main(int argc, char *argv[])
 			strcpy(Load_Tri, "yes");
 			flags |= LOAD;
 		}
+		if ( strcmp(argv[i], "keepFiles") == 0)
+			strcpy(removeFiles, "no");
 		if (strncmp(argv[i], "lawrence", 8) == 0)
 			strcpy(valuationAlg, "lawrence");
 		if (strcmp(argv[i], "triangulate") == 0)
 			strcpy(valuationAlg, "triangulate");
 		if (strcmp(argv[i], "all") == 0)
-			strcpy(valuationType, "all");
+			strcpy(valuationAlg, "all");
 
 	}//for i.
 
@@ -311,7 +316,8 @@ int main(int argc, char *argv[])
 		if (argc == 3)
 		{
 			strcpy(printfile, "yes");
-			flags |= PRINT; //hit
+			//flags |= PRINT; //hit
+			flags &= ~PRINT; //don't print.
 		} else if (argc == 4)
 		{
 			for (i = 1; i < 3; i++)
@@ -584,7 +590,6 @@ int main(int argc, char *argv[])
 				if (strcmp(valuationType, "volume") == 0)
 				{
 					computeVolume(cones, myParameters, valuationAlg);
-					cout << "got here" << endl;
 				} else
 				{
 					cout << "Ops, " << valuationType << " is not supported" << endl;
@@ -628,27 +633,27 @@ int main(int argc, char *argv[])
 	}//dualApproach
 
 
-	if (rationalCone[0] == 'y')
-	{
-		cerr << endl << "Rational function written to " << argv[argc - 1]
-				<< ".rat" << endl << endl;
-		strcpy(command, "mv ");
-		strcat(command, "simplify.sum ");
-		strcat(command, argv[argc - 1]);
-		strcat(command, ".rat");
-		system_with_error_check(command);
-	}
+//	if (rationalCone[0] == 'y')
+//	{
+//		cerr << endl << "Rational function written to " << argv[argc - 1]
+//				<< ".rat" << endl << endl;
+//		strcpy(command, "mv ");
+//		strcat(command, "simplify.sum ");
+//		strcat(command, argv[argc - 1]);
+//		strcat(command, ".rat");
+//		system_with_error_check(command);
+//	}
 
-	if (printfile[0] == 'y')
-	{
-		cerr << endl << "Rational function written to " << argv[argc - 1]
-				<< ".rat" << endl << endl;
-		strcpy(command, "mv ");
-		strcat(command, "func.rat ");
-		strcat(command, argv[argc - 1]);
-		strcat(command, ".rat");
-		system_with_error_check(command);
-	}
+//	if (printfile[0] == 'y')
+//	{
+//		cerr << endl << "Rational function written to " << argv[argc - 1]
+//				<< ".rat" << endl << endl;
+//		strcpy(command, "mv ");
+//		strcat(command, "func.rat ");
+//		strcat(command, argv[argc - 1]);
+//		strcat(command, ".rat");
+//		system_with_error_check(command);
+//	}
 
 	if (removeFiles[0] == 'y')
 	{
@@ -663,84 +668,91 @@ int main(int argc, char *argv[])
 		strcat(command, ".cdd");
 		system_with_error_check(command);
 
-		if (Memory_Save[0] == 'n')
-		{
-			strcpy(command, "rm -f ");
-			strcat(command, fileName);
-			strcat(command, ".maple");
-			system_with_error_check(command);
-		}
-
 		if (cddstyle[0] == 'n')
 		{
 			strcpy(command, "rm -f ");
 			strcat(command, fileName);
 			strcat(command, ".ead");
 			system_with_error_check(command);
-		}
-	}
 
-	if (cddstyle[0] == 'n')
-	{
-		strcpy(command, "rm -f ");
-		strcat(command, fileName);
-		system_with_error_check(command);
-	}
+			strcpy(command, "rm -f ");
+			strcat(command, fileName);
+			system_with_error_check(command);
+		}
+	}// remove the latte_nonredundant_input files.
+
+
+	//free up memory.
+	//if ( matrix) 		freeListVector(matrix);
+	if ( equations) 	freeListVector(equations);
+	if (inequalities) 	freeListVector(inequalities);
+	//if (rays) 			freeListVector(rays);
+	//if (endRays) 		freeListVector(endRays);
+	//if (tmpRays)		freeListVector(tmpRays);
+	//if (matrixTmp)		freeListVector(matrixTmp);
+	//if (templistVec)	freeListVector(templistVec);
+
+	//if (generators)		delete generators;
+
+
+	if (cones) 			freeListCone(cones);
+	//if (tmp) 			freeListCone(tmp);
+	//if (tmpcones) 		freeListCone(tmpcones);
 
 	return (0);
-#endif
-	BuildRandomPolytope *buildPolytope = 0;
-#if 0
+}//mainValuationDrivver()
 
-	if ( argc > 2 )
+
+
+
+void runOneTest(int ambientDim, int numPoints)
+{
+	char * argv[] = {"runTests()", "all", 0};
+	stringstream comments;
+	comments << "Making random integer polytope with " << numPoints << " points in R^" << ambientDim<< " for volume testing";
+
+	BuildRandomPolytope buildPolytope(ambientDim);
+	buildPolytope.setComments(comments.str().c_str());
+	//buildPolytope.setIntegerPoints(false); //make random rational points.
+	buildPolytope.buildPolymakeFile(numPoints); //make the file
+	buildPolytope.callPolymake(); //run polymake
+	buildPolytope.findVolumeWithPolymake(); //run polymake for the volume
+	buildPolytope.convertFacetEquations(); //fix facet equations
+	buildPolytope.printFacetEquationsForLattE(); //make latte file.
+	cout << comments.str().c_str();
+	//buildPolytope.findEhrhardPolynomial();
+	//buildPolytope.findVolumeWithPolymake();
+
+	string file = buildPolytope.getLatteFile();
+
+	char * sFile = new char[file.size() + 1];
+	strcpy(sFile, file.c_str());
+	argv[2] = sFile;
+	mainValuationDriver(argv, 3);
+	delete [] sFile;
+}//RunOneTest
+
+void runTests()
+{
+	int startAmbientDim = 6, endAmbientDim = 50;
+	int pointStepSize = 5;
+
+
+	for(int ambientDim = startAmbientDim; ambientDim < endAmbientDim; ambientDim = ambientDim + 3)
 	{
-		buildPolytope = new BuildRandomPolytope(atoi(argv[1]));
-		buildPolytope->setComments("Making random integer polytope for volume testing");
-		buildPolytope->buildPolymakeFile(atoi(argv[2])); //make the file
-		buildPolytope->callPolymake(); //run polymake
-		buildPolytope->findVolumeWithPolymake(); //run polymake for the volume
-		buildPolytope->convertFacetEquations(); //fix facet equations
-		buildPolytope->printFacetEquationsForLattE(); //make latte file.
+		for(int numberPoints = startAmbientDim / 2; numberPoints < startAmbientDim/2 + startAmbientDim + 10; numberPoints = numberPoints + pointStepSize)
+			runOneTest(ambientDim, numberPoints);
 
-		read_polyhedron_data.filename = buildPolytope->getLatteFile();
-		read_polyhedron_data.expect_filename = false;
+	}//for ambientDim
 
-	}
-	else
-	set_program_name(argv[0]);
+}//runTests
 
-	int i;
-	for (i = 1; i < argc; i++)
-	{
-		if (read_polyhedron_data.parse_option(argv[i]))
-		{
-		}
-	}//for i.
 
-#endif
-	Polyhedron *poly = read_polyhedron_data.read_polyhedron(&parameters);
-	//cout << "Finished reading poly. data." << endl;
-	if (buildPolytope)
-		delete buildPolytope;
+int main(int argc, char *argv[])
+{
+	//mainValuationDriver(argv, argc);
+	runTests();
+	//runOneTest(atoi(argv[1]), atoi(argv[2]));
 
-	parameters.Number_of_Variables = poly->numOfVars;
-
-	//cout << "PRINT VERTICES" << endl;
-	//for (listCone * c = poly->cones; c; c = c->rest)
-	//	printRationalVectorToFile(cout, c->vertex->vertex, poly->numOfVars);
-	//cout << "END PRINT VERTICES" << endl;
-
-#if 0
-	PolytopeValuation polytopeValuation(poly, &parameters);
-	RationalNTL rVolume = polytopeValuation.findVolume();
-	cout << "TOTAL VOLUME (from the class)(rational) = " << rVolume << " = " << rVolume.to_RR() << endl;
-	cout << "TOTAL VOLUME (from the class)(float) = " << polytopeValuation.findVolume_old() << endl;
-	exit(0);
-#endif
-
-	//computeUniVolume(poly);
-	//computeTriangVolume(poly);
-	//printRationalFunction(poly);
 	return 0;
-}
-
+}//main()

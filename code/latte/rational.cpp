@@ -159,6 +159,17 @@ RR RationalNTL::to_RR() const
 	return NTL::to_RR(numerator) / NTL::to_RR(denominator);
 }
 
+bool RationalNTL::operator==(const RationalNTL & rhs) const
+{
+	return numerator == rhs.numerator && denominator == rhs.denominator;
+}
+
+bool RationalNTL::operator!=(const RationalNTL & rhs) const
+{
+	return !(*this == rhs);
+}
+
+
 ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
 {
 	out << rationalNTL.numerator;

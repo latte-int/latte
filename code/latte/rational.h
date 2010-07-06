@@ -142,6 +142,8 @@ public:
 	RR to_RR()	const;								// converts the fraction to a float.
 
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
+	bool operator==(const RationalNTL & rhs) const;
+	bool operator!=(const RationalNTL & rhs) const;
 
 };
 

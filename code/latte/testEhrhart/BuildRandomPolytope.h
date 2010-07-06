@@ -30,6 +30,7 @@ protected:
     string latteFile;		//file name for latte
     string PolytopeComments;//describes the current polytope (example: "edge poly of a line graph of 30 nodes")
     int maxInteger;			//when making random points, take elements in  |x| in [0, maxInteger)
+    bool integerPoints;		//if true, makes random integer points; if false, makes random rational points.
     double probNegative;	//when making random points, probNegative percent of them should be negative.
     int dim;				//dim of the polytope found by polymake
     vector< vector<mpq_class> > facets; //facets of the polytope found by polymake
@@ -43,6 +44,7 @@ public:
 	void buildPolymakeFile(const int numPoints);
 	void callPolymake();
 	void convertFacetEquations();
+	int gcd(int a, int b) const;
 	const string & getLatteFile() const;
 	void findEhrhardPolynomial();
 	void findFacetEquations();
@@ -52,6 +54,7 @@ public:
 	void printFacetEquationsForLattE();
 
 	void setComments(const string& newComments);
+	void setIntegerPoints(bool t);
 };//BuildRandomPolytope
 
 
