@@ -172,9 +172,8 @@ RationalNTL PolytopeValuation::findVolumeUsingDeterminant(const listCone * oneSi
  * @input: a listCone of the cones and the nnumber of variables (dimension of the space)
  * @return RationalNTL: the volume of the polytope
  */
-RationalNTL PolytopeValuation::findVolumeUsingLarence() const
+RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 {
-	cout << "findVolumeUsingLarence() is called" << endl;
 	RationalNTL answer;
 
 	vec_ZZ c = vec_ZZ();
@@ -187,9 +186,13 @@ RationalNTL PolytopeValuation::findVolumeUsingLarence() const
 	vec_ZZ vert = vec_ZZ();
 	vec_ZZ ans = vec_ZZ();
 	mat_ZZ mat;
+
+	triangulatePolytopeVertexRayCone();
+
 	ZZ det = ZZ();
 	mat.SetDims(numOfVars, numOfVars);
-	//	listCone *triangulatedCones;
+
+
 
 	c.SetLength(numOfVars);
 	for (int i = 0; i < numOfVars; i++)
@@ -268,9 +271,9 @@ RationalNTL PolytopeValuation::findVolume(VolumeType v)
 	}
 	else if (v == LawrenceVolume )
 	{
-		answer = findVolumeUsingLarence();
+		answer = findVolumeUsingLawrence();
 
-		cout << "findVolumeUsingLarence(): VOLUME: " << answer << "\n  = " << answer.to_RR() << endl;
+		cout << "findVolumeUsingLawrence(): VOLUME: " << answer << "\n  = " << answer.to_RR() << endl;
 	}
 
 
@@ -313,3 +316,17 @@ void PolytopeValuation::triangulatePolytopeCone()
 	//parameters.Number_of_Variables = numOfVars; //convert back. This is not really needed.
 	freeTriangulatedPoly = 1; //Delete this in the deconstructor.
 }//triangulateCone()
+
+
+/**
+ * Triangulate the cones from they vertex-ray cone.
+ */
+void PolytopeValuation::triangulatePolytopeVertexRayCone()
+{
+	if ( triangulatedPoly)
+		return ; //already did computation
+
+
+	triangulatedPoly = decomposeCones(vertexRayCones, parameters.Number_of_Variables,
+			parameters.Flags, parameters.File_Name, 0, true, BarvinokParameters::DualDecomposition);
+}

@@ -158,15 +158,15 @@ void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		}
 		cout << "Driver:computeVolume(): coneDetSize=" << coneDetSize << endl;
 
-		cones = decomposeCones(cones, myParameters.Number_of_Variables,
-				myParameters.Flags, myParameters.File_Name, coneDetSize, true,
-				BarvinokParameters::DualDecomposition);
+		//cones = decomposeCones(cones, myParameters.Number_of_Variables,
+		//		myParameters.Flags, myParameters.File_Name, coneDetSize, true,
+		//		BarvinokParameters::DualDecomposition);
 
 		PolytopeValuation polytopeValuation(cones,
-				PolytopeValuation::TriangulatedCones,
+				PolytopeValuation::VertexRayCones,
 				myParameters.Number_of_Variables, myParameters);
 		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
-		//computeTriangVolume(cones, myParameters.Number_of_Variables);
+
 	}
 
 	if ( strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
@@ -713,7 +713,7 @@ void runOneTest(int ambientDim, int numPoints)
 
 	BuildRandomPolytope buildPolytope(ambientDim);
 	buildPolytope.setComments(comments.str().c_str());
-	//buildPolytope.setIntegerPoints(false); //make random rational points.
+	buildPolytope.setIntegerPoints(false); //make random rational points.
 	buildPolytope.buildPolymakeFile(numPoints); //make the file
 	buildPolytope.callPolymake(); //run polymake
 	buildPolytope.findVolumeWithPolymake(); //run polymake for the volume
@@ -724,6 +724,7 @@ void runOneTest(int ambientDim, int numPoints)
 	//buildPolytope.findVolumeWithPolymake();
 
 	string file = buildPolytope.getLatteFile();
+
 
 	char * sFile = new char[file.size() + 1];
 	strcpy(sFile, file.c_str());

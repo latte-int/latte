@@ -64,10 +64,11 @@ public:
 
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone
 	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const;
-	RationalNTL findVolumeUsingLarence() const;
+	RationalNTL findVolumeUsingLawrence();
 	RationalNTL findVolume(const VolumeType v);		 //finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);
 	void triangulatePolytopeCone();  //convert polytopeAsOneCone to triangulatedPoly
+	void triangulatePolytopeVertexRayCone(); //convert vertexRayCones to triangulatedPoly using decomposeCones
 
 };
 
