@@ -156,7 +156,7 @@ void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		{
 			coneDetSize = atoi(&(valuationAlg[8]));
 		}
-		/*cout << "Driver:computeVolume(): coneDetSize=" << coneDetSize << endl;
+		cout << "Driver:computeVolume(): coneDetSize=" << coneDetSize << endl;
 
 		//cones = decomposeCones(cones, myParameters.Number_of_Variables,
 		//		myParameters.Flags, myParameters.File_Name, coneDetSize, true,
@@ -166,6 +166,8 @@ void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 				PolytopeValuation::VertexRayCones,
 				myParameters.Number_of_Variables, myParameters);
 		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
+
+		polytopeValuation.printRationalFunction();
 
 	}
 
@@ -713,7 +715,7 @@ void runOneTest(int ambientDim, int numPoints)
 
 	BuildRandomPolytope buildPolytope(ambientDim);
 	buildPolytope.setComments(comments.str().c_str());
-	buildPolytope.setIntegerPoints(false); //make random rational points.
+	//buildPolytope.setIntegerPoints(false); //make random rational points.
 	buildPolytope.buildPolymakeFile(numPoints); //make the file
 	buildPolytope.callPolymake(); //run polymake
 	buildPolytope.findVolumeWithPolymake(); //run polymake for the volume
@@ -752,8 +754,8 @@ void runTests()
 int main(int argc, char *argv[])
 {
 	//mainValuationDriver(argv, argc);
-	runTests();
-	//runOneTest(atoi(argv[1]), atoi(argv[2]));
+	//runTests();
+	runOneTest(atoi(argv[1]), atoi(argv[2]));
 
 	return 0;
 }//main()

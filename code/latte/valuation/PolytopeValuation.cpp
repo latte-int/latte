@@ -289,6 +289,7 @@ void PolytopeValuation::printRationalFunction() {
 	vec_ZZ vert = vec_ZZ();
 	ZZ temp = ZZ();
 	mat_ZZ mat;
+	ZZ det;
 	mat.SetDims(numOfVars, numOfVars);
 
 	triangulatePolytopeVertexRayCone();
@@ -306,7 +307,7 @@ void PolytopeValuation::printRationalFunction() {
 			if (temp != 1)
 				cout << " / " << temp;
 			cout << " * c" << i;
-			if(i != parameters.Number_of_Variables)
+			if(i != parameters.Number_of_Variables - 1)
 				cout << " + ";
 		}
 		cout << " ) ^ " << parameters.Number_of_Variables << " / ( ";
@@ -317,12 +318,14 @@ void PolytopeValuation::printRationalFunction() {
 
 		//divide by the multiplication of all the dots
 		//of the rays dotted with c
+		int col = 0;
+
 		for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
-				= currentRay->rest) {
+				= currentRay->rest, col++) {
 			cout << "( ";
-			for (int i = 0; i < parameters.Number_of_Variables; i++) {
-				cout << currentRay->first[i] << " * c" << i;
-				if (i != parameters.Number_of_Variables - 1) {
+			for (int row = 0; row < numOfVars; row++) {
+				cout << currentRay->first[row] << " * c" << row;
+				if (row != parameters.Number_of_Variables - 1) {
 					cout << " + ";
 				}
 				mat[row][col] = currentRay->first[row];
@@ -341,7 +344,7 @@ void PolytopeValuation::printRationalFunction() {
 		//multiply by the coefficient and determinant
 		cout << simplicialCone->coefficient;
 		if(det != 1)
-			cout << " * " << det;
+			cout << " * (" << abs(det) << ')';
 
 		//if more cones, type the +
 		if (simplicialCone->rest != NULL)
