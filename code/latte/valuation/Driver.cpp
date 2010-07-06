@@ -156,7 +156,7 @@ void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		{
 			coneDetSize = atoi(&(valuationAlg[8]));
 		}
-		cout << "Driver:computeVolume(): coneDetSize=" << coneDetSize << endl;
+		/*cout << "Driver:computeVolume(): coneDetSize=" << coneDetSize << endl;
 
 		//cones = decomposeCones(cones, myParameters.Number_of_Variables,
 		//		myParameters.Flags, myParameters.File_Name, coneDetSize, true,

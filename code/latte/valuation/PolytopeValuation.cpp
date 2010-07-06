@@ -14,8 +14,9 @@ using namespace std;
  * Polyhedron *poly contains the list of vertex-ray pairs.
  */
 PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
-	vertexRayCones(p->cones), parameters(bp), polytopeAsOneCone(NULL), triangulatedPoly(NULL), freeVertexRayCones(0), freePolytopeAsOneCone(0), freeTriangulatedPoly(0)
-{
+	vertexRayCones(p->cones), parameters(bp), polytopeAsOneCone(NULL),
+			triangulatedPoly(NULL), freeVertexRayCones(0),
+			freePolytopeAsOneCone(0), freeTriangulatedPoly(0) {
 	numOfVars = p->numOfVars;
 	srand(time(0));
 }
@@ -24,9 +25,12 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
  * if coneType = VertexRayCones we will need to convert it to one cone for triangulation
  *
  */
-PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType, int numofvars, BarvinokParameters &bp) :
-	vertexRayCones(NULL), parameters(bp), polytopeAsOneCone(NULL), triangulatedPoly(NULL), numOfVars(numofvars), freeVertexRayCones(0), freePolytopeAsOneCone(0), freeTriangulatedPoly(0)
-{
+PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType,
+		int numofvars, BarvinokParameters &bp) :
+	vertexRayCones(NULL), parameters(bp), polytopeAsOneCone(NULL),
+			triangulatedPoly(NULL), numOfVars(numofvars),
+			freeVertexRayCones(0), freePolytopeAsOneCone(0),
+			freeTriangulatedPoly(0) {
 	if (coneType == VertexRayCones)
 		vertexRayCones = cones;
 	else if (coneType == TriangulatedCones)
@@ -34,12 +38,12 @@ PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType, int num
 	srand(time(0));
 }
 
-
-PolytopeValuation::~PolytopeValuation()
-{
+PolytopeValuation::~PolytopeValuation() {
 	//don't free vertexRayCones, because we did not make them!
-	if (polytopeAsOneCone && freePolytopeAsOneCone) freeListCone(polytopeAsOneCone);
-	if (triangulatedPoly && freeTriangulatedPoly) freeListCone(triangulatedPoly);
+	if (polytopeAsOneCone && freePolytopeAsOneCone)
+		freeListCone(polytopeAsOneCone);
+	if (triangulatedPoly && freeTriangulatedPoly)
+		freeListCone(triangulatedPoly);
 }
 
 /**
@@ -53,14 +57,12 @@ PolytopeValuation::~PolytopeValuation()
  *
  *
  */
-void PolytopeValuation::convertToOneCone()
-{
-	if ( polytopeAsOneCone)
-		return ; //already did computation.
-	if ( triangulatedPoly )
+void PolytopeValuation::convertToOneCone() {
+	if (polytopeAsOneCone)
+		return; //already did computation.
+	if (triangulatedPoly)
 		return; //don't care about converting to one cone for triangulation because already triangulated!
-	if ( ! vertexRayCones )
-	{
+	if (!vertexRayCones) {
 		cout << "vertexRayCones* is not defined" << endl;
 		exit(1);
 	}//error.
@@ -86,21 +88,18 @@ void PolytopeValuation::convertToOneCone()
 	//The first entry in masterList should be ignored because masterList->first = masterList->rest->first.
 	listVector * masterList = new listVector;
 
-
 	for (listCone * currentCone = vertexRayCones; currentCone; currentCone
-			= currentCone->rest)
-	{
+			= currentCone->rest) {
 		vec_ZZ buildRay; //buildRay = [1, old-vertex]
 		ZZ nume, denom;
 		buildRay.SetLength(numOfVars + 1);
 
-
 		ZZ scaleFactor; //scaleRationalVectorToInteger() sets scaleFactor.
-		vec_ZZ integerVertex = scaleRationalVectorToInteger(currentCone->vertex->vertex, numOfVars, scaleFactor);
+		vec_ZZ integerVertex = scaleRationalVectorToInteger(
+				currentCone->vertex->vertex, numOfVars, scaleFactor);
 
 		buildRay[0] = scaleFactor; // = 1 * scaleFactor.
-		for (int i = 0; i < numOfVars; ++i)
-		{
+		for (int i = 0; i < numOfVars; ++i) {
 			buildRay[i + 1] = integerVertex[i];
 		}//for i
 
@@ -134,8 +133,8 @@ void PolytopeValuation::convertToOneCone()
  * We compute the abs. value of
  * {1\over n!}  {1 \over {v_o[0]*v_1[0]*...v_n[0]}} \det \begin{pmatrix} v_0 & v_1 & v_2 & \dots & v_{n-1} & v_n \end{pmatrix}
  */
-RationalNTL PolytopeValuation::findVolumeUsingDeterminant(const listCone * oneSimplex) const
-{
+RationalNTL PolytopeValuation::findVolumeUsingDeterminant(
+		const listCone * oneSimplex) const {
 	int i, numOfRays;
 	mat_ZZ mat;
 
@@ -147,20 +146,19 @@ RationalNTL PolytopeValuation::findVolumeUsingDeterminant(const listCone * oneSi
 
 	numOfRays = lengthListVector(oneSimplex->rays);
 
-	mat.SetDims(numOfRays, numOfVars+1);
-
+	mat.SetDims(numOfRays, numOfVars + 1);
 
 	i = 0;
-	for(listVector * currentRay = oneSimplex->rays; currentRay; currentRay = currentRay->rest)
-	{
-		for (int k = 0; k < numOfVars +1; ++k)
+	for (listVector * currentRay = oneSimplex->rays; currentRay; currentRay
+			= currentRay->rest) {
+		for (int k = 0; k < numOfVars + 1; ++k)
 			mat[i][k] = ((currentRay->first)[k]);
 		denominator *= (currentRay->first)[0];
 		++i;
 	}//for currentRay
 
-	numerator =  abs(determinant(mat));
-	denominator *= factorial(numOfRays -1);
+	numerator = abs(determinant(mat));
+	denominator *= factorial(numOfRays - 1);
 	//cout << mat << " = " << determinant(mat) << "\n./." << factorial(numOfRays -1) << endl;
 	return RationalNTL(numerator, denominator);
 }//findDetermiantForVolume
@@ -198,10 +196,8 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 	for (int i = 0; i < numOfVars; i++)
 		c[i] = rand() % 10000;
 
-
 	for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
-			= simplicialCone->rest)
-	{
+			= simplicialCone->rest) {
 
 		//find vertex
 		vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
@@ -215,14 +211,12 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 		int col = 0;
 
 		for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
-				= currentRay->rest, col++)
-		{
+				= currentRay->rest, col++) {
 			//divide by the dot product of c and the ray
 			tempDenom *= -1 * c * currentRay->first;
 
 			//generate matrix
-			for (int row = 0; row < numOfVars; row++)
-			{
+			for (int row = 0; row < numOfVars; row++) {
 				mat[row][col] = currentRay->first[row];
 			}//for every component of the ray
 
@@ -254,65 +248,128 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
  * Converts the input polynomal vertex-ray input to one polytope for trangulation,
  * then sums the volume of each triangulated simplex.
  */
-RationalNTL PolytopeValuation::findVolume(VolumeType v)
-{
+RationalNTL PolytopeValuation::findVolume(VolumeType v) {
 	RationalNTL answer;
 
-	if ( v == DeterminantVolume )
-	{
+	if (v == DeterminantVolume) {
 
 		convertToOneCone();
 		triangulatePolytopeCone();
 
-		for (listCone * oneSimplex = triangulatedPoly; oneSimplex; oneSimplex = oneSimplex->rest)
+		for (listCone * oneSimplex = triangulatedPoly; oneSimplex; oneSimplex
+				= oneSimplex->rest)
 			answer.add(findVolumeUsingDeterminant(oneSimplex));
 
-		cout << "findVolumeUsingDeterminant(): VOLUME: " << answer << "\n  = " << answer.to_RR() << endl;
-	}
-	else if (v == LawrenceVolume )
-	{
+		cout << "findVolumeUsingDeterminant(): VOLUME: " << answer << "\n  = "
+				<< answer.to_RR() << endl;
+	} else if (v == LawrenceVolume) {
 		answer = findVolumeUsingLawrence();
 
 		cout << "findVolumeUsingLawrence(): VOLUME: " << answer << "\n  = " << answer.to_RR() << endl;
 	}
-
 
 	return answer;
 
 }//findVolume
 
 
-
 /**
  * Computes n!
  */
-ZZ  PolytopeValuation::factorial(const int n)
-{
+ZZ PolytopeValuation::factorial(const int n) {
 	ZZ product;
 	product = 1;
-	for(int i = n; i > 1; --i)
+	for (int i = n; i > 1; --i)
 		product *= i;
 	return product;
 }//factorial
 
+void PolytopeValuation::printRationalFunction() {
+	listCone * triangulatedCones;
+	vec_ZZ vert = vec_ZZ();
+	ZZ temp = ZZ();
+	mat_ZZ mat;
+	mat.SetDims(numOfVars, numOfVars);
+
+	triangulatePolytopeVertexRayCone();
+
+	cout << "( ";
+	for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
+			= simplicialCone->rest) {
+		vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
+				parameters.Number_of_Variables, temp);
+		cout << "( ";
+
+		//dot of c and v raised to the dim power
+		for (int i = 0; i < parameters.Number_of_Variables; i++) {
+			cout << vert[i];
+			if (temp != 1)
+				cout << " / " << temp;
+			cout << " * c" << i;
+			if(i != parameters.Number_of_Variables)
+				cout << " + ";
+		}
+		cout << " ) ^ " << parameters.Number_of_Variables << " / ( ";
+
+		//the correct sign on the denominator
+		if (parameters.Number_of_Variables % 2 == 1)
+			cout << "-";
+
+		//divide by the multiplication of all the dots
+		//of the rays dotted with c
+		for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
+				= currentRay->rest) {
+			cout << "( ";
+			for (int i = 0; i < parameters.Number_of_Variables; i++) {
+				cout << currentRay->first[i] << " * c" << i;
+				if (i != parameters.Number_of_Variables - 1) {
+					cout << " + ";
+				}
+				mat[row][col] = currentRay->first[row];
+			}
+			cout << " )";
+			if (currentRay->rest != NULL)
+				cout << " * ";
+		}//for every ray
+
+		//get the determinant
+		determinant(det, mat);
+
+		//close up the denominator
+		cout << " ) * ";
+
+		//multiply by the coefficient and determinant
+		cout << simplicialCone->coefficient;
+		if(det != 1)
+			cout << " * " << det;
+
+		//if more cones, type the +
+		if (simplicialCone->rest != NULL)
+			cout << " + ";
+	}//for every simple cone.
+
+	// divide the sum by the factorial
+	cout << ") / ( " << parameters.Number_of_Variables << "!";
+	cout << " )" << endl;
+}
 
 /**
  * Triangulates 1 cone (which encodes the polytope. See the comments for convertToOneCone()
  * to learn how the polytope is encoded in one cone.)
  */
-void PolytopeValuation::triangulatePolytopeCone()
-{
-	if ( triangulatedPoly)
-		return ; //all ready did computation.
-	if ( polytopeAsOneCone == NULL)
-	{
-		cout << "PolytopeValuation::triangulatePolytopeCone(): there is no cone to triangulate" << endl;
+void PolytopeValuation::triangulatePolytopeCone() {
+	if (triangulatedPoly)
+		return; //all ready did computation.
+	if (polytopeAsOneCone == NULL) {
+		cout
+				<< "PolytopeValuation::triangulatePolytopeCone(): there is no cone to triangulate"
+				<< endl;
 		exit(1);
 	}
 
-
 	parameters.Number_of_Variables = numOfVars + 1;
-	triangulatedPoly = triangulateCone(polytopeAsOneCone, numOfVars + 1, &parameters);
+	triangulatedPoly = triangulateCone(polytopeAsOneCone, numOfVars + 1,
+			&parameters);
 	//parameters.Number_of_Variables = numOfVars; //convert back. This is not really needed.
 	freeTriangulatedPoly = 1; //Delete this in the deconstructor.
 }//triangulateCone()
