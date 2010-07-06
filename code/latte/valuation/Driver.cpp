@@ -75,67 +75,13 @@ ReadPolyhedronData read_polyhedron_data;
 string output_filename;
 
 
-/*void printRationalFunction(Polyhedron * poly)
- {
- listCone * triangulatedCones;
- vec_ZZ vert = vec_ZZ();
- ZZ temp = ZZ();
- triangulatedCones = decomposeCones(poly->cones, false, parameters);
- cout << "( ";
- for (listCone * simplicialCone = triangulatedCones; simplicialCone; simplicialCone
- = simplicialCone->rest)
- {
- printConeToFile(cout, simplicialCone, poly->numOfVars);
- vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
- poly->numOfVars, temp);
- cout << "( ";
- for (int i = 0; i < poly->numOfVars - 1; i++)
- {
- cout << vert[i];
- if (temp != 1)
- cout << " / " << temp;
- cout << " * c" << i << " + ";
- }
- cout << vert[poly->numOfVars - 1];
- if (temp != 1)
- cout << " / " << temp;
- cout << " * c" << poly->numOfVars - 1 << " ) ^ " << poly->numOfVars
- << " / ( ";
-
- if (poly->numOfVars % 2 == 1)
- cout << "-";
- for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
- = currentRay->rest)
- {
- cout << "( ";
- for (int i = 0; i < poly->numOfVars; i++)
- {
- cout << currentRay->first[i] << " * c" << i;
- if (i != poly->numOfVars - 1)
- {
- cout << " + ";
- }
- }
- cout << " )";
- if (currentRay->rest != NULL)
- cout << " * ";
- }//for every ray
- cout << " ) * ";
- cout << simplicialCone->coefficient;
- if (simplicialCone->rest != NULL)
- cout << " + ";
- }//for every simple cone.
- cout << ") / ( " << poly->numOfVars << "!";
- cout << " )" << endl;
- }*/
-
 /* ----------------------------------------------------------------- */
 
 /**
  * Computes the volume of the polytope.
  */
 void computeVolume(listCone * cones, BarvinokParameters &myParameters,
-		const char *valuationAlg)
+		const char *valuationAlg, const char * print)
 {
 	RationalNTL ans1, ans2;
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
@@ -145,37 +91,31 @@ void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 				PolytopeValuation::VertexRayCones,
 				myParameters.Number_of_Variables, myParameters);
 		ans1 = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
-	}
+
+		cout << "(using triangulation-determinant method) VOLUME " << ans1 << endl;
+	}//if triangulate
 
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
 			|| strcmp(valuationAlg, "all") == 0)
 	{
-
-		int coneDetSize = 0;
-		if (strcmp(valuationAlg, "lawrence") != 0)
-		{
-			coneDetSize = atoi(&(valuationAlg[8]));
-		}
-		cout << "Driver:computeVolume(): coneDetSize=" << coneDetSize << endl;
-
-		//cones = decomposeCones(cones, myParameters.Number_of_Variables,
-		//		myParameters.Flags, myParameters.File_Name, coneDetSize, true,
-		//		BarvinokParameters::DualDecomposition);
 
 		PolytopeValuation polytopeValuation(cones,
 				PolytopeValuation::VertexRayCones,
 				myParameters.Number_of_Variables, myParameters);
 		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
 
-		polytopeValuation.printRationalFunction();
+		cout << "(using Lawrence method) VOLUME " << ans2 << endl;
 
-	}
+		if (*print == 'y')
+			polytopeValuation.printLawrenceVolumeFunction(); //print the lawrence rational function.
+
+	}//if lawrence
 
 	if ( strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
 	{
 		cout << "Driver.cpp: the two methods are different." << ans1 << "!=" << ans2 << endl;
 		exit(1);
-	}
+	}//if error.
 
 }//computeVolume
 
@@ -201,7 +141,7 @@ int mainValuationDriver(char *argv[], int argc)
 			cddstyle[127], grobner[127], removeFiles[127], command[127],
 			maximum[127], Singlecone[127], LRS[127], Vrepresentation[127],
 			dilation[127], minimize[127], binary[127], interior[127];
-	char valuationType[127], valuationAlg[127];
+	char valuationType[127], valuationAlg[127], printLawrenceFunction[127];
 	listVector *matrix = 0, *equations = 0, *inequalities = 0, *rays = 0, *endRays = 0, *tmpRays = 0,
 			*matrixTmp = 0;
 	vec_ZZ cost;
@@ -211,14 +151,10 @@ int mainValuationDriver(char *argv[], int argc)
 	latte_banner(cerr);
 
 	z = 0;
-	//setbuf(stdout,0);
 
 	strcpy(invocation, "Invocation: ");
 	strcat(invocation, argv[0]);
 	strcat(invocation, " ");
-	/*    strcat(invocation,argv[argc-1]); */
-	/*    strcat(invocation,"\n\n"); */
-	/*    printf(invocation); */
 
 	strcpy(Vrepresentation, "no");
 	strcpy(interior, "no");
@@ -246,21 +182,25 @@ int mainValuationDriver(char *argv[], int argc)
 	strcpy(LRS, "no");
 	strcpy(valuationType, "volume");
 	strcpy(valuationAlg, "all");
+	strcpy(printLawrenceFunction, "no");
 
 	flags |= DUAL_APPROACH;
 
-	for (i = 1; i < argc - 1; i++)
+
+
+	if ( argc == 2 && !strcmp(argv[1], "help"))
+	{
+		cout << "usage: valuation-exe [valuation  type] [valuation algorithm] <latte file>\n";
+		cout << "valuation types: volume\n";
+		cout << "  volume algorithm: [lawrence  <printLawrenceFunction> | triangulate | all]\n";
+		exit(0);
+	}//if need help.
+
+	for (i = 1; i < argc - 1; i++) //i = 1...argc-1 because we do not want to process the file name. The file name could be "simp"
 	{
 		strcat(invocation, argv[i]);
 		strcat(invocation, " ");
 
-		if (strcmp(argv[i], "help") == 0)
-		{
-			cout << "usage: valuation-exe [valuation  type] [valuation algorithm][lawrence | triangulate | both] <latte file>\n";
-			cout << "     valuation types: volume\n";
-			cout<< "                     algorithm: [lawrenceX where x is 1 if unimodular cones are wanted, 0 else | triangulate | all]\n";
-			exit(0);
-		}//pirnt help menu.
 		if (strncmp(argv[i], "simp", 3) == 0)
 			strcpy(rationalCone, "yes");
 
@@ -288,9 +228,11 @@ int mainValuationDriver(char *argv[], int argc)
 			strcpy(valuationAlg, "triangulate");
 		if (strcmp(argv[i], "all") == 0)
 			strcpy(valuationAlg, "all");
+		if ( strcmp(argv[i], "printLawrenceFunction") == 0)
+			strcpy(printLawrenceFunction, "yes");
 
 	}//for i.
-
+#if 0
 	/* if cdd and lrs are NOT called. */
 	if ((cddstyle[0] == 'n') && (LRS[0] == 'n'))
 	{//hit
@@ -304,13 +246,16 @@ int mainValuationDriver(char *argv[], int argc)
 				strcpy(rationalCone, "yes");
 			else
 				strcpy(taylor, "yes");
-		} else
-		{
-			cerr << "Too many arguments.  Check the manual for command line."
-					<< endl;
-			exit(1);
 		}
+		//
+		//else
+		//{
+		//	cerr << "Too many arguments.  Check the manual for command line."
+		//			<< endl;
+		//	exit(1);
+		//}
 	}
+
 
 	/* if cdd is called but and lrs is NOT called. */
 	else if ((cddstyle[0] == 'y') && (LRS[0] == 'n'))
@@ -379,6 +324,7 @@ int mainValuationDriver(char *argv[], int argc)
 			exit(1);
 		}
 	}
+#endif
 
 	flags |= DUAL_APPROACH;//hit
 	if (minimize[0] == 'y')
@@ -591,44 +537,12 @@ int mainValuationDriver(char *argv[], int argc)
 
 				if (strcmp(valuationType, "volume") == 0)
 				{
-					computeVolume(cones, myParameters, valuationAlg);
+					computeVolume(cones, myParameters, valuationAlg, printLawrenceFunction);
 				} else
 				{
 					cout << "Ops, " << valuationType << " is not supported" << endl;
 					exit(1);
 				}//if not finding volume.
-
-				//ofstream file;
-				//file.open("printAllTheConesNotDual.txt");
-				//file << "cones that are passed into decomposedCones()" << endl;
-				//for (listCone * c = cones; c; c = c->rest)
-				//	printConeToFile(file, c, numOfVars);
-
-
-				//PolytopeValuation polytopeValuation(cones, PolytopeValuation::VertexRayCones, numOfVars,
-				//&myParameters);
-				//RationalNTL rVolume = polytopeValuation.findVolume(
-				//		PolytopeValuation::DeterminantVolume);
-				//cout << "VOLUME (ehrhart)" << rVolume << " = "
-				//		<< rVolume.to_RR() << endl;
-
-				//cones = decomposeCones(cones, numOfVars, flags, fileName, 0,
-				//		true, BarvinokParameters::DualDecomposition);
-				//computeUniVolume(cones, numOfVars);
-				//cones = decomposeCones(cones, myParameters.Number_of_Variables, myParameters.Flags,
-				//		myParameters.File_Name, 0, true, BarvinokParameters::DualDecomposition);
-				//computeTriangVolume(cones, numOfVars);
-
-				//int k = 0;
-				//file << "after call to decompose cones " << endl;
-				//for (listCone * c = cones; c; c = c->rest)
-				//{
-				//cout << ++k << endl;
-				//printConeToFile(file, c, numOfVars);
-				//}
-				//cout << "printed ok" << endl;
-
-				// Iterator through simplicial cones, DFS
 
 			}//if decompose
 		}//assumeUnimodularCones
@@ -715,7 +629,7 @@ void runOneTest(int ambientDim, int numPoints)
 
 	BuildRandomPolytope buildPolytope(ambientDim);
 	buildPolytope.setComments(comments.str().c_str());
-	//buildPolytope.setIntegerPoints(false); //make random rational points.
+	buildPolytope.setIntegerPoints(false); //make random rational points.
 	buildPolytope.buildPolymakeFile(numPoints); //make the file
 	buildPolytope.callPolymake(); //run polymake
 	buildPolytope.findVolumeWithPolymake(); //run polymake for the volume
@@ -754,8 +668,8 @@ void runTests()
 int main(int argc, char *argv[])
 {
 	//mainValuationDriver(argv, argc);
-	//runTests();
-	runOneTest(atoi(argv[1]), atoi(argv[2]));
+	runTests();
+	//runOneTest(atoi(argv[1]), atoi(argv[2]));
 
 	return 0;
 }//main()

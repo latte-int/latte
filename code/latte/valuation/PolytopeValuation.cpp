@@ -260,12 +260,11 @@ RationalNTL PolytopeValuation::findVolume(VolumeType v) {
 				= oneSimplex->rest)
 			answer.add(findVolumeUsingDeterminant(oneSimplex));
 
-		cout << "findVolumeUsingDeterminant(): VOLUME: " << answer << "\n  = "
-				<< answer.to_RR() << endl;
+		//cout << "findVolumeUsingDeterminant(): VOLUME: " << answer << endl;
 	} else if (v == LawrenceVolume) {
 		answer = findVolumeUsingLawrence();
 
-		cout << "findVolumeUsingLawrence(): VOLUME: " << answer << "\n  = " << answer.to_RR() << endl;
+		//cout << "findVolumeUsingLawrence(): VOLUME: " << answer << endl;
 	}
 
 	return answer;
@@ -284,7 +283,11 @@ ZZ PolytopeValuation::factorial(const int n) {
 	return product;
 }//factorial
 
-void PolytopeValuation::printRationalFunction() {
+
+/**
+ * Find the Lawrence rational function for volume.
+ */
+void PolytopeValuation::printLawrenceVolumeFunction() {
 	listCone * triangulatedCones;
 	vec_ZZ vert = vec_ZZ();
 	ZZ temp = ZZ();
