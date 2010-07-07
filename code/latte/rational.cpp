@@ -98,7 +98,12 @@ RationalNTL::RationalNTL(const ZZ &num, const ZZ& denom): numerator(num), denomi
 	canonicalize();
 }
 
-
+RationalNTL::RationalNTL(const int num, const int denom)
+{
+	numerator = num;
+	denominator = denom;
+	canonicalize();
+}
 
 /**
  * factors out common terms and makes the denominator positive.

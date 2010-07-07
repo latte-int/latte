@@ -3,12 +3,29 @@
  *
  *  Created on: Jun 24, 2010
  *      Author: Brandon Dutra and Gregory Pinto
+ *
+ *
+ *
+ *  type --help to print the help menu.
  */
+
+
+
 
 #include <cstdlib>
 #include <iostream>
 #include <string>
 #include <cassert>
+#include <sys/types.h>
+#include <dirent.h>
+#include <errno.h>
+#include <vector>
+
+
+
+
+
+
 
 #include "barvinok/barvinok.h"
 #include "ReadPolyhedron.h"
@@ -28,6 +45,7 @@
 #include <NTL/RR.h>
 #include <NTL/mat_ZZ.h>
 #include "testEhrhart/BuildRandomPolytope.h"
+#include "testEhrhart/BuildHypersimplexEdgePolytope.h"
 
 /* EHRHART INCLUDES */
 #include <string.h>
@@ -65,8 +83,20 @@
 /* END EHRHART INCLUDES */
 using namespace std;
 
-void computeVolume(listCone * cones, BarvinokParameters &myParameters,
+
+
+
+typedef struct
+{
+	RationalNTL triangulate;
+	RationalNTL lawrence;
+
+} VolumesContainer;
+
+
+VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		const char *valuationType);
+VolumesContainer mainValuationDriver(char *argv[], int argc);
 void runOneTest(int ambientDim, int numPoints);
 void runTests();
 
@@ -80,9 +110,10 @@ void runTests();
 /**
  * Computes the volume of the polytope.
  */
-void computeVolume(listCone * cones, BarvinokParameters &myParameters,
+VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		const char *valuationAlg, const char * print)
 {
+	VolumesContainer ans;
 	RationalNTL ans1, ans2;
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
@@ -117,14 +148,21 @@ void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		exit(1);
 	}//if error.
 
+
+	ans.lawrence = ans2;
+	ans.triangulate = ans1;
+
+	return ans;
+
 }//computeVolume
 
-int mainValuationDriver(char *argv[], int argc)
+VolumesContainer mainValuationDriver(char *argv[], int argc)
 {
 
 	set_program_name(argv[0]);
 
 	BarvinokParameters params;
+	VolumesContainer volumeAns;
 #ifdef SUN
 	struct tms tms_buf;
 #endif
@@ -187,12 +225,16 @@ int mainValuationDriver(char *argv[], int argc)
 	flags |= DUAL_APPROACH;
 
 
-
-	if ( argc == 2 && !strcmp(argv[1], "help"))
+	if ( argc == 1)
+	{
+		cout << "type --help to print a help menu." << endl;
+		exit(1);
+	}//if too few parameters.
+	if ( argc == 2 && !strcmp(argv[1], "--help"))
 	{
 		cout << "usage: valuation-exe [valuation  type] [valuation algorithm] <latte file>\n";
 		cout << "valuation types: volume\n";
-		cout << "  volume algorithm: [lawrence  <printLawrenceFunction> | triangulate | all]\n";
+		cout << "  volume algorithm: [--lawrence  <--printLawrenceFunction> | --triangulate | --all]\n";
 		exit(0);
 	}//if need help.
 
@@ -222,13 +264,13 @@ int mainValuationDriver(char *argv[], int argc)
 		}
 		if ( strcmp(argv[i], "keepFiles") == 0)
 			strcpy(removeFiles, "no");
-		if (strncmp(argv[i], "lawrence", 8) == 0)
-			strcpy(valuationAlg, "lawrence");
-		if (strcmp(argv[i], "triangulate") == 0)
+		if (strncmp(argv[i], "--lawrence", 8) == 0)
+			strcpy(valuationAlg, "--lawrence");
+		if (strcmp(argv[i], "--triangulate") == 0)
 			strcpy(valuationAlg, "triangulate");
-		if (strcmp(argv[i], "all") == 0)
+		if (strcmp(argv[i], "--all") == 0)
 			strcpy(valuationAlg, "all");
-		if ( strcmp(argv[i], "printLawrenceFunction") == 0)
+		if ( strcmp(argv[i], "--printLawrenceFunction") == 0)
 			strcpy(printLawrenceFunction, "yes");
 
 	}//for i.
@@ -537,7 +579,7 @@ int mainValuationDriver(char *argv[], int argc)
 
 				if (strcmp(valuationType, "volume") == 0)
 				{
-					computeVolume(cones, myParameters, valuationAlg, printLawrenceFunction);
+					volumeAns = computeVolume(cones, myParameters, valuationAlg, printLawrenceFunction);
 				} else
 				{
 					cout << "Ops, " << valuationType << " is not supported" << endl;
@@ -615,7 +657,7 @@ int mainValuationDriver(char *argv[], int argc)
 	//if (tmp) 			freeListCone(tmp);
 	//if (tmpcones) 		freeListCone(tmpcones);
 
-	return (0);
+	return (volumeAns);
 }//mainValuationDrivver()
 
 
@@ -623,7 +665,7 @@ int mainValuationDriver(char *argv[], int argc)
 
 void runOneTest(int ambientDim, int numPoints)
 {
-	char * argv[] = {"runTests()", "all", 0};
+	char * argv[] = {"runTests()", "--all", 0};
 	stringstream comments;
 	comments << "Making random integer polytope with " << numPoints << " points in R^" << ambientDim<< " for volume testing";
 
@@ -665,9 +707,154 @@ void runTests()
 }//runTests
 
 
+void runHyperSimplexTests()
+{
+	char * argv[] = {"runHyperSimplexTests()", "--all", 0};
+						//   n  k  num/denom
+	int  hyperSimplexData[][4] = { /*{4, 1, 1, 6},
+							{4, 2, 2, 3},
+							{5, 1, 1, 24},
+							{5, 2, 11, 24},
+							{6, 1, 1, 120},
+							{6, 2, 13, 60},
+							{6, 3, 11, 20},
+							{7, 1, 1, 720},
+							{7, 2, 19, 240},
+							{7, 3, 151, 360},
+							{8, 1, 1, 5040},
+							{8, 2, 1, 42},
+							{8, 3, 397, 1680},
+							{8, 4, 151, 315},
+							{9, 1, 1, 40320},
+							{9, 2, 247, 40320},
+							{9, 3, 477, 4480},
+							{9, 4, 15619, 40320},
+							{10, 1, 1, 362880},
+							{10, 2, 251, 181440},
+							{10, 3, 913, 22680},*/
+							{10, 4, 44117, 18440},
+							{10, 5, 15619, 36288},
+							{11, 1, 1, 3628800},
+							{11, 2, 1013, 3628800},
+							{11, 3, 299, 22680},
+							{11, 4, 56899, 45300},
+							{11, 5, 655177, 1814400},
+							{12, 1, 1, 39916800},
+							{12, 2, 509, 9979200},
+							{12, 3, 50879, 13305600},
+							{12, 4, 1093, 19800},
+							{12, 5, 1623019, 6652800},
+							{12, 6, 655177, 1663200}
+	};//hyperSimplexData
+
+	int numberTestCases = 34;
+
+	VolumesContainer volumeAnswer;
+	for(int i = 0; i < numberTestCases; ++i)
+	{
+		stringstream comments;
+		BuildHypersimplexEdgePolytope hyperSimplex(hyperSimplexData[i][0], hyperSimplexData[i][1]);
+
+		comments << "finding volume of Hypersimplex(" << hyperSimplexData[i][0] << ", " << hyperSimplexData[i][1] << ")";
+		hyperSimplex.buildPolymakeFile();
+
+
+
+		hyperSimplex.setComments(comments.str().c_str());
+
+		hyperSimplex.buildPolymakeFile(); //make the file
+		hyperSimplex.callPolymake(); //run polymake
+		//hyperSimplex.findVolumeWithPolymake(); //run polymake for the volume
+		hyperSimplex.convertFacetEquations(); //fix facet equations
+		hyperSimplex.printFacetEquationsForLattE(); //make latte file.
+
+		string file = hyperSimplex.getLatteFile();
+
+		cout << comments.str().c_str() << endl;
+
+		char * sFile = new char[file.size() + 1];
+		strcpy(sFile, file.c_str());
+		argv[2] = sFile;
+		volumeAnswer = mainValuationDriver(argv, 3);
+		delete [] sFile;
+
+		RationalNTL correctVolumeAnswer(hyperSimplexData[i][2], hyperSimplexData[i][3]);
+		if ( correctVolumeAnswer != volumeAnswer.lawrence
+				|| correctVolumeAnswer != volumeAnswer.triangulate)
+		{
+			cout << "******* ERROR ******" << endl;
+			cout << "correct answer: " << correctVolumeAnswer << endl;
+			cout << "lawrence: " << volumeAnswer.lawrence << endl;
+			cout << "triangulate: " << volumeAnswer.triangulate << endl;
+			cout << "see file " << file.c_str() << endl;
+			exit(1); //dont' delete the latte file.
+		}//if error
+		else
+			cout << comments.str().c_str() << " CORRECT!" << endl;
+
+
+	}//for i.
+
+
+
+}//runHyperSimplexTests
+
+
+/**
+ * Get list of files in directory dir.
+ */
+int getdir (string dir, vector<string> &files)
+{
+    DIR *dp;
+    struct dirent *dirp;
+    if((dp  = opendir(dir.c_str())) == NULL) {
+        cout << "Error(" << errno << ") opening " << dir << endl;
+        return errno;
+    }
+
+    while ((dirp = readdir(dp)) != NULL) {
+        files.push_back(string(dirp->d_name));
+    }
+    closedir(dp);
+    return 0;
+}
+
+
+void runBirkhoffTests()
+{
+    string dir = string("../../EXAMPLES/birkhoff/");
+    vector<string> files = vector<string>();
+	VolumesContainer volumeAnswer;
+	char * argv[] = {"runHyperSimplexTests()", "--all", 0};
+
+    getdir(dir,files);
+
+    for(int i = 0; i < file.size(); ++i)
+    {
+    	if ( strrncmp(file[i], ".latte", 6) == 0)
+    	{
+
+
+    		char * sFile = new char[file[i].length() + 1];
+    		strcpy(sFile, file[i].c_str());
+    		argv[2] = sFile;
+    		volumeAnswer = mainValuationDriver(argv, 3);
+    		delete [] sFile;
+
+
+    	}//if a latte file.
+    }//for ever file in the directory
+
+
+
+}//runBirkhoffTests
+
+
 int main(int argc, char *argv[])
 {
-	mainValuationDriver(argv, argc);
+	//mainValuationDriver(argv, argc);
+	runHyperSimplexTests();
+	//runBirkhoffTests();
 	//runTests();
 	//runOneTest(atoi(argv[1]), atoi(argv[2]));
 

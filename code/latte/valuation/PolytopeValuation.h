@@ -36,8 +36,8 @@ using namespace std;
  * Finding Volume:
  * 1) Call findVolume(DeterminantVolume) if you want to use the Determinant method. Will convert first
  * 		convert  vertexRayCones into a triangulation if needed.
- * 2) Call findVolume(LawrenceVolume) if you want to use the Lawrence method. Assumes you
- *      have constructed the object with ConeType::TriangulatedCones
+ * 2) Call findVolume(LawrenceVolume) if you want to use the Lawrence method. Will convert first
+ * 		convert  vertexRayCones into a triangulation if needed using decomposeCones
  *
  */
 
