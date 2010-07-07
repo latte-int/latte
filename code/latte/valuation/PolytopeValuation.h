@@ -2,7 +2,7 @@
  * PolytopeValuation.h
  *
  *  Created on: Jun 25, 2010
- *      Author: bedutra
+ *      Author: Brandon Dutra and Gregory Pinto
  */
 
 #ifndef POLYTOPEVALUATION_H_

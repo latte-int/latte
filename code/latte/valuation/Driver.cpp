@@ -2,7 +2,7 @@
  * Driver.cpp
  *
  *  Created on: Jun 24, 2010
- *      Author: bedutra
+ *      Author: Brandon Dutra and Gregory Pinto
  */
 
 #include <cstdlib>
@@ -45,14 +45,12 @@
 #include "RudyResNTL.h"
 #include "Residue.h"
 #include "Grobner.h"
-//  #include "jesus.h"
 #include "preprocess.h"
 #include "print.h"
 #include "ramon.h"
 #include "rational.h"
 #include "timing.h"
 #include "flags.h"
-//#include "testing.h"
 #include "IntegralHull.h"
 #include "ReadingFile.h"
 #include "binarySearchIP.h"
@@ -69,10 +67,12 @@ using namespace std;
 
 void computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		const char *valuationType);
+void runOneTest(int ambientDim, int numPoints);
+void runTests();
 
-BarvinokParameters parameters;
-ReadPolyhedronData read_polyhedron_data;
-string output_filename;
+//BarvinokParameters parameters;
+//ReadPolyhedronData read_polyhedron_data;
+//string output_filename;
 
 
 /* ----------------------------------------------------------------- */
@@ -667,8 +667,8 @@ void runTests()
 
 int main(int argc, char *argv[])
 {
-	//mainValuationDriver(argv, argc);
-	runTests();
+	mainValuationDriver(argv, argc);
+	//runTests();
 	//runOneTest(atoi(argv[1]), atoi(argv[2]));
 
 	return 0;

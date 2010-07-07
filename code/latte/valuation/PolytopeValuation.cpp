@@ -2,7 +2,7 @@
  * PolytopeValuation.cpp
  *
  *  Created on: Jun 25, 2010
- *      Author: bedutra
+ *      Author: Brandon Dutra and Gregory Pinto
  */
 
 #include "PolytopeValuation.h"
