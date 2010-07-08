@@ -16,9 +16,6 @@
 #include <iostream>
 #include <string>
 #include <cassert>
-#include <sys/types.h>
-#include <dirent.h>
-#include <errno.h>
 #include <vector>
 
 
@@ -96,9 +93,11 @@ typedef struct
 
 VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		const char *valuationType);
-VolumesContainer mainValuationDriver(char *argv[], int argc);
+VolumesContainer mainValuationDriver(const char *argv[], int argc);
 void runOneTest(int ambientDim, int numPoints);
 void runTests();
+
+void printVolumeTest(const RationalNTL &correctVolumeAnswer, VolumesContainer volumeAnswer, const string &file, const string &comments);
 
 //BarvinokParameters parameters;
 //ReadPolyhedronData read_polyhedron_data;
@@ -156,7 +155,7 @@ VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameter
 
 }//computeVolume
 
-VolumesContainer mainValuationDriver(char *argv[], int argc)
+VolumesContainer mainValuationDriver(const char *argv[], int argc)
 {
 
 	set_program_name(argv[0]);
@@ -661,11 +660,34 @@ VolumesContainer mainValuationDriver(char *argv[], int argc)
 }//mainValuationDrivver()
 
 
+/**
+ * Checks to see if the triangulation and lawrence volume equal the expected volume.
+ */
+void printVolumeTest(const RationalNTL &correctVolumeAnswer, VolumesContainer volumeAnswer, const string &file, const string &comments)
+{
+	if ( correctVolumeAnswer != volumeAnswer.lawrence
+			|| correctVolumeAnswer != volumeAnswer.triangulate)
+	{
+		cout << "******* ERROR ******" << endl;
+		cout << "correct answer: " << correctVolumeAnswer << endl;
+		cout << "lawrence: " << volumeAnswer.lawrence << endl;
+		cout << "triangulate: " << volumeAnswer.triangulate << endl;
+		cout << "see file " << file.c_str() << endl;
+		exit(1); //dont' delete the latte file.
+	}//if error
+	else
+		cout << comments.c_str() << " CORRECT!" << endl;
+}//printVolumeTest
 
-
+/**
+ * Calls polymake to make a random interger (or rational) vertex polytope, and then makes the latte file.
+ * The latte file is then passed into mainValuationDriver() to find the volume
+ *
+ * We cannot check our volume with polymake for low-dimensional polytopes.
+ */
 void runOneTest(int ambientDim, int numPoints)
 {
-	char * argv[] = {"runTests()", "--all", 0};
+	const char * argv[] = {"runTests()", "--all", 0};
 	stringstream comments;
 	comments << "Making random integer polytope with " << numPoints << " points in R^" << ambientDim<< " for volume testing";
 
@@ -691,6 +713,9 @@ void runOneTest(int ambientDim, int numPoints)
 	delete [] sFile;
 }//RunOneTest
 
+/**
+ * Runs many random tests.
+ */
 void runTests()
 {
 	int startAmbientDim = 6, endAmbientDim = 50;
@@ -706,10 +731,12 @@ void runTests()
 
 }//runTests
 
-
+/**
+ * Finds the volume of hypersimplex polytopes and checks for correctness.
+ */
 void runHyperSimplexTests()
 {
-	char * argv[] = {"runHyperSimplexTests()", "--all", 0};
+	const char * argv[] = {"runHyperSimplexTests()", "--all", 0};
 						//   n  k  num/denom
 	int  hyperSimplexData[][4] = { /*{4, 1, 1, 6},
 							{4, 2, 2, 3},
@@ -731,9 +758,9 @@ void runHyperSimplexTests()
 							{9, 4, 15619, 40320},
 							{10, 1, 1, 362880},
 							{10, 2, 251, 181440},
-							{10, 3, 913, 22680},*/
-							{10, 4, 44117, 18440},
-							{10, 5, 15619, 36288},
+							{10, 3, 913, 22680},
+							{10, 4, 44117, 181440},*/
+							{10, 5, 15619, 36288}, //start here
 							{11, 1, 1, 3628800},
 							{11, 2, 1013, 3628800},
 							{11, 3, 299, 22680},
@@ -758,8 +785,6 @@ void runHyperSimplexTests()
 		comments << "finding volume of Hypersimplex(" << hyperSimplexData[i][0] << ", " << hyperSimplexData[i][1] << ")";
 		hyperSimplex.buildPolymakeFile();
 
-
-
 		hyperSimplex.setComments(comments.str().c_str());
 
 		hyperSimplex.buildPolymakeFile(); //make the file
@@ -779,82 +804,52 @@ void runHyperSimplexTests()
 		delete [] sFile;
 
 		RationalNTL correctVolumeAnswer(hyperSimplexData[i][2], hyperSimplexData[i][3]);
-		if ( correctVolumeAnswer != volumeAnswer.lawrence
-				|| correctVolumeAnswer != volumeAnswer.triangulate)
-		{
-			cout << "******* ERROR ******" << endl;
-			cout << "correct answer: " << correctVolumeAnswer << endl;
-			cout << "lawrence: " << volumeAnswer.lawrence << endl;
-			cout << "triangulate: " << volumeAnswer.triangulate << endl;
-			cout << "see file " << file.c_str() << endl;
-			exit(1); //dont' delete the latte file.
-		}//if error
-		else
-			cout << comments.str().c_str() << " CORRECT!" << endl;
-
-
+		printVolumeTest(correctVolumeAnswer, volumeAnswer, file, comments.str());
 	}//for i.
-
-
-
 }//runHyperSimplexTests
 
 
+
 /**
- * Get list of files in directory dir.
+ * Finds the volume of Birkhoff polytopes and checks for correctness.
  */
-int getdir (string dir, vector<string> &files)
-{
-    DIR *dp;
-    struct dirent *dirp;
-    if((dp  = opendir(dir.c_str())) == NULL) {
-        cout << "Error(" << errno << ") opening " << dir << endl;
-        return errno;
-    }
-
-    while ((dirp = readdir(dp)) != NULL) {
-        files.push_back(string(dirp->d_name));
-    }
-    closedir(dp);
-    return 0;
-}
-
-
 void runBirkhoffTests()
 {
-    string dir = string("../../EXAMPLES/birkhoff/");
-    vector<string> files = vector<string>();
-	VolumesContainer volumeAnswer;
-	char * argv[] = {"runHyperSimplexTests()", "--all", 0};
 
-    getdir(dir,files);
+	string birkhoff[] = { "../../EXAMPLES/birkhoff/birkhoff-5.latte",
+						  "../../EXAMPLES/birkhoff/birkhoff-6.latte",
+						  "../../EXAMPLES/birkhoff/birkhoff-7.latte"};
+	string birkhoffVolume[][2] = { {"188723", "836911595520"}, //5
+								   {"9700106723", "10258736801144832000000"}, //6
+								   {"225762910421308831", "4709491654300668677115504230400000000"} //7
+								 };
+	int numberTestCases = 3;
 
-    for(int i = 0; i < file.size(); ++i)
+
+    VolumesContainer volumeAnswer;
+	const char * argv[] = {"runBirkhoffTests()", "--all", 0};
+
+
+    for(int i = 0; i < numberTestCases; ++i)
     {
-    	if ( strrncmp(file[i], ".latte", 6) == 0)
-    	{
+		char * sFile = new char[birkhoff[i].length() + 1];
+		strcpy(sFile, birkhoff[i].c_str());
+		argv[2] = sFile;
+		volumeAnswer = mainValuationDriver(argv, 3);
+		delete [] sFile;
 
-
-    		char * sFile = new char[file[i].length() + 1];
-    		strcpy(sFile, file[i].c_str());
-    		argv[2] = sFile;
-    		volumeAnswer = mainValuationDriver(argv, 3);
-    		delete [] sFile;
-
-
-    	}//if a latte file.
+		RationalNTL correctVolumeAnswer(birkhoffVolume[i][0], birkhoffVolume[i][1]);
+		printVolumeTest(correctVolumeAnswer, volumeAnswer, string(birkhoff[i]), string("testing ") + string(birkhoff[i]));
     }//for ever file in the directory
-
-
-
 }//runBirkhoffTests
+
 
 
 int main(int argc, char *argv[])
 {
 	//mainValuationDriver(argv, argc);
-	runHyperSimplexTests();
-	//runBirkhoffTests();
+	//runHyperSimplexTests();
+	runBirkhoffTests();
 	//runTests();
 	//runOneTest(atoi(argv[1]), atoi(argv[2]));
 

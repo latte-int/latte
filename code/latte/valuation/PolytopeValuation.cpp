@@ -194,8 +194,6 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 	vec_ZZ ans = vec_ZZ();
 	mat_ZZ mat;
 
-	triangulatePolytopeVertexRayCone();
-
 	ZZ det = ZZ();
 	mat.SetDims(numOfVars, numOfVars);
 
@@ -257,6 +255,8 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 /**
  * Converts the input polynomal vertex-ray input to one polytope for trangulation,
  * then sums the volume of each triangulated simplex.
+ *
+ * Uses the determinant or lawrence method.
  */
 RationalNTL PolytopeValuation::findVolume(VolumeType v)
 {
@@ -275,6 +275,7 @@ RationalNTL PolytopeValuation::findVolume(VolumeType v)
 		//cout << "findVolumeUsingDeterminant(): VOLUME: " << answer << endl;
 	} else if (v == LawrenceVolume)
 	{
+		triangulatePolytopeVertexRayCone();
 		answer = findVolumeUsingLawrence();
 
 		//cout << "findVolumeUsingLawrence(): VOLUME: " << answer << endl;
@@ -286,7 +287,7 @@ RationalNTL PolytopeValuation::findVolume(VolumeType v)
 
 
 /**
- * Computes n!
+ * Computes n!, n >= 0.
  */
 ZZ PolytopeValuation::factorial(const int n)
 {
@@ -398,7 +399,7 @@ void PolytopeValuation::triangulatePolytopeCone()
 	parameters.Number_of_Variables = numOfVars + 1;
 	triangulatedPoly = triangulateCone(polytopeAsOneCone, numOfVars + 1,
 			&parameters);
-	//parameters.Number_of_Variables = numOfVars; //convert back. This is not really needed.
+	//parameters.Number_of_Variables = numOfVars; //convert back. This is not really needed, because we never look at this value again.
 	freeTriangulatedPoly = 1; //Delete this in the deconstructor.
 }//triangulateCone()
 
@@ -416,4 +417,5 @@ void PolytopeValuation::triangulatePolytopeVertexRayCone()
 			parameters.Number_of_Variables, parameters.Flags,
 			parameters.File_Name, 0, true,
 			BarvinokParameters::DualDecomposition);
+	freeTriangulatedPoly = 1; //Delete this in the deconstructor.
 }

@@ -134,6 +134,7 @@ public:
 	RationalNTL();									//initialize to 0
 	RationalNTL(const ZZ &num, const ZZ& denom);
 	RationalNTL(const int num, const int denom);
+	RationalNTL(const string &num, const string &denom);
 	void canonicalize();							// reduces the fraction to lowest terms, and makes
 													//	the denominator positive.
 	void add(const ZZ &num, const ZZ& denom);		// adds fractions and then reduces them.
