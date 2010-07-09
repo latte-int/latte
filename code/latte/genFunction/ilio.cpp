@@ -30,8 +30,8 @@ int main(int argc, char *argv[])
      //cout << "Usage: ilio numRuns dim [seed]" << endl;
      //return 1;
      //assume testing
-	loops = 300;
-	rdim = cdim = 30;
+	loops = 1;
+	rdim = cdim = 11;
     }
     else
     {
