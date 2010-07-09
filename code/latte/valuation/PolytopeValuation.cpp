@@ -415,7 +415,7 @@ void PolytopeValuation::triangulatePolytopeVertexRayCone()
 
 	triangulatedPoly = decomposeCones(vertexRayCones,
 			parameters.Number_of_Variables, parameters.Flags,
-			parameters.File_Name, 0, true,
+			parameters.File_Name, 0, true, //change to false later?!?!?!
 			BarvinokParameters::DualDecomposition);
 	freeTriangulatedPoly = 1; //Delete this in the deconstructor.
 }
