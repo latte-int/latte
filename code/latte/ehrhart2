@@ -22,6 +22,7 @@ then
 	echo "-s: saves the ehrhart and latte files if a coefficient of the ehrhart polynomial is negative"
 	echo "-R: invokes the -r option and saves the latte and ehrhart files if the real part of a root is positive"
 	echo "-S: forces a save of the ehrhart and latte files"
+	echo "All files are saved in ./savedfiles"
 	exit 0
 fi
 
