@@ -231,9 +231,13 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	}//if too few parameters.
 	if ( argc == 2 && !strcmp(argv[1], "--help"))
 	{
-		cout << "usage: valuation-exe [valuation  type] [valuation algorithm] <latte file>\n";
-		cout << "valuation types: volume\n";
-		cout << "  volume algorithm: [--lawrence  <--printLawrenceFunction> | --triangulate | --all]\n";
+		cout << "usage: " << argv[0] << " [valuation  type] [valuation algorithm] <latte file>\n"
+		     << "valuation types: volume\n"
+		     << "  volume algorithm: [--lawrence  <--printLawrenceFunction> | --triangulate | --all]\n"
+		     << "\n"
+		     << "Example: " << argv[0] << " --lawrence --printLawrenceFunction file.latte\n"
+			 << "         (will print the volume found by the Lawrence method along with the Lawrence rational function.)\n";
+
 		exit(0);
 	}//if need help.
 
@@ -847,9 +851,9 @@ void runBirkhoffTests()
 
 int main(int argc, char *argv[])
 {
-	//mainValuationDriver(argv, argc);
+	mainValuationDriver((const char **) argv, argc);
 	//runHyperSimplexTests();
-	runBirkhoffTests();
+	//runBirkhoffTests();
 	//runTests();
 	//runOneTest(atoi(argv[1]), atoi(argv[2]));
 
