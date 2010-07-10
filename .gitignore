@@ -246,11 +246,15 @@ distro/Makefile
 distro/Makefile.in
 distro/aclocal.m4
 distro/autom4te.cache
+distro/config.guess
 distro/config.log
 distro/config.status
+distro/config.sub
 distro/configure
 distro/configure.lineno
 distro/dest
+distro/install-sh
+distro/missing
 doc/manual.pdf
 doc/manual.ps
 /install-reloc
