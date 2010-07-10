@@ -39,9 +39,6 @@ code/latte/interpolation/PolynomialInterpolation.cpp -text
 code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
 code/latte/polyintegration.tex -text
-code/latte/testEhrhart/.deps/.dirstamp -text
-code/latte/testEhrhart/.deps/BuildRandomEdgePolytope.Po -text
-code/latte/testEhrhart/.deps/BuildRandomPolytope.Po -text
 code/latte/testEhrhart/BuildGraphPolytope.cpp -text
 code/latte/testEhrhart/BuildGraphPolytope.h -text
 code/latte/testEhrhart/BuildHypersimplexEdgePolytope.cpp -text
