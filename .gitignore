@@ -18,6 +18,9 @@ EXAMPLES/Check_red.out
 EXAMPLES/Error
 EXAMPLES/Makefile
 EXAMPLES/Makefile.in
+EXAMPLES/birkhoff/*.ddl
+EXAMPLES/birkhoff/*.ine
+EXAMPLES/birkhoff/*.rat
 EXAMPLES/crosspolytope/*.latte
 EXAMPLES/crosspolytope/*.latte.cdd
 EXAMPLES/crosspolytope/*.latte.ead
