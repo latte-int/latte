@@ -29,8 +29,8 @@ code/latte/integration/newIntegration.cpp -text
 code/latte/integration/newIntegration.h -text
 code/latte/integration/residue.cpp -text
 code/latte/integration/residue.h -text
-code/latte/integration/testIntegration.sh -text
-code/latte/integration/testMultiply.sh -text
+code/latte/integration/testIntegration.sh.in -text
+code/latte/integration/testMultiply.sh.in -text
 code/latte/integration/versusMode.cpp -text
 code/latte/interpolation/PolynomialInterpolation.cpp -text
 code/latte/interpolation/PolynomialInterpolation.h -text
