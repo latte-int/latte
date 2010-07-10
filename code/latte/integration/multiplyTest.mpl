@@ -1,6 +1,8 @@
 with(linalg):with(LinearAlgebra):
 with(numapprox,laurent):
 
+printf("Testing polynomial multiplication...\n"):
+
 ## Converting from Maple polynomials to our sparse format
 
 polynomial_to_sparsepoly := proc(p, dimension)
@@ -54,9 +56,9 @@ local temp, polyFile, formFile, i:
 myIndex:=1:
 polyFile:=fopen("integration/randomPolys.txt",WRITE,TEXT):
 for myDim from 10 to 30 do
+  printf("Multiplying monomials of dimension %d...\n", myDim):
   for i from myIndex to myIndex + 2*polyCount - 1 do
   #polyCount, bigConstant, numTerms, dimension, myDegree
-  print(StringTools[Join](["Multiplying monomials of dimension", convert(myDim,string)], " ")):
   myPolys[i]:=random_sparse_homogeneous_polynomial_with_degree(1000, myDim, myDim*3, 10);
   writeline(polyFile, convert(polynomial_to_sparsepoly(myPolys[i], myDim), string));
   myIndex:=myIndex+1:

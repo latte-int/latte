@@ -165,6 +165,17 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
+
+TESTS = ilio_test
+check_PROGRAMS = ilio_test
+ilio_test_SOURCES = genFunction/ilio.cpp
+
+# Maple code
+dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
+
+###### VOLUME COMPUTATION AND RATIONAL VALUATIONS ##########
+
+
 bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
 ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
@@ -172,7 +183,7 @@ ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 bin_PROGRAMS += myTest
 myTest_SOURCES = interpolation/PolynomialInterpolation.cpp
 myTest_SOURCES += interpolation/testDriver.cpp
- 
+
 bin_PROGRAMS += myTestEhrhart
 myTestEhrhart_SOURCES = testEhrhart/Driver.cpp
 myTestEhrhart_SOURCES += testEhrhart/BuildRandomPolytope.cpp
@@ -190,9 +201,6 @@ ValuationComputation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
 
 
 
-
-check_PROGRAMS = ilio_test
-ilio_test_SOURCES = genFunction/ilio.cpp
 
 
 
@@ -249,9 +257,8 @@ check_PROGRAMS += compare
 compare_SOURCES = integration/versusMode.cpp
 compare_LDADD = liblatteintegration.a liblatte.a
 
-TESTS =  integration/testMultiply.sh
+TESTS +=  integration/testMultiply.sh
 TESTS += integration/testIntegration.sh
-TESTS += ilio_test
 
 bench-table5: 
 	integration/benchmark.sh 5 integration/table5.txt
@@ -267,5 +274,3 @@ bench-all:
 	bench-table5 bench-table6 bench-table10 bench-table11 bench-table13
 .PHONY: bench-all bench-table5 bench-table6 bench-table10 bench-table11 bench-table13
 
-# Maple code
-dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add

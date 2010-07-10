@@ -1,6 +1,17 @@
 with(linalg):with(LinearAlgebra):
 with(numapprox,laurent):
+
+
+printf("Testing decomposition into linear forms and integration...\n"):
+#
+# The test is done by comparing against known-good Maple code.
+#
+# Test limits:
+maxDim := 8:
+maxDegree := 8:
+
 read("integration/createLinear.mpl"):
+
 # Integral of a  power of a linear form over a simplex.
 # Our Notations;
 
@@ -323,23 +334,23 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
       mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],dimension,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
     od:
     intTime:=intTime + time() - temp:
-    print(StringTools[Join](["Integrating", convert(intTime,string)], ":"));
+    #####print(StringTools[Join](["Integrating", convert(intTime,string)], ":"));
   od:
   
   intTime:=intTime / polyCount:
-  print(StringTools[Join]([convert(intTime,string),"s. avg. spent on Maple integration."], " "));
+  #####print(StringTools[Join]([convert(intTime,string),"s. avg. spent on Maple integration."], " "));
   
   #compare the forms
   errors:=0:
   errorFile:=fopen("integration/errors.log",APPEND,TEXT):
   for i from 1 to polyCount do
-    print(myLinForms[i]);
+    ##### print(myLinForms[i]);
     if decomposing = 1 then
       curForms:=Array(parse(myLinForms[i])):
     end if:
-    print("curForms", curForms):
+    ##### print("curForms", curForms):
     
-    print(mapleLinForms[i]);
+    ##### print(mapleLinForms[i]);
     myResults[i]:=parse(myResults[i]):
     wrong:=0: #prevents double counting errors, hopefully
     if decomposing = 1 then #check that decomposition is correct
@@ -385,7 +396,9 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   close(errorFile):
   
   totalErrors:= totalErrors + errors:
-  print(StringTools[Join]([convert(errors,string),"tests failed."], " "));
+  if errors > 0 then 
+    printf("%d tests failed.\n", errors):
+  end if;
 end:
 
 global totalErrors:
@@ -394,12 +407,12 @@ local myDim, myDegree:
 errorFile:=fopen("integration/errors.log",WRITE,TEXT):
 close(errorFile):
 totalErrors:= 0:
-for myDim from 2 to 20 do
-  for myDegree from 2 to 20 do
+for myDim from 2 to maxDim do
+  for myDegree from 2 to maxDegree do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    print(StringTools[Join](["Integrating monomials of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
+    printf("Integrating monomials of degree %d, dimension %d...\n", myDegree, myDim):
     test_integration(10, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
-    print(StringTools[Join](["Integrating powers of linear forms of degree", convert(myDegree,string),"dimension", convert(myDim,string)], " ")):
+    printf("Integrating powers of linear forms of degree %d, dimension %d...\n", myDegree, myDim):
     test_integration(10, 1000, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm):
     if (totalErrors > 0) then
       quit:
@@ -407,6 +420,6 @@ for myDim from 2 to 20 do
   od:
 od:
 #print(integral_power_linear_form([[0],[1]],1,1,[1]);
-print(StringTools[Join]([convert(totalErrors,string),"total errors."], " ")):
+printf("%d total errors.\n", totalErrors):
 
  

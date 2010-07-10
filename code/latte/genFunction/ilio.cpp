@@ -24,6 +24,9 @@ int main(int argc, char *argv[])
     
     double nTime, lTime;
     double oldTime;
+
+    cout << "Testing Ilio Smith normal form algorithm..." << endl;
+    
     nTime = lTime = 0;
     if (argc < 3)
     {
