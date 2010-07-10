@@ -5,6 +5,7 @@
 #include <iostream>
 #include <fstream>
 #include <NTL/ZZ.h>
+#include <cstring>
 
 using namespace std;
 

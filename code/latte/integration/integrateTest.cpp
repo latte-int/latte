@@ -8,6 +8,7 @@ Used by decomposeTest.mpl in make check as well as benchmark.mpl for benchmark g
 #include "../timing.h"
 #include <iostream>
 #include <fstream>
+#include <cstring>
 #include <NTL/ZZ.h>
 
 using namespace std;

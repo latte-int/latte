@@ -9,6 +9,7 @@ Provides interactive console tool for decomposition and/or integration over arbi
 #include <fstream>
 #include <NTL/ZZ.h>
 #include <string>
+#include <cstring>
 
 using namespace std;
 

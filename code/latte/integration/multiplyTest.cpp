@@ -7,6 +7,7 @@ Called in multiplyTest.mpl as part of make check
 #include "../timing.h"
 #include <iostream>
 #include <fstream>
+#include <climits>
 #include <NTL/ZZ.h>
 
 using namespace std;

@@ -5,6 +5,8 @@
 #include <iostream>
 #include <fstream>
 #include <NTL/ZZ.h>
+#include <cstring>
+
 using namespace std;
 
 //This main function takes in a number of polynomial-simplex or liear-form-simplex pairs and integrate them.
