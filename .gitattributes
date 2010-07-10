@@ -32,9 +32,6 @@ code/latte/integration/residue.h -text
 code/latte/integration/testIntegration.sh -text
 code/latte/integration/testMultiply.sh -text
 code/latte/integration/versusMode.cpp -text
-code/latte/interpolation/.deps/.dirstamp -text
-code/latte/interpolation/.deps/PolynomialInt.Po -text
-code/latte/interpolation/.deps/testDriver.Po -text
 code/latte/interpolation/PolynomialInterpolation.cpp -text
 code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
