@@ -5,6 +5,8 @@
 #include "../timing.h"
 #include <iostream>
 #include <fstream>
+#include <climits>
+#include <cstring>
 #include <NTL/ZZ.h>
 
 using namespace std;
