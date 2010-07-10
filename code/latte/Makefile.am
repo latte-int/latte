@@ -184,6 +184,8 @@ bin_PROGRAMS += myTest
 myTest_SOURCES = interpolation/PolynomialInterpolation.cpp
 myTest_SOURCES += interpolation/testDriver.cpp
 
+noinst_HEADERS += interpolation/PolynomialInterpolation.h
+
 bin_PROGRAMS += myTestEhrhart
 myTestEhrhart_SOURCES = testEhrhart/Driver.cpp
 myTestEhrhart_SOURCES += testEhrhart/BuildRandomPolytope.cpp
@@ -191,6 +193,10 @@ myTestEhrhart_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
 myTestEhrhart_SOURCES += testEhrhart/GraphMaker.cpp
 myTestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
 
+noinst_HEADERS += testEhrhart/BuildGraphPolytope.h	\
+	testEhrhart/BuildHypersimplexEdgePolytope.h	\
+	testEhrhart/BuildRandomPolytope.h		\
+	testEhrhart/GraphMaker.h
 
 
 bin_PROGRAMS += ValuationComputation
@@ -199,9 +205,7 @@ ValuationComputation_SOURCES += valuation/PolytopeValuation.cpp
 ValuationComputation_SOURCES += testEhrhart/BuildRandomPolytope.cpp
 ValuationComputation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
 
-
-
-
+noinst_HEADERS += valuation/PolytopeValuation.h
 
 
 ################ INTEGRATION ####################
@@ -223,6 +227,7 @@ noinst_HEADERS +=				\
 	integration/PolyTrie.h			\
 	integration/newIntegration.h		\
 	integration/burstTrie.h			\
+	integration/blockReps.h			\
 	integration/residue.h
 
 bin_PROGRAMS += BlockIntegrate
