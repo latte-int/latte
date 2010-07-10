@@ -1,0 +1,96 @@
+
+\documentclass{article}[12 pt]
+
+\usepackage{a4wide}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsthm}
+\usepackage{mathrsfs}
+\usepackage{graphicx}
+\usepackage{psfrag}
+\usepackage{url}
+\usepackage{amstext}
+\usepackage{multirow}
+\usepackage{latexsym}
+
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\FC}{{\overline{\mathbb{F}}}}
+\newcommand{\KC}{{\overline{\mathbb{K}}}}
+\newcommand{\K}{\mathbb{K}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\G}{\mathcal{G}}
+\newcommand{\V}[1]{V_\KC(#1)}
+\newcommand{\W}{\mathcal{W}}
+\newcommand{\aH}{{}^aH}
+\newcommand{\x}{{\bf x}}
+
+\newcommand{\genR}[1]{\langle #1 \rangle_R}
+\newcommand{\genK}[1]{\langle #1 \rangle_\K}
+
+\newcommand{\CP}[3]{\mathcal{CP}_{#1}(#2,#3)}
+\newcommand{\CPX}[4]{\mathcal{CP}^{#1}_{#2}(#3,#4)}
+\newcommand{\CPT}[4]{\mathcal{CP}_{{#1},{#2}}(#3,#4)}
+\newcommand{\CPTX}[5]{\mathcal{CP}^{#1}_{{#2},{#3}}(#4,#5)}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\gen}[1]{\langle #1 \rangle_{\F_2}}
+
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\codim}{codim}
+
+\begin{document}
+
+
+
+\begin{table}
+\caption{Average integration of one power of linear form over a random simplex (average time over 50 random forms)}
+\begin{tabular}{|llllllll|}
+\hline
+\multicolumn{8}{|c|}{Degree}  \\ \hline
+n & 2 & 10 & 20 & 50 & 100 & 300 & 1000 \\ \hline
+10 & 0.0000 & 0.0000 & 0.0002 & 0.0002 & 0.0004 & 0.0020 & 0.0068 \\
+20 & 0.0004 & 0.0004 & 0.0006 & 0.0006 & 0.0018 & 0.0024 & 0.0118 \\
+50 & 0.0024 & 0.0034 & 0.0020 & 0.0028 & 0.0040 & 0.0084 & 0.0240 \\
+100 & 0.0160 & 0.0176 & 0.0172 & 0.0184 & 0.0206 & 0.0296 & 0.0858 \\
+300 & 0.3398 & 0.3370 & 0.3450 & 0.3516 & 0.3632 & 0.4108 & 0.6310 \\
+400 & 0.7590 & 0.7550 & 0.7652 & 0.7732 & 0.7908 & 0.8620 & 1.2154 \\ \hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}
+\caption{Average integration time of a random monomial of prescribed degree by decomposition into linear forms (average over 50 random forms)}
+\begin{tabular}{|llllllllllll|}
+\hline
+\multicolumn{12}{|c|}{Degree} \\ \hline
+n & 1 & 2 & 5 & 10 & 20 & 30 & 40 & 50 & 100 & 200 & 300 \\ \hline
+2 & 0.0000 & 0.0000 & 0.0002 & 0.0004 & 0.0014 & 0.0034 & 0.0078 & 0.0142 & 0.1144 & 0.9880 & 3.7944 \\
+3 & 0.0000 & 0.0004 & 0.0000 & 0.0010 & 0.0060 & 0.0204 & 0.0608 & 0.1406 & 1.9348 & 27.935 & 154.42 \\
+4 & 0.0000 & 0.0002 & 0.0004 & 0.0018 & 0.0188 & 0.0784 & 0.3440 & 0.9874 & 20.367 & 2825.4 & 4327.3 \\
+5 & 0.0000 & 0.0002 & 0.0004 & 0.0036 & 0.0460 & 0.3342 & 1.2116 & 3.6140 & 198.98 & -- & -- \\
+6 & 0.0000 & 0.0002 & 0.0006 & 0.0060 & 0.1132 & 0.8264 & 3.8862 & 17.766 & 838.18 & -- & -- \\
+7 & 0.0000 & 0.0002 & 0.0010 & 0.0098 & 0.2086 & 1.9856 & 11.540 & 42.609 & 18306 & -- & -- \\
+8 & 0.0000 & 0.0000 & 0.0014 & 0.0126 & 0.4568 & 3.3430 & 25.103 & 117.98 & 52947 & -- & -- \\
+10 & 0.0000 & 0.0000 & 0.0020 & 0.0224 & 0.9514 & 11.470 & 116.14 & 1681.0 & -- & -- & -- \\
+15 & 0.0002 & 0.0008 & 0.0044 & 0.0586 & 6.2396 & 149.05 & 3733.2 & -- & -- & -- & -- \\
+20 & 0.0002 & 0.0016 & 0.0078 & 0.1428 & 21.829 & 1546.1 & -- & -- & -- & -- & -- \\
+30 & 0.0008 & 0.0016 & 0.0190 & 0.4724 & 85.416 & 2368.0 & -- & -- & -- & -- & -- \\ \hline
+\end{tabular}
+\end{table}
+\end{document}

@@ -194,6 +194,78 @@ ValuationComputation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
 
-TESTS = $(check_PROGRAMS)
+
+
+################ INTEGRATION ####################
+
+
+noinst_LIBRARIES += liblatteintegration.a
+
+liblatteintegration_a_SOURCES = 		\
+	integration/PolyRep.cpp			\
+	integration/residue.cpp			\
+	integration/newIntegration.cpp		\
+	integration/PolyTrie.cpp
+
+noinst_HEADERS +=				\
+	integration/multiply.h			\
+	integration/iterators.h			\
+	integration/consumers.h			\
+	integration/PolyRep.h			\
+	integration/PolyTrie.h			\
+	integration/newIntegration.h		\
+	integration/burstTrie.h			\
+	integration/residue.h
+
+bin_PROGRAMS += BlockIntegrate
+BlockIntegrate_SOURCES = integration/blockInt.cpp
+BlockIntegrate_LDADD = liblatteintegration.a liblatte.a
+
+bin_PROGRAMS += BurstIntegrate
+BurstIntegrate_SOURCES = integration/burstInt.cpp
+BurstIntegrate_LDADD = liblatteintegration.a liblatte.a
+
+#bin_PROGRAMS += BurstBench
+#BurstBench_SOURCES = integration/burstBench.cpp
+#BurstBench_LDADD = liblatteintegration.a liblatte.a
+
+#bin_PROGRAMS += BlockBench
+#BlockBench_SOURCES = integration/blockBench.cpp
+#BlockBench_LDADD = liblatteintegration.a liblatte.a
+
+bin_PROGRAMS += integrate_demo
+integrate_demo_SOURCES =    integration/integrateDemo.cpp
+integrate_demo_LDADD = liblatteintegration.a liblatte.a
+
+check_PROGRAMS += integrate_test
+integrate_test_SOURCES =    integration/integrateTest.cpp
+integrate_test_LDADD = liblatteintegration.a liblatte.a
+
+check_PROGRAMS += multiply_test
+multiply_test_SOURCES =   integration/multiplyTest.cpp
+multiply_test_LDADD = liblatteintegration.a liblatte.a
+
+check_PROGRAMS += compare
+compare_SOURCES = integration/versusMode.cpp
+compare_LDADD = liblatteintegration.a liblatte.a
+
+TESTS =  integration/testMultiply.sh
+TESTS += integration/testIntegration.sh
+TESTS += ilio_test
+
+bench-table5: 
+	integration/benchmark.sh 5 integration/table5.txt
+bench-table6: 
+	integration/benchmark.sh 6 integration/table6.txt
+bench-table10: 
+	integration/benchmark.sh 10 integration/table10.txt
+bench-table11: 
+	integration/benchmark.sh 11 integration/table11.txt
+bench-table13: 
+	integration/benchmark.sh 13 integration/table13.txt
+bench-all:
+	bench-table5 bench-table6 bench-table10 bench-table11 bench-table13
+.PHONY: bench-all bench-table5 bench-table6 bench-table10 bench-table11 bench-table13
+
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
