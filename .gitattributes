@@ -1,5 +1,8 @@
 * text=auto !eol
 EXAMPLES/garcia -text
+EXAMPLES/kahle/K4.latte -text
+EXAMPLES/kahle/join.latte -text
+EXAMPLES/kahle/other.latte -text
 EXAMPLES/lehmann -text
 EXAMPLES/nicole-simplex.vrep -text
 EXAMPLES/tests/implied-equation.latte -text
