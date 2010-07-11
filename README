@@ -20,7 +20,7 @@ code distribution called
 that includes all of these libraries and will build them automatically. 
 You can get it at the same place where you got LattE macchiato,
 
-    http://www.math.uni-magdeburg.de/~mkoeppe/latte/
+    http://www.math.ucdavis.edu/~mkoeppe/latte/
 
 
 Building and installing LattE
@@ -74,12 +74,12 @@ N. Build and install LattE
 
    From the source directory of LattE:
 
-   ./configure --prefix=$HOME/latte --with-default=$HOME/latte --program-prefix=latte-
+   ./configure --prefix=$HOME/latte --with-default=$HOME/latte 
    make
    make install
 
-Now the LattE executables (latte-count, latte-ehrhart, latte-minimize,
-latte-maximize) should be available in $HOME/latte/bin.
+Now the LattE executables (count, ehrhart, minimize, maximize, ...)
+should be available in $HOME/latte/bin.
 
 
 More information
@@ -95,5 +95,5 @@ More information
 
  * Changes since the official release 1.2: see NEWS and ChangeLog
 
- * Website: http://www.math.uni-magdeburg.de/~mkoeppe/latte
+ * Website: http://www.math.ucdavis.edu/~mkoeppe/latte
 
