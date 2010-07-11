@@ -1,6 +1,7 @@
 * text=auto !eol
 EXAMPLES/garcia -text
 EXAMPLES/lehmann -text
+EXAMPLES/nicole-simplex.vrep -text
 EXAMPLES/tests/implied-equation.latte -text
 EXAMPLES/tests/missing-newline-2.latte -text
 EXAMPLES/tests/missing-newline-3.latte -text
