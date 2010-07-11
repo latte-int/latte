@@ -56,7 +56,7 @@ ReadPolyhedronData::ReadPolyhedronData()
   strcpy(Memory_Save, "yes");
 
   vertexcones = VertexConesWithCdd;
-  redundancycheck = RedundancyCheckWithCddlib;
+  redundancycheck = FullRedundancyCheckWithCddlib;
   
   expect_dilation_factor = false;
   dilation_const = 1;
@@ -77,8 +77,8 @@ void ReadPolyhedronData::show_options(ostream &stream)
 {
   stream << "Standard input specifications:" << endl
          << "  FILENAME                                 Inequalities in LattE format" << endl
-	 << "  vrep FILENAME                            Vertices in LattE format" << endl
-	 << "  cdd FILENAME.{ext,ine}                   Inequalities or vertices in CDD format" << endl
+	 << "  --vrep FILENAME                          Vertices in LattE format" << endl
+	 << "  --cdd FILENAME.{ext,ine}                 Inequalities or vertices in CDD format" << endl
          << "Input modifications:" << endl
 	 << "  --dilation=DILATION-FACTOR               Dilate by DILATION-FACTOR" << endl
          << "  --interior                               Handle the interior of the polyhedron" << endl
@@ -103,7 +103,9 @@ void ReadPolyhedronData::show_options(ostream &stream)
 	 << "  --compute-vertex-cones={cdd,lrs,4ti2}    Use this method for computing vertex cones" << endl
 	 << "  --redundancy-check={none,cddlib,full-cddlib}   Use this method for computing an irredundant " << endl
 	 << "                                           representation" << endl
-    ;
+         << "Algorithmic option:" << endl
+	 << "  --homog                                  Compute in homomogenized mode (by coning over the polytope) " << endl
+	 << "                                           rather than using the vertex cones" << endl;
 }
 
 bool ReadPolyhedronData::parse_option(const char *arg)
@@ -140,6 +142,15 @@ bool ReadPolyhedronData::parse_option(const char *arg)
   }
   else if (strcmp(arg, "--interior") == 0) {
     strcpy(interior,"yes");
+  }
+  else if (strcmp(arg, "--vrep") == 0) {
+    strcpy(Vrepresentation,"yes"); 
+  }
+  else if (strcmp(arg, "--homog") == 0) {
+    strcpy(dualApproach,"yes");
+  }
+  else if (strcmp(arg, "--cdd") == 0) {
+    strcpy (cddstyle, "yes");
   }
   else if (strncmp(arg, "--input-primal-homog-cone=", 26)==0) {
     filename = arg + 26;
