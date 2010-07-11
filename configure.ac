@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(latte-mk, 1.4-prerelease-2009-11-14)
+AC_INIT(latte-mk, 1.4-prerelease-2010-07-09)
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
@@ -113,7 +113,8 @@ AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != x )
 AC_DEFINE_UNQUOTED(MAPLE_PATH, "${MAPLEBIN}", [The path to the Maple program.])
 
 # TOPCOM for triangulations (optional)
-LB_CHECK_TOPCOM
+# Currently disabled because TOPCOM and upstream versions of cddlib do not compile together.
+###LB_CHECK_TOPCOM
 
 # 4ti2 for triangulations (optional)
 LB_CHECK_FORTYTWO
