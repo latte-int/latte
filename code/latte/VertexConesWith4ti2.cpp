@@ -149,7 +149,9 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
 	 them when needed.
       */
 
+#if 0
       printCone(cone, numOfVars);
+#endif
       
       consumer.ConsumeCone(cone);
     }
