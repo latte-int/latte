@@ -14,18 +14,21 @@ TESTS +=					\
 	test-irr-exp-maxdet1000.sh		\
 	test-allprimal-exp-maxdet1000.sh
 
+#### Using 4ti2 is actually the new default, no need to test it separately.
+## if HAVE_FORTYTWO_LIB
+## TESTS +=					\
+## 	test-4ti2.sh				\
+## 	test-irr-exp-maxdet1000-4ti2.sh		\
+## 	test-allprimal-exp-maxdet1000-4ti2.sh
+## endif
+
 ## Tests with defaults of older versions
 TESTS += 					\
 	test-cdd.sh				\
 	test-cdd-cddlib.sh
 
-if HAVE_FORTYTWO_LIB
-TESTS +=					\
-	test-4ti2.sh				\
-	test-irr-exp-maxdet1000-4ti2.sh		\
-	test-allprimal-exp-maxdet1000-4ti2.sh
-endif
-
 EXTRA_DIST = $(TESTS)
 
+clean-local:
+	-rm -rf results
 
