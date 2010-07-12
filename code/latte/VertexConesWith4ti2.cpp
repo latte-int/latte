@@ -62,6 +62,15 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
   }
   /* Make the homogenization coordinate (corresponding to the right-hand side) non-negative */
   rs->set(num_ineqs);
+
+#if 0
+  {
+    std::ofstream file("cone_for_4ti2_vertex_cones_computation");
+    file << matrix->get_number() << " " << lifted_dim << endl;
+    print(file, *matrix, 0, lifted_dim);
+    cerr << "Created file `cone_for_4ti2_vertex_cones_computation'" << endl;
+  }
+#endif
   
   VectorArray *rays = new VectorArray(0, matrix->get_size());
   lattice_basis(*matrix, *rays);
@@ -70,6 +79,15 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
   algorithm.compute(*matrix, *rays, *subspace, *rs);
   delete rs;
 
+#if 0
+  {
+    std::ofstream file("4ti2_vertex_cones_computation_output");
+    file << rays->get_number() << " " << lifted_dim << "\n";
+    print(file, *rays, 0, lifted_dim);
+    cerr << "Created file `4ti2_vertex_cones_computation_output'" << endl;
+  }
+#endif
+  
   assert(subspace->get_number() == 0); /* We assume polytopes,
 					  thus a pointed
 					  homogenization */
@@ -111,6 +129,14 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
 	  int k;
 	  for (k = 0; k<numOfVars; k++)
 	    facet_vector[k] = - ineq->first[k + 1];
+	  /* Cancel GCD: */
+	  ZZ gcd;
+	  for (k = 0; k<numOfVars; k++)
+	    gcd = GCD(gcd, facet_vector[k]);
+	  if (gcd != 0 && gcd != 1) {
+	    for (k = 0; k<numOfVars; k++)
+	      facet_vector[k] /= gcd;
+	  }
 	  cone->facets = new listVector(facet_vector, cone->facets);
 	}
       }
@@ -123,6 +149,10 @@ computeVertexConesWith4ti2(listVector* ineqs, int numOfVars,
 	 them when needed.
       */
 
+#if 0
+      printCone(cone, numOfVars);
+#endif
+      
       consumer.ConsumeCone(cone);
     }
   }

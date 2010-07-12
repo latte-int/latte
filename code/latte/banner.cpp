@@ -1,6 +1,6 @@
 /* banner.cpp -- Print the LattE banner
 
-   Copyright 2006 Matthias Koeppe
+   Copyright 2006, 2010 Matthias Koeppe
 
    This file is part of LattE.
    
@@ -27,7 +27,7 @@ void
 latte_banner(ostream &s)
 {
   s << "This is LattE macchiato " << VERSION << endl;
-  s << "Available from http://www.math.uni-magdeburg.de/~mkoeppe/latte/" << endl;
+  s << "Available from http://www.math.ucdavis.edu/~mkoeppe/latte/" << endl;
   s << "Derived from the official LattE release 1.2 (August 18, 2005)" << endl;
   s << "as available from http://www.math.ucdavis.edu/~latte/" << endl << endl;
 }

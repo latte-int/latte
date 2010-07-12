@@ -32,6 +32,7 @@
 #include "cone.h"
 #include "ramon.h"
 #include "print.h"
+#include "gnulib/pathmax.h"
 
 /* ----------------------------------------------------------------- */
 void printVector(const vec_ZZ &v, int numOfVars)
@@ -324,7 +325,7 @@ readListConeFromFile(istream &in, ConeConsumer &consumer)
 /* ----------------------------------------------------------------- */
 void printResidueFile(const char* fileName, listCone* cones, int numOfVars) {
   int numOfTerms;
-  char outFileName[127];
+  char outFileName[PATH_MAX];
   listVector *tmp;
   listCone *C;
 

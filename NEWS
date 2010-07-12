@@ -50,13 +50,6 @@ Changes since the official release 1.2:
    (The `ehrhart' program is still available, but it does not accept
    the new command-line options of `count'.)
 
-* The TOPCOM program by Joerg Rambau can be used instead of cddlib to
-  compute triangulations of cones (but it is usually not faster).
-
-  	./configure --with-topcom=PATH-TO-TOPCOM
-
-  	count --triangulation=topcom
-
 * The 4ti2 program (http://www.4ti2.de) can be used instead of cddlib and CDD+
   to compute the vertex cones of polytopes and triangulations and duals of cones.
   In many cases, 4ti2 is faster.
@@ -67,11 +60,14 @@ Changes since the official release 1.2:
 
 * New command-line option --redundancy-check={none,cddlib,full-cddlib}.
   
-  - "full-cddlib" uses cddlib to compute an irredundant system of
-    linear equations and inequalities describing the polyhedron.  This
-    corresponds to the traditional LattE behavior; it can be expensive.
+  - "full-cddlib" (the default) uses cddlib to compute an irredundant
+    system of linear equations and inequalities describing the
+    polyhedron.  This corresponds to the traditional LattE behavior;
+    it can be expensive.
 
-  - "cddlib" (the new default) uses cddlib to compute the implicit linearities only.
+  - "cddlib" (used to be the default in the 1.2+mk-0.9.x series) uses
+    cddlib to compute some implicit linearities only; it often fails
+    but is faster than full-cddlib.
 
   - "none" does nothing, the input description of the polytope should
     be irredundant.

@@ -19,6 +19,7 @@
 */
 
 #include <cstdlib>
+#include <cstdio>
 #include <iostream>
 #include <cassert>
 #include <climits>

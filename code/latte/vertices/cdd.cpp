@@ -28,6 +28,8 @@
 #include <cassert>
 #include "latte_system.h"
 #include "latte_relocatable.h"
+#include "latte_cddlib.h"
+#include "gnulib/pathmax.h"
 
 using namespace std;
 /* ----------------------------------------------------------------- */
@@ -378,7 +380,7 @@ listVector* createListOfInequalities(listVector* matrix, int numOfVars) {
 listCone* readCddExtFile(int &numOfVars) {
   int i,j,numOfVertices;
   ZZ x,y;
-  char cddInFileName[127];
+  char cddInFileName[PATH_MAX];
   rationalVector *v;
   listCone *cones,*endCones,*c;
   string tmpString;
@@ -477,7 +479,7 @@ listCone* readCddExtFile(int &numOfVars) {
 /* ----------------------------------------------------------------- */
 listCone* readCddEadFile(listCone* cones, int numOfVars) {
   int i,j,k,numOfVertices,numOfRays;
-  char cddInFileName[127];
+  char cddInFileName[PATH_MAX];
   vec_ZZ v;
   rationalVector **vertices;
   listVector *rays, *endRays;
@@ -541,7 +543,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
 
 /* ----------------------------------------------------------------- */
 void CreatExtEadFile(){
-  char cddInFileName[127];
+  char cddInFileName[PATH_MAX];
   string tmpString;
 
   strcpy(cddInFileName,"latte_cdd.out");
@@ -570,7 +572,7 @@ void CreatExtEadFile(){
 /* ----------------------------------------------------------------- */
 listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
   int i,j,k,numOfVertices,numOfRays, counter = 0;
-  char cddInFileName[127];
+  char cddInFileName[PATH_MAX];
   vec_ZZ v;
   rationalVector **vertices;
   listVector *rays, *endRays;
@@ -634,7 +636,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
 /* ----------------------------------------------------------------- */
 listCone* computeVertexCones(const char* fileName, listVector* matrix, 
 			     int numOfVars) {
-  char cddOutFileName[127], command[127];
+  char cddOutFileName[PATH_MAX], command[PATH_MAX];
   listCone *cones;
 
 /* Compute vertices and edges with cdd. */
@@ -646,15 +648,15 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
   system_with_error_check(relocated_pathname(CDD_PATH) + " latte_cdd.ine > latte_cdd.out");
   cerr << "done." << endl;
 
-  strcpy(command,"cp latte_cdd.ext ");
-  strcat(command,fileName);
-  strcat(command,".ext");
-  system_with_error_check(command);
+///   strcpy(command,"cp latte_cdd.ext ");
+///   strcat(command,fileName);
+///   strcat(command,".ext");
+///   system_with_error_check(command);
 
-  strcpy(command,"cp latte_cdd.ead ");
-  strcat(command,fileName);
-  strcat(command,".ead");
-  system_with_error_check(command);
+///   strcpy(command,"cp latte_cdd.ead ");
+///   strcat(command,fileName);
+///   strcat(command,".ead");
+///   system_with_error_check(command);
 
   {
     int ext_numOfVars;
@@ -664,9 +666,9 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
   cones=readCddEadFile(cones,numOfVars+1);
   system_with_error_check("rm -f latte_cdd.*"); 
 
-  strcpy(cddOutFileName,fileName);
-  strcat(cddOutFileName,".cdd");
-  printListConeToFile(cddOutFileName,cones,numOfVars);
+///   strcpy(cddOutFileName,fileName);
+///   strcat(cddOutFileName,".cdd");
+///   printListConeToFile(cddOutFileName,cones,numOfVars);
 
   return(cones);
 }
@@ -676,7 +678,7 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
 listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix, 
 			     int numOfVars) {
 
-  char cddOutFileName[127], command[127];
+  char cddOutFileName[PATH_MAX], command[PATH_MAX];
   listCone *cones;
 
 /* Compute vertices with lrs. */
@@ -694,15 +696,15 @@ listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix,
   system_with_error_check(relocated_pathname(CDD_PATH) + " latte_cdd.ine > latte_cdd.out");
   cerr << "done.\n\n";
 
-  strcpy(command,"cp latte_cdd.ext ");
-  strcat(command,fileName);
-  strcat(command,".ext");
-  system_with_error_check(command);
+///   strcpy(command,"cp latte_cdd.ext ");
+///   strcat(command,fileName);
+///   strcat(command,".ext");
+///   system_with_error_check(command);
 
-  strcpy(command,"cp latte_cdd.ead ");
-  strcat(command,fileName);
-  strcat(command,".ead");
-  system_with_error_check(command);
+///   strcpy(command,"cp latte_cdd.ead ");
+///   strcat(command,fileName);
+///   strcat(command,".ead");
+///   system_with_error_check(command);
 
   {
     int ext_numOfVars;
@@ -712,35 +714,173 @@ listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix,
   cones=readCddEadFile(cones,numOfVars+1);
   system_with_error_check("rm -f latte_cdd.* latte_lrs.*"); 
 
-  strcpy(cddOutFileName,fileName);
-  strcat(cddOutFileName,".cdd");
-  printListConeToFile(cddOutFileName,cones,numOfVars);
+///   strcpy(cddOutFileName,fileName);
+///   strcat(cddOutFileName,".cdd");
+///   printListConeToFile(cddOutFileName,cones,numOfVars);
 
   return(cones);
 }
 
 /* ----------------------------------------------------------------- */
+
+/* from ComputeAdjacency.cpp */
+
+dd_boolean SetInputFile(FILE **f, dd_DataFileType fname)
+{
+  dd_boolean success=dd_FALSE;
+  success=dd_FALSE;
+
+  if ( ( *f = fopen(fname, "r") )!= NULL) {
+/*     printf("input file %s is open\n", fname); */
+    success=dd_TRUE;
+  }
+  else{
+    printf("The input file %s not found\n",fname);
+  }
+  return success;
+}
+
+dd_boolean SetWriteFile(FILE **f, dd_DataFileType fname)
+{
+  dd_boolean success=dd_FALSE;
+
+  if ( (*f = fopen(fname, "w")) != NULL){
+/*     printf("output file %s is open\n",fname); */
+    success=dd_TRUE;
+  }
+  else{
+    printf("The output file %s cannot be opened\n",fname);
+  }
+  return success;
+}
+
+static int compute_adjacency(int argc, char *argv[])
+{
+  dd_MatrixPtr M=NULL,M2=NULL,M3=NULL;
+  dd_SetFamilyPtr A=NULL;
+  dd_colrange d;
+  dd_ErrorType err=dd_NoError;
+  dd_rowset redrows,linrows,ignoredrows, basisrows;
+  dd_colset ignoredcols, basiscols;
+  long rank;
+  mytype val;
+  FILE* out;
+  int flag = 0;
+  time_t starttime, endtime;
+  dd_DataFileType inputfile;
+  FILE *reading=NULL;
+  
+  //dd_set_global_constants();  /* First, this must be called. */
+  out = fopen("latte_cdd.ead", "w");
+  dd_init(val);
+  if (argc>1) strcpy(inputfile,argv[1]);
+  if (argc<=1 || !SetInputFile(&reading,argv[1])){
+/*     dd_WriteProgramDescription(stdout); */
+/*     fprintf(stdout,"\ncddlib test program to remove redundancy and compute adjacency of the resulting representation.\n"); */
+    dd_SetInputFile(&reading,inputfile, &err);
+  }
+  if (err==dd_NoError) {
+    M=dd_PolyFile2Matrix(reading, &err);
+  }
+  else {
+      fprintf(stderr,"Input file not found\n");
+    goto _L99;
+  }
+
+  if (err!=dd_NoError) goto _L99;
+
+  if (M->representation==dd_Generator) d=M->colsize+1; else d=M->colsize;
+
+  /*   fprintf(stdout, "redundant rows:\n");*/ 
+  time(&starttime); 
+  redrows=dd_RedundantRows(M, &err);
+  time(&endtime);
+  set_fwrite(out, redrows); 
+/*   dd_WriteTimes(stdout,starttime,endtime); */
+
+  M2=dd_MatrixSubmatrix(M, redrows);
+  if(M2->rowsize != M->rowsize) { fprintf(stderr,"redundant rows.\n"); goto _L99; }
+ 
+/*   fprintf(stdout, "Implicit linearity (after removal of redundant rows): "); */
+  linrows=dd_ImplicitLinearityRows(M2, &err);
+
+  set_fwrite(stdout,linrows);
+  set_uni(M2->linset, M2->linset, linrows); 
+      /* add the implicit linrows to the explicit linearity rows */
+
+  /* To remove redundancy of the linearity part, 
+     we need to compute the rank and a basis of the linearity part. */
+  set_initialize(&ignoredrows, M2->rowsize);
+  set_initialize(&ignoredcols, M2->colsize);
+  set_compl(ignoredrows, M2->linset);
+  rank=dd_MatrixRank(M2,ignoredrows,ignoredcols, &basisrows, &basiscols);
+  set_diff(ignoredrows, M2->linset, basisrows);
+
+  M3=dd_MatrixSubmatrix(M2, ignoredrows); 
+  if(M3->rowsize != M2->rowsize) { fprintf(stderr,"redundant rows.\n"); goto _L99; }
+
+  A=dd_Matrix2Adjacency(M3, &err);
+  
+  dd_WriteSetFamily(out, A); 
+  
+  dd_clear(val);
+  set_free(linrows);
+  set_free(basisrows);
+  set_free(basiscols);
+  set_free(ignoredrows);
+  set_free(ignoredcols);
+  set_free(redrows);
+  
+  if (A!=NULL) dd_FreeSetFamily(A);
+  dd_FreeMatrix(M);
+  dd_FreeMatrix(M2);
+  dd_FreeMatrix(M3);
+  fclose(out);
+_L99:;
+  if (err!=dd_NoError) {
+    dd_WriteErrorMessages(stderr,err);
+    return 1;
+  }
+  else
+    return 0;
+}
+
 listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars) {
-  char cddOutFileName[127], command[127];
+  char cddOutFileName[PATH_MAX], command[PATH_MAX];
   listCone *cones;
 
 /* Compute vertices and edges with cdd. */
 
  createCddExtFile2(fileName);
 
-  cerr << "Computing vertices and edges with cdd...";
-  system_with_error_check(COMPUTEADJACENCY_PATH " latte_cdd.ext > latte_cdd.jnk 2>&1");
+#if 0
+ cerr << "Computing vertices and edges with cdd...";
+  system_with_error_check(relocated_pathname(COMPUTEADJACENCY_PATH) + " latte_cdd.ext > latte_cdd.jnk 2>&1");
   cerr << "done.\n\n";
+#else
+  cerr << "Computing vertices and edges with cddlib...";
+  // FIXME: This needs to be rewritten properly, avoiding the use of
+  // files. 
+  {
+    char *argv[2]={(char*) "", (char*) "latte_cdd.ext"};
+    if (compute_adjacency(2, argv) != 0) {
+      cerr << "failed." << endl;
+      exit(1);
+    };
+  }
+  cerr << "done.\n\n";
+#endif
   //  CreatExtEadFile();
-   strcpy(command,"cp latte_cdd.ext ");
-  strcat(command,fileName);
-  strcat(command,".ext");
-  system_with_error_check(command);
 
-  strcpy(command,"cp latte_cdd.ead ");
-  strcat(command,fileName);
-  strcat(command,".ead");
-  system_with_error_check(command);
+///   strcpy(command,"cp latte_cdd.ext ");
+///   strcat(command,fileName);
+///   strcat(command,".ext");
+///   system_with_error_check(command);
+
+///   strcpy(command,"cp latte_cdd.ead ");
+///   strcat(command,fileName);
+///   strcat(command,".ead");
+///   system_with_error_check(command);
 
   {
     int ext_numOfVars;
@@ -750,9 +890,9 @@ listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars) {
   cones=readCddEadFileFromVrep(cones,numOfVars+1);
   system_with_error_check("rm -f latte_cdd.*"); 
 
-  strcpy(cddOutFileName,fileName);
-  strcat(cddOutFileName,".cdd");
-  printListConeToFile(cddOutFileName,cones,numOfVars);
+///   strcpy(cddOutFileName,fileName);
+///   strcat(cddOutFileName,".cdd");
+///   printListConeToFile(cddOutFileName,cones,numOfVars);
 
   return(cones);
 }

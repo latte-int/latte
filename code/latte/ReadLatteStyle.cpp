@@ -32,7 +32,7 @@ using namespace std;
 
 static void check_stream(const istream &f, const char *fileName, const char *proc)
 {
-  if (!f.good()) {
+  if (f.bad() || f.fail()) {
     cerr << "Read error on input file " << fileName << " in " << proc << "." << endl;
     exit(1);
   }
