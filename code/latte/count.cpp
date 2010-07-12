@@ -115,7 +115,6 @@ main(int argc, char *argv[])
   ehrhart_polynomial = false;
   params->substitution = BarvinokParameters::PolynomialSubstitution;
   params->decomposition = BarvinokParameters::DualDecomposition;
-  params->triangulation = BarvinokParameters::RegularTriangulationWithCdd;
   params->max_determinant = 1;
 
   for (i=1; i<argc; i++) {
