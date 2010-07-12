@@ -118,7 +118,10 @@ bool ReadPolyhedronData::parse_option(const char *arg)
 {
   /* Parse traditional LattE options. */
   if (strncmp(arg,"vrep",3)==0) strcpy(Vrepresentation,"yes"); 
-  else if(strncmp(arg,"int",3)==0) strcpy(interior,"yes");
+  else if(strncmp(arg,"int",3)==0) {
+    strcpy(interior,"yes");
+    cerr << "WARNING: Options `--interior' and `int' are broken for most methods." << endl;
+  }
   else if(strncmp(arg,"homog",3)==0) strcpy(dualApproach,"yes");
   else if(strncmp(arg,"equ",3)==0) {
     cerr << "Warning: Ignoring the old-style LattE option `equ', "
@@ -147,6 +150,7 @@ bool ReadPolyhedronData::parse_option(const char *arg)
     dilation_const = atoi(arg + 11);
   }
   else if (strcmp(arg, "--interior") == 0) {
+    cerr << "WARNING: Options `--interior' and `int' are broken for most methods." << endl;
     strcpy(interior,"yes");
   }
   else if (strcmp(arg, "--vrep") == 0) {
