@@ -48,14 +48,26 @@
 BarvinokParameters::BarvinokParameters() :
   substitution(PolynomialSubstitution),
   decomposition(DualDecomposition),
-  triangulation(RegularTriangulationWithCdd),
+  triangulation(
+#ifdef HAVE_FORTYTWO_LIB
+		RegularTriangulationWith4ti2
+#else
+		RegularTriangulationWithCdd
+#endif
+		),
   triangulation_max_height(10000),
   triangulation_bias(-1),
   nonsimplicial_subdivision(false),
   triangulation_special_cone(NULL),
   triangulation_prescribed_height_data(NULL),
   triangulation_assume_fulldim(true),
-  dualization(DualizationWithCdd),
+  dualization(
+#ifdef HAVE_FORTYTWO_LIB
+	      DualizationWith4ti2
+#else
+	      DualizationWithCdd
+#endif
+	      ),
   shortvector(LatteLLL),
   smithform(
 #ifdef HAVE_LIDIA

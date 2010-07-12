@@ -55,7 +55,13 @@ ReadPolyhedronData::ReadPolyhedronData()
   strcpy(rationalCone,"no");
   strcpy(Memory_Save, "yes");
 
-  vertexcones = VertexConesWithCdd;
+  vertexcones =
+#ifdef HAVE_FORTYTWO_LIB
+    VertexConesWith4ti2
+#else
+    VertexConesWithCdd
+#endif
+    ;
   redundancycheck = FullRedundancyCheckWithCddlib;
   
   expect_dilation_factor = false;
