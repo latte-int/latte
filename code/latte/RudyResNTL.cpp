@@ -36,6 +36,7 @@
 #include "latte_system.h"
 #include "latte_relocatable.h"
 #include "latte_ntl_integer.h"
+#include "gnulib/pathmax.h"
 
 using namespace std;
 

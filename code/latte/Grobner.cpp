@@ -33,6 +33,7 @@
 #include "barvinok/dec.h"
 #include "latte_system.h"
 #include "ProjectUp.h"
+#include "gnulib/pathmax.h"
 
 /* ---------------------------------------------------------------------- */
 void CheckGrobner(const char* filename, char * cdd){
@@ -635,7 +636,7 @@ void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
  char uni[127];
  int numOfVars, oldnumofvars, d;
  ReadGrobnerProblem(filename, A, W, bignum, d, numOfVars, uni, cdd);
- char  outFile[127];
+ char  outFile[PATH_MAX];
  strcpy(outFile, filename);
  strcat(outFile, ".gro");
  ofstream out(outFile);

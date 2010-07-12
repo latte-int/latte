@@ -61,6 +61,7 @@
 #include "ProjectUp.h"
 
 #include "gnulib/progname.h"
+#include "gnulib/pathmax.h"
 
 static void
 usage(const char *progname)
@@ -81,7 +82,7 @@ main(int argc, char *argv[])
   char printfile[127],
     Save_Tri[127],
     Load_Tri[127], Print[127], 
-    removeFiles[127], command[127];
+    removeFiles[127], command[PATH_MAX];
   bool approx;
   bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
   bool triangulation_specified = false;

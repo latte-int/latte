@@ -53,6 +53,7 @@
 #include "latte_system.h"
 
 #include "gnulib/progname.h"
+#include "gnulib/pathmax.h"
 
 /* ----------------------------------------------------------------- */
 int main(int argc, char *argv[]) {
@@ -68,11 +69,11 @@ int main(int argc, char *argv[]) {
   vec_ZZ dim, v, w;
   int oldnumofvars;
   vec_ZZ *generators;
-  char fileName[127], invocation[127], decompose[10], equationsPresent[10],
+  char fileName[PATH_MAX], invocation[127], decompose[10], equationsPresent[10],
     assumeUnimodularCones[127], dualApproach[127], taylor[127], printfile[127],
     rationalCone[127], nonneg[127], Memory_Save[127], Save_Tri[127],
     Load_Tri[127], Print[127], inthull[127], cddstyle[127], grobner[127],
-    removeFiles[127], command[127], maximum[127],  Singlecone[127], LRS[127],
+    removeFiles[127], command[PATH_MAX], maximum[127],  Singlecone[127], LRS[127],
     Vrepresentation[127], dilation[127], minimize[127], binary[127], interior[127];
   listVector *matrix, *equations, *inequalities, *rays, *endRays, *tmpRays, *matrixTmp;
   vec_ZZ cost;
@@ -187,7 +188,7 @@ int main(int argc, char *argv[]) {
   strcat(invocation,argv[argc-1]);
   strcat(invocation,"\n\n");
   cerr << invocation;
-  char costFile[127];
+  char costFile[PATH_MAX];
   if(maximum[0] == 'y'){
     strcpy(fileName,argv[argc-1]);
     strcpy(costFile, argv[argc - 1]);
