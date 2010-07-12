@@ -6,7 +6,7 @@ AC_INIT(latte-mk, 1.4-prerelease-2010-07-09)
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
-AC_CONFIG_FILES([Makefile EXAMPLES/Makefile code/Makefile code/latte/Makefile code/latte/normalize/Makefile code/test-suite/Makefile code/latte/adjacency/Makefile code/lidia-include.h:code/lidia-include.hin])
+AC_CONFIG_FILES([Makefile EXAMPLES/Makefile code/Makefile code/latte/Makefile code/latte/normalize/Makefile code/test-suite/Makefile code/lidia-include.h:code/lidia-include.hin])
 AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
 AC_CONFIG_FILES([code/gnulib/Makefile])
 AC_PROG_RANLIB
@@ -35,10 +35,6 @@ AC_FUNC_MALLOC
 AC_CHECK_FUNCS([pow sqrt])
 
 AC_CHECK_HEADERS([sstream])
-
-# Compute installed location of auxiliary binaries.
-computeadjacency_path=${libexecdir}/`echo ComputeAdjacency | sed "${program_transform_name}"`
-AC_DEFINE_DIR([COMPUTEADJACENCY_PATH], [computeadjacency_path], [The path to the ComputeAdjacency binary.])
 
 maple_script_dir=${datadir}/latte
 AC_DEFINE_DIR([MAPLE_SCRIPT_DIR], [maple_script_dir], [The directory where LattE's Maple scripts are installed.])
@@ -71,6 +67,13 @@ AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD+ binary.])
 if test -z "$CDD"; then
   AC_MSG_ERROR([The `cddr+' binary from CDD+ is required for LattE.])			
 fi
+dnl Does not work.......
+dnl # From cddlib or CDD+
+dnl AC_PATH_PROGS(CDD, [scdd_gmp cddr+_gmp cddr+])
+dnl AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to cddlib's scdd_gmp executable (or CDD+).])
+dnl if test -z "$CDD"; then
+dnl   AC_MSG_ERROR([The `scdd_gmp' binary from cddlib or `cddr+' binary from CDD+ is required for LattE.])			
+dnl fi
 AC_CACHE_SAVE
 
 # From cddlib
@@ -94,8 +97,7 @@ if test "x$cddlib_found" = "xno" ; then
 fi   
 if test "x$cddlib_found" = "xno" ; then
    AC_MSG_WARN([cddlib not found!
-LattE needs it for building the CheckAdjacency program, which is
-needed for the "vrep" mode.])
+LattE needs it.])
 fi
 AC_CACHE_SAVE
 	  

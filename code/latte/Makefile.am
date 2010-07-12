@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
 
-SUBDIRS = adjacency . 
+SUBDIRS = .
 SUBDIRS += normalize
 
 bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext
