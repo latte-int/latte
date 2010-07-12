@@ -29,47 +29,49 @@ dnl Check for existence
 BACKUP_CXXFLAGS=${CXXFLAGS}
 BACKUP_LIBS=${LIBS}
 
-if test -n "$TOPCOM_HOME_PATH" ; then
-AC_MSG_CHECKING(for TOPCOM library)
-fi
+### TOPCOM library currently disabled -- TOPCOM and upstream versions of cddlib do not compile together.
 
-for TOPCOM_HOME in ${TOPCOM_HOME_PATH} 
- do	
-if test -r "$TOPCOM_HOME/include/PointConfiguration.hh"; then
-	if test "x$TOPCOM_HOME" != "x/usr" -a "x$TOPCOM_HOME" != "x/usr/local"; then
-		TOPCOM_CXXFLAGS="-I${TOPCOM_HOME}/include"
-		TOPCOM_LIBS="-L${TOPCOM_HOME}/lib -lTOPCOM -lCHECKREG -lwrapgmp-gcc4"
-	else
-		TOPCOM_CXXFLAGS=
-		TOPCOM_LIBS="-lTOPCOM -lCHECKREG -lwrapgmp-gcc4"
-	fi	
-	CXXFLAGS="${BACKUP_CXXFLAGS} ${TOPCOM_CXXFLAGS} ${GMP_CFLAGS}" 
-	LIBS="${BACKUP_LIBS} ${TOPCOM_LIBS} ${GMP_LIBS}"
+# if test -n "$TOPCOM_HOME_PATH" ; then
+# AC_MSG_CHECKING(for TOPCOM library)
+# fi
 
-	AC_TRY_LINK([
-#include "PointConfiguration.hh"
-],
-[ PointConfiguration pc;
-],
-[	topcom_found="yes"
-	break
-]
-)
-else
-	topcom_found="no"
-fi
-done
+# for TOPCOM_HOME in ${TOPCOM_HOME_PATH} 
+#  do	
+# if test -r "$TOPCOM_HOME/include/PointConfiguration.hh"; then
+# 	if test "x$TOPCOM_HOME" != "x/usr" -a "x$TOPCOM_HOME" != "x/usr/local"; then
+# 		TOPCOM_CXXFLAGS="-I${TOPCOM_HOME}/include"
+# 		TOPCOM_LIBS="-L${TOPCOM_HOME}/lib -lTOPCOM -lCHECKREG -lwrapgmp-gcc4"
+# 	else
+# 		TOPCOM_CXXFLAGS=
+# 		TOPCOM_LIBS="-lTOPCOM -lCHECKREG -lwrapgmp-gcc4"
+# 	fi	
+# 	CXXFLAGS="${BACKUP_CXXFLAGS} ${TOPCOM_CXXFLAGS} ${GMP_CFLAGS}" 
+# 	LIBS="${BACKUP_LIBS} ${TOPCOM_LIBS} ${GMP_LIBS}"
 
-if test "x$topcom_found" = "xyes" ; then		
-	AC_SUBST(TOPCOM_CXXFLAGS)
-	AC_SUBST(TOPCOM_LIBS)
-	AC_DEFINE(HAVE_TOPCOM_LIB,1,[Define if the TOPCOM library is installed])
-	HAVE_TOPCOM_LIB=yes
-	AC_MSG_RESULT(found)
-else
-	AC_MSG_RESULT(not found)
-	ifelse([$3], , :, [$3])
-fi	
+# 	AC_TRY_LINK([
+# #include "PointConfiguration.hh"
+# ],
+# [ PointConfiguration pc;
+# ],
+# [	topcom_found="yes"
+# 	break
+# ]
+# )
+# else
+# 	topcom_found="no"
+# fi
+# done
+
+# if test "x$topcom_found" = "xyes" ; then		
+# 	AC_SUBST(TOPCOM_CXXFLAGS)
+# 	AC_SUBST(TOPCOM_LIBS)
+# 	AC_DEFINE(HAVE_TOPCOM_LIB,1,[Define if the TOPCOM library is installed])
+# 	HAVE_TOPCOM_LIB=yes
+# 	AC_MSG_RESULT(found)
+# else
+# 	AC_MSG_RESULT(not found)
+# 	ifelse([$3], , :, [$3])
+# fi	
 
 AM_CONDITIONAL(HAVE_TOPCOM_LIB, test "x$HAVE_TOPCOM_LIB" = "xyes")
 
