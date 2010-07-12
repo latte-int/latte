@@ -8,13 +8,6 @@ BUILT_SOURCES = test.pl
 
 TESTS =
 
-if HAVE_FORTYTWO_LIB
-TESTS +=					\
-	test-4ti2.sh				\
-	test-irr-exp-maxdet1000-4ti2.sh		\
-	test-allprimal-exp-maxdet1000-4ti2.sh
-endif
-
 TESTS +=					\
 	test-homog.sh				\
 	test-default.sh				\
@@ -25,6 +18,13 @@ TESTS +=					\
 TESTS += 					\
 	test-cdd.sh				\
 	test-cdd-cddlib.sh
+
+if HAVE_FORTYTWO_LIB
+TESTS +=					\
+	test-4ti2.sh				\
+	test-irr-exp-maxdet1000-4ti2.sh		\
+	test-allprimal-exp-maxdet1000-4ti2.sh
+endif
 
 
 
