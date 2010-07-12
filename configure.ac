@@ -113,8 +113,7 @@ AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != x )
 AC_DEFINE_UNQUOTED(MAPLE_PATH, "${MAPLEBIN}", [The path to the Maple program.])
 
 # TOPCOM for triangulations (optional)
-# Currently disabled because TOPCOM and upstream versions of cddlib do not compile together.
-###LB_CHECK_TOPCOM
+LB_CHECK_TOPCOM
 
 # 4ti2 for triangulations (optional)
 LB_CHECK_FORTYTWO
