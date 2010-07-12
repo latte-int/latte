@@ -12,6 +12,18 @@
 
 
 
+/** TODO
+ *
+--Fix the PolytopeValuation: change the constructor to take a polytope.
+--use gdb to set through the main funtion to see what is used (with and without using the strong cdd option), so we can learn what we can cut in the main function
+--add command line options like before.
+--remove debug cout's?
+--remove the old main function?
+--make the factorial function static or move to a different file!
+--test on RATIONAL VERTICES!!!
+ *
+ */
+
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -153,7 +165,7 @@ void printVolumeTest(const RationalNTL &correctVolumeAnswer, VolumesContainer vo
 /**
  * Computes the volume of the polytope.
  */
-VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
+VolumesContainer computeVolume(Polyhedron * poly, BarvinokParameters &myParameters,
 		const char *valuationAlg, const char * print)
 {
 	VolumesContainer ans;
@@ -161,9 +173,7 @@ VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameter
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
 	{
-		PolytopeValuation polytopeValuation(cones,
-				PolytopeValuation::VertexRayCones,
-				myParameters.Number_of_Variables, myParameters);
+		PolytopeValuation polytopeValuation(poly, myParameters);
 		ans1 = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
 
 		cout << "(using triangulation-determinant method) VOLUME " << ans1 << endl;
@@ -173,9 +183,7 @@ VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameter
 			|| strcmp(valuationAlg, "all") == 0)
 	{
 
-		PolytopeValuation polytopeValuation(cones,
-				PolytopeValuation::VertexRayCones,
-				myParameters.Number_of_Variables, myParameters);
+		PolytopeValuation polytopeValuation(poly, myParameters);
 		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
 
 		cout << "(using Lawrence method) VOLUME " << ans2 << endl;
@@ -217,6 +225,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	unsigned int flags = 0, print_flag = 0, output_cone = 0;
 	char printfile[127], Save_Tri[127], Load_Tri[127], Print[127],
 			removeFiles[127], command[127];
+	char valuationAlg[127], printLawrence[127];
 	bool approx;
 	bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
 	bool triangulation_specified = false;
@@ -247,7 +256,11 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	strcpy(printfile, "no");
 	strcpy(Save_Tri, "no");
 	strcpy(Load_Tri, "no");
-	strcpy(Print, "yes");
+	strcpy(Print, "no");
+	strcpy(valuationAlg, "all");
+	strcpy(printLawrence, "no");
+
+
 	approx = false;
 	ehrhart_polynomial = false;
 	params->substitution = BarvinokParameters::PolynomialSubstitution;
@@ -353,6 +366,18 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 		{
 			read_polyhedron_data.show_options(cerr);
 			cerr << "Options that control what to compute:" << endl
+				 << "  valuation types: volume\n"
+			     << "  volume algorithms:\n"
+			     << "  --lawrence  [--printLawrenceFunction]       Computes the volume using the Lawrence formula and\n"
+			     << "                                              and prints the Lawrence rational function.\n"
+			     << "  --triangulate                               Computes the volume using the triangulation method.\n"
+			     << "  --all                                       Computes the volume using all the methods.\n"
+			     << "\n"
+			     << "Example: " << argv[0] << " --lawrence --printLawrenceFunction file.latte\n"
+				 << "         (will print the volume found by the Lawrence method along with the Lawrence rational function.)\n"
+			     << endl;
+			     /*
+
 					<< "  --count-lattice-points                   Compute the number of lattice points"
 					<< endl
 					<< "                                           (default)"
@@ -405,8 +430,17 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 			show_standard_smith_option(cerr);
 			show_standard_dualization_option(cerr);
 			show_standard_triangulation_options(cerr);
+			*/
 			exit(0);
-		} else if (read_polyhedron_data.parse_option(argv[i]))
+		}else if ( strcmp(argv[i], "--lawrence") == 0)
+			strcpy(valuationAlg, "lawrence");
+		else if ( strcmp(argv[i], "--triangulate") == 0)
+			strcpy(valuationAlg, "triangulate");
+		else if ( strcmp(argv[i], "--all") == 0 )
+			strcpy(valuationAlg, "all");
+		else if ( strcmp(argv[i], "--printLawrenceFunction") == 0)
+			strcpy(printLawrence, "yes");
+		else if (read_polyhedron_data.parse_option(argv[i]))
 		{
 		} else
 		{
@@ -522,23 +556,26 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	params->Flags = flags;
 	params->Number_of_Variables = Poly->numOfVars;
 	params->max_determinant = 1;
+	params->File_Name = (char*) fileName;
 	//params->File_Name = fileName;
 	params->decomposition = BarvinokParameters::DualDecomposition;
 
 
-	ofstream file;
+
+	volumeAnswers = computeVolume(Poly, *params, valuationAlg, printLawrence);
+	//return volumeAnswers;
+
+/*	ofstream file;
 	file.open("cones_count.txt");
 	for(listCone * t = Poly->cones; t; t = t->rest)
 		printConeToFile(file, t, Poly->numOfVars);
 	file.close();
 
 
-	PolytopeValuation polytopeValuation(Poly->cones,
-					PolytopeValuation::VertexRayCones,
-					Poly->numOfVars, *params);
+	PolytopeValuation polytopeValuation(Poly, *params);
 
-	RationalNTL ans = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
-	cout << "VOLUME BY TRIANGULATION: " << ans << endl;
+	RationalNTL ans1 = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
+	cout << "VOLUME BY TRIANGULATION: " << ans1 << endl;
 
 
 
@@ -549,29 +586,26 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 
 	cout << "VOLUME BY LAWRENCE " << ans2 << endl;
 
+	volumeAnswers.triangulate = ans1;
+	volumeAnswers.lawrence = ans2;
+
+	return volumeAnswers;
+*/
 
 
-	//computeVolume(Poly->cones, *params, "all", "no");
-	exit(1);
-
-	if (Print[0] == 'y')
-	{
-		cout << "printing on line 512" << endl;
-		printListCone(Poly->cones, Poly->numOfVars);
-		cout << "end printing on line 512" << endl;
-	}
 
 
 	/* Compute the facet information from tight inequalities if
 	 possible.  It is essential that this is done BEFORE translating
 	 vertexes to the origin (in Ehrhart polynomial mode) -- otherwise
 	 tightness information is wrong. */
+/*
 	if (not Poly->dualized && Poly->cones != NULL
 			&& read_polyhedron_data.matrix != NULL
 			&& read_polyhedron_data.Vrepresentation[0] != 'y')
 	{
-		/* Fill in the facets of all cones; we determine them by
-		 taking all inequalities tight at the respective vertex. */
+		// Fill in the facets of all cones; we determine them by
+		// taking all inequalities tight at the respective vertex. /
 		params->dualize_time.start();
 		computeTightInequalitiesOfCones(Poly->cones,
 				read_polyhedron_data.matrix, Poly->numOfVars);
@@ -581,7 +615,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 
 	if (ehrhart_polynomial)
 	{
-		/* Translate all cones to the origin, saving the original vertex. */
+		// Translate all cones to the origin, saving the original vertex. /
 		listCone *cone;
 		for (cone = Poly->cones; cone; cone = cone->rest)
 		{
@@ -606,14 +640,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	params->File_Name = (char*) fileName;
 	params->Number_of_Variables = Poly->numOfVars;
 
-	if (Print[0] == 'y')
-	{
-		cout << "printing on line 560" << endl;
-		printListCone(Poly->cones, Poly->numOfVars);
-		cout << "end printing on line 560" << endl;
-	}
-	cout << "calling exit on line 569" << endl;
-	exit(1);
+
 
 
 
@@ -625,8 +652,8 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 			{
 				if (read_polyhedron_data.Vrepresentation[0] != 'y')
 				{
-					/* Compute all inequalities tight at the respective vertex.
-					 Then dualizeCones just needs to swap rays and facets. */
+					//* Compute all inequalities tight at the respective vertex.
+					// Then dualizeCones just needs to swap rays and facets. /
 					computeTightInequalitiesOfCones(Poly->cones,
 							read_polyhedron_data.matrix, Poly->numOfVars);
 				}
@@ -656,9 +683,9 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 					cerr.flush();
 				} else if (Poly->cones->rays == NULL)
 				{
-					/* Only facets computed, for instance by using the 4ti2
-					 method of computing vertex cones.  So dualize twice to
-					 compute the rays. */
+					//* Only facets computed, for instance by using the 4ti2
+					// method of computing vertex cones.  So dualize twice to
+					// compute the rays. /
 					cerr << "(First computing their rays... ";
 					cerr.flush();
 					dualizeCones(Poly->cones, Poly->numOfVars, params);
@@ -682,12 +709,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 			abort();
 	}
 
-	if (Print[0] == 'y')
-	{
-		cout << "printing on line 630" << endl;
-		printListCone(Poly->cones, Poly->numOfVars);
-		cout << "end printing on line 630" << endl;
-	}
+
 
 
 	try
@@ -744,7 +766,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 						Poly->cones = decomposed_cones;
 						// 	cerr << "Decomposed cones: " << endl;
 						//	printListCone(Poly->cones, Poly->numOfVars);
-						/* Compute points in parallelepipeds */
+						// Compute points in parallelepipeds /
 						computePointsInParallelepipeds(Poly->cones,
 								Poly->numOfVars, params);
 					}
@@ -807,16 +829,18 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 						//				myParameters.Number_of_Variables, myParameters);
 						//		ans1 = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
 
-						for(listCone * t = Poly->cones; t; t = t->rest)
-							printConeToFile(cout, Poly->cones, Poly->numOfVars);
+
+						//for(listCone * t = Poly->cones; t; t = t->rest)
+						//	printConeToFile(cout, Poly->cones, Poly->numOfVars);
 
 
-						PolytopeValuation polytopeValuation(Poly->cones,
-										PolytopeValuation::TriangulatedCones,
-										Poly->numOfVars, *params);
-						RationalNTL ans = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
-						cout << "VOLUME BY DETERMINAT-VOLUME2 " << ans << endl;
-						exit(1);
+						//PolytopeValuation polytopeValuation(Poly->cones,
+						//				PolytopeValuation::TriangulatedCones,
+						//				Poly->numOfVars, *params);
+						//RationalNTL ans = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
+						//cout << "VOLUME BY DETERMINAT-VOLUME2 " << ans << endl;
+						//exit(1);
+
 						cerr << endl << "Ehrhart polynomial: ";
 						{
 							unsigned int i;
@@ -860,12 +884,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 			Poly->numOfVars = read_polyhedron_data.oldnumofvars;
 
 		}
-		if (Print[0] == 'y')
-		{
-			cout << "printing on line 800" << endl;
-			printListCone(Poly->cones, Poly->numOfVars);
-			cout << "end printing on line 800" << endl;
-		}
+
 
 		//   printListVector(IntegralHull(Poly->cones,  inequalities, equations, Poly->numOfVars), Poly->numOfVars);
 		if (read_polyhedron_data.Memory_Save[0] == 'n')
@@ -939,6 +958,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 		cerr << "Bug: Irrationalization failed" << endl;
 		exit(1);
 	};
+	*/
 
 	freeListVector(read_polyhedron_data.templistVec);
 	freeListVector(read_polyhedron_data.matrix);
@@ -994,28 +1014,20 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 
 	}
 
-	//cerr << "Computation done. " << endl;
+
 
 	params->total_time.stop();
 	cerr << params->total_time;
-
-	{
-		// until we have a more sophisticated test script --mkoeppe
-		ofstream totalTime("totalTime");
-		totalTime << params->total_time.get_seconds() << " ("
-				<< params->read_time.get_seconds() << "r" << ", "
-				<< params->vertices_time.get_seconds() << "v" << ", "
-				<< params->irrationalize_time.get_seconds() << "i" << ", "
-				<< params->dualize_time.get_seconds() << "d" << ", "
-				<< params->triangulate_time.get_seconds() << "t" << ", "
-				<< params->decompose_time.get_seconds() << "b" << ")" << endl;
-		ofstream stats("latte_stats");
-		params->print_statistics(stats);
-	}
-
 	delete params;
+
 	return volumeAnswers;
 }//mainValuationDriver
+
+
+
+
+
+
 
 
 
@@ -1449,9 +1461,17 @@ VolumesContainer mainValuationDriverOLD(const char *argv[], int argc)
 				myParameters.decomposition
 						= BarvinokParameters::DualDecomposition;
 
+				Polyhedron myPoly;
+				myPoly.numOfVars = numOfVars;
+				myPoly.homogenized = false;
+				myPoly.dualized = false;
+				myPoly.unbounded = false;
+				myPoly.cones = cones;
+
+
 				if (strcmp(valuationType, "volume") == 0)
 				{
-					volumeAns = computeVolume(cones, myParameters, valuationAlg, printLawrenceFunction);
+					volumeAns = computeVolume(&myPoly, myParameters, valuationAlg, printLawrenceFunction);
 				} else
 				{
 					cout << "Ops, " << valuationType << " is not supported" << endl;
@@ -1533,6 +1553,11 @@ VolumesContainer mainValuationDriverOLD(const char *argv[], int argc)
 }//mainValuationDrivver()
 
 
+
+
+
+
+
 /**
  * Checks to see if the triangulation and lawrence volume equal the expected volume.
  */
@@ -1597,7 +1622,7 @@ void runTests()
 
 	for(int ambientDim = startAmbientDim; ambientDim < endAmbientDim; ambientDim = ambientDim + 3)
 	{
-		for(int numberPoints = startAmbientDim / 2; numberPoints < startAmbientDim/2 + startAmbientDim + 10; numberPoints = numberPoints + pointStepSize)
+		for(int numberPoints = startAmbientDim / 2; numberPoints < startAmbientDim/4 + startAmbientDim; numberPoints = numberPoints + pointStepSize)
 			runOneTest(ambientDim, numberPoints);
 
 	}//for ambientDim

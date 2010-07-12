@@ -25,13 +25,16 @@
 #include "rational.h"
 #include "cone.h"
 
+/* Integration Headers */
+#include "integration/PolyTrie.h"
+#include "integration/newIntegration.h"
+
+
 using namespace std;
 
 /*
  * Constructing:
- * 1) Pass in a Polyhedron is you know the polytope is full dim.
- * 2) Pass in ConeType::VertexRayCones is the cones represent the vertex-ray information of a polytope.
- * 3) Pass in ConeType::TriangulatedCones if the cones represent a triangulation of the polytope (may or may not be unimodular).
+ * 1) Pass in a Polyhedron *.
  *
  * Finding Volume:
  * 1) Call findVolume(DeterminantVolume) if you want to use the Determinant method. Will convert first
@@ -44,8 +47,9 @@ using namespace std;
 
 class PolytopeValuation
 {
-	listCone * vertexRayCones;		//list of  vertex-ray pairs.
 	BarvinokParameters parameters; //Barvinok Parameters.
+	Polyhedron * poly;				//The polyhedron, vertexRayCones or PolytopeAsOneCone points to the polyhedron's cones.
+	listCone * vertexRayCones;		//list of  vertex-ray pairs.
 	listCone * polytopeAsOneCone;	//From poly, create one code with vertex=[0,0...0], rays={[1, v] | v is a vertex of the polytope}
 	listCone * triangulatedPoly;	//The triangulation of polytopeAsOneCone.
 	int numOfVars;
@@ -56,7 +60,7 @@ public:
 	typedef enum {VertexRayCones, TriangulatedCones} ConeType;
 
 	PolytopeValuation(Polyhedron *p, BarvinokParameters &bp);
-	PolytopeValuation(listCone *cones, ConeType coneType, int numofvars, BarvinokParameters &bp);
+//	PolytopeValuation(listCone *cones, ConeType coneType, int numofvars, BarvinokParameters &bp);
 	virtual ~PolytopeValuation();
 
 
@@ -65,11 +69,12 @@ public:
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone
 	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const;
 	RationalNTL findVolumeUsingLawrence();
-	RationalNTL findVolume(const VolumeType v);		 //finds the volume of the Polyhedron.
-	ZZ static factorial(const int n);
-	void printLawrenceVolumeFunction();	//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
-	void triangulatePolytopeCone();  //convert polytopeAsOneCone to triangulatedPoly
-	void triangulatePolytopeVertexRayCone(); //convert vertexRayCones to triangulatedPoly using decomposeCones
+	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
+	ZZ static factorial(const int n);			//computes n!
+	RationalNTL integrate(const string& polynomial); //integrates the polynomial over the polytope. The polytope is written in maple syntax.
+	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
+	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly
+	void triangulatePolytopeVertexRayCone();	//convert vertexRayCones to triangulatedPoly using decomposeCones
 
 };
 

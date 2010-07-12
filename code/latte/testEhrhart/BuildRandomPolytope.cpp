@@ -62,7 +62,7 @@ void BuildRandomPolytope::buildPolymakeFile(const int numPoints)
 			if (integerPoints == false && k != 0) //make sure we have at least one integer point in the polytope (be forcing one integer vertex).
 			{
 				denominator = rand() % maxInteger;
-				if ( denominator == 0)
+				if (denominator == 0)
 					denominator = 1;
 				numerator /= gcd(numerator, denominator);
 				denominator /= gcd(numerator, denominator);
@@ -107,7 +107,7 @@ void BuildRandomPolytope::callPolymake()
 	file >> dim;
 
 	for (getline(file, line, '\n'); line != "AMBIENT_DIM"; getline(file, line,
-	        '\n'))
+			'\n'))
 		;
 	file >> ambientDim;
 
@@ -179,7 +179,7 @@ void BuildRandomPolytope::convertFacetEquations()
 			if (facets[i][k] != mpq_class(0))
 			{
 				mpz_gcd(ans, currentGCD.get_mpz_t(),
-				        facets[i][k].get_num_mpz_t());
+						facets[i][k].get_num_mpz_t());
 				currentGCD = mpz_class(ans);
 			}//if
 		}//for k	
@@ -208,20 +208,15 @@ void BuildRandomPolytope::convertFacetEquations()
 /**
  * Regular GCD. m, n > 0;
  */
-int BuildRandomPolytope::gcd(int m, int n) const
+int BuildRandomPolytope::gcd(int a, int b) const
 {
-	while (m > 0)
-	{ /* invariant: gcd(m,n)=g */
-		if (n > m)
-		{
-			int t = m;
-			m = n;
-			n = t;
-		} /* swap */
-		/* m >= n > 0 */
-		m -= n;
+	if (b == 0)
+	{
+		return a;
+	} else
+	{
+		return gcd(b, a % b);
 	}
-	return n;
 }//gcd
 
 const string & BuildRandomPolytope::getLatteFile() const
@@ -241,9 +236,9 @@ void BuildRandomPolytope::findEhrhardPolynomial()
 	stringstream d;
 	d << dim;
 	string command = "./ehrhart2 " + d.str() + " " + latteFile.c_str()
-	        + " -Rs " + "\"" + PolytopeComments.c_str() + "\"";
+			+ " -Rs " + "\"" + PolytopeComments.c_str() + "\"";
 	cout << "findEhrhardPolynomial(): ehrhart calling: " << command.c_str()
-	        << endl;
+			<< endl;
 	system(command.c_str());
 }//findEhrhardPolynomial
 

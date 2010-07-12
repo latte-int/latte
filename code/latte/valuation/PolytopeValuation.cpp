@@ -10,22 +10,41 @@
 using namespace std;
 
 /**
- * Does not keep a local copy of the polyhedron, only a pointer.
- * Polyhedron *poly contains the list of vertex-ray pairs.
+ *
  */
 PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
-	vertexRayCones(p->cones), parameters(bp), polytopeAsOneCone(NULL),
+		parameters(bp), poly(p), vertexRayCones(NULL),  polytopeAsOneCone(NULL),
 			triangulatedPoly(NULL), freeVertexRayCones(0),
 			freePolytopeAsOneCone(0), freeTriangulatedPoly(0)
 {
-	numOfVars = p->numOfVars;
+	numOfVars = parameters.Number_of_Variables; //keep number of origional variables.
+
+	if (p->unbounded)
+	{
+		cout << "Ops, cannot compute valuation for unbounded polyhedron." << endl;
+		exit(1);
+	}//check the polytope is bounded.
+
+	if ( p->homogenized == false)
+		vertexRayCones = p->cones; //Polyhedron is a list of vertex-ray cones.
+	else
+	{
+		polytopeAsOneCone = p->cones;
+		cout << "Ops, I have not implemented passing a polyhedron as one cone yet" << endl;
+		//if homogenized is true and a one is placed in the first element of each ray/vertex, then
+		//we should safely just assign p->cones to polytopeAsOneCone.
+		//But if homogenized means the extra one was placed in a different location (say the last element), I'll have
+		//to change how I am making and reading such representations of one-cone polytopes in this class to be consistant the latte.
+		exit(1);
+	}//else the polyhedron is given by one cone.
+
 	srand(time(0));
-}
+}//constructor
 
 /**
  * Saves a listCone* depending if the listCone encodes vertex-rays or a triangulation.
  *
- */
+
 PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType,
 		int numofvars, BarvinokParameters &bp) :
 	vertexRayCones(NULL), parameters(bp), polytopeAsOneCone(NULL),
@@ -39,6 +58,7 @@ PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType,
 		triangulatedPoly = cones;
 	srand(time(0));
 }
+*/
 
 PolytopeValuation::~PolytopeValuation()
 {
@@ -178,6 +198,18 @@ RationalNTL PolytopeValuation::findVolumeUsingDeterminant(
  * thus it works on all inputs
  * @input: a listCone of the cones and the nnumber of variables (dimension of the space)
  * @return RationalNTL: the volume of the polytope
+ *
+ * Math: For each simple vertex-ray cone, we sum the fractions
+ *
+ * 	<v, c>^d * det(matrix formed by the rays) * cone's coefficient
+ *  --------------------------------------------------------------
+ *                <-r_1, c> * <-r_2, c>*...*<-r_d, c>
+ * where v is a vertex,
+ *       c is a random vector,
+ *       d is the dimension
+ *       r_i is the ith ray of the cone.
+ *
+ * We use the cone's coefficient in case the cone decomposition is signed (ex, unimodular decomposition).
  */
 RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 {
@@ -219,7 +251,8 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 		for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
 				= currentRay->rest, col++)
 		{
-			//divide by the dot product of c and the ray
+			//
+
 			tempDenom *= -1 * c * currentRay->first;
 
 			//generate matrix
@@ -297,6 +330,45 @@ ZZ PolytopeValuation::factorial(const int n)
 		product *= i;
 	return product;
 }//factorial
+
+
+/**
+ * Integrates the polynomial over the polytope. The polytope is written in maple syntax.
+ * Example: 2*X_0^3*X_1^4 + 5 ==> [ [2, [3, 4], [5, [0, 0]] ]
+ */
+RationalNTL integrate(const string& polynomial)
+{
+	/*
+	monomialSum monomials;
+	linFormSum forms;
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+
+
+	loadMonomials(monomials, polynomial);
+
+	if (monomials.termCount == 0 || monomials.varCount == 0)
+	{
+		cout << "Error: loaded invalid monomial sum." << endl;
+		exit(1);
+	}
+
+	forms.termCount = 0;
+	forms.varCount = monomials.varCount;
+
+	it->setTrie(monomials.myMonomials, monomials.varCount);
+
+	decompose(it, forms);
+
+	if (forms.termCount == 0 || forms.varCount == 0)
+	{
+		cout << "Error: no terms in decomposition to sum of linear forms.";
+		exit(1);
+	}
+	destroyMonomials(monomials);
+*/
+	return RationalNTL(0, 1);
+
+}//integrate.
 
 
 /**
