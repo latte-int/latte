@@ -26,6 +26,6 @@ TESTS +=					\
 	test-allprimal-exp-maxdet1000-4ti2.sh
 endif
 
-
+EXTRA_DIST = $(TESTS)
 
 
