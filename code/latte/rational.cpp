@@ -54,6 +54,25 @@ rationalVector::rationalVector(const vec_ZZ &numer, const ZZ &denom)
   computed_integer_scale = true;
 }
 
+
+/* ----------------------------------------------------------------- */
+/**
+ * Computes new_rationalVector = old_rationalVector * numer / denom.
+ * We also canonicalize the vector and find the integer scale.
+ */
+void rationalVector::scalarMultiplication(const ZZ &numer, const ZZ & denom)
+{
+	for(int i = 0; i < denominator.length(); ++i)
+	{
+		enumerator[i] *= numer;
+		denominator[i] *= denom;
+	}
+	computed_integer_scale = false;
+	canonicalizeRationalVector(this, enumerator.length()); //this function will also compute the integer scale.
+}//scalarMultiplication
+
+
+/* ----------------------------------------------------------------- */
 rationalVector* createRationalVector(int numOfVars)
 {
   return new rationalVector(numOfVars);
@@ -68,6 +87,9 @@ rationalVector** createArrayRationalVector(int numOfVectors) {
   if (w==0) abort();
   return (w);
 }
+
+
+
 /* ----------------------------------------------------------------- */
 rationalVector* normalizeRationalVector(rationalVector *z, int numOfVars) {
   int i,j; 
@@ -133,38 +155,85 @@ void RationalNTL::canonicalize()
 }//canonicalize
 
 
-void RationalNTL::add(const ZZ &num, const ZZ& denom)
+RationalNTL & RationalNTL::add(const ZZ &num, const ZZ& denom)
 {
 
 	numerator = numerator * denom + num * denominator;
 	denominator *= denom;
 	canonicalize();
+	return *this;
 }//add
 
 
-void RationalNTL::add(const RationalNTL & rationalNTL)
+RationalNTL & RationalNTL::add(const RationalNTL & rationalNTL)
 {
-	add(rationalNTL.numerator, rationalNTL.denominator);
+	return add(rationalNTL.numerator, rationalNTL.denominator);
 }//add
 
 
+RationalNTL RationalNTL::operator+(const RationalNTL & rhs)
+{
+	RationalNTL answer(*this);
+	return answer.add(rhs.numerator, rhs.denominator);
+}
+RationalNTL RationalNTL::operator-(const RationalNTL & rhs)
+{
+	RationalNTL answer(*this);
+	return answer.add(rhs.numerator * -1, rhs.denominator);
+}
 
-void RationalNTL::mult(const ZZ &num, const ZZ &denum)
+
+RationalNTL & RationalNTL::div(const ZZ & rhs)
+{
+	denominator *= rhs;
+	canonicalize();
+	return *this;
+}
+
+RationalNTL & RationalNTL::div(const RationalNTL & rhs)
+{
+	numerator *= rhs.denominator;
+	denominator *= rhs.numerator;
+	canonicalize();
+	return *this;
+}
+
+const ZZ & RationalNTL::getNumerator() const
+{
+	return numerator;
+}
+
+const ZZ & RationalNTL::getDenominator() const
+{
+	return denominator;
+}
+
+
+
+RationalNTL & RationalNTL::mult(const ZZ &num, const ZZ &denum)
 {
 	numerator *= num;
 	denominator *= denum;
 	canonicalize();
+	return *this;
 }
 
-
-
-void RationalNTL::mult(const RationalNTL & rationalNTL)
+RationalNTL & RationalNTL::mult(const RationalNTL & rationalNTL)
 {
-	mult(rationalNTL.numerator, rationalNTL.denominator);
+	return mult(rationalNTL.numerator, rationalNTL.denominator);
 }
 
+RationalNTL  RationalNTL::operator*(const RationalNTL & rhs)
+{
+	RationalNTL answer(*this);
+	return answer.mult(rhs.numerator, rhs.denominator);
+}
 
-
+RationalNTL  RationalNTL::operator*(const ZZ & rhs)
+{
+	RationalNTL answer(*this);
+	return answer.mult(rhs, to_ZZ(1));
+}
 
 RR RationalNTL::to_RR() const
 {
@@ -181,6 +250,23 @@ bool RationalNTL::operator!=(const RationalNTL & rhs) const
 	return !(*this == rhs);
 }
 
+
+RationalNTL & RationalNTL::operator=(const ZZ & rhs)
+{
+	numerator = rhs;
+	denominator = 1;
+	return *this;
+}
+
+RationalNTL & RationalNTL::operator=(const RationalNTL & rhs)
+{
+	if (this == &rhs)
+		return *this;
+	numerator = rhs.numerator;
+	denominator = rhs.denominator;
+	canonicalize(); //should not be needed.
+	return *this;
+}
 
 ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
 {

@@ -81,6 +81,8 @@ public:
   rationalVector(const vec_ZZ &numer, const ZZ &denom); 
   const vec_ZZ &numerators() const { return enumerator; }
   const vec_ZZ &denominators() const { return denominator; }
+
+  void scalarMultiplication(const ZZ &numer, const ZZ & denom);
   void set_entry(int i, const ZZ &numer, const ZZ &denom, bool lazy=false) {
     enumerator[i] = numer;
     denominator[i] = denom;
@@ -129,23 +131,42 @@ public:
  */
 class RationalNTL
 {
-public:
+private:
 	ZZ numerator, denominator;
+public:
+
 	RationalNTL();									//initialize to 0
 	RationalNTL(const ZZ &num, const ZZ& denom);
 	RationalNTL(const int num, const int denom);
 	RationalNTL(const string &num, const string &denom);
 	void canonicalize();							// reduces the fraction to lowest terms, and makes
 													//	the denominator positive.
-	void add(const ZZ &num, const ZZ& denom);		// adds fractions and then reduces them.
-	void add(const RationalNTL & rationalNTL);
-	void mult(const ZZ &num, const ZZ &denum);		// mult. two fractions and then reduces them.
-	void mult(const RationalNTL & rationalNTL);
+	RationalNTL & add(const ZZ &num, const ZZ& denom);		// adds fractions and then reduces them.
+	RationalNTL & add(const RationalNTL & rationalNTL);
+	RationalNTL operator+(const RationalNTL & rhs); //rhs stands for "right hand size: object + rhs.
+	RationalNTL operator-(const RationalNTL & rhs);
+
+
+	RationalNTL & div(const ZZ & rhs);						// divides by rhs.
+	RationalNTL & div(const RationalNTL & rhs);
+
+	const ZZ & getNumerator() const;
+	const ZZ & getDenominator() const;
+
+	RationalNTL & mult(const ZZ &num, const ZZ &denum);		// mult. two fractions and then reduces them.
+	RationalNTL & mult(const RationalNTL & rationalNTL);
+	RationalNTL operator*(const RationalNTL & rhs);
+	RationalNTL operator*(const ZZ & rhs);
+
+
+
 	RR to_RR()	const;								// converts the fraction to a float.
 
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
 	bool operator==(const RationalNTL & rhs) const;
 	bool operator!=(const RationalNTL & rhs) const;
+	RationalNTL & operator=(const ZZ & rhs);
+	RationalNTL & operator=(const RationalNTL & rhs);
 
 };
 

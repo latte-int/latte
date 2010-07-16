@@ -49,7 +49,8 @@ liblatte_a_SOURCES =							\
 	triangulation/RegularTriangulationWithCdd.cpp			\
 	ReadPolyhedron.cpp						\
 	ProjectUp.cpp							\
-	ReadSubcones.cpp
+	ReadSubcones.cpp						
+
 
 noinst_HEADERS =							\
 	CheckEmpty.h							\
@@ -180,9 +181,9 @@ bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
 ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 
-bin_PROGRAMS += myTest
-myTest_SOURCES = interpolation/PolynomialInterpolation.cpp
-myTest_SOURCES += interpolation/testDriver.cpp
+bin_PROGRAMS += testPolynomialInterpolation
+testPolynomialInterpolation_SOURCES = interpolation/PolynomialInterpolation.cpp
+testPolynomialInterpolation_SOURCES += interpolation/testDriver.cpp
 
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
@@ -202,9 +203,13 @@ noinst_HEADERS += testEhrhart/BuildGraphPolytope.h	\
 bin_PROGRAMS += ValuationComputation
 ValuationComputation_SOURCES = valuation/Driver.cpp
 ValuationComputation_SOURCES += valuation/PolytopeValuation.cpp
-ValuationComputation_SOURCES += testEhrhart/BuildRandomPolytope.cpp
-ValuationComputation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
-
+ValuationComputation_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #used for testing
+ValuationComputation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #used for testing
+ValuationComputation_LDADD = $(LDADD)
+#ValuationComputation_LDADD += liblatte.a
+ValuationComputation_LDADD += liblatteintegration.a
+#ValuationComputation_SOURCES += integration/PolyTrie.cpp
+#ValuationComputation_SOURCES += integration/newIntegration.cpp
 
 noinst_HEADERS += valuation/PolytopeValuation.h
 
