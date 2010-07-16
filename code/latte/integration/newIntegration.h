@@ -13,9 +13,10 @@ NTL_CLIENT
 
 struct simplexZZ
 {
-	int d;
-	vec_vec_ZZ s;
-	ZZ v;
+					// Brandon's notes.
+	int d;			// dimension of the space? so s.length = d + 1?
+	vec_vec_ZZ s;	// s[i] = vector of the ith vertex
+	ZZ v; 			//valuation/integral answer?
 };
 
 void delSpace(string &line);
@@ -66,7 +67,7 @@ void FormIntegrateConsumer<T>::update(const vec_ZZ& l,int m, const ZZ &coe, cons
 	sum_De.SetLength(mySimplex->d+1);
 	total=0;
 	lcm=1;
-	bool repeat[1000];
+	bool repeat[1000]; //constant-size array is bad programming style?
 	for (i=0;i<=mySimplex->d;i++)
 	{
 		sum=0; for (j=0;j<mySimplex->d;j++) sum=sum+l[j]*mySimplex->s[i][j];
