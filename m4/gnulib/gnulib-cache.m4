@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2008 Free Software Foundation, Inc.
+# Copyright (C) 2004-2007 Free Software Foundation, Inc.
 #
 # This file is free software, distributed under the terms of the GNU
 # General Public License.  As a special exception to the GNU General
@@ -15,13 +15,11 @@
 
 
 # Specification in the form of a command-line invocation:
-#   gnulib-tool --import --dir=. --lib=libgnu --source-base=code/gnulib --m4-base=m4/gnulib --doc-base=doc --aux-dir=. --no-libtool --macro-prefix=gl relocatable-prog
+#   gnulib-tool --import --dir=. --lib=libgnu --source-base=code/gnulib --m4-base=m4/gnulib --doc-base=doc --aux-dir=. --no-libtool --macro-prefix=gl relocatable-prog relocate
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([])
-gl_MODULES([
-  relocatable-prog
-])
+gl_MODULES([relocatable-prog relocate])
 gl_AVOID([])
 gl_SOURCE_BASE([code/gnulib])
 gl_M4_BASE([m4/gnulib])

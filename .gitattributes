@@ -9,6 +9,11 @@ EXAMPLES/tests/implied-equation.latte -text
 EXAMPLES/tests/missing-newline-2.latte -text
 EXAMPLES/tests/missing-newline-3.latte -text
 EXAMPLES/tests/missing-newline.latte -text
+code/gnulib/alloca_.h -text
+code/gnulib/setenv.h -text
+code/gnulib/stdbool_.h -text
+code/gnulib/stdlib_.h -text
+code/gnulib/unistd_.h -text
 code/test-suite/test-4ti2.sh -text
 code/test-suite/test-allprimal-exp-maxdet1000-4ti2.sh -text
 code/test-suite/test-allprimal-exp-maxdet1000.sh -text
@@ -21,4 +26,7 @@ code/test-suite/test-irr-exp-maxdet1000.sh -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
+doc/relocatable.texi -text
+m4/gnulib/absolute-header.m4 -text
+m4/gnulib/onceonly_2_57.m4 -text
 /manual_v1.1.pdf -text
