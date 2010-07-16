@@ -13,7 +13,7 @@ using namespace std;
  *
  */
 PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
-		parameters(bp), poly(p), vertexRayCones(NULL),  polytopeAsOneCone(NULL),
+	parameters(bp), poly(p), vertexRayCones(NULL), polytopeAsOneCone(NULL),
 			triangulatedPoly(NULL), freeVertexRayCones(0),
 			freePolytopeAsOneCone(0), freeTriangulatedPoly(0)
 {
@@ -21,16 +21,19 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 
 	if (p->unbounded)
 	{
-		cout << "Ops, cannot compute valuation for unbounded polyhedron." << endl;
+		cout << "Ops, cannot compute valuation for unbounded polyhedron."
+				<< endl;
 		exit(1);
 	}//check the polytope is bounded.
 
-	if ( p->homogenized == false)
+	if (p->homogenized == false)
 		vertexRayCones = p->cones; //Polyhedron is a list of vertex-ray cones.
 	else
 	{
 		polytopeAsOneCone = p->cones;
-		cout << "Ops, I have not implemented passing a polyhedron as one cone yet" << endl;
+		cout
+				<< "Ops, I have not implemented passing a polyhedron as one cone yet"
+				<< endl;
 		//if homogenized is true and a one is placed in the first element of each ray/vertex, then
 		//we should safely just assign p->cones to polytopeAsOneCone.
 		//But if homogenized means the extra one was placed in a different location (say the last element), I'll have
@@ -45,20 +48,20 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
  * Saves a listCone* depending if the listCone encodes vertex-rays or a triangulation.
  *
 
-PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType,
-		int numofvars, BarvinokParameters &bp) :
-	vertexRayCones(NULL), parameters(bp), polytopeAsOneCone(NULL),
-			triangulatedPoly(NULL), numOfVars(numofvars),
-			freeVertexRayCones(0), freePolytopeAsOneCone(0),
-			freeTriangulatedPoly(0)
-{
-	if (coneType == VertexRayCones)
-		vertexRayCones = cones;
-	else if (coneType == TriangulatedCones)
-		triangulatedPoly = cones;
-	srand(time(0));
-}
-*/
+ PolytopeValuation::PolytopeValuation(listCone *cones, ConeType coneType,
+ int numofvars, BarvinokParameters &bp) :
+ vertexRayCones(NULL), parameters(bp), polytopeAsOneCone(NULL),
+ triangulatedPoly(NULL), numOfVars(numofvars),
+ freeVertexRayCones(0), freePolytopeAsOneCone(0),
+ freeTriangulatedPoly(0)
+ {
+ if (coneType == VertexRayCones)
+ vertexRayCones = cones;
+ else if (coneType == TriangulatedCones)
+ triangulatedPoly = cones;
+ srand(time(0));
+ }
+ */
 
 PolytopeValuation::~PolytopeValuation()
 {
@@ -72,11 +75,12 @@ PolytopeValuation::~PolytopeValuation()
 /**
  *  Takes the vertex-ray representation of the polytope, extracts the vertex information,
  *  then then creates one cone with the vertex at the origin and who's rays are integer
- *  multiple of the vertex with a leading 1.
+ *  multiple of the vertex with a leading 1. Finally,
  *
  *  Example: if the polytope has vertex { (3, 3/4), (5, 1/2), (1/2, 1/2)} then the new cone
  *  will have vertex (0 0 0) and integer rays
  *  (1, 3, 3/4)*4, (1, 5, 1/2)*2, (1, 1/2, 1/2)*2
+ *
  *
  *
  */
@@ -145,6 +149,21 @@ void PolytopeValuation::convertToOneCone()
 	polytopeAsOneCone = oneCone; //finally, save the result.
 	freePolytopeAsOneCone = 1; //delete this object in the deconstructor.
 }//convertToOneCone
+
+/**
+ * Dilates the polytope by computing new_vertex = old_vertex * factor, and overriding the
+ * vertex-ray cones.
+ *
+ * The original polytope is lost.
+ */
+void PolytopeValuation::dilatePolytope(const RationalNTL & factor)
+{
+	for (listCone * cone = vertexRayCones; cone; cone = cone->rest)
+	{
+		cone->vertex->vertex->scalarMultiplication(factor.getNumerator(),
+				factor.getDenominator());
+	}//for every vertex.
+}//dilatePolytope
 
 
 /**
@@ -335,16 +354,186 @@ ZZ PolytopeValuation::factorial(const int n)
 /**
  * Integrates the polynomial over the polytope. The polytope is written in maple syntax.
  * Example: 2*X_0^3*X_1^4 + 5 ==> [ [2, [3, 4], [5, [0, 0]] ]
+ *
+ * In the non-integer case, we compute
+ *  a1*a2*...*an* 1/beta * integral( beta f(x1/a1, x2,a2, ..., xn/an) dX
+ *  Where beta is an integer such that beta*f(x1/a1, x2,a2, ..., xn/an) is an integer-coeff. polynomial,
+ *  and where a1*a2*...*an is the Jacobian of the change of variables to make the polytope have integer vertices.
+ *
+ *  We use the fact that if P is a polytope with rational vertices, then
+ *
+ *  integral over P { f(w1, w2, ..., wn) dw } = integral over P' { f(x1/a1, x2,a2, ..., xn/an)  * |d(w1, .., wn)/d(x1, .., xn)| dX }
+ *  where |d(w1, .., wn)/d(x1, .., xn)| is the absolute value of the Jacobian given by the equations xi = wi * ai
+ *  and ai is such that the ith coordinate of ever vertex becomes integer when mult. by ai.
+ *  P' is now a dilation of P such that P' has only integer verticies.
  */
-RationalNTL integrate(const string& polynomial)
+RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 {
-	/*
+
 	monomialSum monomials;
 	linFormSum forms;
-	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
+	RationalNTL answer;
+
+	loadMonomials(monomials, polynomialString);
+
+	if (monomials.termCount == 0 || monomials.varCount == 0)
+	{
+		cout << "Error: loaded invalid monomial sum." << endl;
+		exit(1);
+	}
+
+	//  original vertices = (b1/a1, b2/a2, b3/a3, b4/a4)
+	//  Find the lcm of a_k for every ith element in every vertex. and save it lcmDenominators[i]
+	//vec_ZZ lcmDenominators;
+	//lcmDenominators.SetLength(numOfVars);
+	//for(int i = 0; i < numOfVars; ++i)
+	//	lcmDenominators[i] = 1;
+	ZZ lcmDenominators;
+	lcmDenominators = 1;
+
+	for (listCone * currentCone = vertexRayCones; currentCone; currentCone
+			= currentCone->rest)
+		for (int i = 0; i < numOfVars; ++i)
+			lcmDenominators = lcm(lcmDenominators,
+					(currentCone->vertex->vertex->denominators())[i]);
+	//lcmDenominators[i] = lcm( lcmDenominators[i], (currentCone->vertex->vertex->denominators())[i] );
+
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int> ();
+	it->setTrie(monomials.myMonomials, monomials.varCount);
+	it->begin();
+	ZZ beta;
+	beta = 1;
+	vector<RationalNTL> newCoeffs;
+	newCoeffs.resize(monomials.termCount);
+	int i = 0;
+	for (term<ZZ, int>* tempMonomial = it->nextTerm(); tempMonomial; ++i, tempMonomial
+			= it->nextTerm())
+	{
+		newCoeffs[i] = tempMonomial->coef;
+		for (int k = 0; k < tempMonomial->length; ++k)
+			newCoeffs[i].div(power(lcmDenominators, tempMonomial->exps[k]));
+		//newCoeffs[i].div(power(lcmDenominators[k], tempMonomial->exps[k]));
+		beta = lcm(beta, newCoeffs[i].getDenominator());
+	}//for every monomial, compute the new coefficient.
+
+	monomialSum rationalmonomials;
+	rationalmonomials.termCount = 0;
+	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ> ();
+	myLoader->setMonomialSum(rationalmonomials);
+	myLoader->setDimension(monomials.varCount); //the dimension has not changed.
+	cout << "integrate monomials.varCount = " << monomials.varCount << endl;
+
+	it->begin();
+	i = 0;
+	int * newExponents = new int[monomials.varCount];
+	for (term<ZZ, int>* tempMonomial = it->nextTerm(); tempMonomial; ++i, tempMonomial
+			= it->nextTerm())
+	{
+
+		for (int k = 0; k < monomials.varCount; ++k)
+			newExponents[k] = tempMonomial->exps[k];
+		RationalNTL rationalCoefficient;
+		rationalCoefficient = newCoeffs[i] * beta;
+
+		assert (rationalCoefficient.getDenominator() == 1);
+
+		myLoader->ConsumeMonomial(rationalCoefficient.getNumerator(),
+				newExponents);
+
+	}//copy the old monomials over, updating the coeff.
+	delete[] newExponents;
+	cout << "got here 446" << endl;
+	assert(monomials.termCount == rationalmonomials.termCount && monomials.varCount == rationalmonomials.varCount);
+
+	//delete myLoader;
+	//destroyMonomials(monomials);//don't destroy the rationalmonomials yet.
+	//delete it;
+
+	dilatePolytope(RationalNTL(lcmDenominators, to_ZZ(1))); //dilate so that every vertex is integer
+	convertToOneCone(); //every vertex should be integer
+	triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+
+	//printListCone(triangulatedPoly, numOfVars + 1);
+	cout << "ratMonom=" << printMonomials(rationalmonomials) << endl;
+
+	stringstream rationalPolyString;
+	monomialSum testM;
+	rationalPolyString << printMonomials(rationalmonomials);
+	testDecomp(rationalPolyString.str().c_str());
+
+	cout << "OMG, it worked" << endl;
+
+	exit(1);
+#if 0
+	//now start over with the rational polynomial. :)
+	BTrieIterator<ZZ, int>* rationalIterator = new BTrieIterator<ZZ, int> ();
+	forms.termCount = 0;
+	forms.varCount = rationalmonomials.varCount;
+	rationalIterator->setTrie(rationalmonomials.myMonomials,
+			rationalmonomials.varCount);
+	cout << "got here 461" << endl;
+	decompose(rationalIterator, forms);
+	cout << "got here 463" << endl;
+	destroyMonomials(rationalmonomials); //no longer need them. We only care about the linear forms.
 
 
-	loadMonomials(monomials, polynomial);
+	BTrieIterator<ZZ, ZZ>* linearFormIterator = new BTrieIterator<ZZ, ZZ> ();
+	linearFormIterator->setTrie(forms.myForms, forms.varCount);
+	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
+			= currentCone->rest)
+	{
+		//struct simplexZZ
+		//	int d;
+		//	vec_vec_ZZ s;
+		//	ZZ v;
+
+
+		simplexZZ oneSimplex;
+		oneSimplex.d = numOfVars; //d is for dimention?
+
+		listVector * rays = currentCone->rays;
+
+		int vertexCount = 0; //the current vertex number being processed.
+		oneSimplex.s.SetLength(numOfVars + 1);
+
+		for (rays = rays->rest; rays; rays = rays->rest, ++vertexCount)
+		{
+			oneSimplex.s[vertexCount].SetLength(numOfVars);
+			assert( rays->first[0] == 1);
+			for (int k = 0; k < numOfVars; ++k)
+			oneSimplex.s[vertexCount][k] = rays->first[k + 1];
+
+		}//create the simplex. Don't copy the leading 1.
+		ZZ numerator, denominator;
+		integrateLinFormSum(numerator, denominator, linearFormIterator,
+				oneSimplex);
+
+		//void integrateLinFormSum(ZZ& numerator, ZZ& denominator, PolyIterator<ZZ, ZZ>* it, const simplexZZ &mySimplex)
+
+		answer.add(numerator, denominator);
+
+	}//for every triangulated simplex.
+
+	destroyLinForms(forms);
+	delete linearFormIterator;
+
+	answer.div(beta);
+	answer.mult(power(lcmDenominators, numOfVars), to_ZZ(1));
+
+	return answer;
+#endif
+}//integrate.
+
+void PolytopeValuation::testDecomp(const char stringPoly[])
+{
+	cout << "TESTDECOMP CALLED" << endl;
+	monomialSum monomials;
+	linFormSum forms;
+	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int> ();
+
+	loadMonomials(monomials, stringPoly);
+
+	cout << printMonomials(monomials) << endl;
 
 	if (monomials.termCount == 0 || monomials.varCount == 0)
 	{
@@ -355,9 +544,14 @@ RationalNTL integrate(const string& polynomial)
 	forms.termCount = 0;
 	forms.varCount = monomials.varCount;
 
+	cout << "Decomposing into sum of linear forms..." << endl;
+
 	it->setTrie(monomials.myMonomials, monomials.varCount);
 
 	decompose(it, forms);
+
+	cout << "polynomial to forms: " << printLinForms(forms) << endl;
+
 
 	if (forms.termCount == 0 || forms.varCount == 0)
 	{
@@ -365,11 +559,33 @@ RationalNTL integrate(const string& polynomial)
 		exit(1);
 	}
 	destroyMonomials(monomials);
-*/
-	return RationalNTL(0, 1);
 
-}//integrate.
+}
 
+RationalNTL PolytopeValuation::integrateSimplex(simplexZZ &mysimplex,
+		linFormSum & linearFormSums)
+{
+	return RationalNTL();
+	/*	ZZ numerator, denominator;
+	 cout << "Integrating...";
+
+	 //integrate a polynomial.
+	 it2->setTrie(forms.myForms, forms.varCount);
+	 integrateLinFormSum(numerator, denominator, it2, mySimplex);
+
+	 cout << "done\n";
+
+	 return RationalNTL(numerator, denominator);
+	 */
+}
+
+/**
+ * Returns the lowest common multiple of a and b.
+ */
+ZZ PolytopeValuation::lcm(const ZZ &a, const ZZ & b)
+{
+	return (a * b) / GCD(a, b);
+}//lcm
 
 /**
  * Find the Lawrence rational function for volume.

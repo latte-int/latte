@@ -144,16 +144,17 @@ typedef struct
 	RationalNTL triangulate;
 	RationalNTL lawrence;
 
-} VolumesContainer;
+} ValuationContainer;
 
 
-VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
+
+ValuationContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
 		const char *valuationType);
-VolumesContainer mainValuationDriver(const char *argv[], int argc);
+ValuationContainer mainValuationDriver(const char *argv[], int argc);
 void runOneTest(int ambientDim, int numPoints);
 void runTests();
 
-void printVolumeTest(const RationalNTL &correctVolumeAnswer, VolumesContainer volumeAnswer, const string &file, const string &comments);
+void printVolumeTest(const RationalNTL &correctVolumeAnswer, ValuationContainer volumeAnswer, const string &file, const string &comments);
 
 //BarvinokParameters parameters;
 //ReadPolyhedronData read_polyhedron_data;
@@ -165,10 +166,10 @@ void printVolumeTest(const RationalNTL &correctVolumeAnswer, VolumesContainer vo
 /**
  * Computes the volume of the polytope.
  */
-VolumesContainer computeVolume(Polyhedron * poly, BarvinokParameters &myParameters,
+ValuationContainer computeVolume(Polyhedron * poly, BarvinokParameters &myParameters,
 		const char *valuationAlg, const char * print)
 {
-	VolumesContainer ans;
+	ValuationContainer ans;
 	RationalNTL ans1, ans2;
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
@@ -208,6 +209,21 @@ VolumesContainer computeVolume(Polyhedron * poly, BarvinokParameters &myParamete
 }//computeVolume
 
 
+ValuationContainer computeIntegral(Polyhedron *poly, BarvinokParameters &myParameters, const char *valuationAlg, const char *printLawrence, const char * polynomialString )
+{
+	ValuationContainer answer;
+	RationalNTL ans1;
+	PolytopeValuation polytopeValuation(poly, myParameters);
+
+	ans1 = polytopeValuation.integrate(polynomialString);
+	cout << "integrate answer = " << ans1 << endl;
+
+	answer.triangulate = ans1;
+
+	return answer;
+
+}
+
 static void usage(const char *progname)
 {
 	cerr << "usage: " << progname << " [OPTIONS...] " << "INPUTFILE" << endl;
@@ -216,16 +232,16 @@ static void usage(const char *progname)
 }
 
 
-VolumesContainer mainValuationDriver(const char *argv[], int argc)
+ValuationContainer mainValuationDriver(const char *argv[], int argc)
 {
-	VolumesContainer volumeAnswers;
+	ValuationContainer valuationAnswers;
 	set_program_name(argv[0]);
 
 	int i;
 	unsigned int flags = 0, print_flag = 0, output_cone = 0;
 	char printfile[127], Save_Tri[127], Load_Tri[127], Print[127],
 			removeFiles[127], command[127];
-	char valuationAlg[127], printLawrence[127];
+	char valuationAlg[127], valuationType[127], printLawrence[127];
 	bool approx;
 	bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
 	bool triangulation_specified = false;
@@ -259,7 +275,8 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	strcpy(Print, "no");
 	strcpy(valuationAlg, "all");
 	strcpy(printLawrence, "no");
-
+	//strcpy(valuationType, "volume");
+	strcpy(valuationType, "integrate");
 
 	approx = false;
 	ehrhart_polynomial = false;
@@ -440,6 +457,10 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 			strcpy(valuationAlg, "all");
 		else if ( strcmp(argv[i], "--printLawrenceFunction") == 0)
 			strcpy(printLawrence, "yes");
+		else if ( strcmp(argv[i], "--valuation=integrate") == 0)
+			strcpy(valuationType, "integrate");
+		else if ( strcmp(argv[i], "--valuation=volume") == 0)
+			strcpy(valuationType, "volume");
 		else if (read_polyhedron_data.parse_option(argv[i]))
 		{
 		} else
@@ -550,7 +571,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 
 	Polyhedron *Poly = read_polyhedron_data.read_polyhedron(params);
 
-	//VolumesContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
+	//ValuationContainer computeVolume(listCone * cones, BarvinokParameters &myParameters,
 	//		const char *valuationAlg, const char * print)
 
 	params->Flags = flags;
@@ -561,8 +582,16 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	params->decomposition = BarvinokParameters::DualDecomposition;
 
 
+	if ( strcmp(valuationType, "volume") == 0)
+		valuationAnswers = computeVolume(Poly, *params, valuationAlg, printLawrence);
+	else if ( strcmp(valuationType, "integrate") == 0) //add input of polynomial.
+		valuationAnswers = computeIntegral(Poly, *params, valuationAlg, printLawrence, "[ [3, [1, 1]], [5, [6, 7]]]");
+	else
+	{
+		cout << "ops, valuation type is not known: " << valuationType << endl;
+		exit(1);
+	}//else error. This else block should not be reachable!
 
-	volumeAnswers = computeVolume(Poly, *params, valuationAlg, printLawrence);
 	//return volumeAnswers;
 
 /*	ofstream file;
@@ -1020,7 +1049,7 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 	cerr << params->total_time;
 	delete params;
 
-	return volumeAnswers;
+	return valuationAnswers;
 }//mainValuationDriver
 
 
@@ -1031,13 +1060,13 @@ VolumesContainer mainValuationDriver(const char *argv[], int argc)
 
 
 
-VolumesContainer mainValuationDriverOLD(const char *argv[], int argc)
+ValuationContainer mainValuationDriverOLD(const char *argv[], int argc)
 {
 
 	set_program_name(argv[0]);
 
 	BarvinokParameters params;
-	VolumesContainer volumeAns;
+	ValuationContainer volumeAns;
 #ifdef SUN
 	struct tms tms_buf;
 #endif
@@ -1561,7 +1590,7 @@ VolumesContainer mainValuationDriverOLD(const char *argv[], int argc)
 /**
  * Checks to see if the triangulation and lawrence volume equal the expected volume.
  */
-void printVolumeTest(const RationalNTL &correctVolumeAnswer, VolumesContainer volumeAnswer, const string &file, const string &comments)
+void printVolumeTest(const RationalNTL &correctVolumeAnswer, ValuationContainer volumeAnswer, const string &file, const string &comments)
 {
 	if ( correctVolumeAnswer != volumeAnswer.lawrence
 			|| correctVolumeAnswer != volumeAnswer.triangulate)
@@ -1674,7 +1703,7 @@ void runHyperSimplexTests()
 
 	int numberTestCases = 34;
 
-	VolumesContainer volumeAnswer;
+	ValuationContainer volumeAnswer;
 	for(int i = 0; i < numberTestCases; ++i)
 	{
 		stringstream comments;
@@ -1724,7 +1753,7 @@ void runBirkhoffTests()
 	int numberTestCases = 3;
 
 
-    VolumesContainer volumeAnswer;
+    ValuationContainer volumeAnswer;
 	const char * argv[] = {"runBirkhoffTests()", "--all", 0};
 
 
