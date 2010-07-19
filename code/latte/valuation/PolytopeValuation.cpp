@@ -356,7 +356,7 @@ ZZ PolytopeValuation::factorial(const int n)
  * Example: 2*X_0^3*X_1^4 + 5 ==> [ [2, [3, 4], [5, [0, 0]] ]
  *
  * In the non-integer case, we compute
- *  a1*a2*...*an* 1/beta * integral( beta f(x1/a1, x2,a2, ..., xn/an) dX
+ *  1/a^n * 1/beta * integral( beta f(x1/a, x2/a, ..., xn/a) dX
  *  Where beta is an integer such that beta*f(x1/a1, x2,a2, ..., xn/an) is an integer-coeff. polynomial,
  *  and where a1*a2*...*an is the Jacobian of the change of variables to make the polytope have integer vertices.
  *
@@ -459,12 +459,11 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	stringstream rationalPolyString;
 	monomialSum testM;
 	rationalPolyString << printMonomials(rationalmonomials);
-	testDecomp(rationalPolyString.str().c_str());
+	//testDecomp(rationalPolyString.str().c_str());
 
-	cout << "OMG, it worked" << endl;
+	//cout << "OMG, it worked" << endl;
 
-	exit(1);
-#if 0
+
 	//now start over with the rational polynomial. :)
 	BTrieIterator<ZZ, int>* rationalIterator = new BTrieIterator<ZZ, int> ();
 	forms.termCount = 0;
@@ -474,11 +473,34 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	cout << "got here 461" << endl;
 	decompose(rationalIterator, forms);
 	cout << "got here 463" << endl;
-	destroyMonomials(rationalmonomials); //no longer need them. We only care about the linear forms.
+	//cout << printLinForms(forms) << endl;
+	//destroyMonomials(rationalmonomials); //no longer need them. We only care about the linear forms.
 
 
 	BTrieIterator<ZZ, ZZ>* linearFormIterator = new BTrieIterator<ZZ, ZZ> ();
 	linearFormIterator->setTrie(forms.myForms, forms.varCount);
+
+	cout << "got here 482" << endl;
+
+	//testing**************
+	/*simplexZZ mySimplex;
+	string simplexString = "[ [0, 0], [3, 0], [0, 3]]";
+	convertToSimplex(mySimplex, simplexString);
+	cout << "print MySimplex: " << endl;
+	mySimplex.print(cout);
+
+	//integrate here
+	ZZ numerator, denominator;
+	cout << "Integrating..." << endl;
+
+	linearFormIterator->setTrie(forms.myForms, forms.varCount);
+	integrateLinFormSum(numerator, denominator, linearFormIterator	, mySimplex);
+	//destroyLinForms(forms);
+	cout << "num/denum = " << numerator << "/" << denominator << endl;
+	cout << "calling exit" << endl;
+	*/
+	//end testing**************
+	//exit(1);
 	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
 			= currentCone->rest)
 	{
@@ -496,17 +518,33 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 		int vertexCount = 0; //the current vertex number being processed.
 		oneSimplex.s.SetLength(numOfVars + 1);
 
-		for (rays = rays->rest; rays; rays = rays->rest, ++vertexCount)
+		cout << "got here 500" << endl;
+		for (rays = rays; rays; rays = rays->rest, ++vertexCount)
 		{
 			oneSimplex.s[vertexCount].SetLength(numOfVars);
 			assert( rays->first[0] == 1);
 			for (int k = 0; k < numOfVars; ++k)
-			oneSimplex.s[vertexCount][k] = rays->first[k + 1];
+				oneSimplex.s[vertexCount][k] = rays->first[k + 1];
 
 		}//create the simplex. Don't copy the leading 1.
+
+		mat_ZZ matt;
+		matt.SetDims(oneSimplex.d, oneSimplex.d);
+		for (i = 1; i <= oneSimplex.d; i++)
+			matt[i - 1] = oneSimplex.s[i] - oneSimplex.s[0];
+		oneSimplex.v = determinant(matt);
+
+
 		ZZ numerator, denominator;
+		cout << "got here 510" << endl;
+		cout << printLinForms(forms) << endl;
+
+		cout << "print oneSimplex" << endl;
+		oneSimplex.print(cout);
 		integrateLinFormSum(numerator, denominator, linearFormIterator,
 				oneSimplex);
+		cout << "my num/denum = " << numerator << "/" << denominator << endl;
+		cout << "got here 513" << endl;
 
 		//void integrateLinFormSum(ZZ& numerator, ZZ& denominator, PolyIterator<ZZ, ZZ>* it, const simplexZZ &mySimplex)
 
@@ -518,10 +556,12 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	delete linearFormIterator;
 
 	answer.div(beta);
-	answer.mult(power(lcmDenominators, numOfVars), to_ZZ(1));
+	answer.div(power(lcmDenominators, numOfVars), to_ZZ(1));
+
+	cout << "answer = " << answer << endl;
 
 	return answer;
-#endif
+
 }//integrate.
 
 void PolytopeValuation::testDecomp(const char stringPoly[])
@@ -551,7 +591,6 @@ void PolytopeValuation::testDecomp(const char stringPoly[])
 	decompose(it, forms);
 
 	cout << "polynomial to forms: " << printLinForms(forms) << endl;
-
 
 	if (forms.termCount == 0 || forms.varCount == 0)
 	{
