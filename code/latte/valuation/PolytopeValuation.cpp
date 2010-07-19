@@ -150,6 +150,83 @@ void PolytopeValuation::convertToOneCone()
 	freePolytopeAsOneCone = 1; //delete this object in the deconstructor.
 }//convertToOneCone
 
+
+/**
+ * Converts maple polynomial strings to a vector.  one monomial is saved as [coef., power of x1, power of x2, ... power of xn]. The powers are all rational.
+ *
+ * This is motly a copy of void parseMonomials(MonomialConsumer<ZZ>* consumer, const string &line)
+ */
+void PolytopeValuation::breakupPolynomialToMonomials(
+		const string & polynomialString,
+		vector<vector<RationalNTL> > & monomialList) const
+{
+	int varCount = 0;
+	for (int i = 0; polynomialString[i] != ']'; i++)
+	{
+		varCount += (polynomialString[i] == ',');
+	}
+	if (varCount < 1)
+	{
+		cout << "polynomialString: `" << polynomialString << "'" << endl;
+		cout << "There are " << varCount << " variables, bailing." << endl;
+		return;
+	}
+	//consumer->setDimension(varCount);
+
+	int termIndex, lastPos, expIndex, flag;
+	termIndex = lastPos = flag = 0; //0 means we expect coefficient, 1 means we expect exponent vector
+
+	int *exponents = new int[varCount];
+	vector<RationalNTL> oneMonomial; // coefficient;
+
+	for (int i = 1; i < polynomialString.length() - 1; i++) //ignore outermost square brackets
+	{
+		if (polynomialString[i] == '[')
+		{
+
+			switch (flag)
+			{
+				case 0: //coefficient
+					lastPos = i + 1;
+					for (; polynomialString[i] != ','; i++)
+						;
+
+					oneMonomial.push_back(RationalNTL(polynomialString.substr(
+							lastPos, i - lastPos).c_str()));
+					flag = 1;
+					break;
+				case 1: //exponent vector
+					expIndex = 0;
+					for (i++; polynomialString[i] != ']'; i++)
+					{
+						if (polynomialString[i] != ' ')
+						{
+							lastPos = i;
+							for (; polynomialString[i] != ','
+									&& polynomialString[i] != ']'; i++)
+								;
+							oneMonomial.push_back(RationalNTL(
+									polynomialString.substr(lastPos, i
+											- lastPos).c_str()));
+							//exponents[expIndex++] = atoi(polynomialString.substr(lastPos, i
+							//		- lastPos).c_str());
+						}
+					}
+					monomialList.push_back(oneMonomial); //consumer->ConsumeMonomial(coefficient, exponents);
+					oneMonomial.clear();
+					flag = 0;
+					break;
+				default: //error
+					cout << "Flag is " << flag << ", bailing." << endl;
+					return;
+			}
+		}
+	}
+
+	delete[] exponents;
+
+}
+
 /**
  * Dilates the polytope by computing new_vertex = old_vertex * factor, and overriding the
  * vertex-ray cones.
@@ -374,44 +451,152 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	linFormSum forms;
 	RationalNTL answer;
 
-	loadMonomials(monomials, polynomialString);
+	//find each monomial.
+	vector<vector<RationalNTL> > monomialList; // one monomial is saved as [coef., power of x1, power of x2, ... power of xn]. The powers are all rational.
+	breakupPolynomialToMonomials(polynomialString, monomialList); //saves each monomial into the list.
 
-	if (monomials.termCount == 0 || monomials.varCount == 0)
-	{
-		cout << "Error: loaded invalid monomial sum." << endl;
-		exit(1);
-	}
+	cout << "number of monomials =" << monomialList.size() << endl;
 
-	//  original vertices = (b1/a1, b2/a2, b3/a3, b4/a4)
-	//  Find the lcm of a_k for every ith element in every vertex. and save it lcmDenominators[i]
-	//vec_ZZ lcmDenominators;
-	//lcmDenominators.SetLength(numOfVars);
-	//for(int i = 0; i < numOfVars; ++i)
-	//	lcmDenominators[i] = 1;
-	ZZ lcmDenominators;
-	lcmDenominators = 1;
+	//find the dilation factor.
+	ZZ dilationFactor;
+	dilationFactor = 1;
 
 	for (listCone * currentCone = vertexRayCones; currentCone; currentCone
 			= currentCone->rest)
 		for (int i = 0; i < numOfVars; ++i)
-			lcmDenominators = lcm(lcmDenominators,
+			dilationFactor = lcm(dilationFactor,
 					(currentCone->vertex->vertex->denominators())[i]);
-	//lcmDenominators[i] = lcm( lcmDenominators[i], (currentCone->vertex->vertex->denominators())[i] );
 
-	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int> ();
-	it->setTrie(monomials.myMonomials, monomials.varCount);
-	it->begin();
-	ZZ beta;
-	beta = 1;
-	vector<RationalNTL> newCoeffs;
-	newCoeffs.resize(monomials.termCount);
-	int i = 0;
+	dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
+	convertToOneCone(); //every vertex should be integer
+	triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+
+
+	int *exponents;
+	exponents = new int[monomialList[0].size()];
+
+	cout << "exponents size = " << monomialList[0].size() -1 << endl;
+
+	for (int i = 0; i < monomialList.size(); ++i)
+	{
+		RationalNTL coefficient;
+		coefficient = monomialList[i][0]; //get the original coefficient.
+
+		cout << "original coefficient = " << monomialList[i][0] << endl;
+		//get the new coefficient.
+		long totalDegree;
+		totalDegree = 0;
+		for (int k = 1; k < monomialList[i].size(); ++k)
+			totalDegree += to_int(monomialList[i][k].getNumerator());
+		coefficient.div(power(dilationFactor, totalDegree));
+		cout << "new coefficient = " << monomialList[i][0] << endl;
+
+		//make a new monomial to integrate.
+		monomialSum oneMonomial;
+		oneMonomial.termCount = 0;
+		MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ> ();
+		myLoader->setMonomialSum(oneMonomial);
+		myLoader->setDimension(monomialList[i].size() - 1); //number of variables in the monomial.
+		cout << "My loader made" << endl;
+
+		//get the exponents as c++ ints.
+		for (int k = 0; k < monomialList[i].size() - 1; ++k)
+		{
+			exponents[k] = to_int(monomialList[i][k + 1].getNumerator());
+			cout << exponents[k] << ", " ;
+		}
+
+
+
+		cout << "exponent vector made" << endl;
+		ZZ one;
+		one  = 1;
+		myLoader->ConsumeMonomial(one, exponents);
+
+		cout << "consume monomial worked" << endl;
+
+		cout << "oneMonomila = " << printMonomials(oneMonomial) << endl;
+
+		//oneMonomial is now constructed. Next make the linear forms.
+		BTrieIterator<ZZ, int>* iterator = new BTrieIterator<ZZ, int> ();
+		forms.termCount = 0;
+		forms.varCount = oneMonomial.varCount;
+		iterator->setTrie(oneMonomial.myMonomials, oneMonomial.varCount);
+		decompose(iterator, forms);
+
+		cout << "linear forms = " << printLinForms(forms) << endl;
+
+		BTrieIterator<ZZ, ZZ>* linearFormIterator =
+				new BTrieIterator<ZZ, ZZ> ();
+		linearFormIterator->setTrie(forms.myForms, forms.varCount);
+
+
+		for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
+				= currentCone->rest)
+		{
+			cout << "starting to integrate over a new cone" << endl;
+			//struct simplexZZ
+			//	int d;
+			//	vec_vec_ZZ s;
+			//	ZZ v;
+
+
+			simplexZZ oneSimplex;
+			oneSimplex.d = oneMonomial.varCount; //d is for dimension?
+
+			listVector * rays = currentCone->rays;
+
+			int vertexCount = 0; //the current vertex number being processed.
+			oneSimplex.s.SetLength(numOfVars + 1);
+
+			cout << "got here 500" << endl;
+			for (rays = rays; rays; rays = rays->rest, ++vertexCount)
+			{
+				oneSimplex.s[vertexCount].SetLength(numOfVars);
+				assert( rays->first[0] == 1);
+				for (int k = 0; k < numOfVars; ++k)
+					oneSimplex.s[vertexCount][k] = rays->first[k + 1];
+
+			}//create the simplex. Don't copy the leading 1.
+
+			mat_ZZ matt;
+			matt.SetDims(oneSimplex.d, oneSimplex.d);
+			for (int j = 1; j <= oneSimplex.d; j++)
+				matt[j - 1] = oneSimplex.s[j] - oneSimplex.s[0];
+			oneSimplex.v = abs(determinant(matt));
+
+			ZZ numerator, denominator;
+			cout << "got here 510" << endl;
+			cout << printLinForms(forms) << endl;
+
+			cout << "print oneSimplex" << endl;
+			oneSimplex.print(cout);
+			integrateLinFormSum(numerator, denominator, linearFormIterator,
+					oneSimplex);
+			cout << "my num/denum = " << numerator << "/" << denominator
+					<< endl;
+			cout << "got here 513" << endl;
+
+			//void integrateLinFormSum(ZZ& numerator, ZZ& denominator, PolyIterator<ZZ, ZZ>* it, const simplexZZ &mySimplex)
+
+			answer.add(numerator * coefficient.getNumerator(), denominator * coefficient.getDenominator());
+
+		}//for every triangulated simplex.
+
+	}//for each monomial.
+	delete[] exponents;
+
+	answer.div(power(dilationFactor, monomialList[0].size() - 1)); // monomialList[0].size() - 1 = number of variables.
+	cout << "answer = " << answer << endl;
+
+#if 0
+	// to delete.
 	for (term<ZZ, int>* tempMonomial = it->nextTerm(); tempMonomial; ++i, tempMonomial
 			= it->nextTerm())
 	{
 		newCoeffs[i] = tempMonomial->coef;
 		for (int k = 0; k < tempMonomial->length; ++k)
-			newCoeffs[i].div(power(lcmDenominators, tempMonomial->exps[k]));
+		newCoeffs[i].div(power(lcmDenominators, tempMonomial->exps[k]));
 		//newCoeffs[i].div(power(lcmDenominators[k], tempMonomial->exps[k]));
 		beta = lcm(beta, newCoeffs[i].getDenominator());
 	}//for every monomial, compute the new coefficient.
@@ -431,7 +616,7 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	{
 
 		for (int k = 0; k < monomials.varCount; ++k)
-			newExponents[k] = tempMonomial->exps[k];
+		newExponents[k] = tempMonomial->exps[k];
 		RationalNTL rationalCoefficient;
 		rationalCoefficient = newCoeffs[i] * beta;
 
@@ -484,21 +669,21 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 
 	//testing**************
 	/*simplexZZ mySimplex;
-	string simplexString = "[ [0, 0], [3, 0], [0, 3]]";
-	convertToSimplex(mySimplex, simplexString);
-	cout << "print MySimplex: " << endl;
-	mySimplex.print(cout);
+	 string simplexString = "[ [0, 0], [3, 0], [0, 3]]";
+	 convertToSimplex(mySimplex, simplexString);
+	 cout << "print MySimplex: " << endl;
+	 mySimplex.print(cout);
 
-	//integrate here
-	ZZ numerator, denominator;
-	cout << "Integrating..." << endl;
+	 //integrate here
+	 ZZ numerator, denominator;
+	 cout << "Integrating..." << endl;
 
-	linearFormIterator->setTrie(forms.myForms, forms.varCount);
-	integrateLinFormSum(numerator, denominator, linearFormIterator	, mySimplex);
-	//destroyLinForms(forms);
-	cout << "num/denum = " << numerator << "/" << denominator << endl;
-	cout << "calling exit" << endl;
-	*/
+	 linearFormIterator->setTrie(forms.myForms, forms.varCount);
+	 integrateLinFormSum(numerator, denominator, linearFormIterator	, mySimplex);
+	 //destroyLinForms(forms);
+	 cout << "num/denum = " << numerator << "/" << denominator << endl;
+	 cout << "calling exit" << endl;
+	 */
 	//end testing**************
 	//exit(1);
 	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
@@ -524,16 +709,15 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 			oneSimplex.s[vertexCount].SetLength(numOfVars);
 			assert( rays->first[0] == 1);
 			for (int k = 0; k < numOfVars; ++k)
-				oneSimplex.s[vertexCount][k] = rays->first[k + 1];
+			oneSimplex.s[vertexCount][k] = rays->first[k + 1];
 
 		}//create the simplex. Don't copy the leading 1.
 
 		mat_ZZ matt;
 		matt.SetDims(oneSimplex.d, oneSimplex.d);
 		for (i = 1; i <= oneSimplex.d; i++)
-			matt[i - 1] = oneSimplex.s[i] - oneSimplex.s[0];
+		matt[i - 1] = oneSimplex.s[i] - oneSimplex.s[0];
 		oneSimplex.v = determinant(matt);
-
 
 		ZZ numerator, denominator;
 		cout << "got here 510" << endl;
@@ -556,10 +740,10 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	delete linearFormIterator;
 
 	answer.div(beta);
-	answer.div(power(lcmDenominators, numOfVars), to_ZZ(1));
+	answer.div(power(lcmDenominators, numOfVars));
 
 	cout << "answer = " << answer << endl;
-
+#endif
 	return answer;
 
 }//integrate.

@@ -134,6 +134,21 @@ RationalNTL::RationalNTL(const string &num, const string &denom)
 	canonicalize();
 }
 
+
+RationalNTL::RationalNTL(const string &number)
+{
+	for(int i = 0; i < number.length(); ++i)
+		if ( number[i] == '/')
+		{
+			numerator = to_ZZ(number.substr(0, i).c_str());
+			denominator = to_ZZ(number.substr(i + 1, number.length() - i -1).c_str());
+			canonicalize();
+			return;
+		}
+	numerator = to_ZZ(number.c_str());
+	denominator = 1;
+}
+
 /**
  * factors out common terms and makes the denominator positive.
  */

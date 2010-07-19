@@ -585,7 +585,7 @@ ValuationContainer mainValuationDriver(const char *argv[], int argc)
 	if ( strcmp(valuationType, "volume") == 0)
 		valuationAnswers = computeVolume(Poly, *params, valuationAlg, printLawrence);
 	else if ( strcmp(valuationType, "integrate") == 0) //add input of polynomial.
-		valuationAnswers = computeIntegral(Poly, *params, valuationAlg, printLawrence, "[ [5, [6, 7]]]");
+		valuationAnswers = computeIntegral(Poly, *params, valuationAlg, printLawrence, "[ [3/4, [2, 0]], [1/2, [0, 2]]]");
 	else
 	{
 		cout << "ops, valuation type is not known: " << valuationType << endl;
