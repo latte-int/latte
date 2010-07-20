@@ -21,8 +21,8 @@ code/latte/integration/benchmark.sh -text
 code/latte/integration/blockInt.cpp -text
 code/latte/integration/blockReps.h -text
 code/latte/integration/burstInt.cpp -text
-code/latte/integration/burstTest.cpp -text
 code/latte/integration/burstTrie.h -text
+code/latte/integration/burstTrie.hpp -text
 code/latte/integration/compareTimes.mpl -text
 code/latte/integration/consumers.h -text
 code/latte/integration/createLinear.mpl -text
@@ -32,6 +32,7 @@ code/latte/integration/demo_readme.txt -text
 code/latte/integration/integrateDemo.cpp -text
 code/latte/integration/integrateTest.cpp -text
 code/latte/integration/iterators.h -text
+code/latte/integration/iterators.hpp -text
 code/latte/integration/multiply.h -text
 code/latte/integration/multiplyTest.cpp -text
 code/latte/integration/multiplyTest.mpl -text

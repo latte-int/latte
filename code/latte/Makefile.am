@@ -222,6 +222,7 @@ noinst_LIBRARIES += liblatteintegration.a
 liblatteintegration_a_SOURCES = 		\
 	integration/PolyRep.cpp			\
 	integration/residue.cpp			\
+	timing.cpp			\
 	integration/newIntegration.cpp		\
 	integration/PolyTrie.cpp
 
