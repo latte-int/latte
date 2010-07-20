@@ -48,6 +48,7 @@ using namespace std;
 
 class PolytopeValuation
 {
+private:
 	BarvinokParameters parameters; //Barvinok Parameters.
 	Polyhedron * poly;				//The polyhedron, vertexRayCones or PolytopeAsOneCone points to the polyhedron's cones.
 	listCone * vertexRayCones;		//list of  vertex-ray pairs.
@@ -55,6 +56,10 @@ class PolytopeValuation
 	listCone * triangulatedPoly;	//The triangulation of polytopeAsOneCone.
 	int numOfVars;
 	bool freeVertexRayCones, freePolytopeAsOneCone, freeTriangulatedPoly; //denotes if we made these objects (and should free them) or if they were passed in.
+
+
+
+	RationalNTL integratePolytope(linFormSum &forms) const;
 
 public:
 	typedef enum {DeterminantVolume, LawrenceVolume} VolumeType;
@@ -75,8 +80,6 @@ public:
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
 	RationalNTL integrate(const string& polynomial); //integrates the polynomial over the polytope. The polytope is written in maple syntax.
-	void testDecomp(const char stringPoly[]);
-	RationalNTL integrateSimplex(simplexZZ &mysimplex, linFormSum & linearFormSums);
 	ZZ static lcm(const ZZ &a, const ZZ & b);
 	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
 	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly
