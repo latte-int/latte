@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
 					forms.varCount = monomials.varCount;
 		
 					cout << "Decomposing into sum of linear forms..." << endl;
-					
+					cout << monomials.varCount << endl;
 					it->setTrie(monomials.myMonomials, monomials.varCount);
 					
 					lastTime = myTimer.get_seconds();
