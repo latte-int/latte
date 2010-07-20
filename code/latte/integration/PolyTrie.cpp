@@ -207,7 +207,7 @@ void parseLinForms(FormSumConsumer<ZZ>* consumer, const string& line)
 void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum& formSum) //sort on degree first or last?
 {
 	BurstTrie<ZZ, ZZ> *curTrie;
-	
+	cout << "inserting into linear form with " << formSum.varCount << " variables" << endl;
 	if (formSum.termCount == 0) //need to construct the first burst trie (sorted on the first variable) and first container 
 	{
 		formSum.myForms = new BurstTrie<ZZ, ZZ>();
@@ -221,6 +221,7 @@ void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&
 	ZZ* exps = new ZZ[formSum.varCount];
 	for (int i = 0; i < formSum.varCount; i++) { exps[i] = coeffs[i]; }
 	curTrie->insertTerm(coef, exps, 0, formSum.varCount, degree);
+
 	delete [] exps;
 	formSum.termCount++;
 }
@@ -270,6 +271,7 @@ void destroyLinForms(linFormSum &myPoly)
 //	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
 void decompose(BTrieIterator<ZZ, int>* it, linFormSum &lForm)
 {
+	cout << "decomposing " << lForm.varCount << " variables" << endl;
 	term<ZZ, int>* temp; 
 	//BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 
@@ -280,6 +282,7 @@ void decompose(BTrieIterator<ZZ, int>* it, linFormSum &lForm)
 	do
 	{
 		decompose(temp, lForm);
+		cout << "decomposed term" << endl;
 		temp = it->nextTerm();
 	}
 	while (temp);

@@ -246,7 +246,7 @@ public:
         {
 	    BurstContainer<T, S>* temp = (BurstContainer<T, S>*)curElem->myVal;
 	    //cout << "Trie element is a container (" << temp->termCount << " elements)" << endl;
-            if (temp->termCount == BURST_MAX && myLength > 1)
+            if (temp->termCount == BURST_MAX && (myLength - start) > 1)
             {
 		//cout << "Bursting container..." << endl;
                 BurstTrie<T, S>* newTrie = temp->burst();
