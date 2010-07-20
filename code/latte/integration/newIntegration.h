@@ -17,6 +17,21 @@ struct simplexZZ
 	int d;			// dimension of the space? so s.length = d + 1?
 	vec_vec_ZZ s;	// s[i] = vector of the ith vertex
 	ZZ v; 			//valuation/integral answer?
+
+	void print(ostream & out)
+	{
+		out << "d = " << d << endl;
+		out << "v = " << v << endl;
+		int i;
+		for( i = 0; i < s.length(); ++i)
+		{
+			out << "s[" << i << "] = ";
+			for(int k = 0; k < s[i].length(); ++k)
+				out << s[i][k] << ", ";
+			out << endl;
+		}
+
+	}//pirnt
 };
 
 void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de);
