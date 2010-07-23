@@ -165,6 +165,7 @@ void parseLinForms(FormSumConsumer<RationalNTL>* consumer, const string& line)
 	int k;
 	int flag = 0; //0 means we expect coefficient, 1 means we expect degree, 2 means we expect coefficient vector
 
+	cout << "parseLinForms: line = " << line.c_str() << endl;
 	for (int i = 0; line[i] != ']'; i++)
 	{
 		varCount += (line[i] == ',');
@@ -215,8 +216,10 @@ void parseLinForms(FormSumConsumer<RationalNTL>* consumer, const string& line)
 							lastPos = i;
 							for (; line[i] != ',' && line[i] != ']'; i++)
 								;
+
 							coefs[k++] = to_ZZ(
 									line.substr(lastPos, i - lastPos).c_str());
+
 						}
 					}
 					degreeFactorial = 1;

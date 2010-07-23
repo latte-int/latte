@@ -15,7 +15,7 @@ $
 #
 # Note that we assume polynomial dimension = dimension of the polytope.
 
-
+printf("Testing integration of hyper-rectangles...\n"):
 
 myDim, myDegree, fileName, totalErrors, returnStatus, seed:
 

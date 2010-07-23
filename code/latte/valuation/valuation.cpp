@@ -258,7 +258,7 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 					<< " --valuation=volume --lawrence --printLawrenceFunction file.latte\n"
 					<< "         (will print the volume found by the Lawrence method along with the Lawrence rational function.)\n"
 					<< "Example: " << argv[0]
-					<< "--valuation=volume --monomials=poly.txt file.latte\n"
+					<< "--valuation=integrate --monomials=poly.txt file.latte\n"
 					<< "         (will compute the integral of the polynomial in poly.txt over the polytope in file.latte.)\n"
 					<< endl;
 			exit(0);
