@@ -245,29 +245,40 @@ end:
 #                         bigConstant, dimension, myDegree, numTerms);
 #Makes a random polynomial. Each polynomial contains at most r monomilas of degree between [1, M].
 #Then converts the polynomial to our list syntax: [ [coeff., [exps]]+ ] 
-random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r) 
+random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r, rationalCoeff) 
   local poly;
-  poly:=random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(N,d,M,r): 
+  poly:=random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(N,d,M,r, rationalCoeff): 
   polynomial_to_sparsepoly(poly, d);
 end:
 
 
 #Makes a random polynomial. Each polynomial contains at most r monomilas of degree between [1, M].
-random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r) 
+random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r, rationalCoeff) 
   local p, R, currentDegree, negative;
   ## Give up if too large polynomials requested
   if (r > 500000) then
     error "Too large a polynomial requested"
   fi;
   R := rand(N);
+  R_denom:=rand(100);
+  
   negative:= rand(N); #negative() = 0 or 1
   
-  p := randpoly([ seq(x[i], i=1..d) ], 
-                homogeneous, degree = 1, terms = rand(r)() + 1, coeffs = proc()(-1)^(negative())*( R() + 1); end);
-  for currentDegree from 2 to M do
-    p := p + randpoly([ seq(x[i], i=1..d) ], 
-                homogeneous, degree = currentDegree, terms = rand(r)(), coeffs = proc()(-1)^(negative())*( R() + 1); end);
-   od:             
+  if ( rationalCoeff = 0) then #make integer coeff. polynomials.
+    p := randpoly([ seq(x[i], i=1..d) ], 
+                  homogeneous, degree = 1, terms = rand(r)() + 1, coeffs = proc()(-1)^(negative())*( R() + 1); end);
+    for currentDegree from 2 to M do
+      p := p + randpoly([ seq(x[i], i=1..d) ], 
+                  homogeneous, degree = currentDegree, terms = rand(r)(), coeffs = proc()(-1)^(negative())*( R() + 1); end);
+    od:
+  else #make rational coeff. polynomials.
+    p := randpoly([ seq(x[i], i=1..d) ], 
+                  homogeneous, degree = 1, terms = rand(r)() + 1, coeffs = proc()(-1)^(negative())*( R() / (R_denom() + 1)); end);
+    for currentDegree from 2 to M do
+      p := p + randpoly([ seq(x[i], i=1..d) ], 
+                  homogeneous, degree = currentDegree, terms = rand(r)(), coeffs = proc()(-1)^(negative())*( R() / (R_denom() + 1)); end);
+    od:               
+   fi:            
   
   printf("Random polynomial:\n\n");              
   print(p);
@@ -278,7 +289,7 @@ end:
 
 
 
-test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen)
+test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen, rationalCoeff)
   global filename:
   local errors, wrong:
   local myMonomials, mySimplices, myLinForms, mapleLinForms, myResults, mapleResults:
@@ -296,10 +307,10 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   for myIndex from 1 to polyCount do
     mySimplices[myIndex]:=lattice_random_simplex(dimension, bigConstant);
     if decomposing = 1 then
-      myMonomials[myIndex]:=randomGen(bigConstant, dimension, myDegree, numTerms);
+      myMonomials[myIndex]:=randomGen(bigConstant, dimension, myDegree, numTerms, rationalCoeff);
     else
       #print(myDegree, dimension, bigConstant, bigConstant, numTerms);
-      mapleLinForms[myIndex]:=randomGen(myDegree, dimension, bigConstant, bigConstant, numTerms):
+      mapleLinForms[myIndex]:=randomGen(myDegree, dimension, bigConstant, bigConstant, numTerms, rationalCoeff):
       #print(random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(myDegree, dimension, bigConstant, bigConstant, numTerms));
     end if:
   od:

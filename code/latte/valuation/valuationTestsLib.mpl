@@ -112,8 +112,9 @@ end:
 #
 # Once that is done, we compute the real integral and call ./testPolytopeIntegration for comparison.
 #
+# if rationalCoeff is 1, then the random polynomial has rational coefficients, if it is 0, it has integer coefficients.
 # @return int: the system status.
-test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName) 
+test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoeff) 
  
 	local randomPoly, lowerIntegrationBound, upperIntegrationBound, randNumber, positive, i, integratedPoly, correctAnswer, polynomialFileName, systemCommand, correctAnswerString, status:
 	  
@@ -122,7 +123,7 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	positive := rand(2); #positive() is 0 or 1.
   
 	#get a random polynomial.
-	randomPoly:=random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(5000, polytopeDimension, polyMaxDegree, maxNumberOfTermsPerDegree):
+	randomPoly:=random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(5000, polytopeDimension, polyMaxDegree, maxNumberOfTermsPerDegree, rationalCoeff):
   
 	lowerIntegrationBound:=Vector(polytopeDimension);
 	upperIntegrationBound:=Vector(polytopeDimension);

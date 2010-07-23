@@ -31,8 +31,8 @@ for myDim from 2 to 8 do
 	
 		printf("Testing polynomials of dimension %d, and at most degree %d\n", myDim, myDegree);
   
-#                   the parameters are:  polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName)    
-    	returnStatus:=test_hyperrectangle_integtation(myDegree, myDim, 10, 30000, fileName):
+#                   the parameters are:  polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
+    	returnStatus:=test_hyperrectangle_integtation(myDegree, myDim, 10, 30000, fileName, 1):
    
 		if ( not(returnStatus = 0)) then 
 			totalErrors:= totalErrors + 1; 

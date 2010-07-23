@@ -1,21 +1,29 @@
 with(LinearAlgebra):
 #This function takes in degree, dimension and some bounds, creates a random linear form
-random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,maxcoef,componentmax,maxterm)
-local temp,l,termcount,i,j,R;
-R:=rand(maxterm);
-termcount:=R() + 1;
-l:=[];
-for i from 1 to termcount do
-temp:=[];
-for j from 1 to d do
-R:=rand(componentmax);
-temp:=[R(),op(temp)];
-od;
-temp:=[m,temp];
-R:=rand(maxcoef);
-temp:=[R()-trunc(maxcoef/2),temp];
-l:=[op(l),temp];
-od;
+random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,maxcoef,componentmax,maxterm, rationalCoeff)
+	local temp,l,termcount,i,j,R;
+	R:=rand(maxterm);
+	R_denom:=rand(100);
+	termcount:=R() + 1;
+	l:=[];
+	for i from 1 to termcount do
+		temp:=[];
+			for j from 1 to d do
+				R:=rand(componentmax);
+				temp:=[R(),op(temp)];
+			od;
+		temp:=[m,temp];
+		R:=rand(maxcoef);
+		if ( rationalCoeff = 0) then 
+			temp:=[R()-trunc(maxcoef/2),temp];
+		else
+			temp:=[(R()-trunc(maxcoef/2))/ (R_denom() + 1),temp];
+		fi;
+		l:=[op(l),temp];
+	od;
+	printf("Random Linear Form:\n\n");
+	print(l);
+	l;
 end:
 
 del_space:=proc(s)
