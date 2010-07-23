@@ -25,9 +25,9 @@ int main(int argc, char *argv[])
 	string testForms;
 	int *low, *high;
 	
-	MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ>();
-	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
-	BTrieIterator<ZZ, int>* it2 = new BTrieIterator<ZZ, int>();
+	MonomialLoadConsumer<RationalNTL>* myLoader = new MonomialLoadConsumer<RationalNTL>();
+	BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int>();
+	BTrieIterator<RationalNTL, int>* it2 = new BTrieIterator<RationalNTL, int>();
 	
 	while (!myStream.eof())
 	{
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
 				
 				it->setTrie(firstPoly.myMonomials, firstPoly.varCount);
 				it2->setTrie(secondPoly.myMonomials, secondPoly.varCount);
-				multiply<ZZ>(it, it2, product, low, high);
+				multiply<RationalNTL>(it, it2, product, low, high);
 
 				outStream << printMonomials(product) << endl;
 

@@ -21,6 +21,8 @@ BuildRandomPolytope::BuildRandomPolytope(int ambient_dim)
 	integerPoints = true;
 	probNegative = .5;
 	numAffineHull = 0;
+	savePolymakeFile = false; //don't save the file. Delete it in the deconstructor.
+	saveLatteFile = false;
 
 }//buildRandomPolytope
 
@@ -28,14 +30,20 @@ BuildRandomPolytope::BuildRandomPolytope(int ambient_dim)
 BuildRandomPolytope::~BuildRandomPolytope()
 {
 	stringstream command;
-	command << "rm -f " << fileName.c_str();
-	cout << "Deleting file " << command.str().c_str() << endl;
-	system(command.str().c_str());
-	command.str("");
-	command.clear();
-	command << "rm -f " << latteFile.c_str();
-	cout << "Deleting file " << command.str().c_str() << endl;
-	system(command.str().c_str());
+	if ( savePolymakeFile == false)
+	{
+		command << "rm -f " << fileName.c_str();
+		cout << "Deleting file " << command.str().c_str() << endl;
+		system(command.str().c_str());
+		command.str("");
+	}
+	if (saveLatteFile == false)
+	{
+		command.clear();
+		command << "rm -f " << latteFile.c_str();
+		cout << "Deleting file " << command.str().c_str() << endl;
+		system(command.str().c_str());
+	}
 }//deconstructor.
 
 /**
@@ -300,6 +308,24 @@ void BuildRandomPolytope::printFacetEquationsForLattE()
 	}//if there are affine hulls!
 	file.close();
 }//printFacetEuationsForLatte()
+
+/**
+ * Changes the save state of the latte file.
+ */
+void BuildRandomPolytope::saveTheLatteFile(bool save)
+{
+	saveLatteFile = save;
+}
+
+/**
+ * Changes the save state of the polymake file.
+ */
+
+void BuildRandomPolytope::saveThePolymakeFile(bool save)
+{
+	savePolymakeFile = save;
+}
+
 
 /**
  * This string is passed to ehrhart2 and is printed in the log files to make things easier to read.

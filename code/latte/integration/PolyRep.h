@@ -12,14 +12,14 @@ NTL_CLIENT
 
 void _loadMonomials(_monomialSum&, const string&);
 //string parsing
-void _parseMonomials(_MonomialConsumer<ZZ>*, const string&);
+void _parseMonomials(_MonomialConsumer<RationalNTL>*, const string&);
 //data structure operations
 string _printMonomials(const _monomialSum&);
 void _destroyMonomials(_monomialSum&);
 
 void _loadLinForms(_linFormSum&, const string);
 //string parsing
-void _parseLinForms(_FormSumConsumer<ZZ>*, const string&);
+void _parseLinForms(_FormSumConsumer<RationalNTL>*, const string&);
 //data structure operations
 string _printLinForms(const _linFormSum&);
 void _destroyLinForms(_linFormSum&);

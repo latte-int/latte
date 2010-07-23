@@ -35,6 +35,9 @@ protected:
     int dim;				//dim of the polytope found by polymake
     vector< vector<mpq_class> > facets; //facets of the polytope found by polymake
     int numAffineHull;		//number of affine hull facets found by polymake (saved at the end of the facets vector)
+
+    bool savePolymakeFile;	//if true, will not delete the polymake file. Default is false;
+    bool saveLatteFile;    //if true, will not delete the latte file. Default is false;
 public:
     BuildRandomPolytope(int ambient_dim);
     ~BuildRandomPolytope();
@@ -52,6 +55,9 @@ public:
 
 
 	void printFacetEquationsForLattE();
+
+	void saveTheLatteFile(bool save);
+	void saveThePolymakeFile(bool save);
 
 	void setComments(const string& newComments);
 	void setIntegerPoints(bool t);

@@ -1,7 +1,13 @@
 with(linalg):with(LinearAlgebra):
 with(numapprox,laurent):
 
-#Brandon's note: I should cut these functions out at instead use the integrationTestsLib.mpl
+
+
+#	This is mostly just a copy of decomposeTest.mpl.
+#
+#
+#
+#
 
 printf("Testing decomposition into linear forms and integration...\n"):
 #
@@ -221,7 +227,7 @@ end:
 ## Converting from Maple polynomials to our sparse format
 
 polynomial_to_sparsepoly := proc(p, dimension)
-  local variables,coefficients, monomials, exponents; 
+  local variables,coefficients, monomials, exponents, theZip; 
   variables := [ seq(x[i], i=1..dimension) ];     
   #print (variables);     
   coefficients := coeffs(p, variables, 'monomials');
@@ -236,17 +242,43 @@ polynomial_to_sparsepoly := proc(p, dimension)
       exponents);
 end:
 
+#                         bigConstant, dimension, myDegree, numTerms);
+#Makes a random polynomial. Each polynomial contains at most r monomilas of degree between [1, M].
+#Then converts the polynomial to our list syntax: [ [coeff., [exps]]+ ] 
 random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r) 
-  local p, R;
+  local poly;
+  poly:=random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(N,d,M,r): 
+  polynomial_to_sparsepoly(poly, d);
+end:
+
+
+#Makes a random polynomial. Each polynomial contains at most r monomilas of degree between [1, M].
+random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r) 
+  local p, R, currentDegree, negative;
   ## Give up if too large polynomials requested
   if (r > 500000) then
     error "Too large a polynomial requested"
   fi;
   R := rand(N);
+  negative:= rand(N); #negative() = 0 or 1
+  
   p := randpoly([ seq(x[i], i=1..d) ], 
-                homogeneous, degree = M, terms = r, coeffs = proc() R() + 1; end);
-  polynomial_to_sparsepoly(p, d);
+                homogeneous, degree = 1, terms = rand(r)() + 1, coeffs = proc()(-1)^(negative())*( R() + 1); end);
+  for currentDegree from 2 to M do
+    p := p + randpoly([ seq(x[i], i=1..d) ], 
+                homogeneous, degree = currentDegree, terms = rand(r)(), coeffs = proc()(-1)^(negative())*( R() + 1); end);
+   od:             
+  
+  printf("start poly\n\n");              
+  print(p);
+  printf("end poly\n\n");
+  #printf("degree=%f, terms=%f", M, r);
+  #error "stop the script";
+  p;
 end:
+
+
+#test_integration(10, 1000, 25, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
 
 test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen)
   global filename, totalErrors:
@@ -401,26 +433,3 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     printf("%d tests failed.\n", errors):
   end if;
 end:
-
-global totalErrors:
-local benchmarks:
-local myDim, myDegree:
-errorFile:=fopen("integration/errors.log",WRITE,TEXT):
-close(errorFile):
-totalErrors:= 0:
-for myDim from 2 to maxDim do
-  for myDegree from 2 to maxDegree do
-    #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
-    printf("Integrating monomials of degree %d, dimension %d...\n", myDegree, myDim):
-    test_integration(10, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
-    printf("Integrating powers of linear forms of degree %d, dimension %d...\n", myDegree, myDim):
-    test_integration(10, 1000, 1, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm):
-    if (totalErrors > 0) then
-      quit:
-    end if:
-  od:
-od:
-#print(integral_power_linear_form([[0],[1]],1,1,[1]);
-printf("%d total errors.\n", totalErrors):
-
- 

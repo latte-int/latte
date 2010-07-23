@@ -79,16 +79,17 @@ int main(int argc, char *argv[])
 	float loadTime, decomposeTime, integrateTime;
 	loadTime = decomposeTime = integrateTime = 0.0f;
 	Timer myTimer("Integration timer");
-	FormIntegrateConsumer<ZZ> *integrator;
-	if (!decomposing) { integrator = new FormIntegrateConsumer<ZZ>(); }
+	FormIntegrateConsumer<RationalNTL> *integrator;
+	if (!decomposing) { integrator = new FormIntegrateConsumer<RationalNTL>(); }
 
-	BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
-	BTrieIterator<ZZ, ZZ>* it2 = new BTrieIterator<ZZ, ZZ>();
+	BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int>();
+	BTrieIterator<RationalNTL, ZZ>* it2 = new BTrieIterator<RationalNTL, ZZ>();
 	while (!inFile.eof())
 	{
 		getline(inFile, line, '\n');
 		if (!line.empty())
 		{
+			//cout << "Currently processing line: " << line.c_str() << endl;
 			
 			if (polynomial) //reading form
 			{
@@ -133,6 +134,7 @@ int main(int argc, char *argv[])
 					{ outFile << printLinForms(forms) << endl; }
 
 					destroyMonomials(monomials);
+
 				}
 				else //input is just linear forms
 				{

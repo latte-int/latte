@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 			a=0;b=0;
 			_loadLinForms(forms, line);
 			convertToSimplex(mySimplex, line2);
-			LBlockIterator<ZZ>* it_ = new LBlockIterator<ZZ>();
+			LBlockIterator<RationalNTL>* it_ = new LBlockIterator<RationalNTL>();
 			it_->setLists(forms.lHead, forms.cHead, forms.varCount, forms.termCount);
 			integrateLinFormSum(a, b, it_, mySimplex);
 			hisStream<<a<<endl<<b<<endl;

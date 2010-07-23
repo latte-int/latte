@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 		{
 			a=0;b=0;
 			loadLinForms(forms, line);
-			BTrieIterator<ZZ, ZZ>* it = new BTrieIterator<ZZ, ZZ>();			
+			BTrieIterator<RationalNTL, ZZ>* it = new BTrieIterator<RationalNTL, ZZ>();
 			it->setTrie(forms.myForms, forms.varCount);
 			convertToSimplex(mySimplex, line2);
 			integrateLinFormSum(a, b, it, mySimplex);

@@ -11,7 +11,7 @@
 // result is every term in the product of two monomial sums whose exponents are greater than min and lower than max.
 // min, max point to int arrays of length result.varCount
 template <class T>
-void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, monomialSum& result, int* min, int* max)
+void multiply(PolyIterator<RationalNTL, int>* it, PolyIterator<RationalNTL, int>* it2, monomialSum& result, int* min, int* max)
 {
 	result.myMonomials = new BurstTrie<T, int>();
 	int* resExps = new int[result.varCount];
@@ -42,7 +42,7 @@ void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, monomialSum
 }
 
 template <class T>
-void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, _monomialSum& result, int* min, int* max)
+void multiply(PolyIterator<RationalNTL, int>* it, PolyIterator<RationalNTL, int>* it2, _monomialSum& result, int* min, int* max)
 {
 	//result.myMonomials = new BurstTrie<T, int>();
 	int* resExps = new int[result.varCount];
@@ -54,7 +54,7 @@ void multiply(PolyIterator<ZZ, int>* it, PolyIterator<ZZ, int>* it2, _monomialSu
 	term<T, int> *secondTerm = it2->nextTerm();
 	
 	int i;
-	ZZ prod;
+	RationalNTL prod;
 	while (firstTerm)
 	{
 		while (secondTerm)

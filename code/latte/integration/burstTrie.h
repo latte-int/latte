@@ -11,6 +11,7 @@ Defines the BurstTrie class, used for storing monomials and powers of linear for
 #include <stdio.h>
 #include <sstream>
 #include <assert.h>
+#include "rational.h"
 
 #define BT_DEBUG 1
 
@@ -21,14 +22,14 @@ template <class T, class S> class BurstTrie;
 struct monomialSum
 {
 	int termCount, varCount;
-	BurstTrie<ZZ, int>* myMonomials;
+	BurstTrie<RationalNTL, int>* myMonomials;
 };
 
 //linear forms: sort on degree first, then the form coefficients
 struct linFormSum
 {
 	int termCount, varCount;
-	BurstTrie<ZZ, ZZ>* myForms;
+	BurstTrie<RationalNTL, ZZ>* myForms;
 };
 
 #include "burstTrie.hpp"

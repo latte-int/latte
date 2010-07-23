@@ -31,6 +31,7 @@ code/latte/integration/decomposeTest.mpl -text
 code/latte/integration/demo_readme.txt -text
 code/latte/integration/integrateDemo.cpp -text
 code/latte/integration/integrateTest.cpp -text
+code/latte/integration/integrationTestsLib.mpl -text
 code/latte/integration/iterators.h -text
 code/latte/integration/iterators.hpp -text
 code/latte/integration/multiply.h -text
@@ -59,6 +60,11 @@ code/latte/testEhrhart/GraphMaker.h -text
 code/latte/valuation/Driver.cpp -text
 code/latte/valuation/PolytopeValuation.cpp -text
 code/latte/valuation/PolytopeValuation.h -text
+code/latte/valuation/integrateHyperrectangle.mpl -text
+code/latte/valuation/testIntegrationHyperrectangles.cpp -text
+code/latte/valuation/valuation.cpp -text
+code/latte/valuation/valuation.h -text
+code/latte/valuation/valuationTestsLib.mpl -text
 code/test-suite/test-4ti2.sh -text
 code/test-suite/test-allprimal-exp-maxdet1000-4ti2.sh -text
 code/test-suite/test-allprimal-exp-maxdet1000.sh -text

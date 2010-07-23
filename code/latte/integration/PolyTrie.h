@@ -12,20 +12,20 @@ NTL_CLIENT
 
 void loadMonomials(monomialSum&, const string&);
 //string parsing
-void parseMonomials(MonomialConsumer<ZZ>*, const string&);
+void parseMonomials(MonomialConsumer<RationalNTL>*, const string&);
 //data structure operations
-void insertMonomial(const ZZ&, int*, monomialSum&);
+void insertMonomial(const RationalNTL&, int*, monomialSum&);
 string printMonomials(const monomialSum&);
 void destroyMonomials(monomialSum&);
 
 void loadLinForms(linFormSum&, const string);
 //string parsing
-void parseLinForms(FormSumConsumer<ZZ>*, const string&);
+void parseLinForms(FormSumConsumer<RationalNTL>*, const string&);
 //data structure operations
-void insertLinForm(const ZZ& coef, int degree, const vec_ZZ& coeffs, linFormSum&);
+void insertLinForm(const RationalNTL& coef, int degree, const vec_ZZ& coeffs, linFormSum&);
 string printLinForms(const linFormSum&);
 void destroyLinForms(linFormSum&);
 
-void decompose(term<ZZ, int>*, linFormSum&);
-void decompose(BTrieIterator<ZZ, int>* it, linFormSum&);
+void decompose(term<RationalNTL, int>*, linFormSum&);
+void decompose(BTrieIterator<RationalNTL, int>* it, linFormSum&);
 #endif

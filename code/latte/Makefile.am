@@ -202,16 +202,27 @@ noinst_HEADERS += testEhrhart/BuildGraphPolytope.h	\
 
 bin_PROGRAMS += ValuationComputation
 ValuationComputation_SOURCES = valuation/Driver.cpp
+ValuationComputation_SOURCES += valuation/valuation.cpp
 ValuationComputation_SOURCES += valuation/PolytopeValuation.cpp
 ValuationComputation_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #used for testing
 ValuationComputation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #used for testing
+
 ValuationComputation_LDADD = $(LDADD)
-#ValuationComputation_LDADD += liblatte.a
 ValuationComputation_LDADD += liblatteintegration.a
-#ValuationComputation_SOURCES += integration/PolyTrie.cpp
-#ValuationComputation_SOURCES += integration/newIntegration.cpp
+
 
 noinst_HEADERS += valuation/PolytopeValuation.h
+noinst_HEADERS += valuation/valuation.h
+
+check_PROGRAMS += testPolytopeIntegration
+testPolytopeIntegration_SOURCES = valuation/testIntegrationHyperrectangles.cpp 
+testPolytopeIntegration_SOURCES += valuation/valuation.cpp
+testPolytopeIntegration_SOURCES += valuation/PolytopeValuation.cpp
+testPolytopeIntegration_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
+testPolytopeIntegration_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
+testPolytopeIntegration_LDADD = $(LDADD)
+testPolytopeIntegration_LDADD += liblatteintegration.a
+
 
 
 ################ INTEGRATION ####################
@@ -235,7 +246,7 @@ noinst_HEADERS +=				\
 	integration/newIntegration.h		\
 	integration/burstTrie.h			\
 	integration/blockReps.h			\
-	integration/residue.h
+	integration/residue.h	
 
 bin_PROGRAMS += BlockIntegrate
 BlockIntegrate_SOURCES = integration/blockInt.cpp
@@ -268,6 +279,7 @@ multiply_test_LDADD = liblatteintegration.a liblatte.a
 check_PROGRAMS += compare
 compare_SOURCES = integration/versusMode.cpp
 compare_LDADD = liblatteintegration.a liblatte.a
+
 
 TESTS +=  integration/testMultiply.sh
 TESTS += integration/testIntegration.sh

@@ -34,10 +34,10 @@ struct simplexZZ
 	}//pirnt
 };
 
-void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, ZZ coe, ZZ de);
+void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, RationalNTL coe, ZZ de);
 void delSpace(string &line);
 void convertToSimplex(simplexZZ&, string);
-void integrateLinFormSum(ZZ &a, ZZ &b, PolyIterator<ZZ, ZZ>* it, const simplexZZ &mySimplex);
+void integrateLinFormSum(ZZ &a, ZZ &b, PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex);
 void integrateMonomialSum(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
 void _integrateMonomialSum(ZZ &numerator, ZZ &denominator, _monomialSum &monomials, const simplexZZ &mySimplex);
 
@@ -46,7 +46,7 @@ class FormIntegrateConsumer : public FormSumConsumer<T> {
 public:
   FormIntegrateConsumer() { }
   // Take linear form and consume it.
-  void ConsumeLinForm(const ZZ& coefficient, int degree, const vec_ZZ& coefs);
+  void ConsumeLinForm(const RationalNTL& coefficient, int degree, const vec_ZZ& coefs);
   void setFormSum(const string& myForms) { linForms = myForms; }
   string getFormSum() { return linForms; }
   void setDimension(int dimension) { mySimplex->d = dimension; }//also stored in mySimplex
@@ -61,7 +61,7 @@ private:
 };
 
 template <class T>
-void FormIntegrateConsumer<T>::ConsumeLinForm(const ZZ& coefficient, int degree, const vec_ZZ& coefs)
+void FormIntegrateConsumer<T>::ConsumeLinForm(const RationalNTL& coefficient, int degree, const vec_ZZ& coefs)
 {
 	ZZ de = to_ZZ(1);
 	for (int i=1;i<=mySimplex->d+degree;i++)

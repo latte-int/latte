@@ -167,7 +167,7 @@ public:
 		
 		if (blockIndex < BLOCK_SIZE)
 		{
-			curTerm.coef = to_ZZ(curCoeff->data[blockIndex]);
+			curTerm.coef = /*to_ZZ*/(curCoeff->data[blockIndex]);
                         for (int i = 0; i < dimension; i++)
                         {
                             curTerm.exps[i] = curExp->data[i + dimension*blockIndex];
@@ -242,7 +242,7 @@ public:
 		
 		if (blockIndex < BLOCK_SIZE)
 		{
-			curTerm.coef = to_ZZ(curCoeff->data[blockIndex]);
+			curTerm.coef = /* to _ Z Z */ (curCoeff->data[blockIndex]);
                         vec_ZZ myCoeffs = curLin->data[blockIndex];
                         for (int i = 0; i < dimension; i++)
                         {

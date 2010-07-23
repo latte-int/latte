@@ -81,7 +81,7 @@ template <class T> class _MonomialLoadConsumer : public _MonomialConsumer<T> {
 public:
   _MonomialLoadConsumer() {}
   // Take monomial and consume it.
-  void ConsumeMonomial(const T& coef, int* exps) { _insertMonomial<ZZ>(coef, exps, *monomials); }
+  void ConsumeMonomial(const T& coef, int* exps) { _insertMonomial<RationalNTL>(coef, exps, *monomials); }
   void setMonomialSum(_monomialSum& mySum) { monomials = &mySum; }
   void setDimension(int dimension) { if (monomials) { monomials->varCount = dimension; } }
   int getDimension() { if (monomials) { return monomials->varCount; } else { return 0; } }
@@ -93,7 +93,7 @@ template <class T> class _FormLoadConsumer : public _FormSumConsumer<T> {
 public:
   _FormLoadConsumer() {}
   // Take linear form and consume it.
-  void ConsumeLinForm(const T& coefficient, int degree, const vec_ZZ& coefs) { _insertLinForm<ZZ>(coefficient, degree, coefs, *formSum); }
+  void ConsumeLinForm(const T& coefficient, int degree, const vec_ZZ& coefs) { _insertLinForm<T>(coefficient, degree, coefs, *formSum); }
   void setFormSum(_linFormSum& myForms) { formSum = &myForms; }
   void setDimension(int dimension) { if (formSum) { formSum->varCount = dimension; } }
   int getDimension() { if (formSum) { return formSum->varCount; } else { return 0; } }

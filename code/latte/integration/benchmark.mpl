@@ -410,7 +410,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   local myTime, temp, intTime, L:
   local inputFile, outputFile, errorFile:
   
-  print(randomGen(bigConstant, dimension, myDegree, numTerms)):
+  #print(randomGen(bigConstant, dimension, myDegree, numTerms)):
   #get polynomials
   myTime:=0:
   intTime:=0:

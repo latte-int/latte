@@ -428,6 +428,192 @@ ZZ PolytopeValuation::factorial(const int n)
 }//factorial
 
 
+RationalNTL PolytopeValuation::integrate(const string& polynomialString)
+{
+	RationalNTL answer;
+	linFormSum linearForms;
+
+	monomialSum originalPolynomial;// polynomial without the updated coefficients.
+
+	loadMonomials(originalPolynomial, polynomialString);
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+	dilationFactor = 1;
+
+	for (listCone * currentCone = vertexRayCones; currentCone; currentCone
+			= currentCone->rest)
+		for (int i = 0; i < numOfVars; ++i)
+			dilationFactor = lcm(dilationFactor,
+					(currentCone->vertex->vertex->denominators())[i]);
+
+	//dilate the polytope and triangulate.
+	cout << "dilation factor = " << dilationFactor << endl;
+	dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
+	convertToOneCone(); //every vertex should be integer
+	triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+
+	//Goal: find new polynomial.
+	//define the new polynomial.
+	monomialSum transformedPolynomial; //updated coefficients.
+	transformedPolynomial.termCount = 0;
+	transformedPolynomial.varCount = originalPolynomial.varCount;
+
+	//make an iterator for the original polynomial.
+	MonomialLoadConsumer<RationalNTL>* transformedPolynomialLoader =
+			new MonomialLoadConsumer<RationalNTL> ();
+	transformedPolynomialLoader->setMonomialSum(transformedPolynomial);
+	BTrieIterator<RationalNTL, int>* originalPolynomialIterator =
+			new BTrieIterator<RationalNTL, int> ();
+	originalPolynomialIterator->setTrie(originalPolynomial.myMonomials,
+			originalPolynomial.varCount);
+	originalPolynomialIterator->begin();
+
+	term<RationalNTL, int>* originalMonomial;
+	RationalNTL coefficient, totalDegree;
+	//loop over the original polynomial, and insert the updated monomial into the transformedPolynomial
+	for (originalMonomial = originalPolynomialIterator->nextTerm(); originalMonomial; originalMonomial
+			= originalPolynomialIterator->nextTerm())
+	{
+		long totalDegree = 0;
+		coefficient = originalMonomial->coef;
+
+		//find the total degree of the monomial.
+		for(int currentPower = 0; currentPower < originalMonomial->length; ++currentPower)
+			totalDegree += originalMonomial->exps[currentPower];
+		//cout << "factor^degree = " << dilationFactor << "^" << originalMonomial->degree << endl;
+		//cout << "length = " << originalMonomial->length << endl;
+		coefficient.div(power(dilationFactor, totalDegree));
+
+		transformedPolynomialLoader->ConsumeMonomial(coefficient,
+				originalMonomial->exps);
+	}//for every term in the originalPolynomial
+
+	assert(originalPolynomial.termCount == transformedPolynomial.termCount
+			&& originalPolynomial.varCount == transformedPolynomial.varCount );
+
+	//make an iterator for the transformed polynomial and decompost it into linear forms.
+	BTrieIterator<RationalNTL, int>* transformedPolynomialIterator =
+			new BTrieIterator<RationalNTL, int> ();
+	linearForms.termCount = 0;
+	linearForms.varCount = transformedPolynomial.varCount;
+	transformedPolynomialIterator->setTrie(transformedPolynomial.myMonomials,
+			transformedPolynomial.varCount);
+	decompose(transformedPolynomialIterator, linearForms);
+
+
+	answer.add(integratePolytope(linearForms));
+
+	answer.div(power(dilationFactor, transformedPolynomial.varCount));
+
+	destroyLinForms(linearForms);
+	destroyMonomials(originalPolynomial);
+	destroyMonomials(transformedPolynomial);
+
+	delete transformedPolynomialLoader;
+
+	delete originalPolynomialIterator;
+	delete transformedPolynomialIterator;
+
+	return answer;
+
+	/*
+	 linFormSum forms;
+
+	 int numberOfPolynomialVariables; //same as the dimension of the polytope.
+
+	 //find each monomial.
+	 vector<vector<RationalNTL> > monomialList; // one monomial is saved as [coef., power of x1, power of x2, ... power of xn]. The powers are all rational.
+	 breakupPolynomialToMonomials(polynomialString, monomialList); //saves each monomial into the list.
+
+	 numberOfPolynomialVariables = monomialList[0].size() - 1;
+
+	 //cout << "number of monomials =" << monomialList.size() << endl;
+
+	 //find the dilation factor.
+	 ZZ dilationFactor;
+	 dilationFactor = 1;
+
+	 for (listCone * currentCone = vertexRayCones; currentCone; currentCone
+	 = currentCone->rest)
+	 for (int i = 0; i < numOfVars; ++i)
+	 dilationFactor = lcm(dilationFactor,
+	 (currentCone->vertex->vertex->denominators())[i]);
+
+	 cout << "dilation factor = " << dilationFactor << endl;
+	 dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
+	 convertToOneCone(); //every vertex should be integer
+	 triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+
+
+	 int *exponents;
+	 exponents = new int[numberOfPolynomialVariables];
+
+	 //cout << "exponents size = " << numberOfPolynomialVariables1 << endl;
+
+	 for (int i = 0; i < monomialList.size(); ++i)
+	 {
+	 RationalNTL coefficient;
+	 coefficient = monomialList[i][0]; //get the original coefficient.
+
+	 //cout << "original coefficient = " << coefficient << endl;
+	 //get the new coefficient.
+	 long totalDegree;
+	 totalDegree = 0;
+	 for (int k = 1; k < monomialList[i].size(); ++k)
+	 totalDegree += to_int(monomialList[i][k].getNumerator());
+	 coefficient.div(power(dilationFactor, totalDegree));
+	 //cout << "new coefficient = " << coefficient << endl;
+
+	 //make a new monomial to integrate.
+	 monomialSum oneMonomial;
+	 oneMonomial.termCount = 0;
+	 MonomialLoadConsumer<ZZ>* myLoader = new MonomialLoadConsumer<ZZ> ();
+	 myLoader->setMonomialSum(oneMonomial);
+	 myLoader->setDimension(numberOfPolynomialVariables); //number of variables in the monomial.
+	 //cout << "My loader made" << endl;
+
+	 //get the exponents as c++ ints.
+	 for (int k = 0; k < numberOfPolynomialVariables; ++k)
+	 {
+	 exponents[k] = to_int(monomialList[i][k + 1].getNumerator());
+	 //cout << exponents[k] << ", " ;
+	 }
+	 //cout << "exponent vector made" << endl;
+
+	 myLoader->ConsumeMonomial(to_ZZ(1), exponents); //the coeff. here is 1 because we extracted the real coefficient in "coefficient"
+
+	 //cout << "consume monomial worked" << endl;
+
+	 //cout << "oneMonomila = " << printMonomials(oneMonomial) << endl;
+
+	 //oneMonomial is now constructed. Next make the linear forms.
+	 BTrieIterator<ZZ, int>* iterator = new BTrieIterator<ZZ, int> ();
+	 forms.termCount = 0;
+	 forms.varCount = oneMonomial.varCount;
+	 iterator->setTrie(oneMonomial.myMonomials, oneMonomial.varCount);
+	 decompose(iterator, forms);
+
+	 //cout << "linear forms = " << printLinForms(forms) << endl;
+
+
+	 //integrate every cone over this monomial.
+	 answer.add(coefficient * integratePolytope(forms));
+
+	 destroyMonomials(oneMonomial);
+	 destroyLinForms(forms);
+	 delete myLoader;
+	 delete iterator;
+	 }//for each monomial.
+	 delete[] exponents;
+
+	 answer.div(power(dilationFactor, numberOfPolynomialVariables)); // monomialList[0].size() - 1 = number of variables.
+
+
+	 */
+}//integrate
+
+
 /**
  * Integrates the polynomial over the polytope. The polytope is written in maple syntax.
  * Example: 2*X_0^3*X_1^4 + 5 ==> [ [2, [3, 4], [5, [0, 0]] ]
@@ -444,12 +630,12 @@ ZZ PolytopeValuation::factorial(const int n)
  *  and a is such that ever vertex becomes integer when mult. by a.
  *  P' is now a dilation of P such that P' has only integer vertices.
  */
-RationalNTL PolytopeValuation::integrate(const string& polynomialString)
+RationalNTL PolytopeValuation::integrateOLD(const string& polynomialString)
 {
-
-
-	linFormSum forms;
 	RationalNTL answer;
+/*
+	linFormSum forms;
+
 	int numberOfPolynomialVariables; //same as the dimension of the polytope.
 
 	//find each monomial.
@@ -538,10 +724,7 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	delete[] exponents;
 
 	answer.div(power(dilationFactor, numberOfPolynomialVariables)); // monomialList[0].size() - 1 = number of variables.
-
-
-
-
+*/
 
 #if 0
 	// to delete.
@@ -712,10 +895,9 @@ RationalNTL PolytopeValuation::integratePolytope(linFormSum &forms) const
 {
 	RationalNTL answer;
 
-	BTrieIterator<ZZ, ZZ>* linearFormIterator =
-			new BTrieIterator<ZZ, ZZ> ();
+	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
+			RationalNTL, ZZ> ();
 	linearFormIterator->setTrie(forms.myForms, forms.varCount);
-
 
 	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
 			= currentCone->rest)

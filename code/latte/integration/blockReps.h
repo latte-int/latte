@@ -3,6 +3,7 @@
 
 #include <NTL/vec_ZZ.h>
 #include <NTL/ZZ.h>
+#include "rational.h"
 
 NTL_CLIENT
 
@@ -36,14 +37,14 @@ struct _monomialSum
 {
 	int termCount, varCount;
 	eBlock* eHead; //variable exponents
-	cBlock<ZZ>* cHead; //monomial coefficients over ZZ
+	cBlock<RationalNTL>* cHead; //monomial coefficients over ZZ
 };
 
 struct _linFormSum
 {
 	int termCount, varCount;
 	lBlock* lHead; //linear forms
-	cBlock<ZZ>* cHead; //linear form coefficients over ZZ
+	cBlock<RationalNTL>* cHead; //linear form coefficients over ZZ
 };
 
 // Attempts to find a monomial in _monomialSum with same exponents as those passed in
