@@ -61,6 +61,7 @@ code/latte/valuation/Driver.cpp -text
 code/latte/valuation/PolytopeValuation.cpp -text
 code/latte/valuation/PolytopeValuation.h -text
 code/latte/valuation/integrateHyperrectangle.mpl -text
+code/latte/valuation/integrateHyperrectangleTest.sh -text
 code/latte/valuation/testIntegrationHyperrectangles.cpp -text
 code/latte/valuation/valuation.cpp -text
 code/latte/valuation/valuation.h -text

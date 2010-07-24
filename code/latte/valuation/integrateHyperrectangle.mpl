@@ -14,20 +14,23 @@ $
 # class, and compare for any differences. 
 #
 # Note that we assume polynomial dimension = dimension of the polytope.
+#
 
-printf("Testing integration of hyper-rectangles...\n"):
+print("Testing integration of hyper-rectangles...");
 
-myDim, myDegree, fileName, totalErrors, returnStatus, seed:
+local myDim, myDegree, fileName, totalErrors, returnStatus, seed:
+
 
 totalErrors:= 0:
+
  
 seed := randomize():
-printf("random seed = %d \n", seed):
+printf("random seed = %d \n", seed);
 
 
 fileName:="valuation/hyerrectangleIntegrationTest.latte":
 for myDim from 2 to 8 do
-	for myDegree from 2 to 20 do
+	for myDegree from 2 to 10 do
 	
 		printf("Testing polynomials of dimension %d, and at most degree %d\n", myDim, myDegree);
   
@@ -40,13 +43,13 @@ for myDim from 2 to 8 do
 	
 		#this if could be commented out if you want.
 		if (totalErrors > 0) then
-			printf("Total Errors: %d", totalErrors):
+			printf("\n\n%d total errors.\n", totalErrors):
     		quit:
     	end if:
 	od:
 od:
  
 
-printf("%d total errors.\n", totalErrors):
+printf("\n\n%d total errors.\n", totalErrors):
 printf("random seed = %d \n", seed):
  

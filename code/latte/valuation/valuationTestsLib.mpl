@@ -116,11 +116,12 @@ end:
 # @return int: the system status.
 test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoeff) 
  
-	local randomPoly, lowerIntegrationBound, upperIntegrationBound, randNumber, positive, i, integratedPoly, correctAnswer, polynomialFileName, systemCommand, correctAnswerString, status:
+	local randomPoly, lowerIntegrationBound, upperIntegrationBound, randNumber, randNumber2, positive, i, integratedPoly, correctAnswer, polynomialFileName, systemCommand, correctAnswerString, status:
 	  
 	randNumber:= rand(integrationLimit + 1);
-	randNumber2:= rand(100);
+	randNumber2:= rand(100); #used for the denominator.
 	positive := rand(2); #positive() is 0 or 1.
+  
   
 	#get a random polynomial.
 	randomPoly:=random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(5000, polytopeDimension, polyMaxDegree, maxNumberOfTermsPerDegree, rationalCoeff):
@@ -144,6 +145,7 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	correctAnswer := integrate_polynomial_over_rectangle(upperIntegrationBound, lowerIntegrationBound, randomPoly, polytopeDimension):
     #printf("Found the correct answer\n");
     
+    printf("Making latte file\n");
 	#now make the latte file.
 	make_hyperrectangle_latte_file(lowerIntegrationBound, upperIntegrationBound, polytopeDimension, fileName);
 	#printf("made the latte file\n");
@@ -158,5 +160,6 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	systemCommand:= "./testPolytopeIntegration " || correctAnswerString || " " || polynomialFileName || " " || fileName :
 	#print(systemCommand);
 	status:=system(systemCommand):
+	printf("status=%d", status);
 	status; #return the status.
 end:

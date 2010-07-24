@@ -281,6 +281,22 @@ bool RationalNTL::operator==(const RationalNTL & rhs) const
 	return numerator == rhs.numerator && denominator == rhs.denominator;
 }
 
+bool RationalNTL::operator==(const long rhs) const
+{
+	if (denominator == 1 && numerator == rhs)
+		return true;
+	else
+		return false;
+}
+
+bool RationalNTL::operator==(const ZZ & rhs) const
+{
+	if (denominator == 1 && numerator == rhs)
+		return true;
+	else
+		return false;
+}
+
 bool RationalNTL::operator!=(const RationalNTL & rhs) const
 {
 	return !(*this == rhs);

@@ -183,6 +183,8 @@ public:
 
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
 	bool operator==(const RationalNTL & rhs) const;
+	bool operator==(const long rhs) const;
+	bool operator==(const ZZ & rhs) const;
 	bool operator!=(const RationalNTL & rhs) const;
 	RationalNTL & operator=(const ZZ & rhs);
 	RationalNTL & operator=(const RationalNTL & rhs);
