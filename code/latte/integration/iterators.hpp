@@ -117,7 +117,7 @@ public:
 		//cout << "got term w/coef " << curTerm->coef << endl;
 
 		if (curTerm.coef == 0)
-			return nextTerm(); //skip this term because has a negative coeff.
+			return nextTerm(); //skip this term because has a zero coeff.
 		else
 			return &curTerm;
 	}

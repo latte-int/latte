@@ -398,18 +398,18 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     myResults[i]:=parse(myResults[i]):
     wrong:=0: #prevents double counting errors, hopefully
     if decomposing = 1 then #check that decomposition is correct
-      #if nops(parse(myLinForms[i])) <> nops(mapleLinForms[i]) then
-      #  print("Different number of powers of linear forms.");
-      #  printf("Polynomial number i=%d\n", i);
-      #  printf("nop maple forms = %d\n", nops(mapleLinForms[i]));
-      #  printf("nop our forms = %d\n\n", nops(parse(myLinForms[i])));
-      #  print("myLinForms", myLinForms[i]);
-      #  print("mapleLinForms", mapleLinForms[i]);
-      #  print(mapleResults[i]);
-      #  print(myResults[i]);
-      #  errors:= errors + 1;
-      #  wrong:=1:
-      #else
+      if nops(parse(myLinForms[i])) <> nops(mapleLinForms[i]) then
+        print("Different number of powers of linear forms.");
+        printf("Polynomial number i=%d\n", i);
+        printf("nop maple forms = %d\n", nops(mapleLinForms[i]));
+        printf("nop our forms = %d\n\n", nops(parse(myLinForms[i])));
+        print("myLinForms", myLinForms[i]);
+        print("mapleLinForms", mapleLinForms[i]);
+        print(mapleResults[i]);
+        print(myResults[i]);
+        errors:= errors + 1;
+        wrong:=1:
+      else
         mapleLinForms[i]:=convert(mapleLinForms[i], 'set');
         curTerm:={};
         for j from 1 to nops(parse(myLinForms[i])) do
@@ -434,7 +434,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
           errors:=errors + 1;
           wrong:=1:
         end if:
-      #end if:
+      end if:
     end if:
     #below compares maple results to the ones read in from the c++ output
     if wrong = 0 then
