@@ -283,6 +283,7 @@ compare_LDADD = liblatteintegration.a liblatte.a
 
 TESTS +=  integration/testMultiply.sh
 TESTS += integration/testIntegration.sh
+TESTS += valuation/integrateHyperrectangleTest.sh
 
 bench-table5: 
 	integration/benchmark.sh 5 integration/table5.txt

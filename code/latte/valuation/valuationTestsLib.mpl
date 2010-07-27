@@ -160,6 +160,6 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	systemCommand:= "./testPolytopeIntegration " || correctAnswerString || " " || polynomialFileName || " " || fileName :
 	#print(systemCommand);
 	status:=system(systemCommand):
-	printf("status=%d", status);
+	printf("status=%d\n", status);
 	status; #return the status.
 end:
