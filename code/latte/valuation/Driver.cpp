@@ -14,11 +14,10 @@
 
 int main(int argc, char *argv[])
 {
-	Valuation::mainValuationDriver((const char **) argv, argc);
-	//mainValuationDriverOLD((const char **) argv, argc); //remove the file printing later.
+	//Valuation::mainValuationDriver((const char **) argv, argc);
 	//runHyperSimplexTests();
 	//runBirkhoffTests();
-	//runTests();
+	IntegrationTests::runTests();
 	//runOneTest(atoi(argv[1]), atoi(argv[2]));
 
 	return 0;

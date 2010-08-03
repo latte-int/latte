@@ -55,6 +55,14 @@ rationalVector::rationalVector(const vec_ZZ &numer, const ZZ &denom)
 	computed_integer_scale = true;
 }
 
+rationalVector::rationalVector(const vec_ZZ &numer, const vec_ZZ &denom)
+{
+	int dimension = numer.length();
+	enumerator = numer;
+	denominator = denom;
+	computed_integer_scale = false;
+}
+
 /* ----------------------------------------------------------------- */
 /**
  * Computes new_rationalVector = old_rationalVector * numer / denom.
@@ -70,7 +78,18 @@ void rationalVector::scalarMultiplication(const ZZ &numer, const ZZ & denom)
 	computed_integer_scale = false;
 	canonicalizeRationalVector(this, enumerator.length()); //this function will also compute the integer scale.
 }//scalarMultiplication
+/* ----------------------------------------------------------------- */
 
+/**
+ * returns <rationalVector> * dilationFactor, by calling scalarMultiplication
+ */
+rationalVector rationalVector::operator*(const RationalNTL &dilationFactor) const
+{
+	rationalVector answer(this->enumerator, this->denominator);
+	answer.scalarMultiplication(dilationFactor.getNumerator(),
+			dilationFactor.getDenominator());
+	return answer;
+}
 
 /* ----------------------------------------------------------------- */
 rationalVector* createRationalVector(int numOfVars)
@@ -114,32 +133,39 @@ rationalVector* normalizeRationalVector(rationalVector *z, int numOfVars)
 }
 
 /* ------------------------------------------------------- */
-RationalNTL::RationalNTL()
+RationalNTL::RationalNTL(): canonicalizeFraction(true)
 {
 	denominator = 1; //num = 0
 }
 
 RationalNTL::RationalNTL(const ZZ &num, const ZZ& denom) :
-	numerator(num), denominator(denom)
+	numerator(num), denominator(denom), canonicalizeFraction(true)
 {
 	canonicalize();
 }
 
-RationalNTL::RationalNTL(const int num, const int denom)
+RationalNTL::RationalNTL(const ZZ &num, const int denom) :
+	numerator(num), canonicalizeFraction(true)
+{
+	denominator = denom;
+	canonicalize();
+}
+
+RationalNTL::RationalNTL(const int num, const int denom): canonicalizeFraction(true)
 {
 	numerator = num;
 	denominator = denom;
 	canonicalize();
 }
 
-RationalNTL::RationalNTL(const string &num, const string &denom)
+RationalNTL::RationalNTL(const string &num, const string &denom): canonicalizeFraction(true)
 {
 	numerator = to_ZZ(num.c_str());
 	denominator = to_ZZ(denom.c_str());
 	canonicalize();
 }
 
-RationalNTL::RationalNTL(const string &number)
+RationalNTL::RationalNTL(const string &number): canonicalizeFraction(true)
 {
 	for (int i = 0; i < number.length(); ++i)
 		if (number[i] == '/')
@@ -159,6 +185,9 @@ RationalNTL::RationalNTL(const string &number)
  */
 void RationalNTL::canonicalize()
 {
+	if (canonicalizeFraction == false)
+		return; //don't waste the time.
+
 	if (denominator < 0)
 	{
 		denominator *= -1;
@@ -191,12 +220,12 @@ RationalNTL & RationalNTL::add(const RationalNTL & rationalNTL)
 }//add
 
 
-RationalNTL RationalNTL::operator+(const RationalNTL & rhs)
+RationalNTL RationalNTL::operator+(const RationalNTL & rhs) const
 {
 	RationalNTL answer(*this);
 	return answer.add(rhs.numerator, rhs.denominator);
 }
-RationalNTL RationalNTL::operator-(const RationalNTL & rhs)
+RationalNTL RationalNTL::operator-(const RationalNTL & rhs) const
 {
 	RationalNTL answer(*this);
 	return answer.add(rhs.numerator * -1, rhs.denominator);
@@ -226,6 +255,12 @@ RationalNTL & RationalNTL::div(const RationalNTL & rhs)
 	return *this;
 }
 
+RationalNTL RationalNTL::operator/(const RationalNTL & rhs) const
+{
+	RationalNTL answer(*this);
+	return answer.div(rhs);
+}
+
 const ZZ & RationalNTL::getNumerator() const
 {
 	return numerator;
@@ -249,13 +284,66 @@ RationalNTL & RationalNTL::mult(const RationalNTL & rationalNTL)
 	return mult(rationalNTL.numerator, rationalNTL.denominator);
 }
 
-RationalNTL RationalNTL::operator*(const RationalNTL & rhs)
+RationalNTL & RationalNTL::mult(const ZZ rhs)
+{
+	numerator *= rhs;
+	canonicalize();
+	return *this;
+}
+
+/**
+ * computes (a/b)^e for positive, negative, or zero e.
+ */
+RationalNTL & RationalNTL::power(const long e)
+{
+
+	//void power(ZZ& x, const ZZ& a, long e); // x = a^e (e >= 0)
+	//cout << "RationalNTL::power e= " << e << endl;
+
+	if (e > 0)
+	{
+		//cout << e << "> 0" << endl;
+		numerator = NTL::power(numerator, e);
+		denominator = NTL::power(denominator, e);
+	}// return (a/b) ^ e
+	else if (e < 0)
+	{
+		//cout << e << "< 0" << endl;
+		assert(numerator != 0);
+		ZZ oldNum;
+		oldNum = numerator;
+		numerator = NTL::power(denominator, e * -1);
+		denominator = NTL::power(oldNum, e * -1);
+	} // return (b/a)^|e|, where |.| is abs. value.
+	else if (e == 0)
+	{
+		//cout << e << "== 0" << endl;
+		assert( numerator != 0);
+		numerator = 1;
+		denominator = 1;
+	} // return (a/b)^0
+
+	//cout << "now, this=" << *this << endl;
+	canonicalize();
+
+	return *this;
+}//power
+
+//static method. (base)^e
+RationalNTL RationalNTL::power(const RationalNTL & base, long e)
+{
+	RationalNTL answer(base);
+	return answer.power(e);
+}//power
+
+
+RationalNTL RationalNTL::operator*(const RationalNTL & rhs) const
 {
 	RationalNTL answer(*this);
 	return answer.mult(rhs.numerator, rhs.denominator);
 }
 
-RationalNTL RationalNTL::operator*(const ZZ & rhs)
+RationalNTL RationalNTL::operator*(const ZZ & rhs) const
 {
 	RationalNTL answer(*this);
 	return answer.mult(rhs, to_ZZ(1));
@@ -302,6 +390,18 @@ bool RationalNTL::operator!=(const RationalNTL & rhs) const
 	return !(*this == rhs);
 }
 
+bool RationalNTL::operator!=(const long rhs) const
+{
+	return !(*this == to_ZZ(rhs));
+}
+
+RationalNTL & RationalNTL::operator=(const long rhs)
+{
+	numerator = rhs;
+	denominator = 1;
+	return *this;
+}
+
 RationalNTL & RationalNTL::operator=(const ZZ & rhs)
 {
 	numerator = rhs;
@@ -315,7 +415,7 @@ RationalNTL & RationalNTL::operator=(const RationalNTL & rhs)
 		return *this;
 	numerator = rhs.numerator;
 	denominator = rhs.denominator;
-	canonicalize(); //should not be needed.
+	canonicalize();
 	return *this;
 }
 
@@ -327,6 +427,9 @@ ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
 		out << "/" << rationalNTL.denominator;
 	return out;
 }
+
+void RationalNTL::setCanonicalizeFraction(bool b) { canonicalizeFraction = b;}
+bool RationalNTL::getCanonicalizeFraction() const {return canonicalizeFraction;}
 
 /* ----------------------------------------------------------------- */
 
@@ -351,16 +454,35 @@ vec_RationalNTL::~vec_RationalNTL()
 	vec.clear();
 }
 
-// set current length to n, growing vector if necessary
-void vec_RationalNTL::SetLength(long n)
+//Static method. returns <v1, v2>, where <.,.> is the std. inner product.
+RationalNTL vec_RationalNTL::innerProduct(const vec_RationalNTL & v1,
+		const vec_RationalNTL & v2)
 {
-	vec.resize(n);
+	RationalNTL sum;
+	sum.setCanonicalizeFraction(false);
+	assert(v1.length() == v2.length());
+	for (int k = 0; k < v1.length(); ++k)
+		sum.add(v1.vec[k] * v2.vec[k]);
+	sum.canonicalize();
+	return sum;
+}//innerProduct
+
+// release space and set to length 0
+void vec_RationalNTL::kill()
+{
+	vec.clear();
 }
 
 // current length
 long vec_RationalNTL::length() const
 {
 	return vec.size();
+}
+
+// set current length to n, growing vector if necessary
+void vec_RationalNTL::SetLength(long n)
+{
+	vec.resize(n);
 }
 
 // indexing operation, applied to non-const vec_RationalNTL::, and returns a non-const reference to a RationalNTL
@@ -373,12 +495,6 @@ RationalNTL& vec_RationalNTL::operator[](long i)
 const RationalNTL& vec_RationalNTL::operator[](long i) const
 {
 	return vec[i];
-}
-
-// release space and set to length 0
-void vec_RationalNTL::kill()
-{
-	vec.clear();
 }
 
 /* ----------------------------------------------------------------- */

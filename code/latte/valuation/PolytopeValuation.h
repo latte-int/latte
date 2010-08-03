@@ -58,8 +58,8 @@ private:
 	bool freeVertexRayCones, freePolytopeAsOneCone, freeTriangulatedPoly; //denotes if we made these objects (and should free them) or if they were passed in.
 
 
-
 	RationalNTL integratePolytope(linFormSum &forms) const;
+	RationalNTL integrateRationalPolytope(linFormSum &forms) const;
 
 public:
 	typedef enum {DeterminantVolume, LawrenceVolume} VolumeType;
@@ -72,7 +72,7 @@ public:
 
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
-	void convertToOneCone(); //convert from poly to polytopeAsOneCone.
+	void convertToOneCone(const RationalNTL &dilationFactor = RationalNTL(1, 1)); //convert from poly to polytopeAsOneCone.
 	void breakupPolynomialToMonomials(const string & polynomialString, vector< vector<RationalNTL>  > & monomialList) const;
 	void dilatePolytope(const RationalNTL & factor); //dilates polytope by changing the vertices.
 	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const;
@@ -80,7 +80,7 @@ public:
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
 	RationalNTL integrate(const string& polynomial); //integrates the polynomial over the polytope. The polytope is written in maple syntax.
-	RationalNTL integrateOLD(const string& polynomial); //integrates the polynomial over the polytope. The polytope is written in maple syntax.
+	RationalNTL integrateRational(const string& polynomial); //integrates the polynomial over the polytope using the rational-vertex integration functions.
 	ZZ static lcm(const ZZ &a, const ZZ & b);
 	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
 	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly

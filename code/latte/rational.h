@@ -34,6 +34,9 @@
 
 using namespace std;
 
+class RationalNTL;
+
+
 class HugInt
 {
 public:
@@ -90,6 +93,8 @@ public:
 	rationalVector(int dimension = 0);
 	// Construct a rational vector from an integer vector and a scalar denominator.
 	rationalVector(const vec_ZZ &numer, const ZZ &denom);
+	// Construct a rational vector from an integer vector and an integer denominator.
+	rationalVector(const vec_ZZ &numer, const vec_ZZ &denom);
 	const vec_ZZ &numerators() const
 	{
 		return enumerator;
@@ -100,6 +105,7 @@ public:
 	}
 
 	void scalarMultiplication(const ZZ &numer, const ZZ & denom);
+	rationalVector operator*(const RationalNTL &dilationFactor) const; //returns <rationalVector> * dilationFactor, by calling scalarMultiplication
 	void set_entry(int i, const ZZ &numer, const ZZ &denom, bool lazy = false)
 	{
 		enumerator[i] = numer;
@@ -150,44 +156,71 @@ class RationalNTL
 {
 private:
 	ZZ numerator, denominator;
+	bool canonicalizeFraction;
 public:
+	//a b c d e f g h i j k l m n o p q r s t u v w x y z
 
+	// CONSTRUCTORS
 	RationalNTL(); //initialize to 0
 	RationalNTL(const ZZ &num, const ZZ& denom);
+	RationalNTL(const ZZ &num, const int denom);
 	RationalNTL(const int num, const int denom);
 	RationalNTL(const string &num, const string &denom);
 	RationalNTL(const string &number);
+
+
 	void canonicalize(); // reduces the fraction to lowest terms, and makes
-	//	the denominator positive.
+						//	the denominator positive.
+
+	//ADDITION
 	RationalNTL & add(const ZZ &num, const ZZ& denom); // adds fractions and then reduces them.
 	RationalNTL & add(const RationalNTL & rationalNTL);
-	RationalNTL operator+(const RationalNTL & rhs); //rhs stands for "right hand size: object + rhs.
-	RationalNTL operator-(const RationalNTL & rhs);
+	RationalNTL operator+(const RationalNTL & rhs) const; //rhs stands for "right hand size: object + rhs.
+	RationalNTL operator-(const RationalNTL & rhs) const;
 	RationalNTL & operator+=(const RationalNTL &rhs);
 	RationalNTL & operator-=(const RationalNTL &rhs);
 
+	//DIVISION
 	RationalNTL & div(const ZZ & rhs); // divides by rhs.
 	RationalNTL & div(const RationalNTL & rhs);
+	RationalNTL operator/(const RationalNTL & rhs) const;
 
+	//GET FUNCTIONS
 	const ZZ & getNumerator() const;
 	const ZZ & getDenominator() const;
 
+	//MULTIPLICATION
 	RationalNTL & mult(const ZZ &num, const ZZ &denum); // mult. two fractions and then reduces them.
 	RationalNTL & mult(const RationalNTL & rationalNTL);
-	RationalNTL operator*(const RationalNTL & rhs);
-	RationalNTL operator*(const ZZ & rhs);
+	RationalNTL & mult(const ZZ rhs);
+	RationalNTL & power(const long e); //(a/b)^e for positive, negative, or zero e.
+	static RationalNTL power(const RationalNTL & base, long e); //(base)^e
+	RationalNTL operator*(const RationalNTL & rhs) const;
+	RationalNTL operator*(const ZZ & rhs) const;
 	RationalNTL & operator*=(const RationalNTL & rhs);
 	RationalNTL & operator*=(const ZZ & rhs);
 
 	RR to_RR() const; // converts the fraction to a float.
 
+	// I/O
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
+
+	//COMPARE
 	bool operator==(const RationalNTL & rhs) const;
 	bool operator==(const long rhs) const;
 	bool operator==(const ZZ & rhs) const;
 	bool operator!=(const RationalNTL & rhs) const;
+	bool operator!=(const long rhs) const;
+
+	//ASSIGNMENT
+	RationalNTL & operator=(const long rhs);
 	RationalNTL & operator=(const ZZ & rhs);
 	RationalNTL & operator=(const RationalNTL & rhs);
+
+
+	void setCanonicalizeFraction(bool b);
+	bool getCanonicalizeFraction() const;
+
 
 };
 
@@ -197,23 +230,21 @@ class vec_RationalNTL
 private:
 	vector<RationalNTL> vec;
 public:
+	//a b c d e f g h i j k l m n o p q r s t u v w x y z
 
 	vec_RationalNTL(); // initially length 0
-
-	vec_RationalNTL(const vec_RationalNTL& a);
-	// copy constructor;
+	~vec_RationalNTL();
+	vec_RationalNTL(const vec_RationalNTL& a);	// copy constructor;
 
 	vec_RationalNTL& operator=(const vec_RationalNTL& a);
 	// assignment...performs an element-wise assignment
 
+	static RationalNTL innerProduct(const vec_RationalNTL & v1, const vec_RationalNTL & v2); //returns <v1, v2>, where <.,.> is the std. inner product.
+	void kill(); 				// release space and set to length 0
+	long length() const; 		// current length
+	void SetLength(long n);		// set current length to n, growing vector if necessary
 
-	~vec_RationalNTL();
 
-	void SetLength(long n);
-	// set current length to n, growing vector if necessary
-
-	long length() const;
-	// current length
 
 	RationalNTL& operator[](long i);
 	const RationalNTL& operator[](long i) const;
@@ -222,8 +253,7 @@ public:
 	// and returns a non-const reference to a T, while the second version
 	// is applied to a const vec_T and returns a const reference to a T.
 
-	void kill();
-	// release space and set to length 0
+
 
 
 	//long position(const T& a) const;

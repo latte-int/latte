@@ -111,4 +111,16 @@ void runBirkhoffTests();
 
 }//namespace VolmeTests
 
+
+namespace IntegrationTests
+{
+
+void runOneTest(int ambientDim, int numPoints);
+void runTests();
+
+} //namespace IntegrationTests
+
+
+
+
 #endif /* VALUATION_H_ */

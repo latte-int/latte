@@ -114,7 +114,7 @@ end:
 #
 # if rationalCoeff is 1, then the random polynomial has rational coefficients, if it is 0, it has integer coefficients.
 # @return int: the system status.
-test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoeff) 
+test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoeff, rationalVertex) 
  
 	local randomPoly, lowerIntegrationBound, upperIntegrationBound, randNumber, randNumber2, positive, i, integratedPoly, correctAnswer, polynomialFileName, systemCommand, correctAnswerString, status:
 	  
@@ -132,7 +132,12 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 
 	#find the upper and lower integration bounds.
 	for i from 1 to polytopeDimension do
-		lowerIntegrationBound[i] := (randNumber() / (randNumber2() + 1)) * (-1)^positive();
+		if  rationalVertex = 1  then
+			lowerIntegrationBound[i] := (randNumber() / (randNumber2() + 1)) * (-1)^positive();
+		else
+			lowerIntegrationBound[i] := randNumber() * (-1)^positive();
+		end if:
+
 		upperIntegrationBound[i] := lowerIntegrationBound[i] + randNumber() + 1;
 	od:
   
