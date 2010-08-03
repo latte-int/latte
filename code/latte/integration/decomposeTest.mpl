@@ -1,8 +1,8 @@
 read("integration/integrationTestsLib.mpl");
 
 #comment this line out if you do not want a random value.
-seed := randomize(): #calls to rand() will now be different on different maple runs. 
-printf("seed = %d\n\n", seed);
+#seed := randomize(): #calls to rand() will now be different on different maple runs. 
+#printf("seed = %d\n\n", seed);
 
 
 global totalErrors:
@@ -16,29 +16,22 @@ for myDim from 2 to maxDim do
     
     printf("Integrating monomials of degree %d, dimension %d...\n", myDegree, myDim):
     #parameters:            polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen, rationalCoeff)
-    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree, 1):
+    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree, 0):
     
     if (totalErrors > 0) then
-      printf("seed = %d\n\n", seed);
       quit:
     end if:
-    
-    printf("\n");
-    
+    printf("Finished integrating monomials of degree %d, dimension %d...\n", myDegree, myDim):
     printf("Integrating powers of linear forms of degree %d, dimension %d...\n", myDegree, myDim):
-    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm, 1):
+    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm, 0):
     
     if (totalErrors > 0) then
-      printf("seed = %d\n\n", seed);
       quit:
     end if:
-    
-    printf("\n");
+    printf("Finished integrating powers of linear forms of degree %d, dimension %d...\n", myDegree, myDim):
   od:
 od:
-
-printf("seed = %d\n\n", seed);
 #print(integral_power_linear_form([[0],[1]],1,1,[1]);
-printf("%d total errors.\n", totalErrors);
+printf("%d total errors.\n", totalErrors):
 
  

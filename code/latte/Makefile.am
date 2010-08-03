@@ -11,7 +11,7 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 latte2ine_SOURCES = latte2ine.cpp
 latte2ext_SOURCES = latte2ext.cpp
- 
+
 LDADD = liblatte.a
 AM_CPPFLAGS = -I$(top_srcdir)/code
 AM_CXXFLAGS = $(NTL_CFLAGS) $(LIDIA_CFLAGS) $(TOPCOM_CXXFLAGS) $(CDDLIB_CFLAGS) $(FORTYTWO_CXXFLAGS) $(GMP_CFLAGS)
@@ -283,7 +283,6 @@ compare_LDADD = liblatteintegration.a liblatte.a
 
 TESTS +=  integration/testMultiply.sh
 TESTS += integration/testIntegration.sh
-TESTS += valuation/integrateHyperrectangleTest.sh
 
 bench-table5: 
 	integration/benchmark.sh 5 integration/table5.txt

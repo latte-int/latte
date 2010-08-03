@@ -67,38 +67,13 @@ ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		const char *printLawrence, const char * polynomialString)
 {
 	ValuationContainer answer;
-	RationalNTL ans1, ans2;
-	PolytopeValuation polytopeValuation1(poly, myParameters);
-	PolytopeValuation polytopeValuation2(poly, myParameters);
+	RationalNTL ans1;
+	PolytopeValuation polytopeValuation(poly, myParameters);
 
-
-
-	cout << "Integrate by the dilation method." << endl;
-	Timer dilateMethod("dilation method time");
-	dilateMethod.start();
-	ans1 = polytopeValuation1.integrate(polynomialString);
-	dilateMethod.stop();
-	cout << dilateMethod << endl;
-
-	cout << "Integrate by the direct method." << endl;
-	Timer directMethod("direct method time");
-	directMethod.start();
-	ans2 = polytopeValuation2.integrateRational(polynomialString);
-	directMethod.stop();
-	cout << directMethod << endl;
-
+	ans1 = polytopeValuation.integrate(polynomialString);
 	cout << "integrate answer = " << ans1 << endl;
 
 	answer.triangulate = ans1;
-	answer.lawrence = ans2;
-
-	if ( ans1 != ans2)
-	{
-		cout << "******* ERROR ******" << endl;
-	    cout << "dilation method: " << ans1 << endl;
-	    cout << "other method: " << ans2 << endl;
-	    exit(1); //dont' delete the latte file.
-	}//if error.
 
 	return answer;
 
@@ -496,7 +471,7 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 		system_with_error_check(command);
 	}
 	if ((removeFiles[0] == 'y')
-			&& (read_polyhedron_data.dualApproach[0] == 'n') && 0)
+			&& (read_polyhedron_data.dualApproach[0] == 'n'))
 	{
 
 		strcpy(command, "rm -f ");
@@ -532,84 +507,6 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 }//mainValuationDriver
 
 
-
-void IntegrationTests::runOneTest(int ambientDim, int numPoints)
-{
-	cout << numPoints << '>' << ambientDim << endl;
-	assert(numPoints > ambientDim);
-	ValuationContainer ans;
-	srand(time(0));
-	const char * argv[] =
-	{ "runTests()", "--valuation=integrate", "--monomials=ValuationComputation.it.runOneTest.polynomial", 0 };
-	stringstream comments;
-	comments << "Making random integer polytope with " << numPoints
-			<< " points in R^" << ambientDim << " for integration testing";
-
-	BuildRandomPolytope buildPolytope(ambientDim);
-	buildPolytope.setComments(comments.str().c_str());
-	buildPolytope.setIntegerPoints(false); //make random rational points.
-	buildPolytope.buildPolymakeFile(numPoints); //make the file
-	buildPolytope.callPolymake(); //run polymake
-	buildPolytope.findVolumeWithPolymake(); //run polymake for the volume
-	buildPolytope.convertFacetEquations(); //fix facet equations
-	buildPolytope.printFacetEquationsForLattE(); //make latte file.
-	cout << comments.str().c_str();
-	//buildPolytope.findEhrhardPolynomial();
-	//buildPolytope.findVolumeWithPolymake();
-
-	string file = buildPolytope.getLatteFile();
-
-	ofstream poly("ValuationComputation.it.runOneTest.polynomial");
-	poly << "[";
-	for(int i = 0; i < numPoints; ++i)
-	{
-		poly << "[" << rand() % 100 << '/' << rand()%100 + 1 << ", [";
-		for(int k = 0; k < ambientDim; ++k)
-		{
-			poly << rand()%20;
-			if ( k != ambientDim - 1)
-				poly << ',';
-
-		}
-		poly << "]]";
-	}
-	poly << ']';
-	poly.close();
-
-	char * sFile = new char[file.size() + 1];
-	strcpy(sFile, file.c_str());
-	argv[3] = sFile;
-	ans = Valuation::mainValuationDriver(argv, 4);
-	delete[] sFile;
-	system("rm -f ValuationComputation.it.runOneTest.polynomial");
-	if ( ans.triangulate != ans.lawrence)
-	{
-		cout << "ERROR:" << endl;
-		cout << "dil =  " << ans.triangulate << endl;
-		cout << "dir =  " << ans.lawrence << endl;
-		exit(1);
-	}
-
-}
-void IntegrationTests::runTests()
-{
-	int startAmbientDim = 3, endAmbientDim = 50;
-	int pointStepSize = 5;
-
-	for (int ambientDim = startAmbientDim; ambientDim < endAmbientDim; ambientDim
-			= ambientDim + 3)
-	{
-		//for (int numberPoints = ambientDim + 1; numberPoints
-		//		<= ambientDim +3 ; numberPoints++)
-		for(int k = 0; k < 4; ++k)
-			IntegrationTests::runOneTest(ambientDim, ambientDim +2);
-	}
-
-}
-
-
-
-
 /**
  * Checks to see if the triangulation and lawrence volume equal the expected volume.
  */
@@ -640,7 +537,7 @@ void VolumeTests::printVolumeTest(const RationalNTL &correctVolumeAnswer,
 void VolumeTests::runOneTest(int ambientDim, int numPoints)
 {
 	const char * argv[] =
-	{ "runTests()", "--valuation=volume --all", 0 };
+	{ "runTests()", "--all", 0 };
 	stringstream comments;
 	comments << "Making random integer polytope with " << numPoints
 			<< " points in R^" << ambientDim << " for volume testing";
@@ -692,7 +589,7 @@ void VolumeTests::runTests()
 void VolumeTests::runHyperSimplexTests()
 {
 	const char * argv[] =
-	{ "runHyperSimplexTests()", "--valuation=volume --all", 0 };
+	{ "runHyperSimplexTests()", "--all", 0 };
 	//   n  k  num/denom
 	int hyperSimplexData[][4] =
 	{ /*{4, 1, 1, 6},

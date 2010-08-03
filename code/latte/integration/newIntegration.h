@@ -11,17 +11,14 @@
 
 NTL_CLIENT
 
-
-
-
 struct simplexZZ
 {
-
-	int d;			// dimension of the space. s.length = d + 1.
+					// Brandon's notes.
+	int d;			// dimension of the space? so s.length = d + 1?
 	vec_vec_ZZ s;	// s[i] = vector of the ith vertex
-	ZZ v; 			//volume of simplex
+	ZZ v; 			//valuation/integral answer?
 
-	void print(ostream & out) const
+	void print(ostream & out)
 	{
 		out << "d = " << d << endl;
 		out << "v = " << v << endl;
@@ -37,39 +34,10 @@ struct simplexZZ
 	}//pirnt
 };
 
-
-struct simplexRationalNTL
-{
-
-	int d;							// dimension of the space.
-	vector<vec_RationalNTL> s;	// s[i] = vector of the ith vertex
-	RationalNTL v; 							//volume of simplex.
-
-
-	void print(ostream & out) const
-	{
-		out << "d = " << d << endl;
-		out << "v = " << v << endl;
-		int i;
-		for( i = 0; i < s.size(); ++i)
-		{
-			out << "s[" << i << "] = ";
-			for(int k = 0; k < s[i].length(); ++k)
-				out << s[i][k] << ", ";
-			out << endl;
-		}
-
-	}//pirnt
-};
-
-
-
-void update( ZZ &a, ZZ &b, const vec_ZZ &l, const simplexZZ &mySimplex,int m, const RationalNTL &coe, const ZZ &de);	//for integer-vertex
-void update(RationalNTL & addToAnswer, const vec_RationalNTL &l, const simplexRationalNTL &mySimplex, int m, const RationalNTL &coe, const ZZ &de); // for rational-vertex
+void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, RationalNTL coe, ZZ de);
 void delSpace(string &line);
 void convertToSimplex(simplexZZ&, string);
-void integrateLinFormSum(ZZ &a, ZZ &b, PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex); //for integer-vertex
-void integrateLinFormSum(RationalNTL & answer, PolyIterator<RationalNTL, ZZ>* it, const simplexRationalNTL &mySimplex); //for rational-vertex
+void integrateLinFormSum(ZZ &a, ZZ &b, PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex);
 void integrateMonomialSum(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
 void _integrateMonomialSum(ZZ &numerator, ZZ &denominator, _monomialSum &monomials, const simplexZZ &mySimplex);
 

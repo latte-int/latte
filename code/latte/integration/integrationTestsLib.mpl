@@ -280,8 +280,8 @@ random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r, rat
     od:               
    fi:            
   
-  #printf("Random polynomial:\n\n");              
-  #print(p);
+  printf("Random polynomial:\n\n");              
+  print(p);
   #printf("degree=%f, terms=%f", M, r);
   #error "stop the script";
   p;
@@ -298,7 +298,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
   local myTime, temp, intTime, L:
   local inputFile, outputFile, errorFile:
   
-  #printf("decomposing = %d\n\n", decomposing);
+  printf("decomposing = %d\n\n", decomposing);
   
   #print(randomGen(bigConstant, dimension, myDegree, numTerms)):
   #get polynomials

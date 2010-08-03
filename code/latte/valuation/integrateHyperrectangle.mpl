@@ -34,8 +34,8 @@ for myDim from 2 to 8 do
 	
 		printf("Testing polynomials of dimension %d, and at most degree %d\n", myDim, myDegree);
   
-#                   the parameters are:  polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents, rationalVertex)    
-    	returnStatus:= test_hyperrectangle_integtation(myDegree, myDim, 10, 30000, fileName, 1, 1):
+#                   the parameters are:  polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
+    	returnStatus:=test_hyperrectangle_integtation(myDegree, myDim, 10, 30000, fileName, 1):
    
 		if ( not(returnStatus = 0)) then 
 			totalErrors:= totalErrors + 1; 
@@ -46,14 +46,10 @@ for myDim from 2 to 8 do
 			printf("\n\n%d total errors.\n", totalErrors):
     		quit:
     	end if:
-    	
-    	myDegree := myDegree + 1 * rand(2)(); #maybe skip a degree test.
-    	
 	od:
-	myDim := myDim + 1 * rand(2)(); #maybe skip a dimension test.
 od:
  
 
-printf("\n\n%d total errors.\n", totalErrors);
-printf("random seed = %d \n", seed);
+printf("\n\n%d total errors.\n", totalErrors):
+printf("random seed = %d \n", seed):
  
