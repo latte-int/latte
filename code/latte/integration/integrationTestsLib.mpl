@@ -280,8 +280,8 @@ random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r, rat
     od:               
    fi:            
   
-  printf("Random polynomial:\n\n");              
-  print(p);
+  #printf("Random polynomial:\n\n");              
+  #print(p);
   #printf("degree=%f, terms=%f", M, r);
   #error "stop the script";
   p;

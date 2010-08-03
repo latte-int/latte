@@ -38,7 +38,34 @@ ZZ AChooseB(int a, int b)
 	};
 	return t;
 }
-//This function is called when a vertex is irregular. The function computes the residue at the irregular vertex
+
+
+/**
+ *This function is called when a vertex is irregular. The function computes the residue at the irregular vertex
+ * @parm d: dimension
+ * @parm m: power of the linear form.
+ * @parm innerProDiff[j] =  <l, s_i - s_j>
+ * @parm p = <l, s_i>
+ * @parm a, b: output parameters: answer: a/b.
+ *
+ * Formula: Res_{z = 0} \defrac{(z + l_k)^{M + d}}{z^{m_k} \prod_{k \neq i} ((z + l_{i})^{m_i}}
+ *
+ * Implementation Goal: we expand the polynomial (z + l_k)^{M + d} and we expand the
+ *                 series of 1 / (z + l_{i})^{m_i} up to degree m_k and multiply everything together.
+ *                 Then, we return the coefficient of the m_k term.
+ *
+ * Background Math:
+ * (x + y) ^ r , for any (real or complex r) = \sum _{k = 0}^{\inf} (r, k) x^{r - k}y^{k},
+ * where (r, k) = r (r-1)(r-2)...(r-k+1)/k! = (r)_k/k!.
+ * See http://en.wikipedia.org/wiki/Binomial_series
+ *
+ * So, let r = -s, and using the fact that (-s, k) = -s(-s -1)(-s -2)..(-s-k + 1)/k!= (s +k -1, k)*(-1)^k
+ * 1/(x + b)^s = \sum _ {k = 0}^{\inf} (s +k -1, k)*(-1)^k * x^k * b^{-s - j}
+ *             = \dfrac{1}{b^{m + s}} ( \sum _ {k = 0}^{\inf} (s +k -1, k)*(-1)^k * x^k * b^{m - j} )
+ * 				such that m >= j. This is done because we cannot work with rational-coeff. series...we
+ * 				don't want b^(negative number), so we increase the powers of b in the series and divide by
+ * 				b^{m + s} at the end.
+ */
 void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		ZZ &a, ZZ &b)
 {
@@ -50,11 +77,12 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 	}; //vertex vanishes, return 0;
 	int k, i, j;
 	int counter[1000];//counter counts number of appearances of each index[i]
+					//again, put this on the stack. Don't want the time requesting memory from the heap because this function is called many times.
 	vec_ZZ index;//collecting different terms in the innerProDiff passed in
 	bool found;
-	ZZ de, nu, g; //c was ZZ
-	RationalNTL c; //coefficient? --Brandon
-	int e[1];
+	ZZ de, nu, g;
+	RationalNTL c; //coefficient
+	int e[1]; //this is an array of size one because this is the exponent "vector" using the BurstTrie.
 	int mindeg[1];
 	int maxdeg[1];
 	k = 1;
@@ -81,7 +109,16 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		};
 	};
 	counter[0]--; //excluding the vertex itself
-	//so far I've been doing book keeping stuff, i.e. how many different differences of each kind are there? index stores the differences and counter stores the multiplicity. 0th entry means 0 itself. It is very important because it's the multiplicity of a vertex itself.
+	//so far we've been doing book keeping stuff: index stores the UNIQUE differences and counter stores the multiplicity
+
+
+	//Brandon's notes: index[k] keeps the unique terms <l, s_i - s_j> for some fixed i.
+	//				 : and counter[k] keeps track of how many times index[k] appears in the denominator.
+	//				 : counter[0] = number of terms <l, s_i - s_j> that equals zero, which has to at least one, otherwise computeResidue would not have been called.
+	//				 : 		Thus, we take counter[0]--, and so counter[0] now is equal to the number of additional terms that vanish.
+	//				 : 		So now, counter[0] is our upper bound for how far we need to take the series expansion.
+	//				 :		To find the residue, we need to find the coeff. of the counter[0]-degree term because we are dividing by z^{counter[0]+1}
+
 	//actual calculations, I want the appropriate coefficient in a product of one polynomial and some power series. (everything is truncated).
 	nu = 1;
 	de = 1;
@@ -90,6 +127,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		de = de * Power_ZZ(index[j], counter[j] + counter[0]);
 	monomialSum m1;
 	monomialSum sub; //sub is the substitution for m1, which alternatively stores the product for each other
+					 // we alternatively do sum:= m1 * m2  and then m1:=sub * m2.
 	m1.varCount = 1;
 	m1.termCount = 0;
 	sub.varCount = 1;
@@ -99,7 +137,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		c = AChooseB(M + d, i) * Power_ZZ(p, M + d - i);
 		e[0] = i;
 		insertMonomial(c, e, m1);
-	};
+	}//now, m1 = <l, s_i>^(M+d) but in expanded form.
 	for (i = 1; i < k; i++)
 	{
 		monomialSum m2;
@@ -109,6 +147,8 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		{
 			c = AChooseB(counter[i] + j - 1, j) * Power_ZZ(index[i], counter[0]
 					- j);
+			//index[i]^{counter[0] - j - (counter[j] + counter[0] (which is in de))} = -counter[j] - j. :)
+
 			if (j % 2 == 1)
 				c.mult(to_ZZ(-1), to_ZZ(1));
 			e[0] = j;
@@ -116,7 +156,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		};
 		mindeg[0] = 0;
 		maxdeg[0] = counter[0];
-		BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> ();
+		BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> (); //MEMORY LEAK !?!??!?!
 		BTrieIterator<RationalNTL, int>* it2 = new BTrieIterator<RationalNTL, int> ();
 		if (i % 2 == 1)
 		{
@@ -189,8 +229,8 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		{
 			findCoeff = storedTerm->coef;
 			break;
-		};
-	};
+		}//again, counter[0] +1 = degree of z, which we are dividing by.
+	}//while
 
 	a = nu * findCoeff.getNumerator();
 	b = de * findCoeff.getDenominator();

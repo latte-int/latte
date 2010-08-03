@@ -317,7 +317,7 @@ void destroyLinForms(linFormSum &myPoly)
 //	note: all linear form coefficients assumed to be divided by their respective |M|!, and the form is assumed to be of power M
 void decompose(BTrieIterator<RationalNTL, int>* it, linFormSum &lForm)
 {
-	cout << "decomposing " << lForm.varCount << " variables" << endl;
+	//cout << "decomposing " << lForm.varCount << " variables" << endl;
 	term<RationalNTL, int>* temp;
 	//BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 

@@ -81,29 +81,72 @@ void convertToSimplex(simplexZZ &mySimplex, string line)
 }
 ;
 
-//The purpose of this function is to modify a given fraction a/b. 
-//Input: l is the exponents of a linear form, mySimplex is the Simplex we are integrating over with d+1 vertices
-//m is the power the linear form is raised to
-//coe is the coefficient of a linear form
-//de is the extra factor in the formulae that we we multiply the result by
-
+/**
+ * Integrate a simplex over a linear form.
+ *
+ * @parm a, b: ouput parameters, we return a/b += integration answer.
+ * @parm l: a linear form.
+ * @parm mySimplex: integer simplex
+ * @parm m: the power the linear form is raised to
+ * @parm coe: the coefficient of a linear form
+ * @parm de: is the extra factor in the formulae that we we multiply the result by
+ *
+ * Assumes the polytope has dimension less than 1000.
+ *
+ * Paper Citation: @ARTICLE{2008arXiv0809.2083B,
+   author = {{Baldoni}, V. and {Berline}, N. and {De Loera}, J. and {K{\"o}ppe}, M. and
+	{Vergne}, M.},
+    title = "{How to Integrate a Polynomial over a Simplex}",
+  journal = {ArXiv e-prints},
+archivePrefix = "arXiv",
+   eprint = {0809.2083},
+ primaryClass = "math.MG",
+ keywords = {Mathematics - Metric Geometry, Computer Science - Computational Complexity, Computer Science - Symbolic Computation},
+     year = 2008,
+    month = sep,
+   adsurl = {http://adsabs.harvard.edu/abs/2008arXiv0809.2083B},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+ *
+ *BACKGROUND MATH: \int_\Delta l^m \d m' = d!\vol(\Delta, \d m')\frac{m!}{(m+d)!}
+ *                            \Big(\sum_{i=1}^{d+1}
+ *                                  \frac{ <l, s_i >^{M+d}}
+ *                                       {\prod_{j\neq i} <l, s_i- s_j >}
+ *                            \Big),
+ * Where \Delta is a regular integer-vertex simplex, d is the dimention, l is a linear form, s_i are the verties.
+ *
+ *  \int_{\Delta} l^m  \d m' = d!\vol(\Delta, \d m') \frac{m!}{(m+d)!}
+ *                             \sum_{k\in K} \Res_{z=0}
+ *                                  \frac{(z + <l, s_k>)^{m+d}}
+ *                                       {\z^{m_k} {\prod_{i\in K, i \neq k} {(z + <l, s_k - s_i> )}^{m_i}} }
+ * as above and if the simplex is not regular, and where $K\subseteq\{1,\dots,d+1\}$ is an index set of the different poles
+ * $t= 1/\langle \l ,s_k\rangle$, and for $k\in K$ let $m_k$ denote the order of the pole, i.e.,
+ *   $m_k = sizeof the set { i \in \{1,\dots,d+1\} : <l ,s_i> = <l ,s_k> }.
+ *
+ * Implementation:
+ * Instead of finding d!\vol(\Delta, \d m') directly, we just find the volume of the parallelepiped of the simplex.
+ * The data structor also assumes the m! is part of the linear form's coefficient.
+ */
 void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe, ZZ de)
 {
 	ZZ sum, lcm, total, g, tem;
 	int i, j;
-	vec_ZZ inner_Pro, sum_Nu, sum_De;
+	vec_ZZ inner_Pro; //inner_Pro[i] = <l, s_i>
+	vec_ZZ sum_Nu, sum_De; // (sum_Nu/sum_De)[i] = <l, s_i>^d/ (\prod_{j \neq i} <l, s_i - s_j>)
 	inner_Pro.SetLength(mySimplex.d + 1);
 	sum_Nu.SetLength(mySimplex.d + 1);
 	sum_De.SetLength(mySimplex.d + 1);
 	total = 0;
 	lcm = 1;
-	bool repeat[1000];
+	bool repeat[1000]; //put this on the stack, do not waste the time requesting memory from the heap because this function is called many, many, many times.
+					 //What is this bool (vs int): if there are no repeats in the <l, s_i> terms, the simplex is regular on l and we compue the integral as in the first case of the theory.
+					 // Otherwise we will have to compute for residue. It is then where we worry about the multiplicity of things.
 	for (i = 0; i <= mySimplex.d; i++)
 	{
 		sum = 0;
 		for (j = 0; j < mySimplex.d; j++)
 			sum = sum + l[j] * mySimplex.s[i][j];
-		inner_Pro[i] = sum;
+		inner_Pro[i] = sum; // inner_Pro_i= <l, s_i>
 		repeat[i] = 0;
 		for (j = 0; j < i; j++)
 			if (inner_Pro[j] == inner_Pro[i])
@@ -117,11 +160,11 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 		{
 			sum_Nu[i] = 1;
 			for (j = 0; j < m + mySimplex.d; j++)
-				sum_Nu[i] = sum_Nu[i] * inner_Pro[i];
+				sum_Nu[i] = sum_Nu[i] * inner_Pro[i]; // sum_Nu_i = inner_pro ^ (m + d)
 			sum_De[i] = 1;
 			for (j = 0; j <= mySimplex.d; j++)
 				if (i != j)
-					sum_De[i] = sum_De[i] * (inner_Pro[i] - inner_Pro[j]);
+					sum_De[i] = sum_De[i] * (inner_Pro[i] - inner_Pro[j]);  //sum_de_i	 = \prod _{i != j} <l, s_i - s_j>
 			if ((sum_Nu[i] < 0) && (sum_De[i] < 0))
 			{
 				sum_Nu[i] = -sum_Nu[i];
@@ -149,7 +192,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 
 
 	lcm = lcm * de * coe.getDenominator();
-	total = total * mySimplex.v * coe.getNumerator(); //was just * coe.
+	total = total * mySimplex.v * coe.getNumerator();
 	if (a == 0)
 	{
 		a = total;

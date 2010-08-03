@@ -13,10 +13,10 @@ NTL_CLIENT
 
 struct simplexZZ
 {
-					// Brandon's notes.
-	int d;			// dimension of the space? so s.length = d + 1?
+
+	int d;			// dimension of the space. s.length = d + 1
 	vec_vec_ZZ s;	// s[i] = vector of the ith vertex
-	ZZ v; 			//valuation/integral answer?
+	ZZ v; 			//volume of the parallelepiped. We take v = det(simplex rays) and we do NOT divide by d!.
 
 	void print(ostream & out)
 	{

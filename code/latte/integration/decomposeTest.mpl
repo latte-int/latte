@@ -16,14 +16,14 @@ for myDim from 2 to maxDim do
     
     printf("Integrating monomials of degree %d, dimension %d...\n", myDegree, myDim):
     #parameters:            polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen, rationalCoeff)
-    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree, 0):
+    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree, 1):
     
     if (totalErrors > 0) then
       quit:
     end if:
     printf("Finished integrating monomials of degree %d, dimension %d...\n", myDegree, myDim):
     printf("Integrating powers of linear forms of degree %d, dimension %d...\n", myDegree, myDim):
-    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm, 0):
+    totalErrors:=test_integration(10, 1000, 10, myDim, myDegree, 0, random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm, 1):
     
     if (totalErrors > 0) then
       quit:
