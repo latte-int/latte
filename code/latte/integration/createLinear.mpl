@@ -21,8 +21,8 @@ random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,
 		fi;
 		l:=[op(l),temp];
 	od;
-	printf("Random Linear Form:\n\n");
-	print(l);
+	#printf("Random Linear Form:\n\n");
+	#print(l);
 	l;
 end:
 
