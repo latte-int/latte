@@ -17,10 +17,10 @@ void delSpace(string &line)
 		while ((i < line.length()) && (line.at(i) == 32))
 		{
 			line.erase(i, 1);
-		};
-	};
-}
-;
+		}
+	}
+}//delSpace
+
 
 //this function converts a given string into a simlexZZ mySimplex
 //for example, string [[0,0],[1,1],[7,8]] is converted to a two-dimensional vector of ZZs.
@@ -91,30 +91,32 @@ void convertToSimplex(simplexZZ &mySimplex, string line)
  * @parm coe: the coefficient of a linear form
  * @parm de: is the extra factor in the formulae that we we multiply the result by
  *
- * Assumes the polytope has dimension less than 1000.
+ * ASSUMES the polytope has dimension less than 1000.
  *
- * Paper Citation: @ARTICLE{2008arXiv0809.2083B,
-   author = {{Baldoni}, V. and {Berline}, N. and {De Loera}, J. and {K{\"o}ppe}, M. and
-	{Vergne}, M.},
-    title = "{How to Integrate a Polynomial over a Simplex}",
-  journal = {ArXiv e-prints},
-archivePrefix = "arXiv",
-   eprint = {0809.2083},
- primaryClass = "math.MG",
- keywords = {Mathematics - Metric Geometry, Computer Science - Computational Complexity, Computer Science - Symbolic Computation},
-     year = 2008,
-    month = sep,
-   adsurl = {http://adsabs.harvard.edu/abs/2008arXiv0809.2083B},
-  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
-}
+ * Paper Citation: @ARTICLE
+ * {2008arXiv0809.2083B,
+ *  author = {{Baldoni}, V. and {Berline}, N. and {De Loera}, J. and {K{\"o}ppe}, M. and
+ *	{Vergne}, M.},
+ *    title = "{How to Integrate a Polynomial over a Simplex}",
+ *  journal = {ArXiv e-prints},
+ *archivePrefix = "arXiv",
+ *   eprint = {0809.2083},
+ *primaryClass = "math.MG",
+ * keywords = {Mathematics - Metric Geometry, Computer Science - Computational Complexity, Computer Science - Symbolic Computation},
+ *     year = 2008,
+ *    month = sep,
+ *   adsurl = {http://adsabs.harvard.edu/abs/2008arXiv0809.2083B},
+ *  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+ * }
  *
- *BACKGROUND MATH: \int_\Delta l^m \d m' = d!\vol(\Delta, \d m')\frac{m!}{(m+d)!}
+ *BACKGROUND MATH 1: \int_\Delta l^m \d m' = d!\vol(\Delta, \d m')\frac{m!}{(m+d)!}
  *                            \Big(\sum_{i=1}^{d+1}
  *                                  \frac{ <l, s_i >^{M+d}}
  *                                       {\prod_{j\neq i} <l, s_i- s_j >}
  *                            \Big),
- * Where \Delta is a regular integer-vertex simplex, d is the dimention, l is a linear form, s_i are the verties.
+ * Where \Delta is a regular integer-vertex simplex, d is the dimension, l is a linear form, s_i are the verties.
  *
+ *BACKGROUND MATH 2:
  *  \int_{\Delta} l^m  \d m' = d!\vol(\Delta, \d m') \frac{m!}{(m+d)!}
  *                             \sum_{k\in K} \Res_{z=0}
  *                                  \frac{(z + <l, s_k>)^{m+d}}
@@ -125,7 +127,7 @@ archivePrefix = "arXiv",
  *
  * Implementation:
  * Instead of finding d!\vol(\Delta, \d m') directly, we just find the volume of the parallelepiped of the simplex.
- * The data structor also assumes the m! is part of the linear form's coefficient.
+ * The data structure also assumes the m! is part of the linear form's coefficient.
  */
 void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe, ZZ de)
 {
@@ -139,8 +141,8 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 	total = 0;
 	lcm = 1;
 	bool repeat[1000]; //put this on the stack, do not waste the time requesting memory from the heap because this function is called many, many, many times.
-					 //What is this bool (vs int): if there are no repeats in the <l, s_i> terms, the simplex is regular on l and we compue the integral as in the first case of the theory.
-					 // Otherwise we will have to compute for residue. It is then where we worry about the multiplicity of things.
+					 //Why is this bool (vs int): if there are no repeats in the <l, s_i> terms, the simplex is regular on l and we compute the integral as in the first case of the theory.
+					 // Otherwise we will have to compute the residue. It is in the residue-function where we worry about the multiplicity of things.
 	for (i = 0; i <= mySimplex.d; i++)
 	{
 		sum = 0;
@@ -188,7 +190,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 		if ((!repeat[i]) && (sum_De[i] != 0))
 		{
 			total += sum_Nu[i] * (lcm / sum_De[i]);
-		};
+		}
 
 
 	lcm = lcm * de * coe.getDenominator();
@@ -211,9 +213,9 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 	{
 		a = a / g;
 		b = b / g;
-	};
-}
-;
+	}
+}//update
+
 
 //This function computes a given fraction a/b, the integral of the linear form forms, over the simplex mySimplex
 void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
@@ -242,17 +244,17 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
 		for (i = 1; i <= mySimplex.d + m; i++)
 		{
 			de = de * i;
-		}; //de is (d+m)!. Note this is different from the factor in the paper because in our 								storage of a linear form, any coefficient is automatically adjusted by m!
+		} //de is (d+m)!. Note this is different from the factor in the paper because in our storage of a linear form, any coefficient is automatically adjusted by m!
 		update(numerator, denominator, l, mySimplex, m, coe, de);//We are ready to compute the integral of one linear form over the simplex
-	};
+	}
 	delete temp;
 	if (denominator < 0)
 	{
 		denominator *= to_ZZ(-1);
 		numerator *= to_ZZ(-1);
-	};
-}
-;
+	}
+}//integrateLinFormSum
+
 
 void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials,
 		const simplexZZ &mySimplex)//integrate a polynomial stored as a Burst Trie
@@ -268,7 +270,7 @@ void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials,
 	it2->setTrie(forms.myForms, forms.varCount);
 	integrateLinFormSum(a, b, it2, mySimplex);
 }
-;
+
 void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials,
 		const simplexZZ &mySimplex)
 {
@@ -281,4 +283,4 @@ void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials,
 	it_->setLists(forms.lHead, forms.cHead, forms.varCount, forms.termCount);
 	integrateLinFormSum(a, b, it_, mySimplex);
 }
-;
+

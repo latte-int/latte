@@ -39,6 +39,7 @@ void multiply(PolyIterator<RationalNTL, int>* it, PolyIterator<RationalNTL, int>
 		}
 		it2->begin();
 	}
+	delete [] resExps;
 }
 
 template <class T>
@@ -75,5 +76,6 @@ void multiply(PolyIterator<RationalNTL, int>* it, PolyIterator<RationalNTL, int>
 		it2->begin();
 		firstTerm = it->nextTerm();
 	}
+	delete [] resExps;
 }
 #endif

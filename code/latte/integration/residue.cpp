@@ -132,6 +132,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 	m1.termCount = 0;
 	sub.varCount = 1;
 	sub.termCount = 0;
+	sub.myMonomials = NULL;
 	for (i = 0; i <= counter[0]; i++)
 	{
 		c = AChooseB(M + d, i) * Power_ZZ(p, M + d - i);
@@ -156,20 +157,28 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		};
 		mindeg[0] = 0;
 		maxdeg[0] = counter[0];
-		BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> (); //MEMORY LEAK !?!??!?!
+		BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> ();
 		BTrieIterator<RationalNTL, int>* it2 = new BTrieIterator<RationalNTL, int> ();
 		if (i % 2 == 1)
 		{
 			it->setTrie(m1.myMonomials, m1.varCount);
 			it2->setTrie(m2.myMonomials, m2.varCount);
+			if ( sub.myMonomials != NULL)
+				destroyMonomials(sub);
+			sub.varCount = 1;
 			multiply<RationalNTL> (it, it2, sub, mindeg, maxdeg);
 		}//cout<<"times "<<printMonomials(m2)<<" gives "<<printMonomials(sub)<<endl;}
 		else
 		{
 			it->setTrie(sub.myMonomials, sub.varCount);
 			it2->setTrie(m2.myMonomials, m2.varCount);
+			destroyMonomials(m1);
+			m1.varCount = 1;
 			multiply<RationalNTL> (it, it2, m1, mindeg, maxdeg);
 		}//cout<<"times "<<printMonomials(m2)<<"gives "<<printMonomials(m1)<<endl;};
+		delete it;
+		delete it2;
+		destroyMonomials(m2);
 	};
 	//ZZ findCoeff = to_ZZ(0);
 	RationalNTL findCoeff;
@@ -207,17 +216,17 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 	 };*/
 
 	//The following part is trying to find a monomial that has the degree we want and returns its coefficient to findCoeff
-	BurstTerm<RationalNTL, int>* temp;
+	//BurstTerm<RationalNTL, int>* temp;
 	BurstTrie<RationalNTL, int>* myTrie;
 	BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> ();
 	if (k % 2 == 1)
 	{
-		temp = new BurstTerm<RationalNTL, int> (m1.varCount);
+		//temp = new BurstTerm<RationalNTL, int> (m1.varCount);
 		myTrie = m1.myMonomials;
 		it->setTrie(myTrie, m1.varCount);
 	} else
 	{
-		temp = new BurstTerm<RationalNTL, int> (sub.varCount);
+		//temp = new BurstTerm<RationalNTL, int> (sub.varCount);
 		myTrie = sub.myMonomials;
 		it->setTrie(myTrie, sub.varCount);
 	}
@@ -240,6 +249,10 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		a = a / g;
 		b = b / g;
 	};
+
+	delete it;
+	destroyMonomials(m1);
+	destroyMonomials(sub);
 	return;
-}
-;
+}//computeResidue
+

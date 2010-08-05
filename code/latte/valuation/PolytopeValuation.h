@@ -73,7 +73,6 @@ public:
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone.
-	void breakupPolynomialToMonomials(const string & polynomialString, vector< vector<RationalNTL>  > & monomialList) const;
 	void dilatePolytope(const RationalNTL & factor); //dilates polytope by changing the vertices.
 	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const;
 	RationalNTL findVolumeUsingLawrence();

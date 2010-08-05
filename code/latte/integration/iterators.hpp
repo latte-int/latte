@@ -139,7 +139,7 @@ private:
 	int dimension;
 
 	BurstTerm<T, S>* storedTerm; //pointer to next stored term in current container
-	trieElem** triePath;
+	trieElem** triePath;		 //array of pointers (not a table)
 	int curDepth;
 };
 
