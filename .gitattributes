@@ -104,17 +104,10 @@ EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/integrateAsFunction.mw -
 EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/mapleBean.mpl -text
 EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/plotFuctionNorm.mw -text
 EXAMPLES/volumeIntegrationPaperComparison/Henrion/paper/appVolumeIntegrationBasicSemiAlgebraicSets.pdf -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/.project -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/.settings/org.eclipse.ltk.core.refactoring.prefs -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/.texlipse -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/READEME.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/paper/bueler.pdf -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.dvi -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.tex -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/texput.log -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/tmp/tables_1and2.aux -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/tmp/tables_1and2.log -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/4ti2_triangulation_output -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/Check_emp.ddl -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/Check_emp.ddl.old -text
