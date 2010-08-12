@@ -371,14 +371,12 @@ ZZ PolytopeValuation::factorial(const int n)
  *  and a is such that ever vertex becomes integer when mult. by a.
  *  P' is now a dilation of P such that P' has only integer vertices.
  */
-RationalNTL PolytopeValuation::integrate(const string& polynomialString)
+RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 {
 	RationalNTL answer;
 	linFormSum linearForms;
 
-	monomialSum originalPolynomial;// polynomial without the updated coefficients.
 
-	loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
 
 	//find the dilation factor.
 	ZZ dilationFactor;
@@ -450,7 +448,6 @@ RationalNTL PolytopeValuation::integrate(const string& polynomialString)
 	answer.div(power(dilationFactor, transformedPolynomial.varCount));
 
 	destroyLinForms(linearForms);
-	destroyMonomials(originalPolynomial);
 	destroyMonomials(transformedPolynomial);
 
 	delete transformedPolynomialLoader;

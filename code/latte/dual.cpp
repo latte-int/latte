@@ -208,7 +208,7 @@ dualizeCones(listCone *cones, int numOfVars, BarvinokParameters *params)
     tmp=tmp->rest;
     numOfConesDualized++;
     if (numOfConesDualized==50*(numOfConesDualized/50)) {
-      printf("%d / %d done.\n",numOfConesDualized,numOfAllCones);
+    	cerr << numOfConesDualized << " / " << numOfAllCones << " done.\n";
     }
   }
 

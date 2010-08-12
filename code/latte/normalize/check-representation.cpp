@@ -114,38 +114,38 @@ int main(int argc, char **argv)
     }
   }
 
-  cout << "Checking that all vectors are generated over the nonnegative reals, and the nonnegative integers." << endl;
+  cerr << "Checking that all vectors are generated over the nonnegative reals, and the nonnegative integers." << endl;
   vector<int> v(dim_vectors);
   int i;
   for (i = 0; i<num_vectors; i++) {
     if (i % 1000 == 0) {
-      cout << i << "/" << num_vectors << " done. " << endl;
+      cerr << i << "/" << num_vectors << " done. " << endl;
     }
     if (verbose)
-      cout << "Checking vector: ";
+    	cerr << "Checking vector: ";
     int j;
     for (j = 0; j<dim_vectors; j++) {
       vectors_file >> v[j];
       if (verbose)
-	cout << v[j] << " ";
+    	  cerr << v[j] << " ";
     }
 
     if (vectors_file_no_header && vectors_file.eof()) {
-      cout << "After reading " << i << " vectors, end of file." << endl;
+    	cerr << "After reading " << i << " vectors, end of file." << endl;
       exit(0);
     }
     if (!vectors_file.good()) {
-      cerr << "After reading " << i << " vectors, parse error reading vectors file" << endl;
+    	cerr << "After reading " << i << " vectors, parse error reading vectors file" << endl;
       exit(1);
     }
     if (verbose)
-      cout << endl;
+    	cerr << endl;
 
     if (!reduction_test->IsReducible(v)) {
-      cout << "Irreducible: ";
+    	cerr << "Irreducible: ";
       for (j = 0; j<dim_vectors; j++)
-	cout << v[j] << " ";
-      cout << endl;
+    	  cerr << v[j] << " ";
+      cerr << endl;
     }
   }
   delete reduction_test;

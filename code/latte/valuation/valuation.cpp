@@ -16,15 +16,18 @@ ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 {
 	ValuationContainer ans;
 	RationalNTL ans1, ans2;
+	Timer timer("");
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
 	{
 		PolytopeValuation polytopeValuation(poly, myParameters);
+		timer.start();
 		ans1 = polytopeValuation.findVolume(
 				PolytopeValuation::DeterminantVolume);
-
+		timer.stop();
 		cout << "(using triangulation-determinant method) VOLUME " << ans1
 				<< endl;
+		cout << "Time for the triangulation-determinant method" << timer << endl;
 	}//if triangulate
 
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
@@ -32,9 +35,11 @@ ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 	{
 
 		PolytopeValuation polytopeValuation(poly, myParameters);
+		timer.start();
 		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
-
+		timer.stop();
 		cout << "(using Lawrence method) VOLUME " << ans2 << endl;
+		cout << "Time for the Lawrence method" << timer << endl;
 
 		if (*print == 'y')
 			polytopeValuation.printLawrenceVolumeFunction(); //print the lawrence rational function.
@@ -43,10 +48,14 @@ ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 
 	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
 	{
-		cout << "Driver.cpp: the two methods are different." << ans1 << "!="
+		cerr << "Driver.cpp: the two methods are different." << ans1 << "!="
 				<< ans2 << endl;
 		exit(1);
 	}//if error.
+	else if (strncmp(valuationAlg, "lawrence", 8) == 0)
+		cout << "Decimal: " << ans2.to_RR() << endl; //lawrence.
+	else
+		cout << "Decimal: " << ans1.to_RR() << endl; //triangulate or all.
 
 
 	ans.lawrence = ans2;
@@ -68,13 +77,17 @@ ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 {
 	ValuationContainer answer;
 	RationalNTL ans1;
+	monomialSum originalPolynomial;// polynomial without the updated coefficients.
 	PolytopeValuation polytopeValuation(poly, myParameters);
 
-	ans1 = polytopeValuation.integrate(polynomialString);
+	loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
+	ans1 = polytopeValuation.integrate(originalPolynomial);
 	cout << "integrate answer = " << ans1 << endl;
+	cout << "Decimal answer = " << ans1.to_RR() << endl;
 
 	answer.triangulate = ans1;
 
+	destroyMonomials(originalPolynomial);
 	return answer;
 
 }//computeIntegral
@@ -416,7 +429,7 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 			inFile.open(polynomialFile);
 			if (!inFile.is_open())
 			{
-				cout << "Error: cannot open " << polynomialFile;
+				cerr << "Error: cannot open " << polynomialFile;
 				exit(1);
 			}
 			inStream.rdbuf(inFile.rdbuf());
@@ -441,7 +454,7 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 				valuationAlg, printLawrence, polynomialLine.c_str());
 	} else
 	{
-		cout << "ops, valuation type is not known: " << valuationType << endl;
+		cerr << "ops, valuation type is not known: " << valuationType << endl;
 		exit(1);
 	}//else error. This else block should not be reachable!
 
@@ -517,15 +530,15 @@ void VolumeTests::printVolumeTest(const RationalNTL &correctVolumeAnswer,
 	if (correctVolumeAnswer != volumeAnswer.lawrence || correctVolumeAnswer
 			!= volumeAnswer.triangulate)
 	{
-		cout << "******* ERROR ******" << endl;
-		cout << "correct answer: " << correctVolumeAnswer << endl;
-		cout << "lawrence: " << volumeAnswer.lawrence << endl;
-		cout << "triangulate: " << volumeAnswer.triangulate << endl;
-		cout << "see file " << file.c_str() << endl;
+		cerr << "******* ERROR ******" << endl;
+		cerr << "correct answer: " << correctVolumeAnswer << endl;
+		cerr << "lawrence: " << volumeAnswer.lawrence << endl;
+		cerr << "triangulate: " << volumeAnswer.triangulate << endl;
+		cerr << "see file " << file.c_str() << endl;
 		exit(1); //dont' delete the latte file.
 	}//if error
 	else
-		cout << comments.c_str() << " CORRECT!" << endl;
+		cerr << comments.c_str() << " CORRECT!" << endl;
 }//printVolumeTest
 
 /**
@@ -537,7 +550,7 @@ void VolumeTests::printVolumeTest(const RationalNTL &correctVolumeAnswer,
 void VolumeTests::runOneTest(int ambientDim, int numPoints)
 {
 	const char * argv[] =
-	{ "runTests()", "--all", 0 };
+	{ "runTests()", "--valuation=volume", "--all", 0 };
 	stringstream comments;
 	comments << "Making random integer polytope with " << numPoints
 			<< " points in R^" << ambientDim << " for volume testing";
@@ -550,7 +563,7 @@ void VolumeTests::runOneTest(int ambientDim, int numPoints)
 	buildPolytope.findVolumeWithPolymake(); //run polymake for the volume
 	buildPolytope.convertFacetEquations(); //fix facet equations
 	buildPolytope.printFacetEquationsForLattE(); //make latte file.
-	cout << comments.str().c_str();
+	cerr << comments.str().c_str();
 	//buildPolytope.findEhrhardPolynomial();
 	//buildPolytope.findVolumeWithPolymake();
 
@@ -558,8 +571,8 @@ void VolumeTests::runOneTest(int ambientDim, int numPoints)
 
 	char * sFile = new char[file.size() + 1];
 	strcpy(sFile, file.c_str());
-	argv[2] = sFile;
-	Valuation::mainValuationDriver(argv, 3);
+	argv[3] = sFile;
+	Valuation::mainValuationDriver(argv, 4);
 	delete[] sFile;
 }//RunOneTest
 
@@ -589,12 +602,12 @@ void VolumeTests::runTests()
 void VolumeTests::runHyperSimplexTests()
 {
 	const char * argv[] =
-	{ "runHyperSimplexTests()", "--all", 0 };
+	{ "runHyperSimplexTests()", "--valuation=volume", "--all", 0 };
 	//   n  k  num/denom
 	int hyperSimplexData[][4] =
-	{ /*{4, 1, 1, 6},
+	{ {4, 1, 1, 6},
 	 {4, 2, 2, 3},
-	 {5, 1, 1, 24},
+	 /*{5, 1, 1, 24},
 	 {5, 2, 11, 24},
 	 {6, 1, 1, 120},
 	 {6, 2, 13, 60},
@@ -651,12 +664,12 @@ void VolumeTests::runHyperSimplexTests()
 
 		string file = hyperSimplex.getLatteFile();
 
-		cout << comments.str().c_str() << endl;
+		cerr << comments.str().c_str() << endl;
 
 		char * sFile = new char[file.size() + 1];
 		strcpy(sFile, file.c_str());
-		argv[2] = sFile;
-		volumeAnswer = Valuation::mainValuationDriver(argv, 3);
+		argv[3] = sFile;
+		volumeAnswer = Valuation::mainValuationDriver(argv, 4);
 		delete[] sFile;
 
 		RationalNTL correctVolumeAnswer(hyperSimplexData[i][2],
@@ -673,9 +686,9 @@ void VolumeTests::runBirkhoffTests()
 {
 
 	string birkhoff[] =
-	{ "../../EXAMPLES/birkhoff/birkhoff-5.latte",
-			"../../EXAMPLES/birkhoff/birkhoff-6.latte",
-			"../../EXAMPLES/birkhoff/birkhoff-7.latte" };
+	{ "../../../../EXAMPLES/birkhoff/birkhoff-5.latte",
+			"../../../../EXAMPLES/birkhoff/birkhoff-6.latte",
+			"birkhoff7.latte.vrep" };
 	string birkhoffVolume[][2] =
 	{
 	{ "188723", "836911595520" }, //5
@@ -688,14 +701,25 @@ void VolumeTests::runBirkhoffTests()
 
 	ValuationContainer volumeAnswer;
 	const char * argv[] =
-	{ "runBirkhoffTests()", "--all", 0 };
+	{ "runBirkhoffTests()", "--valuation=volume", "--all", 0 };
 
 	for (int i = 0; i < numberTestCases; ++i)
 	{
 		char * sFile = new char[birkhoff[i].length() + 1];
 		strcpy(sFile, birkhoff[i].c_str());
-		argv[2] = sFile;
-		volumeAnswer = Valuation::mainValuationDriver(argv, 3);
+		argv[3] = sFile;
+		if ( i != 2)
+			volumeAnswer = Valuation::mainValuationDriver(argv, 4);
+		else
+		{
+			const char * argv2[5];
+			argv2[0] = argv[0];
+			argv2[1] = argv[1];
+			argv2[2] = argv[2];
+			argv2[3] = "--vrep";
+			argv2[4] = sFile;
+			volumeAnswer = Valuation::mainValuationDriver(argv2, 5);
+		}//need to handel the v-rep file differently.
 		delete[] sFile;
 
 		RationalNTL correctVolumeAnswer(birkhoffVolume[i][0],

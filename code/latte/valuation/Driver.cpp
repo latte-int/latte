@@ -15,7 +15,6 @@
 int main(int argc, char *argv[])
 {
 	Valuation::mainValuationDriver((const char **) argv, argc);
-	//mainValuationDriverOLD((const char **) argv, argc); //remove the file printing later.
 	//runHyperSimplexTests();
 	//runBirkhoffTests();
 	//runTests();

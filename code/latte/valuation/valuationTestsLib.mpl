@@ -151,7 +151,7 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	#printf("made the latte file\n");
 	
 	#make the polynomial file
-	polynomialFileName:=fileName||".polnomial"; #concat. the strings.
+	polynomialFileName:=fileName||".polynomial"; #concat. the strings.
 	save_polynomial_to_file_mapleEncoded(randomPoly, polynomialFileName, polytopeDimension);
 	#print(polynomialFileName);
 	
