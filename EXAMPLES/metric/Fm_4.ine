@@ -1,0 +1,13 @@
+Fm_4.ine
+H-representation
+begin
+7  7  integer
+ -6 0 -3 -3 -1 -1 2
+ 3 0 1 1 0 0 -1
+ 0 -1 0 -1 1 0 1
+ 0 -1 -1 0 0 1 1
+ 0 0 -1 -1 1 1 0
+ 0 1 -1 0 0 -1 1
+ 0 1 0 -1 -1 0 1
+end
+input_incidence

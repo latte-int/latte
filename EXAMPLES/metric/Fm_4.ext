@@ -1,0 +1,14 @@
+Fm_4.ext
+V-representation
+begin
+        7      7    integer
+  1 -1 -1 -1 -1 -1 -1
+  1 -3 -3 -3 -3 -3 -3
+  1  3 -3 -3  3  3 -3
+  1 -3  3 -3  3 -3  3
+  1 -3 -3  3 -3  3  3
+  1  3  3 -3 -3  3  3
+  1  3 -3  3  3 -3  3
+end
+hull
+incidence

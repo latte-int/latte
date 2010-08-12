@@ -1,3 +1,4 @@
+
 examplesdir = $(pkgdatadir)/examples
 
 # Install and distribute these examples.
@@ -178,4 +179,22 @@ dist_examples_DATA = 				\
     crosspolytope/cross-polytope-28.vrep	\
     crosspolytope/cross-polytope-29.vrep	\
     crosspolytope/cross-polytope-30.vrep
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

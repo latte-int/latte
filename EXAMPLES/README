@@ -6,3 +6,42 @@ yoshida		Examples collected by Ruriko Yoshida
 mcallister	Examples from Tyrrell McAllister
 hickerson	Examples from Dean Hickerson
 
+
+birkhoff/
+Doubly stochastic matrices (take a nxn matrix, each col and row sums to 1).
+
+cpp/
+complete cut polytopes on five to seven vertices. The polytopes have been scaled by 2 and then translated by 1 to contain the origin in their interor. So their vertices have coordinates +1 and -1 now. Taken from Vinci by Andreas Enge.
+
+crossCyclic/
+cc_8_7 to cc_8_11, the product of two cyclic polyhedra with seven to eleven vertices, each in dimension four. The final dimension is therefore eight. Taken from Vinci by Andreas Enge.
+
+crosspolytope/cddStyle/ 
+cross polytopes, the duals of cubes. Taken from Vinci by Andreas Enge.
+
+cubes/
+hypercubes with -1 and 1 as vertex coordinates, in dimension 2 to 14.  Taken from Vinci by Andreas Enge. Note the makeCube exe. makes latte-style cubes over [0, 1]^n.
+
+matroid/
+To do.
+
+metric/
+After expansion, contains facets of the fourth (Fm_4) to sixth (Fm_6) metric polytope. Taken from Vinci by Andreas Enge.
+The metric cone M_n is defined by the following 3{n\choose 3} triangle inequalities:
+    * x_{ij}-x_{ik}-x_{jk} \leq 0
+      for all triples {i,j,k} subset of {1,...,n}
+Then, bounding the latter by the following {n\choose 3} perimeter inequalities,
+    * x_{ij}+x_{ik}+x_{jk} \leq 2 
+    
+random-simplex/
+Random simplex polytopes.
+
+rh/
+Polytopes constructed by randomly choosing hyperplanes tangent to the sphere; after unpacking, files rh_d_m will be created, where d stands for the dimension and m for the number of hyperplanes. Taken from Vinci by Andreas Enge.
+
+rv/
+Dually to rh/, these polytopes have vertices randomly distributed on the sphere. Taken from Vinci by Andreas Enge.
+
+tests/
+Test errors and other issues when reading in polytopes.
+

@@ -1,0 +1,16 @@
+cube_5.ine
+H-representation
+begin
+       10      6    integer
+  1  0  0  0  0  1
+  1  1  0  0  0  0
+  1  0  1  0  0  0
+  1  0  0  1  0  0
+  1  0  0  0  1  0
+  1  0  0  0  0 -1
+  1  0  0  0 -1  0
+  1  0  0 -1  0  0
+  1  0 -1  0  0  0
+  1 -1  0  0  0  0
+end
+input_incidence
