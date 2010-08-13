@@ -78,12 +78,16 @@ ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	ValuationContainer answer;
 	RationalNTL ans1;
 	monomialSum originalPolynomial;// polynomial without the updated coefficients.
+	Timer timer("Integration time");
 	PolytopeValuation polytopeValuation(poly, myParameters);
 
 	loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
+	timer.start();
 	ans1 = polytopeValuation.integrate(originalPolynomial);
+	timer.stop();
 	cout << "integrate answer = " << ans1 << endl;
 	cout << "Decimal answer = " << ans1.to_RR() << endl;
+	cout << timer << endl;
 
 	answer.triangulate = ans1;
 
