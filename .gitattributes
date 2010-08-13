@@ -108,25 +108,11 @@ EXAMPLES/volumeIntegrationPaperComparison/bueler/READEME.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/paper/bueler.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.tex -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/4ti2_triangulation_output -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/Check_emp.ddl -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/Check_emp.ddl.old -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/Check_emp.lp -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/Check_emp.lps -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/Check_emp.out -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/README.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/ch3.1 -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/ch3.2 -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/ch3.3 -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/lifted_cone_for_4ti2_triangulation -text
 EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/paper/Mark[!!-~]Korenblit1.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/tri.ddl -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/tri.ddl.old -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/tri.ext -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/tri.icd -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/tri.icd.old -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/tri.ine -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/tri.ine.old -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/Fausto[!!-~]Bernardini.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/RATHOD.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
