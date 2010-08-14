@@ -129,55 +129,45 @@ void readCDDicdFileRudy(int & face2, vec_ZZ & numOfPoints, mat_ZZ & Result) {
       cerr<<"File could not be opened in readCDDicdFileRudy."<<endl;
       exit(5);
     }
-  int num, art;
+  int num;
   string tmp;
   
   while(tmp != "begin")
     getline(File3, tmp);
   
-  File3 >> face2 >> num >> art; 
+  File3 >> face2 >> num;
   Result.SetDims(face2, num);
   numOfPoints.SetLength(face2);
   char trash;
  
-  int number = 0;
   
   /*
-    If numOfPoints[i] is negative, then, numOfPoints[i]
-    is the number of points which are NOT on the plane and
+    If numOfPoints[i] is negative, then -numOfPoints[i]
+    is the number of points which are on the plane and
     filename.icd has a list of points which
     are NOT in the plane.  
     In that case, we want to have points which are NOT in the 
     list.
   */
+  int k = 0;
   for(int i = 0; i < face2; i++){
-    File3 >> numOfPoints[i] >> trash;
-    if(numOfPoints[i] > 0)
-      for(int j = 0; j < numOfPoints[i]; j++)
-	File3 >> Result[i][j];
+    File3 >> k >> numOfPoints[i] >> trash;
+    if(numOfPoints[i] >= 0) {
+      for(int j = 0; j < numOfPoints[i]; j++) { File3 >> Result[i][j]; }
+    }
     else { 
-      number = 0;
-      numOfPoints[i] = - numOfPoints[i];
-      for(int j = 0; j < numOfPoints[i]; j++)
-	File3 >> Result[i][j];
-      
-      numOfPoints[i] = num - numOfPoints[i];
-      vec_ZZ Temp;
-      Temp.SetLength(num + 1);
-      
-      for(int j = 0; j <= num; j++) conv(Temp[j], j+1);
-      for(int j = 0; j < num - numOfPoints[i]; j++) {
-	for(int k = 0; k <= num; k++) {
-	  if(Temp[k] == Result[i][j]) {
-	    Temp[k] = 0;   
-	  }
-	}
+      numOfPoints[i] = -numOfPoints[i];
+      int r = 1;
+      int j = 0;
+      for (int n = 0; n < num - numOfPoints[i]; ++n) {
+          File3 >> k;
+          while (r < k) {
+            Result[i][j++] = r++;
+          }
+          ++r;
       }
-      for(int j = 0; j <= num; j++) {
-	if(Temp[j] != 0)
-	  Result[i][j - number] = Temp[j];
-	else
-	  number++;
+      while (r <= num) {
+        Result[i][j++] = r++;
       }
     }
   }

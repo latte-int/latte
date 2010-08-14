@@ -498,7 +498,7 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
 
   while (tmpString!="begin") getline(in,tmpString);
 
-  in >> numOfVertices;
+  in >> numOfVertices; getline(in,tmpString);
 
   vertices=createArrayRationalVector(numOfVertices);
 
@@ -522,13 +522,35 @@ listCone* readCddEadFile(listCone* cones, int numOfVars) {
     rays=createListVector(createVector(numOfVars));
     endRays=rays;
 
-    for (j=0; j<numOfRays; j++) {
-      in >> k;
-      v=constructRay(vertices[i],vertices[k-1],numOfVars-1);
-      endRays->rest=createListVector(v);
-      endRays=endRays->rest;
+    if (numOfRays >= 0) {
+      for (j=0; j<numOfRays; j++) {
+        in >> k;
+        v=constructRay(vertices[i],vertices[k-1],numOfVars-1);
+        endRays->rest=createListVector(v);
+        endRays=endRays->rest;
+      }
     }
-
+    else {
+      // numOfRays<0 means that the list of adjacencies is inverted.
+      numOfRays = -numOfRays;
+      int r = 1;
+      for (j = 0; j < numOfVertices - numOfRays; ++j) {
+          in >> k;
+          while (r < k) {
+            v=constructRay(vertices[i],vertices[r-1],numOfVars-1);
+            endRays->rest=createListVector(v);
+            endRays=endRays->rest;
+            ++r;
+          }
+          ++r;
+      }
+      while (r <= numOfVertices) {
+        v=constructRay(vertices[i],vertices[r-1],numOfVars-1);
+        endRays->rest=createListVector(v);
+        endRays=endRays->rest;
+        ++r;
+      }
+    }
     tmp->rays=rays->rest;
     delete rays; // only deletes the dummy head
     tmp=tmp->rest;
@@ -615,11 +637,34 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars) {
     rays=createListVector(createVector(numOfVars));
     endRays=rays;
 
-    for (j=0; j<numOfRays; j++) {
-      in >> k;
-      v=constructRay(vertices[i],vertices[k-1],numOfVars-1);
-      endRays->rest=createListVector(v);
-      endRays=endRays->rest;
+    if (numOfRays >= 0) {
+      for (j=0; j<numOfRays; j++) {
+        in >> k;
+        v=constructRay(vertices[i],vertices[k-1],numOfVars-1);
+        endRays->rest=createListVector(v);
+        endRays=endRays->rest;
+      }
+    }
+    else {
+      // numOfRays<0 means that the list of adjacencies is inverted.
+      numOfRays += numOfVertices;
+      int r = 1;
+      for (j = 0; j < numOfRays; ++j) {
+          in >> k;
+          while (r < k) {
+            v=constructRay(vertices[i],vertices[r-1],numOfVars-1);
+            endRays->rest=createListVector(v);
+            endRays=endRays->rest;
+            ++r;
+          }
+          ++r;
+      }
+      while (r <= numOfVertices) {
+        v=constructRay(vertices[i],vertices[r-1],numOfVars-1);
+        endRays->rest=createListVector(v);
+        endRays=endRays->rest;
+        ++r;
+      }
     }
 
     tmp->rays=rays->rest;

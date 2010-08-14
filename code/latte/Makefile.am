@@ -165,8 +165,10 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
+if HAVE_LIDIA
 check_PROGRAMS = ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
+endif
 
 TESTS = $(check_PROGRAMS)
 # Maple code

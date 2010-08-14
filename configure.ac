@@ -62,18 +62,12 @@ LB_CHECK_LIDIA(,,
 AC_CACHE_SAVE
 
 # From CDD+
-AC_PATH_PROGS(CDD, [cddr+_gmp cddr+])
-AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD+ binary.])
+AC_PATH_PROGS(CDD, [scdd_gmp scdd])
+AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD binary.])
 if test -z "$CDD"; then
-  AC_MSG_ERROR([The `cddr+' binary from CDD+ is required for LattE.])			
+  AC_MSG_ERROR([The `scdd_gmp' or `scdd' binary from CDDLIB is required for LattE.])			
 fi
-dnl Does not work.......
-dnl # From cddlib or CDD+
-dnl AC_PATH_PROGS(CDD, [scdd_gmp cddr+_gmp cddr+])
-dnl AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to cddlib's scdd_gmp executable (or CDD+).])
-dnl if test -z "$CDD"; then
-dnl   AC_MSG_ERROR([The `scdd_gmp' binary from cddlib or `cddr+' binary from CDD+ is required for LattE.])			
-dnl fi
+
 AC_CACHE_SAVE
 
 # From cddlib
