@@ -104,15 +104,24 @@ EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/integrateAsFunction.mw -
 EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/mapleBean.mpl -text
 EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/plotFuctionNorm.mw -text
 EXAMPLES/volumeIntegrationPaperComparison/Henrion/paper/appVolumeIntegrationBasicSemiAlgebraicSets.pdf -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/README.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/ch3.1 -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/ch3.2 -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/ch3.3 -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/paper/Mark[!!-~]Korenblit1.pdf -text svneol=unset#unset
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/README.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p1.latte.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p2.latte.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p3.latte.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p4.latte.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p5.latte.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p6.latte.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p7.latte.txt -text
+EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/paper/OngVolumeExperiments.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/bueler/READEME.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/paper/bueler.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.tex -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/README.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/ch3.1 -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/ch3.2 -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/ch3.3 -text
-EXAMPLES/volumeIntegrationPaperComparison/markKorenblit/paper/Mark[!!-~]Korenblit1.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/Fausto[!!-~]Bernardini.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/RATHOD.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
