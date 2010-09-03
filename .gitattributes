@@ -1,4 +1,5 @@
 * text=auto !eol
+EXAMPLES/aimPresentation/notes.txt -text
 EXAMPLES/ccp/ccp_5.ext -text
 EXAMPLES/ccp/ccp_5.ine -text
 EXAMPLES/ccp/ccp_6.ext -text

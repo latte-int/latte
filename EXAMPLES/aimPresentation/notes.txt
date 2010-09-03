@@ -1,0 +1,22 @@
+
+
+
+
+
+examples:
+1x1 sq of volume
+1x1 sq of x^2 + y^2
+cubeocthedron.
+
+
+
+integral:
+birkoff 4 : 9-var polynomial.
+hyper-rectangle.
+cubeocthedron any function.
+
+
+
+
+
+
