@@ -100,7 +100,8 @@ listCone*
 decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
 	       char *File_Name, int max_determinant,
 	       bool dualize,
-	       BarvinokParameters::DecompositionType decomposition)
+	       BarvinokParameters::DecompositionType decomposition,
+	       bool debug_triangulation)
 {
   Collecting_Single_Cone_Parameters parameters;
   parameters.Flags = Flags;
@@ -108,6 +109,7 @@ decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
   parameters.max_determinant = max_determinant;
   parameters.File_Name = File_Name;
   parameters.decomposition = decomposition;
+  parameters.debug_triangulation = debug_triangulation;
   return decomposeCones(cones, dualize, parameters);
 }
 

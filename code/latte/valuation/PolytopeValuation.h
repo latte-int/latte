@@ -78,7 +78,7 @@ public:
 	RationalNTL findVolumeUsingLawrence();
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
-	RationalNTL integrate(const monomialSum& polynomial); //integrates the polynomial over the polytope. The polytope is written in maple syntax.
+	RationalNTL integrate(const monomialSum& polynomial); //integrates the polynomial over the polytope.
 	ZZ static lcm(const ZZ &a, const ZZ & b);
 	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
 	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly

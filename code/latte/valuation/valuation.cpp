@@ -10,24 +10,27 @@
 /**
  * Computes the volume of the polytope.
  */
-ValuationContainer Valuation::computeVolume(Polyhedron * poly,
+Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
 		const char * print)
 {
 	ValuationContainer ans;
+	ValuationData timer_and_result;
 	RationalNTL ans1, ans2;
-	Timer timer("");
+
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
 	{
 		PolytopeValuation polytopeValuation(poly, myParameters);
-		timer.start();
+		timer_and_result.timer.start();
 		ans1 = polytopeValuation.findVolume(
 				PolytopeValuation::DeterminantVolume);
-		timer.stop();
-		cout << "(using triangulation-determinant method) VOLUME " << ans1
-				<< endl;
-		cout << "Time for the triangulation-determinant method" << timer << endl;
+		timer_and_result.timer.stop();
+
+
+		timer_and_result.valuationType = ValuationData::volumeTriangulation;
+		timer_and_result.answer = ans1;
+		ans.add(timer_and_result);
 	}//if triangulate
 
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
@@ -35,15 +38,16 @@ ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 	{
 
 		PolytopeValuation polytopeValuation(poly, myParameters);
-		timer.start();
+		timer_and_result.timer.start();
 		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
-		timer.stop();
-		cout << "(using Lawrence method) VOLUME " << ans2 << endl;
-		cout << "Time for the Lawrence method" << timer << endl;
+		timer_and_result.timer.stop();
 
 		if (*print == 'y')
 			polytopeValuation.printLawrenceVolumeFunction(); //print the lawrence rational function.
 
+		timer_and_result.valuationType = ValuationData::volumeLawrence;
+		timer_and_result.answer = ans2;
+		ans.add(timer_and_result);
 	}//if lawrence
 
 	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
@@ -52,17 +56,8 @@ ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 				<< ans2 << endl;
 		exit(1);
 	}//if error.
-	else if (strncmp(valuationAlg, "lawrence", 8) == 0)
-		cout << "Decimal: " << ans2.to_RR() << endl; //lawrence.
-	else
-		cout << "Decimal: " << ans1.to_RR() << endl; //triangulate or all.
-
-
-	ans.lawrence = ans2;
-	ans.triangulate = ans1;
 
 	return ans;
-
 }//computeVolume
 
 /**
@@ -71,29 +66,28 @@ ValuationContainer Valuation::computeVolume(Polyhedron * poly,
  * Currently returns a ValuationContainer object because we might
  * add Lawrence functionality in the future. --Brandon July 2010
  */
-ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
+Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
 		const char *printLawrence, const char * polynomialString)
 {
 	ValuationContainer answer;
+	ValuationData timer_and_result;
 	RationalNTL ans1;
+
 	monomialSum originalPolynomial;// polynomial without the updated coefficients.
-	Timer timer("Integration time");
 	PolytopeValuation polytopeValuation(poly, myParameters);
 
 	loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
-	timer.start();
+	timer_and_result.timer.start();
 	ans1 = polytopeValuation.integrate(originalPolynomial);
-	timer.stop();
-	cout << "integrate answer = " << ans1 << endl;
-	cout << "Decimal answer = " << ans1.to_RR() << endl;
-	cout << timer << endl;
+	timer_and_result.timer.stop();
 
-	answer.triangulate = ans1;
+	timer_and_result.valuationType = ValuationData::integrateTriangulation;
+	timer_and_result.answer = ans1;
+	answer.add(timer_and_result);
 
 	destroyMonomials(originalPolynomial);
 	return answer;
-
 }//computeIntegral
 
 
@@ -108,7 +102,7 @@ static void Valuation::usage(const char *progname)
 /**
  * The main function and reads in the polytope and computes a valuation.
  */
-ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
+Valuation::ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 {
 	ValuationContainer valuationAnswers;
 	set_program_name(argv[0]);
@@ -419,9 +413,13 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 	//params->File_Name = fileName;
 	params->decomposition = BarvinokParameters::DualDecomposition;
 
+
+
 	if (strcmp(valuationType, "volume") == 0)
+	{
 		valuationAnswers = computeVolume(Poly, *params, valuationAlg,
 				printLawrence);
+	}
 	else if (strcmp(valuationType, "integrate") == 0) //add input of polynomial.
 	{
 		//read the polynomial from the file or from std in.
@@ -461,6 +459,12 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 		cerr << "ops, valuation type is not known: " << valuationType << endl;
 		exit(1);
 	}//else error. This else block should not be reachable!
+	ValuationData totalValuationTimer;
+	totalValuationTimer.valuationType = ValuationData::entireValuation;
+	params->total_time.stop();
+	totalValuationTimer.timer = params->total_time;
+	valuationAnswers.add(totalValuationTimer);
+
 
 	freeListVector(read_polyhedron_data.templistVec);
 	freeListVector(read_polyhedron_data.matrix);
@@ -516,28 +520,79 @@ ValuationContainer Valuation::mainValuationDriver(const char *argv[], int argc)
 
 	}
 
-	params->total_time.stop();
-	cerr << params->total_time;
+
 	delete params;
 
+	valuationAnswers.printResults(cout);
 	return valuationAnswers;
 }//mainValuationDriver
+
+Valuation::ValuationData::ValuationData(): timer(string(""), false){
+}
+
+
+void Valuation::ValuationContainer::add(const ValuationData & d ) { answers.push_back(d);}
+
+void Valuation::ValuationContainer::printResults(ostream & out) const
+{
+	for(int i = 0; i < answers.size(); ++i)
+	{
+		if ( answers[i].valuationType == ValuationData::volumeLawrence)
+			out << "Volume (using the Lawrence method)" << endl;
+		else if (  answers[i].valuationType == ValuationData::volumeTriangulation)
+			out << "Volume (using the triangulation-determinant method)" << endl;
+		else if ( answers[i].valuationType == ValuationData::integrateTriangulation)
+			out << "Integration (using the triangulation method)" << endl;
+		else if ( answers[i].valuationType == ValuationData::entireValuation)
+		{
+			out << "Computational time (algorithms + processing + program control)" << endl;
+			out << "     " << answers[i].timer;
+			continue;
+		}
+
+		out << "     Answer: " << answers[i].answer << endl;
+		out << "     Decimal: " << answers[i].answer.to_RR() << endl;
+		out << "     Time" << answers[i].timer;
+	}//for each valuation entry.
+
+}//printResults
+
 
 
 /**
  * Checks to see if the triangulation and lawrence volume equal the expected volume.
  */
 void VolumeTests::printVolumeTest(const RationalNTL &correctVolumeAnswer,
-		ValuationContainer volumeAnswer, const string &file,
+		const Valuation::ValuationContainer & valuationResults, const string &file,
 		const string &comments)
 {
-	if (correctVolumeAnswer != volumeAnswer.lawrence || correctVolumeAnswer
-			!= volumeAnswer.triangulate)
+	RationalNTL lawrence, triangulate;
+	int found = 0;
+
+	for(int i = 0; i < valuationResults.answers.size(); ++i)
+		if ( valuationResults.answers[i].valuationType == Valuation::ValuationData::volumeLawrence)
+		{
+			++found;
+			lawrence = valuationResults.answers[i].answer;
+		}
+		else if ( valuationResults.answers[i].valuationType == Valuation::ValuationData::volumeTriangulation)
+		{
+			++found;
+			triangulate = valuationResults.answers[i].answer;
+		}
+	if ( found != 2)
+	{
+		cerr << "VolumeTests::printVolumeTest: could not find lawrence and triangulation volumes." << endl;
+		exit(1);
+	}
+
+	if (correctVolumeAnswer != lawrence || correctVolumeAnswer
+			!= triangulate)
 	{
 		cerr << "******* ERROR ******" << endl;
 		cerr << "correct answer: " << correctVolumeAnswer << endl;
-		cerr << "lawrence: " << volumeAnswer.lawrence << endl;
-		cerr << "triangulate: " << volumeAnswer.triangulate << endl;
+		cerr << "lawrence: " << lawrence << endl;
+		cerr << "triangulate: " << triangulate << endl;
 		cerr << "see file " << file.c_str() << endl;
 		exit(1); //dont' delete the latte file.
 	}//if error
@@ -630,14 +685,14 @@ void VolumeTests::runHyperSimplexTests()
 	 {10, 1, 1, 362880},
 	 {10, 2, 251, 181440},
 	 {10, 3, 913, 22680},
-	 {10, 4, 44117, 181440},*/
-	{ 10, 5, 15619, 36288 }, //start here
+	 {10, 4, 44117, 181440},
+	{ 10, 5, 15619, 36288 },
 
 			{ 11, 1, 1, 3628800 },
 			{ 11, 2, 1013, 3628800 },
 			{ 11, 3, 299, 22680 },
-			{ 11, 4, 56899, 45300 },
-			{ 11, 5, 655177, 1814400 },
+			{ 11, 4, 56899, 453600 }, */ 
+			{ 11, 5, 655177, 1814400 }, //start here
 			{ 12, 1, 1, 39916800 },
 			{ 12, 2, 509, 9979200 },
 			{ 12, 3, 50879, 13305600 },
@@ -647,7 +702,7 @@ void VolumeTests::runHyperSimplexTests()
 
 	int numberTestCases = 34;
 
-	ValuationContainer volumeAnswer;
+	Valuation::ValuationContainer volumeAnswer;
 	for (int i = 0; i < numberTestCases; ++i)
 	{
 		stringstream comments;
@@ -703,7 +758,7 @@ void VolumeTests::runBirkhoffTests()
 	};
 	int numberTestCases = 3;
 
-	ValuationContainer volumeAnswer;
+	Valuation::ValuationContainer volumeAnswer;
 	const char * argv[] =
 	{ "runBirkhoffTests()", "--valuation=volume", "--all", 0 };
 

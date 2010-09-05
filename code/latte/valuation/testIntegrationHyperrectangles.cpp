@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
 
 	RationalNTL correctAnswer(argv[1]);
-	ValuationContainer answer;
+	Valuation::ValuationContainer valuationContainer;
 
 	char * options[4];
 
@@ -37,15 +37,15 @@ int main(int argc, char *argv[])
 	strcat(options[2], argv[2]);
 	options[3] = argv[3];
 
-	answer = Valuation::mainValuationDriver((const char **)options, 4);
+	valuationContainer = Valuation::mainValuationDriver((const char **)options, 4);
 	delete options[2];
 
 
-	if ( answer.triangulate != correctAnswer)
+	if ( valuationContainer.answers[0].answer != correctAnswer)
 	{
 		cout << "******ERROR*******" << endl;
 		cout << "correct answer  = " << correctAnswer << endl;
-		cout << "computed answer = " << answer.triangulate << endl;
+		cout << "computed answer = " << valuationContainer.answers[0].answer << endl;
 
 		return 2;
 	}

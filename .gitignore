@@ -156,9 +156,9 @@ code/gnulib/alloca.h
 code/gnulib/stdlib.h
 code/gnulib/string.h
 code/gnulib/unistd.h
-code/latte/*.er
-code/latte/*.qv
 code/latte/.deps
+code/latte/.nfs*
+code/latte/4ti2_triangulation_output
 code/latte/BlockIntegrate
 code/latte/BurstIntegrate
 code/latte/Check_emp.ddl
@@ -169,6 +169,7 @@ code/latte/ComputeAdjacency
 code/latte/Error
 code/latte/Makefile
 code/latte/Makefile.in
+code/latte/SavedFiles
 code/latte/SunWS_cache
 code/latte/ValuationComputation
 code/latte/aggregate
@@ -180,11 +181,15 @@ code/latte/barvinok/SunWS_cache
 code/latte/compare
 code/latte/complete-boundary-triangulation
 code/latte/count
+code/latte/cube5*
+code/latte/cubeH*
+code/latte/cubeocthedron
 code/latte/ehrhart
 code/latte/ehrhart3
 code/latte/genFunction/.deps
 code/latte/genFunction/.dirstamp
 code/latte/genFunction/SunWS_cache
+code/latte/gmon.out
 code/latte/gmptest
 code/latte/ilio_test
 code/latte/integrate_demo
@@ -199,10 +204,13 @@ code/latte/latte-maximize
 code/latte/latte-minimize
 code/latte/latte2ext
 code/latte/latte2ine
+code/latte/longRunningTests
 code/latte/maximize
 code/latte/minimize
 code/latte/multiply_test
+code/latte/myTest
 code/latte/myTestEhrhart
+code/latte/negativeCoeff
 code/latte/normalize/.deps
 code/latte/normalize/Makefile
 code/latte/normalize/Makefile.in
@@ -212,6 +220,7 @@ code/latte/numOfLatticePoints
 code/latte/numOfUnimodularCones
 code/latte/polyhedron-to-cones
 code/latte/redcheck
+code/latte/savedfiles
 code/latte/simple-count
 code/latte/test-todd
 code/latte/testEhrhart/.deps

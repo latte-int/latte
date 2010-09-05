@@ -223,7 +223,14 @@ testPolytopeIntegration_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
 testPolytopeIntegration_LDADD = $(LDADD)
 testPolytopeIntegration_LDADD += liblatteintegration.a
 
-
+check_PROGRAMS += TestVolumeHypersimplex
+TestVolumeHypersimplex_SOURCES = valuation/testVolumeHypersimplex.cpp
+TestVolumeHypersimplex_SOURCES += valuation/valuation.cpp
+TestVolumeHypersimplex_SOURCES += valuation/PolytopeValuation.cpp
+TestVolumeHypersimplex_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
+TestVolumeHypersimplex_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
+TestVolumeHypersimplex_LDADD = $(LDADD)
+TestVolumeHypersimplex_LDADD += liblatteintegration.a
 
 ################ INTEGRATION ####################
 

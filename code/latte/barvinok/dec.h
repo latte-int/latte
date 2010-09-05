@@ -44,7 +44,8 @@ listCone*
 decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
 	       char *File_Name, int max_determinant,
 	       bool dualize,
-	       BarvinokParameters::DecompositionType decomposition);
+	       BarvinokParameters::DecompositionType decomposition,
+	       bool debug_triangulation = false);
 // Nicer, more general interface:
 listCone*
 decomposeCones(listCone *cones, bool dualize,

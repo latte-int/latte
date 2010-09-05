@@ -71,15 +71,44 @@
 
 using namespace std;
 
-typedef struct
-{
-	RationalNTL triangulate;
-	RationalNTL lawrence;
 
-} ValuationContainer;
+
+
+
 
 namespace Valuation
 {
+class ValuationData
+{
+public:
+	//Notes:
+	//1) volumeLawrence, volumeTriangulation, and integrateTriangulation timers
+	//start from when the tangent cones are computed to the volume/integral computation.
+	//2) entireValuation timer starts from when mainValuationDriver is called to when it finishes.
+	//Also "answer" is meaningless for "entireValuation".
+
+	enum ValuationType { unknown, volumeLawrence, volumeTriangulation, integrateTriangulation, entireValuation};
+	ValuationType valuationType;
+	RationalNTL answer;
+	Timer timer;
+
+	ValuationData();
+};
+
+
+class ValuationContainer
+{
+
+public:
+	vector<ValuationData> answers;
+
+	//Adds a ValuationData to the vector
+	void add(const ValuationData & d );
+
+	//Prints the stats: valuation type, valuation time, total program time, etc.
+	void printResults(ostream & out) const;
+};
+
 
 ValuationContainer computeVolume(Polyhedron * poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
@@ -92,6 +121,10 @@ ValuationContainer computeIntegral(Polyhedron *poly,
 ValuationContainer mainValuationDriver(const char *argv[], int argc);
 
 static void usage(const char *progname);
+
+
+
+
 }//namespace Valuation
 
 
@@ -100,7 +133,7 @@ namespace VolumeTests
 {
 
 void printVolumeTest(const RationalNTL &correctVolumeAnswer,
-		ValuationContainer volumeAnswer, const string &file,
+		const Valuation::ValuationContainer & valuationResults, const string &file,
 		const string &comments);
 
 void runOneTest(int ambientDim, int numPoints);
