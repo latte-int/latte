@@ -256,10 +256,11 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 	for (int i = 0; i < numOfVars; i++)
 		c[i] = rand() % 10000;
 
+	//int coneCounter = 0;
 	for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
 			= simplicialCone->rest)
 	{
-
+		//cout << "Processing cone " << ++coneCounter << endl;
 		//find vertex
 		vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
 				numOfVars, tempDenom);

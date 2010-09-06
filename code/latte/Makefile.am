@@ -214,6 +214,11 @@ ValuationComputation_LDADD += liblatteintegration.a
 noinst_HEADERS += valuation/PolytopeValuation.h
 noinst_HEADERS += valuation/valuation.h
 
+bin_PROGRAMS += ConvertCDDextToLatte
+ConvertCDDextToLatte_SOURCES = convertCDD_ext_to_latte.cpp
+#ConvertCDDextToLatte_SOURCES == rational.cpp
+ConvertCDDextToLatte_LDADD = $(LDADD)
+
 check_PROGRAMS += testPolytopeIntegration
 testPolytopeIntegration_SOURCES = valuation/testIntegrationHyperrectangles.cpp 
 testPolytopeIntegration_SOURCES += valuation/valuation.cpp

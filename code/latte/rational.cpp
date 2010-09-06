@@ -239,6 +239,12 @@ RationalNTL RationalNTL::operator/(const RationalNTL & rhs) const
 	return answer.div(rhs);
 }
 
+RationalNTL RationalNTL::operator/(const ZZ & rhs) const
+{
+	RationalNTL answer(*this);
+	return answer.div(rhs);
+}
+
 const ZZ & RationalNTL::getNumerator() const
 {
 	return numerator;
@@ -405,6 +411,7 @@ ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
 		out << "/" << rationalNTL.denominator;
 	return out;
 }
+
 
 /* ----------------------------------------------------------------- */
 
