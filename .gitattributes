@@ -121,7 +121,6 @@ EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p7.latte.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/paper/OngVolumeExperiments.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/bueler/READEME.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/paper/bueler.pdf -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.tex -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/Fausto[!!-~]Bernardini.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/RATHOD.pdf -text svneol=unset#unset
