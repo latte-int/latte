@@ -126,7 +126,6 @@ EXAMPLES/volumeIntegrationPaperComparison/notStarted/Fausto[!!-~]Bernardini.pdf 
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/RATHOD.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/alanGenz.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/notStarted/ong.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/shaoweiLin.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/zhiqiangXu.pdf -text
 code/latte/burstmapletest.mpl -text
