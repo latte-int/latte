@@ -35,6 +35,7 @@ public:
   Timer(const std::string &a_name, bool start_timer = false);
   void start();
   void stop();
+  void clear();
   float get_seconds() const;
   friend std::ostream &operator<< (std::ostream &s, const Timer &timer);
 };

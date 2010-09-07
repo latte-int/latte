@@ -58,6 +58,11 @@ void Timer::stop()
   started = false;
 }
 
+void Timer::clear()
+{
+	assert(!started);
+	ticks_elapsed = 0;
+}
 float Timer::get_seconds() const
 {
   assert(!started);

@@ -33,6 +33,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		ans.add(timer_and_result);
 	}//if triangulate
 
+	timer_and_result.timer.clear();
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
 			|| strcmp(valuationAlg, "all") == 0)
 	{
@@ -448,7 +449,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(const char *argv[],
 			inFile.close();
 		} else
 		{
-			cerr << "Enter Polynomial >";
+			cerr << "Enter Polynomial of dimension " << (Poly->homogenized ? Poly->numOfVars -1 : Poly->numOfVars) << ">";
 			getline(inStream, polynomialLine, '\n');
 		}//user supplied polynomial in file.
 
