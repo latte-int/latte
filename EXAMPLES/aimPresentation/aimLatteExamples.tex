@@ -14,6 +14,7 @@
 \usepackage{amssymb}
 \usepackage{latexsym}
 \usepackage{multirow}
+\usepackage{verbatim}
 %\usepackage{algorithm}
 
 
@@ -180,18 +181,6 @@ Time: 0.00 sec
 
 
 
-\frame{
-\frametitle{Data Structures}
-The data structure used by LattE to store the monomials and powers of linear forms is a burst trie, which is a 
-fancy prefix tree.   Standard trees use pointers (references to memory locations) to point to other points of 
-the tree, each path culminating in an entire record of what is stored in the tree.  Prefix trees differ by 
-forgetting whatever was used to traverse the tree up to that point.  As an example, say that we are looking for 
-the word serendipitously.  If we had traversed four levels down the trie, we would have stored sere as the prefix, 
-meaning from our current position in the tree we could reach any words beginning with sere, such as serene.  
-For a more detailed explanation either look up burst trie on google or contact the people who implemented it for 
-LattE.
-}%frame
-
 \section{Integration}
 
 \frame{
@@ -222,15 +211,62 @@ LattE.
 \frametitle{Algorithm 2 / 2}
 Now the problem is that this powerful formula uses linear forms.  Luckily for us, there is a closed formula to break down any normal polynomial into a sum of linear forms. 
 For any monomial $x_1^{M_1}x_2^{M_2}...x_n^{M_n}$, we can break it into the following sum of powers of linear forms:
-$\frac{1}{|M|!}\sum(-1^{|M|-(p_1+...+p_n)}\binom{M_1}{p_1}...\binom{M_n}{p_n}(p_1x_1 + ... + p_nx_n)^{|M|}$
+$\frac{1}{|M|!}\sum_{0\leq p_1 \leq M_i} (-1^{|M|-(p_1+...+p_n)}\binom{M_1}{p_1}...\binom{M_n}{p_n}(p_1x_1 + ... + p_nx_n)^{|M|}$
 where $|M| = \sum_{1\leq i\leq n}M_i$
 
-By applying this formula to each monomial in the polynomial, we get the linear sums which we then use to integrate over the current simplex.
+By applying this formula to each monomial in the polynomial, we get the powers linear forms which sum to the original polynomial, which we then use to integrate over the current simplex.
 }%frame
 
 \frame{
-\frametitle{Examples}
+\frametitle{Representation}
+\begin{itemize}
+\item Linear forms are represented by strings of the form [[coefficient, power,[coefficients of the linear form]],...]
+\item Polynomials are represented by strings of the form [[coefficient,[exponent vector]],...]
+\item Simplices for integration are represented by [[coordinates],...]
+\end{itemize}
+If no input file is specified for the polynomial you can input the polynomial by hand when prompted.
 }%frame
 
+
+\frame{
+\frametitle{Data Structures}
+Originally, the monomials and linear forms were implemented as a pair of lists.  In the case of monomials, there was a list of coefficients and a list of coefficient vectors which would be traversed simultaneously.  A very similar structure was used for powers of linear forms.  This implementation was slow because a linear search would have to be performed every time a new term was to be added to make sure it wasn't a duplicate entry.  This implementation was changed to a structure called a burst trie, which is an adaptive prefix tree, allowing for efficient space usage while sorting for easy duplication checking.
+}%frame
+
+\frame{
+\frametitle{Example 1}
+Let us go back to our friend the unit square.  Let us say we wish to compute $\int_0^1\int_0^1x\dy\dx$.
+
+We must first create a file containing the polynomial:
+
+\begin{block}<+->{xMonomial.txt}
+	[[1,[1,0]]]
+\end{block}
+}%frame
+
+\frame{
+\frametitle{Example 1 cont.}
+Once we have the monomial in a file we simply execute the command
+
+\begin{block}<+->{Command:}
+./ValuationComputation  --valuation=integrate --monomials=xMonomial.txt square.latte
+\end{block}
+
+and we are able to quickly verify the output of 1/2 is correct by a quick integration by hand or head.
+}%frame
+
+\frame{
+\frametitle{Example 2}
+Let us choose both a more complex region to integrate over and a more complex polynomial to integrate.
+One readily available example that comes with LattE is the 24-cell.  We first make a file containing the polynomial $5x_1^2x_2^2x_3^4 - 3x_1x_3^4x_4^3$ and call it what we wish (assume polynomial.txt for now).  We then execute the command
+
+\begin{block}<+->{Command:}
+./ValuationComputation  --valuation=integrate --monomials=polynomial.txt \{path to EXAMPLES/24{\_}cell\}
+\end{block}
+
+Unless you move files around, this path will be ../../EXAMPLES/24{\_}cell.
+
+We can safely assume the answer of 449/8910 is correct.
+}%frame
 
 \end{document}
