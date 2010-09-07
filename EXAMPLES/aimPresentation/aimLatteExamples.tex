@@ -252,7 +252,10 @@ Once we have the monomial in a file we simply execute the command
 ./ValuationComputation  --valuation=integrate --monomials=xMonomial.txt square.latte
 \end{block}
 
-and we are able to quickly verify the output of 1/2 is correct by a quick integration by hand or head.
+\begin{block}<+->{Output:}
+integrate answer: 1 / 2 \\*
+Total time = 0.00 sec
+\end{block}
 }%frame
 
 \frame{
@@ -266,7 +269,29 @@ One readily available example that comes with LattE is the 24-cell.  We first ma
 
 Unless you move files around, this path will be ../../EXAMPLES/24{\_}cell.
 
+\begin{block}<+->{Output:}
+integrate answer: 449 / 8910 \\*
+Total time = 0.4 sec
+\end{block}
+
 We can safely assume the answer of 449/8910 is correct.
+}%frame
+
+\frame{
+\frametitle{Example 3}
+Let us end the examples by integrating over Birkhoff 4.  Once again, LattE has this polyopt in the EXAMPLES folder.
+After we make the file of the polynomial $3x_1^3x_2x_5^2 + x_3x_7^2x_9^3 - 2x_4^3x_6^2x_8$, we execute the command
+
+\begin{block}<+->{Command:}
+./ValuationComputation  --valuation=integrate --monomials=polynomial.txt ../../EXAMPLES/birkhoff/birkhoff-4.latte
+\end{block}
+
+\begin{block}<+->{Output:}
+integrate answer: 18461 / 6054048000 \\*
+Total time = 3.23 sec
+\end{block}
+
+Once again, we can assume the answer of 18461/6054048000 is correct.
 }%frame
 
 \end{document}
