@@ -1,4 +1,11 @@
 * text=auto !eol
+EXAMPLES/aimPresentation/aimLatteExamples.tex -text
+EXAMPLES/aimPresentation/examples/square.latte -text
+EXAMPLES/aimPresentation/img/cube.png -text
+EXAMPLES/aimPresentation/img/cubeVertex.png -text
+EXAMPLES/aimPresentation/img/cubeVertex.xcf -text
+EXAMPLES/aimPresentation/img/unitSquare.png -text
+EXAMPLES/aimPresentation/img/unitSquare.xcf -text
 EXAMPLES/aimPresentation/notes.txt -text
 EXAMPLES/ccp/ccp_5.ext -text
 EXAMPLES/ccp/ccp_5.ine -text
