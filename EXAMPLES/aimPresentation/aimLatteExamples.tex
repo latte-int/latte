@@ -182,18 +182,51 @@ Time: 0.00 sec
 
 \frame{
 \frametitle{Data Structures}
-
+The data structure used by LattE to store the monomials and powers of linear forms is a burst trie, which is a 
+fancy prefix tree.   Standard trees use pointers (references to memory locations) to point to other points of 
+the tree, each path culminating in an entire record of what is stored in the tree.  Prefix trees differ by 
+forgetting whatever was used to traverse the tree up to that point.  As an example, say that we are looking for 
+the word serendipitously.  If we had traversed four levels down the trie, we would have stored sere as the prefix, 
+meaning from our current position in the tree we could reach any words beginning with sere, such as serene.  
+For a more detailed explanation either look up burst trie on google or contact the people who implemented it for 
+LattE.
 }%frame
 
 \section{Integration}
 
 \frame{
-\frametitle{Algorithm}
+\frametitle{Algorithm 1 / 2}
 \begin{itemize}
-\item
-\item
+\item BACKGROUND MATH 1: \int_\Delta l^m \d m' = d!vol(\Delta, \d m')\frac{m!}{(m+d)!}
+                            \Big(\sum_{i=1}^{d+1}
+                                  \frac{ <l, s_i >^{M+d}}
+                                       {\prod_{j\neq i} <l, s_i- s_j >}
+                            \Big),
+                            
+ Where $\Delta$ is a regular integer-vertex simplex, d is the dimension, l is a linear form, $s_i$ are the verties.
+
+\item BACKGROUND MATH 2:
+  \int_{\Delta} l^m  \d m' = 
+  d!vol(\Delta, \d m') \frac{m!}{(m+d)!}
+                             \sum_{k\in K} Res_{z=0}
+                                  \frac{(z + <l, s_k>)^{m+d}}
+                                       {\z^{m_k} {\prod_{i\in K, i \neq k} {(z + <l, s_k - s_i> )}^{m_i}} }
+ 
+ as above and if the simplex is not regular, and where $K\subseteq\{1,\dots,d+1\}$ is an index set of the different poles
+ $t= 1/\langle \l ,s_k\rangle$, and for $k\in K$ let $m_k$ denote the order of the pole, i.e.,
+   $m_k$ = size of the set ${ i \in \{1,\dots,d+1\} : <l ,s_i> = <l ,s_k> }$. 
 \end{itemize}
 }%frame	
+
+\frame{
+\frametitle{Algorithm 2 / 2}
+Now the problem is that this powerful formula uses linear forms.  Luckily for us, there is a closed formula to break down any normal polynomial into a sum of linear forms. 
+For any monomial $x_1^{M_1}x_2^{M_2}...x_n^{M_n}$, we can break it into the following sum of powers of linear forms:
+$\frac{1}{|M|!}\sum(-1^{|M|-(p_1+...+p_n)}\binom{M_1}{p_1}...\binom{M_n}{p_n}(p_1x_1 + ... + p_nx_n)^{|M|}$
+where $|M| = \sum_{1\leq i\leq n}M_i$
+
+By applying this formula to each monomial in the polynomial, we get the linear sums which we then use to integrate over the current simplex.
+}%frame
 
 \frame{
 \frametitle{Examples}
