@@ -1,0 +1,4 @@
+Kneser graph with 2 < 5, edge encoding (isomorphic to Petersen graph).
+
+Take all subsets of order m from a set of n. The size is then d = (n!)/(n - m)!m!.
+Let e_i, e_j be unit vectors in R^d, and let i, j correspond to a subset. If i instercept j = {}, then add e_i + e_j as a vertex to a polytope.

@@ -1,0 +1,4 @@
+
+Take a 3x3 chessboard. Connect same-colored squares and the border, then take the sym. edge encoding.
+
+

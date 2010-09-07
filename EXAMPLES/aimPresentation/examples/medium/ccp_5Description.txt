@@ -1,0 +1,1 @@
+ccp: complete cut polytopes on 5 vertices. The polytope has been scaled by 2 and then translated by 1 to contain the origin in their interor. So their vertices have coordinates +1 and -1 now.

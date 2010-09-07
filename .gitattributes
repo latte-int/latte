@@ -1,6 +1,25 @@
 * text=auto !eol
 EXAMPLES/aimPresentation/aimLatteExamples.tex -text
-EXAMPLES/aimPresentation/examples/square.latte -text
+EXAMPLES/aimPresentation/examples/easy/birkhoff-4.latte -text
+EXAMPLES/aimPresentation/examples/easy/birkhoff-4.latte.polynomial -text
+EXAMPLES/aimPresentation/examples/easy/checkGraph3_3_se.latte -text
+EXAMPLES/aimPresentation/examples/easy/checkGraph3_3_se.polynomial -text
+EXAMPLES/aimPresentation/examples/easy/checkGraph3_3_seDescription.txt -text
+EXAMPLES/aimPresentation/examples/easy/cubeocthedron -text
+EXAMPLES/aimPresentation/examples/easy/cubeocthedron.polynomial -text
+EXAMPLES/aimPresentation/examples/easy/hyperrectangle.latte -text
+EXAMPLES/aimPresentation/examples/easy/hyperrectangle.polynomial -text
+EXAMPLES/aimPresentation/examples/easy/hyperrectangleDescription.txt -text
+EXAMPLES/aimPresentation/examples/easy/kneser2_5_edge.latte -text
+EXAMPLES/aimPresentation/examples/easy/kneser2_5_edge.polymake -text
+EXAMPLES/aimPresentation/examples/easy/kneser2_5_edge.polynomial -text
+EXAMPLES/aimPresentation/examples/easy/kneser2_5_edgeDescription.tet -text
+EXAMPLES/aimPresentation/examples/easy/magic4x4 -text
+EXAMPLES/aimPresentation/examples/easy/magic4x4.polynomial -text
+EXAMPLES/aimPresentation/examples/easy/square.latte -text
+EXAMPLES/aimPresentation/examples/easy/square.polynomial -text
+EXAMPLES/aimPresentation/examples/medium/ccp_5.ine -text
+EXAMPLES/aimPresentation/examples/medium/ccp_5Description.txt -text
 EXAMPLES/aimPresentation/img/cube.png -text
 EXAMPLES/aimPresentation/img/cubeVertex.png -text
 EXAMPLES/aimPresentation/img/cubeVertex.xcf -text
