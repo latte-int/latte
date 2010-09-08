@@ -31,3 +31,4 @@ doc/relocatable.texi -text
 m4/gnulib/absolute-header.m4 -text
 m4/gnulib/onceonly_2_57.m4 -text
 /manual_v1.1.pdf -text
+/reloc-ldflags -text
