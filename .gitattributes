@@ -27,6 +27,7 @@ distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
 doc/relocatable.texi -text
+/link-warning.h -text
 m4/gnulib/absolute-header.m4 -text
 m4/gnulib/onceonly_2_57.m4 -text
 /manual_v1.1.pdf -text
