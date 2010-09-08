@@ -2,10 +2,10 @@
    Copyright (C) 2003, 2005-2007 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
-   This program is free software: you can redistribute it and/or modify
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,17 +13,17 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 /* Dependencies:
    relocwrapper
     -> progname
     -> progreloc
-        -> areadlink
+        -> xreadlink
            -> readlink
         -> canonicalize-lgpl
            -> malloca
-           -> readlink
     -> relocatable
     -> setenv
        -> malloca
@@ -53,6 +53,7 @@
 
 #include "progname.h"
 #include "relocatable.h"
+#include "setenv.h"
 #include "c-ctype.h"
 
 /* Return a copy of the filename, with an extra ".bin" at the end.

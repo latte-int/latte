@@ -1,11 +1,11 @@
 /* Provide relocatable programs.
-   Copyright (C) 2003-2008 Free Software Foundation, Inc.
+   Copyright (C) 2003-2006 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
-   This program is free software: you can redistribute it and/or modify
+   This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   the Free Software Foundation; either version 2, or (at your option)
+   any later version.
 
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,7 +13,8 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
+   along with this program; if not, write to the Free Software Foundation,
+   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 
 #include <config.h>
@@ -43,15 +44,9 @@
 # include <windows.h>
 #endif
 
+#include "xreadlink.h"
 #include "canonicalize.h"
 #include "relocatable.h"
-
-#ifdef NO_XMALLOC
-# include "areadlink.h"
-# define xreadlink areadlink
-#else
-# include "xreadlink.h"
-#endif
 
 #ifdef NO_XMALLOC
 # define xmalloc malloc
@@ -281,7 +276,7 @@ static void
 prepare_relocate (const char *orig_installprefix, const char *orig_installdir,
 		  const char *argv0)
 {
-  char *curr_prefix;
+  const char *curr_prefix;
 
   /* Determine the full pathname of the current executable.  */
   executable_fullname = find_executable (argv0);
@@ -290,12 +285,8 @@ prepare_relocate (const char *orig_installprefix, const char *orig_installdir,
   curr_prefix = compute_curr_prefix (orig_installprefix, orig_installdir,
 				     executable_fullname);
   if (curr_prefix != NULL)
-    {
-      /* Now pass this prefix to all copies of the relocate.c source file.  */
-      set_relocation_prefix (orig_installprefix, curr_prefix);
-
-      free (curr_prefix);
-    }
+    /* Now pass this prefix to all copies of the relocate.c source file.  */
+    set_relocation_prefix (orig_installprefix, curr_prefix);
 }
 
 /* Set program_name, based on argv[0], and original installation prefix and

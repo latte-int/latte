@@ -3,6 +3,8 @@ AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = .
 SUBDIRS += normalize
 
+TESTS =
+
 bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext
 
 latte_maximize_SOURCES = maximize.cpp
@@ -166,10 +168,12 @@ endif
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
 
+check_PROGRAMS =
 
-TESTS = ilio_test
-check_PROGRAMS = ilio_test
+if HAVE_LIDIA
+check_PROGRAMS += ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
+endif
 
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
