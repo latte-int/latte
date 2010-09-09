@@ -1,52 +1,203 @@
-
-
-with(linalg):with(LinearAlgebra):
+with(linalg):
+with(LinearAlgebra):
 read("integration/createLinear.mpl"): #load the function to make a random linear form
 read("testingSL/SL_lib.mpl");	#load the SL functions.
 
-
-#insert making  simplex H-rep here.
-
-
-test_sl_volume:=proc(simplexDim, numTests, fileBaseName)
-local simplexList, i, volumeAnswersLatte, fileNameSimplex, fileNameVolume, systemCommand, status:
-
-	fileNameSimplex:=baseFileName || ".simplex" :
-	fileNameVolume:=baseFileName || ".volume":
-
-	simplexList:= [];
-	for i from 1 to numTests do:
-		simplexList:=[[op(make_random_simplex(simplexDim))], op(simplexList)];
-	od;
-
-	write_simplex_to_file(simplexList, fileNameSimplex);
-
-	#Ask C++ exe to compute the volumes of the simplex.
-	systemCommand:= "./testVolumeForSL " || fileNameSimplex  || " " || fileNameVolume :
-	#print(systemCommand);
-	#status:=system(systemCommand):
-	#printf("status=%d\n", status);
+# A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
 
-	volumeAnswersLatte:=read_volume_from_file(fileNameVolume, numTests);
+#Input: simplexDim: the amb. dim of the simplex.
+#Output: returns a list of simplexDim+1 vectors in R^(simplexDim).
+create_random_simplex:=proc(simplexDim)
+	local i, j, M, checkRankMatrix:
+
+	do
+		M:=RandomMatrix(simplexDim+1, simplexDim) /~ ( abs(RandomMatrix(simplexDim+1, simplexDim)) +~ 1);
+		
+		checkRankMatrix:=RandomMatrix(simplexDim, simplexDim);
+		for i from 1 to simplexDim do
+			for j from 1 to simplexDim do
+				checkRankMatrix[i, j] := M[i, j] - M[simplexDim+1, j];
+			od;
+		od;
+		#print("got here");
+		#print(checkRankMatrix, "=checkRandMatrix");
+		
+		if Rank(checkRankMatrix) = simplexDim then:
+			break;
+		fi;
+	end do;
+	#print(M, "=M");
+	
+	return(convert(M, listlist));
 end:
 
 
+#This is the main function for testing volume between the SL functions and latte.
+#Input: dim. of the simplex, number of simplices you want to test, and base file name for savine latte's facets and volume answers.
+#Output: creates latte-style facet files and a volume file.
+test_sl_volume:=proc(simplexDim, numTests, baseFileName)
+local simplexList, i, volumeAnswersLatte, volumeAnswersSL, fileNameSimplex, fileNameVolume, systemCommand, status, equations:
+local fileNameSimplex_i, stringI, DD, stringNum, seed;
+
+	seed:=randomize();
+
+	fileNameSimplex:=baseFileName || ".simplex" :
+	fileNameVolume:=baseFileName || ".volume":
+	
+	#print(fileNameSimplex, "=fileNameSimplex");
+
+	#make the test simplex
+	simplexList:= [];
+	
+	for i from 1 to numTests do:
+		DD:=[[0,0,0,0],[0,0,1,0],[1,0,0,0],[0,1,0,0],[0,0,0,1]]; #used for debugging.
+		simplexList:=[create_random_simplex(simplexDim), op(simplexList)];
+		#simplexList:=[DD, op(simplexList)];
+	od;
+	
+	#print(simplexList, "=simplexList");
+	
+	
+	for i from 1 to numTests do:
+		printf("%d: Writing simplex facet equations out to file\n", i);
+		equations:=simplex_to_hyperplanes(simplexList[i]);
+		stringI:=convert(i, string);
+		fileNameSimplex_i:=cat(fileNameSimplex,stringI);
+		write_facets_to_file(equations, fileNameSimplex_i, simplexDim);	
+	od;
+	
+	
+	#Ask C++ exe to compute the volumes of the simplex.
+	stringNum := convert(nops(simplexList), string);
+	systemCommand:= "./testVolumeForSL " || fileNameSimplex  || " " || fileNameVolume || " " || stringNum || " 2>/dev/null":
+	#print(systemCommand);
+	status:=system(systemCommand):
+
+	#read latte's answers
+	volumeAnswersLatte:=read_volume_from_file(fileNameVolume, numTests);
+	
+	#compute SL's volume.
+	volumeAnswersSL:=find_volume_using_SL(simplexList, numTests, simplexDim);
+	
+	#test the answers
+	if nops(volumeAnswersLatte) <> nops(volumeAnswersSL)  or nops(volumeAnswersLatte) <> numTests then:
+		print("Error, latte and SL functions have different number of results.");
+		print(volumeAnswersLatte);
+		print(volumeAnswersSL);
+		exit(1);
+	fi;
+	
+	for i from 1 to numTests do:
+		if  volumeAnswersLatte[i] <> volumeAnswersSL[i] then:
+			print("The ", i, "st test does not agree");
+			print(volumeAnswersLatte);
+			print(volumeAnswersSL);
+			exit(1);
+		fi;
+	od;
+	
+	#if made it this far, the test went error free!!!
+	printf("Seed: %d\n", seed);
+	printf("Tested %d dim-%d simplices\n", numTests, simplexDim);
+	printf("NO ERRORS!\n");
+	
+end:
+
+
+
+
+
+
+
+
+#Input: A list of numSimplex many simplex
+#output: A list of the volume of each as computed by the SL functions.
+find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim)
+	local volumeList, oneVolume, i, dummyLinearForm, startTime:
+	
+	volumeList:=[];
+	dummyLinearForm:=[];
+	#set dummyLinearForm=[0,0....0].
+	for i from 1 to simplexDim do:
+		dummyLinearForm:=[ 0, op(dummyLinearForm)];	
+	od;
+	
+	#Find the volume of each simplex with the SL functions.
+	for i from 1 to numSimplex do:
+		printf("SL Valuation: going to compute volume of simplex %d out of %d\n", i, numSimplex);
+		#tfunction_SL_simplex_ell(t,S,L,ell,M)
+		startTime:=time();
+		oneVolume:=tfunction_SL_simplex_ell(1,simplexList[i],simplexList[i], dummyLinearForm,0);
+		printf("SL Volume: %d/%d\n", numer(oneVolume), denom(oneVolume));
+		printf("SL Time: %f sec\n", time() - startTime);
+		volumeList:=[oneVolume, op(volumeList)];
+	od;
+	return(volumeList);
+end:
+
+#input: Read numberAnswers many rows from the file fileName. So the volumes should all be on their own lines
+#output: List of volumes as read in by the file.
+#usage: This function reads the output of the testVolumeForSL C++ exe.
 read_volume_from_file:=proc(fileName, numberAnswers)
-	local filePtr, volumeList, i;
+	local filePtr, volumeString, volumeList, i;
 
 	volumeList:=[];
 	filePtr:=fopen(fileName, READ, TEXT);
 	for i from 1 to numberAnswers do:
-		volumeList:=[ readline(filePtr), volumeList];
+		volumeString:=readline(filePtr);
+		volumeList:=[ parse(volumeString), op(volumeList)];
 	od:
 
 	close(filePtr);
-	print(volumeList, "=read_volume.volumeList");
+	#print(volumeList, "=read_volume.volumeList");
+	return(volumeList);
 end:
 
+#Input:facet equations in maple syntax.
+#Output: Writes to file fileName the latte-style facet equations.
+write_facets_to_file:=proc(equations, fileName, simplexDim)
+	local i, j, filePtr, lcmDenom, M:
+	
+	filePtr:=fopen(fileName, WRITE, TEXT);
+	
+	#print(equations, "=equations");
+	#print(fileName, "=fileName");
+	
+	
+	
+	#sorry, I had to do a bunch of converting because I couldn't pull the elements in the origional structure.
+	M:=convert(equations, Matrix);
+	#print(M, "=M1");
+	M:=convert(M, list);
+	#print(M, "=M3");
+	#print(simplexDim, "=simplexDim");
+	M:=matrix(simplexDim+1, simplexDim+1, M);
+	#print(M, "=M2");
+	#print(M[1], "=M2[1,1]");
+	
+	#write the latte file.
+	fprintf(filePtr,"%d %d\n", simplexDim+1, simplexDim+1);
+	for i from 1 to simplexDim+1 do:
+		lcmDenom:=1;
+		
+		for j from 1 to simplexDim+1 do:
+			lcmDenom:=lcm(lcmDenom, denom(M[i, j]));
+		od:
+
+		for j from 1 to simplexDim+1 do:
+			#print(M[i, j], "M[i, j]");
+			fprintf(filePtr, "%d ", M[i, j]*lcmDenom);
+		od:
+		fprintf(filePtr, "\n");
+	od:
+	close(filePtr);
+end:
+
+#input:filename and list of simplices
+#output: writes each simplex to a new line of the file in maple syntax.
 write_simplex_to_file:=proc(simplexList, fileName)
-	local filePtr:
+	local filePtr, i:
 	filePtr:=fopen(fileName,WRITE,TEXT):
 	
 	for i from 1 to nops(simplexList) do:	
@@ -57,9 +208,44 @@ end:
 
 
 
+                                                          
+#Input:List of n points of a simplex and the last point.
+#Output: the Facet of the equation containing the n points with the sign such that the last point is in the halfspace. 
+#Description: Feeding the n points of a n-simplex and the 1 point that
+# is not in their facet it generates ONE equation of the simplex in LattE format
+#for those points.
+facets_equation:=proc(L,notinL)
+	local x,aux1,aux2,M,i;
+	M:=Matrix([op(1,L)]);
+	for i from 2 to nops(L) do
+		M:=stackmatrix(M,op(i,L));
+	od:
+	M:=stackmatrix(M,[x[j] $j=1..nops(L)]);
+	M:=transpose(M);
+	M:=stackmatrix(M,[1 $j=1..nops(L)+1]);
+	aux1:=det(M):
+	for i from 1 to nops(notinL) do
+		aux1:=subs(x[i]=op(i,notinL),aux1):
+	od;
+	#print(sign(aux1),"hi I am here");
+	aux2:=sign(aux1)*det(M);
+	for i from 1 to nops(notinL) do
+		aux2:=subs(x[i]=0,aux2):
+	od;
+	return(genmatrix({aux2*x[0]+sign(aux1)*det(M)},[x[j] $j=0..nops(L)]));
+end:
 
-#tfunction_SL_simplex_ell(1,[[0, 0], [1/7*5/4, 0], [1/7*5/4, 1/7*5/2]],[[1,0]],[1,1],1); 
+#Input: n+1 points in R^n
+#Output: the facet equations that define the simplex of the n+1 points.
+simplex_to_hyperplanes:=proc(simplex)
+local i, b_ax, equations, n_points;
+
+	equations:= [];
+	for i from 1 to nops(simplex) do:
+		n_points:= subsop(i = NULL, simplex);
+		b_ax:= facets_equation(n_points, simplex[i]); # 0 < b - a*x
+		equations:=[ op(b_ax), op(equations)];
+	od;
+	return(equations);
+end:
 	
-
-test_sl_volume(5, 3, "testingSL_volume");
-

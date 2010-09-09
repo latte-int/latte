@@ -204,6 +204,8 @@ code/latte/testEhrhart/Driver.cpp -text
 code/latte/testEhrhart/GraphMaker.cpp -text
 code/latte/testEhrhart/GraphMaker.h -text
 code/latte/testingSL/SL_lib.mpl -text
+code/latte/testingSL/testingSLIntegration.mpl -text
+code/latte/testingSL/testingSLVolume.mpl -text
 code/latte/testingSL/testingSL_lib.mpl -text
 code/latte/valuation/Driver.cpp -text
 code/latte/valuation/PolytopeValuation.cpp -text

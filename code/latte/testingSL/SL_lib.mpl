@@ -2,7 +2,7 @@
 # PROGRAM FOR COMPUTING THE FUNCTION SL(Polytope,variable); 
 
 # 
-restart;with(linalg):with(LinearAlgebra):with(combinat):
+with(linalg):with(LinearAlgebra):with(combinat):
 kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 # General Notations:
 #  If we work in R^d:
@@ -1015,7 +1015,8 @@ end:
 
 # 
 fmod:=proc(p,q,t) local u: 
-u:=modp(p,q);print(u);
+u:=modp(p,q);
+#print(u);
 ModP(u*t,q);
 end:
 ourmod:=proc(p,q,t) local our,T;
@@ -1059,7 +1060,7 @@ M:=Matrix([seq(Vector(WW[h]),h=1..nops(WW))]);
 s_II_in_lattice_coord:=projectedvertexinbasislattice(WW,II,s);
 st:=[seq(t*s[i],i=1..nops(s))];  
 function_on_IIc:=functionI(st,WW,II,x);
-print("functionInt",function_on_IIc);
+#print("functionInt",function_on_IIc);
 #from here express in terms of the basis lattice for projected cone.
 
 WW_projected:=projectedconeinbasislattice(WW,II):
