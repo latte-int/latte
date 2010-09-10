@@ -154,6 +154,10 @@ EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/alanGenz.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/shaoweiLin.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/zhiqiangXu.pdf -text
+code/gnulib/alloca_.h -text
+code/gnulib/stdbool_.h -text
+code/gnulib/stdlib_.h -text
+code/gnulib/unistd_.h -text
 code/latte/burstmapletest.mpl -text
 code/latte/convertCDD_ext_to_latte.cpp -text
 code/latte/ehrhart2 -text
