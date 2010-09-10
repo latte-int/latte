@@ -1,6 +1,8 @@
 with(linalg):
 with(LinearAlgebra):
+with(numapprox,laurent):
 read("integration/createLinear.mpl"): #load the function to make a random linear form
+read("integration/integrationTestsLib.mpl"):#integration functions.
 read("testingSL/SL_lib.mpl");	#load the SL functions.
 
 # A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
@@ -31,6 +33,135 @@ create_random_simplex:=proc(simplexDim)
 	
 	return(convert(M, listlist));
 end:
+
+
+
+#Input: A list of numSimplex many simplex
+#output: A list of the volume of each as computed by the SL functions.
+find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim)
+	local volumeList, oneVolume, i, dummyLinearForm, startTime:
+	
+	volumeList:=[];
+	dummyLinearForm:=[];
+	#set dummyLinearForm=[0,0....0].
+	for i from 1 to simplexDim do:
+		dummyLinearForm:=[ 0, op(dummyLinearForm)];	
+	od;
+	
+	#Find the volume of each simplex with the SL functions.
+	for i from 1 to numSimplex do:
+		printf("SL Valuation: going to compute volume of simplex %d out of %d\n", i, numSimplex);
+		#tfunction_SL_simplex_ell(t,S,L,ell,M)
+		startTime:=time();
+		oneVolume:=tfunction_SL_simplex_ell(1,simplexList[i],simplexList[i], dummyLinearForm,0);
+		printf("SL Volume: %d/%d\n", numer(oneVolume), denom(oneVolume));
+		printf("SL Time: %f sec\n", time() - startTime);
+		volumeList:=[oneVolume, op(volumeList)];
+	od;
+	return(volumeList);
+end:
+
+
+
+
+#Input: n+1 points in R^n
+#Output: the facet equations that define the simplex of the n+1 points.
+simplex_to_hyperplanes:=proc(simplex)
+local i, b_ax, equations, n_points;
+
+	equations:= [];
+	for i from 1 to nops(simplex) do:
+		n_points:= subsop(i = NULL, simplex);
+		b_ax:= facets_equation(n_points, simplex[i]); # 0 < b - a*x
+		equations:=[ op(b_ax), op(equations)];
+	od;
+	return(equations);
+end:
+	
+
+
+
+
+#Input:
+#@parm: simplexDim: the abm. dim of the simplix
+#@parm: numTests: how many simpleices you want to test at once
+#@parm: baseFileName: string. File names used for saving latte's facet equations and latte's integration answer. ex:"testingSL/testingSL_volume"
+test_sl_integration:=proc(simplexDim, numTests, degreeL)
+############################################################################################################
+	local randomGen:
+	local mySimplices, mapleLinForms,  mapleResults, integrationSLanswer:
+	local myIndex, formIndex, i, j:
+	local rationalCoeff, bigConstant, seed, numTerms:
+	local mapleTime, SLTime:
+	
+	randomGen:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm; 
+
+	bigConstant:=10000; #sets the max size of the coeff. and terms in the random linear form.
+	numTerms:=1; #we only want to test 1 linear form at a time.
+	rationalCoeff:=1;#the coeff. of the linear form should be rational.
+	mapleTime:= 0;
+	SLTime:=0;
+  
+	seed:=randomize();
+	print(seed, "seed");
+  
+  	#make the simplex and linear forms.
+	for myIndex from 1 to numTests do:
+		mySimplices[myIndex]:=lattice_random_simplex(simplexDim, bigConstant);		
+      	mapleLinForms[myIndex]:=randomGen(degreeL, simplexDim, bigConstant, bigConstant, numTerms, rationalCoeff):
+	od:
+	
+	#print(mySimplices, "=mySimplices");
+	#print(mapleLinForms, "=mapleLinForms");
+	
+  
+  	mapleTime:=time();
+  	#find maple and SL integraton. 
+	for myIndex from 1 to numTests do
+		printf("Integrating %d-linear form to the %d power using origional maple code. Test %d out of %d\n", simplexDim, degreeL, myIndex, numTests);
+    	mapleResults[myIndex]:=0:
+    	
+    	for formIndex from 1 to nops(mapleLinForms[myIndex]) do
+      		mapleResults[myIndex]:=mapleResults[myIndex]+mapleLinForms[myIndex][formIndex][1]*integral_power_linear_form(mySimplices[myIndex],simplexDim,mapleLinForms[myIndex][formIndex][2][1],mapleLinForms[myIndex][formIndex][2][2]):
+    	od:
+    	#print("[1]",mapleLinForms[myIndex][1]);
+ 		#print("[1][1]",mapleLinForms[myIndex][1][1]);
+ 		#print("[1][2]",mapleLinForms[myIndex][1][2]);	    
+    od:
+    mapleTime:=time()-mapleTime;
+    printf("Total time using origional maple code: %f\n", mapleTime);
+
+	SLTime:=time();    
+    for myIndex from 1 to numTests do
+		#tfunction_SL_simplex_ell(t,S,L,ell,M)
+		printf("Integrating %d-linear form to the %d power using SL code. Test %d out of %d\n", simplexDim, degreeL, myIndex, numTests);
+    	integrationSLanswer[myIndex]:=mapleLinForms[myIndex][1][1]*tfunction_SL_simplex_ell(1,mySimplices[myIndex],mySimplices[myIndex],mapleLinForms[myIndex][1][2][2],mapleLinForms[myIndex][1][2][1]);
+	od:
+  	SLTime:=time()-SLTime;
+  	printf("Total time using SL code: %f\n", SLTime);
+  
+  
+  #compare the forms
+	if nops(mapleResults) <> nops(integrationSLanswer) then:
+		print("Different number of test cases for maple results and SL results");
+		quit;
+	fi; 
+	for i from 1 to numTests do
+		if  mapleResults[i] <> integrationSLanswer[i]*degreeL! then:
+		  	print("Test: ", i);
+  			print("mapleResults[i]=\n", mapleResults[i]);
+  			print("integrationSLanswer[i] =\n", integrationSLanswer[i]);
+  			print("integrationSLanswer[i]*m! =\n", integrationSLanswer[i]*degreeL!);
+  			print(integrationSLanswer[i]/mapleResults[i]);
+    		quit;
+    	fi;
+  	od;
+  	
+  	#if got here, no errrors.
+  	printf("NO INTEGRATION ERRORS\n");
+end:
+
+
 
 
 #This is the main function for testing volume between the SL functions and latte.
@@ -107,34 +238,6 @@ end:
 
 
 
-
-
-
-
-#Input: A list of numSimplex many simplex
-#output: A list of the volume of each as computed by the SL functions.
-find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim)
-	local volumeList, oneVolume, i, dummyLinearForm, startTime:
-	
-	volumeList:=[];
-	dummyLinearForm:=[];
-	#set dummyLinearForm=[0,0....0].
-	for i from 1 to simplexDim do:
-		dummyLinearForm:=[ 0, op(dummyLinearForm)];	
-	od;
-	
-	#Find the volume of each simplex with the SL functions.
-	for i from 1 to numSimplex do:
-		printf("SL Valuation: going to compute volume of simplex %d out of %d\n", i, numSimplex);
-		#tfunction_SL_simplex_ell(t,S,L,ell,M)
-		startTime:=time();
-		oneVolume:=tfunction_SL_simplex_ell(1,simplexList[i],simplexList[i], dummyLinearForm,0);
-		printf("SL Volume: %d/%d\n", numer(oneVolume), denom(oneVolume));
-		printf("SL Time: %f sec\n", time() - startTime);
-		volumeList:=[oneVolume, op(volumeList)];
-	od;
-	return(volumeList);
-end:
 
 #input: Read numberAnswers many rows from the file fileName. So the volumes should all be on their own lines
 #output: List of volumes as read in by the file.
@@ -235,17 +338,3 @@ facets_equation:=proc(L,notinL)
 	return(genmatrix({aux2*x[0]+sign(aux1)*det(M)},[x[j] $j=0..nops(L)]));
 end:
 
-#Input: n+1 points in R^n
-#Output: the facet equations that define the simplex of the n+1 points.
-simplex_to_hyperplanes:=proc(simplex)
-local i, b_ax, equations, n_points;
-
-	equations:= [];
-	for i from 1 to nops(simplex) do:
-		n_points:= subsop(i = NULL, simplex);
-		b_ax:= facets_equation(n_points, simplex[i]); # 0 < b - a*x
-		equations:=[ op(b_ax), op(equations)];
-	od;
-	return(equations);
-end:
-	
