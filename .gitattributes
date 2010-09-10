@@ -3,6 +3,9 @@ EXAMPLES/deloera/6e.latte -text
 EXAMPLES/deloera/7h.latte -text
 EXAMPLES/deloera/C11.latte -text
 EXAMPLES/deloera/C12.latte -text
+EXAMPLES/deloera/another-birkhoff-simplex.vrep -text
+EXAMPLES/deloera/chan-robbins-yuen-pyramid.vrep -text
+EXAMPLES/deloera/some-birkhoff-simplex.vrep -text
 EXAMPLES/garcia -text
 EXAMPLES/kahle/K4.latte -text
 EXAMPLES/kahle/join.latte -text
