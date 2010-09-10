@@ -191,12 +191,12 @@ testPolynomialInterpolation_SOURCES += interpolation/testDriver.cpp
 
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
-bin_PROGRAMS += myTestEhrhart
-myTestEhrhart_SOURCES = testEhrhart/Driver.cpp
-myTestEhrhart_SOURCES += testEhrhart/BuildRandomPolytope.cpp
-myTestEhrhart_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
-myTestEhrhart_SOURCES += testEhrhart/GraphMaker.cpp
-myTestEhrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
+bin_PROGRAMS += my-test-ehrhart
+my_test_ehrhart_SOURCES = testEhrhart/Driver.cpp
+my_test_ehrhart_SOURCES += testEhrhart/BuildRandomPolytope.cpp
+my_test_ehrhart_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
+my_test_ehrhart_SOURCES += testEhrhart/GraphMaker.cpp
+my_test_ehrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
 
 noinst_HEADERS += testEhrhart/BuildGraphPolytope.h	\
 	testEhrhart/BuildHypersimplexEdgePolytope.h	\
@@ -204,15 +204,15 @@ noinst_HEADERS += testEhrhart/BuildGraphPolytope.h	\
 	testEhrhart/GraphMaker.h
 
 
-bin_PROGRAMS += ValuationComputation
-ValuationComputation_SOURCES = valuation/Driver.cpp
-ValuationComputation_SOURCES += valuation/valuation.cpp
-ValuationComputation_SOURCES += valuation/PolytopeValuation.cpp
-ValuationComputation_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #used for testing
-ValuationComputation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #used for testing
+bin_PROGRAMS += valuation-computation
+valuation_computation_SOURCES = valuation/Driver.cpp
+valuation_computation_SOURCES += valuation/valuation.cpp
+valuation_computation_SOURCES += valuation/PolytopeValuation.cpp
+valuation_computation_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #used for testing
+valuation_computation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #used for testing
 
-ValuationComputation_LDADD = $(LDADD)
-ValuationComputation_LDADD += liblatteintegration.a
+valuation_computation_LDADD = $(LDADD)
+valuation_computation_LDADD += liblatteintegration.a
 
 
 noinst_HEADERS += valuation/PolytopeValuation.h
@@ -223,23 +223,33 @@ ConvertCDDextToLatte_SOURCES = convertCDD_ext_to_latte.cpp
 #ConvertCDDextToLatte_SOURCES == rational.cpp
 ConvertCDDextToLatte_LDADD = $(LDADD)
 
-check_PROGRAMS += testPolytopeIntegration
-testPolytopeIntegration_SOURCES = valuation/testIntegrationHyperrectangles.cpp 
-testPolytopeIntegration_SOURCES += valuation/valuation.cpp
-testPolytopeIntegration_SOURCES += valuation/PolytopeValuation.cpp
-testPolytopeIntegration_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
-testPolytopeIntegration_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
-testPolytopeIntegration_LDADD = $(LDADD)
-testPolytopeIntegration_LDADD += liblatteintegration.a
+check_PROGRAMS += test-polytope-integration
+test_polytope_integration_SOURCES = valuation/testIntegrationHyperrectangles.cpp 
+test_polytope_integration_SOURCES += valuation/valuation.cpp
+test_polytope_integration_SOURCES += valuation/PolytopeValuation.cpp
+test_polytope_integration_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
+test_polytope_integration_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
+test_polytope_integration_LDADD = $(LDADD)
+test_polytope_integration_LDADD += liblatteintegration.a
 
-check_PROGRAMS += TestVolumeHypersimplex
-TestVolumeHypersimplex_SOURCES = valuation/testVolumeHypersimplex.cpp
-TestVolumeHypersimplex_SOURCES += valuation/valuation.cpp
-TestVolumeHypersimplex_SOURCES += valuation/PolytopeValuation.cpp
-TestVolumeHypersimplex_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
-TestVolumeHypersimplex_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
-TestVolumeHypersimplex_LDADD = $(LDADD)
-TestVolumeHypersimplex_LDADD += liblatteintegration.a
+check_PROGRAMS += test-volume-hypersimplex
+test_volume_hypersimplex_SOURCES = valuation/testVolumeHypersimplex.cpp
+test_volume_hypersimplex_SOURCES += valuation/valuation.cpp
+test_volume_hypersimplex_SOURCES += valuation/PolytopeValuation.cpp
+test_volume_hypersimplex_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
+test_volume_hypersimplex_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
+test_volume_hypersimplex_LDADD = $(LDADD)
+test_volume_hypersimplex_LDADD += liblatteintegration.a  
+
+check_PROGRAMS += test-volume-for-SL
+test_volume_for_SL_SOURCES = valuation/testVolume.cpp
+test_volume_for_SL_SOURCES += valuation/valuation.cpp
+test_volume_for_SL_SOURCES += valuation/PolytopeValuation.cpp
+test_volume_for_SL_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
+test_volume_for_SL_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
+test_volume_for_SL_LDADD = $(LDADD)
+test_volume_for_SL_LDADD += liblatteintegration.a
+
 
 ################ INTEGRATION ####################
 

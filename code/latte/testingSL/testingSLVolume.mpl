@@ -10,9 +10,18 @@ with(CodeTools[Profiling]):
 #@parm: simplexDim: the abm. dim of the simplix
 #@parm: numTests: how many simpleices you want to test at once
 #@parm: baseFileName: string. File names used for saving latte's facet equations and latte's volume answer. ex:"testingSL/testingSL_volume"
+Profile(denomWL);
 Profile(regularSL);
+Profile(series);
 Profile(ttruncatedSL);
+Profile(tSLell);
+
 test_sl_volume(5, 10, "testingSL/testingSL_volume");
+
+PrintProfiles(denomWL);
 PrintProfiles(regularSL);
+PrintProfiles(series);
 PrintProfiles(ttruncatedSL);
+PrintProfiles(tSLel);
+
 

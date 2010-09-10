@@ -82,6 +82,66 @@ end:
 
 
 
+test_sl_countLattice:=proc(simplexDim, numTests, fileName)
+	local i, filePtr, mySimplices, stringCommand;
+	local countAnswers, SLAnswers;
+	
+	countAnswers:=[];
+	SLAnswers:=[];
+	latteFacetFile:=filName||".latte";
+	countFile:=fileName||".count";
+	
+	filePtr:=fopen(countFile, WRITE, TEXT);
+	fprintf(filePtr, " ");
+	fclose(filePtr);
+	
+	#make the simplex
+	for i from 1 to numTests do:
+		mySimplices[i]:=lattice_random_simplex(simplexDim, 10000);
+	od:
+	
+	#call count, save answer in new line of the 'count file'
+	for i from 1 to numTests do:
+		printf("Calling count simplex %d of %d\n", i, numTests);
+		equations:=simplex_to_hyperplanes(mySimplices[i]);
+		write_facets_to_file(equations, fileName, simplexDim);
+		stringCommand:="./count --redundancy-check=none "||fileName||" 2>/dev/null | tail -n 1 >> "||countFile;
+		print(stringCommand);
+		system(stringCommand);
+	od:
+	
+	#read latte's answers.
+	filePtr:=fopen(countFile, READ, TEXT);
+	for i from 1 to numTests do:
+		countAnswers:=[parse(readline(filePtr)), op(countAnswers)];
+	od:
+	fclose(filePtr);
+
+	#find the count using SL.
+	for i from 1 to numTests do:
+		SLAnswers:= [1, op(SLAnswers)]; #TO FIX
+	od: 
+	
+	#compare the answers.
+	if nops(countAnswers) <> nops(SLAnswers) then:
+		print("Different number of answers reported by countAnswers and SLAnswers");
+		print(countAnswers, "=countAnswers");
+		print(SLAnswers, "=SLAnswers");
+		print(numTests, "=numTests");
+		quit;
+	fi;
+	for i from 1 to numTests do:
+		if countAnswers[i] <> SLAnswers[i] then:
+			print("Different answers: count vs sl:", countAnswers[i], "vs.", SLAnswers[i]);
+			print(countAnswers, "=countAnswers");
+			print(SLAnswers, "=SLAnswers");
+			print(numTests, "=numTests");
+		fi;
+	od:
+end:
+
+
+
 #Input:
 #@parm: simplexDim: the abm. dim of the simplix
 #@parm: numTests: how many simpleices you want to test at once

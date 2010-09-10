@@ -10,7 +10,8 @@ random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,
 		temp:=[];
 			for j from 1 to d do
 				R:=rand(componentmax);
-				temp:=[R(),op(temp)];
+				#temp:=[R(),op(temp)];
+				temp:=[1, op(temp)];
 			od;
 		temp:=[m,temp];
 		R:=rand(maxcoef);

@@ -160,6 +160,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(const char *argv[],
 
 	for (i = 1; i < argc; i++)
 	{
+		//cout << "currently doing " << argv[i] << "." << endl;
 		if (strncmp(argv[i], "nodecom", 3) == 0 || strncmp(argv[i],
 				"--nodecomposition", 5) == 0 || strncmp(argv[i],
 				"--no-decomposition", 7) == 0)
@@ -258,7 +259,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(const char *argv[],
 			cerr << "Options that control what to compute:" << endl
 					<< "  valuation types: --valuation=volume, or --valuation=integrate\n"
 					<< "volume algorithms and options:\n"
-					<< "  --lawrence  [--printLawrenceFunction]       Computes the volume using the Lawrence formula and\n"
+					<< "  --lawrence  [--print-lawrence-function]       Computes the volume using the Lawrence formula and\n"
 					<< "                                              and prints the Lawrence rational function.\n"
 					<< "  --triangulate                               Computes the volume using the triangulation method.\n"
 					<< "  --all                                       Computes the volume using all the methods.\n"
@@ -267,10 +268,10 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(const char *argv[],
 					<< "                                              encoded in maple-syntax: [ [coef, [exponent vector]], ...]\n"
 					<< "                                              If cannot open file, the line is read from std in.\n"
 					<< "Example: " << argv[0]
-					<< " --valuation=volume --lawrence --printLawrenceFunction file.latte\n"
+					<< " --valuation=volume --lawrence --print-lawrence-function file.latte\n"
 					<< "         (will print the volume found by the Lawrence method along with the Lawrence rational function.)\n"
 					<< "Example: " << argv[0]
-					<< "--valuation=integrate --monomials=poly.txt file.latte\n"
+					<< " --valuation=integrate --monomials=poly.txt file.latte\n"
 					<< "         (will compute the integral of the polynomial in poly.txt over the polytope in file.latte.)\n"
 					<< endl;
 			exit(0);
@@ -280,7 +281,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(const char *argv[],
 			strcpy(valuationAlg, "triangulate");
 		else if (strcmp(argv[i], "--all") == 0)
 			strcpy(valuationAlg, "all");
-		else if (strcmp(argv[i], "--printLawrenceFunction") == 0)
+		else if (strcmp(argv[i], "--print-lawrence-function") == 0)
 			strcpy(printLawrence, "yes");
 		else if (strcmp(argv[i], "--valuation=integrate") == 0)
 			strcpy(valuationType, "integrate");

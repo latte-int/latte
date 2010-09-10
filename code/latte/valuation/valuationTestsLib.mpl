@@ -157,7 +157,7 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	
 	#Finally, now test our code.
 	correctAnswerString :=convert(correctAnswer, string):
-	systemCommand:= "./testPolytopeIntegration " || correctAnswerString || " " || polynomialFileName || " " || fileName :
+	systemCommand:= "./test-polytope-integration " || correctAnswerString || " " || polynomialFileName || " " || fileName :
 	#print(systemCommand);
 	status:=system(systemCommand):
 	printf("status=%d\n", status);

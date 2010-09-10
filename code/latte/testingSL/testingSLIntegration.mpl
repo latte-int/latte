@@ -11,8 +11,9 @@ lattice_random_simplex:=proc(d,N) local R,U;
   [ seq(U(), i=1..d+1) ];
 end:
 
+
 #Input:
 #@parm: simplexDim: the abm. dim of the simplix
 #@parm: numTests: how many simpleices you want to test at once
 #@parm: degreeL: The power you want to take the linear form to.
-test_sl_integration(200, 1, 2);
+test_sl_integration(25, 1, 3);
