@@ -38,8 +38,9 @@ end:
 
 #Input: A list of numSimplex many simplex
 #output: A list of the volume of each as computed by the SL functions.
-find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim)
-	local volumeList, oneVolume, i, dummyLinearForm, startTime:
+# if timer = 1, then we return a list containing [volume answer, total time];
+find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim, timer)
+	local volumeList, oneVolume, i, dummyLinearForm, currentTime, totalTime:
 	
 	volumeList:=[];
 	dummyLinearForm:=[];
@@ -52,13 +53,19 @@ find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim)
 	for i from 1 to numSimplex do:
 		printf("SL Valuation: going to compute volume of simplex %d out of %d\n", i, numSimplex);
 		#tfunction_SL_simplex_ell(t,S,L,ell,M)
-		startTime:=time();
+		currentTime:=time(); #start clock
 		oneVolume:=tfunction_SL_simplex_ell(1,simplexList[i],simplexList[i], dummyLinearForm,0);
 		printf("SL Volume: %d/%d\n", numer(oneVolume), denom(oneVolume));
+		currentTime:= time() - currentTime;
+		totalTime:= totalTime + currentTime;
 		printf("SL Time: %f sec\n", time() - startTime);
 		volumeList:=[oneVolume, op(volumeList)];
 	od;
-	return(volumeList);
+	if timer = 0 then:
+		return(volumeList);
+	else
+		return([volumeList, totalTime]);
+	fi;
 end:
 
 
@@ -229,7 +236,8 @@ end:
 #Output: creates latte-style facet files and a volume file.
 test_sl_volume:=proc(simplexDim, numTests, baseFileName)
 local simplexList, i, volumeAnswersLatte, volumeAnswersSL, fileNameSimplex, fileNameVolume, systemCommand, status, equations:
-local fileNameSimplex_i, stringI, DD, stringNum, seed;
+local fileNameSimplex_i, stringI, DD, stringNum, seed, temp;
+local totalTimeSL, totalTimeLatte;
 
 	seed:=randomize();
 
@@ -261,15 +269,20 @@ local fileNameSimplex_i, stringI, DD, stringNum, seed;
 	
 	#Ask C++ exe to compute the volumes of the simplex.
 	stringNum := convert(nops(simplexList), string);
-	systemCommand:= "./testVolumeForSL " || fileNameSimplex  || " " || fileNameVolume || " " || stringNum || " 2>/dev/null":
+	systemCommand:= "./test-volume-for-SL " || fileNameSimplex  || " " || fileNameVolume || " " || stringNum || " 2>/dev/null":
 	#print(systemCommand);
+	totalTimeLatte:=time();
 	status:=system(systemCommand):
+	totalTimeLatte:=time() - totalTimeLatte;
 
 	#read latte's answers
 	volumeAnswersLatte:=read_volume_from_file(fileNameVolume, numTests);
 	
 	#compute SL's volume.
-	volumeAnswersSL:=find_volume_using_SL(simplexList, numTests, simplexDim);
+	temp:=find_volume_using_SL(simplexList, numTests, simplexDim, 1);
+	volumeAnswersSL:=temp[1];
+	totalTimeSL:=temp[2];
+	
 	
 	#test the answers
 	if nops(volumeAnswersLatte) <> nops(volumeAnswersSL)  or nops(volumeAnswersLatte) <> numTests then:
@@ -293,6 +306,7 @@ local fileNameSimplex_i, stringI, DD, stringNum, seed;
 	printf("Tested %d dim-%d simplices\n", numTests, simplexDim);
 	printf("NO ERRORS!\n");
 	
+	return([totalTimeSL, totalTimeLatte]);
 end:
 
 

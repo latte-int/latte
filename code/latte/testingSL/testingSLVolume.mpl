@@ -11,17 +11,29 @@ with(CodeTools[Profiling]):
 #@parm: numTests: how many simpleices you want to test at once
 #@parm: baseFileName: string. File names used for saving latte's facet equations and latte's volume answer. ex:"testingSL/testingSL_volume"
 Profile(denomWL);
+Profile(functionI);
+Profile(linindenom);
+Profile(projectedconeinbasislattice);
+Profile(projectedlattice);
+Profile(projectedvector); 
+Profile(projectedvertexinbasislattice);
 Profile(regularSL);
-Profile(series);
+Profile(tfunction_SL);
 Profile(ttruncatedSL);
 Profile(tSLell);
 
-test_sl_volume(5, 10, "testingSL/testingSL_volume");
+test_sl_volume(6, 10, "testingSL/testingSL_volume");
 
 PrintProfiles(denomWL);
+PrintProfiles(functionI);
+PrintProfiles(linindenom);
+PrintProfiles(projectedconeinbasislattice);
+PrintProfiles(projectedlattice);
+PrintProfiles(projectedvector);
+PrintProfiles(projectedvertexinbasislattice);
 PrintProfiles(regularSL);
-PrintProfiles(series);
+PrintProfiles(tfunction_SL);
 PrintProfiles(ttruncatedSL);
-PrintProfiles(tSLel);
+PrintProfiles(tSLell);
 
 
