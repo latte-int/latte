@@ -1,0 +1,60 @@
+read("testingSL/testSLEhrhart.mpl"); #load the test functions
+with(CodeTools[Profiling]):
+#
+#  Sept. 9, 2010
+#  Author: Brandon
+#  Description: Uses the main SL testing lib to compute the volume of simplies and compare the answer's with latte's tirangulation method.
+#
+
+#Input:
+#@parm: simplexDim: the abm. dim of the simplix
+#@parm: numTests: how many simpleices you want to test at once
+#@parm: baseFileName: string. File names used for saving latte's facet equations and latte's volume answer. ex:"testingSL/testingSL_volume"
+Profile(primitive_vector);
+Profile(short_vector);
+Profile(sign_entries_vector);
+Profile(good_vector);
+Profile(signed_decomp);
+Profile(good_cone_dec); 
+Profile(more_decomposition_in_cones);
+Profile(cone_dec);
+Profile(projectedvector);
+Profile(projectedlattice);
+Profile(projectedconeinbasislattice);
+Profile(Toddzero);
+Profile(relativevolumeoffaceiotac);
+Profile(functionIzero);
+Profile(prod_Toddzero);
+Profile(functionSzero);
+Profile(changeofcoordinates);
+Profile(coeff_minusdplusk_iota_function_S);
+Profile(coeff_minusdplusk_S);
+Profile(coeff_dminusk_Eh_with_reg);
+Profile(random_vector);
+Profile(coeff_dminusk_Eh);
+
+test_sl_ehrhart(6, "testingSL/Dim6TestXTop3");
+
+PrintProfiles(primitive_vector);
+PrintProfiles(short_vector);
+PrintProfiles(sign_entries_vector);
+PrintProfiles(good_vector);
+PrintProfiles(signed_decomp);
+PrintProfiles(good_cone_dec);
+PrintProfiles(more_decomposition_in_cones);
+PrintProfiles(cone_dec);
+PrintProfiles(projectedvector);
+PrintProfiles(projectedlattice);
+PrintProfiles(projectedconeinbasislattice);
+Profile(projectedconeinbasislattice);
+Profile(Toddzero);
+Profile(relativevolumeoffaceiotac);
+Profile(functionIzero);
+Profile(prod_Toddzero);
+Profile(functionSzero);
+Profile(changeofcoordinates);
+Profile(coeff_minusdplusk_iota_function_S);
+Profile(coeff_minusdplusk_S);
+Profile(coeff_dminusk_Eh_with_reg);
+Profile(random_vector);
+Profile(coeff_dminusk_Eh);
