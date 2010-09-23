@@ -6,6 +6,7 @@ with(CodeTools[Profiling]):
 #  Description: Uses the main SL testing lib to compute the volume of simplies and compare the answer's with latte's tirangulation method.
 #
 
+#Saves the average time it takes to find the top-3 ehrhart coeff in a file.
 #For each random simplex of dim between startingDim to infinity, test numTests many ehrhart top 3 coefficients.
 # The time of each simplex coeff. is saved in the log file, and the average of the numTests tests is saved in the table file.
 # If the first test takes more than 1/2 hour, we stop the function.
