@@ -20,7 +20,8 @@ create_random_simplex:=proc(simplexDim)
 		#print("got here");
 		#print(checkRankMatrix, "=checkRandMatrix");
 		
-		if Rank(checkRankMatrix) = simplexDim then:
+		#print(rank(checkRankMatrix), checkRankMatrix, simplexDim, rank(checkRankMatrix) = simplexDim);
+		if rank(checkRankMatrix) = simplexDim then:
 			break;
 		fi;
 	end do;
@@ -132,19 +133,21 @@ write_simplex_to_file:=proc(simplexList, fileName)
 	od;	
 	close(filePtr);
 end:
-print("testSLEhrhar.135");
+
 test_sl_ehrhart:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex:
 	randomize():
-	#mysimplex:=create_random_simplex(mydim):
-	#myfileName:="testingSL/testingEhrhartDim9Test1Top3":
-	#write_simplex_to_file(mysimplex,cat(myfileName,".simp")):
-	#write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
+	mysimplex:=create_random_simplex(mydim):
+	myfileName:="testingSL/testingEhrhartDim9Test1Top3":
+	write_simplex_to_file(mysimplex,cat(myfileName,".simp")):
+	write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
 
-	#for myi from 0 to 2 do:
-	#	myCC:=[op(myCC),[coeff_dminusk_Eh(mysimplex,myi)]]:
-	#od:
-	#myCC;
-	CheckSou(5);
+	startTime:=time();
+	for myi from 0 to 2 do:
+		myCC:=[op(myCC),[coeff_dminusk_Eh(mysimplex,myi)]]:
+	od:
+	totalTime:= time() - startTime;
+	return([totalTime, myCC]);
+	#CheckSou(5);
 end:
 print("testSLEhrhar.file ok");

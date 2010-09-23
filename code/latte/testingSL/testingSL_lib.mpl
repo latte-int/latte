@@ -16,7 +16,7 @@ create_random_simplex:=proc(simplexDim)
 	do
 		M:=RandomMatrix(simplexDim+1, simplexDim) /~ ( abs(RandomMatrix(simplexDim+1, simplexDim)) +~ 1);
 		
-		checkRankMatrix:=RandomMatrix(simplexDim, simplexDim);
+		checkRankMatrix:=RandomMatrix(simplexDim, simplexDim);#Not sure how to make an empty matrix.
 		for i from 1 to simplexDim do
 			for j from 1 to simplexDim do
 				checkRankMatrix[i, j] := M[i, j] - M[simplexDim+1, j];
