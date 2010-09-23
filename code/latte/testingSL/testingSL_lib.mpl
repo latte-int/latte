@@ -89,7 +89,7 @@ end:
 
 
 
-
+#Not currently implemented. 
 test_sl_countLattice:=proc(simplexDim, numTests, fileName)
 	local i, filePtr, mySimplices, stringCommand;
 	local countAnswers, SLAnswers;
@@ -154,8 +154,8 @@ end:
 #@parm: simplexDim: the abm. dim of the simplix
 #@parm: numTests: how many simpleices you want to test at once
 #@parm: baseFileName: string. File names used for saving latte's facet equations and latte's integration answer. ex:"testingSL/testingSL_volume"
+#Test integration of random linear forms over random simplex using maple vs sl functions.
 test_sl_integration:=proc(simplexDim, numTests, degreeL)
-############################################################################################################
 	local randomGen:
 	local mySimplices, mapleLinForms,  mapleResults, integrationSLanswer:
 	local myIndex, formIndex, i, j:
@@ -230,6 +230,9 @@ test_sl_integration:=proc(simplexDim, numTests, degreeL)
 end:
 
 
+#Finds the time to compute the volume of a full-dim simplex using the SL functions.
+#@parm simplexDim: am. dim. of the simplex.
+#@parm numTests: number of tests to run.
 time_sl_volume:=proc(simplexDim, numTests)
 local simplexList, i, volumeAnswersLatte, volumeAnswersSL, fileNameSimplex, fileNameVolume, systemCommand, status, equations:
 local fileNameSimplex_i, stringI, DD, stringNum, seed, temp;

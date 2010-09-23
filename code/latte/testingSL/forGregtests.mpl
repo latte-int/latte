@@ -34,9 +34,9 @@
 # We input the standard triangle S:=[[0,0],[1,0],[0,1]]; we know that the Ehrhat polunomial is 
 # (t+1)(t+2)/2=t^2/2+3/2 t+1;
 
-coeff_dminusk_Eh([[0,0],[1,0],[0,1]],0);
-coeff_dminusk_Eh([[0,0],[1,0],[0,1]],1);
-coeff_dminusk_Eh([[0,0,0],[1,0,0],[0,1,0],[0,0,1]],3);
+#coeff_dminusk_Eh([[0,0],[1,0],[0,1]],0);
+#coeff_dminusk_Eh([[0,0],[1,0],[0,1]],1);
+#coeff_dminusk_Eh([[0,0,0],[1,0,0],[0,1,0],[0,0,1]],3);
  
 # This program is extracted from the more general program:
 # total_approx_weighted_Eh;
@@ -152,9 +152,10 @@ end:
 # #               according to the signs of the entries of the vector V. in the basis G. 
 good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L;
        n:=nops(G);  
-       A:=Transpose(Matrix(G));      
-       Ainverse:=MatrixInverse(A);
-       B:=[seq(convert(Ainverse[1..n,i],list),i=1..n)]; 
+       #A:=Transpose(Matrix(G));      
+       Ainverse:=inverse(matrix(G));
+       B:=convert(Ainverse, listlist);
+       #B:=[seq(convert(Ainverse[i,1..n],list),i=1..n)]; 
        sho:=short_vector(B); 
        V :=[seq(add(G[j][i]*sho[j],j=1..n),i=1..n)];
        L:= sign_entries_vector(sho);
@@ -179,7 +180,7 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
 		for i from 1 to kplus do
         		C:=[seq(G[Lplus[j]],j=1..i-1),seq(-G[Lplus[j]],j=i+1..kplus),v,seq(G[Lminus[j]],j=1..kminus),seq(G[Lzero[j]],j=1..kzero)];
 
-		        detC := Determinant(Matrix(C));        
+		        detC := det(matrix(C));        
 		        Csigned:=[eps*(-1)^(i+kplus),detC,C];       
  
 		       if abs(detC)>1 then
@@ -192,7 +193,7 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
 		for i from 1 to kminus do
        		C:=[seq(G[Lplus[j]],j=1..kplus),-v,seq(-G[Lminus[j]],j=1..i-1),seq(G[Lminus[j]],j=i+1..kminus),seq(G[Lzero[j]],j=1..kzero)]; 
         
-       		detC := Determinant(Matrix(C));
+       		detC := det(matrix(C));
        		Csigned:=[eps*(-1)^(i+1),detC,C];      
        
       			if abs(detC)>1 then
@@ -207,10 +208,11 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
 # #  Input: eps = 1 or -1
 # #             G  is a  simplicial cone
 # #  Output:  two lists [Nonuni,Uni] as in procedure signed_decomp: 
-good_cone_dec:=proc(eps,G) local n,A,R,Output;
-	n:=nops(G);  A:=Matrix([seq(G[i],i=1..n)]);   
-	if abs(Determinant(A))=1 then
-		Output:=[[],[[eps,Determinant(A),G]]];
+good_cone_dec:=proc(eps,G) local n,A,R,Output, det_A;
+	n:=nops(G);  A:=matrix([seq(G[i],i=1..n)]);
+	det_A:=det(A);   
+	if abs(det_A)=1 then
+		Output:=[[],[[eps,det_A,G]]];
      	else R:=good_vector(G);
           	Output:=signed_decomp(eps,G,R[1],R[2]);
    	fi;
@@ -252,6 +254,8 @@ cone_dec:=proc(G) local seed, i,ok;
     	RETURN(seed[2]);
 end:
 
+print("forGregTest.225");
+
 # Projections:  
 # Input: W is a list of vectors  of V , [v[1],..v[d]], of lenght d. 
 # iota =[i[1]..,i[s]], is a list of integers, b is a vector of lenght d.
@@ -261,10 +265,11 @@ end:
 # Thus we write b=b_iota+b_iota_c; 
 # Our output is b_iota; 
 # Example: projectedvector([[1,0,0],[0,1,2],[0,1,0]],[3],[0,0,1])->[0,-1/2,0]; 
-projectedvector:=proc(W,iota,b) local M,S,j,v,V,m; 
-	M:=transpose(matrix([seq(W[i],i=1..nops(W))])); 
-	S:=linsolve(M,b); 
-	m:=det(M);
+projectedvector:=proc(M_inverse, W,iota,b) local S,j,v,V; 
+	
+	#printf("forGregtests.268: size(M)= %d, %d\n", rowdim(M), coldim(M)); 
+	S:=multiply(M_inverse,b); 
+	#m:=det(M);
 	for j from 1 to nops(W) do 
 		v[j]:=add(S[iota[i]]*W[iota[i]][j],i=1..nops(iota));
 	od: 
@@ -285,15 +290,19 @@ end:
 # We will use over and over again this list H1,H2,..., Hk, so that we will work in Z^k  (embedded in R^d via H1,H2,..Hk).
 # EXAMPLE: 
 #projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3])-># [[0, 1/2, 0]];
-projectedlattice:=proc(W,iota) local m,B, d,k,i,r,S,IS,List;
+projectedlattice:=proc(W,iota) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_projectedVectors;
 	d:=nops(W);
 	B:=ortho_basis(d); 
 	k:=nops(iota);
-	m:=abs(Determinant(Transpose(Matrix([seq(W[i],i=1..nops(W))]))));
-	for i from 1 to d do 
- 		r[i]:=[seq(m*projectedvector(W,iota,B[i])[j],j=1..nops(W))];
+	m:=abs(det(transpose(matrix([seq(W[i],i=1..nops(W))]))));
+	
+	M_inverse:=inverse(transpose(matrix([seq(W[i],i=1..nops(W))])));
+	for i from 1 to d do
+		
+		temp_projectedVectors:=m*projectedvector(M_inverse, W,iota,B[i]);
+ 		r[i]:=[seq(temp_projectedVectors[j],j=1..nops(W))];
 	od;
- 	S:=Matrix([seq(r[i],i=1..d)]);;
+ 	S:=matrix([seq(r[i],i=1..d)]);;
  	IS:=ihermite(S);
  	List:=[seq(1/m*convert(row(IS,j),list),j=1..k)];
 	List;
@@ -308,10 +317,10 @@ end:
 #  Example: projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3])→[[1,0],[0,1]]
 projectedconeinbasislattice:=proc(W,iota) local P,M,output,i,F; 
 	P:=projectedlattice(W,iota);
-	M:=Transpose(Matrix([seq(P[i],i=1..nops(P))]));
+	M:=transpose(matrix([seq(P[i],i=1..nops(P))]));
 	output:=[]; 
 	for i from 1 to nops(iota) do 
-		F:=convert(LinearSolve(M,Vector(W[iota[i]])),list); 
+		F:=convert(linsolve(M,Vector(W[iota[i]])),list); 
 		output:=[op(output),primitive_vector(F)];
  	od;
 	output;
@@ -414,6 +423,8 @@ changeofcoordinates:=proc(W,iota,x) local H,newx,i;
 	newx;
 end:
 
+print("forGreagtests.419");
+
 # THE FUNCTION S_iota for a cone.
 # THE I of the paper is called here iota: reason I in maple means squareroot of minus  -1
 # THIS IS THE MAIN TECHNICAL  PROCEDURE. 
@@ -446,7 +457,7 @@ functionconeuni, conff,out1,out2,M,newx,newP, seriesff, tt; #added tt and series
 			WWW:=uni_cones[j][3];
 			signuni:=uni_cones[j][1];
 			ASSERT(abs(uni_cones[j][2])=1, "decomposition not unimodular");
-			newP:=MatrixInverse(Transpose(Matrix(WWW)));
+			newP:=inverse(transpose(matrix(WWW)));
 			function_on_iota:=functionSzero(newx,WWW);
 			functionconeuni:=function_on_iotac*function_on_iota; 
 			##print('functionconeuni',functionconeuni);
@@ -492,8 +503,8 @@ coeff_dminusk_Eh_with_reg:=proc(S,k,reg) local M,out,F,W,i,st,d,y;
 	F:=0;
 	d:=nops(S)-1;
 	if k=0 then 
- 		M:=Matrix([seq(S[j]-S[1],j=2..d+1)]);
-		out:=abs(Determinant(M)/d!);
+ 		M:=matrix([seq(S[j]-S[1],j=2..d+1)]);
+		out:=abs(det(M)/d!);
 	else
 		for i from 1 to nops(S) do 
 			W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
@@ -544,6 +555,8 @@ Srandom:=proc(d,N) local S,i;
 	S;
 end:
 
+print("forGreagtests.551");
+
 Checkrandom:=proc(d) local S,reg,CC,k,tk; 
 	S:=Srandom(d,100); print(S); 
 	CC:=[];
@@ -576,3 +589,4 @@ end:
 
 #CheckSou(5) gives the result:
 #1+(16/3)*t+(23/4)*t^4+t^5+(73/6)*t^3+(47/4)*t^2
+print("forGregtest.file ok");

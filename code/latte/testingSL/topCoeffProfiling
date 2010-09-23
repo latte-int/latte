@@ -35,6 +35,9 @@ Profile(coeff_dminusk_Eh);
 
 test_sl_ehrhart(6, "testingSL/Dim6TestXTop3");
 
+
+
+
 PrintProfiles(primitive_vector);
 PrintProfiles(short_vector);
 PrintProfiles(sign_entries_vector);
@@ -46,15 +49,15 @@ PrintProfiles(cone_dec);
 PrintProfiles(projectedvector);
 PrintProfiles(projectedlattice);
 PrintProfiles(projectedconeinbasislattice);
-Profile(projectedconeinbasislattice);
-Profile(Toddzero);
-Profile(relativevolumeoffaceiotac);
-Profile(functionIzero);
-Profile(prod_Toddzero);
-Profile(functionSzero);
-Profile(changeofcoordinates);
-Profile(coeff_minusdplusk_iota_function_S);
-Profile(coeff_minusdplusk_S);
-Profile(coeff_dminusk_Eh_with_reg);
-Profile(random_vector);
-Profile(coeff_dminusk_Eh);
+PrintProfiles(projectedconeinbasislattice);
+PrintProfiles(Toddzero);
+PrintProfiles(relativevolumeoffaceiotac);
+#PrintProfiles(functionIzero);
+#PrintProfiles(prod_Toddzero);
+#PrintProfiles(functionSzero);
+PrintProfiles(changeofcoordinates);
+PrintProfiles(coeff_minusdplusk_iota_function_S);
+#PrintProfiles(coeff_minusdplusk_S);
+#PrintProfiles(coeff_dminusk_Eh_with_reg);
+#PrintProfiles(random_vector);
+#PrintProfiles(coeff_dminusk_Eh);
