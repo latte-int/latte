@@ -1,4 +1,5 @@
 read("testingSL/testingSL_lib.mpl");	#load the testing functions.
+with(CodeTools[Profiling]):
 #
 #  Sept. 9, 2010
 #  Author: Brandon
@@ -11,9 +12,32 @@ lattice_random_simplex:=proc(d,N) local R,U;
   [ seq(U(), i=1..d+1) ];
 end:
 
+Profile(denomWL);
+Profile(functionI);
+Profile(linindenom);
+Profile(projectedconeinbasislattice);
+Profile(projectedlattice);
+Profile(projectedvector); 
+Profile(projectedvertexinbasislattice);
+Profile(regularSL);
+Profile(tfunction_SL);
+Profile(ttruncatedSL);
+Profile(tSLell);
 
 #Input:
 #@parm: simplexDim: the abm. dim of the simplix
 #@parm: numTests: how many simpleices you want to test at once
 #@parm: degreeL: The power you want to take the linear form to.
-test_sl_integration(25, 1, 3);
+test_sl_integration(5, 5, 3);
+
+PrintProfiles(denomWL);
+PrintProfiles(functionI);
+PrintProfiles(linindenom);
+PrintProfiles(projectedconeinbasislattice);
+PrintProfiles(projectedlattice);
+PrintProfiles(projectedvector);
+PrintProfiles(projectedvertexinbasislattice);
+PrintProfiles(regularSL);
+PrintProfiles(tfunction_SL);
+PrintProfiles(ttruncatedSL);
+PrintProfiles(tSLell);

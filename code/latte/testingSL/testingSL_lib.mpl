@@ -44,6 +44,7 @@ find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim, timer)
 	
 	volumeList:=[];
 	dummyLinearForm:=[];
+	totalTime:=0;
 	#set dummyLinearForm=[0,0....0].
 	for i from 1 to simplexDim do:
 		dummyLinearForm:=[ 0, op(dummyLinearForm)];	
@@ -58,7 +59,7 @@ find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim, timer)
 		printf("SL Volume: %d/%d\n", numer(oneVolume), denom(oneVolume));
 		currentTime:= time() - currentTime;
 		totalTime:= totalTime + currentTime;
-		printf("SL Time: %f sec\n", time() - startTime);
+		printf("SL Time: %f sec\n", currentTime);
 		volumeList:=[oneVolume, op(volumeList)];
 	od;
 	if timer = 0 then:
@@ -228,6 +229,24 @@ test_sl_integration:=proc(simplexDim, numTests, degreeL)
   	printf("NO INTEGRATION ERRORS\n");
 end:
 
+
+time_sl_volume:=proc(simplexDim, numTests)
+local simplexList, i, volumeAnswersLatte, volumeAnswersSL, fileNameSimplex, fileNameVolume, systemCommand, status, equations:
+local fileNameSimplex_i, stringI, DD, stringNum, seed, temp;
+local totalTimeSL, totalTimeLatte;
+
+	seed:=randomize();
+	#make the test simplex
+	simplexList:= [];
+	totalTimeSL:=0;
+	
+	for i from 1 to numTests do:
+		simplexList:=[create_random_simplex(simplexDim), op(simplexList)];
+	od;
+	
+	temp:=find_volume_using_SL(simplexList, numTests, simplexDim, 1);
+	return(temp[2]); #return total time.
+end:
 
 
 
