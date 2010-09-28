@@ -2,6 +2,7 @@
 
 save () {
 	echo "Saving the Ehrhart polynomial file and the LattE file that generated it."
+	echo "Saved file savedfiles/ehrhart".$3.$2
 	echo "Save code: "$2
 
 	cp ehrhart.$3.txt savedfiles/ehrhart.$3.$2

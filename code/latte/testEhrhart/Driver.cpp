@@ -249,8 +249,8 @@ int main()
 {
 	string type;
 	
-	doAuto();
-	return 0;
+	//doAuto();
+	//return 0;
 
 	cout << "run type: (rand, edge, graph) >> ";
 	cin >> type;

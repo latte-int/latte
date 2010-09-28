@@ -254,7 +254,6 @@ cone_dec:=proc(G) local seed, i,ok;
     	RETURN(seed[2]);
 end:
 
-print("forGregTest.225");
 
 # Projections:  
 # Input: W is a list of vectors  of V , [v[1],..v[d]], of lenght d. 
@@ -423,7 +422,7 @@ changeofcoordinates:=proc(W,iota,x) local H,newx,i;
 	newx;
 end:
 
-print("forGreagtests.419");
+
 
 # THE FUNCTION S_iota for a cone.
 # THE I of the paper is called here iota: reason I in maple means squareroot of minus  -1
@@ -555,7 +554,7 @@ Srandom:=proc(d,N) local S,i;
 	S;
 end:
 
-print("forGreagtests.551");
+
 
 Checkrandom:=proc(d) local S,reg,CC,k,tk; 
 	S:=Srandom(d,100); print(S); 
@@ -589,4 +588,3 @@ end:
 
 #CheckSou(5) gives the result:
 #1+(16/3)*t+(23/4)*t^4+t^5+(73/6)*t^3+(47/4)*t^2
-print("forGregtest.file ok");

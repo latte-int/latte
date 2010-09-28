@@ -1,7 +1,7 @@
 with(linalg):
 with(LinearAlgebra):
 with(numapprox,laurent):
-read("testingSL/forGregtests.mpl"); #load the ehrhart functions
+read("TopEhrhart_lib.mpl"); #load the ehrhart functions
 
 #Input: simplexDim: the amb. dim of the simplex.
 #Output: returns a list of simplexDim+1 vectors in R^(simplexDim).
@@ -9,7 +9,8 @@ create_random_simplex:=proc(simplexDim)
 	local i, j, M, checkRankMatrix:
 
 	do
-		M:=randmatrix(simplexDim+1, simplexDim);
+		M:=randmatrix(simplexDim+1, simplexDim); #default is  rand(-99..99).
+		# if you want different matrices, try randmatrix(simplexDim+1, simplexDim, entries=rand(0..10))
 		
 		checkRankMatrix:=randmatrix(simplexDim, simplexDim);
 		for i from 1 to simplexDim do
@@ -135,10 +136,10 @@ write_simplex_to_file:=proc(simplexList, fileName)
 end:
 
 test_sl_ehrhart:=proc(mydim, myfilename)
-	local myi, myCC:=[], mysimplex:
+	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime:
 	randomize():
 	mysimplex:=create_random_simplex(mydim):
-	myfileName:="testingSL/testingEhrhartDim9Test1Top3":
+	myfileName:=myfilename:
 	write_simplex_to_file(mysimplex,cat(myfileName,".simp")):
 	write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
 

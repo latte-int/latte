@@ -177,7 +177,7 @@ od;
 interface(prettyprint=false):
 interface(screenwidth=300):
 with(linalg):
-writeto("formatthias");
+#writeto("formatthias");
 return(matrix(simp));
 end proc:
 #--------------EXAMPLE-----------------------
@@ -185,4 +185,6 @@ end proc:
 # from it.
 
 Zeros:=[[1,3],[1,4],[1,5],[2,4],[2,5],[3,5]];
-gensimplexB_n(8,50,[]);
+ans:=gensimplexB_n(3,5,[]);
+print(ans);
+

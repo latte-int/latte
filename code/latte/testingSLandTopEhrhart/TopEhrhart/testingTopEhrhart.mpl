@@ -1,4 +1,4 @@
-read("testingSL/testSLEhrhart.mpl"); #load the test functions
+read("testingTopEhrhart_lib.mpl"); #load the test functions
 with(CodeTools[Profiling]):
 #
 #  Sept. 9, 2010
@@ -20,17 +20,18 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 	
 	#file names
 	fileNameLog:=fileBaseName||".log"; #hold times of everything.
-	fileNameTable:=fileBaseName||".table";	#hold times only for the average.
+	fileNameTable:=fileBaseName||".average";	#hold times only for the average.
 	
 	#file ptr.
 	filePtrLog:=fopen(fileNameLog, WRITE, TEXT);
 	filePtrTable:=fopen(fileNameTable, WRITE, TEXT);
-	fprintf(filePtrTabe, "Number of tests | dim | average time\n");
+	fprintf(filePtrTable, "Number of tests | dim | average time\n");
 	
 	
 	currentDim:=startingDim;
 	#this loop is broken if a test takes more than 30mins.
 	while 1 = 1 do
+		printf("currently starting dim %d\n", currentDim);
 		currentTestNumber:=1;
 		totalTime:=0;
 		
@@ -40,7 +41,7 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		failFlag:= 1;
 		while failFlag <> 0 do
 			try
-				time_coeff:=test_sl_ehrhart(currentDim, "testingSL/debugTesting");
+				time_coeff:=test_sl_ehrhart(currentDim, fileBaseName||".debug");
 				failFlag:=0; #no erros. break out of while loop.				
 			catch:
 				printf("Something went wrong: %q\n",lastexception);
@@ -59,7 +60,9 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		#finally, how long did 1 test take? If more than 30min*60sec/min, stop.
 		if time_coeff[1] > 60*30 then:
 			printf("Test took longer than 1/2 hour, stopping script\n");
-			break; #break the while 1 = 1 loop.
+			currentDim:=currentDim + 1;
+			continue;
+			#break; #break the while 1 = 1 loop.
 		fi;
 		
 		#save the time.
@@ -70,7 +73,7 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 			failFlag:= 1;
 			while failFlag <> 0 do
 				try
-					time_coeff:=test_sl_ehrhart(currentDim, "testingSL/debugTesting");
+					time_coeff:=test_sl_ehrhart(currentDim, fileBaseName||".debug");
 					failFlag:=0; #no erros. break out of while loop.
 					
 					#print to log.
@@ -106,12 +109,13 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 end:
 
 
-
+#Find the average time to compute the top 3 coeff. of many simplices and increasing dim.
 				#starting dim, number of tests, file base name.
-table_time_sl_ehrhart(2, 50, "testingSL/tableTimeSLTopEhrhart");
+table_time_sl_ehrhart(2, 10, "tableTimeSLTopEhrhart_oneTest");
+#13, 50,
 
-
-#test_sl_ehrhart(6, "testingSL/Dim6TestXTop3");
+#Find the top 3 coeff. of 1 simplex.
+#test_sl_ehrhart(6, "debug");
 
 
 

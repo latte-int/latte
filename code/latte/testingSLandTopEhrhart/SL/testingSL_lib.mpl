@@ -1,16 +1,16 @@
 with(linalg):
 with(LinearAlgebra):
 with(numapprox,laurent):
-read("integration/createLinear.mpl"): #load the function to make a random linear form
-read("integration/integrationTestsLib.mpl"):#integration functions.
-read("testingSL/SL_lib.mpl");	#load the SL functions.
+read("../../integration/createLinear.mpl"): #load the function to make a random linear form
+read("../../integration/integrationTestsLib.mpl"):#integration functions.
+read("SL_lib.mpl");	#load the SL functions.
 
 # A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
 
 #Input: simplexDim: the amb. dim of the simplex.
 #Output: returns a list of simplexDim+1 vectors in R^(simplexDim).
-create_random_simplex:=proc(simplexDim)
+create_random_rational_simplex:=proc(simplexDim)
 	local i, j, M, checkRankMatrix:
 
 	do
@@ -38,7 +38,8 @@ end:
 
 #Input: A list of numSimplex many simplex
 #output: A list of the volume of each as computed by the SL functions.
-# if timer = 1, then we return a list containing [volume answer, total time];
+# if timer = 1, then we return a list containing [volume answer, total time],
+#  otherwise we just return the volume answers.
 find_volume_using_SL:=proc(simplexList, numSimplex, simplexDim, timer)
 	local volumeList, oneVolume, i, dummyLinearForm, currentTime, totalTime:
 	
@@ -89,72 +90,11 @@ end:
 
 
 
-#Not currently implemented. 
-test_sl_countLattice:=proc(simplexDim, numTests, fileName)
-	local i, filePtr, mySimplices, stringCommand;
-	local countAnswers, SLAnswers;
-	
-	countAnswers:=[];
-	SLAnswers:=[];
-	latteFacetFile:=filName||".latte";
-	countFile:=fileName||".count";
-	
-	filePtr:=fopen(countFile, WRITE, TEXT);
-	fprintf(filePtr, " ");
-	fclose(filePtr);
-	
-	#make the simplex
-	for i from 1 to numTests do:
-		mySimplices[i]:=lattice_random_simplex(simplexDim, 10000);
-	od:
-	
-	#call count, save answer in new line of the 'count file'
-	for i from 1 to numTests do:
-		printf("Calling count simplex %d of %d\n", i, numTests);
-		equations:=simplex_to_hyperplanes(mySimplices[i]);
-		write_facets_to_file(equations, fileName, simplexDim);
-		stringCommand:="./count --redundancy-check=none "||fileName||" 2>/dev/null | tail -n 1 >> "||countFile;
-		print(stringCommand);
-		system(stringCommand);
-	od:
-	
-	#read latte's answers.
-	filePtr:=fopen(countFile, READ, TEXT);
-	for i from 1 to numTests do:
-		countAnswers:=[parse(readline(filePtr)), op(countAnswers)];
-	od:
-	fclose(filePtr);
-
-	#find the count using SL.
-	for i from 1 to numTests do:
-		SLAnswers:= [1, op(SLAnswers)]; #TO FIX
-	od: 
-	
-	#compare the answers.
-	if nops(countAnswers) <> nops(SLAnswers) then:
-		print("Different number of answers reported by countAnswers and SLAnswers");
-		print(countAnswers, "=countAnswers");
-		print(SLAnswers, "=SLAnswers");
-		print(numTests, "=numTests");
-		quit;
-	fi;
-	for i from 1 to numTests do:
-		if countAnswers[i] <> SLAnswers[i] then:
-			print("Different answers: count vs sl:", countAnswers[i], "vs.", SLAnswers[i]);
-			print(countAnswers, "=countAnswers");
-			print(SLAnswers, "=SLAnswers");
-			print(numTests, "=numTests");
-		fi;
-	od:
-end:
-
-
-
-#Input:
-#@parm: simplexDim: the abm. dim of the simplix
-#@parm: numTests: how many simpleices you want to test at once
-#@parm: baseFileName: string. File names used for saving latte's facet equations and latte's integration answer. ex:"testingSL/testingSL_volume"
 #Test integration of random linear forms over random simplex using maple vs sl functions.
+#Input:
+# simplexDim: the abm. dim of the simplix
+# numTests: how many simpleices you want to test at once
+# baseFileName: string. File names used for saving latte's facet equations and latte's integration answer. ex:"testingSL/testingSL_volume"
 test_sl_integration:=proc(simplexDim, numTests, degreeL)
 	local randomGen:
 	local mySimplices, mapleLinForms,  mapleResults, integrationSLanswer:
@@ -244,7 +184,7 @@ local totalTimeSL, totalTimeLatte;
 	totalTimeSL:=0;
 	
 	for i from 1 to numTests do:
-		simplexList:=[create_random_simplex(simplexDim), op(simplexList)];
+		simplexList:=[create_random_rational_simplex(simplexDim), op(simplexList)];
 	od;
 	
 	temp:=find_volume_using_SL(simplexList, numTests, simplexDim, 1);
@@ -272,8 +212,8 @@ local totalTimeSL, totalTimeLatte;
 	simplexList:= [];
 	
 	for i from 1 to numTests do:
-		DD:=[[0,0,0,0],[0,0,1,0],[1,0,0,0],[0,1,0,0],[0,0,0,1]]; #used for debugging.
-		simplexList:=[create_random_simplex(simplexDim), op(simplexList)];
+		#DD:=[[0,0,0,0],[0,0,1,0],[1,0,0,0],[0,1,0,0],[0,0,0,1]]; #used for debugging.
+		simplexList:=[create_random_rational_simplex(simplexDim), op(simplexList)];
 		#simplexList:=[DD, op(simplexList)];
 	od;
 	
@@ -291,7 +231,7 @@ local totalTimeSL, totalTimeLatte;
 	
 	#Ask C++ exe to compute the volumes of the simplex.
 	stringNum := convert(nops(simplexList), string);
-	systemCommand:= "./test-volume-for-SL " || fileNameSimplex  || " " || fileNameVolume || " " || stringNum || " 2>/dev/null":
+	systemCommand:= "../../test-volume-for-SL " || fileNameSimplex  || " " || fileNameVolume || " " || stringNum || " 2>/dev/null":
 	#print(systemCommand);
 	totalTimeLatte:=time();
 	status:=system(systemCommand):
@@ -311,7 +251,7 @@ local totalTimeSL, totalTimeLatte;
 		print("Error, latte and SL functions have different number of results.");
 		print(volumeAnswersLatte);
 		print(volumeAnswersSL);
-		exit(1);
+		quit;
 	fi;
 	
 	for i from 1 to numTests do:
@@ -319,7 +259,7 @@ local totalTimeSL, totalTimeLatte;
 			print("The ", i, "st test does not agree");
 			print(volumeAnswersLatte);
 			print(volumeAnswersSL);
-			exit(1);
+			quit;
 		fi;
 	od;
 	
