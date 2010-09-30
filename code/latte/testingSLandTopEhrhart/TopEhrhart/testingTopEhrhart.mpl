@@ -1,15 +1,23 @@
 read("testingTopEhrhart_lib.mpl"); #load the test functions
 with(CodeTools[Profiling]):
 #
-#  Sept. 9, 2010
-#  Author: Brandon
-#  Description: Uses the main SL testing lib to compute the volume of simplies and compare the answer's with latte's tirangulation method.
+#  Sept. 28, 2010
+#  Author: Brandon, Gregory
+#  Description: Uses the main TopEhrhart lib to compute the top-three ehrhart coeff. 
+#	This script can either 1)generate a table of time test for finding the top ehrhart coeff. or 2) test
 #
 
 #Saves the average time it takes to find the top-3 ehrhart coeff in a file.
 #For each random simplex of dim between startingDim to infinity, test numTests many ehrhart top 3 coefficients.
 # The time of each simplex coeff. is saved in the log file, and the average of the numTests tests is saved in the table file.
 # If the first test takes more than 1/2 hour, we stop the function.
+# So the basic idea is:
+#
+#  for i from startindDim to infinity
+#	find the time to do 1 test
+#	if the test took longer than 1/2 hour, stop script.
+#	else find the time for numTests-1 more tests and average them.
+#  end for.
 #Input:
 #@parm: startingDim: starting dim. of the simplex.
 #@parm: numTests: how many simpleices you want to test at once
@@ -41,7 +49,7 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		failFlag:= 1;
 		while failFlag <> 0 do
 			try
-				time_coeff:=test_sl_ehrhart(currentDim, fileBaseName||".debug");
+				time_coeff:=test_top_ehrhart(currentDim, fileBaseName||".debug");
 				failFlag:=0; #no erros. break out of while loop.				
 			catch:
 				printf("Something went wrong: %q\n",lastexception);
@@ -59,10 +67,10 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		
 		#finally, how long did 1 test take? If more than 30min*60sec/min, stop.
 		if time_coeff[1] > 60*30 then:
-			printf("Test took longer than 1/2 hour, stopping script\n");
-			currentDim:=currentDim + 1;
-			continue;
-			#break; #break the while 1 = 1 loop.
+			printf("Test took longer than 1/2 hour\n");
+			#currentDim:=currentDim + 1;
+			#next;
+			break; #break the while 1 = 1 loop.
 		fi;
 		
 		#save the time.
@@ -73,7 +81,7 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 			failFlag:= 1;
 			while failFlag <> 0 do
 				try
-					time_coeff:=test_sl_ehrhart(currentDim, fileBaseName||".debug");
+					time_coeff:=test_top_ehrhart(currentDim, fileBaseName||".debug");
 					failFlag:=0; #no erros. break out of while loop.
 					
 					#print to log.
@@ -102,7 +110,7 @@ table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		fflush(filePtrTable);
 		
 		currentDim:=currentDim + 1;
-	end; #while. Keep trying higher dim. simplex.\
+	end; #while. Keep trying higher dim. simplex.
 	
 	fclose(filePtrLog);
 	fclose(filePtrTable);
@@ -111,11 +119,10 @@ end:
 
 #Find the average time to compute the top 3 coeff. of many simplices and increasing dim.
 				#starting dim, number of tests, file base name.
-table_time_sl_ehrhart(2, 10, "tableTimeSLTopEhrhart_oneTest");
-#13, 50,
+table_time_top_ehrhart(13, 1, "tableTimeSLTopEhrhart_debug");
 
 #Find the top 3 coeff. of 1 simplex.
-#test_sl_ehrhart(6, "debug");
+#test_top_ehrhart(6, "debug");
 
 
 

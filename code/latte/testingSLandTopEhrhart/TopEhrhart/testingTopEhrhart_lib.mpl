@@ -135,7 +135,7 @@ write_simplex_to_file:=proc(simplexList, fileName)
 	close(filePtr);
 end:
 
-test_sl_ehrhart:=proc(mydim, myfilename)
+test_top_ehrhart:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime:
 	randomize():
 	mysimplex:=create_random_simplex(mydim):
