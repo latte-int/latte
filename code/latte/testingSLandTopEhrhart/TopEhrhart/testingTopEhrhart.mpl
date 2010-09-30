@@ -22,7 +22,7 @@ with(CodeTools[Profiling]):
 #@parm: startingDim: starting dim. of the simplex.
 #@parm: numTests: how many simpleices you want to test at once
 #@parm: baseFileName: string. File names used for saving the time, average, and latte's facet equations and latte's volume answer. ex:"testingSL/testingSL_volume"
-table_time_sl_ehrhart:=proc(startingDim, numTests, fileBaseName)
+table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 	local currentDim, currentTestNumber, time_coeff, fileNameLog, fileNameTable, filePtrLog, filePtrTable;
 	local failFlag, totalTime;
 	
