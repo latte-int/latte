@@ -355,6 +355,44 @@ ZZ PolytopeValuation::factorial(const int n)
 	return product;
 }//factorial
 
+RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
+{
+	return integrateByTriangulation(originalPolynomial); //triangulation.
+	//integrateByTangetCones(originalPolynomial); //lawrence type
+}
+
+
+RationalNTL PolytopeValuation::integrateByTangetCones(const monomialSum& originalPolynomial)
+{
+	RationalNTL answer;
+	linFormSum* linearForms;
+
+
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+	dilationFactor = 1;
+
+	for (listCone * currentCone = vertexRayCones; currentCone; currentCone
+			= currentCone->rest)
+		for (int i = 0; i < numOfVars; ++i)
+			dilationFactor = lcm(dilationFactor,
+					(currentCone->vertex->vertex->denominators())[i]);
+
+	//dilate the tanget cones.
+	dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
+	triangulatePolytopeVertexRayCone();
+
+	//update polynomial.
+	linearForms = transformPolynomial(dilationFactor, originalPolynomial);
+
+
+	destroyLinForms(*linearForms);
+	//todo delete linearForms. is this safe?
+	return answer;
+}
+
+
 
 /**
  * Integrates the polynomial over the polytope. The polytope is written in maple syntax.
@@ -372,10 +410,10 @@ ZZ PolytopeValuation::factorial(const int n)
  *  and a is such that ever vertex becomes integer when mult. by a.
  *  P' is now a dilation of P such that P' has only integer vertices.
  */
-RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
+RationalNTL PolytopeValuation::integrateByTriangulation(const monomialSum& originalPolynomial)
 {
 	RationalNTL answer;
-	linFormSum linearForms;
+	linFormSum* linearForms;
 
 
 
@@ -394,6 +432,25 @@ RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 	dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
 	convertToOneCone(); //every vertex should be integer
 	triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+
+	linearForms = transformPolynomial(dilationFactor, originalPolynomial);
+
+
+	answer.add(integratePolytope(*linearForms)); //finally, we are ready to do the integration!
+
+	answer.div(power(dilationFactor, originalPolynomial.varCount));
+
+	destroyLinForms(*linearForms);
+	//todo:: delete linearForms.
+	return answer;
+
+}//integrate
+
+//converts the polynomial we integrate over the new dilated polytope.
+//caller is taksed with deleting the pointer.
+linFormSum* PolytopeValuation::transformPolynomial(const ZZ &dilationFactor, const monomialSum& originalPolynomial ) const
+{
+	linFormSum * linearForms = new linFormSum;
 
 	//Goal: find new polynomial.
 	//define the new polynomial.
@@ -437,28 +494,21 @@ RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 	//make an iterator for the transformed polynomial and decompost it into linear forms.
 	BTrieIterator<RationalNTL, int>* transformedPolynomialIterator =
 			new BTrieIterator<RationalNTL, int> ();
-	linearForms.termCount = 0;
-	linearForms.varCount = transformedPolynomial.varCount;
+	linearForms->termCount = 0;
+	linearForms->varCount = transformedPolynomial.varCount;
 	transformedPolynomialIterator->setTrie(transformedPolynomial.myMonomials,
 			transformedPolynomial.varCount);
-	decompose(transformedPolynomialIterator, linearForms);
+	decompose(transformedPolynomialIterator, *linearForms);
 
 
-	answer.add(integratePolytope(linearForms)); //finally, we are ready to do the integration!
-
-	answer.div(power(dilationFactor, transformedPolynomial.varCount));
-
-	destroyLinForms(linearForms);
 	destroyMonomials(transformedPolynomial);
-
 	delete transformedPolynomialLoader;
-
 	delete originalPolynomialIterator;
 	delete transformedPolynomialIterator;
 
-	return answer;
+	return linearForms;
+}//transformPolynomial
 
-}//integrate
 
 
 /**
@@ -523,8 +573,18 @@ RationalNTL PolytopeValuation::integratePolytope(linFormSum &forms) const
 	}//for every triangulated simplex.
 	delete linearFormIterator;
 
+	cout << "poly. valuation.cpp: 576 return answer " << answer << endl;
 	return answer;
 }//integratePolytope()
+
+
+RationalNTL PolytopeValuation::integrateTriangulatedTangetCones(linFormSum &forms) const
+{
+
+	return RationalNTL(); //to fix.
+}
+
+
 
 /**
  * Returns the lowest common multiple of a and b.
