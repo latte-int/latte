@@ -135,6 +135,7 @@ write_simplex_to_file:=proc(simplexList, fileName)
 	close(filePtr);
 end:
 
+
 test_top_ehrhart:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime:
 	randomize():
@@ -144,9 +145,14 @@ test_top_ehrhart:=proc(mydim, myfilename)
 	write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
 
 	startTime:=time();
+
+##ATTENTION this line is replaced now by a SINGLE call to the Topk_Eh
 	for myi from 0 to 2 do:
 		myCC:=[op(myCC),[coeff_dminusk_Eh(mysimplex,myi)]]:
+
 	od:
+
+#    myCC:=Topk_Eh(mysimplex,2,t);
 	totalTime:= time() - startTime;
 	return([totalTime, myCC]);
 	#CheckSou(5);
