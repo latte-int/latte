@@ -136,25 +136,100 @@ write_simplex_to_file:=proc(simplexList, fileName)
 end:
 
 
-test_top_ehrhart:=proc(mydim, myfilename)
-	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime:
+#Makes a random simplex, saves it to a file, and calls both top ehrhart functions and looks at which one was faster.
+test_top_ehrhart_compare_v1_v2:=proc(mydim, myfilename)
+	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version1, version2:
 	randomize():
 	mysimplex:=create_random_simplex(mydim):
 	myfileName:=myfilename:
 	write_simplex_to_file(mysimplex,cat(myfileName,".simp")):
 	write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
 
+	version1:= test_top_ehrhart_given_simplex_v1(mysimplex);
+	version2:= test_top_ehrhart_given_simplex_v2(mysimplex);
+
+	printf("NEW TEST: Dim %d\n", mydim);
+	print(version1); 
+	print(version2);
+	if( version2[1] > version1[1]) then;
+		printf("version 1 is faster than version 2 when doing v1 before v2.\n");
+	else
+		printf("version 2 is faster than version 1 when doing v1 before v2.\n");
+	fi;
+
+	version2:= test_top_ehrhart_given_simplex_v2(mysimplex);
+	version1:= test_top_ehrhart_given_simplex_v1(mysimplex);
+
+	
+	print(version1);
+	print(version2);
+	if( version2[1] > version1[1]) then;
+		printf("version 1 is faster than version 2 when doing v2 before v1.\n");
+	else
+		printf("version 2 is faster than version 1 when doing v2 before v1.\n");
+	fi;
+
+	#CheckSou(5);
+end:
+
+#Makes a random simplex, saves it to a file, and calles the origional (version 1) TopEhrhart functions.
+test_top_ehrhart_v1:=proc(mydim, myfilename)
+	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version1:
+	randomize():
+	mysimplex:=create_random_simplex(mydim):
+	myfileName:=myfilename:
+	write_simplex_to_file(mysimplex,cat(myfileName,".simp")):
+	write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
+
+	version1:= test_top_ehrhart_given_simplex_v1(mysimplex);
+	return version1;
+	
+	#CheckSou(5);
+end:
+
+
+#Makes a random simplex, saves it to a file, and calles the new (version 1) TopEhrhart functions.
+test_top_ehrhart_v2:=proc(mydim, myfilename)
+	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version2:
+	randomize():
+	mysimplex:=create_random_simplex(mydim):
+	myfileName:=myfilename:
+	write_simplex_to_file(mysimplex,cat(myfileName,".simp")):
+	write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
+
+	version2:= test_top_ehrhart_given_simplex_v2(mysimplex);
+	return version2;
+end:
+
+
+
+#Tests top-ehrhart functions 
+#These are the orgigional functions we recieved before Oct 2010.
+test_top_ehrhart_given_simplex_v1:=proc(mysimplex)
+	local myi, myCC:=[], startTime, totalTime:
+
 	startTime:=time();
 
-##ATTENTION this line is replaced now by a SINGLE call to the Topk_Eh
+
 	for myi from 0 to 2 do:
 		myCC:=[op(myCC),[coeff_dminusk_Eh(mysimplex,myi)]]:
-
 	od:
 
-#    myCC:=Topk_Eh(mysimplex,2,t);
 	totalTime:= time() - startTime;
 	return([totalTime, myCC]);
 	#CheckSou(5);
 end:
+
+#Tests top-ehrhart functions 
+#These are the new functions we recieved on Oct 2010.
+test_top_ehrhart_given_simplex_v2:=proc(mysimplex)
+	local startTime, myCC, totalTime;
+
+	startTime:=time();
+	myCC:=Topk_Eh(mysimplex,2,t);
+	totalTime:= time() - startTime;
+	return([totalTime, myCC]);
+end:
+
+
 print("testSLEhrhar.file ok");

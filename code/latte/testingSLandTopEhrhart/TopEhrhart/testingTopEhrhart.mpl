@@ -49,7 +49,9 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		failFlag:= 1;
 		while failFlag <> 0 do
 			try
-				time_coeff:=test_top_ehrhart(currentDim, fileBaseName||".debug");
+				#time_coeff:=test_top_ehrhart_v1(currentDim, fileBaseName||".debug");
+				 time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
+
 				failFlag:=0; #no erros. break out of while loop.
 			catch:
 				printf("Something went wrong: %q\n",lastexception);
@@ -81,7 +83,8 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 			failFlag:= 1;
 			while failFlag <> 0 do
 				try
-					time_coeff:=test_top_ehrhart(currentDim, fileBaseName||".debug");
+					#time_coeff:=test_top_ehrhart_v1(currentDim, fileBaseName||".debug");
+					 time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
 					failFlag:=0; #no erros. break out of while loop.
 
 					#print to log.
@@ -119,10 +122,17 @@ end:
 
 #Find the average time to compute the top 3 coeff. of many simplices and increasing dim.
 				#starting dim, number of tests, file base name.
-table_time_top_ehrhart(4, 5, "CUCARACHAS/tableTimeSLTopEhrhart_debug");
+table_time_top_ehrhart(4, 7, "tableTimeSLTopEhrhart");
+
+
+#test_top_ehrhart_compare_v1_v2(4, "compareV1V2");
+
+
+
+
 
 #Find the top 3 coeff. of 1 simplex.
-#test_top_ehrhart(6, "debug");
+#test_top_ehrhart(6, "oneTopEhrhartTest");
 
 
 
@@ -143,13 +153,13 @@ Profile(relativevolumeoffaceiotac);
 Profile(functionIzero);
 Profile(prod_Toddzero);
 Profile(functionSzero);
-Profile(changeofcoordinates);
-Profile(coeff_minusdplusk_iota_function_S);
 Profile(coeff_minusdplusk_S);
 Profile(coeff_dminusk_Eh_with_reg);
 Profile(random_vector);
 Profile(coeff_dminusk_Eh);
 
+Profile(changeofcoordinates);
+Profile(coeff_minusdplusk_iota_function_S);
 
 PrintProfiles(primitive_vector);
 PrintProfiles(short_vector);
