@@ -1,8 +1,9 @@
 read("testingTopEhrhart_lib.mpl"); #load the test functions
+interface(quiet=true);
 #with(CodeTools[Profiling]):
 #
 #  Sept. 28, 2010
-#  Author: Brandon, Gregory
+#  Author: Brandon, Gregory, Jesus
 #  Description: Uses the main TopEhrhart lib to compute the top-three ehrhart coeff.
 #	This script can either 1)generate a table of time test for finding the top ehrhart coeff. or 2) test
 #
@@ -122,13 +123,10 @@ end:
 
 #Find the average time to compute the top 3 coeff. of many simplices and increasing dim.
 				#starting dim, number of tests, file base name.
-table_time_top_ehrhart(4, 7, "tableTimeSLTopEhrhart");
+table_time_top_ehrhart(11, 50, "CUCARACHAS/tableTimeSLTopEhrhart");
 
 
 #test_top_ehrhart_compare_v1_v2(4, "compareV1V2");
-
-
-
 
 
 #Find the top 3 coeff. of 1 simplex.
