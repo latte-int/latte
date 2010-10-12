@@ -217,8 +217,8 @@ code/latte/testingSLandTopEhrhart/TopEhrhart/Data/tableTimeSLTopEhrhart_dim12_1_
 code/latte/testingSLandTopEhrhart/TopEhrhart/Data/tableTimeSLTopEhrhart_dim2-10.average -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/Data/tableTimeSLTopEhrhart_dim2-10.log -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/TopEhrhart_lib.mpl -text
-code/latte/testingSLandTopEhrhart/TopEhrhart/compareTopEhrhartFunctions.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart.mpl -text
+code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhartBirkhoffSimplex.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart_lib.mpl -text
 code/latte/valuation/Driver.cpp -text
 code/latte/valuation/PolytopeValuation.cpp -text

@@ -136,7 +136,8 @@ write_simplex_to_file:=proc(simplexList, fileName)
 end:
 
 
-#Makes a random simplex, saves it to a file, and calls both top ehrhart functions and looks at which one was faster.
+#Makes a random simplex, saves it to a file, and calls both top ehrhart functions.
+#This function is usefull if you want to make sure both functions are returning the same answers.
 test_top_ehrhart_compare_v1_v2:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version1, version2:
 	randomize():
@@ -147,29 +148,7 @@ test_top_ehrhart_compare_v1_v2:=proc(mydim, myfilename)
 
 	version1:= test_top_ehrhart_given_simplex_v1(mysimplex);
 	version2:= test_top_ehrhart_given_simplex_v2(mysimplex);
-
-	printf("NEW TEST: Dim %d\n", mydim);
-	print(version1); 
-	print(version2);
-	if( version2[1] > version1[1]) then;
-		printf("version 1 is faster than version 2 when doing v1 before v2.\n");
-	else
-		printf("version 2 is faster than version 1 when doing v1 before v2.\n");
-	fi;
-
-	version2:= test_top_ehrhart_given_simplex_v2(mysimplex);
-	version1:= test_top_ehrhart_given_simplex_v1(mysimplex);
-
-	
-	print(version1);
-	print(version2);
-	if( version2[1] > version1[1]) then;
-		printf("version 1 is faster than version 2 when doing v2 before v1.\n");
-	else
-		printf("version 2 is faster than version 1 when doing v2 before v1.\n");
-	fi;
-
-	#CheckSou(5);
+	return [version1, version2];
 end:
 
 #Makes a random simplex, saves it to a file, and calles the origional (version 1) TopEhrhart functions.
