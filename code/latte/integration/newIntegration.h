@@ -8,6 +8,7 @@
 //#include "PolyRep.cpp"
 //#include "PolyTrie.cpp"
 #include "residue.h"
+#include "cone.h"
 
 NTL_CLIENT
 
@@ -35,10 +36,13 @@ struct simplexZZ
 };
 
 void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, RationalNTL coe, ZZ de);
+void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, RationalNTL coe, ZZ de, int dim);
 void delSpace(string &line);
 void convertToSimplex(simplexZZ&, string);
 void integrateLinFormSum(ZZ &a, ZZ &b, PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex);
+void integrateLinFormSumLawrence(ZZ &a, ZZ &b, PolyIterator<RationalNTL, ZZ>* it, listCone *cone, int dim);
 void integrateMonomialSum(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
+void integrateMonomialSumLawrence(ZZ &numerator, ZZ &denominator, monomialSum &monomials, listCone *cone, int dim);
 void _integrateMonomialSum(ZZ &numerator, ZZ &denominator, _monomialSum &monomials, const simplexZZ &mySimplex);
 
 template <class T>

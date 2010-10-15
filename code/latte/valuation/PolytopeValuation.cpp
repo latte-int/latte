@@ -256,11 +256,9 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 	for (int i = 0; i < numOfVars; i++)
 		c[i] = rand() % 10000;
 
-	//int coneCounter = 0;
 	for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
 			= simplicialCone->rest)
 	{
-		//cout << "Processing cone " << ++coneCounter << endl;
 		//find vertex
 		vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
 				numOfVars, tempDenom);
@@ -275,8 +273,6 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 		for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
 				= currentRay->rest, col++)
 		{
-			//
-
 			tempDenom *= -1 * c * currentRay->first;
 
 			//generate matrix
@@ -294,20 +290,15 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 		tempNum *= abs(det) * simplicialCone->coefficient;
 
 		//add current term to the running total
-		//cout << "adding " << tempNum << " / " << tempDenom << " to " << num
-		//		<< " / " << denom << endl;
 		answer.add(tempNum, tempDenom);
-		//add(num, denom, tempNum, tempDenom);
 	}//for every simple cone in the cone
 
-	//	}//for every cone
 	ZZ one;
 	one = 1;
 	answer.mult(one, factorial(numOfVars));
 
 	return answer;
 }//findVolumeUsingLarence()
-
 
 /**
  * Converts the input polynomal vertex-ray input to one polytope for trangulation,
@@ -355,44 +346,6 @@ ZZ PolytopeValuation::factorial(const int n)
 	return product;
 }//factorial
 
-RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
-{
-	return integrateByTriangulation(originalPolynomial); //triangulation.
-	//integrateByTangetCones(originalPolynomial); //lawrence type
-}
-
-
-RationalNTL PolytopeValuation::integrateByTangetCones(const monomialSum& originalPolynomial)
-{
-	RationalNTL answer;
-	linFormSum* linearForms;
-
-
-
-	//find the dilation factor.
-	ZZ dilationFactor;
-	dilationFactor = 1;
-
-	for (listCone * currentCone = vertexRayCones; currentCone; currentCone
-			= currentCone->rest)
-		for (int i = 0; i < numOfVars; ++i)
-			dilationFactor = lcm(dilationFactor,
-					(currentCone->vertex->vertex->denominators())[i]);
-
-	//dilate the tanget cones.
-	dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
-	triangulatePolytopeVertexRayCone();
-
-	//update polynomial.
-	linearForms = transformPolynomial(dilationFactor, originalPolynomial);
-
-
-	destroyLinForms(*linearForms);
-	//todo delete linearForms. is this safe?
-	return answer;
-}
-
-
 
 /**
  * Integrates the polynomial over the polytope. The polytope is written in maple syntax.
@@ -410,10 +363,10 @@ RationalNTL PolytopeValuation::integrateByTangetCones(const monomialSum& origina
  *  and a is such that ever vertex becomes integer when mult. by a.
  *  P' is now a dilation of P such that P' has only integer vertices.
  */
-RationalNTL PolytopeValuation::integrateByTriangulation(const monomialSum& originalPolynomial)
+RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 {
 	RationalNTL answer;
-	linFormSum* linearForms;
+	linFormSum linearForms;
 
 
 
@@ -432,25 +385,6 @@ RationalNTL PolytopeValuation::integrateByTriangulation(const monomialSum& origi
 	dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
 	convertToOneCone(); //every vertex should be integer
 	triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
-
-	linearForms = transformPolynomial(dilationFactor, originalPolynomial);
-
-
-	answer.add(integratePolytope(*linearForms)); //finally, we are ready to do the integration!
-
-	answer.div(power(dilationFactor, originalPolynomial.varCount));
-
-	destroyLinForms(*linearForms);
-	//todo:: delete linearForms.
-	return answer;
-
-}//integrate
-
-//converts the polynomial we integrate over the new dilated polytope.
-//caller is taksed with deleting the pointer.
-linFormSum* PolytopeValuation::transformPolynomial(const ZZ &dilationFactor, const monomialSum& originalPolynomial ) const
-{
-	linFormSum * linearForms = new linFormSum;
 
 	//Goal: find new polynomial.
 	//define the new polynomial.
@@ -494,22 +428,114 @@ linFormSum* PolytopeValuation::transformPolynomial(const ZZ &dilationFactor, con
 	//make an iterator for the transformed polynomial and decompost it into linear forms.
 	BTrieIterator<RationalNTL, int>* transformedPolynomialIterator =
 			new BTrieIterator<RationalNTL, int> ();
-	linearForms->termCount = 0;
-	linearForms->varCount = transformedPolynomial.varCount;
+	linearForms.termCount = 0;
+	linearForms.varCount = transformedPolynomial.varCount;
 	transformedPolynomialIterator->setTrie(transformedPolynomial.myMonomials,
 			transformedPolynomial.varCount);
-	decompose(transformedPolynomialIterator, *linearForms);
+	decompose(transformedPolynomialIterator, linearForms);
 
 
+	answer.add(integratePolytope(linearForms)); //finally, we are ready to do the integration!
+
+	answer.div(power(dilationFactor, transformedPolynomial.varCount));
+
+	destroyLinForms(linearForms);
 	destroyMonomials(transformedPolynomial);
+
 	delete transformedPolynomialLoader;
+
 	delete originalPolynomialIterator;
 	delete transformedPolynomialIterator;
 
-	return linearForms;
-}//transformPolynomial
+	return answer;
+
+}//integrate
+
+RationalNTL PolytopeValuation::integrateLawrence(const monomialSum& originalPolynomial)
+{
+	RationalNTL answer;
+
+	linFormSum linearForms;
 
 
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+	dilationFactor = 1;
+
+	for (listCone * currentCone = vertexRayCones; currentCone; currentCone
+			= currentCone->rest)
+		for (int i = 0; i < numOfVars; ++i)
+			dilationFactor = lcm(dilationFactor,
+					(currentCone->vertex->vertex->denominators())[i]);
+	//dilate the polytope and triangulate.
+	cout << "dilation factor = " << dilationFactor << endl;
+	dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
+	triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
+
+	//Goal: find new polynomial.
+	//define the new polynomial.
+	monomialSum transformedPolynomial; //updated coefficients.
+	transformedPolynomial.termCount = 0;
+	transformedPolynomial.varCount = originalPolynomial.varCount;
+
+	//make a loader for the transformed polynomial and make an iterator for the original polynomial.
+	MonomialLoadConsumer<RationalNTL>* transformedPolynomialLoader =
+			new MonomialLoadConsumer<RationalNTL> ();
+	transformedPolynomialLoader->setMonomialSum(transformedPolynomial);
+	BTrieIterator<RationalNTL, int>* originalPolynomialIterator =
+			new BTrieIterator<RationalNTL, int> ();
+	originalPolynomialIterator->setTrie(originalPolynomial.myMonomials,
+			originalPolynomial.varCount);
+	originalPolynomialIterator->begin();
+
+	term<RationalNTL, int>* originalMonomial;
+	RationalNTL coefficient, totalDegree;
+	//loop over the original polynomial, and insert the updated monomial into the transformedPolynomial
+	for (originalMonomial = originalPolynomialIterator->nextTerm(); originalMonomial; originalMonomial
+			= originalPolynomialIterator->nextTerm())
+	{
+		long totalDegree = 0;
+		coefficient = originalMonomial->coef;
+
+		//find the total degree of the monomial.
+		for(int currentPower = 0; currentPower < originalMonomial->length; ++currentPower)
+			totalDegree += originalMonomial->exps[currentPower];
+		//cout << "factor^degree = " << dilationFactor << "^" << originalMonomial->degree << endl;
+		//cout << "length = " << originalMonomial->length << endl;
+		coefficient.div(power(dilationFactor, totalDegree));
+
+		transformedPolynomialLoader->ConsumeMonomial(coefficient,
+				originalMonomial->exps);
+	}//for every term in the originalPolynomial
+
+	assert(originalPolynomial.termCount == transformedPolynomial.termCount
+			&& originalPolynomial.varCount == transformedPolynomial.varCount );
+
+	//make an iterator for the transformed polynomial and decompost it into linear forms.
+	BTrieIterator<RationalNTL, int>* transformedPolynomialIterator =
+			new BTrieIterator<RationalNTL, int> ();
+	linearForms.termCount = 0;
+	linearForms.varCount = transformedPolynomial.varCount;
+	transformedPolynomialIterator->setTrie(transformedPolynomial.myMonomials,
+		transformedPolynomial.varCount);
+	decompose(transformedPolynomialIterator, linearForms);
+
+
+	answer.add(integratePolytopeLawrence(linearForms)); //finally, we are ready to do the integration!
+
+	answer.div(power(dilationFactor, transformedPolynomial.varCount));
+
+	destroyLinForms(linearForms);
+	destroyMonomials(transformedPolynomial);
+
+	delete transformedPolynomialLoader;
+
+	delete originalPolynomialIterator;
+	delete transformedPolynomialIterator;
+
+	return answer;
+}//integrateLawrence
 
 /**
  * Computes the integral of the linear forms over the polytope.
@@ -573,18 +599,58 @@ RationalNTL PolytopeValuation::integratePolytope(linFormSum &forms) const
 	}//for every triangulated simplex.
 	delete linearFormIterator;
 
-	cout << "poly. valuation.cpp: 576 return answer " << answer << endl;
 	return answer;
 }//integratePolytope()
 
-
-RationalNTL PolytopeValuation::integrateTriangulatedTangetCones(linFormSum &forms) const
+RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) const
 {
+	RationalNTL answer;
 
-	return RationalNTL(); //to fix.
-}
+	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
+			RationalNTL, ZZ> ();
+	linearFormIterator->setTrie(forms.myForms, forms.varCount);
 
+	for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
+			= simplicialCone->rest)
+	{
+/*
+		//First construct a simplex.
+		simplexZZ oneSimplex;
+		oneSimplex.d = forms.varCount;
 
+		listVector * rays = currentCone->rays;
+
+		int vertexCount = 0; //the current vertex number being processed.
+		oneSimplex.s.SetLength(numOfVars + 1);
+
+		for (rays = rays; rays; rays = rays->rest, ++vertexCount)
+		{
+			oneSimplex.s[vertexCount].SetLength(numOfVars);
+			assert( rays->first[0] == 1); //make sure the triangulation is such that the vertices of the original polytope is integer.
+			for (int k = 0; k < numOfVars; ++k)
+				oneSimplex.s[vertexCount][k] = rays->first[k + 1];
+
+		}//create the simplex. Don't copy the leading 1.
+
+		//comute the volume of the Parallelepiped
+		mat_ZZ matt;
+		matt.SetDims(oneSimplex.d, oneSimplex.d);
+		for (int j = 1; j <= oneSimplex.d; j++)
+			matt[j - 1] = oneSimplex.s[j] - oneSimplex.s[0];
+		oneSimplex.v = abs(determinant(matt));
+*/
+
+		ZZ numerator, denominator;
+
+		integrateLinFormSumLawrence(numerator, denominator, linearFormIterator,
+				simplicialCone, numOfVars);
+
+		answer.add(numerator, denominator);
+	}//for every triangulated simplex.
+	delete linearFormIterator;
+
+	return answer;
+}//integratePolytopeLawrence()
 
 /**
  * Returns the lowest common multiple of a and b.
@@ -690,7 +756,6 @@ void PolytopeValuation::triangulatePolytopeCone()
 				<< endl;
 		exit(1);
 	}
-
 	parameters.Number_of_Variables = numOfVars + 1;
 	triangulatedPoly = triangulateCone(polytopeAsOneCone, numOfVars + 1,
 			&parameters);

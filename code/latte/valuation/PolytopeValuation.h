@@ -60,8 +60,7 @@ private:
 
 
 	RationalNTL integratePolytope(linFormSum &forms) const;
-	RationalNTL integrateTriangulatedTangetCones(linFormSum &forms) const;
-	linFormSum* transformPolynomial(const ZZ &dilationFactor, const monomialSum& originalPolynomial) const; //converts the polynomial we integrate over the new dilated polytope.
+	RationalNTL integratePolytopeLawrence(linFormSum &forms) const;
 
 public:
 	typedef enum {DeterminantVolume, LawrenceVolume} VolumeType;
@@ -81,8 +80,7 @@ public:
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
 	RationalNTL integrate(const monomialSum& polynomial); //integrates the polynomial over the polytope.
-	RationalNTL integrateByTriangulation(const monomialSum& polynomial);//integrates by triangulating the polytope
-	RationalNTL integrateByTangetCones  (const monomialSum& polynomial); //integrates by using the lawrence type metod.
+	RationalNTL integrateLawrence(const monomialSum& polynomial);
 	ZZ static lcm(const ZZ &a, const ZZ & b);
 	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
 	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly

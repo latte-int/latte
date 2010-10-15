@@ -216,6 +216,57 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 	}
 }//update
 
+void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL coe, ZZ de, int dim)
+{
+	ZZ sum, lcm, total, g, tem, det;
+	int i, j;
+	//vec_ZZ inner_Pro; //inner_Pro[i] = <l, s_i>
+	//vec_ZZ sum_Nu, sum_De; // (sum_Nu/sum_De)[i] = <l, s_i>^d/ (\prod_{j \neq i} <l, s_i - s_j>)
+	//inner_Pro.SetLength(mySimplex.d + 1);
+	//sum_Nu.SetLength(mySimplex.d + 1);
+	//sum_De.SetLength(mySimplex.d + 1);
+	total = 0;
+	lcm = 1;
+	//bool repeat[1000]; //put this on the stack, do not waste the time requesting memory from the heap because this function is called many, many, many times.
+					 //Why is this bool (vs int): if there are no repeats in the <l, s_i> terms, the simplex is regular on l and we compute the integral as in the first case of the theory.
+					 // Otherwise we will have to compute the residue. It is in the residue-function where we worry about the multiplicity of things.
+
+	mat_ZZ mat;
+
+	a = l * (scaleRationalVectorToInteger(cone->vertex->vertex, dim, b));
+	a = power(a, dim + m);
+	b = power(b, dim + m);
+
+	int col = 0;
+	for(listVector *ray = cone->rays; ray; ray = ray->rest, col++){
+		b *= ray->first * l;
+		for (int row = 0; row < dim; row++)
+		{
+			mat[row][col] = ray->first[row];
+		}
+	}
+	if(a < 0 && b < 0){
+		a *= -1;
+		b *= -1;
+	};
+	if(b == 0){
+		vec_ZZ ProDiff;
+		ProDiff.SetLength(dim + 1);
+		for (i = 0; i <= dim; i++)
+			ProDiff[i] = cone->rays->first * l;
+		computeResidue(dim, m, ProDiff, l * scaleRationalVectorToInteger(
+			cone->vertex->vertex, dim, b), a, b);
+	}
+	determinant(det, mat);
+	a *= det * coe.getNumerator();
+	b *= coe.getDenominator();
+	g = GCD(a, b);
+	if (g != 0)
+	{
+		a = a / g;
+		b = b / g;
+	}
+} // updateLawrence
 
 //This function computes a given fraction a/b, the integral of the linear form forms, over the simplex mySimplex
 void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
@@ -255,6 +306,42 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
 	}
 }//integrateLinFormSum
 
+//This function computes a given fraction a/b, the integral of the linear form forms, over the cone
+void integrateLinFormSumLawrence(ZZ& numerator, ZZ& denominator, PolyIterator<RationalNTL, ZZ>* it, listCone *cone, int dim)
+{
+	ZZ v, de, counter, tem; //, coe;
+	RationalNTL coe;
+	int i, j, index, k, m;
+	vec_ZZ l;
+	//if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<forms.varCount<<"<>"<<mySimplex.d<<endl;exit(1);};
+	l.SetLength(dim);
+	numerator = 0;
+	denominator = 0;
+	it->begin();
+	term<RationalNTL, ZZ>* temp;
+	while (temp = it->nextTerm())
+	{
+		coe = temp->coef;
+		m = temp->degree; //obtain coefficient, power
+		l.SetLength(temp->length); //obtain exponent vector
+		for (j = 0; j < temp->length; j++)
+		{
+			l[j] = temp->exps[j];
+		}
+		de = 1;
+		for (i = 1; i <= dim + m; i++)
+		{
+			de = de * i;
+		} //de is (d+m)!. Note this is different from the factor in the paper because in our storage of a linear form, any coefficient is automatically adjusted by m!
+		updateLawrence(numerator, denominator, l, cone, m, coe, de, dim);//We are ready to compute the integral of one linear form over the simplex
+	}
+	delete temp;
+	if (denominator < 0)
+	{
+		denominator *= to_ZZ(-1);
+		numerator *= to_ZZ(-1);
+	}
+}//integrateLinFormSum
 
 void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials,
 		const simplexZZ &mySimplex)//integrate a polynomial stored as a Burst Trie
@@ -270,6 +357,22 @@ void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials,
 	it2->setTrie(forms.myForms, forms.varCount);
 	integrateLinFormSum(a, b, it2, mySimplex);
 }
+
+void integrateMonomialSumLawrence(ZZ &a, ZZ &b, monomialSum &monomials,
+		listCone *cone, int dim)//integrate a polynomial stored as a Burst Trie
+{
+	linFormSum forms;
+	forms.termCount = 0;
+	forms.varCount = monomials.varCount;
+	BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> ();
+	it->setTrie(monomials.myMonomials, monomials.varCount);
+	decompose(it, forms); //decomposition
+	delete it;
+	BTrieIterator<RationalNTL, ZZ>* it2 = new BTrieIterator<RationalNTL, ZZ> ();
+	it2->setTrie(forms.myForms, forms.varCount);
+	integrateLinFormSumLawrence(a, b, it2, cone, dim);
+}
+
 
 void _integrateMonomialSum(ZZ &a, ZZ &b, _monomialSum &monomials,
 		const simplexZZ &mySimplex)
