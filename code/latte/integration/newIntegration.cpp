@@ -4,6 +4,7 @@
 #include <NTL/ZZ.h>
 #include <NTL/mat_ZZ.h>
 #include <iostream>
+#include "print.h"
 
 using namespace std;
 
@@ -218,8 +219,13 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 
 void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL coe, ZZ de, int dim)
 {
+	cout << "m=" << m << " dim=" << dim << endl;
 	ZZ sum, lcm, total, g, tem, det;
 	int i, j;
+	ZZ temp_a, temp_b;
+	temp_a = 0;
+	temp_b = 1;
+
 	//vec_ZZ inner_Pro; //inner_Pro[i] = <l, s_i>
 	//vec_ZZ sum_Nu, sum_De; // (sum_Nu/sum_De)[i] = <l, s_i>^d/ (\prod_{j \neq i} <l, s_i - s_j>)
 	//inner_Pro.SetLength(mySimplex.d + 1);
@@ -232,40 +238,72 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 					 // Otherwise we will have to compute the residue. It is in the residue-function where we worry about the multiplicity of things.
 
 	mat_ZZ mat;
+	mat.SetDims(dim, dim); //(n, m) makes mat have dimension n x m.
 
-	a = l * (scaleRationalVectorToInteger(cone->vertex->vertex, dim, b));
-	a = power(a, dim + m);
-	b = power(b, dim + m);
+
+	//printListCone(cone, dim);
+	//find <l, v>^(dim+m).
+	temp_a = l * (scaleRationalVectorToInteger(cone->vertex->vertex, dim, temp_b));
+	temp_a = power(temp_a, dim + m);
+	temp_b = power(temp_b, dim + m);
 
 	int col = 0;
 	for(listVector *ray = cone->rays; ray; ray = ray->rest, col++){
-		b *= ray->first * l;
+		//cout << "I'm inside the matrix building outer loop: col=" << col << endl;
+		temp_b *= ray->first * l; //find <ray, l>
 		for (int row = 0; row < dim; row++)
 		{
 			mat[row][col] = ray->first[row];
 		}
 	}
-	if(a < 0 && b < 0){
-		a *= -1;
-		b *= -1;
+	//cout << "hey, I made it past the matrix building: newIntegration::251" << endl;
+	if(temp_a < 0 && temp_b < 0){
+		temp_a *= -1;
+		temp_b *= -1;
 	};
-	if(b == 0){
+	if(temp_b == 0){
 		vec_ZZ ProDiff;
 		ProDiff.SetLength(dim + 1);
-		for (i = 0; i <= dim; i++)
-			ProDiff[i] = cone->rays->first * l;
+		listVector * temp = cone->rays;
+		for (i = 0; i < dim; i++)
+		{
+			//cout << "going to take inner prod " << i << endl;
+			//cout << temp->first << endl;
+			ProDiff[i] = temp->first * l;
+			temp = temp->rest;
+		}
+		//cout << "done with inner prods.!" << endl;
 		computeResidue(dim, m, ProDiff, l * scaleRationalVectorToInteger(
-			cone->vertex->vertex, dim, b), a, b);
+			cone->vertex->vertex, dim, temp_b), temp_a, temp_b);
+
 	}
 	determinant(det, mat);
-	a *= det * coe.getNumerator();
-	b *= coe.getDenominator();
-	g = GCD(a, b);
+	temp_a *= det * coe.getNumerator();// we should add to a/b. ???
+	temp_b *= coe.getDenominator();
+	g = GCD(temp_a, temp_b);
 	if (g != 0)
 	{
-		a = a / g;
-		b = b / g;
+		temp_a = temp_a / g;
+		temp_b = temp_b / g;
 	}
+	//add a/b + temp_a/temp_b
+
+	cout << a << "/" << b << " + " << temp_a << "/" << temp_b << "==";
+	if (a == 0)
+	{
+		a = temp_a;
+		b = temp_b;
+	} //return a/b = temp_a/temp_b
+	else //if ((lcm != 0) && (b != 0))
+	{
+
+		ZZ lcmB;
+		lcmB = b * temp_b / GCD(b, temp_b); //find LCM of b and temp_b
+		a = a * lcmB / b + temp_a * lcmB / temp_b;
+		b = lcmB;
+	} // a/b = a/b + temp_a/temp_b.
+	cout << a << "/" << b << endl;
+
 } // updateLawrence
 
 //This function computes a given fraction a/b, the integral of the linear form forms, over the simplex mySimplex

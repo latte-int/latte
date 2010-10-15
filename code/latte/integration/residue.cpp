@@ -69,6 +69,8 @@ ZZ AChooseB(int a, int b)
 void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		ZZ &a, ZZ &b)
 {
+	//cout << "Compute residue called" << endl;
+	//cout << "d=" << d << "M=" << M << " innerprod=" << innerProDiff << "p= " << p << endl;
 	if (p == 0)
 	{
 		a = 0;
