@@ -28,17 +28,19 @@ int main(int argc, char *argv[])
 	RationalNTL correctAnswer(argv[1]);
 	Valuation::ValuationContainer valuationContainer;
 
-	char * options[4];
+	char * options[5];
 
 	options[0] = "./exe";
 	options[1] = "--valuation=integrate";
-	options[2] = new char[strlen(argv[2]) + 13];
-	strcpy(options[2], "--monomials=");
-	strcat(options[2], argv[2]);
-	options[3] = argv[3];
+	options[2] = "--triangulate";
+	options[3] = new char[strlen(argv[2]) + 13];
+	strcpy(options[3], "--monomials=");
+	strcat(options[3], argv[2]);
+	options[4] = argv[3];
 
-	valuationContainer = Valuation::mainValuationDriver((const char **)options, 4);
-	delete options[2];
+	cout << "Running main valuation Driver" << endl;
+	valuationContainer = Valuation::mainValuationDriver((const char **)options, 5);
+	delete options[3];
 
 
 	if ( valuationContainer.answers[0].answer != correctAnswer)
