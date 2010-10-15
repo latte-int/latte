@@ -116,7 +116,7 @@ ValuationContainer computeVolume(Polyhedron * poly,
 
 ValuationContainer computeIntegral(Polyhedron *poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
-		const char *printLawrence, const char * polynomialString);
+		const char * polynomialString);
 
 ValuationContainer mainValuationDriver(const char *argv[], int argc);
 

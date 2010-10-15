@@ -69,25 +69,55 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
  */
 Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
-		const char *printLawrence, const char * polynomialString)
+		const char * polynomialString)
 {
 	ValuationContainer answer;
-	ValuationData timer_and_result;
+	ValuationData tiangulate_timer_and_result;
+	ValuationData lawrence_timer_and_result;
 	RationalNTL ans1;
 
-	monomialSum originalPolynomial;// polynomial without the updated coefficients.
-	PolytopeValuation polytopeValuation(poly, myParameters);
+	cout << "val alg=" << valuationAlg << endl;
 
-	loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
-	timer_and_result.timer.start();
-	ans1 = polytopeValuation.integrate(originalPolynomial);
-	timer_and_result.timer.stop();
+	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
+				== 0)
+	{
+		cout << "Going to run the triangulation integration method" << endl;
+		monomialSum originalPolynomial;// polynomial without the updated coefficients.
+		PolytopeValuation polytopeValuation(poly, myParameters);
 
-	timer_and_result.valuationType = ValuationData::integrateTriangulation;
-	timer_and_result.answer = ans1;
-	answer.add(timer_and_result);
+		loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
+		tiangulate_timer_and_result.timer.start();
+		ans1 = polytopeValuation.integrate(originalPolynomial);
+		tiangulate_timer_and_result.timer.stop();
 
-	destroyMonomials(originalPolynomial);
+		tiangulate_timer_and_result.valuationType = ValuationData::integrateTriangulation;
+		tiangulate_timer_and_result.answer = ans1;
+		answer.add(tiangulate_timer_and_result);
+
+		destroyMonomials(originalPolynomial);
+		cout << "triangulation integration method worked ok." << endl;
+	}//if doing triangulation method.
+
+
+	if (strncmp(valuationAlg, "lawrence", 8) == 0
+			|| strcmp(valuationAlg, "all") == 0)
+	{
+		cout << "Going to run the lawrence integration method" << endl;
+		monomialSum originalPolynomial;// polynomial without the updated coefficients.
+		PolytopeValuation polytopeValuation(poly, myParameters);
+
+		loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
+		tiangulate_timer_and_result.timer.start();
+		ans1 = polytopeValuation.integrateLawrence(originalPolynomial);
+		tiangulate_timer_and_result.timer.stop();
+
+		tiangulate_timer_and_result.valuationType = ValuationData::integrateTriangulation;
+		tiangulate_timer_and_result.answer = ans1;
+		answer.add(tiangulate_timer_and_result);
+
+		destroyMonomials(originalPolynomial);
+		cout << "lawrence integration method worked ok" << endl;
+	}
 	return answer;
 }//computeIntegral
 
@@ -455,7 +485,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(const char *argv[],
 		}//user supplied polynomial in file.
 
 		valuationAnswers = computeIntegral(Poly, *params,
-				valuationAlg, printLawrence, polynomialLine.c_str());
+				valuationAlg, polynomialLine.c_str());
 	} else
 	{
 		cerr << "ops, valuation type is not known: " << valuationType << endl;
