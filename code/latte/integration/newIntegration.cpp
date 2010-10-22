@@ -162,8 +162,10 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 		if (!repeat[i])
 		{
 			sum_Nu[i] = 1;
+			cout << "l^dim+m=" << inner_Pro[i] << "^" << mySimplex.d << "+" << m;
 			for (j = 0; j < m + mySimplex.d; j++)
 				sum_Nu[i] = sum_Nu[i] * inner_Pro[i]; // sum_Nu_i = inner_pro ^ (m + d)
+			cout << "=" << sum_Nu[i] << endl;
 			sum_De[i] = 1;
 			for (j = 0; j <= mySimplex.d; j++)
 				if (i != j)
@@ -186,6 +188,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 			{
 				lcm = lcm * sum_De[i] / (GCD(lcm, sum_De[i]));
 			};
+			cout << "i= " << i << "num/dem= " << RationalNTL(sum_Nu[i], sum_De[i]) << endl;
 		};
 	for (i = 0; i <= mySimplex.d; i++)
 		if ((!repeat[i]) && (sum_De[i] != 0))
@@ -196,6 +199,8 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 
 	lcm = lcm * de * coe.getDenominator();
 	total = total * mySimplex.v * coe.getNumerator();
+
+	cout << "update: total/lcm = " << RationalNTL(total,lcm) << endl;
 	if (a == 0)
 	{
 		a = total;
@@ -243,14 +248,19 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 
 	//printListCone(cone, dim);
 	//find <l, v>^(dim+m).
-	temp_a = l * (scaleRationalVectorToInteger(cone->vertex->vertex, dim, temp_b));
+	scaleRationalVectorToInteger(cone->vertex->vertex, dim, temp_b);
+	assert(temp_b == 1);
+	cout << "l^dim+m= ";
+	temp_a = l * cone->vertex->vertex->numerators();
+	cout << temp_a << "^" << dim << "+ "<< m;
 	temp_a = power(temp_a, dim + m);
-	temp_b = power(temp_b, dim + m);
+	cout << "= " << temp_a << endl;
+	//temp_b = power(temp_b, dim + m);
 
 	int col = 0;
 	for(listVector *ray = cone->rays; ray; ray = ray->rest, col++){
 		//cout << "I'm inside the matrix building outer loop: col=" << col << endl;
-		temp_b *= ray->first * l; //find <ray, l>
+		temp_b *= (ray->first * l); //find <ray, l>
 		for (int row = 0; row < dim; row++)
 		{
 			mat[row][col] = ray->first[row];
@@ -273,13 +283,24 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 			temp = temp->rest;
 		}
 		//cout << "done with inner prods.!" << endl;
-		computeResidue(dim, m, ProDiff, l * scaleRationalVectorToInteger(
-			cone->vertex->vertex, dim, temp_b), temp_a, temp_b);
+		//computeResidue(dim, m, ProDiff, l * scaleRationalVectorToInteger(
+		//	cone->vertex->vertex, dim, temp_b), temp_a, temp_b);
+		computeResidue(dim, m, ProDiff, l * cone->vertex->vertex->numerators(), temp_a, temp_b);
 
 	}
+
+
 	determinant(det, mat);
-	temp_a *= det * coe.getNumerator();// we should add to a/b. ???
-	temp_b *= coe.getDenominator();
+	temp_a *= abs(det) * coe.getNumerator();// we should add to a/b. ???
+	temp_b *= de * coe.getDenominator();
+
+	cout << "total/lcm(L) = " << RationalNTL(temp_a, temp_b) << endl;
+
+	//total/lcm =
+	//total = total * mySimplex.v * coe.getNumerator();
+	//lcm = lcm * de * coe.getDenominator();
+
+
 	g = GCD(temp_a, temp_b);
 	if (g != 0)
 	{

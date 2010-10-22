@@ -252,6 +252,10 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		b = b / g;
 	};
 
+	cout << "compute residue: d=" << d << ", M=" << M << ", p=" << p << endl;
+	cout << "  innerProdDiff" << innerProDiff << endl;
+	cout << "  a/b = " << RationalNTL(a, b) << endl;
+
 	delete it;
 	destroyMonomials(m1);
 	destroyMonomials(sub);

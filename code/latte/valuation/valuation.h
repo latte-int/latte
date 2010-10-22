@@ -87,7 +87,7 @@ public:
 	//2) entireValuation timer starts from when mainValuationDriver is called to when it finishes.
 	//Also "answer" is meaningless for "entireValuation".
 
-	enum ValuationType { unknown, volumeLawrence, volumeTriangulation, integrateTriangulation, entireValuation};
+	enum ValuationType { unknown, volumeLawrence, volumeTriangulation, integrateTriangulation, integrateLawrence, entireValuation};
 	ValuationType valuationType;
 	RationalNTL answer;
 	Timer timer;

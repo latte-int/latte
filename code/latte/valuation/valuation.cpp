@@ -111,7 +111,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		ans1 = polytopeValuation.integrateLawrence(originalPolynomial);
 		tiangulate_timer_and_result.timer.stop();
 
-		tiangulate_timer_and_result.valuationType = ValuationData::integrateTriangulation;
+		tiangulate_timer_and_result.valuationType = ValuationData::integrateLawrence;
 		tiangulate_timer_and_result.answer = ans1;
 		answer.add(tiangulate_timer_and_result);
 
@@ -575,6 +575,8 @@ void Valuation::ValuationContainer::printResults(ostream & out) const
 			out << "Volume (using the triangulation-determinant method)" << endl;
 		else if ( answers[i].valuationType == ValuationData::integrateTriangulation)
 			out << "Integration (using the triangulation method)" << endl;
+		else if ( answers[i].valuationType == ValuationData::integrateLawrence)
+			out << "Integration (using the Lawrence method" << endl;
 		else if ( answers[i].valuationType == ValuationData::entireValuation)
 		{
 			out << "Computational time (algorithms + processing + program control)" << endl;
