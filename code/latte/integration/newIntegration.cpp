@@ -162,7 +162,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 		if (!repeat[i])
 		{
 			sum_Nu[i] = 1;
-			cout << "l^dim+m=" << inner_Pro[i] << "^" << mySimplex.d << "+" << m;
+			cout << "update::l^dim+m=" << inner_Pro[i] << "^" << mySimplex.d << "+" << m;
 			for (j = 0; j < m + mySimplex.d; j++)
 				sum_Nu[i] = sum_Nu[i] * inner_Pro[i]; // sum_Nu_i = inner_pro ^ (m + d)
 			cout << "=" << sum_Nu[i] << endl;
@@ -188,7 +188,11 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 			{
 				lcm = lcm * sum_De[i] / (GCD(lcm, sum_De[i]));
 			};
-			cout << "i= " << i << "num/dem= " << RationalNTL(sum_Nu[i], sum_De[i]) << endl;
+			//cout << "update:i= " << i << "num/dem= " << RationalNTL(sum_Nu[i], sum_De[i]) << endl;
+			cout << "update:i= " << i << "num/dem= " << sum_Nu[i]<< " / "<< sum_De[i] << endl;
+			//cout << "update:i= " << i << "num/dem= " << sum_Nu[i]/GCD(sum_Nu[i],sum_De[i])<< " / "<< sum_De[i]/GCD(sum_Nu[i],sum_De[i]) << endl;
+			cout << RationalNTL(coe.getNumerator()*mySimplex.v*sum_Nu[i],de*coe.getDenominator()*sum_De[i]) << endl;
+
 		};
 	for (i = 0; i <= mySimplex.d; i++)
 		if ((!repeat[i]) && (sum_De[i] != 0))
@@ -224,7 +228,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 
 void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL coe, ZZ de, int dim)
 {
-	cout << "m=" << m << " dim=" << dim << endl;
+	//cout << "m=" << m << " dim=" << dim << endl;
 	ZZ sum, lcm, total, g, tem, det;
 	int i, j;
 	ZZ temp_a, temp_b;
@@ -250,7 +254,7 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 	//find <l, v>^(dim+m).
 	scaleRationalVectorToInteger(cone->vertex->vertex, dim, temp_b);
 	assert(temp_b == 1);
-	cout << "l^dim+m= ";
+	cout << "updateLawrence:l^dim+m= ";
 	temp_a = l * cone->vertex->vertex->numerators();
 	cout << temp_a << "^" << dim << "+ "<< m;
 	temp_a = power(temp_a, dim + m);
@@ -260,7 +264,8 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 	int col = 0;
 	for(listVector *ray = cone->rays; ray; ray = ray->rest, col++){
 		//cout << "I'm inside the matrix building outer loop: col=" << col << endl;
-		temp_b *= (ray->first * l); //find <ray, l>
+		temp_b *= -1*(ray->first * l); //find <ray, l>
+			//why times -1 you ask? The paper says <l, vertex - other vtertex> which is a ray directed TO the vertex, not AWAY from the vertex.
 		for (int row = 0; row < dim; row++)
 		{
 			mat[row][col] = ray->first[row];
@@ -294,7 +299,7 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 	temp_a *= abs(det) * coe.getNumerator();// we should add to a/b. ???
 	temp_b *= de * coe.getDenominator();
 
-	cout << "total/lcm(L) = " << RationalNTL(temp_a, temp_b) << endl;
+	cout << "updateLawrence:total/lcm(L) = " << RationalNTL(temp_a, temp_b) << endl;
 
 	//total/lcm =
 	//total = total * mySimplex.v * coe.getNumerator();
@@ -309,7 +314,7 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 	}
 	//add a/b + temp_a/temp_b
 
-	cout << a << "/" << b << " + " << temp_a << "/" << temp_b << "==";
+	cout << "updateLawrence:" << a << "/" << b << " + " << temp_a << "/" << temp_b << "==";
 	if (a == 0)
 	{
 		a = temp_a;
