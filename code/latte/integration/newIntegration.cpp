@@ -284,7 +284,7 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 		{
 			//cout << "going to take inner prod " << i << endl;
 			//cout << temp->first << endl;
-			ProDiff[i] = temp->first * l;
+			ProDiff[i] = -1*temp->first * l;
 			temp = temp->rest;
 		}
 		//cout << "done with inner prods.!" << endl;
