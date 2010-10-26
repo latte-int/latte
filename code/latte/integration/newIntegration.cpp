@@ -254,6 +254,8 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 	//find <l, v>^(dim+m).
 	scaleRationalVectorToInteger(cone->vertex->vertex, dim, temp_b);
 	assert(temp_b == 1);
+	cout << "updateLawrence: l = " << l << endl;
+	cout << "updateLawrence: numerators: " << cone->vertex->vertex->numerators() << endl;
 	cout << "updateLawrence:l^dim+m= ";
 	temp_a = l * cone->vertex->vertex->numerators();
 	cout << temp_a << "^" << dim << "+ "<< m;
@@ -278,7 +280,7 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 	};
 	if(temp_b == 0){
 		vec_ZZ ProDiff;
-		ProDiff.SetLength(dim + 1);
+		ProDiff.SetLength(dim);
 		listVector * temp = cone->rays;
 		for (i = 0; i < dim; i++)
 		{
@@ -290,12 +292,16 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 		//cout << "done with inner prods.!" << endl;
 		//computeResidue(dim, m, ProDiff, l * scaleRationalVectorToInteger(
 		//	cone->vertex->vertex, dim, temp_b), temp_a, temp_b);
+
+		//TODO: fix computeResidue. questions: how to modify prodDiff and other imputs to trick it into computing the right residue
+		//			or we have to do a cute-pate-edit solution which is messay :(
 		computeResidue(dim, m, ProDiff, l * cone->vertex->vertex->numerators(), temp_a, temp_b);
 
 	}
 
 
 	determinant(det, mat);
+	cout << "de=" << de << ", det=" << det << ", coe=" << coe << ", tempa= " << temp_a << ", tempb=" << temp_b << endl;
 	temp_a *= abs(det) * coe.getNumerator();// we should add to a/b. ???
 	temp_b *= de * coe.getDenominator();
 
