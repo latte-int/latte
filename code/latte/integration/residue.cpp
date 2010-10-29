@@ -69,8 +69,8 @@ ZZ AChooseB(int a, int b)
 void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		ZZ &a, ZZ &b)
 {
-	//cout << "Compute residue called" << endl;
-	//cout << "d=" << d << "M=" << M << " innerprod=" << innerProDiff << "p= " << p << endl;
+	cout << "Compute residue called" << endl;
+	cout << "d=" << d << "M=" << M << " innerprod=" << innerProDiff << "p= " << p << endl;
 	if (p == 0)
 	{
 		a = 0;
@@ -91,6 +91,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 	index.SetLength(d);
 	index[k - 1] = 0;
 	counter[k - 1] = 0;
+
 	for (i = 0; i <= d; i++)
 	{
 		found = 0;
@@ -103,6 +104,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 				break;
 			}
 		};
+
 		if (!found)
 		{
 			k++;
@@ -261,4 +263,8 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 	destroyMonomials(sub);
 	return;
 }//computeResidue
+
+
+
+
 

@@ -645,10 +645,12 @@ RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) cons
 		integrateLinFormSumLawrence(numerator, denominator, linearFormIterator,
 				simplicialCone, numOfVars);
 
+		cout << "PolytopeValuation::integratePolytopeLawrence" << answer << "+"<< numerator << "/" << denominator << endl;
 		answer.add(numerator, denominator);
 	}//for every triangulated simplex.
 	delete linearFormIterator;
 
+	cout << "PolytopeValuation::integratePolytopeLawrence final ans:" << answer << endl;
 	return answer;
 }//integratePolytopeLawrence()
 

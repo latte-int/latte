@@ -149,6 +149,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 		sum = 0;
 		for (j = 0; j < mySimplex.d; j++)
 			sum = sum + l[j] * mySimplex.s[i][j];
+
 		inner_Pro[i] = sum; // inner_Pro_i= <l, s_i>
 		repeat[i] = 0;
 		for (j = 0; j < i; j++)
@@ -162,6 +163,11 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 		if (!repeat[i])
 		{
 			sum_Nu[i] = 1;
+			cout << "update: l= " << l;
+			cout << "update: v=";
+
+			for(int index = 0; index <= mySimplex.d; ++index) cout << mySimplex.s[index] << ", ";
+			cout << endl;
 			cout << "update::l^dim+m=" << inner_Pro[i] << "^" << mySimplex.d << "+" << m;
 			for (j = 0; j < m + mySimplex.d; j++)
 				sum_Nu[i] = sum_Nu[i] * inner_Pro[i]; // sum_Nu_i = inner_pro ^ (m + d)
@@ -265,7 +271,7 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 
 	int col = 0;
 	for(listVector *ray = cone->rays; ray; ray = ray->rest, col++){
-		//cout << "I'm inside the matrix building outer loop: col=" << col << endl;
+
 		temp_b *= -1*(ray->first * l); //find <ray, l>
 			//why times -1 you ask? The paper says <l, vertex - other vtertex> which is a ray directed TO the vertex, not AWAY from the vertex.
 		for (int row = 0; row < dim; row++)
@@ -278,17 +284,19 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 		temp_a *= -1;
 		temp_b *= -1;
 	};
-	if(temp_b == 0){
+	if(temp_b == 0 && temp_a != 0){
 		vec_ZZ ProDiff;
-		ProDiff.SetLength(dim);
+		ProDiff.SetLength(dim+1);
 		listVector * temp = cone->rays;
 		for (i = 0; i < dim; i++)
 		{
 			//cout << "going to take inner prod " << i << endl;
 			//cout << temp->first << endl;
 			ProDiff[i] = -1*temp->first * l;
+			cout << "ProDiff:" << temp->first << "*" << l << "= " << ProDiff[i] << endl;
 			temp = temp->rest;
 		}
+		ProDiff[dim] = 0;
 		//cout << "done with inner prods.!" << endl;
 		//computeResidue(dim, m, ProDiff, l * scaleRationalVectorToInteger(
 		//	cone->vertex->vertex, dim, temp_b), temp_a, temp_b);
@@ -298,6 +306,11 @@ void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL c
 		computeResidue(dim, m, ProDiff, l * cone->vertex->vertex->numerators(), temp_a, temp_b);
 
 	}
+	else if ( temp_b == 0 && temp_a == 0)
+	{
+		temp_b = 1;
+	}
+
 
 
 	determinant(det, mat);
@@ -404,6 +417,7 @@ void integrateLinFormSumLawrence(ZZ& numerator, ZZ& denominator, PolyIterator<Ra
 			de = de * i;
 		} //de is (d+m)!. Note this is different from the factor in the paper because in our storage of a linear form, any coefficient is automatically adjusted by m!
 		updateLawrence(numerator, denominator, l, cone, m, coe, de, dim);//We are ready to compute the integral of one linear form over the simplex
+		cout << "integrateLinFormSumLawrence:: partial sum:" << numerator << "/" << denominator << endl;
 	}
 	delete temp;
 	if (denominator < 0)
