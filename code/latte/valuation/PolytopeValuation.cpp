@@ -6,6 +6,7 @@
  */
 
 #include "PolytopeValuation.h"
+#include "Perturbation.h"
 
 using namespace std;
 
@@ -606,13 +607,13 @@ RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) cons
 	linearFormIterator->setTrie(forms.myForms, forms.varCount);
 
 	RationalNTL coe;
-	int j, index, k, m;
+	int j, m;
 	unsigned int i;
-
 	vec_ZZ l;
-	ZZ de;
+	ZZ de, numerator, denominator;
+	int dim = numOfVars;
+
 	l.SetLength(numOfVars);
-	int dim=numOfVars;
 	numerator = 0;
 	denominator = 0;
 	linearFormIterator->begin();
@@ -634,12 +635,7 @@ RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) cons
 			l[j] = temp->exps[j];
 		}
 
-		bool dividedByZero = false;
-
-
 		lpc.findPerturbation(l);
-
-
 
 
 		de = 1;
@@ -647,11 +643,12 @@ RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) cons
 		{
 			de = de * i;
 		} //de is (d+m)!. Note this is different from the factor in the paper because in our storage of a linear form, any coefficient is automatically adjusted by m!
-		updateLawrence(numerator, denominator, l, cone, m, coe, de, dim);//We are ready to compute the integral of one linear form over the simplex
-		cout << "integrateLinFormSumLawrence:: partial sum:" << numerator
-				<< "/" << denominator << endl;
+		//updateLawrence(numerator, denominator, l, cone, m, coe, de, dim);//We are ready to compute the integral of one linear form over the simplex
+		//cout << "integrateLinFormSumLawrence:: partial sum:" << numerator
+		//		<< "/" << denominator << endl;
 	}
 
+	return RationalNTL();
 	//TODO:FIX integrateLawrence...do I need to be finding the volume..is this not already done for me. Look in the listCone datastructure !!!
 	/*
 	 RationalNTL answer;
