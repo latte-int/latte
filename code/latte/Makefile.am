@@ -208,6 +208,7 @@ bin_PROGRAMS += valuation-computation
 valuation_computation_SOURCES = valuation/Driver.cpp
 valuation_computation_SOURCES += valuation/valuation.cpp
 valuation_computation_SOURCES += valuation/PolytopeValuation.cpp
+valuation_computation_SOURCES += valuation/Perturbation.cpp
 valuation_computation_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #used for testing
 valuation_computation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #used for testing
 
@@ -217,6 +218,7 @@ valuation_computation_LDADD += liblatteintegration.a
 
 noinst_HEADERS += valuation/PolytopeValuation.h
 noinst_HEADERS += valuation/valuation.h
+noinst_HEADERS += valuation/Perturbation.h
 
 bin_PROGRAMS += ConvertCDDextToLatte
 ConvertCDDextToLatte_SOURCES = convertCDD_ext_to_latte.cpp

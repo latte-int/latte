@@ -221,6 +221,8 @@ code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhartBirkhoffSimplex.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart_lib.mpl -text
 code/latte/valuation/Driver.cpp -text
+code/latte/valuation/Perturbation.cpp -text
+code/latte/valuation/Perturbation.h -text
 code/latte/valuation/PolytopeValuation.cpp -text
 code/latte/valuation/PolytopeValuation.h -text
 code/latte/valuation/integrateHyperrectangle.mpl -text

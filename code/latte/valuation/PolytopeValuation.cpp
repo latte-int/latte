@@ -152,7 +152,6 @@ void PolytopeValuation::convertToOneCone()
 }//convertToOneCone
 
 
-
 /**
  * Dilates the polytope by computing new_vertex = old_vertex * factor, and overriding the
  * vertex-ray cones.
@@ -368,8 +367,6 @@ RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 	RationalNTL answer;
 	linFormSum linearForms;
 
-
-
 	//find the dilation factor.
 	ZZ dilationFactor;
 	dilationFactor = 1;
@@ -412,7 +409,7 @@ RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 		coefficient = originalMonomial->coef;
 
 		//find the total degree of the monomial.
-		for(int currentPower = 0; currentPower < originalMonomial->length; ++currentPower)
+		for (int currentPower = 0; currentPower < originalMonomial->length; ++currentPower)
 			totalDegree += originalMonomial->exps[currentPower];
 		//cout << "factor^degree = " << dilationFactor << "^" << originalMonomial->degree << endl;
 		//cout << "length = " << originalMonomial->length << endl;
@@ -434,7 +431,6 @@ RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 			transformedPolynomial.varCount);
 	decompose(transformedPolynomialIterator, linearForms);
 
-
 	answer.add(integratePolytope(linearForms)); //finally, we are ready to do the integration!
 
 	answer.div(power(dilationFactor, transformedPolynomial.varCount));
@@ -451,13 +447,12 @@ RationalNTL PolytopeValuation::integrate(const monomialSum& originalPolynomial)
 
 }//integrate
 
-RationalNTL PolytopeValuation::integrateLawrence(const monomialSum& originalPolynomial)
+RationalNTL PolytopeValuation::integrateLawrence(
+		const monomialSum& originalPolynomial)
 {
 	RationalNTL answer;
 
 	linFormSum linearForms;
-
-
 
 	//find the dilation factor.
 	ZZ dilationFactor;
@@ -499,7 +494,7 @@ RationalNTL PolytopeValuation::integrateLawrence(const monomialSum& originalPoly
 		coefficient = originalMonomial->coef;
 
 		//find the total degree of the monomial.
-		for(int currentPower = 0; currentPower < originalMonomial->length; ++currentPower)
+		for (int currentPower = 0; currentPower < originalMonomial->length; ++currentPower)
 			totalDegree += originalMonomial->exps[currentPower];
 		//cout << "factor^degree = " << dilationFactor << "^" << originalMonomial->degree << endl;
 		//cout << "length = " << originalMonomial->length << endl;
@@ -518,9 +513,8 @@ RationalNTL PolytopeValuation::integrateLawrence(const monomialSum& originalPoly
 	linearForms.termCount = 0;
 	linearForms.varCount = transformedPolynomial.varCount;
 	transformedPolynomialIterator->setTrie(transformedPolynomial.myMonomials,
-		transformedPolynomial.varCount);
+			transformedPolynomial.varCount);
 	decompose(transformedPolynomialIterator, linearForms);
-
 
 	answer.add(integratePolytopeLawrence(linearForms)); //finally, we are ready to do the integration!
 
@@ -602,56 +596,88 @@ RationalNTL PolytopeValuation::integratePolytope(linFormSum &forms) const
 	return answer;
 }//integratePolytope()
 
+/** Loops over each linear form and integrates it over every cone.
+ *
+ */
 RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) const
 {
-	RationalNTL answer;
-
 	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
 			RationalNTL, ZZ> ();
 	linearFormIterator->setTrie(forms.myForms, forms.varCount);
 
-	for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
-			= simplicialCone->rest)
+	RationalNTL coe;
+	int j, index, k, m;
+	unsigned int i;
+
+	vec_ZZ l;
+	ZZ de;
+	l.SetLength(numOfVars);
+	int dim=numOfVars;
+	numerator = 0;
+	denominator = 0;
+	linearFormIterator->begin();
+	term<RationalNTL, ZZ>* temp;
+
+
+	LinearPerturbationContainer lpc;
+	lpc.setListCones(numOfVars, triangulatedPoly);
+
+
+	while (temp = linearFormIterator->nextTerm())
 	{
-/*
-		//First construct a simplex.
-		simplexZZ oneSimplex;
-		oneSimplex.d = forms.varCount;
 
-		listVector * rays = currentCone->rays;
-
-		int vertexCount = 0; //the current vertex number being processed.
-		oneSimplex.s.SetLength(numOfVars + 1);
-
-		for (rays = rays; rays; rays = rays->rest, ++vertexCount)
+		coe = temp->coef;
+		m = temp->degree; //obtain coefficient, power
+		l.SetLength(temp->length); //obtain exponent vector
+		for (j = 0; j < temp->length; j++)
 		{
-			oneSimplex.s[vertexCount].SetLength(numOfVars);
-			assert( rays->first[0] == 1); //make sure the triangulation is such that the vertices of the original polytope is integer.
-			for (int k = 0; k < numOfVars; ++k)
-				oneSimplex.s[vertexCount][k] = rays->first[k + 1];
+			l[j] = temp->exps[j];
+		}
 
-		}//create the simplex. Don't copy the leading 1.
+		bool dividedByZero = false;
 
-		//comute the volume of the Parallelepiped
-		mat_ZZ matt;
-		matt.SetDims(oneSimplex.d, oneSimplex.d);
-		for (int j = 1; j <= oneSimplex.d; j++)
-			matt[j - 1] = oneSimplex.s[j] - oneSimplex.s[0];
-		oneSimplex.v = abs(determinant(matt));
-*/
 
-		ZZ numerator, denominator;
+		lpc.findPerturbation(l);
 
-		integrateLinFormSumLawrence(numerator, denominator, linearFormIterator,
-				simplicialCone, numOfVars);
 
-		cout << "PolytopeValuation::integratePolytopeLawrence" << answer << "+"<< numerator << "/" << denominator << endl;
-		answer.add(numerator, denominator);
-	}//for every triangulated simplex.
-	delete linearFormIterator;
 
-	cout << "PolytopeValuation::integratePolytopeLawrence final ans:" << answer << endl;
-	return answer;
+
+		de = 1;
+		for (i = 1; i <= dim + m; i++)
+		{
+			de = de * i;
+		} //de is (d+m)!. Note this is different from the factor in the paper because in our storage of a linear form, any coefficient is automatically adjusted by m!
+		updateLawrence(numerator, denominator, l, cone, m, coe, de, dim);//We are ready to compute the integral of one linear form over the simplex
+		cout << "integrateLinFormSumLawrence:: partial sum:" << numerator
+				<< "/" << denominator << endl;
+	}
+
+	//TODO:FIX integrateLawrence...do I need to be finding the volume..is this not already done for me. Look in the listCone datastructure !!!
+	/*
+	 RationalNTL answer;
+
+	 BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
+	 RationalNTL, ZZ> ();
+	 linearFormIterator->setTrie(forms.myForms, forms.varCount);
+
+	 for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
+	 = simplicialCone->rest)
+	 {
+
+
+	 ZZ numerator, denominator;
+
+	 integrateLinFormSumLawrence(numerator, denominator, linearFormIterator,
+	 simplicialCone, numOfVars);
+
+	 cout << "PolytopeValuation::integratePolytopeLawrence" << answer << "+"<< numerator << "/" << denominator << endl;
+	 answer.add(numerator, denominator);
+	 }//for every triangulated simplex.
+	 delete linearFormIterator;
+
+	 cout << "PolytopeValuation::integratePolytopeLawrence final ans:" << answer << endl;
+	 return answer;
+	 */
 }//integratePolytopeLawrence()
 
 /**
