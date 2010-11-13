@@ -163,15 +163,15 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 		if (!repeat[i])
 		{
 			sum_Nu[i] = 1;
-			cout << "update: l= " << l;
-			cout << "update: v=";
+			//cout << "update: l= " << l;
+			//cout << "update: v=";
 
 			for(int index = 0; index <= mySimplex.d; ++index) cout << mySimplex.s[index] << ", ";
-			cout << endl;
-			cout << "update::l^dim+m=" << inner_Pro[i] << "^" << mySimplex.d << "+" << m;
+			//cout << endl;
+			//cout << "update::l^dim+m=" << inner_Pro[i] << "^" << mySimplex.d << "+" << m;
 			for (j = 0; j < m + mySimplex.d; j++)
 				sum_Nu[i] = sum_Nu[i] * inner_Pro[i]; // sum_Nu_i = inner_pro ^ (m + d)
-			cout << "=" << sum_Nu[i] << endl;
+			//cout << "=" << sum_Nu[i] << endl;
 			sum_De[i] = 1;
 			for (j = 0; j <= mySimplex.d; j++)
 				if (i != j)
@@ -195,9 +195,9 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 				lcm = lcm * sum_De[i] / (GCD(lcm, sum_De[i]));
 			};
 			//cout << "update:i= " << i << "num/dem= " << RationalNTL(sum_Nu[i], sum_De[i]) << endl;
-			cout << "update:i= " << i << "num/dem= " << sum_Nu[i]<< " / "<< sum_De[i] << endl;
+			//cout << "update:i= " << i << "num/dem= " << sum_Nu[i]<< " / "<< sum_De[i] << endl;
 			//cout << "update:i= " << i << "num/dem= " << sum_Nu[i]/GCD(sum_Nu[i],sum_De[i])<< " / "<< sum_De[i]/GCD(sum_Nu[i],sum_De[i]) << endl;
-			cout << RationalNTL(coe.getNumerator()*mySimplex.v*sum_Nu[i],de*coe.getDenominator()*sum_De[i]) << endl;
+			//cout << RationalNTL(coe.getNumerator()*mySimplex.v*sum_Nu[i],de*coe.getDenominator()*sum_De[i]) << endl;
 
 		};
 	for (i = 0; i <= mySimplex.d; i++)
@@ -210,7 +210,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 	lcm = lcm * de * coe.getDenominator();
 	total = total * mySimplex.v * coe.getNumerator();
 
-	cout << "update: total/lcm = " << RationalNTL(total,lcm) << endl;
+	//cout << "update: total/lcm = " << RationalNTL(total,lcm) << endl;
 	if (a == 0)
 	{
 		a = total;

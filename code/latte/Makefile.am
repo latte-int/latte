@@ -219,6 +219,8 @@ valuation_computation_LDADD += liblatteintegration.a
 noinst_HEADERS += valuation/PolytopeValuation.h
 noinst_HEADERS += valuation/valuation.h
 noinst_HEADERS += valuation/Perturbation.h
+liblatte_a_SOURCES += valuation/Perturbation.cpp
+
 
 bin_PROGRAMS += ConvertCDDextToLatte
 ConvertCDDextToLatte_SOURCES = convertCDD_ext_to_latte.cpp

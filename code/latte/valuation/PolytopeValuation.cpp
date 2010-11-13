@@ -602,6 +602,7 @@ RationalNTL PolytopeValuation::integratePolytope(linFormSum &forms) const
  */
 RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) const
 {
+	RationalNTL ans;
 	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
 			RationalNTL, ZZ> ();
 	linearFormIterator->setTrie(forms.myForms, forms.varCount);
@@ -622,6 +623,7 @@ RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) cons
 
 	LinearPerturbationContainer lpc;
 	lpc.setListCones(numOfVars, triangulatedPoly);
+	cout << "lpc got past construction" << endl;
 
 
 	while (temp = linearFormIterator->nextTerm())
@@ -636,19 +638,26 @@ RationalNTL PolytopeValuation::integratePolytopeLawrence(linFormSum &forms) cons
 		}
 
 		lpc.findPerturbation(l);
-
+		cout << "lpc got past finding a perturbation" << endl;
+		RationalNTL integralAns = lpc.integratePolytope(m);
+		cout << "lpc got past integrating 1 linear form. d+m!*ans = " << integralAns << endl;
 
 		de = 1;
 		for (i = 1; i <= dim + m; i++)
 		{
 			de = de * i;
 		} //de is (d+m)!. Note this is different from the factor in the paper because in our storage of a linear form, any coefficient is automatically adjusted by m!
-		//updateLawrence(numerator, denominator, l, cone, m, coe, de, dim);//We are ready to compute the integral of one linear form over the simplex
-		//cout << "integrateLinFormSumLawrence:: partial sum:" << numerator
-		//		<< "/" << denominator << endl;
+		integralAns.mult(coe);
+		integralAns.div(de);
+
+		ans += integralAns;
+
+
+		cout << "integrateLinFormSumLawrence:: " << l << "^" << m << " gave: " << integralAns << endl;
+
 	}
 
-	return RationalNTL();
+	return ans;
 	//TODO:FIX integrateLawrence...do I need to be finding the volume..is this not already done for me. Look in the listCone datastructure !!!
 	/*
 	 RationalNTL answer;

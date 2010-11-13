@@ -5,6 +5,7 @@
 #include <vector>
 #include <NTL/ZZ.h>
 #include <NTL/vec_ZZ.h>
+#include "rational.h"
 #include "cone.h"
 
 using namespace std;
@@ -19,17 +20,22 @@ using namespace std;
  */
 class LinearLawrenceIntegration;
 
+extern void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegration & coneTerm, ZZ &numerator, ZZ &denominator);
+
 
 class LinearPerturbationContainer
 {
 public:
 	void setListCones(int dim, listCone * simpleConeList);
+	void findPerturbation(const vec_ZZ &l);
+	RationalNTL integratePolytope(int m); //integrates the polytope over l.
+private:
+
 	bool tryCurrentPerturbation(const vec_ZZ &l);
 	bool tryNoPerturbation(const vec_ZZ &l);
-	void findPerturbation(const vec_ZZ &l);
 
-private:
 	bool divideByZero; //true = currentPerturbation causes a divide by zero (currentPerturbation could be the zero vector).
+	int dimention;
 	vec_ZZ currentPerturbation;
 	vector<LinearLawrenceIntegration> coneTerms;
 }; //class LinearPerturbationContainer
@@ -43,20 +49,23 @@ public:
 	void setSimplicialCone(listCone *cone, int dim);
 	bool computeDotProducts(const vec_ZZ &e, const vec_ZZ &l); //true = error, we still divide by zero.
 	bool computeDotProducts(const vec_ZZ & l);//true=we divided by zero. need to try an perturbation.
+	void integrateTerm(RationalNTL &totalSum, int m, int dim);
+	void printTerm() const; //prints out the current term.
+	void updatePowers(); //merges powers and places the location of the (0+e) term in index 0 of rayDotProducts.
 private:
-
-
 	struct linearPerturbation
 	{
 		ZZ constant;	//a number
 		ZZ epsilon;		//coeff. of epsilon from the perturbation
-		ZZ power;		//0 if not processed yet. power= number of times the term repeats.
+		int power;		//0 if not processed yet. power= k where k is the number of times the term repeats or -1 if it is one of the (k-1) repeated terms.
 	};
 
 	bool divideByZero; //true if one of the <l,ray> terms vanish.
 	listCone * simplicialCone; //we treat this as a pointer to a cone, not a pointer to a list of cones...but it is a list of cones.
 	vector<linearPerturbation> rayDotProducts;
 	linearPerturbation numeratorDotProduct;//power term not used.
+	ZZ determinant;
+	friend void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegration & coneTerm, ZZ &numerator, ZZ &denominator);
 
 }; //class LinearLawrenceIntegration
 

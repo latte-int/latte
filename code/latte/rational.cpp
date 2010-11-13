@@ -348,6 +348,13 @@ RR RationalNTL::to_RR() const
 	return NTL::to_RR(numerator) / NTL::to_RR(denominator);
 }
 
+//times by -1. does not try to reduce the fraction.
+void RationalNTL::changeSign()
+{
+	numerator *= -1;
+}
+
+
 bool RationalNTL::operator==(const RationalNTL & rhs) const
 {
 	return numerator == rhs.numerator && denominator == rhs.denominator;

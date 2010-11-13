@@ -5,6 +5,7 @@
  *      Author: Brandon Dutra and Gregory Pinto
  */
 
+#include <cassert>
 #include "Perturbation.h"
 #include "print.h"
 
@@ -16,6 +17,7 @@ void LinearPerturbationContainer::setListCones(int dim,
 
 	coneTerms.resize(lengthListCone(simpleConeList));
 	currentPerturbation.SetLength(dim);
+	dimention = dim;
 
 	//build the vector of cones.
 	listCone* ptr = simpleConeList;
@@ -26,12 +28,12 @@ void LinearPerturbationContainer::setListCones(int dim,
 	}//for every cone.
 }
 
-
 bool LinearPerturbationContainer::tryCurrentPerturbation(const vec_ZZ &l)
 {
 	divideByZero = false;
 	for (unsigned int i = 0; i < coneTerms.size(); ++i)
-		if ((divideByZero = coneTerms[i].computeDotProducts(currentPerturbation, l)))
+		if ((divideByZero = coneTerms[i].computeDotProducts(
+				currentPerturbation, l)))
 			break;
 	return divideByZero;
 }//tryCurrentPerturbation
@@ -50,13 +52,20 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 
 	ZZ gcdValue;
 	if (tryNoPerturbation(l) == false)
+	{
+		cout << "findPerturbation::" << currentPerturbation << endl;
+		for(long i = 0; i < coneTerms.size(); ++i)
+			coneTerms[i].printTerm();
+		cout <<" end printing perturbed system" << endl;
 		return; //no errors. doing nothing worked!
+	}
 
 	currentPerturbation = l;
 	currentPerturbation[rand() % currentPerturbation.length()] += rand() % 10;
 
 	//project p onto l: <p,l>/||l|| * l but we do not care about the scale, so don't divide.
 	currentPerturbation = currentPerturbation - (currentPerturbation * l) * l;
+	//currentPerturbation is now normal to l.
 
 	//see if we can scale the currentPerturbation down
 	gcdValue = currentPerturbation[0];
@@ -66,14 +75,15 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 	}
 	if (gcdValue > 1)
 		for (long i = 1; i < currentPerturbation.length(); ++i)
-			currentPerturbation[i] = currentPerturbation[i]/gcdValue;
+			currentPerturbation[i] = currentPerturbation[i] / gcdValue;
 
 	while (tryCurrentPerturbation(l) == true)
 	{
 		//we divided by zero again. that is <l+e, r>=0 for some ray and for for some cone while <l,v>!=0. :(
 
 		//try a new perturbation.
-		currentPerturbation[rand() % currentPerturbation.length()] += rand() % 10;
+		currentPerturbation[rand() % currentPerturbation.length()] += rand()
+				% 10;
 
 		//see if we can scale things down.
 		gcdValue = currentPerturbation[0];
@@ -86,10 +96,28 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 				currentPerturbation[i] = currentPerturbation[i] / gcdValue;
 	}//make a new perturbation and try again.
 
-	//currentPerturbation is now normal to l.
+	cout << "findPerturbation::" << currentPerturbation << endl;
+	for(long i = 0; i < coneTerms.size(); ++i)
+		coneTerms[i].printTerm();
+	cout <<" end printing perturbed system" << endl;
 
 
 }//findPerturbation
+
+/**integrates the polytope over l.
+ *
+ */
+RationalNTL LinearPerturbationContainer::integratePolytope(int m)
+{
+	RationalNTL totalSum; //contains the sum. init. to zero.
+
+	for (unsigned int i = 0; i < coneTerms.size(); ++i)
+		coneTerms[i].integrateTerm(totalSum, m, dimention);
+
+	if (dimention %2)
+		totalSum.changeSign();
+	return totalSum; //integral of l over the polytope!
+}
 
 //--------------------------------------
 //--------------------------------------
@@ -113,6 +141,8 @@ void LinearLawrenceIntegration::setSimplicialCone(listCone *cone, int dim)
 {
 	simplicialCone = cone;
 	rayDotProducts.resize(dim);
+
+
 }
 
 /** Finds the innerproducts of the vertex and rays for each term.
@@ -140,7 +170,12 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
 	divideByZero = false;
 	//cout << "printing cone" << endl;
 	//printCone(simplicialCone, l.length());
-	for(listVector * ray = simplicialCone->rays; ray; ray = ray->rest, ++i)
+
+
+	//now find the abs. value of the det.
+	mat_ZZ rayMatrix;
+	rayMatrix.SetDims(rayDotProducts.size(), rayDotProducts.size());//dimention.
+	for (listVector * ray = simplicialCone->rays; ray; ray = ray->rest, ++i)
 	{
 		//cout << "i=" << i << endl;
 
@@ -148,31 +183,33 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
 		rayDotProducts[i].epsilon = 0;
 		rayDotProducts[i].power = 0;
 
-
-		if ( rayDotProducts[i].constant == 0)
+		if (rayDotProducts[i].constant == 0)
 			divideByZero = true;
 
+		for(unsigned int j = 0; j < rayDotProducts.size(); ++j)
+			rayMatrix[i][j]  = ray->first[j];
 	}//for each ray.
+	determinant = abs(NTL::determinant(rayMatrix));
 	//cout << "going to return " << divideByZero << endl;
 	return divideByZero;
 }
-
 
 /** Finds the innerproducts of the vertex and rays for each term with the perturbation term ONLY.
  *  If a residue calculation is needed, returns true, otherwise
  *  we did not divide by zero and false is returned.
  */
-bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &e, const vec_ZZ &l)
+bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &e,
+		const vec_ZZ &l)
 {
 	if (divideByZero == false)
 		return false; //we do not need to do further process. plugging in numbers will work.
 
 	//find that rays that dotted to zero and see if this new perturbation will work.
 	unsigned int i = 0;
-	for(listVector * ray = simplicialCone->rays; ray; ray = ray->rest, ++i)
+	for (listVector * ray = simplicialCone->rays; ray; ray = ray->rest, ++i)
 	{
 		rayDotProducts[i].epsilon = e * ray->first;
-		if ( rayDotProducts[i].constant == 0 && rayDotProducts[i].epsilon == 0)
+		if (rayDotProducts[i].constant == 0 && rayDotProducts[i].epsilon == 0)
 			return true; //darn, this perturbation did not fix our problem. stop processing.
 	}
 	//if we got here then:
@@ -188,4 +225,125 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &e, const vec_ZZ
 	//NOTE::we still did not remove repeated dot products...the powers are all still zero.
 	return false;
 }
+
+/**
+ * Integrates l over this cone. Adds the result to totalSum
+ */
+void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
+		int dim)
+{
+	ZZ numerator, denominator;
+
+	cout << endl;
+	denominator = 1;
+	if (numeratorDotProduct.constant == 0)
+		return; //integral over cone is zero!!!
+
+	if (divideByZero == false)
+	{
+		numerator = power(numeratorDotProduct.constant, m + dim);
+		for (unsigned int i = 0; i < dim; ++i)
+			denominator *= rayDotProducts[i].constant;
+
+		totalSum.add(numerator * determinant, denominator);
+		cout << "--compute redidue not needed."
+			 << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
+		return;
+	}//just plug in numbers.
+
+
+	//need to find residue after increasing the power of e...or the constant term in the series expansion
+	//first, sort/merge repeated terms. so (c1x + c0)*(c1x + c0)=(c1x + c0)^2
+	//(actually, we do (c1x + c0)*(c1x + c0)=(c1x + c0)^2(c1x + c0)^-1 and we just ignore negative powers.
+	//  so we treat the power as a flag to denote now the term has been processed. 0 = not processed, n = regular power, -1=repeated term.
+
+	updatePowers(); //also the location of the (0+e)^{m_0} term is in array index 0.
+
+	cout << "--going to call computeResidueLawrence(" << dim << ", " << m <<" this, " << numerator << ", " <<  denominator << endl;
+	computeResidueLawrence(dim, m, *this, numerator, denominator);
+	cout << "--returned from computeResidueLawrence ok" << endl;
+	cout << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
+	totalSum.add(numerator * determinant, denominator);
+
+	//todo: write a friend function in residue.cpp (not in /valuation/) that will compute the residue using
+	//our data structure.
+
+}//integrateTerm
+
+
+//prints out the current term.
+void LinearLawrenceIntegration::printTerm() const
+{
+	cout << "(" << numeratorDotProduct.constant << "+ " << numeratorDotProduct.epsilon << "e)^" << numeratorDotProduct.power
+	     << "/ ";
+	for(unsigned int i = 0; i < rayDotProducts.size(); ++i)
+		cout << "(" << rayDotProducts[i].constant << " + " << rayDotProducts[i].epsilon << "e)^" << rayDotProducts[i].power << " ";
+	cout << endl;
+}//printTerm()
+
+
+/** Merges powers and returns location of the (0+e) term.
+ *  Assumes a residue really need to be called. That is, assumes a (0+e) term exists and will return it's location...or else will return -1.
+ *  After this, if power = 0: there should be no 0 powers!
+ *  					   k: then the power of this term is k.
+ *  					  -1: There were repeated terms and this term has been merged with another term.
+ *  example: (c1x + c0)*(b1x + b0)*(c1x + c0)=(c1x + c0)^2*(b1x + b0)*(c1x + c0)^-1
+ */
+void LinearLawrenceIntegration::updatePowers()
+{
+	int locationOfe = -1;
+
+	cout << "rayDotProd.size()" << rayDotProducts.size() << endl;
+	printTerm();
+
+	unsigned int i, j;
+
+
+	for (i = 0; i < rayDotProducts.size(); ++i)
+	{
+		//if found a (0+c*e) term.
+		if (rayDotProducts[i].constant == 0)
+		{
+			if (locationOfe == -1)
+			{
+				locationOfe = i;
+				rayDotProducts[locationOfe].power = 1;
+			} //if first time we found a (0+c*e) term.
+			else
+			{
+
+				rayDotProducts[locationOfe].epsilon	*= rayDotProducts[i].epsilon;
+				rayDotProducts[locationOfe].power++;
+				rayDotProducts[i].power = -1;
+			}//add to the (0+c*e) term.
+			continue;
+		}//handle (0+c*e) terms differently.
+
+
+		int numberRepeatedTerms = 1;//count ourself, and start j at i+1
+		for (j = i + 1; j < rayDotProducts.size(); ++j)
+		{
+			if (rayDotProducts[j].constant == rayDotProducts[i].constant
+					&& rayDotProducts[j].epsilon == rayDotProducts[i].epsilon
+					&& rayDotProducts[j].power == 0)
+			{
+				++numberRepeatedTerms;
+				rayDotProducts[j].power = -1;//don't consider this term again.
+			}//if (c0 + c1e) == (b0 + b1e) and (b0 + b1e) has not already been processed.
+		}//for j.
+		rayDotProducts[i].power = numberRepeatedTerms;
+	}//for i.
+
+	printTerm();
+	assert(locationOfe >= 0); //otherwise we would not have called this function!
+
+	if (locationOfe > 0)
+	{
+		linearPerturbation temp = rayDotProducts[0];
+		rayDotProducts[0] = rayDotProducts[locationOfe];
+		rayDotProducts[locationOfe] = temp;
+	}//swap locationOfE with index 0
+
+}//updatePowers
+
 

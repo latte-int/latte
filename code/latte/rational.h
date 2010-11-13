@@ -194,7 +194,9 @@ public:
 	RationalNTL & operator*=(const RationalNTL & rhs);
 	RationalNTL & operator*=(const ZZ & rhs);
 
+	//OTHER
 	RR to_RR() const; // converts the fraction to a float.
+	void changeSign(); //times by -1. does not try to reduce the fraction.
 
 	// I/O
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
