@@ -9,18 +9,20 @@
 
 /**
  * Computes the volume of the polytope.
+ * The triangulation method will not change the org. polytope, but the
+ * lawrence method will dilate it.
  */
 Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
 		const char * print)
 {
 	ValuationContainer ans;
-	ValuationData timer_and_result;
 	RationalNTL ans1, ans2;
 
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
 	{
+		ValuationData timer_and_result;
 		PolytopeValuation polytopeValuation(poly, myParameters);
 		timer_and_result.timer.start();
 		ans1 = polytopeValuation.findVolume(
@@ -31,13 +33,12 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		timer_and_result.valuationType = ValuationData::volumeTriangulation;
 		timer_and_result.answer = ans1;
 		ans.add(timer_and_result);
-	}//if triangulate
+	}//if triangulate. origional polytope should not have changed.
 
-	timer_and_result.timer.clear();
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
 			|| strcmp(valuationAlg, "all") == 0)
 	{
-
+		ValuationData timer_and_result;
 		PolytopeValuation polytopeValuation(poly, myParameters);
 		timer_and_result.timer.start();
 		ans2 = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
@@ -49,7 +50,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		timer_and_result.valuationType = ValuationData::volumeLawrence;
 		timer_and_result.answer = ans2;
 		ans.add(timer_and_result);
-	}//if lawrence
+	}//if lawrence. Origional polytope is now dilated.
 
 	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
 	{
@@ -64,8 +65,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 /**
  * Computes the integral of a polynomial over the polytope.
  *
- * Currently returns a ValuationContainer object because we might
- * add Lawrence functionality in the future. --Brandon July 2010
+ * Bothe the triangulation and lawrence methods will dilate the org. polytope.
  */
 Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
@@ -74,13 +74,18 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	ValuationContainer answer;
 	ValuationData tiangulate_timer_and_result;
 	ValuationData lawrence_timer_and_result;
-	RationalNTL ans1;
+	RationalNTL ans1, ans2;
+	Polyhedron *poly2 = poly;//if doing both methods, make a deep copy of the origional polytopel.
 
-	cout << "val alg=" << valuationAlg << endl;
+	if ( strcmp(valuationAlg, "all") == 0)
+	{
+		poly2 = new Polyhedron(*poly); //copy org. polytope
+	}
 
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 				== 0)
 	{
+		//the org. polytope is dilated.
 		cout << "Going to run the triangulation integration method" << endl;
 		monomialSum originalPolynomial;// polynomial without the updated coefficients.
 		PolytopeValuation polytopeValuation(poly, myParameters);
@@ -95,7 +100,6 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		answer.add(tiangulate_timer_and_result);
 
 		destroyMonomials(originalPolynomial);
-		cout << "triangulation integration method worked ok." << endl;
 	}//if doing triangulation method.
 
 
@@ -104,20 +108,35 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	{
 		cout << "Going to run the lawrence integration method" << endl;
 		monomialSum originalPolynomial;// polynomial without the updated coefficients.
-		PolytopeValuation polytopeValuation(poly, myParameters);
+		PolytopeValuation polytopeValuation(poly2, myParameters);
 
 		loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
-		tiangulate_timer_and_result.timer.start();
-		ans1 = polytopeValuation.integrateLawrence(originalPolynomial);
-		tiangulate_timer_and_result.timer.stop();
+		lawrence_timer_and_result.timer.start();
+		ans2 = polytopeValuation.integrateLawrence(originalPolynomial);
+		lawrence_timer_and_result.timer.stop();
 
-		tiangulate_timer_and_result.valuationType = ValuationData::integrateLawrence;
-		tiangulate_timer_and_result.answer = ans1;
-		answer.add(tiangulate_timer_and_result);
+		lawrence_timer_and_result.valuationType = ValuationData::integrateLawrence;
+		lawrence_timer_and_result.answer = ans2;
+		answer.add(lawrence_timer_and_result);
 
 		destroyMonomials(originalPolynomial);
-		cout << "lawrence integration method worked ok" << endl;
 	}
+
+
+
+	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
+	{
+		cerr << "Driver.cpp: the two methods are different.\n"
+			 << "triangulateion: " << ans1
+			 << "\nlawrence       " << ans2
+			 << endl;
+		exit(1);
+	}//if error.
+	if ( strcmp(valuationAlg, "all") == 0)
+	{
+		delete poly2;
+	}//delete the copy we made.
+
 	return answer;
 }//computeIntegral
 
@@ -576,7 +595,7 @@ void Valuation::ValuationContainer::printResults(ostream & out) const
 		else if ( answers[i].valuationType == ValuationData::integrateTriangulation)
 			out << "Integration (using the triangulation method)" << endl;
 		else if ( answers[i].valuationType == ValuationData::integrateLawrence)
-			out << "Integration (using the Lawrence method" << endl;
+			out << "Integration (using the Lawrence method)" << endl;
 		else if ( answers[i].valuationType == ValuationData::entireValuation)
 		{
 			out << "Computational time (algorithms + processing + program control)" << endl;

@@ -32,7 +32,8 @@ int main(int argc, char *argv[])
 
 	options[0] = "./exe";
 	options[1] = "--valuation=integrate";
-	options[2] = "--triangulate";
+	//options[2] = "--triangulate";
+	options[2] = "--all";
 	options[3] = new char[strlen(argv[2]) + 13];
 	strcpy(options[3], "--monomials=");
 	strcat(options[3], argv[2]);

@@ -51,17 +51,18 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 {
 
 	ZZ gcdValue;
+	divideByZero = false;
 	if (tryNoPerturbation(l) == false)
 	{
-		cout << "findPerturbation::" << currentPerturbation << endl;
-		for(long i = 0; i < coneTerms.size(); ++i)
-			coneTerms[i].printTerm();
-		cout <<" end printing perturbed system" << endl;
+		//cout << "findPerturbation::" << currentPerturbation << endl;
+		//for(long i = 0; i < coneTerms.size(); ++i)
+		//	coneTerms[i].printTerm();
+		//cout <<" end printing perturbed system" << endl;
 		return; //no errors. doing nothing worked!
 	}
 
 	currentPerturbation = l;
-	currentPerturbation[rand() % currentPerturbation.length()] += rand() % 10;
+	currentPerturbation[rand() % currentPerturbation.length()] += 1+ rand() % 10;
 
 	//project p onto l: <p,l>/||l|| * l but we do not care about the scale, so don't divide.
 	currentPerturbation = currentPerturbation - (currentPerturbation * l) * l;
@@ -82,7 +83,7 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 		//we divided by zero again. that is <l+e, r>=0 for some ray and for for some cone while <l,v>!=0. :(
 
 		//try a new perturbation.
-		currentPerturbation[rand() % currentPerturbation.length()] += rand()
+		currentPerturbation[rand() % currentPerturbation.length()] += 1+rand()
 				% 10;
 
 		//see if we can scale things down.
@@ -96,10 +97,10 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 				currentPerturbation[i] = currentPerturbation[i] / gcdValue;
 	}//make a new perturbation and try again.
 
-	cout << "findPerturbation::" << currentPerturbation << endl;
-	for(long i = 0; i < coneTerms.size(); ++i)
-		coneTerms[i].printTerm();
-	cout <<" end printing perturbed system" << endl;
+	//cout << "findPerturbation::" << currentPerturbation << endl;
+	//for(long i = 0; i < coneTerms.size(); ++i)
+	//	coneTerms[i].printTerm();
+	//cout <<" end printing perturbed system" << endl;
 
 
 }//findPerturbation
@@ -234,7 +235,7 @@ void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 {
 	ZZ numerator, denominator;
 
-	cout << endl;
+	//cout << endl;
 	denominator = 1;
 	if (numeratorDotProduct.constant == 0)
 		return; //integral over cone is zero!!!
@@ -246,8 +247,8 @@ void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 			denominator *= rayDotProducts[i].constant;
 
 		totalSum.add(numerator * determinant, denominator);
-		cout << "--compute redidue not needed."
-			 << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
+		//cout << "--compute redidue not needed."
+		//	 << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
 		return;
 	}//just plug in numbers.
 
@@ -257,12 +258,16 @@ void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 	//(actually, we do (c1x + c0)*(c1x + c0)=(c1x + c0)^2(c1x + c0)^-1 and we just ignore negative powers.
 	//  so we treat the power as a flag to denote now the term has been processed. 0 = not processed, n = regular power, -1=repeated term.
 
+	//cout << "before update power: ";
+	//printTerm(true);
 	updatePowers(); //also the location of the (0+e)^{m_0} term is in array index 0.
+	//cout << "after update power: ";
+	//printTerm();
 
-	cout << "--going to call computeResidueLawrence(" << dim << ", " << m <<" this, " << numerator << ", " <<  denominator << endl;
+	//cout << "--going to call computeResidueLawrence(" << dim << ", " << m <<" this, " << numerator << ", " <<  denominator << endl;
 	computeResidueLawrence(dim, m, *this, numerator, denominator);
-	cout << "--returned from computeResidueLawrence ok" << endl;
-	cout << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
+	//cout << "--returned from computeResidueLawrence ok" << endl;
+	//cout << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
 	totalSum.add(numerator * determinant, denominator);
 
 	//todo: write a friend function in residue.cpp (not in /valuation/) that will compute the residue using
@@ -272,12 +277,21 @@ void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 
 
 //prints out the current term.
-void LinearLawrenceIntegration::printTerm() const
+//Afer updatePowers(), the term of  the zero constants has a special form.
+//Intead of (0 + ce)^m, the zero constants should be thought as 0 + c (e^m).
+void LinearLawrenceIntegration::printTerm(bool printVertexRays) const
 {
 	cout << "(" << numeratorDotProduct.constant << "+ " << numeratorDotProduct.epsilon << "e)^" << numeratorDotProduct.power
 	     << "/ ";
 	for(unsigned int i = 0; i < rayDotProducts.size(); ++i)
 		cout << "(" << rayDotProducts[i].constant << " + " << rayDotProducts[i].epsilon << "e)^" << rayDotProducts[i].power << " ";
+	if ( true == printVertexRays)
+	{
+		cout << endl;
+		cout << "  vertex: " << simplicialCone->vertex->vertex->numerators() << endl;
+		for(listVector *v = simplicialCone->rays; v; v = v->rest)
+			cout << "  ray: " << v->first << endl;
+	}
 	cout << endl;
 }//printTerm()
 
@@ -293,14 +307,17 @@ void LinearLawrenceIntegration::updatePowers()
 {
 	int locationOfe = -1;
 
-	cout << "rayDotProd.size()" << rayDotProducts.size() << endl;
-	printTerm();
+	//cout << "rayDotProd.size()" << rayDotProducts.size() << endl;
+	//printTerm();
 
 	unsigned int i, j;
 
 
 	for (i = 0; i < rayDotProducts.size(); ++i)
 	{
+		if (rayDotProducts[i].power < 0)
+			continue; //already processed this term.
+
 		//if found a (0+c*e) term.
 		if (rayDotProducts[i].constant == 0)
 		{
@@ -334,7 +351,7 @@ void LinearLawrenceIntegration::updatePowers()
 		rayDotProducts[i].power = numberRepeatedTerms;
 	}//for i.
 
-	printTerm();
+	//printTerm();
 	assert(locationOfe >= 0); //otherwise we would not have called this function!
 
 	if (locationOfe > 0)

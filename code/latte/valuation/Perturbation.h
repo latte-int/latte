@@ -50,7 +50,7 @@ public:
 	bool computeDotProducts(const vec_ZZ &e, const vec_ZZ &l); //true = error, we still divide by zero.
 	bool computeDotProducts(const vec_ZZ & l);//true=we divided by zero. need to try an perturbation.
 	void integrateTerm(RationalNTL &totalSum, int m, int dim);
-	void printTerm() const; //prints out the current term.
+	void printTerm(bool printRayVertex = false) const; //prints out the current term.
 	void updatePowers(); //merges powers and places the location of the (0+e) term in index 0 of rayDotProducts.
 private:
 	struct linearPerturbation
@@ -58,7 +58,9 @@ private:
 		ZZ constant;	//a number
 		ZZ epsilon;		//coeff. of epsilon from the perturbation
 		int power;		//0 if not processed yet. power= k where k is the number of times the term repeats or -1 if it is one of the (k-1) repeated terms.
-	};
+	}; // (constant + epsilon *e )^power.
+	//Afer updatePowers(), the term of  the zero constants has a special form.
+	//Intead of (0 + ce)^m, the zero constants should be thought as 0 + c (e^m).
 
 	bool divideByZero; //true if one of the <l,ray> terms vanish.
 	listCone * simplicialCone; //we treat this as a pointer to a cone, not a pointer to a list of cones...but it is a list of cones.

@@ -27,6 +27,7 @@
 #include "testEhrhart/BuildHypersimplexEdgePolytope.h"
 
 #include "CheckEmpty.h"
+#include "Polyhedron.h"
 /* START COUNT INCLUDES */
 #include "config.h"
 #include "latte_ntl_integer.h"

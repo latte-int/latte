@@ -75,6 +75,7 @@ public:
 
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone.
 	void dilatePolytope(const RationalNTL & factor); //dilates polytope by changing the vertices.
+	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor);
 	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const;
 	RationalNTL findVolumeUsingLawrence();
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
