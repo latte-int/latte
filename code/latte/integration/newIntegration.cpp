@@ -132,6 +132,7 @@ void convertToSimplex(simplexZZ &mySimplex, string line)
  */
 void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe, ZZ de)
 {
+
 	ZZ sum, lcm, total, g, tem;
 	int i, j;
 	vec_ZZ inner_Pro; //inner_Pro[i] = <l, s_i>
@@ -159,6 +160,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 				break;
 			};//record repetitions
 	};//stores inner product for use
+
 	for (i = 0; i <= mySimplex.d; i++)
 		if (!repeat[i])
 		{
@@ -166,7 +168,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 			//cout << "update: l= " << l;
 			//cout << "update: v=";
 
-			for(int index = 0; index <= mySimplex.d; ++index) cout << mySimplex.s[index] << ", ";
+			//for(int index = 0; index <= mySimplex.d; ++index) cout << mySimplex.s[index] << ", ";
 			//cout << endl;
 			//cout << "update::l^dim+m=" << inner_Pro[i] << "^" << mySimplex.d << "+" << m;
 			for (j = 0; j < m + mySimplex.d; j++)
@@ -187,6 +189,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 				ProDiff.SetLength(mySimplex.d + 1);
 				for (j = 0; j <= mySimplex.d; j++)
 					ProDiff[j] = inner_Pro[i] - inner_Pro[j];
+
 				computeResidue(mySimplex.d, m, ProDiff, inner_Pro[i],
 						sum_Nu[i], sum_De[i]);
 			}
@@ -200,6 +203,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 			//cout << RationalNTL(coe.getNumerator()*mySimplex.v*sum_Nu[i],de*coe.getDenominator()*sum_De[i]) << endl;
 
 		};
+
 	for (i = 0; i <= mySimplex.d; i++)
 		if ((!repeat[i]) && (sum_De[i] != 0))
 		{
@@ -232,124 +236,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex, int m, RationalNTL coe,
 	}
 }//update
 
-void updateLawrence(ZZ &a, ZZ &b, vec_ZZ l, listCone *cone, int m, RationalNTL coe, ZZ de, int dim)
-{
-	//cout << "m=" << m << " dim=" << dim << endl;
-	ZZ sum, lcm, total, g, tem, det;
-	int i, j;
-	ZZ temp_a, temp_b;
-	temp_a = 0;
-	temp_b = 1;
 
-	//vec_ZZ inner_Pro; //inner_Pro[i] = <l, s_i>
-	//vec_ZZ sum_Nu, sum_De; // (sum_Nu/sum_De)[i] = <l, s_i>^d/ (\prod_{j \neq i} <l, s_i - s_j>)
-	//inner_Pro.SetLength(mySimplex.d + 1);
-	//sum_Nu.SetLength(mySimplex.d + 1);
-	//sum_De.SetLength(mySimplex.d + 1);
-	total = 0;
-	lcm = 1;
-	//bool repeat[1000]; //put this on the stack, do not waste the time requesting memory from the heap because this function is called many, many, many times.
-					 //Why is this bool (vs int): if there are no repeats in the <l, s_i> terms, the simplex is regular on l and we compute the integral as in the first case of the theory.
-					 // Otherwise we will have to compute the residue. It is in the residue-function where we worry about the multiplicity of things.
-
-	mat_ZZ mat;
-	mat.SetDims(dim, dim); //(n, m) makes mat have dimension n x m.
-
-
-	//printListCone(cone, dim);
-	//find <l, v>^(dim+m).
-	scaleRationalVectorToInteger(cone->vertex->vertex, dim, temp_b);
-	assert(temp_b == 1);
-	cout << "updateLawrence: l = " << l << endl;
-	cout << "updateLawrence: numerators: " << cone->vertex->vertex->numerators() << endl;
-	cout << "updateLawrence:l^dim+m= ";
-	temp_a = l * cone->vertex->vertex->numerators();
-	cout << temp_a << "^" << dim << "+ "<< m;
-	temp_a = power(temp_a, dim + m);
-	cout << "= " << temp_a << endl;
-	//temp_b = power(temp_b, dim + m);
-
-	int col = 0;
-	for(listVector *ray = cone->rays; ray; ray = ray->rest, col++){
-
-		temp_b *= -1*(ray->first * l); //find <ray, l>
-			//why times -1 you ask? The paper says <l, vertex - other vtertex> which is a ray directed TO the vertex, not AWAY from the vertex.
-		for (int row = 0; row < dim; row++)
-		{
-			mat[row][col] = ray->first[row];
-		}
-	}
-	//cout << "hey, I made it past the matrix building: newIntegration::251" << endl;
-	if(temp_a < 0 && temp_b < 0){
-		temp_a *= -1;
-		temp_b *= -1;
-	};
-	if(temp_b == 0 && temp_a != 0){
-		vec_ZZ ProDiff;
-		ProDiff.SetLength(dim+1);
-		listVector * temp = cone->rays;
-		for (i = 0; i < dim; i++)
-		{
-			//cout << "going to take inner prod " << i << endl;
-			//cout << temp->first << endl;
-			ProDiff[i] = -1*temp->first * l;
-			cout << "ProDiff:" << temp->first << "*" << l << "= " << ProDiff[i] << endl;
-			temp = temp->rest;
-		}
-		ProDiff[dim] = 0;
-		//cout << "done with inner prods.!" << endl;
-		//computeResidue(dim, m, ProDiff, l * scaleRationalVectorToInteger(
-		//	cone->vertex->vertex, dim, temp_b), temp_a, temp_b);
-
-		//TODO: fix computeResidue. questions: how to modify prodDiff and other imputs to trick it into computing the right residue
-		//			or we have to do a cute-pate-edit solution which is messay :(
-		computeResidue(dim, m, ProDiff, l * cone->vertex->vertex->numerators(), temp_a, temp_b);
-
-	}
-	else if ( temp_b == 0 && temp_a == 0)
-	{
-		temp_b = 1;
-	}
-
-
-
-	determinant(det, mat);
-	cout << "de=" << de << ", det=" << det << ", coe=" << coe << ", tempa= " << temp_a << ", tempb=" << temp_b << endl;
-	temp_a *= abs(det) * coe.getNumerator();// we should add to a/b. ???
-	temp_b *= de * coe.getDenominator();
-
-	cout << "updateLawrence:total/lcm(L) = " << RationalNTL(temp_a, temp_b) << endl;
-
-	//total/lcm =
-	//total = total * mySimplex.v * coe.getNumerator();
-	//lcm = lcm * de * coe.getDenominator();
-
-
-	g = GCD(temp_a, temp_b);
-	if (g != 0)
-	{
-		temp_a = temp_a / g;
-		temp_b = temp_b / g;
-	}
-	//add a/b + temp_a/temp_b
-
-	cout << "updateLawrence:" << a << "/" << b << " + " << temp_a << "/" << temp_b << "==";
-	if (a == 0)
-	{
-		a = temp_a;
-		b = temp_b;
-	} //return a/b = temp_a/temp_b
-	else //if ((lcm != 0) && (b != 0))
-	{
-
-		ZZ lcmB;
-		lcmB = b * temp_b / GCD(b, temp_b); //find LCM of b and temp_b
-		a = a * lcmB / b + temp_a * lcmB / temp_b;
-		b = lcmB;
-	} // a/b = a/b + temp_a/temp_b.
-	cout << a << "/" << b << endl;
-
-} // updateLawrence
 
 //This function computes a given fraction a/b, the integral of the linear form forms, over the simplex mySimplex
 void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
@@ -389,44 +276,6 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
 	}
 }//integrateLinFormSum
 
-//This function computes a given fraction a/b, the integral of the linear form forms, over the cone
-void integrateLinFormSumLawrence(ZZ& numerator, ZZ& denominator, PolyIterator<RationalNTL, ZZ>* it, listCone *cone, int dim)
-{
-	ZZ v, de, counter, tem; //, coe;
-	RationalNTL coe;
-	int i, j, index, k, m;
-	vec_ZZ l;
-	//if (forms.varCount!=mySimplex.d) {cout<<"The dimensions of the polynomial and simplex don't match. Please check!"<<forms.varCount<<"<>"<<mySimplex.d<<endl;exit(1);};
-	l.SetLength(dim);
-	numerator = 0;
-	denominator = 0;
-	it->begin();
-	term<RationalNTL, ZZ>* temp;
-	while (temp = it->nextTerm())
-	{
-		coe = temp->coef;
-		m = temp->degree; //obtain coefficient, power
-		l.SetLength(temp->length); //obtain exponent vector
-		for (j = 0; j < temp->length; j++)
-		{
-			l[j] = temp->exps[j];
-		}
-		de = 1;
-		for (i = 1; i <= dim + m; i++)
-		{
-			de = de * i;
-		} //de is (d+m)!. Note this is different from the factor in the paper because in our storage of a linear form, any coefficient is automatically adjusted by m!
-		updateLawrence(numerator, denominator, l, cone, m, coe, de, dim);//We are ready to compute the integral of one linear form over the simplex
-		cout << "integrateLinFormSumLawrence:: partial sum:" << numerator << "/" << denominator << endl;
-	}
-	delete temp;
-	if (denominator < 0)
-	{
-		denominator *= to_ZZ(-1);
-		numerator *= to_ZZ(-1);
-	}
-}//integrateLinFormSum
-
 void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials,
 		const simplexZZ &mySimplex)//integrate a polynomial stored as a Burst Trie
 {
@@ -440,21 +289,6 @@ void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials,
 	BTrieIterator<RationalNTL, ZZ>* it2 = new BTrieIterator<RationalNTL, ZZ> ();
 	it2->setTrie(forms.myForms, forms.varCount);
 	integrateLinFormSum(a, b, it2, mySimplex);
-}
-
-void integrateMonomialSumLawrence(ZZ &a, ZZ &b, monomialSum &monomials,
-		listCone *cone, int dim)//integrate a polynomial stored as a Burst Trie
-{
-	linFormSum forms;
-	forms.termCount = 0;
-	forms.varCount = monomials.varCount;
-	BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> ();
-	it->setTrie(monomials.myMonomials, monomials.varCount);
-	decompose(it, forms); //decomposition
-	delete it;
-	BTrieIterator<RationalNTL, ZZ>* it2 = new BTrieIterator<RationalNTL, ZZ> ();
-	it2->setTrie(forms.myForms, forms.varCount);
-	integrateLinFormSumLawrence(a, b, it2, cone, dim);
 }
 
 

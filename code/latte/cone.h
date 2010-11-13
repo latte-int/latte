@@ -100,6 +100,9 @@ listCone *appendListCones(listCone *A, listCone *B);
 /* Copy a single cone. */
 listCone *copyCone(const listCone *cone);
 
+/* Copy a list of cones */
+listCone *copyListCone(const listCone *cone);
+
 /* Deduce the ambient dimension of CONE from its data. */
 int ambient_cone_dimension(const listCone *cone);
 

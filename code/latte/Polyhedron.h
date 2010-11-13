@@ -42,9 +42,14 @@ public:
 						 transducer that
 						 "projects up" cones
 						 into original space" */
-private:
-  Polyhedron(const Polyhedron &);
-public:
+
+  Polyhedron(const Polyhedron & p):numOfVars(p.numOfVars), homogenized(p.homogenized),
+		  dualized(p.dualized), unbounded(p.unbounded)
+  {
+	  cones = copyListCone(p.cones);//make a deep copy of the list of cones.
+	  projecting_up_transducer = p.projecting_up_transducer; //not sure if a deep copy is neded or not.Brandon Nov 13 2010.
+  }//copy constructor.
+
   Polyhedron() : numOfVars(0), homogenized(false), dualized(false),
 		 unbounded(false), cones(0), projecting_up_transducer(0) {}
   ~Polyhedron() { freeListCone(cones); }

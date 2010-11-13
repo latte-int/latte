@@ -145,6 +145,17 @@ listCone *copyCone(const listCone *cone)
   return copy;
 }
 
+
+//Copy a list of cones.
+listCone *copyListCone(const listCone *cone)
+{
+	if ( !cone)
+		return NULL;
+	listCone *copyList = copyCone(cone); //copy one cone.
+	copyList->rest = copyListCone(cone->rest); //copy the rest.
+	return copyList;
+}
+
 int ambient_cone_dimension(const listCone *cone)
 {
   if (cone == NULL) return 0;

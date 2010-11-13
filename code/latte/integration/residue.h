@@ -12,8 +12,7 @@
 void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p, ZZ &a, ZZ &b);//compute residue given the inner products
 
 void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegration & coneTerm, ZZ &numerator, ZZ &denominator);
-void computeResidueLawrence(int d, int M, const vec_ZZ &lDotR, const vec_ZZ &eDotR, const vec_ZZ leDotRPower, const ZZ &lDotV, const ZZ &eDotV,
-		ZZ &a, ZZ &b); //TO DELETE ?
+
 
 ZZ Power_ZZ(ZZ a, int b);
 ZZ AChooseB(int a,int b);
