@@ -11,12 +11,30 @@
 using namespace std;
 
 /**
- * For each cone, we perturb the linear form l by l:=(l+e) where e is a vector in the form (epsilon, epsilon, ...).
+ * For each cone, we perturb the linear form l by l:=(l+e) where e is a vector in the form (a1*epsilon, a2*epsilon, ...).
  * Each <l+e, v> is saved in the rayDotProducts vector.
- * <l+e, v> = <l,v> + <(1,1,1...1),v>*epsilon
+ * <l+e, v> = <l,v> + <(a1,...,an),v>*epsilon
  *             \           \_-> this value saved in the epsilon variable
  *              \_-> this value saved in the constant variable
- *If there are repeats, the power is updated. The default power is 1.
+ * If there are repeats, the power is updated. The default power is 0.
+ *
+ *
+ * Math: we need to compute
+ *  	<v, l>^d+M * abs(det(matrix formed by the rays)) * M!/(d+M)!
+ *  --------------------------------------------------------------
+ *                <r_1, -l> * <r_2, -l>*...*<r_d, -l>
+ *
+ * where v is a vertex of a cone
+ *       l is the linear form
+ *       r is a ray of the simply cone
+ *       M is the power of the linear form
+ *       d is the dimention.
+ *
+ * If we divide by zero, we pick a perturbation e s.t
+ *  	<v, l+e>^d+M * abs(det(matrix formed by the rays)) * M!/(d+M)!
+ *  --------------------------------------------------------------
+ *            <r_1, -l -e> * <r_2, -l -e>*...*<r_d, -l-e>
+ *
  */
 class LinearLawrenceIntegration;
 
@@ -58,16 +76,14 @@ private:
 		ZZ constant;	//a number
 		ZZ epsilon;		//coeff. of epsilon from the perturbation
 		int power;		//0 if not processed yet. power= k where k is the number of times the term repeats or -1 if it is one of the (k-1) repeated terms.
-	}; // (constant + epsilon *e )^power.
-	//Afer updatePowers(), the term of  the zero constants has a special form.
-	//Intead of (0 + ce)^m, the zero constants should be thought as 0 + c (e^m).
+	}; // (constant + epsilon *e )^power if constant!=0. If constant = 0, then the semantic is 0 + epsilon * (e^power)
 
 	bool divideByZero; //true if one of the <l,ray> terms vanish.
 	listCone * simplicialCone; //we treat this as a pointer to a cone, not a pointer to a list of cones...but it is a list of cones.
 	vector<linearPerturbation> rayDotProducts;
 	linearPerturbation numeratorDotProduct;//power term not used.
-	ZZ determinant;
-	friend void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegration & coneTerm, ZZ &numerator, ZZ &denominator);
+	ZZ determinant;//abs. det. of the rays of the cone.
+	friend void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegration & coneTerm, ZZ &numerator, ZZ &denominator); //does the residue-like calculation.
 
 }; //class LinearLawrenceIntegration
 

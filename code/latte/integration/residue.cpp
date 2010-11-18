@@ -267,13 +267,32 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 
 
 /**
- * Assumes the numerator does not vanish.
- * Assumes the first entry of lDotR is zero and the first entry of leDotRPower is the order of the pole we are interested in.
- *   that is, find Residue( (lDotV +eDotV*e)^d+m / (e^leDotRPower[0] * (lDotR[i] +  eDotR[i])^leDotRPower[i]))
+ * This function is very similar to the computeResidue() function, but
+ * instead of finding the series expansion of 1/(a+e)^m about e= 0,
+ * we need to take the expansion 1/(a+b*e)^m about e=0.
  *
- *   This function is a friend function to LinearLawrenceIntegration
+ * Assumes the numerator does not vanish.
+ * Assumes the first entry of lDotR is zero and the first entry of leDotRPower is the order of the pole.
+ * We find Residue about e=0 of( (lDotV +eDotV*e)^d+m / (e^leDotRPower[0]+1 * (lDotR[i] +  eDotR[i]*e)^leDotRPower[i]))
+ *                                               \_>note the +1.
+ * This function is a friend function to LinearLawrenceIntegration
+ * @parm d: dimension
+ * @parm m: power of the linear form.
+ * @parm coneTerm: <v,l+e>/ e^m1*(a1 +b1e)^m2*...(ak +bke)^mk, k<d.(note that the power of <v,e+l> is not saved here.
+ * @parm numerator, denominator:output parameters
+ *
+ * Formula: Res_{z = 0} \defrac{(z + l_k)^{M + d}}{z^{m_k} \prod_{k \neq i} ((z + l_{i})^{m_i}}
+ *
+ * Implementation: Use regular binomial theorem to expand <v,l+e>^(m+d) and delete terms of larger than degree m1.
+ *                 Expand 1/(a+be)^mi using the negative binomial theorem and delete powers larger than degree m1.
+ *                 Multiply these finite powers, keeping the degree <= m1 terms.
+ *                 Then find the constant coeff. term in this final polynmial product.
+ * For the negative binomial theorem: http://en.wikipedia.org/wiki/Binomial_series
+ *
+ * Like in computeResideu, when expanding 1/(a + be)^m up to degree m1,
+ * we factor a 1/(a^(m+m1)) so that the finite-degree polynomial will have
+ * integer values.See the notes for computeResidue()
  */
-
 void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegration & coneTerm, ZZ &numerator, ZZ &denominator)
 {
 
@@ -296,13 +315,11 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 
 	int truncateDegree;
 	truncateDegree = coneTerm.rayDotProducts[0].power; //want to find the coef. of the truncateDegree-degree term in the final polynomial.
-			//we assume the power of the (0+c1*e) term in in the first array index.
+			//we assume the power of the (0+c1*e) term is in the first array index.
 
-	//actual calculations, I want the truncateDegree coefficient in a product of one polynomial and some power series. (everything is truncated).
+
 	nu = 1;
-	de = coneTerm.rayDotProducts[0].epsilon; //factor the constand of e^m out.
-	//for (i=1;i<=counter[0];i++) nu*=i;
-
+	de = coneTerm.rayDotProducts[0].epsilon; //factor the coeff. of e^m out.
 
 	monomialSum products;
 	monomialSum tempProducts;
@@ -323,7 +340,7 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 		insertMonomial(c, e, products);
 	}//now, m1 = <l +e, vertex>^(M+d) but in expanded form and truncated
 	//cout << endl;
-	//start i at zero because first index assumed to be order of pole....(0+ce)
+	//start i at 1 because first index (0) assumed to be order of pole....(0+ce)
 	for (i = 1; i < d; i++)
 	{
 		//cout << "going to do case i=" << i << endl;
@@ -334,8 +351,8 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 			//cout << "factored anoter term: " << coneTerm.rayDotProducts[i].constant << "^" << coneTerm.rayDotProducts[i].power << endl;
 			de *= Power_ZZ(coneTerm.rayDotProducts[i].constant, coneTerm.rayDotProducts[i].power);
 			continue;
-		}//factor the constant out
-		//factor out a
+		}//factor the constant out: (a + 0*e)^power.
+		//factor out a so that the polynomial is integer.
 		//cout << "factoring out: " << coneTerm.rayDotProducts[j].constant << "^" << coneTerm.rayDotProducts[j].power + truncateDegree << endl;
 		de = de * Power_ZZ(coneTerm.rayDotProducts[i].constant, coneTerm.rayDotProducts[i].power + truncateDegree);
 
@@ -348,11 +365,12 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 		{
 			//MATH: (a + be)^{-s} truncated to degree m in terms of e:
 			//      = b^{-s -m} sum_j=0^k=m (-1)^j * (s+j-1 choose j) * (be)^j * a^{m -k}
-			//                                                            \        \_>coneTerm.rayDotProducts[i].constant
-			//                                                             \_>coneTerm.rayDotProducts[i].epsilon
+			//              \                                             \        \_>coneTerm.rayDotProducts[i].constant
+			//               \                                             \_>coneTerm.rayDotProducts[i].epsilon
+			//                \_>factored out into de agove.
 			c = AChooseB(coneTerm.rayDotProducts[i].power + j - 1, j) * Power_ZZ(coneTerm.rayDotProducts[i].constant, truncateDegree	- j) * Power_ZZ(coneTerm.rayDotProducts[i].epsilon, j);
 
-			if (j % 2 == 1)
+			if (j % 2 == 1)//this sign comes from (-s, k) = -s(-s -1)(-s -2)..(-s-k + 1)/k!= (s +k -1, k)*(-1)^k
 				c.mult(to_ZZ(-1));
 			e[0] = j;
 			//cout << c << "e^" << j << " + ";
@@ -360,7 +378,7 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 		};
 		//cout << endl;
 
-		//I took out the whole polynomial multiplication flip-flop code.
+		//I took out the whole polynomial multiplication flip-flop code found in computeResidue().
 
 		mindeg[0] = 0;
 		maxdeg[0] = truncateDegree;
@@ -382,9 +400,7 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 	//ZZ findCoeff = to_ZZ(0);
 	RationalNTL findCoeff;
 
-	//The following part is trying to find a monomial that has the degree we want and returns its coefficient to findCoeff
-	//BurstTerm<RationalNTL, int>* temp;
-	//BurstTrie<RationalNTL, int>* myTrie;
+	///find a monomial that has degree truncateDegree and get its coefficient
 	BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int> ();
 	//myTrie = products.myMonomials;
 	it->setTrie(products.myMonomials, products.varCount);
@@ -411,8 +427,7 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 
 
 	delete it;
-	//destroyMonomials(m1);
-	//destroyMonomials(sub);
+	destroyMonomials(products);
 	return;
 
 }//computeResidueLawrence

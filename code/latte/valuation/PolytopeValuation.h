@@ -58,34 +58,33 @@ private:
 	bool freeVertexRayCones, freePolytopeAsOneCone, freeTriangulatedPoly; //denotes if we made these objects (and should free them) or if they were passed in.
 
 
+	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+	void convertToOneCone(); //convert from poly to polytopeAsOneCone. Then late you can triangulate the polytope into simpleces
+	void dilatePolytope(const RationalNTL & factor); //dilates polytope by changing the vertices.
+	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor); //given a polynomial and a dilation factor, replaces x_i^k --> factor^k*x_i^k
+	RationalNTL findIntegralUsingTriangulation(linFormSum &forms) const; //computes the integral over every simplex
+	RationalNTL findIntegralUsingLawrence(linFormSum &forms) const;      //computes the integral over every simple cone.
+	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const; //computes the volume over every simplex
+	RationalNTL findVolumeUsingLawrence();								 //computes the volume over every simple cone.
+	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly (triangulates the polytope)
+	void triangulatePolytopeVertexRayCone();	//convert vertexRayCones to triangulatedPoly using decomposeCones (triangulates the vertex cones)
 
-	RationalNTL integratePolytope(linFormSum &forms) const;
-	RationalNTL integratePolytopeLawrence(linFormSum &forms) const;
 
 public:
 	typedef enum {DeterminantVolume, LawrenceVolume} VolumeType;
+	typedef enum {TriangulationIntegration, LawrenceIntegration} IntegrationType;
 	typedef enum {VertexRayCones, TriangulatedCones} ConeType;
 
 	PolytopeValuation(Polyhedron *p, BarvinokParameters &bp);
-//	PolytopeValuation(listCone *cones, ConeType coneType, int numofvars, BarvinokParameters &bp);
 	virtual ~PolytopeValuation();
 
 
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-
-	void convertToOneCone(); //convert from poly to polytopeAsOneCone.
-	void dilatePolytope(const RationalNTL & factor); //dilates polytope by changing the vertices.
-	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor);
-	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const;
-	RationalNTL findVolumeUsingLawrence();
+	RationalNTL findIntegral(const monomialSum& polynomial, const IntegrationType integrationType);
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
-	RationalNTL integrate(const monomialSum& polynomial); //integrates the polynomial over the polytope.
-	RationalNTL integrateLawrence(const monomialSum& polynomial);
 	ZZ static lcm(const ZZ &a, const ZZ & b);
 	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
-	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly
-	void triangulatePolytopeVertexRayCone();	//convert vertexRayCones to triangulatedPoly using decomposeCones
 
 };
 

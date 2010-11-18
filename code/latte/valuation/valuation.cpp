@@ -65,7 +65,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 /**
  * Computes the integral of a polynomial over the polytope.
  *
- * Bothe the triangulation and lawrence methods will dilate the org. polytope.
+ * Both the triangulation and lawrence methods will dilate the org. polytope.
  */
 Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
@@ -92,7 +92,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 
 		loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
 		tiangulate_timer_and_result.timer.start();
-		ans1 = polytopeValuation.integrate(originalPolynomial);
+		ans1 = polytopeValuation.findIntegral(originalPolynomial, PolytopeValuation::TriangulationIntegration);
 		tiangulate_timer_and_result.timer.stop();
 
 		tiangulate_timer_and_result.valuationType = ValuationData::integrateTriangulation;
@@ -112,7 +112,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 
 		loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
 		lawrence_timer_and_result.timer.start();
-		ans2 = polytopeValuation.integrateLawrence(originalPolynomial);
+		ans2 = polytopeValuation.findIntegral(originalPolynomial, PolytopeValuation::LawrenceIntegration);
 		lawrence_timer_and_result.timer.stop();
 
 		lawrence_timer_and_result.valuationType = ValuationData::integrateLawrence;

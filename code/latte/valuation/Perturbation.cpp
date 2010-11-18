@@ -11,6 +11,12 @@
 
 using namespace std;
 
+
+/**
+ * Allocates space for each term in the integration formula.
+ * @dim: dimention of the polytope (number of slots in each vertex).
+ * @simpleConeList: linked list of every simple cone.
+ */
 void LinearPerturbationContainer::setListCones(int dim,
 		listCone * simpleConeList)
 {
@@ -28,6 +34,12 @@ void LinearPerturbationContainer::setListCones(int dim,
 	}//for every cone.
 }
 
+/**
+ * Computes the dot products of <e, l> where e is the current pertrubation.
+ * If we still divide by zero, we break and return true;
+ * @l: the same linear form  tryNoPerturbation() was called with.
+ */
+
 bool LinearPerturbationContainer::tryCurrentPerturbation(const vec_ZZ &l)
 {
 	divideByZero = false;
@@ -38,6 +50,16 @@ bool LinearPerturbationContainer::tryCurrentPerturbation(const vec_ZZ &l)
 	return divideByZero;
 }//tryCurrentPerturbation
 
+
+/**
+ * For every vertex and ray, compute <v,l> and <r,l> and save the results.
+ * If we divide by zero, return true. However, do not break early.
+ * That is, if we divide by zero, we keep computing the rest of the dot products because we need
+ * this information in any case.
+ *
+ * @l: linear form.
+ *
+ */
 bool LinearPerturbationContainer::tryNoPerturbation(const vec_ZZ &l)
 {
 	divideByZero = false;
@@ -47,6 +69,13 @@ bool LinearPerturbationContainer::tryNoPerturbation(const vec_ZZ &l)
 	return divideByZero;
 }
 
+/**
+ * Finds a perturbation s.t we do not divide by zero.
+ * First, we try no perturbation and hope for the best.
+ * If we divide by zero, we set e to l + (0,0...,0,randon number,0,...,0), and take the orthogonal projection on l.
+ * If this still does not work, we just take e to be e + (0,0...,0,randon number,0,...,0) and keep trying.
+ *
+ */
 void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 {
 
@@ -105,8 +134,13 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 
 }//findPerturbation
 
-/**integrates the polytope over l.
+/**
+ * Integrates the polytope over l.
+ * Assumes we already computed the dot products with l
+ * and we are no longer dividing by zero.
  *
+ * Instead of saving the terms <r, -l-e>, we save <r,l+e>
+ * It is here that we multiply the (-1)^d back in.
  */
 RationalNTL LinearPerturbationContainer::integratePolytope(int m)
 {
@@ -146,9 +180,20 @@ void LinearLawrenceIntegration::setSimplicialCone(listCone *cone, int dim)
 
 }
 
-/** Finds the innerproducts of the vertex and rays for each term.
+/** Finds the dot products of the vertex and rays for each term.
  *  If a residue calculation is needed, returns true, otherwise
  *  we did not divide by zero and false is returned.
+ *
+ *  We also find the abs. value of the determinant for this cone's rays.
+ *
+ *  For the <v,l>^M+d part, we only save <v,l> because we do not know M at this point.
+ *  Instead of saving <r, l>, we factor the (-1)^d out and compute <r, l>.
+ *
+ *  We set the coeff. of the epsilon term and power term to zero to denote that the powers have not yet been processed.
+ *
+ *  @l: linear form.
+ *  @return: true=we divided by zero wen <v,l>!= 0 (and so we need to find a perturbation for this term).
+ *           false=we did not divide by zero or <v,l> = 0.
  */
 bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
 {
@@ -195,9 +240,19 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
 	return divideByZero;
 }
 
-/** Finds the innerproducts of the vertex and rays for each term with the perturbation term ONLY.
- *  If a residue calculation is needed, returns true, otherwise
- *  we did not divide by zero and false is returned.
+/** Finds the dot products of the vertex and rays for each term with the perturbation term ONLY.
+*
+* @e: perturbation vector: (a1, a1, ..., an)*epsilon
+* @l: linear form. Oh, it is not currently used.
+* @return: true:with this perturbation, we are still dividing by zero.
+*          false: this perturbation worked or we do not need a perturbation.
+*
+* We already found <v, l> and <r, l>, if the zero perturbation does not make us divide by zero, we simply return false
+* Otherwise, we find <v, e> and <r,e>
+*
+*
+* We still ignore the powers of each term. The powers are all still zero.
+*
  */
 bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &e,
 		const vec_ZZ &l)
@@ -229,6 +284,13 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &e,
 
 /**
  * Integrates l over this cone. Adds the result to totalSum
+ *
+ * @totalSum: output parameter
+ * @m: the power of the linear form
+ * @dim: dimension of the polytope.
+ *
+ * It is here that we merge/update the powers in the denominator.
+ *
  */
 void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 		int dim)
@@ -270,15 +332,13 @@ void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 	//cout << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
 	totalSum.add(numerator * determinant, denominator);
 
-	//todo: write a friend function in residue.cpp (not in /valuation/) that will compute the residue using
-	//our data structure.
-
 }//integrateTerm
 
 
 //prints out the current term.
-//Afer updatePowers(), the term of  the zero constants has a special form.
-//Intead of (0 + ce)^m, the zero constants should be thought as 0 + c (e^m).
+//After updatePowers(), the term of the zero constants has a special form.
+//Instead of (0 + ce)^m, the zero constants should be thought as 0 + c (e^m).
+//This function is really just for debugging.
 void LinearLawrenceIntegration::printTerm(bool printVertexRays) const
 {
 	cout << "(" << numeratorDotProduct.constant << "+ " << numeratorDotProduct.epsilon << "e)^" << numeratorDotProduct.power
@@ -297,11 +357,17 @@ void LinearLawrenceIntegration::printTerm(bool printVertexRays) const
 
 
 /** Merges powers and returns location of the (0+e) term.
- *  Assumes a residue really need to be called. That is, assumes a (0+e) term exists and will return it's location...or else will return -1.
+ *  Assumes a residue really need to be called. That is, assumes a (0+e) term exists.
  *  After this, if power = 0: there should be no 0 powers!
  *  					   k: then the power of this term is k.
  *  					  -1: There were repeated terms and this term has been merged with another term.
- *  example: (c1x + c0)*(b1x + b0)*(c1x + c0)=(c1x + c0)^2*(b1x + b0)*(c1x + c0)^-1
+ *                            Thus, -1 is a lazy deletion.
+ *  We swap the location of the (0+ce) term to be at location [0].
+ *  example: (c1x + c0)*  (b1x + b0)*  (c1x + c0)    (0+ 2e) *(0+3e)
+ *          =(c1x + c0)^2*(b1x + b0)^1*(c1x + c0)^-1*(0+ 6e)^2 *(0+3e)^-1 (before the swap)
+ *          =(0 + 6e)^2*  (b1x + b0)^1*(c1x + c0)^-1*(c1x + c0)^2 *(0+3e)^-1 (after the swap)
+ *              \_> note that the semantics of our data structure is (constant + epsilon*e)^power.
+ *                  But for the zero constant terms, the semantic should be 0 + epsilon* (e^power).
  */
 void LinearLawrenceIntegration::updatePowers()
 {
