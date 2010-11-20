@@ -5,6 +5,9 @@
 # Goal: This maple file should contain all the functions need for testing the valuation class
 #  through maple.
 # Currently, we only test integration of hyper-rectangles.
+#
+# Assumes this script is called/exicuted in the top-level code director (two folders above it's location).
+#
 
 
 #dependent files: (used for making the polynomials.)
@@ -157,7 +160,7 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	
 	#Finally, now test our code.
 	correctAnswerString :=convert(correctAnswer, string):
-	systemCommand:= "./test-polytope-integration " || correctAnswerString || " " || polynomialFileName || " " || fileName :
+	systemCommand:= "./test-hyperrectangle-integration " || correctAnswerString || " " || polynomialFileName || " " || fileName :
 	#print(systemCommand);
 	status:=system(systemCommand):
 	printf("status=%d\n", status);

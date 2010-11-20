@@ -1,4 +1,4 @@
-read("valuation/valuationTestsLib.mpl"):
+read("valuation/testCorrectnessAndBenchmark/valuationTestsLib.mpl"):
 
 
 #	integrateHyperrectangle.mpl

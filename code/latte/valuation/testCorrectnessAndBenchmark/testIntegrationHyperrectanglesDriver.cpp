@@ -1,15 +1,17 @@
 /*
- * testIntegrationHyperrectangles.cpp
+ * testIntegrationHyperrectanglesDriver.cpp
  *
  *  Created on: Jul 21, 2010
  *      Author: bedutra
  *
  *  usage: exe correct-answer polynomial-file latte-file
+ *  Compars the result from the valuation class with the passed-in correct value.
+ *  This exe is used by a maple script.
  */
 
 #include <iostream>
 #include <cstring>
-#include "valuation.h"
+#include "../valuation.h"
 #include "rational.h"
 
 using namespace std;
