@@ -23,8 +23,6 @@
 #include <NTL/mat_ZZ.h>
 
 #include "valuation/PolytopeValuation.h"
-#include "testEhrhart/BuildRandomPolytope.h"
-#include "testEhrhart/BuildHypersimplexEdgePolytope.h"
 
 #include "CheckEmpty.h"
 #include "Polyhedron.h"
@@ -123,26 +121,10 @@ ValuationContainer mainValuationDriver(const char *argv[], int argc);
 
 static void usage(const char *progname);
 
-
-
-
 }//namespace Valuation
 
 
 
-namespace VolumeTests
-{
 
-void printVolumeTest(const RationalNTL &correctVolumeAnswer,
-		const Valuation::ValuationContainer & valuationResults, const string &file,
-		const string &comments);
-
-void runOneTest(int ambientDim, int numPoints);
-void runTests();
-
-void runHyperSimplexTests();
-void runBirkhoffTests();
-
-}//namespace VolmeTests
 
 #endif /* VALUATION_H_ */

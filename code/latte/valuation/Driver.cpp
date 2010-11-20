@@ -15,11 +15,6 @@
 int main(int argc, char *argv[])
 {
 	Valuation::mainValuationDriver((const char **) argv, argc);
-	//runHyperSimplexTests();
-	//runBirkhoffTests();
-	//runTests();
-	//runOneTest(atoi(argv[1]), atoi(argv[2]));
-
 	return 0;
 }
 //main()

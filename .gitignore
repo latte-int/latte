@@ -178,6 +178,8 @@ code/latte/aggregation/.dirstamp
 code/latte/barvinok/.deps
 code/latte/barvinok/.dirstamp
 code/latte/barvinok/SunWS_cache
+code/latte/buildPolytopes/.deps
+code/latte/buildPolytopes/.dirstamp
 code/latte/compare
 code/latte/complete-boundary-triangulation
 code/latte/count
@@ -223,8 +225,6 @@ code/latte/redcheck
 code/latte/savedfiles
 code/latte/simple-count
 code/latte/test-todd
-code/latte/testEhrhart/.deps
-code/latte/testEhrhart/.dirstamp
 code/latte/testPolynomialInterpolation
 code/latte/todd/.deps
 code/latte/todd/.dirstamp

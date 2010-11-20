@@ -181,6 +181,31 @@ dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
 ###### VOLUME COMPUTATION AND RATIONAL VALUATIONS ##########
 
 
+#main valuation headers and source
+noinst_HEADERS += valuation/PolytopeValuation.h
+noinst_HEADERS += valuation/valuation.h
+noinst_HEADERS += valuation/Perturbation.h
+
+liblatte_a_SOURCES += valuation/PolytopeValuation.cpp
+liblatte_a_SOURCES += valuation/valuation.cpp
+liblatte_a_SOURCES += valuation/Perturbation.cpp
+
+#Polytope building headers and source.
+noinst_HEADERS += buildPolytopes/BuildGraphPolytope.h
+noinst_HEADERS += buildPolytopes/BuildHypersimplexEdgePolytope.h
+noinst_HEADERS += buildPolytopes/BuildRandomPolytope.h
+noinst_HEADERS += buildPolytopes/GraphMaker.h
+
+liblatte_a_SOURCES  += buildPolytopes/BuildGraphPolytope.cpp
+liblatte_a_SOURCES  += buildPolytopes/BuildHypersimplexEdgePolytope.cpp
+liblatte_a_SOURCES  += buildPolytopes/BuildRandomPolytope.cpp
+liblatte_a_SOURCES  += buildPolytopes/GraphMaker.cpp
+
+
+#interpolation. to delete this.
+noinst_HEADERS += interpolation/PolynomialInterpolation.h
+
+
 bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
 ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
@@ -189,73 +214,47 @@ bin_PROGRAMS += testPolynomialInterpolation
 testPolynomialInterpolation_SOURCES = interpolation/PolynomialInterpolation.cpp
 testPolynomialInterpolation_SOURCES += interpolation/testDriver.cpp
 
-noinst_HEADERS += interpolation/PolynomialInterpolation.h
-
 bin_PROGRAMS += my-test-ehrhart
-my_test_ehrhart_SOURCES = testEhrhart/Driver.cpp
-my_test_ehrhart_SOURCES += testEhrhart/BuildRandomPolytope.cpp
-my_test_ehrhart_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp
-my_test_ehrhart_SOURCES += testEhrhart/GraphMaker.cpp
-my_test_ehrhart_SOURCES += testEhrhart/BuildGraphPolytope.cpp
+my_test_ehrhart_SOURCES = buildPolytopes/Driver.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/BuildRandomPolytope.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/BuildHypersimplexEdgePolytope.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/GraphMaker.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/BuildGraphPolytope.cpp
 
-noinst_HEADERS += testEhrhart/BuildGraphPolytope.h	\
-	testEhrhart/BuildHypersimplexEdgePolytope.h	\
-	testEhrhart/BuildRandomPolytope.h		\
-	testEhrhart/GraphMaker.h
-
-
+#main program to find volumes and integrals of polytopes.
 bin_PROGRAMS += valuation-computation
 valuation_computation_SOURCES = valuation/Driver.cpp
-valuation_computation_SOURCES += valuation/valuation.cpp
-valuation_computation_SOURCES += valuation/PolytopeValuation.cpp
-valuation_computation_SOURCES += valuation/Perturbation.cpp
-valuation_computation_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #used for testing
-valuation_computation_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #used for testing
-
 valuation_computation_LDADD = $(LDADD)
 valuation_computation_LDADD += liblatteintegration.a
 
+#convert a cdd H-rep to latte H-rep (by clearing the fractions)
+bin_PROGRAMS += ConvertCDDineToLatte
+ConvertCDDineToLatte_SOURCES = convertCDD_ine_to_latte.cpp
+ConvertCDDineToLatte_LDADD = $(LDADD)
 
-noinst_HEADERS += valuation/PolytopeValuation.h
-noinst_HEADERS += valuation/valuation.h
-noinst_HEADERS += valuation/Perturbation.h
-liblatte_a_SOURCES += valuation/Perturbation.cpp
+
+#Run ./valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh 
+#  to start a maple script that will test integration of polynomials over rectangles in many dimentions.
+check_PROGRAMS += test-hyperrectangle-integration
+test_hyperrectangle_integration_SOURCES = valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesDriver.cpp 
+test_hyperrectangle_integration_LDADD = $(LDADD)
+test_hyperrectangle_integration_LDADD += liblatteintegration.a
 
 
-bin_PROGRAMS += ConvertCDDextToLatte
-ConvertCDDextToLatte_SOURCES = convertCDD_ext_to_latte.cpp
-#ConvertCDDextToLatte_SOURCES == rational.cpp
-ConvertCDDextToLatte_LDADD = $(LDADD)
-
-check_PROGRAMS += test-polytope-integration
-test_polytope_integration_SOURCES = valuation/testIntegrationHyperrectangles.cpp 
-test_polytope_integration_SOURCES += valuation/valuation.cpp
-test_polytope_integration_SOURCES += valuation/PolytopeValuation.cpp
-test_polytope_integration_SOURCES += valuation/Perturbation.cpp
-test_polytope_integration_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
-test_polytope_integration_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
-test_polytope_integration_LDADD = $(LDADD)
-test_polytope_integration_LDADD += liblatteintegration.a
-
+#Computes the volums of standard hypersimplex
 check_PROGRAMS += test-volume-hypersimplex
-test_volume_hypersimplex_SOURCES = valuation/testVolumeHypersimplex.cpp
-test_volume_hypersimplex_SOURCES += valuation/valuation.cpp
-test_volume_hypersimplex_SOURCES += valuation/PolytopeValuation.cpp
-test_volume_hypersimplex_SOURCES += valuation/Perturbation.cpp
-test_volume_hypersimplex_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
-test_volume_hypersimplex_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
+test_volume_hypersimplex_SOURCES = valuation/testCorrectnessAndBenchmark/testVolumeHypersimplexDriver.cpp
+test_volume_hypersimplex_SOURCES += valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp
 test_volume_hypersimplex_LDADD = $(LDADD)
 test_volume_hypersimplex_LDADD += liblatteintegration.a  
 
+#A maple script can find the volume of many simplices at once using the PolytopeValuation class.
 check_PROGRAMS += test-volume-for-SL
-test_volume_for_SL_SOURCES = valuation/testVolume.cpp
-test_volume_for_SL_SOURCES += valuation/valuation.cpp
-test_volume_for_SL_SOURCES += valuation/PolytopeValuation.cpp
-test_volume_for_SL_SOURCES += valuation/Perturbation.cpp
-test_volume_for_SL_SOURCES += testEhrhart/BuildRandomPolytope.cpp           #quick fix
-test_volume_for_SL_SOURCES += testEhrhart/BuildHypersimplexEdgePolytope.cpp #quick fix
+test_volume_for_SL_SOURCES = valuation/testCorrectnessAndBenchmark/testVolumeForSLDriver.cpp
 test_volume_for_SL_LDADD = $(LDADD)
 test_volume_for_SL_LDADD += liblatteintegration.a
+
+
 
 
 ################ INTEGRATION ####################
