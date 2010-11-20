@@ -1,12 +1,15 @@
 read("testingTopEhrhart_lib.mpl"); #load the test functions
-interface(quiet=true);
-#with(CodeTools[Profiling]):
+#with(CodeTools[Profiling]): #for profilling.
 #
 #  Sept. 28, 2010
 #  Author: Brandon, Gregory, Jesus
 #  Description: Uses the main TopEhrhart lib to compute the top-three ehrhart coeff.
-#	This script can either 1)generate a table of time test for finding the top ehrhart coeff. or 2) test
+#	This script generates a table of time test for finding the top ehrhart coeff.
 #
+
+#used for debugging.
+#printlevel:=40;
+
 
 #Saves the average time it takes to find the top-3 ehrhart coeff in a file.
 #For each random simplex of dim between startingDim to infinity, test numTests many ehrhart top 3 coefficients.
@@ -123,16 +126,18 @@ end:
 
 #Find the average time to compute the top 3 coeff. of many simplices and increasing dim.
 				#starting dim, number of tests, file base name.
-table_time_top_ehrhart(11, 50, "CUCARACHAS/tableTimeSLTopEhrhart");
+table_time_top_ehrhart(11, 50, "tableTimeSLTopEhrhart_debug");
 
 
-#test_top_ehrhart_compare_v1_v2(4, "compareV1V2");
+
+
 
 
 #Find the top 3 coeff. of 1 simplex.
-#test_top_ehrhart(6, "oneTopEhrhartTest");
+#test_top_ehrhart_v2(3, "Jesus3");
 
 
+#cut-and-paste these profile statements if you want to profile everything.
 
 quit;
 Profile(primitive_vector);

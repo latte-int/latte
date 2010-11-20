@@ -1,4 +1,4 @@
-#---------------------------------------------------------
+ #---------------------------------------------------------
 #This is MAPLE code to generate random $k$-simplices
 # inside the Birkhoff polytope B_n
 # THe user can prescribe in advance forbidden positions in the
@@ -178,6 +178,47 @@ local V,II,simp,r,U,J,simp2;
 
 	return(matrix(simp));
 end proc:
+
+gensimplexB_n_nonProjected:=proc(n,k,F, dataBaseFileName)
+local V,II,simp,r,U,J,simp2;
+local nonProjectedSimplex, numberIterations;
+
+	numberIteration:=0; # the number of times we tried to find a NEW simplex that was not already in the database.
+
+	if k> (n-1)^2+1 then
+		printf("This is impossible: %d >= (%d -1)^2 + 1 = %d\n", k, n, (n-1)^2 +1);
+		quit;
+	fi;
+
+
+
+
+	II:=IdentityMatrix(n);
+	simp2:=[straighten(II)];
+	J:=SubMatrix(IdentityMatrix(n),[$1..(n-1)],[$1..(n-1)]):
+	simp:=[straighten(J)]:
+
+	Rank(Matrix(simp));
+	nonProjectedSimplex:=[];
+	r:=1:
+	while r<k do
+		if (r <=(n-1)^2-nops(F)) and nops(F)>0 then
+			U:=Matrix(RestrictedPositionRandPerm(n,F));
+		else
+			 U:=SubMatrix(IdentityMatrix(n),[$1..n],randperm(n));
+		fi;
+		V:=SubMatrix(U,[$1..(n-1)],[$1..(n-1)]);
+		simp2:=[op(simp2),straighten(U)];
+		if r<Rank(Matrix(simp2)) then
+			simp:=[op(simp),straighten(V)]:
+			nonProjectedSimplex:=[op(nonProjectedSimplex), straighten(U)];
+			r:=r+1;
+		fi;
+	od;
+
+	return([simp, nonProjectedSimplex]);
+end proc:
+
 #--------------EXAMPLE-----------------------
 # This is a Chan-Robbins-Yuen face of B_5 and we are sampling
 # from it.
