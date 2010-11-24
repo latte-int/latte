@@ -191,11 +191,13 @@ liblatte_a_SOURCES += valuation/valuation.cpp
 liblatte_a_SOURCES += valuation/Perturbation.cpp
 
 #Polytope building headers and source.
+noinst_HEADERS += buildPolytopes/BuildPolytope.h
 noinst_HEADERS += buildPolytopes/BuildGraphPolytope.h
 noinst_HEADERS += buildPolytopes/BuildHypersimplexEdgePolytope.h
 noinst_HEADERS += buildPolytopes/BuildRandomPolytope.h
 noinst_HEADERS += buildPolytopes/GraphMaker.h
 
+liblatte_a_SOURCES  += buildPolytopes/BuildPolytope.cpp
 liblatte_a_SOURCES  += buildPolytopes/BuildGraphPolytope.cpp
 liblatte_a_SOURCES  += buildPolytopes/BuildHypersimplexEdgePolytope.cpp
 liblatte_a_SOURCES  += buildPolytopes/BuildRandomPolytope.cpp
@@ -205,6 +207,16 @@ liblatte_a_SOURCES  += buildPolytopes/GraphMaker.cpp
 #interpolation. to delete this.
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
+#This is used to make many polytopes for the new research paper.
+bin_PROGRAMS += build-database-polytopes
+build_database_polytopes_SOURCES = buildPolytopes/buildDatabaseRandomPolytopesDriver.cpp
+
+
+
+#we should delete this~Brandon
+bin_PROGRAMS += testBuildPolytope
+testBuildPolytope_SOURCES = buildPolytopes/testBuildPolytopes.cpp
+testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
 
 bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp

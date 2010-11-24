@@ -64,17 +64,10 @@ void VolumeTests::runOneTest(int ambientDim, int numPoints)
 	comments << "Making random integer polytope with " << numPoints
 			<< " points in R^" << ambientDim << " for volume testing";
 
-	BuildRandomPolytope buildPolytope(ambientDim);
-	buildPolytope.setComments(comments.str().c_str());
+	BuildRandomPolytope buildPolytope;
 	buildPolytope.setIntegerPoints(false); //make random rational points.
-	buildPolytope.buildPolymakeFile(numPoints); //make the file
-	buildPolytope.callPolymake(); //run polymake
-	buildPolytope.findVolumeWithPolymake(); //run polymake for the volume
-	buildPolytope.convertFacetEquations(); //fix facet equations
-	buildPolytope.printFacetEquationsForLattE(); //make latte file.
-	cerr << comments.str().c_str();
-	//buildPolytope.findEhrhardPolynomial();
-	//buildPolytope.findVolumeWithPolymake();
+	buildPolytope.makePoints(ambient, numPoints);
+	buildPolytope.buildLatteHRepFile();
 
 	string file = buildPolytope.getLatteFile();
 
