@@ -175,11 +175,12 @@ void GraphMaker::makeCircleGraph(const int size)
  */
 void GraphMaker::makeKneserGraph(const int setSize, const int subSetSize)
 {
-	BuildHypersimplexEdgePolytope hPoly(setSize, subSetSize);
-	vector< vector<int> > points;
-	vector<int> startingPoint;
+	BuildHypersimplexEdgePolytope hPoly;
+	vector< vector<mpq_class> > points;
+	vector<mpq_class> startingPoint;
 	bool match;
 
+	hPoly.generatePoints(setSize, subSetSize);
 
 	if (subSetSize > (setSize +1)/2)
 	{

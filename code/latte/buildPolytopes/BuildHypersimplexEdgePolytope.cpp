@@ -12,11 +12,8 @@
 using namespace std;
 
 
-BuildHypersimplexEdgePolytope::BuildHypersimplexEdgePolytope(int ambient_dim, int numones): BuildRandomPolytope(ambient_dim), numOnes(numones)
+BuildHypersimplexEdgePolytope::BuildHypersimplexEdgePolytope(): BuildPolytope()
 {
-	stringstream ss;
-	ss << "A hypersimplex(" << ambientDim << ", " << numOnes << ")."; //caller should call setComments for a better label.
-	PolytopeComments = ss.str();
 }//BuildHypersimplexEdgePolytope
 
 
@@ -28,10 +25,10 @@ BuildHypersimplexEdgePolytope::BuildHypersimplexEdgePolytope(int ambient_dim, in
  * @parm addCurrent: checks to see if the currentPoint should be added to the list. The default is false.
  */
 void BuildHypersimplexEdgePolytope::addToPoints(
-	vector< vector<int> > &list,
-	vector<int> currentPoint, 
+	vector< vector<mpq_class> > &list,
+	vector<mpq_class> currentPoint,
 	int base, 
-	bool addCurrent) const
+	bool addCurrent)
 {
 	if ( addCurrent == true)
 		list.push_back(currentPoint);
@@ -96,40 +93,29 @@ void BuildHypersimplexEdgePolytope::addToPoints(
 			//    currentPoint = 00011100, 00001110, 00000111
 		}//for each shift, recurse.
 	}//keep the recurison.
-	
-
 }//addToPoints
 
-
-void BuildHypersimplexEdgePolytope::buildPolymakeFile()
+/**
+ * Makes the vertices/points of the hypersimplex.
+ * @parm ambient_dim: the ambient dim! What did you expect?
+ * @numones: The number of 1's each vertex should have.
+ */
+void BuildHypersimplexEdgePolytope::generatePoints(int ambient_dim, int numones)
 {
-	ofstream file;
-	
-	file.open(fileName.c_str());
-	file << "POINTS" << endl;
-	
-	vector< vector<int> > points;
-	
-	vector<int> starter;
-	for(int k = 0; k < numOnes; ++k)
+	ambientDim = ambient_dim;
+	_numOnes = numones;
+
+	points.clear();
+	vector<mpq_class> starter;
+	for(int k = 0; k < _numOnes; ++k)
 		starter.push_back(1);
-	for(int k = numOnes; k < ambientDim; ++k)
+	for(int k = _numOnes; k < ambientDim; ++k)
 		starter.push_back(0); // ex: starter = 1110000
-	
+
 	addToPoints(points, starter, 0, true);
 	//points now contains all the points we need.
+}
 
-	for(int k = 0; k < (int) points.size(); k++)
-	{
-		file << 1 << ' ';
-		for(int i = 0; i < ambientDim; ++i)
-			file << points[k][i] << " ";
-		file << endl;
-	}//for k
-
-	file.close();
-	
-}//buildPolymakeFile()
 
 
 

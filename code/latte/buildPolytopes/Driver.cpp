@@ -12,6 +12,10 @@
 #include "BuildGraphPolytope.h"
 
 
+void findEhrhartPolynomial(const string &file)
+{
+	system((string("./count --ehrhart-polynomial --maxdet=1000000 ") + file).c_str());
+}
 
 void doRandom()
 {
@@ -20,37 +24,39 @@ void doRandom()
 
 	cout << "Enter: size numPoints >> ";
 	cin >> size >> points;
-	BuildRandomPolytope rPoly(size);
-	
-	rPoly.buildPolymakeFile(points);
-	//rPoly.callPolymake();
-	comments << "Random edge polytope with " << points << " random points of size " << size << ". ";
-	rPoly.setComments(comments.str());
-	rPoly.findEhrhardPolynomial();
+	BuildRandomPolytope rPoly;
+	rPoly.makePoints(size, points);
+
+	rPoly.buildLatteHRepFile();
+
+	findEhrhartPolynomial(rPoly.getLatteHRepFile());
+	rPoly.deleteLatteHRepFile();
+	rPoly.deletePolymakeFile();
 }
 
 
-void doEdge()
+void doHypersimplex()
 {
 	int n, k;
 	stringstream comments;
 
 	cout << "Enter: n (vector lenght) k (number of ones) >> ";
 	cin >> n >> k;
-	BuildHypersimplexEdgePolytope rPoly(n, k);
+	BuildHypersimplexEdgePolytope rPoly;
+	rPoly.generatePoints(n, k);
 	
-	rPoly.buildPolymakeFile();
-	//rPoly.callPolymake();
+	rPoly.buildLatteHRepFile();
 
-	comments << "Hypersimplex with n=" << n << ", and k=" << k << ". ";
-	rPoly.setComments(comments.str());
-	rPoly.findEhrhardPolynomial();
+	findEhrhartPolynomial(rPoly.getLatteHRepFile());
 
+	rPoly.deleteLatteHRepFile();
+	rPoly.deletePolymakeFile();
 }
 
 
 void doGraphs()
 {
+
 	GraphMaker g;
 	BuildGraphPolytope gPoly;
 	int numVertx, offset;
@@ -134,18 +140,18 @@ void doGraphs()
 
 
 
-	g.printEdges();
-	cout << "poly type (e or se) >> ";
+	//g.printEdges();
+	cout << "edge type: regular edge or symmetric edge (e or se) >> ";
 	cin >> type;
 
 	if (type == "e")
 	{
-		gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::EDGE);
+		gPoly.findEdgePolytope(g.getEdges());
 		comments << " Edge polytope encoding used. ";
 	}//edge poly
 	else if (type == "se")
 	{
-		gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::SYMMETRIC_EDGE);
+		gPoly.findSymmetricEdgePolytope(g.getEdges());
 		comments << "Symmetric edge polytope encoding used. ";
 	}//symmetric edge poly.
 	else
@@ -154,114 +160,28 @@ void doGraphs()
 		exit(1);
 	}//else stop
 
-	gPoly.setComments(comments.str());
-	gPoly.findEhrhardPolynomial();
+	gPoly.buildLatteHRepFile();
+	findEhrhartPolynomial(gPoly.getLatteHRepFile());
+
+	gPoly.deleteLatteHRepFile();
+	gPoly.deletePolymakeFile();
 }//doGraphs
 
-void doAuto()
-{
-	stringstream comments;
 
-/*	
-	for(int i =  20; i <= 40; ++i)
-	{
-		stringstream comments;
-		BuildGraphPolytope gPoly;
-		GraphMaker g;
-		
-		comments << "doing line graph of size " << i << " with edge encoding" ;
-		cout << "***********************************\n" << comments.str() << endl;
-		g.makeLinearGraph(i);
-		gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::EDGE);
-		gPoly.setComments(comments.str());
-		gPoly.findEhrhardPolynomial();
-	}//line graphs.
-*/	
-
-//try two disconnected petersen graphs.
-/*	stringstream comments2;
-	BuildGraphPolytope gPoly2;
-	GraphMaker g2;
-	g2.makePetersenFunGraph(2);
-	comments2 << "A Fun Peterson Graph";
-	gPoly2.buildPolymakeFile(g2.getEdges(), BuildGraphPolytope::EDGE);
-	gPoly2.setComments(comments2.str());
-	gPoly2.findEhrhardPolynomial();
-*/
-	for(int i = 5; i <= 50; i = i + 1)
-		for(int j = 1; j <= i/2; j = j + 1)
-		{
-			stringstream comments;
-			BuildGraphPolytope gPoly;
-			GraphMaker g;
-
-			comments << "Kneser graph with " << j << " < " << i << ". ";
-			cout << "***********************************\n" << comments.str() << endl;
-			g.makeKneserGraph(i, j);
-			g.printEdges();
-			gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::EDGE);
-			gPoly.setComments(comments.str());
-			gPoly.findEhrhardPolynomial();
-		}//rand graph
-
-
-	//already did i=[15,30], j=[i, i+10] untill i = 17, j= 24 for connected edge graphs.
-	
-	
-	for(int i = 35; i <= 40; i = i + 5)
-		for(int j = i+3; j <= i+9; j = j + 3)
-		{
-			stringstream comments;
-			BuildGraphPolytope gPoly;
-			GraphMaker g;
-			
-			comments << "Random disconnected graph with " << i << " nodes and " << j << " edges. ";
-			cout << "***********************************\n" << comments.str() << endl;
-			g.makeRandomDisconnectedGraph(i, j);
-			g.printEdges();
-			gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::EDGE);
-			gPoly.setComments(comments.str());
-			gPoly.findEhrhardPolynomial();
-		}//rand graph
-
-
-/*
-	for(int i = 3; i <= 30; i = i + 5)
-		for(int j = i; j <= i+0; ++j)
-		{
-			stringstream comments;
-			BuildGraphPolytope gPoly;
-			GraphMaker g;
-			
-			comments << "doing random graph of size " << i << " and edge " << j << " with symmetric edge encoding" ;
-			cout << "***********************************\n" << comments.str() << endl;
-			g.makeRandomConnectedGraph(i, j);
-			gPoly.buildPolymakeFile(g.getEdges(), BuildGraphPolytope::SYMMETRIC_EDGE);
-			gPoly.setComments(comments.str());
-			gPoly.findEhrhardPolynomial();
-		}//rand graph
-*/		
-
-
-}//doAuto
 
 int main()
 {
 	string type;
-	
-	//doAuto();
-	//return 0;
 
-	cout << "run type: (rand, edge, graph) >> ";
+
+	cout << "run type: (rand, hypersimplex, graph) >> ";
 	cin >> type;
 	if ( type == "rand")
 		doRandom(); //call polymake on random points
-	else if ( type == "edge")
-		doEdge();   //call polymake on hypersimplices
+	else if ( type == "hypersimplex")
+		doHypersimplex();   //call polymake on hypersimplices
 	else if ( type == "graph")
 		doGraphs(); //call polymake on graph polytopes
-	else if ( type == "auto")
-		doAuto();
 	else	
 		exit(1); //error.
 

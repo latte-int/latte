@@ -162,11 +162,15 @@ code/latte/buildPolytopes/BuildGraphPolytope.cpp -text
 code/latte/buildPolytopes/BuildGraphPolytope.h -text
 code/latte/buildPolytopes/BuildHypersimplexEdgePolytope.cpp -text
 code/latte/buildPolytopes/BuildHypersimplexEdgePolytope.h -text
+code/latte/buildPolytopes/BuildPolytope.cpp -text
+code/latte/buildPolytopes/BuildPolytope.h -text
 code/latte/buildPolytopes/BuildRandomPolytope.cpp -text
 code/latte/buildPolytopes/BuildRandomPolytope.h -text
 code/latte/buildPolytopes/Driver.cpp -text
 code/latte/buildPolytopes/GraphMaker.cpp -text
 code/latte/buildPolytopes/GraphMaker.h -text
+code/latte/buildPolytopes/buildDatabaseRandomPolytopesDriver.cpp -text
+code/latte/buildPolytopes/testBuildPolytopes.cpp -text
 code/latte/burstmapletest.mpl -text
 code/latte/convertCDD_ext_to_latte.cpp -text
 code/latte/ehrhart2 -text
