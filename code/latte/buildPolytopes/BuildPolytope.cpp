@@ -165,7 +165,7 @@ void BuildPolytope::findFacets()
 	buildPolymakeFile();
 	
 	//ask polymake for the 
-	system((string("polymake ") + getPolymakeFile() + " DIM AMBIENT_DIM FACETS AFFINE_HULL").c_str());
+	system((string("polymake ") + getPolymakeFile() + " DIM AMBIENT_DIM FACETS AFFINE_HULL > /dev/null ").c_str());
 
 	//next, read the polymake file.
 
@@ -277,7 +277,7 @@ void BuildPolytope::findVertices()
 	buildPolymakeFile();
 	
 	//ask polymake for the 
-	system((string("polymake ") + getPolymakeFile() + " DIM AMBIENT_DIM VERTICES ").c_str());
+	system((string("polymake ") + getPolymakeFile() + " DIM AMBIENT_DIM VERTICES > /dev/null ").c_str());
 
 
 	//next, read the polymake file.

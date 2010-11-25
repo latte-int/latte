@@ -51,8 +51,8 @@ void BuildRandomPolytope::makePoints(int ambient_dim, int numberPoints)
 		}//build one point.
 		points.push_back(onePoint);
 
-		for(int j = 0; j <(int)onePoint.size(); ++j)
-			cout << onePoint[j] << ", ";
-		cout << endl;
+		//for(int j = 0; j <(int)onePoint.size(); ++j)
+		//	cout << onePoint[j] << ", ";
+		//cout << endl;
 	}//for each point.
 }//makePoints
