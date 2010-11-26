@@ -18,7 +18,7 @@ using namespace std;
 
 /**
  * Builds a random polytope with the name "rp_dim_currentPolytopeCount in the directory fileBaseName
- * Note that fileBaseName does not really have to be a directory.... it is just a prefix for the polytope file.
+ * We add a slash after the fileBaseName/director/filepath.
  */
 
 void buildDataBaseOfPolytopes(const string & fileBaseName,
@@ -34,17 +34,16 @@ void buildDataBaseOfPolytopes(const string & fileBaseName,
 		cout << "Going to make " << currentPolytopeCount << "th polytope for dim " << dim << " in location " << fileBaseName.c_str() << endl;
 		BuildRandomPolytope rp; //random polytope.
 
-		polytopeBaseFileName << fileBaseName << "rp_" << dim << "_" << currentPolytopeCount;
+		polytopeBaseFileName << fileBaseName << "/rp_" << dim << "_" << currentPolytopeCount;
 		rp.setBaseFileName(polytopeBaseFileName.str());
-		rp.makePoints(dim, dim*2);
+		rp.makePoints(dim, dim*2+1);
 		rp.buildPolymakeFile();
-		rp.buildLatteHRepFile();
+		rp.buildLatteVRepFile();
 
 		if ( rp.getDim() != dim)
 		{
-			cout << "darn, rp=" << rp.getDim() << endl;
-			cout << "files " << rp.getLatteHRepFile().c_str() << ", " << rp.getPolymakeFile().c_str() << endl;
-			exit(1);
+			cout << "darn, rp dim=" << rp.getDim() << endl;
+			cout << "files " << rp.getLatteVRepFile().c_str() << ", " << rp.getPolymakeFile().c_str() << endl;
 			continue; //start over with this test case.
 		}
 
@@ -69,11 +68,11 @@ int main(int argc, char *argv[])
 
 
 	cout << "Give me a list of polytope classes you want to build.\n"
-		 << "Example: build class 1 > dir2/ 2 10\n"
-		 << "         build class 2 > dir3/ 3 12\n"
+		 << "Example: build class 1 > dir2 2 10\n"
+		 << "         build class 2 > dir3 3 12\n"
 		 << "         build class 3 > done\n"
 		 << "This will find 10 random polytopes of dim 2 and save it in dir2, and save 12 random polytopes of dim 3 in dir3."
-		 << " The directory should already exist and you must include the slash after the directory name." << endl;
+		 << " The directory should already exist." << endl;
 
 
 	cout << "build class 1 > ";

@@ -2,10 +2,178 @@
  * VolumeAndIntegrationTests.cpp
  *
  *  Created on: Nov 19, 2010
- *      Author: bedutra
+ *      Author: Brandon Dutra and Gregory Pinto
  */
 
 #include "VolumeAndIntegrationTests.h"
+
+
+
+/**
+ * makes a random monomial in dim variables of a set degree.
+ * We treat totalDegree as the amount left over...how much powers we still have to add.
+ * The monomial is monic.
+ */
+string IntegrationPaper::makeMonomial(const int dim, int totalDegree)
+{
+	const int stepSize = 11; //add no more than 10 powers to a term at a time.
+	vector<int> powers;
+	int i; //i = the x_i who will be getting more powers.
+	int newPower;
+	stringstream poly;
+
+	powers.resize(dim);
+
+
+	while (totalDegree > 0 )
+	{
+		i = rand()%dim; //find the x_i who will get more powers.
+		newPower = rand()%stepSize; //find the additional power.
+
+		powers[i] += newPower;
+		totalDegree -= newPower;
+	}//add more powers to the polynomial
+
+	if (totalDegree < 0)
+	{
+		powers[i] += totalDegree; //totalDegree is neg!
+	}//if we added too much, subtract from the last term we added to.
+
+	//now make a string monomial.
+	poly << "[1,[";
+	for(int j = 0; j < powers.size(); ++j)
+	{
+		poly << powers[j];
+		if (j != powers.size()-1)
+			poly << ',';
+	}
+	poly << "]]";
+	return poly.str();
+}
+
+
+/* makes many random monic monomials of the same degree.
+ * If you want 1 monomial, you must use this function and just set numMonomials to 1.
+ *
+ */
+string IntegrationPaper::makePolynomial(const int dim, const int totalDegree, const int numMonomials)
+{
+	stringstream poly;
+
+	poly << "[";
+	for(int i = 0; i < numMonomials; ++i)
+	{
+		poly << IntegrationPaper::makeMonomial(dim, totalDegree);
+		if ( i < numMonomials-1)
+			poly << ',';
+	}
+	poly << "]";
+	return poly.str();
+}
+
+
+
+/** Given a path to a directory, will return a list of all the .latte files in that directory. This is NOT recursive and only works on unix boxes I think.
+ *  Assumes dir is a string in the form "name/" (note the ending slash).
+ */
+void IntegrationPaper::findAllLatteFilesInDirectory(const string &dir, vector<string> &latteFiles)
+{
+	//string key(".latte");
+    DIR *dirp;
+    struct dirent *dp;
+
+    //this example came from http://www.opengroup.org/onlinepubs/009695399/functions/readdir.html
+    if ((dirp = opendir(dir.c_str())) == NULL)
+    {
+        cerr << "findAllLatteFilesInDirectory:: couldn't open " << dir.c_str() << endl;
+        exit(1);
+    }
+
+
+    do {
+        errno = 0;
+        if ((dp = readdir(dirp)) != NULL)
+        {
+        	//cout << "file: " << dp->d_name << endl;
+        	if ( strlen(dp->d_name) < 6) // 6 = strlen(".latte");
+        		continue; //cannot be a fileName.latte file b/c too few char's.
+
+        	if (strcmp(".latte", dp->d_name + strlen(dp->d_name) - 6) != 0)
+        		continue; //last 6 char's is not equal to ".latte"
+
+        	//now, dp is a .latte file.
+
+        	latteFiles.push_back(dir + dp->d_name);
+         }
+    } while (dp != NULL);
+
+
+    if (errno != 0)
+    {
+        cerr << "findAllLatteFilesInDirectory:: error reading directory " << dir.c_str() << endl;
+        exit(1);
+    }//if errors
+}
+
+
+
+
+/* Integrates each file with a polynomial/monomial and save it to a log file.
+ *
+ */
+void IntegrationPaper::integrateFiles(const string &logFileName, const vector<string> &files, const int dim, const int polynomialDegree)
+{
+	Valuation::ValuationContainer ans;
+	fstream log;
+	string polynomialFileName((logFileName+".polynomial").c_str());
+	log.open(logFileName.c_str(), ios::out | ios::app);
+	log << "#Running " << files.size() << " tests with polynomials of degree " << polynomialDegree << endl;
+	const char* parms[]= {"integrationPaper.integrateFiles", "--valuation=integrate", "--all", "--vrep", 0,0};
+
+
+	for(int i = 0; i < (int) files.size(); ++i)
+	{
+		ofstream polynomialFile(polynomialFileName.c_str());
+		string thePolynomial = IntegrationPaper::makePolynomial(dim, polynomialDegree, 1) ;
+
+		polynomialFile << thePolynomial << endl;
+		polynomialFile.close();
+		string polynomialParm("--monomials=");
+		polynomialParm += polynomialFileName;
+		parms[4] = polynomialParm.c_str();
+		parms[5] = files[i].c_str();
+		ans = Valuation::mainValuationDriver(parms,6); //finally, do the integratio.
+
+		//now save the results.
+
+		//ans should have 3 values [triangulation][lawrence][total]
+		assert(ans.answers.size() == 3);
+		for(int k = 0; k < 2; ++k)
+		{
+			log << files[k].c_str() << "\t"
+				<< thePolynomial.c_str()
+				<< "\t" << ans.answers[k].timer.get_seconds() << (ans.answers[k].valuationType == Valuation::ValuationData::integrateLawrence ? "law" : "tri")
+				<< "\t" << ans.answers[k].answer
+				<< "\t" << ans.answers[k].answer.to_RR()
+				<< endl;
+
+		}
+		log << files[i].c_str() << "\t"
+				<< thePolynomial.c_str()
+				<< "\t" << ans.answers[2].timer.get_seconds()
+				<< endl; //total amount of time for everthing.
+
+	}//for each valuation entry.
+
+
+
+	log.close();
+
+}//integrateFiles
+
+
+
+
 
 
 
@@ -66,16 +234,18 @@ void VolumeTests::runOneTest(int ambientDim, int numPoints)
 
 	BuildRandomPolytope buildPolytope;
 	buildPolytope.setIntegerPoints(false); //make random rational points.
-	buildPolytope.makePoints(ambient, numPoints);
+	buildPolytope.makePoints(ambientDim, numPoints);
 	buildPolytope.buildLatteHRepFile();
 
-	string file = buildPolytope.getLatteFile();
+	string file = buildPolytope.getLatteHRepFile();
 
 	char * sFile = new char[file.size() + 1];
 	strcpy(sFile, file.c_str());
 	argv[3] = sFile;
 	Valuation::mainValuationDriver(argv, 4);
 	delete[] sFile;
+	buildPolytope.deleteLatteHRepFile();
+	buildPolytope.deletePolymakeFile();
 }//RunOneTest
 
 /**
@@ -149,31 +319,26 @@ void VolumeTests::runHyperSimplexTests()
 	for (int i = 0; i < numberTestCases; ++i)
 	{
 		stringstream comments;
-		BuildHypersimplexEdgePolytope hyperSimplex(hyperSimplexData[i][0],
+		BuildHypersimplexEdgePolytope hyperSimplex;
+		hyperSimplex.generatePoints(hyperSimplexData[i][0],
 				hyperSimplexData[i][1]);
 
 		comments << "finding volume of Hypersimplex(" << hyperSimplexData[i][0]
 				<< ", " << hyperSimplexData[i][1] << ")";
 		hyperSimplex.buildPolymakeFile();
+		hyperSimplex.buildLatteHRepFile();
 
-		hyperSimplex.setComments(comments.str().c_str());
 
-		hyperSimplex.buildPolymakeFile(); //make the file
-		hyperSimplex.callPolymake(); //run polymake
-		//hyperSimplex.findVolumeWithPolymake(); //run polymake for the volume
-		hyperSimplex.convertFacetEquations(); //fix facet equations
-		hyperSimplex.printFacetEquationsForLattE(); //make latte file.
 
-		string file = hyperSimplex.getLatteFile();
-
-		cerr << comments.str().c_str() << endl;
+		string file = hyperSimplex.getLatteHRepFile();
 
 		char * sFile = new char[file.size() + 1];
 		strcpy(sFile, file.c_str());
 		argv[3] = sFile;
 		volumeAnswer = Valuation::mainValuationDriver(argv, 4);
 		delete[] sFile;
-
+		hyperSimplex.deletePolymakeFile();
+		hyperSimplex.deleteLatteHRepFile();
 		RationalNTL correctVolumeAnswer(hyperSimplexData[i][2],
 				hyperSimplexData[i][3]);
 		VolumeTests::printVolumeTest(correctVolumeAnswer, volumeAnswer, file, comments.str());

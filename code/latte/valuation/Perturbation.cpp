@@ -81,6 +81,7 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 
 	ZZ gcdValue;
 	divideByZero = false;
+	int numberTimesDiviedByZero = 1;
 	if (tryNoPerturbation(l) == false)
 	{
 		//cout << "findPerturbation::" << currentPerturbation << endl;
@@ -109,6 +110,7 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 
 	while (tryCurrentPerturbation(l) == true)
 	{
+		cout << "findPerturbation(): we divided by zero, trying new perturbation for the " << ++numberTimesDiviedByZero << "th time." << endl;
 		//we divided by zero again. that is <l+e, r>=0 for some ray and for for some cone while <l,v>!=0. :(
 
 		//try a new perturbation.

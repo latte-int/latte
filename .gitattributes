@@ -233,6 +233,7 @@ code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp -
 code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.h -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangle.mpl -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh -text
+code/latte/valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testVolumeForSLDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testVolumeHypersimplexDriver.cpp -text

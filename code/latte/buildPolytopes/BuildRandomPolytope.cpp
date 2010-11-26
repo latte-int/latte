@@ -2,7 +2,7 @@
  * BuildRandomPolytope.cpp
  *
  *  Created on: June 15, 2010
- *      Author: bedutra
+ *      Author: Brandon Dutra and Gregory Pinto
  */
 #include "BuildRandomPolytope.h"
 #include <iostream>

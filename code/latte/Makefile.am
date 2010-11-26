@@ -222,6 +222,13 @@ bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
 ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 
+bin_PROGRAMS += integrate-polynomial-for-paper
+integrate_polynomial_for_paper_SOURCES = valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp
+integrate_polynomial_for_paper_SOURCES += valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp
+integrate_polynomial_for_paper_LDADD = $(LDADD)
+integrate_polynomial_for_paper_LDADD += liblatteintegration.a
+
+
 bin_PROGRAMS += testPolynomialInterpolation
 testPolynomialInterpolation_SOURCES = interpolation/PolynomialInterpolation.cpp
 testPolynomialInterpolation_SOURCES += interpolation/testDriver.cpp
