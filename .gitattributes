@@ -211,6 +211,11 @@ code/latte/interpolation/PolynomialInterpolation.cpp -text
 code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
 code/latte/polyintegration.tex -text
+code/latte/sqlite/IntegrationDB.cpp -text
+code/latte/sqlite/IntegrationDB.h -text
+code/latte/sqlite/SqliteDB.cpp -text
+code/latte/sqlite/SqliteDB.h -text
+code/latte/sqlite/select.sqlite -text
 code/latte/testingSLandTopEhrhart/SL/Data/tableTimeSLVolume_6_3.txt -text
 code/latte/testingSLandTopEhrhart/SL/SL_lib.mpl -text
 code/latte/testingSLandTopEhrhart/SL/testingSLIntegration.mpl -text

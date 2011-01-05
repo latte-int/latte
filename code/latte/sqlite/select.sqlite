@@ -1,0 +1,26 @@
+
+--test foriegen keys worked.
+select p.filePath, t.latteFilePath, t.polymakeFilePath, p.rowid, i.polynomialID, t.rowid, i.polytopeID, t.dual, i.timeLawrence as TL
+from polynomial as p, polytope as t, integrate as i 
+where p.rowid = i.polynomialID and t.rowid = i.polytopeID
+order by t.latteFilePath
+limit 1;
+
+
+--why didn't all of them change?
+select p.filePath, p.degree, p.dim, t.dim, t.dual, t.simple, t.vertexCount, i.timeLawrence as TL, i.timeTriangulate as TT, i.rowid as ID
+from polynomial as p, polytope as t, integrate as i 
+where p.rowid = i.polynomialID and t.rowid = i.polytopeID
+order by t.latteFilePath
+;--limit 10;
+
+
+
+--test c++ selection.
+--select i.rowid, p.filePath, t.latteFilePath, t.polymakeFilePath, i.timeLawrence, i.timeTriangulate, i.integral
+--from polynomial as p, polytope as t, integrate as i 
+--where p.rowid = i.polynomialID and t.rowid = i.polytopeID
+----and p.degree [>|=] [0] and p.dim [>|=] [0] and t.vertexCount [>|=] [0] and t.simple [>|=] [0] and [dual]
+--order by t.dim, p.degree, t.vertexCount
+--limit 1;
+
