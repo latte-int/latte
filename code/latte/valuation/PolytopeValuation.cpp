@@ -292,13 +292,14 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 	if ( integrationType == LawrenceIntegration)
 	{
 		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
+		cout <<
 		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
 	}// if computing the integral using the lawrence style method.
 	else if ( integrationType == TriangulationIntegration)
 	{
 		convertToOneCone(); //every vertex should be integer
 		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
-
+		cout << lengthListCone(triangulatedPoly) << " triangulations done.\n";
 		answer.add(findIntegralUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
 	}//if computing the integral by triangulating to simplex polytopes.
 	else

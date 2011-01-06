@@ -99,6 +99,7 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 	//currentPerturbation is now normal to l.
 
 	//see if we can scale the currentPerturbation down
+
 	gcdValue = currentPerturbation[0];
 	for (long i = 1; i < currentPerturbation.length(); ++i)
 	{
@@ -107,6 +108,7 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 	if (gcdValue > 1)
 		for (long i = 1; i < currentPerturbation.length(); ++i)
 			currentPerturbation[i] = currentPerturbation[i] / gcdValue;
+
 
 	while (tryCurrentPerturbation(l) == true)
 	{
@@ -118,6 +120,7 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 				% 10;
 
 		//see if we can scale things down.
+
 		gcdValue = currentPerturbation[0];
 		for (long i = 1; i < currentPerturbation.length(); ++i)
 		{
@@ -126,6 +129,7 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 		if (gcdValue > 1)
 			for (long i = 1; i < currentPerturbation.length(); ++i)
 				currentPerturbation[i] = currentPerturbation[i] / gcdValue;
+
 	}//make a new perturbation and try again.
 
 	//cout << "findPerturbation::" << currentPerturbation << endl;

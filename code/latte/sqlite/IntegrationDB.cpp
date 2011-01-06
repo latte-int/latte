@@ -60,9 +60,16 @@ int IntegrationDB::getNumberPolynomials(int dim, int degree)
 int IntegrationDB::getNumberPolytopes(int dim, int vertexCount, bool useDuals)
 {
 	stringstream sql;
-	sql << "select count(*) from polytope where dim = " << dim
-		<< " and vertexCount = " << vertexCount
-		<< " and dual is " << (useDuals ? "not":"") << " null";
+	if (useDuals == false)
+		sql << "select count(*) from polytope where dim = " << dim
+			<< " and vertexCount = " << vertexCount
+			<< " and dual is  null";
+	else
+		sql << "select count(*) from polytope as orgP, polytope as dualP"
+			<< " where orgP.dim = " << dim
+			<< "  and orgP.rowid = dualP.dual"
+			<< "  and orgP.vertexCount = " << vertexCount;
+
 	cout << sql.str().c_str() << endl;
 	//when the column for dual is null, then the polytope is not a dual.
 	//when the column for dual is NOT null, then the polytope is a dual.
@@ -75,11 +82,23 @@ int IntegrationDB::getNumberPolytopes(int dim, int vertexCount, bool useDuals)
 int IntegrationDB::getNumberIntegrationTest(int dim, int vertexCount, int degree, bool useDuals)
 {
 	stringstream sql; //we are going to join the tables.
-	sql << "select count(*) from polynomial as p, polytope as t, integrate as i "
-		<< "where i.polynomialID = p.rowid and i.polytopeID = t.rowid " //join
-		<< " and t.dim = " << dim << " and t.vertexCount = " << vertexCount
-		<< " and p.degree = " << degree
-		<< " and t.dual is " << (useDuals ? "not":"") << " null ";
+	if ( useDuals == false)
+	{
+		sql << "select count(*) from polynomial as p, polytope as t, integrate as i "
+			<< "where i.polynomialID = p.rowid and i.polytopeID = t.rowid " //join
+			<< " and t.dim = " << dim << " and t.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and t.dual is null ";
+	}
+	else
+	{
+		sql << "select count(*) from polynomial as p, polytope as orgP, polytope as dualP, integrate as i "
+				<< "where i.polynomialID = p.rowid and i.polytopeID = dualP.rowid " //join
+				<< " and dualP.dual = orgP.rowid "
+				<< " and orgP.dim = " << dim << " and orgP.vertexCount = " << vertexCount
+				<< " and p.degree = " << degree
+				<< " and dualP.dual is not null ";
+	}
 	return queryAsInteger(sql.str().c_str());
 }//getNumberIntegrationTest
 
@@ -92,29 +111,82 @@ int IntegrationDB::getNumberIntegrationTest(int dim, int vertexCount, int degree
 vector<vector<string> > IntegrationDB::getUnusedPolynomials(int dim, int degree, int vertexCount, bool useDual)
 {
 	stringstream sql;
-	sql << "select distinct rowid from polynomial where rowid not in"
-		<< " ( select p.rowid from polynomial as p, integrate as i, polytope as t "
-		<< "     where i.polytopeID = t.rowid and i.polynomialID = p.rowid " //join
-	    << "       and t.dim = " << dim << "and t.vertexCount = " << vertexCount
-	    << "       and p.degree = " << degree
-	    << "       and t.dual is " << (useDual ? "not":"") << " null "
-	    << " ) "
-		<< " and dim = " << dim << " and degree = " << degree;
+	//GOAL: 1) Find all the polynomials that are of a set degree and dim.
+	//      2) Find all the tests where the polynomials are of a set degree dim, the polytope is a set dim, and vertexCount (or came from a polytope of a set vertexCount if useDual=ture),
+	//      3) Return the polynomials that are in the set 1 but NOT set 2.
+	if ( useDual == false)
+	{//for every polynomial of set dim and degree ans ask the question
+		//Is this polynomial already being used in a test with a non-dual polytope of dim 10 and set vertexCount?
+		//if not, then return it.
+		sql << "select distinct rowid from polynomial "
+				<< " where rowid not in"
+				<< " ( select p.rowid from polynomial as p, integrate as i, polytope as t "
+				<< "     where i.polytopeID = t.rowid and i.polynomialID = p.rowid " //join
+				<< "       and t.dim = " << dim
+				<< "       and t.vertexCount = " << vertexCount
+				<< "       and p.degree = " << degree
+				<< "       and t.dual is null "
+				<< " ) "
+				<< " and dim = " << dim << " and degree = " << degree;
+	}
+	else
+	{//for every polynomial of set dim and degree ask the question:
+		//Is this polynomial already being used in a test with a DUAL polytope of dim 10 where the org. polytope had set vertexCount?
+		//if not, then return it.
+		sql << "select distinct rowid from polynomial where rowid not in"
+			<< "  (select p.rowid from polynomial as p, integrate as i, polytope as dualPolytope, polytope as orgPolytope "
+			<< "     where i.polytopeID = dualPolytope.rowid and i.polynomialID = p.rowid "
+			<< " 	   and dualPolytope.dual is not null "				//make sure we have dual
+			<< "       and dualPolytope.dual = orgPolytope.rowid "		//find the org. polytope
+			<< "       and orgPolytope.dim = " << dim					//look at the dim of the test case
+			<< "       and orgPolytope.vertexCount = " << vertexCount	//look at the vertex count of the org polytope
+			<< "       and p.degree = " << degree						//polynomial degree.
+			<< "  ) "
+			<< " and dim = " << dim << " and degree = " << degree;
+	}
 	return query(sql.str().c_str());
 }//getUnusedPolynomials
 
 vector<vector<string> > IntegrationDB::getUnusedPolytopes(int dim, int degree, int vertexCount, bool useDual)
 {
 	stringstream sql;
-	sql << "select distinct rowid from polytope where rowid not in"
-		<< " ( select t.rowid from polynomial as p, integrate as i, polytope as t "
-		<< "     where i.polytopeID = t.rowid and i.polynomialID = p.rowid " //join
-	    << "       and t.dim = " << dim << "and t.vertexCount = " << vertexCount
-	    << "       and p.degree = " << degree
-	    << "       and t.dual is " << (useDual ? "not":"") << " null "
-	    << " ) "
-		<< " and dim = " << dim << " and vertexCount = " << vertexCount
-		<< " and dual is " << (useDual ? "not":"")  << " null";
+	//GOAL: 1) Find all the polytopes that are of a set dim and vertex count (or game from a polytope of a set vertex count if useDual = true).
+	//      2) Find all the tests where the polynomials are of a set degree dim, the polytope is a set dim, and vertexCount (or came from a polytope of a set vertexCount if useDual=ture),
+	//      3) Return the polytopes that are in the set 1 but NOT set 2.
+	if (useDual == false)
+	{//for every non-dual polytope of set dim and vertexCount ask the question:
+		//Is this polytope already being used in a test with a polynomial of set degree and vertexCount?
+		//if not, then return it
+		sql << "select distinct rowid from polytope where rowid not in"
+			<< " ( select t.rowid from polynomial as p, integrate as i, polytope as t "
+			<< "     where i.polytopeID = t.rowid and i.polynomialID = p.rowid " //join
+			<< "       and t.dim = " << dim
+			<< "       and t.vertexCount = " << vertexCount
+			<< "       and p.degree = " << degree
+			<< "       and t.dual is  null "
+			<< " ) "
+			<< " and dim = " << dim << " and vertexCount = " << vertexCount
+			<< " and dual is  null";
+	}
+	else
+	{//for every dual polytope of set dim and that came from an org. polytope of set vertexCount ask the question:
+		//Is this polytope already being used in a test with a polynomial of set degree and vertexCount?
+		//if not, then return it
+		sql << "select distinct dualP.rowid from polytope as dualP, polytope as orgP "
+			<< " where dualP.rowid not in "
+			<< " ( select dualPoly.rowid from polynomial as p, integrate as i, polytope as dualPoly, polytope as orgPoly "
+			<< "     where i.polytopeID = dualPoly.rowid and i.polynomialID = p.rowid " //join
+			<< "       and dualPoly.dual is not null"
+			<< "       and dualPoly.dual = orgPoly.rowid"
+			<< "       and orgPoly.dim = " << dim
+			<< "       and orgPoly.vertexCount = " << vertexCount
+			<< "       and p.degree = " << degree
+			<< " ) "
+			<< " and dualP.dim = " << dim
+			<< " and dualP.dual is not null"
+			<< " and dualP.dual = orgP.rowid" //join the orgPoly and dualPoly.
+			<< " and orgP.vertexCount = " << vertexCount;
+	}
 	return query(sql.str().c_str());
 }//getUnusedPolytopes
 
@@ -187,6 +259,12 @@ void IntegrationDB::insertIntegrationTest(int dim, int degree, int vertexCount, 
 	if (numDualPolytopes < count)
 		throw SqliteDBexception("insertIntegrationTest::not enough dual polytopes exist");
 	//ok, now we know we can make count many integration tests! so lets do it...
+
+	if ( count - numIntegrationTests  <= 0)
+	{
+		cout << "There already exist " << numIntegrationTests << " tests, but added any more" << endl;
+		return;
+	}
 
 	if (numIntegrationTests < count)
 		makeMoreIntegrationTests(dim, degree, vertexCount, false, count, numIntegrationTests);

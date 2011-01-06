@@ -196,26 +196,40 @@ noinst_HEADERS += buildPolytopes/BuildGraphPolytope.h
 noinst_HEADERS += buildPolytopes/BuildHypersimplexEdgePolytope.h
 noinst_HEADERS += buildPolytopes/BuildRandomPolytope.h
 noinst_HEADERS += buildPolytopes/GraphMaker.h
+noinst_HEADERS += buildPolytopes/BuildRandomPolynomials.h
 
 liblatte_a_SOURCES  += buildPolytopes/BuildPolytope.cpp
 liblatte_a_SOURCES  += buildPolytopes/BuildGraphPolytope.cpp
 liblatte_a_SOURCES  += buildPolytopes/BuildHypersimplexEdgePolytope.cpp
 liblatte_a_SOURCES  += buildPolytopes/BuildRandomPolytope.cpp
 liblatte_a_SOURCES  += buildPolytopes/GraphMaker.cpp
-
+liblatte_a_SOURCES  += buildPolytopes/BuildRandomPolynomials.cpp
 
 #interpolation. to delete this.
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
 #This is used to make many polytopes for the new research paper.
 bin_PROGRAMS += build-database-polytopes
-build_database_polytopes_SOURCES = buildPolytopes/buildDatabaseRandomPolytopesDriver.cpp
+build_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp
+build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+#build_database_polytopes_CPPFLAGS = -lsqlite3
+build_database_polytopes_LDFLAGS = -lsqlite3
 
 
+#This is used to test integration classes from the database
+bin_PROGRAMS += integrate-database-polytopes
+integrate_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp
+integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+integrate_database_polytopes_LDFLAGS = -lsqlite3
+integrate_database_polytopes_LDADD = $(LDADD)
+integrate_database_polytopes_LDADD += liblatteintegration.a
 
-#we should delete this~Brandon
+ 
+#we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
 bin_PROGRAMS += testBuildPolytope
-testBuildPolytope_SOURCES = buildPolytopes/testBuildPolytopes.cpp
+testBuildPolytope_SOURCES = valuation/testCorrectnessAndBenchmark/testBuildPolytopes.cpp
 testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
 
 bin_PROGRAMS += ehrhart3

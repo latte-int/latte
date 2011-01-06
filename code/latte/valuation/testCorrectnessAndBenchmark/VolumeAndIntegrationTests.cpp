@@ -9,67 +9,6 @@
 
 
 
-/**
- * makes a random monomial in dim variables of a set degree.
- * We treat totalDegree as the amount left over...how much powers we still have to add.
- * The monomial is monic.
- */
-string IntegrationPaper::makeMonomial(const int dim, int totalDegree)
-{
-	const int stepSize = 11; //add no more than 10 powers to a term at a time.
-	vector<int> powers;
-	int i; //i = the x_i who will be getting more powers.
-	int newPower;
-	stringstream poly;
-
-	powers.resize(dim);
-
-
-	while (totalDegree > 0 )
-	{
-		i = rand()%dim; //find the x_i who will get more powers.
-		newPower = rand()%stepSize; //find the additional power.
-
-		powers[i] += newPower;
-		totalDegree -= newPower;
-	}//add more powers to the polynomial
-
-	if (totalDegree < 0)
-	{
-		powers[i] += totalDegree; //totalDegree is neg!
-	}//if we added too much, subtract from the last term we added to.
-
-	//now make a string monomial.
-	poly << "[1,[";
-	for(int j = 0; j < powers.size(); ++j)
-	{
-		poly << powers[j];
-		if (j != powers.size()-1)
-			poly << ',';
-	}
-	poly << "]]";
-	return poly.str();
-}
-
-
-/* makes many random monic monomials of the same degree.
- * If you want 1 monomial, you must use this function and just set numMonomials to 1.
- *
- */
-string IntegrationPaper::makePolynomial(const int dim, const int totalDegree, const int numMonomials)
-{
-	stringstream poly;
-
-	poly << "[";
-	for(int i = 0; i < numMonomials; ++i)
-	{
-		poly << IntegrationPaper::makeMonomial(dim, totalDegree);
-		if ( i < numMonomials-1)
-			poly << ',';
-	}
-	poly << "]";
-	return poly.str();
-}
 
 
 
@@ -134,7 +73,7 @@ void IntegrationPaper::integrateFiles(const string &logFileName, const vector<st
 	for(int i = 0; i < (int) files.size(); ++i)
 	{
 		ofstream polynomialFile(polynomialFileName.c_str());
-		string thePolynomial = IntegrationPaper::makePolynomial(dim, polynomialDegree, 1) ;
+		string thePolynomial = makeRandomPolynomial(dim, polynomialDegree, 1) ;
 
 		polynomialFile << thePolynomial << endl;
 		polynomialFile.close();
