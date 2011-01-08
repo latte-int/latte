@@ -32,6 +32,9 @@ int IntegrationDB::doesPolynomialExist(const char * p)
 	return 0;
 }//doesPolynomialExist
 
+/**
+ * Searches for polytope rowid by polymake file path.
+ */
 int IntegrationDB::doesPolytopeExist(const char *polymake)
 {
 	stringstream sql;
@@ -56,7 +59,9 @@ int IntegrationDB::getNumberPolynomials(int dim, int degree)
 	return queryAsInteger(sql.str().c_str());
 }//getNumberPolynomials
 
-
+/**
+ * Return the number of polytopes with set dim and vertexCount and dual value.
+ */
 int IntegrationDB::getNumberPolytopes(int dim, int vertexCount, bool useDuals)
 {
 	stringstream sql;
@@ -103,11 +108,43 @@ int IntegrationDB::getNumberIntegrationTest(int dim, int vertexCount, int degree
 }//getNumberIntegrationTest
 
 
-//select rowid from polynomial where rowid not in
-//	(select p.rowid from polynomial as p, integrate as i, polytope as t
-	//where i.polytopeID = t.rowid and i.polynomialID = p.rowid
-	 //  and t.dim = 5 and p.degree = 32 and t.vertexCount = 10
-	//) and dim = 5 and degree = 32
+/**
+ * Gets all the integrate rows that have a set dim, vertex count, degree, and dual values.
+ */
+vector<vector<string> > IntegrationDB::getRowsToIntegrate(int dim, int vertex, int degree, bool useDual, int limit)
+{
+	stringstream sql;
+	if (useDual == false)
+	{
+		sql << "select p.filePath, t.latteFilePath, i.timeLawrence, i.timeTriangulate, i.integral, i.rowid"
+			<< " from polynomial as p, polytope as t, integrate as i "
+			<< " where p.rowid = i.polynomialID and t.rowid = i.polytopeID "
+			<< " and p.degree = " << degree
+			<< " and t.dim = " << dim
+			<< " and t.vertexCount =" << vertex
+			<< " and t.dual is null"
+			<< " order by t.latteFilePath, p.degree"
+			<< " limit " << limit;
+	}
+	else
+	{
+		sql << "select p.filePath, t.latteFilePath, i.timeLawrence, i.timeTriangulate, i.integral, i.rowid"
+			<< " from polynomial as p, polytope as t, polytope as orgP, integrate as i "
+			<< " where p.rowid = i.polynomialID and t.rowid = i.polytopeID "
+			<< " and orgP.rowid = t.dual"
+			<< " and p.degree = " << degree
+			<< " and t.dim = " << dim
+			<< " and orgP.vertexCount =" << vertex
+			<< " and t.dual is not null"
+			<< " order by t.latteFilePath, p.degree"
+			<< "limit " << limit;
+	}
+	return query(sql.str().c_str());
+}//getRowsToIntegrate
+
+/**
+ * Within all polynomials of set dim and degree, find my the ones that are NOT being used in a test with a polytope of set vertexCount and dual values.
+ */
 vector<vector<string> > IntegrationDB::getUnusedPolynomials(int dim, int degree, int vertexCount, bool useDual)
 {
 	stringstream sql;
@@ -147,6 +184,9 @@ vector<vector<string> > IntegrationDB::getUnusedPolynomials(int dim, int degree,
 	return query(sql.str().c_str());
 }//getUnusedPolynomials
 
+/**
+ * Given a set dim, degree, vertexCount and dual values, find me all polytopes that are not used in the integrate table.
+ */
 vector<vector<string> > IntegrationDB::getUnusedPolytopes(int dim, int degree, int vertexCount, bool useDual)
 {
 	stringstream sql;
@@ -192,6 +232,8 @@ vector<vector<string> > IntegrationDB::getUnusedPolytopes(int dim, int degree, i
 
 
 /**
+ * No longer used....to delte.
+ *
  *	Inserts a polynomial, a polytope, and the dual polytope in the polynomial/polytope tables.
  * Also, inserts two integration tests (one for the org. polytope and one for the dual polytope).
  *
@@ -238,8 +280,17 @@ int IntegrationDB::insertIntegrationTest(int polynomialID, int polytopeID)
 	return last_insert_rowid();
 }
 
+/**
+ * Pre conditions: the polynomial and polytope tables have enough rows of a
+ * set dim/degree/vertex count to make 'count' many integration tests
+ * and dual integration tests.
+ *
+ * If there is enough, we will then pick unused polytopes and polynomials and
+ * insert there combination into the integrate table.
+ */
 void IntegrationDB::insertIntegrationTest(int dim, int degree, int vertexCount, int count)
 {
+	//find how many of each we have.
 	int numPolynomials          = getNumberPolynomials(dim, degree);
 	cout << "numPolynomials" << numPolynomials << endl;
 	int numPolytopes            = getNumberPolytopes(dim, vertexCount, false);
@@ -252,17 +303,19 @@ void IntegrationDB::insertIntegrationTest(int dim, int degree, int vertexCount, 
 	cout << "numDualIntegrationTests" << numDualIntegrationTests << endl;
 
 
+	//check if we really can make 'count' many integration tests and dual integration tets.
 	if (numPolynomials < count)
 		throw SqliteDBexception("insertIntegrationTest::Not enough polynomials exist");
 	if (numPolynomials < count)
 		throw SqliteDBexception("insertIntegrationTest::Not enough polytopes exist");
 	if (numDualPolytopes < count)
 		throw SqliteDBexception("insertIntegrationTest::not enough dual polytopes exist");
-	//ok, now we know we can make count many integration tests! so lets do it...
+
+	//ok, now we know we can make count many integration tests! so lets do it.
 
 	if ( count - numIntegrationTests  <= 0)
 	{
-		cout << "There already exist " << numIntegrationTests << " tests, but added any more" << endl;
+		cout << "There already exist " << numIntegrationTests << " tests; in fact, there might be more." << endl;
 		return;
 	}
 
@@ -317,7 +370,8 @@ int IntegrationDB::insertPolytope(int dim, int vertexCount, bool simple, int dua
 	return last_insert_rowid();
 }//insertPolytope
 
-
+//no longer used.
+//to delete one day....
 int IntegrationDB::insertPolytopeAndPickIntegrationTest(int dim, int vertexCount,     bool simple    , const char * latteFile    , const char * polymakeFile
 												, int dualVertexCount, bool dualSimple, const char * dualLatteFile, const char * dualPolymakeFile)
 {
@@ -354,11 +408,17 @@ int IntegrationDB::insertPolytopeAndPickIntegrationTest(int dim, int vertexCount
 }//insertPolytopeAndPickIntegrationTest
 
 										
-
+/**
+ *
+ * Private function.
+ *
+ * Get a list of unused polynomials and polytopes, and add them to the integrate table.
+ */
 void IntegrationDB::makeMoreIntegrationTests(int dim, int degree, int vertexCount, bool useDual, int requestedCount, int existingCount)
 {
 	int newRows = requestedCount - existingCount;
-	//unusedPoly* has 1 column of rowid's that do not already exist in the integrate table
+	//unusedPolynomials and unusedPolytopes has 1 column of rowid's that do not already exist in the integrate table
+	//again, unusedPolynomials[i] is a vector with 1 element.
 	vector<vector<string> > unusedPolynomials = getUnusedPolynomials(dim, degree, vertexCount, useDual);
 	vector<vector<string> > unusedPolytopes   = getUnusedPolytopes(dim, degree, vertexCount, useDual);
 
@@ -371,3 +431,45 @@ void IntegrationDB::makeMoreIntegrationTests(int dim, int degree, int vertexCoun
 	}//for i
 }//makeMoreIntegrationTests
 
+
+
+/**
+ * Updates the integral table with time and valuation results.
+ *
+ * @alg: what column should be updated in the integrate table?
+ * @time: time from calling the mainValuationDriver
+ * @currentValue: new value for the integral column. Checks to see if this is different from any previous values.
+ * @previousValue: current value in the integral column, or the string "NA"
+ * @rowid: which row are we updating?
+ */
+void IntegrationDB::updateIntegrationTimeAndValue(AlgorithemUsed alg, double time, RationalNTL computedValue, string previousValueStr,  string rowid)
+{
+	stringstream sql;
+
+	sql << "update integrate set ";
+	if ( alg == Lawrence)
+		sql << " timeLawrence = " << time;
+	else //Triangulate};
+		sql << " timeTriangulate = " << time;
+
+
+	if ( previousValueStr == "NA")
+	{
+		sql << " , integral = ' " << computedValue << "' ";
+	}
+	else
+	{
+		RationalNTL previousValue(previousValueStr);
+		if ( previousValue != computedValue)
+		{
+			throw SqliteDBexception(string("updateIntegrationTimeAndValue::The integrals differ")
+					+"\n\tpreviousValue: " + previousValueStr
+					+"\n\tcomputedValue: " + computedValue.str()
+					+"\n\tcurrent sql stm:" + sql.str()
+					+"\n\trowid: " + rowid);
+		}
+	}
+	sql << " where rowid = " << rowid << endl;
+	query(sql.str().c_str());
+
+}//updateIntegrationTimeAndValue

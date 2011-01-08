@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <sstream>
 #include "rational.h"
 /* ----------------------------------------------------------------- */
 rationalVector::rationalVector(int dimension)
@@ -346,6 +347,14 @@ RationalNTL & RationalNTL::operator*=(const ZZ & rhs)
 RR RationalNTL::to_RR() const
 {
 	return NTL::to_RR(numerator) / NTL::to_RR(denominator);
+}
+
+//converts the fraction to a string.
+string RationalNTL::str() const
+{
+	stringstream s;
+	s << *this;
+	return s.str();
 }
 
 //times by -1. does not try to reduce the fraction.

@@ -346,6 +346,26 @@ void BuildPolytope::dilateFacetEquations()
 	mpz_t currentLCM;
 	mpz_init_set_si(currentLCM, 1);
 
+	//first, we must center the polytope about 0.
+	vector<mpq_class> translation; //starts off as zero.
+	translation.resize(ambientDim);
+	for(int i = 0; i <(int) facets.size(); ++i)
+	{
+		for(int k = 1; k <= ambientDim; ++k)
+			translation[k-1] += facets[i][k];
+	}
+	//next divide to get the average pont.
+	for(int k = 0; k < ambientDim; ++k)
+		translation[k] /= (int)facets.size();
+	//next, subtract the translation.
+	for(int i = 0; i <(int) facets.size(); ++i)
+	{
+		for(int k = 1; k <= ambientDim; ++k)
+			facets[i][k] -= translation[k-1];
+	}
+
+
+
 	//currentLCM = 1
 	//loop over everything and find the lcm of the denom.
 	for (int i = 0; i < (int) facets.size(); ++i)

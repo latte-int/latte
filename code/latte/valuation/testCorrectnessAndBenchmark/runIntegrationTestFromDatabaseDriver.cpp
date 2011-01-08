@@ -10,16 +10,24 @@
 #include <vector>
 #include <sstream>
 #include <iostream>
+#include <ctime>
 #include "../valuation.h"
 #include "../../sqlite/IntegrationDB.h"
 
 
 
 /**
- * @alg. 1=lawrence, 2=triangulate, 3 = both!
+ * Integrate each row in the toTest vector.
+ * Makes a log file of the current row being tested.
+ *
+ * @alg. 1=lawrence, 2=triangulate
+ * @dbFile* : sqlite database file with tables set up as in the create script
+ * @toTest: sql query listing what rows in the integrate table we need to run.
+ * @logFileName : print the current test info to the log file.
  */
-void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFile)
+void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFile, string logFileName)
 {
+	ofstream log;
 	for(vector<vector<string> >::const_iterator row = toTest.begin(); row != toTest.end(); ++row)
 	{
 		string polynomial  = "--monomials="+(*row)[0];
@@ -42,16 +50,31 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		const char *argv[6];
 		argv[0] = "./runTheTests";
 		argv[1] =  "--valuation=integrate";
-		if (alg == 1)
+		if (alg == 1) //if you cange this, allso need to chage the other alg get below.
 			argv[2] = "--lawrence";
 		else if (alg == 2)
 			argv[2] = "--triangulate";
 		else
-			argv[2] = "--all";
+		{
+			cout << "runTheTests::unknown alg." << endl;
+			exit(1);
+		}
 		argv[3] = polynomial.c_str();
 		argv[4] = "--vrep";
 		argv[5] = latte.c_str();
 
+		//open the log file and print what we are about to do.
+		ofstream log(logFileName.c_str(), ios::app);
+		time_t rawtime;
+		struct tm * timeinfo;
+		time ( &rawtime );
+		timeinfo = localtime ( &rawtime );
+
+		log << asctime (timeinfo) << ": Testing " << (alg == 1? "lawrence" : "triangulate") << endl;
+		log << "\tLatte: " << latte.c_str()
+			<< "\n\tPolynomial: " << polynomial.c_str()
+			<< "\n\trowid: " << rowid.c_str();
+		log.close();
 		//RUN IT. finally.
 		Valuation::ValuationContainer vc = Valuation::mainValuationDriver(argv, 6);
 
@@ -61,74 +84,25 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		for( int i = 0; i < vc.answers.size(); ++i)
 		{
 			stringstream sql;
-			sql << "update integrate set ";
-			if ( vc.answers[i].valuationType == Valuation::ValuationData::integrateLawrence && atof(lawrence.c_str()) < 0)
-				sql << " timeLawrence = " << vc.answers[i].timer.get_seconds();
-			else if (vc.answers[i].valuationType ==Valuation::ValuationData:: integrateTriangulation && atof(triangulate.c_str()) < 0)
-				sql << " timeTriangulate = " << vc.answers[i].timer.get_seconds();
-			else
+			if ( vc.answers[i].valuationType != Valuation::ValuationData::entireValuation)
 				continue;
 
-			if ( value == "NA")
-			{
-				sql << " , integral = ' " << vc.answers[i].answer << "' ";
-			}
-			else
-			{
-				RationalNTL previousValue(value), computedValue(vc.answers[i].answer);
-				if ( previousValue != computedValue)
-				{
-					cout << "ERROR: the integrals differ." << endl;
-					cout << "previousValue: " << previousValue << endl;
-					cout << "computedValue: " << computedValue << endl;
-					cout << "current sql stm:" << sql.str().c_str();
-					cout << "rowid: " << rowid.c_str() << endl;
-					exit(1);
-				}
-			}
-			sql << " where rowid = " << rowid << endl;
-			db.query(sql.str().c_str());
+			db.updateIntegrationTimeAndValue((alg == 1 ? IntegrationDB::Lawrence : IntegrationDB::Triangulate)
+					, vc.answers[i].timer.get_seconds(), vc.answers[i].answer, value, rowid);
 		}
 		db.close();
-
 	}
 
 }//runTheTests
 
 
 
-void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit)
+void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit, string log)
 {
-	stringstream sql;
-	if (useDual == false)
-	{
-		sql << "select p.filePath, t.latteFilePath, i.timeLawrence, i.timeTriangulate, i.integral, i.rowid"
-			<< " from polynomial as p, polytope as t, integrate as i "
-			<< " where p.rowid = i.polynomialID and t.rowid = i.polytopeID "
-			<< " and p.degree = " << degree
-			<< " and t.dim = " << dim
-			<< " and t.vertexCount =" << vertex
-			<< " and t.dual is null"
-			<< " order by t.latteFilePath, p.degree";
-	}
-	else
-	{
-		sql << "select p.filePath, t.latteFilePath, i.timeLawrence, i.timeTriangulate, i.integral, i.rowid"
-			<< " from polynomial as p, polytope as t, polytope as orgP, integrate as i "
-			<< " where p.rowid = i.polynomialID and t.rowid = i.polytopeID "
-			<< " and orgP.rowid = t.dual"
-			<< " and p.degree = " << degree
-			<< " and t.dim = " << dim
-			<< " and orgP.vertexCount =" << vertex
-			<< " and t.dual is not null"
-			<< " order by t.latteFilePath, p.degree";
-	}
-
-
 	vector<vector<string> > toTest;
 	IntegrationDB db;
 	db.open(dbFile);
-	toTest = db.query(sql.str().c_str());
+	toTest = db.getRowsToIntegrate(dim, vertex, degree, useDual, limit);
 	db.close();
 
 	if (! toTest.size() )
@@ -136,11 +110,10 @@ void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool use
 		cout << "test case is empty" << endl;
 		exit(1);
 	}
-	runTheTests(toTest, alg, dbFile);
-
+	runTheTests(toTest, alg, dbFile, log);
 }
 
-
+/*
 void runIntegrationTest(char * dbFile)
 {
 	stringstream sql;
@@ -199,6 +172,7 @@ void runIntegrationTest(char * dbFile)
 
 	runTheTests(toTest, alg, dbFile);
 }
+*/
 
 int main(int argc, char *argv[])
 {
@@ -209,12 +183,11 @@ int main(int argc, char *argv[])
 	//}
 	if( argc != 7 )
 	{
-		cout << "erro: usage: " << argv[0] << " database dim vertex degree dual[true|false] algorithem[1=lawrence,2=triangulate] " << endl;
+		cout << "error: usage: " << argv[0] << " database-file dim vertex degree dual[true|false] algorithm[1=lawrence,2=triangulate] " << endl;
 		exit(1);
 	}
 
 //	char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit)
-	runIntegrationTest(argv[1], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50);
-	//runIntegrationTest(argv[1]);
+	runIntegrationTest(argv[1], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
 	return 0;
 }//main

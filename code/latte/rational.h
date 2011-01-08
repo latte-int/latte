@@ -196,6 +196,7 @@ public:
 
 	//OTHER
 	RR to_RR() const; // converts the fraction to a float.
+	string str() const; //converts the fraction to a string.
 	void changeSign(); //times by -1. does not try to reduce the fraction.
 
 	// I/O

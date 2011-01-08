@@ -8,6 +8,7 @@
 
 
 #include "SqliteDB.h"
+#include "../rational.h"
 
 using namespace std;
 //A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
@@ -20,6 +21,7 @@ private:
 	vector<vector<string> > getUnusedPolytopes(int dim, int degree, int vertexCount, bool useDual);
 
 public:
+	enum AlgorithemUsed {Lawrence, Triangulate};
 	IntegrationDB();
 
 	void deletePolynomial(int id);
@@ -30,7 +32,7 @@ public:
 	int getNumberPolytopes(int dim, int vertexCount, bool useDuals);
 	int getNumberIntegrationTest(int dim, int vertexCount, int degree, bool useDuals);
 
-
+	vector<vector<string> > getRowsToIntegrate(int dim, int vertex, int degree, bool useDual, int limit);
 
 	void insertEmptyIntegrationTest(const char* polynomialPath, int dim, int degree,
 											const char* polytopePath, const char* polymakePath, int vertexCount, bool simple,
@@ -46,7 +48,7 @@ public:
 	int insertPolytopeAndPickIntegrationTest(int dim, int vertexCount,     bool simple    , const char * latteFile    , const char * polymakeFile
 													, int dualVertexCount, bool dualSimple, const char * dualLatteFile, const char * dualPolymakeFile);
 
-
+	void updateIntegrationTimeAndValue(AlgorithemUsed alg, double time, RationalNTL currentValue, string previousValueStr,  string rowid);
 
 };
 
