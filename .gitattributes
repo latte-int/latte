@@ -154,6 +154,8 @@ EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/alanGenz.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/shaoweiLin.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/zhiqiangXu.pdf -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/createScript.sqlite -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/makeDatabase.sh -text
 code/gnulib/alloca_.h -text
 code/gnulib/stdbool_.h -text
 code/gnulib/stdlib_.h -text
