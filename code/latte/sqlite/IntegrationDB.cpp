@@ -247,8 +247,8 @@ vector<vector<string> > IntegrationDB::getUnusedPolytopes(int dim, int degree, i
  */
 void IntegrationDB::insertEmptyIntegrationTest(
 			const char* polynomialPath, int dim, int degree,
-			const char* polytopePath, const char* polymakePath, int vertexCount, bool simple,
-			const char* dualPolytopePath, const char* dualPolymakePath, int dualVertexCount, bool dualSimple)
+			const char* polytopePath, const char* polymakePath, int vertexCount, int simple,
+			const char* dualPolytopePath, const char* dualPolymakePath, int dualVertexCount, int dualSimple)
 {
 	int polynomialID, polytopeID, dualPolytopeID;
 	
@@ -355,11 +355,11 @@ int IntegrationDB::insertPolynomial(int dim, int degree, const char*filePath) th
  * @parm latteFilePath: file name of the latte file.
  * @parm polymakeFilePath: polymake file path. could be null.
  */
-int IntegrationDB::insertPolytope(int dim, int vertexCount, bool simple, int dualRowID, const char* latteFilePath, const char* polymakeFilePath)
+int IntegrationDB::insertPolytope(int dim, int vertexCount, int simple, int dualRowID, const char* latteFilePath, const char* polymakeFilePath)
 {
 	stringstream sql;
 	sql << "insert into polytope (dim, vertexCount, simple, latteFilePath, polymakeFilePath, dual) values (" 
-	    << dim << ", " << vertexCount << ", " << (simple ? 1 : 0) << ", '" << latteFilePath << "', '" << polymakeFilePath 
+	    << dim << ", " << vertexCount << ", " << simple  << ", '" << latteFilePath << "', '" << polymakeFilePath
 	    << "', ";
 	if (dualRowID > 0 )
 		sql << dualRowID;
@@ -372,8 +372,8 @@ int IntegrationDB::insertPolytope(int dim, int vertexCount, bool simple, int dua
 
 //no longer used.
 //to delete one day....
-int IntegrationDB::insertPolytopeAndPickIntegrationTest(int dim, int vertexCount,     bool simple    , const char * latteFile    , const char * polymakeFile
-												, int dualVertexCount, bool dualSimple, const char * dualLatteFile, const char * dualPolymakeFile)
+int IntegrationDB::insertPolytopeAndPickIntegrationTest(int dim, int vertexCount,     int simple    , const char * latteFile    , const char * polymakeFile
+												               , int dualVertexCount, int dualSimple, const char * dualLatteFile, const char * dualPolymakeFile)
 {
 	stringstream sql;
 	sql << "select * from polytope where polymakeFilePath = '" << latteFile << "' or polymakeFilePath = '" << dualLatteFile << "'";

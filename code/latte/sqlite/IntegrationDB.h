@@ -35,18 +35,18 @@ public:
 	vector<vector<string> > getRowsToIntegrate(int dim, int vertex, int degree, bool useDual, int limit);
 
 	void insertEmptyIntegrationTest(const char* polynomialPath, int dim, int degree,
-											const char* polytopePath, const char* polymakePath, int vertexCount, bool simple,
-											const char* dualPolytopePath, const char* dualPolymakePath, int dualVertexCount, bool dualSimple);
+											const char* polytopePath, const char* polymakePath, int vertexCount, int simple,
+											const char* dualPolytopePath, const char* dualPolymakePath, int dualVertexCount, int dualSimple);
 
 	int insertIntegrationTest(int polynomialID, int polytopeID);
 	void insertIntegrationTest(int dim, int degree, int vertexCount, int count);
 	int insertPolynomial(int dim, int degree, const char*filePath) throw(SqliteDBexception);
 
-	int insertPolytope(int dim, int vertexCount, bool simple, int dualRowID, const char* latteFilePath, const char* polymakeFilePath);
+	int insertPolytope(int dim, int vertexCount, int simple, int dualRowID, const char* latteFilePath, const char* polymakeFilePath);
 
 	//Here, we pick the polynomial to test on from what is in the database.
-	int insertPolytopeAndPickIntegrationTest(int dim, int vertexCount,     bool simple    , const char * latteFile    , const char * polymakeFile
-													, int dualVertexCount, bool dualSimple, const char * dualLatteFile, const char * dualPolymakeFile);
+	int insertPolytopeAndPickIntegrationTest(int dim, int vertexCount,     int simple    , const char * latteFile    , const char * polymakeFile
+													, int dualVertexCount, int dualSimple, const char * dualLatteFile, const char * dualPolymakeFile);
 
 	void updateIntegrationTimeAndValue(AlgorithemUsed alg, double time, RationalNTL currentValue, string previousValueStr,  string rowid);
 

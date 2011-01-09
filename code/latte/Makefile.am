@@ -236,6 +236,7 @@ bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
 ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 
+#not used. to delete.
 bin_PROGRAMS += integrate-polynomial-for-paper
 integrate_polynomial_for_paper_SOURCES = valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp
 integrate_polynomial_for_paper_SOURCES += valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp

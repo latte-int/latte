@@ -16,8 +16,7 @@
 #include "../../buildPolytopes/BuildRandomPolynomials.h"
 #include "../../sqlite/IntegrationDB.h"
 
-#include <sys/types.h> //needed for the mkdir() function
-#include <sys/stat.h>//needed for the mkdir() function
+
 
 
 using namespace std;
@@ -32,8 +31,9 @@ struct BuildClass
 };
 
 
-void buildIntegrationTest(char *dbFile)
+void buildIntegrationTest(char *dbFile, int count, int dim, int vertexCount, int degree)
 {
+/*
 	cout << "Enter list of test classes to build (dim vertex-count degree count\n Example:"<<endl;
 	cout << "> 2 3 4 5 " << endl;
 	cout << "> -1"<< endl;
@@ -54,6 +54,14 @@ void buildIntegrationTest(char *dbFile)
 		cout << "> ";
 		cin >> dim;
 	}//while there is more testing classes to build.
+*/
+	vector<BuildClass> toBuildList;
+	BuildClass b;
+	b.dim = dim;
+	b.vertex = vertexCount;
+	b.degree = degree;
+	b.number = count;
+	toBuildList.push_back(b);
 
 	for(int i = 0; i < (int) toBuildList.size(); ++i)
 	{
@@ -64,8 +72,9 @@ void buildIntegrationTest(char *dbFile)
 }//buildIntegrationTest
 
 //build polytopes and insert them with unused polynomials for the class.
-void buildPolytopes(char *dbFile)
+void buildPolytopes(char *dbFile, int count, int dim, int vertexCount)
 {
+/*
 	cout << "Enter list of polytope classes to build (vertex-count dim count)\n Example:" << endl;
 	cout << "> 5 2 10" << endl;
 	cout << "> -1" << endl;
@@ -85,6 +94,13 @@ void buildPolytopes(char *dbFile)
 		cout << "> ";
 		cin >> vertex;
 	}//while there are more build classes
+*/
+	vector<BuildClass> toBuildList;
+	BuildClass b;
+	b.dim = dim;
+	b.vertex = vertexCount;
+	b.number = count;
+	toBuildList.push_back(b);
 
 	//now build everything!
 	for(int i = 0; i < (int) toBuildList.size(); ++i)
@@ -93,7 +109,7 @@ void buildPolytopes(char *dbFile)
 		{
 			//make the name
 			stringstream baseFileName;
-			baseFileName << "dim" << toBuildList[i].dim << "/polytope" << toBuildList[i].dim << "_vertex" << toBuildList[i].vertex << "_num" << toBuildList[i].number;
+			baseFileName << "dim" << toBuildList[i].dim <<  "/ext" << toBuildList[i].vertex << "/polytope" << toBuildList[i].dim << "_vertex" << toBuildList[i].vertex << "_num" << toBuildList[i].number;
 
 			//try to build the polytope
 			bool correctFlag = false;
@@ -117,7 +133,7 @@ void buildPolytopes(char *dbFile)
 				db.close(); //close it because the next part can take a really long time!
 
 				//make the polymake file and latte file.
-				cout << "**dim = " << toBuildList[i].dim << "vertex=" << max(toBuildList[i].vertex, toBuildList[i].vertex + additionalPoints) <<endl;
+				cout << "**dim = " << toBuildList[i].dim << " vertex=" << max(toBuildList[i].vertex, toBuildList[i].vertex + additionalPoints) <<endl;
 				newPolytope.makePoints(toBuildList[i].dim, max(toBuildList[i].vertex, toBuildList[i].vertex + additionalPoints), 50, 0.5);
 				newPolytope.buildLatteVRepFile();//also makes a polymake file
 
@@ -137,20 +153,21 @@ void buildPolytopes(char *dbFile)
 				}//if polytope is not built to the requirements.
 
 				//now make the latte file and the dual polymake and dual latte file.
-				newPolytope.buildPolymakeDualFile();
-				newPolytope.buildLatteVRepDualFile();
+				cout << "dual not being made";
+				//newPolytope.buildPolymakeDualFile();
+				//newPolytope.buildLatteVRepDualFile();
 
 				//collect more statistics
 				int dualVertexCount;
-				bool simple, dualSimple;
-				dualVertexCount = newPolytope.getVertexDualCount();
+				int simple, dualSimple;
+				dualVertexCount = -1;//newPolytope.getVertexDualCount();
 				simple          = newPolytope.isSimplicial();
-				dualSimple      = newPolytope.isDualSimplicial();
+				dualSimple      = -1;//newPolytope.isDualSimplicial();
 
 				//print to screen --debugging.
-				cout << newPolytope.getLatteVRepFile().c_str() << "dim: " << buildDim << "\tvertex" << buildVertexCount << "\tsimple" << simple << endl;
+				cout << newPolytope.getLatteVRepFile().c_str() << " dim: " << buildDim << "\tvertex " << buildVertexCount << "\tsimple " << simple << endl;
 				cout << "  polymake: " << newPolytope.getPolymakeFile().c_str() << endl;
-				cout << "  " << newPolytope.getLatteVRepDualFile().c_str() << "dim: " << buildDim << "\tvertex" << dualVertexCount << "\tsimple" << dualSimple << endl;
+				cout << "  " << newPolytope.getLatteVRepDualFile().c_str() << " dim: " << buildDim << "\tvertex " << dualVertexCount << "\tsimple " << dualSimple << endl;
 				cout << "  polymake: " << newPolytope.getPolymakeDualFile().c_str() << endl;
 				correctFlag = true;
 
@@ -166,9 +183,9 @@ void buildPolytopes(char *dbFile)
 }//buildPolytopes
 
 //saves the polynomials in ./polynomials/dimN/
-void buildPolynomials(char *dbFile)
+void buildPolynomials(char *dbFile, int count, int dim, int degree)
 {
-	cout << "Enter list of polynomial classes to build (degree dim count)\n Example:"<<endl;
+/*	cout << "Enter list of polynomial classes to build (degree dim count)\n Example:"<<endl;
 	cout << "> 4 10 50" << endl;
 	cout << "> -1" <<endl;
 	cout << "Will build 50 degree 4, dim-10 polynomials in folder polynomials/dim10" << endl;
@@ -187,6 +204,13 @@ void buildPolynomials(char *dbFile)
 		cout << "> ";
 		cin >> degree;
 	}//while another case to bild.
+*/
+	vector<BuildClass> toBuildList;
+	BuildClass b;
+	b.dim = dim;
+	b.degree = degree;
+	b.number = count;
+	toBuildList.push_back(b);
 
 	//connect to the db.
 	IntegrationDB db;
@@ -198,7 +222,7 @@ void buildPolynomials(char *dbFile)
 		for(; toBuildList[i].number > 0; --toBuildList[i].number)
 		{
 			stringstream fileName;
-			fileName << "polynomials/dim" << toBuildList[i].dim << "/poly" << toBuildList[i].dim << "_deg" << toBuildList[i].degree << "_num" << toBuildList[i].number << ".polynomial";
+			fileName << "polynomials/dim" << toBuildList[i].dim  << "/deg" << toBuildList[i].degree << "/poly" << toBuildList[i].dim << "_deg" << toBuildList[i].degree << "_num" << toBuildList[i].number << ".polynomial";
 
 			//insert the name in the db.
 			int newRowid;
@@ -231,22 +255,42 @@ void buildPolynomials(char *dbFile)
 
 int main(int argc, char *argv[])
 {
-	if (argc != 2)
+	if (argc <= 2 )
 	{
-		cout << "error. usage: " << argv[0] << "sqlite-file-name" << endl;
+		cout << "Hello,\n This program can"
+			 << "\n\t1) Make polynomials in a set folder (see below), and update a sqlite database"
+			 << "\n\t2) Make polytopes (with polymake) in a set folder (see below),, and update a sqlite database"
+			 << "\n\t3) Insert test cases into the sqlite database" << endl;
+
+		cout << "error. usage: " << argv[0] << " sqlite-db-file [polytope | polynomial | test] [more parameters]" << endl;
+		cout << "  polytope parameters:   count dim vertex-count " << endl;
+		cout << "  polynomial parameters: count dim degree" << endl;
+		cout << "  test parameters:       count dim vertex-count degree\n" << endl;
+
+		cout << "Example: " << argv[0] << " file.sqlite3 polytope 50 4 8\n"
+			 << "        \t will make 50 dim-4 polytopes with 8 vertices in folder dim4/ext4/" << endl;
+		cout << "Example: " << argv[0] << " file.sqlite3 polyomial 50 4 8\n"
+			 << "        \t will make 50 dim-4 degree-8 polynomials in the folder polynomials/dim4/deg8" << endl;
+		cout << "Example: " << argv[0] << " file.sqlite3 test 50 4 8 10"
+			 << "        \t will make 50 test covering dim-4 polytopes with 8 vertices on polynomials of dim-4 and degree 10" << endl;
+
 		exit(1);
 	}
 
-	char ans;
-	cout << "Do you want to build polynomials (p) or polyTopes(t) or integration test(i)?";
-	cin >> ans;
-
-	if (ans == 'p')
-		buildPolynomials(argv[1]);
-	else if (ans == 't')
-		buildPolytopes(argv[1]);
+	if (strcmp(argv[2], "polynomial") == 0)
+					// db file,   count,       dim              degree
+		buildPolynomials(argv[1], atoi(argv[3]),atoi(argv[4]), atoi(argv[5]));
+	else if (strcmp(argv[2], "polytope") == 0)
+		            // db file,   count,       dim              vertex-count
+		buildPolytopes(argv[1], atoi(argv[3]),atoi(argv[4]), atoi(argv[5]));
+	else if (strcmp(argv[2], "test") == 0)
+					       // db file,   count,       dim              vertex-count, degree
+		buildIntegrationTest(argv[1], atoi(argv[3]),atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
 	else
-		buildIntegrationTest(argv[1]);
+	{
+		cout << "unknown option" << endl;
+	}
+
 	return 0;
 }//main
 
