@@ -1557,6 +1557,7 @@ EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim15/ext30/polytope15
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim15/ext30/polytope15_vertex30_num9.vrep.latte -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim15/ext35/polytope15_vertex35_num50.polymake -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim15/ext35/polytope15_vertex35_num50.vrep.latte -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim3/ext13/polytope3_vertex13_num1.polymake -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim4/ext14/polytope4_vertex14_num1.polymake -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim4/ext14/polytope4_vertex14_num1.vrep.latte -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim4/ext14/polytope4_vertex14_num10.polymake -text
