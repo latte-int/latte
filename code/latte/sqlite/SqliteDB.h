@@ -56,6 +56,8 @@ public:
 	
 	vector<vector<string> > query(const char* query); //basic query function. returns results as 2d array of strings.
 	vector<vector<string> > query(const string &query);
+
+	double queryAsFloat(const char* q);
 	int queryAsInteger(const char* query); //for querys that should only return 1 integer (ex: select count(*) from...)
  		
 private: 

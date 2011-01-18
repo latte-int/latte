@@ -2,7 +2,9 @@
 
 #include "SqliteDB.h"
 #include <iostream>
+#include <sstream>
 #include <cstdlib>
+#include <unistd.h> //for sleep()
 
 
 //A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
@@ -74,8 +76,19 @@ vector<vector<string> > SqliteDB::query(const char* query)
 {
 	sqlite3_stmt *statement;
 	vector<vector<string> > results;
-	 
-	if(sqlite3_prepare_v2(dbPtr, query, -1, &statement, 0) == SQLITE_OK)
+	int queryErrorCode;
+
+	queryErrorCode =sqlite3_prepare_v2(dbPtr, query, -1, &statement, 0);
+	while ( queryErrorCode == SQLITE_BUSY)
+	{
+		cout << "Database is busy, sleeping for 5sec." << endl;
+		sleep(5);
+		cout << "Re-running sql:" << query << endl;
+		queryErrorCode = sqlite3_prepare_v2(dbPtr, query, -1, &statement, 0);
+	}//while db is busy.
+
+
+	if(queryErrorCode == SQLITE_OK)
 	{
 		int cols = sqlite3_column_count(statement);
 		
@@ -111,8 +124,10 @@ vector<vector<string> > SqliteDB::query(const char* query)
 	else
 	{
 		string error = sqlite3_errmsg(dbPtr);
-		cout << "SqliteDB ERROR:: ." << query << ". " << error << endl;
-		exit(1);
+		stringstream s;
+		s << "SqliteDB ERROR:: ." << query << ". " << error << endl;
+		cout << s.str().c_str() << endl;
+		throw SqliteDBexception(s.str());
 	}//else there was errors running the sql statment
 	     
 	return results; 
@@ -137,7 +152,17 @@ int SqliteDB::queryAsInteger(const char* q)
 	return atoi(result[0][0].c_str());
 }
 
+/**
+ * For queries that return 1 floating-point number (example: select avg(*) form...where...)
+ */
+double SqliteDB::queryAsFloat(const char* q)
+{
+	vector<vector<string> > result = query(q);
+	if ( result.size() != 1 && result[0].size() !=1 )
+		throw SqliteDBexception("queryAsFloat::Query contains more than 1 result");
 
+	return atof(result[0][0].c_str());
+}
 
 
 

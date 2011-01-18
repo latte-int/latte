@@ -24,12 +24,17 @@
 	p.buildLatteHRepFile();
 	cout << "making latte V-rep" << endl;
 	p.buildLatteVRepFile();
+
+	cout << "Making dual polymake file" << endl;
+	p.buildPolymakeDualFile();
 	cout << "making latte dual V-rep" << endl;
 	p.buildLatteVRepDualFile();
 	cout << "making latte dual H-rep...not implemented." << endl;
 
 	cout << "Polytope " << (p.isSimplicial() ? "is" : "is NOT") << " simplicial" << endl;
+	cout << "Polytope " << (p.isSimple() ? "is" : "is NOT") << " simple" << endl;
 	cout << "Dual Polytope " << (p.isDualSimplicial() ? "is" : "is NOT") << " simplicial" << endl;
+	cout << "Dual Polytope " << (p.isDualSimple() ? "is" : "is NOT") << " simple" << endl;
 
  	cout << "\nplease remove the pie.* files yourself" << endl;
  	return 0;

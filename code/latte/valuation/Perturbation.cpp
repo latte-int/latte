@@ -70,11 +70,16 @@ bool LinearPerturbationContainer::tryNoPerturbation(const vec_ZZ &l)
 }
 
 /**
- * Finds a perturbation s.t we do not divide by zero.
+ * Finds a perturbation (e is the math formula, currentPerturbation here) s.t. we do not divide by zero.
  * First, we try no perturbation and hope for the best.
+ *
+ * Old:
  * If we divide by zero, we set e to l + (0,0...,0,randon number,0,...,0), and take the orthogonal projection on l.
  * If this still does not work, we just take e to be e + (0,0...,0,randon number,0,...,0) and keep trying.
  *
+ * New:
+ * If we divide by zero we set e to a random vector.
+ * If this does not work, we set e to a random point on the moment curve.
  */
 void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 {
@@ -91,12 +96,24 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 		return; //no errors. doing nothing worked!
 	}
 
-	currentPerturbation = l;
-	currentPerturbation[rand() % currentPerturbation.length()] += 1+ rand() % 10;
-
+	//old way to select the currentPerturbation
+	//currentPerturbation = l;
+	//currentPerturbation[rand() % currentPerturbation.length()] += 1+ rand() % 10;
 	//project p onto l: <p,l>/||l|| * l but we do not care about the scale, so don't divide.
-	currentPerturbation = currentPerturbation - (currentPerturbation * l) * l;
+	//currentPerturbation = currentPerturbation - (currentPerturbation * l) * l;
 	//currentPerturbation is now normal to l.
+
+	//new way to select the currentPerturbation
+	//for(int i = 0; i < currentPerturbation.length(); ++i)
+	//	currentPerturbation[i] = rand()%100;
+	ZZ t, currentPower;
+	t = rand()%100;
+	currentPower = 1;
+	for(int i = 0; i < currentPerturbation.length(); ++i)
+	{
+		currentPerturbation[i] = currentPower * (t%2 ? -1: 1); //t^i * 1 or -1
+		currentPower *= t;
+	}
 
 	//see if we can scale the currentPerturbation down
 
@@ -115,9 +132,20 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 		cout << "findPerturbation(): we divided by zero, trying new perturbation for the " << ++numberTimesDiviedByZero << "th time." << endl;
 		//we divided by zero again. that is <l+e, r>=0 for some ray and for for some cone while <l,v>!=0. :(
 
-		//try a new perturbation.
-		currentPerturbation[rand() % currentPerturbation.length()] += 1+rand()
-				% 10;
+		//old way of picking a new perturbation.
+		//currentPerturbation[rand() % currentPerturbation.length()] += 1+rand()
+		//		% 10;
+
+		//new way of picking a new perturbation.
+		//pick a point on the moment curve 1, t, t^2, t^3...
+		//ZZ t;
+		t = rand()%100;
+		currentPower = 1;
+		for(int i = 0; i < currentPerturbation.length(); ++i)
+		{
+			currentPerturbation[i] = currentPower * (t%2 ? -1: 1); //t^i * 1 or -1
+			currentPower *= t;
+		}
 
 		//see if we can scale things down.
 

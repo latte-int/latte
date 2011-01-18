@@ -40,11 +40,20 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		if ( value != "NA")
 		{
 			if ( alg == 1 && atof(lawrence.c_str()) >= 0)
+			{
+				cout << "Skipping lawrence integration on " << latte.c_str() << " " << polynomial.c_str() << endl;
 				continue;
+			}
 			if ( alg == 2 && atof(triangulate.c_str()) >= 0)
+			{
+				cout << "Skipping triangulation integration on " << latte.c_str() << " " << polynomial.c_str() << endl;
 				continue;
+			}
 			if (atof(triangulate.c_str()) >= 0 && atof(lawrence.c_str()) >= 0)
+			{
+				cout << "Skipping integration on " << latte.c_str() << " " << polynomial.c_str() << endl;
 				continue;
+			}
 		}//check to see if the test is already done or not
 
 		const char *argv[6];
@@ -70,7 +79,7 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		time ( &rawtime );
 		timeinfo = localtime ( &rawtime );
 
-		log << asctime (timeinfo) << ": Testing " << (alg == 1? "lawrence" : "triangulate") << endl;
+		log << "\n" << asctime (timeinfo) << ": Testing " << (alg == 1? "lawrence" : "triangulate") << endl;
 		log << "\tLatte: " << latte.c_str()
 			<< "\n\tPolynomial: " << polynomial.c_str()
 			<< "\n\trowid: " << rowid.c_str();
@@ -79,18 +88,48 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		Valuation::ValuationContainer vc = Valuation::mainValuationDriver(argv, 6);
 
 		//ok, now save the results.
-		IntegrationDB db;
-		db.open(dbFile);
+
+		RationalNTL theComputedIntegral;
+		float theTotalTime;
 		for( int i = 0; i < vc.answers.size(); ++i)
 		{
-			stringstream sql;
-			if ( vc.answers[i].valuationType != Valuation::ValuationData::entireValuation)
-				continue;
+			if ( vc.answers[i].valuationType == Valuation::ValuationData::integrateLawrence
+					&& alg == 1)
+			{
+				theComputedIntegral = vc.answers[i].answer;
+			}
+			else if (vc.answers[i].valuationType == Valuation::ValuationData::integrateTriangulation
+					&& alg == 2)
+			{
+				theComputedIntegral = vc.answers[i].answer;
+			}
 
-			db.updateIntegrationTimeAndValue((alg == 1 ? IntegrationDB::Lawrence : IntegrationDB::Triangulate)
-					, vc.answers[i].timer.get_seconds(), vc.answers[i].answer, value, rowid);
-		}
+			if ( vc.answers[i].valuationType == Valuation::ValuationData::entireValuation)
+			{
+				theTotalTime = vc.answers[i].timer.get_seconds();
+			}
+
+		}//find the integral and time
+
+		//print results to the log file
+		log.open(logFileName.c_str(), ios::app);
+		log << "\n\tvaluation type: " << alg
+			<< "\n\tvaluation time: " << theTotalTime
+			<< "\n\tvaluation ans: "  << theComputedIntegral;
+		log.close();
+
+		//finally, save it.
+		IntegrationDB db;
+		db.open(dbFile);
+		db.updateIntegrationTimeAndValue((alg == 1 ? IntegrationDB::Lawrence : IntegrationDB::Triangulate)
+							, theTotalTime, theComputedIntegral, value, rowid);
 		db.close();
+
+		if ( theTotalTime > 660 ) //660 sec= 10.5mins
+		{
+			cout << "Valuation took " << theTotalTime << " seconds, skipping the test of the test case" << endl;
+			return;
+		}//if it took too long, don't do the rest.
 	}
 
 }//runTheTests
@@ -102,77 +141,27 @@ void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool use
 	vector<vector<string> > toTest;
 	IntegrationDB db;
 	db.open(dbFile);
-	toTest = db.getRowsToIntegrate(dim, vertex, degree, useDual, limit);
+	if ( limit <= db.testCasesCompleted((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence),dim, vertex, degree, useDual) )
+	{
+		cout << "Skipping " << dim << " " << vertex << " " << degree << " " << useDual << " " << alg << ":: test class already done" << endl;
+		db.close();
+		exit(1);
+	}//if test already done
+	if( db.canTestFinish((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence),dim, vertex, degree, useDual, 600) )
+	{
+		toTest = db.getRowsToIntegrate(dim, vertex, degree, useDual, limit);
+	}//if we think the test can finish in 600 sec, then do it.
 	db.close();
 
 	if (! toTest.size() )
 	{
 		cout << "test case is empty" << endl;
+		db.close();
 		exit(1);
 	}
 	runTheTests(toTest, alg, dbFile, log);
 }
 
-/*
-void runIntegrationTest(char * dbFile)
-{
-	stringstream sql;
-	string line;
-	sql << "select p.filePath, t.latteFilePath, i.timeLawrence, i.timeTriangulate, i.integral, i.rowid"
-		<< "\n from polynomial as p, polytope as t, integrate as i "
-		<< "\n where p.rowid = i.polynomialID and t.rowid = i.polytopeID ";
-		//and p.degree = ?
-		//and t.dim = ?
-		//and t.vertexCount = ?
-		//and t.simple = ?
-	    //and t.dual =?
-		//order by t.latteFilePath, p.degree
-	cout << "Please finish the sql selection statement" << endl;
-	cout << sql.str().c_str() << endl;
-
-	cout << " p.degree [>|<|=|<=,etc] [number] ";
-	getline(cin, line);
-	sql << " and p.degree " << line << " ";
-
-	cout << " t.dim [>|<|=|<=,etc] [number] ";
-	getline(cin, line);
-	sql << " and t.dim " << line << " ";
-
-	cout << " t.vertexCount [>|<|=|<=,etc] [number] ";
-	getline(cin, line);
-	sql << " and t.vertexCount " << line << " ";
-
-	cout << " t.simple [>|<|=|<=,etc] [0|1] ";
-	getline(cin, line);
-	sql << " and t.simple " << line << " ";
-
-	cout << " t.dual [is|is not] null :";
-	getline(cin, line);
-	sql << " and t.dual " << line << " null ";
-
-	cout << " order by [t.latteFilePath, p.degree] ";
-	getline(cin, line);
-	sql << " order by " << line;
-
-	vector<vector<string> > toTest;
-	IntegrationDB db;
-	db.open(dbFile);
-	toTest = db.query(sql.str().c_str());
-	db.close();
-
-	if (! toTest.size() )
-	{
-		cout << "test case is empty" << endl;
-		exit(1);
-	}
-
-	cout << " Use lawrence(1) or triangulation(2) or both(3)? ";
-	int alg;
-	cin >> alg;
-
-	runTheTests(toTest, alg, dbFile);
-}
-*/
 
 int main(int argc, char *argv[])
 {

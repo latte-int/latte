@@ -10443,9 +10443,11 @@ code/latte/valuation/PolytopeValuation.h -text
 code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.h -text
 code/latte/valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp -text
+code/latte/valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangle.mpl -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh -text
 code/latte/valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp -text
+code/latte/valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testBuildPolytopes.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesDriver.cpp -text

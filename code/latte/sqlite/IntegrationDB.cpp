@@ -8,6 +8,85 @@ IntegrationDB::IntegrationDB()
 {
 }
 
+
+/**
+ * @parm seconds: time limit how how each polytope should take.
+ * @parm dim: of polytope
+ * @parm vertexCount of the polytope (or it's dual if useDual is ture)
+ * @parm degree of the polynomial
+ * @parm useDual: true if we are testing the dual polytopes
+ * @return bool: true if the test case "dim-vertecCount-degree-dual" should finish with secondsLimit
+ */
+bool IntegrationDB::canTestFinish(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual, int secondsLimit)
+{
+	stringstream sql;
+	vector<vector<string> > result;
+	//if we have data for this test case, great, find the average.
+	if ( useDual == true)
+	{
+		sql << "select avg(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << ")"
+			<< " from polynomial as p, integrate as i, polytope as dualP, polytope as orgP "
+			<< " where i.polytopeID = dualP.rowid and i.polynomialID = p.rowid " //joint dual-integrate-polynomial
+			<< " and dualP.dual = orgP.rowid and dualP.dual is not null" //join the dual and org. polytope.
+			<< " and orgP.dim = " << dim
+			<< " and orgP.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and " << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << " >= 0";
+
+	}
+	else
+	{
+		sql << "select avg(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << ")"
+			<< " from polynomial as p, integrate as i, polytope as t "
+			<< " where i.polytopeID = t.rowid and i.polynomialID = p.rowid "
+			<< " and t.dim = " << dim
+			<< " and t.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and " << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << " >= 0";
+	}//else not using the dual.
+
+	result = query(sql.str().c_str());
+	if ( result[0][0] != "NULL")
+		return atof(result[0][0].c_str()) < secondsLimit;
+
+	//darn, if we are here, then there where no test cases of this class.
+	//now look at the previous vertexCount and keeping everything the same.
+	if (vertexCount <= dim + 3)
+		return true; //always do the basic cases!
+
+	//find the max time for all vertexCount and polynomial degree less than the current setting for fix dim.
+	sql.str("");
+	if ( useDual == true)
+	{
+		sql << "select max(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << ")"
+			<< " from polynomial as p, integrate as i, polytope as dualP, polytope as orgP "
+			<< " where i.polytopeID = dualP.rowid and i.polynomialID = p.rowid " //joint dual-integrate-polynomial
+			<< " and dualP.dual = orgP.rowid and dualP.dual is not null" //join the dual and org. polytope.
+			<< " and orgP.dim = " << dim
+			<< " and orgP.vertexCount = " << vertexCount //the difference here with the above is the
+			<< " and p.degree <= " << degree              // <=  on degree.
+			<< " and " << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << " >= 0";
+
+	}
+	else
+	{
+		sql << "select max(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << ")"
+			<< " from polynomial as p, integrate as i, polytope as t "
+			<< " where i.polytopeID = t.rowid and i.polynomialID = p.rowid "
+			<< " and t.dim = " << dim
+			<< " and t.vertexCount = " << vertexCount
+			<< " and p.degree <= " << degree
+			<< " and " << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << " >= 0";
+	}//else not using the dual.
+	result = query(sql.str().c_str());
+	if ( result[0][0] != "NULL")
+		return true; //we have no data to say one way or the other.
+
+
+	return (atof(result[0][0].c_str()) < secondsLimit);
+
+}//canTestFinish
+
 void IntegrationDB::deletePolynomial(int id)
 {
 	stringstream sql;
@@ -109,6 +188,22 @@ int IntegrationDB::getNumberIntegrationTest(int dim, int vertexCount, int degree
 
 
 /**
+ * @polytopeID: rowid of a polytope.
+ * @degree: of a polynomial
+ * @return: number of integration tests in the integrate table with this polytope and a polynomial of this degree.
+ */
+int IntegrationDB::getNumberIntegrationTest(int polytopeID, int degree)
+{
+	stringstream sql;
+	sql << "select count(*) from integrate as i, polytope as t, polynomial as p"
+		<< " where i.polytopeID = t.rowid and i.polynomialID = p.rowid " //join
+		<< " and t.rowid = " << polytopeID
+		<< " and p.degree = " << degree;
+	return queryAsInteger(sql.str().c_str());
+}//getNumberIntegrationTest
+
+
+/**
  * Gets all the integrate rows that have a set dim, vertex count, degree, and dual values.
  */
 vector<vector<string> > IntegrationDB::getRowsToIntegrate(int dim, int vertex, int degree, bool useDual, int limit)
@@ -137,10 +232,142 @@ vector<vector<string> > IntegrationDB::getRowsToIntegrate(int dim, int vertex, i
 			<< " and orgP.vertexCount =" << vertex
 			<< " and t.dual is not null"
 			<< " order by t.latteFilePath, p.degree"
-			<< "limit " << limit;
+			<< " limit " << limit;
 	}
 	return query(sql.str().c_str());
 }//getRowsToIntegrate
+
+
+
+/**
+ * Given a set dim, will find what polynomial degrees and vertex counts exist in the db
+ * and give the results/stats in a 2d matrix.
+ *
+ * Assumes the db only contains a few different polynomial degrees and vertex counts.
+ * (That is, we didn't blindly insert non-dual polynomials of any degree, only of degree 2,3,4,5,15,20,30,...etc
+ * If we did, then we would get a new column in the matrix for each different degree!!!)
+ *
+ * @parm: dim. dimension of polytope.
+ * @useDua: tue if we want to use he dual polytopes.
+ * @return: a 2d matrix of polytope test stats.
+ * answer[i][k] contains information on polytope vertex-count case i and
+ *   polynomial degree case k.
+ */
+vector<vector<IntegrationPrintData> >  IntegrationDB::getStatisticsByDim(int dim, bool useDual)
+{
+	vector<vector<IntegrationPrintData> > ans;
+	vector<vector<string> > polynomialDegrees;
+	vector<vector<string> > vertexCounts;
+	stringstream sql;
+
+	sql << "select distinct p.degree from polynomial as p where p.dim = " << dim;
+	polynomialDegrees = query(sql.str().c_str());
+
+
+	sql.str("");
+	sql << "select distinct t.vertexCount from polytope as t "
+		<< " where t.dual is null"
+		<< " and t.dim = " << dim;
+	vertexCounts = query(sql.str().c_str());
+
+	ans.resize(vertexCounts.size()); //make room for each row.
+	//now loop over every vertexCount and polynomial degree and get
+	//the statistics for the class dim-vertecCount-degree-dual
+	cerr << "table is " << vertexCounts.size() << " by " << polynomialDegrees.size();
+	for(int row = 0; row < (int)vertexCounts.size(); ++row)
+	{
+
+		for(int col = 0; col < (int)polynomialDegrees.size(); ++col)
+		{
+			cerr << "row, col=" << row << ", " << col << endl;
+			ans[row].push_back(getStatisticsByDimVertexDegree(dim, atoi(vertexCounts[row][0].c_str()), atoi(polynomialDegrees[col][0].c_str()), useDual));
+		}//for
+	}//for row. vertexCounts
+
+	return ans;
+}//getResultsByDim
+
+
+/**
+ * Given the (dual) polytope dim, vertex count, and polynomial degree,
+ * Will find and return basic statistics (avg time, min/max, totals, etc) about this test class.
+ */
+IntegrationPrintData IntegrationDB::getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual)
+{
+	IntegrationPrintData ipd;
+	vector<double> avgMinMaxCountLawrence, avgMinMaxCountTriangulate;
+
+	//save how this function was called.
+	ipd.dim = dim;
+	ipd.vertexCount = vertexCount;
+	ipd.degree = degree;
+	ipd.useDual = useDual;
+
+	//get avg, min, man, and number finished
+	avgMinMaxCountLawrence    = getStatisticsAvgMinMaxCount(Lawrence, dim, vertexCount, degree, useDual);
+	avgMinMaxCountTriangulate = getStatisticsAvgMinMaxCount(Triangulate, dim, vertexCount, degree, useDual);
+
+	ipd.avgTriangulationTime = avgMinMaxCountTriangulate[0];
+	ipd.avgLawrenceTime      = avgMinMaxCountLawrence[0];
+
+	ipd.minTriangulationTime = avgMinMaxCountTriangulate[1];
+	ipd.minLawrenceTime      = avgMinMaxCountLawrence[1];
+
+	ipd.maxTriangulationTime = avgMinMaxCountTriangulate[2];
+	ipd.maxLawrenceTime      = avgMinMaxCountLawrence[2];
+
+	ipd.totalFinishedTriangulationTestCases = avgMinMaxCountTriangulate[3];
+	ipd.totalFinishedLawrenceTestCases      = avgMinMaxCountLawrence[3];
+
+	ipd.totalTestCases = getNumberIntegrationTest(dim, vertexCount, degree, useDual);
+
+	return ipd;
+}//getStatisticsByDimVertexDegree
+
+vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual)
+{
+	vector<double> ans;
+	vector<vector<string> > strAns;
+	stringstream sql;
+	string strAlg;
+
+	strAlg = (alg == Lawrence ? "timeLawrence" : "timeTriangulate");
+
+	if (useDual == true)
+	{
+		sql << "select avg(i." << strAlg << "), min(i." << strAlg << "), max(i." << strAlg << "), count(*) "
+			<< " from polynomial as p, polytope as dualP, polytope as orgP, integrate as i "
+			<< " where i.polynomialID = p.rowid and i.polytopeID = dualP.rowid " //join with p, i, dualP
+			<< " and dualP.dual is not null and dualP.dual = orgP.rowid" //and with orgp
+			<< " and orgP.dim = " << dim
+			<< " and orgP.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " >= 0 ";
+	}//if dual
+	else
+	{
+
+		sql << "select avg(i." << strAlg << "), min(i." << strAlg << "), max(i." << strAlg << "), count(*) "
+			<< " from polynomial as p, polytope as t, integrate as i "
+			<< " where i.polynomialID = p.rowid and i.polytopeID = t.rowid " //join with p, i, dualP
+			<< " and t.dual is null"
+			<< " and t.dim = " << dim
+			<< " and t.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " >= 0 ";
+
+	}//regular
+
+	//get the data and save it
+	strAns = query(sql.str().c_str());
+
+	ans.push_back(atof(strAns[0][0].c_str())); //avg
+	ans.push_back(atof(strAns[0][1].c_str())); //min
+	ans.push_back(atof(strAns[0][2].c_str())); //max
+	ans.push_back(atof(strAns[0][3].c_str())); //count
+
+	return ans;
+}//	getStatisticsAvgMinMaxCount
 
 /**
  * Within all polynomials of set dim and degree, find my the ones that are NOT being used in a test with a polytope of set vertexCount and dual values.
@@ -183,6 +410,21 @@ vector<vector<string> > IntegrationDB::getUnusedPolynomials(int dim, int degree,
 	}
 	return query(sql.str().c_str());
 }//getUnusedPolynomials
+
+
+vector<vector<string> > IntegrationDB::getUnusedPolynomials(int dim, int degree, int polytopeID)
+{
+	stringstream sql;
+	sql << "select distinct rowid from polynomial where rowid not in "
+			<< " ( select p.rowid from polynomial as p, integrate as i, polytope as t "
+			<< "     where i.polytopeID = t.rowid and i.polynomialID = p.rowid " //join
+			<< "       and t.rowid = " << polytopeID
+			<< "       and p.degree = " << degree
+			<< " ) "
+			<< " and dim = " << dim << " and degree = " << degree;
+	return query(sql.str().c_str());
+}//getUnusedPolynomials
+
 
 /**
  * Given a set dim, degree, vertexCount and dual values, find me all polytopes that are not used in the integrate table.
@@ -292,15 +534,15 @@ void IntegrationDB::insertIntegrationTest(int dim, int degree, int vertexCount, 
 {
 	//find how many of each we have.
 	int numPolynomials          = getNumberPolynomials(dim, degree);
-	cout << "numPolynomials" << numPolynomials << endl;
+	//cout << "numPolynomials" << numPolynomials << endl;
 	int numPolytopes            = getNumberPolytopes(dim, vertexCount, false);
-	cout << "numPolytope" << numPolytopes <<endl;
+	//cout << "numPolytope" << numPolytopes <<endl;
 	int numDualPolytopes        = getNumberPolytopes(dim, vertexCount, true);
-	cout << "numDualPolT" << numDualPolytopes <<endl;
+	//cout << "numDualPolytope" << numDualPolytopes <<endl;
 	int numIntegrationTests     = getNumberIntegrationTest(dim, vertexCount, degree, false);
-	cout << "numIntegrationTests" << numIntegrationTests << endl;
+	//cout << "numIntegrationTests" << numIntegrationTests << endl;
 	int numDualIntegrationTests = getNumberIntegrationTest(dim, vertexCount, degree, true);
-	cout << "numDualIntegrationTests" << numDualIntegrationTests << endl;
+	//cout << "numDualIntegrationTests" << numDualIntegrationTests << endl;
 
 
 	//check if we really can make 'count' many integration tests and dual integration tets.
@@ -324,6 +566,32 @@ void IntegrationDB::insertIntegrationTest(int dim, int degree, int vertexCount, 
 	if (numDualIntegrationTests < count)
 		makeMoreIntegrationTests(dim, degree, vertexCount, true, count, numIntegrationTests);
 }//insertIntegrationTest
+
+void  IntegrationDB::insertSpecficPolytopeIntegrationTest(string polymakeFile, int degree, int count)
+{
+	stringstream sql;
+	sql << "select dim from polytope where polymakeFilePath = '" << polymakeFile << "'";
+
+	int dim = queryAsInteger(sql.str().c_str());
+	int numPolynomials = getNumberPolynomials(dim, degree);
+	int rowid = doesPolytopeExist(polymakeFile.c_str());
+	int numIntegrationTests = getNumberIntegrationTest(rowid, degree);
+
+	if ( rowid <= 0)
+		throw SqliteDBexception("insertSpecficPolytopeIntegrationTest::polytope does not exist");
+	if (count > numPolynomials)
+		throw SqliteDBexception("insertSpecficPolytopeIntegrationTest::Not enough polynomials exist");
+	if ( count - numIntegrationTests <= 0)
+	{
+		cout << "There already exist " << numIntegrationTests << " tests; in fact, there might be more." << endl;
+		return;
+	}
+
+	makeMoreIntegrationTests(rowid, dim, degree, count, numIntegrationTests);
+
+}//insertSpecficPolytopeIntegrationTest
+
+
 
 /**
  * Inserts 1 row in the polynomial table.
@@ -407,7 +675,36 @@ int IntegrationDB::insertPolytopeAndPickIntegrationTest(int dim, int vertexCount
 	insertIntegrationTest(polynomialID, dualPolytopeID);
 }//insertPolytopeAndPickIntegrationTest
 
-										
+
+/**
+ * Returns the number of completed test in the integrate table for the specfic test class
+ */
+int IntegrationDB::testCasesCompleted(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual)
+{
+	stringstream sql;
+	if ( useDual == true)
+	{
+		sql << "select count(*) from polynomial as p, integrate as i, polytope as dualP, polytope as orgP "
+			<< " where i.polynomialID = p.rowid and i.polytopeID = dualP.rowid "
+			<< " and dualP.dual is not null and dualP.dual = orgP.rowid "
+			<< " and orgP.vertexCount = " << vertexCount
+			<< " and orgP.dim = " << dim
+			<< " and p.degree = " << degree;
+	}
+	else
+	{
+		sql << "select count(*) from polynomial as p, integrate as i, polytope as t "
+			<< " where i.polynomialID = p.rowid and i.polytopeID = t.rowid "
+			<< " and t.vertexCount = " << vertexCount
+			<< " and t.dim = " << dim
+			<< " and p.degree = " << degree
+			<< " and t.dual is null ";
+	}//else not dual polytopes.
+
+	sql << " and " << (alg == Lawrence  ? " i.timeLawrence " : " i.timeTriangulate ") << " >= 0";
+	return queryAsInteger(sql.str().c_str());
+}//isTestCaseFinished
+
 /**
  *
  * Private function.
@@ -431,7 +728,23 @@ void IntegrationDB::makeMoreIntegrationTests(int dim, int degree, int vertexCoun
 	}//for i
 }//makeMoreIntegrationTests
 
+/**
+ * Private function.
+ * get a list of unused polynomials for this set polytope and add them to the integrate table.
+ */
+void IntegrationDB::makeMoreIntegrationTests(int polytopeID, int dim, int degree, int requestedCount, int existingCount)
+{
+	int newRows = requestedCount - existingCount;
+	vector<vector<string> > unusedPolynomials = getUnusedPolynomials(dim, degree, polytopeID);
 
+	if ( unusedPolynomials.size() < newRows)
+		throw SqliteDBexception("makeMoreIntegrationTests: there are not enough free polynomials"); //I think this should never be true...
+
+	for(int i = 0; i < newRows; ++i)
+	{
+		insertIntegrationTest(atoi(unusedPolynomials[i][0].c_str()), polytopeID);
+	}//for i
+}//makeMoreIntegrationTests
 
 /**
  * Updates the integral table with time and valuation results.

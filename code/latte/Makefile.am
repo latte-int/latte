@@ -226,6 +226,25 @@ integrate_database_polytopes_LDFLAGS = -lsqlite3
 integrate_database_polytopes_LDADD = $(LDADD)
 integrate_database_polytopes_LDADD += liblatteintegration.a
 
+
+#This is used to test integration classes from the database
+bin_PROGRAMS += fix-dual-database-polytopes
+fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp
+fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+fix_dual_database_polytopes_LDFLAGS = -lsqlite3
+#fix_dual_database_polytopes_LDADD = $(LDADD)
+#fix_dual_database_polytopes_LDADD += liblatteintegration.a
+
+
+#This is used to test integration classes from the database
+bin_PROGRAMS += print-database-time-table 
+print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
+print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
+print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
+print_database_time_table_LDFLAGS = -lsqlite3
+
+
  
 #we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
 bin_PROGRAMS += testBuildPolytope

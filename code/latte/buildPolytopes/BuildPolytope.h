@@ -51,13 +51,17 @@ protected:
 
     vector< vector<mpq_class> > points; //each point lives in ambientDim space. Assumes the points do not have a leading 1.
     vector< vector<mpq_class> > facets; //facets of the polytope found by polymake
+    vector< vector<mpq_class> > dualVertices;//assumes points DO have a leading "1"..so the length is (dim+1)
     int numAffineHull;		//number of affine hull facets found by polymake (saved at the end of the facets vector)
 
     string getDualFileBaseName() const;
+    bool isStringNumber(const string & s) const;
 public:
     BuildPolytope();
 	
 	//A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+
+    void centerPolytope();
 
     //Delete the generated files.
 	void deletePolymakeFile();
@@ -67,6 +71,7 @@ public:
 	void deleteLatteHRepFile();
 	void deleteLatteHRepDualFile();
 
+	void dilateDualVertices();
 
 	void buildPolymakeFile(); //builds the polymake file.
 	void buildPolymakeDualFile(); //build the dual polymake file.
@@ -76,7 +81,8 @@ public:
 
 
 	void findDimentions(); //finds the dim of the polytope form polymake.
-	void findFacets(bool dilateFacets = false);     //saves the facets in our vector.
+	void findFacets(bool rationalize = true);     //saves the facets in our vector.
+	void findAffineHull();//find the rests of the facets.
 	void findVertices();   //saves the vertices in points (overrides the org. points vector).
 	void findVerticesDual();//finds the facet equations.
 	
@@ -84,6 +90,7 @@ public:
 	int getAmbientDim() const; //returns abmient dim.
 	int getDim() const; //returns the dim. Assumes polymake has been called.
 	
+	vector<vector<mpq_class> > getFacets() const;
 	string getLatteVRepFile() const; //Return file names.
 	string getLatteVRepDualFile() const;
 	string getLatteHRepFile() const;
@@ -94,13 +101,18 @@ public:
 	int getVertexCount();
 	int getVertexDualCount();
 
+	void homogenizeDualVertices(); //divides so the first slot is 1.
+
+	bool isCentered();
 	bool isSimplicial();
-	bool isDualSimplicial(); //makes a temp file. I could not find a polymake command that would give this w/o making a temp file.
+	bool isSimple();
+	bool isDualSimplicial();
+	bool isDualSimple();
 	
 	void convertFacetEquations();//mult. each equations by a (different) number to clear the denominators for latte.
-	void dilateFacetEquations(); //mult. each equations by the same number  to clear the denominators for latte. This is important for V-reps!
 	void setBaseFileName(const string & n); //sets the file name root.
 	void setIntegerPoints(bool t); //should the polytope be interger?
+	void setBuildPolymakeFile(bool t); //used for finding the dual vertices.
 	
 	void forDebugging();
 };//BuildRandomPolytope

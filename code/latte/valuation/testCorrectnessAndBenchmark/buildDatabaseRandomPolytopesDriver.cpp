@@ -31,6 +31,75 @@ struct BuildClass
 };
 
 
+		// db file,  count         polymake file, degree
+void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFile, int degree)
+{
+	string baseFileName(polymakeFile);
+	string fileEnding(".polymake");
+	baseFileName.replace(baseFileName.find(fileEnding),fileEnding.length(),"");
+	//now baseFileName does not contain the .polymake file extention.
+
+	BuildPolytope newPolytope;
+	newPolytope.setBaseFileName(baseFileName);
+	newPolytope.setBuildPolymakeFile(true);
+	newPolytope.findVertices();
+	newPolytope.findFacets();
+
+	//first insert the polytopes into the polytope table.
+	IntegrationDB db;
+	db.open(dbFile);
+	bool doesPolytopeExist =db.doesPolytopeExist(newPolytope.getPolymakeFile().c_str());
+	db.close(); //close because next part can take a long time.
+	if ( doesPolytopeExist )
+	{
+		cout << newPolytope.getPolymakeFile().c_str() << " already exist in database, skipping" << endl;
+	}
+	else
+	{
+		int dualVertexCount, buildVertexCount, buildDim;
+		int simple, dualSimple;
+
+		//make the polymake file and latte file.
+		cout << "**" << newPolytope.getPolymakeFile().c_str() << " degree " << degree << endl;
+		newPolytope.buildLatteVRepFile();
+		newPolytope.buildPolymakeDualFile();
+		newPolytope.buildLatteVRepDualFile();
+
+
+		//get info about this polytope.
+		buildVertexCount = newPolytope.getVertexCount();
+		buildDim         = newPolytope.getDim();
+		dualVertexCount  = newPolytope.getVertexDualCount();
+		simple           = -1;//save time, don't compute this. newPolytope.isSimplicial(); //again, historical naming error.
+		dualSimple       = -1;//newPolytope.isDualSimplicial();
+
+		//print to screen --debugging.
+		cout << newPolytope.getLatteVRepFile().c_str() << " dim: " << buildDim << "\tvertex " << buildVertexCount << "\tsimple " << simple << endl;
+		cout << "  polymake: " << newPolytope.getPolymakeFile().c_str() << endl;
+		cout << "  " << newPolytope.getLatteVRepDualFile().c_str() << " dim: " << buildDim << "\tvertex " << dualVertexCount << "\tsimple " << dualSimple << endl;
+		cout << "  polymake: " << newPolytope.getPolymakeDualFile().c_str() << endl;
+
+		//save the polytopes in the database.
+		db.open(dbFile);
+		int dualID;
+		dualID = db.insertPolytope(buildDim, buildVertexCount, simple    , -1    , newPolytope.getLatteVRepFile().c_str()    , newPolytope.getPolymakeFile().c_str());
+		         db.insertPolytope(buildDim, dualVertexCount, dualSimple, dualID, newPolytope.getLatteVRepDualFile().c_str(), newPolytope.getPolymakeDualFile().c_str());
+		db.close();
+		newPolytope.deletePolymakeDualFile();
+	}//insert this polytope into the database.
+
+	//now that the polytope is in the database, lets add testcases for the given polynomial degree.
+	//(we assume the db already has enough polynomials...that is, we do not make any now).
+
+
+	db.open(dbFile);
+	db.insertSpecficPolytopeIntegrationTest(newPolytope.getPolymakeFile(), degree, count);
+	db.insertSpecficPolytopeIntegrationTest(newPolytope.getPolymakeDualFile(), degree, count);
+	db.close();
+
+}//buildSpecficPolytopeAndTestCase
+
+
 void buildIntegrationTest(char *dbFile, int count, int dim, int vertexCount, int degree)
 {
 /*
@@ -65,6 +134,11 @@ void buildIntegrationTest(char *dbFile, int count, int dim, int vertexCount, int
 
 	for(int i = 0; i < (int) toBuildList.size(); ++i)
 	{
+		cout << "Going to build " << count << " many tests using: "
+			 << "\n dim " << dim
+			 << "\n vertexCount " << vertexCount
+			 << "\n degree " << degree
+			 << endl;
 		IntegrationDB db;
 		db.open(dbFile);
 		db.insertIntegrationTest(toBuildList[i].dim, toBuildList[i].degree, toBuildList[i].vertex, toBuildList[i].number);
@@ -154,15 +228,15 @@ void buildPolytopes(char *dbFile, int count, int dim, int vertexCount)
 
 				//now make the latte file and the dual polymake and dual latte file.
 				cout << "dual not being made";
-				//newPolytope.buildPolymakeDualFile();
-				//newPolytope.buildLatteVRepDualFile();
+				newPolytope.buildPolymakeDualFile();
+				newPolytope.buildLatteVRepDualFile();
 
 				//collect more statistics
 				int dualVertexCount;
 				int simple, dualSimple;
-				dualVertexCount = -1;//newPolytope.getVertexDualCount();
+				dualVertexCount = newPolytope.getVertexDualCount();
 				simple          = newPolytope.isSimplicial();
-				dualSimple      = -1;//newPolytope.isDualSimplicial();
+				dualSimple      = newPolytope.isDualSimplicial();
 
 				//print to screen --debugging.
 				cout << newPolytope.getLatteVRepFile().c_str() << " dim: " << buildDim << "\tvertex " << buildVertexCount << "\tsimple " << simple << endl;
@@ -176,6 +250,8 @@ void buildPolytopes(char *dbFile, int count, int dim, int vertexCount)
 				int dualID;
 				dualID = db.insertPolytope(toBuildList[i].dim, toBuildList[i].vertex, simple    , -1    , newPolytope.getLatteVRepFile().c_str()    , newPolytope.getPolymakeFile().c_str());
 				         db.insertPolytope(toBuildList[i].dim, dualVertexCount      , dualSimple, dualID, newPolytope.getLatteVRepDualFile().c_str(), newPolytope.getPolymakeDualFile().c_str());
+
+				newPolytope.deletePolymakeDualFile();
 				//yes, we are done! Let the deconstructor clean things up.
 			}//while the current polytope is not of the correct dim or vertex-count, try again.
 		}//for every polytope
@@ -262,17 +338,22 @@ int main(int argc, char *argv[])
 			 << "\n\t2) Make polytopes (with polymake) in a set folder (see below),, and update a sqlite database"
 			 << "\n\t3) Insert test cases into the sqlite database" << endl;
 
-		cout << "error. usage: " << argv[0] << " sqlite-db-file [polytope | polynomial | test] [more parameters]" << endl;
+		cout << "error. usage: " << argv[0] << " sqlite-db-file [polytope | polynomial | test | specficPolytoepAndTest ] [more parameters]" << endl;
 		cout << "  polytope parameters:   count dim vertex-count " << endl;
 		cout << "  polynomial parameters: count dim degree" << endl;
 		cout << "  test parameters:       count dim vertex-count degree\n" << endl;
+		cout << "  specficPolytoepAndTest parameters : count polytope-file-path degree" << endl;
 
 		cout << "Example: " << argv[0] << " file.sqlite3 polytope 50 4 8\n"
-			 << "        \t will make 50 dim-4 polytopes with 8 vertices in folder dim4/ext4/" << endl;
+			 << "\t will make 50 dim-4 polytopes with 8 vertices in folder dim4/ext4/" << endl;
 		cout << "Example: " << argv[0] << " file.sqlite3 polyomial 50 4 8\n"
-			 << "        \t will make 50 dim-4 degree-8 polynomials in the folder polynomials/dim4/deg8" << endl;
+			 << "\t will make 50 dim-4 degree-8 polynomials in the folder polynomials/dim4/deg8" << endl;
 		cout << "Example: " << argv[0] << " file.sqlite3 test 50 4 8 10"
-			 << "        \t will make 50 test covering dim-4 polytopes with 8 vertices on polynomials of dim-4 and degree 10" << endl;
+			 << "\t will make 50 test covering dim-4 polytopes with 8 vertices on polynomials of dim-4 and degree 10" << endl;
+		cout << "Example: " << argv[0] << " file.sqlite3 specficPolytoepAndTest 50 dir/Birkhoff.polymake 9\n"
+			 << "\t will make 50 polynomial-degree 9 tests for this polytope, and will make the latte and dual latte vrep files. The polymake file should already exist, and the db should have polynomials already.\n"
+			 << "\t The polymake file must end in .polymake and is assumed to NOT to be dual." << endl;
+
 
 		exit(1);
 	}
@@ -286,6 +367,9 @@ int main(int argc, char *argv[])
 	else if (strcmp(argv[2], "test") == 0)
 					       // db file,   count,       dim              vertex-count, degree
 		buildIntegrationTest(argv[1], atoi(argv[3]),atoi(argv[4]), atoi(argv[5]), atoi(argv[6]));
+	else if ( strcmp(argv[2], "specficPolytoepAndTest") == 0 )
+									// db file,  count         polymake file, degree
+		buildSpecficPolytopeAndTestCase(argv[1], atoi(argv[3]), argv[4], atoi(argv[5]));
 	else
 	{
 		cout << "unknown option" << endl;

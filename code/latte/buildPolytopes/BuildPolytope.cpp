@@ -33,6 +33,14 @@ BuildPolytope::BuildPolytope():
 	fileBaseName = ss.str();
 }
 
+
+void BuildPolytope::centerPolytope()
+{
+	system((string("center ") + getPolymakeFile() + " " + getPolymakeFile()).c_str());
+}
+
+
+
 /**
  * Deletes the generated file if it has been created.
  */
@@ -74,6 +82,9 @@ void BuildPolytope::buildPolymakeFile()
 }//buildPolymakeFile
 
 
+/**
+ * Finds the dual vertices and prints them to a new polymake file.
+ */
 void BuildPolytope::buildPolymakeDualFile()
 {
 	if (createdPolymakeDualFile == true)
@@ -83,14 +94,15 @@ void BuildPolytope::buildPolymakeDualFile()
 	fstream file;
 	file.open(getPolymakeDualFile().c_str(), ios::out);
 	file << "VERTICES" << endl;
-	for(int i = 0; i < (int) facets.size(); ++i)
+	for(int i = 0; i < (int) dualVertices.size(); ++i)
 	{
 		file << "1 ";
-		for(int k = 1; k <= ambientDim; ++k)
-			file << facets[i][k] << " ";
+		for(int k = 1; k < dualVertices[i].size(); ++k)
+			file << dualVertices[i][k] << " ";
 		file << endl;
 	}//for i.
 
+	createdPolymakeDualFile = true;
 	file.close();
 }
 
@@ -167,7 +179,8 @@ void BuildPolytope::buildLatteVRepDualFile()
 		return; //already did this.
 
 	createdLatteVRepDualFile = true;
-	findVerticesDual(); //facets information is saved in facets.
+	findVerticesDual();
+	dilateDualVertices(); //after this, dualVertices are in the form [a, vij], vij are integer
 
 	//now print to a latte file.
 	ofstream file;
@@ -175,12 +188,13 @@ void BuildPolytope::buildLatteVRepDualFile()
 	file.open(getLatteVRepDualFile().c_str());
 
 
-	file << facets.size() << " " << ambientDim + 1 << endl;
+	file << dualVertices.size() << " " << ambientDim + 1 << endl;
 	for (int i = 0; i < (int) facets.size(); ++i)
 	{
-		file << "1 "; //ignore the fist entry in the facets array.
+		//file << "1 "; //ignore the fist entry in the facets array.
+		file << dualVertices[i][0] << " ";
 		for (int k = 1; k < ambientDim + 1; ++k)
-			file << facets[i][k] << " ";
+			file << dualVertices[i][k] << " ";
 		file << endl;
 	}//for i
 
@@ -204,18 +218,26 @@ void BuildPolytope::findDimentions()
 	file >> dim;
 	file.close();
 
+	file.open(getPolymakeFile().c_str());
+	for (getline(file, line, '\n'); line != "AMBIENT_DIM"; getline(file, line, '\n'))
+		;
+	file >> ambientDim;
+	file.close();
+
 	assert(0 < dim && dim <= ambientDim);
 }
 
 /**
  * Reads the polymake facet information into the facet vector.
  * Builds the polymake file if needed.
+ * @rationalize: default is true. If true, each facet equation is mult. by a different positive number s.t. each slot is integer.
  */
-void BuildPolytope::findFacets(bool dilateFacets)
+void BuildPolytope::findFacets(bool rationalize)
 {
 	buildPolymakeFile();
 	
 	//ask polymake for the 
+
 	system((string("polymake ") + getPolymakeFile() + " DIM AMBIENT_DIM FACETS AFFINE_HULL > /dev/null ").c_str());
 
 	//next, read the polymake file.
@@ -229,6 +251,23 @@ void BuildPolytope::findFacets(bool dilateFacets)
 
 	facets.clear();
 
+	getline(file, line, '\n');
+	string term;
+	while (line != "")
+	{
+		stringstream ss(line);
+		vector<mpq_class> oneFacet;
+
+		for (int k = 0; k < ambientDim + 1; ++k)
+		{
+			ss >> term;
+			oneFacet.push_back(mpq_class(term));
+		}//for k
+		facets.push_back(oneFacet);//hyperplane has rational coeffs.
+		getline(file, line, '\n');
+	}//while
+	/*
+	 *
 	string term;
 	file >> term;
 	do
@@ -241,11 +280,34 @@ void BuildPolytope::findFacets(bool dilateFacets)
 			//cout << term << ". " ;
 		}//for i
 
-		facets.push_back(oneFacet);//hyperplane has interger coeffs.
-	} while (term != "AFFINE_HULL");
+		facets.push_back(oneFacet);
+	} while (! file.eof() && isStringNumber(term)); // != "AFFINE_HULL");
+
+	*/
+	file.close();
+	findAffineHull();
 
 
-	file.ignore(10000, '\n');
+	if ( rationalize)
+	{
+		convertFacetEquations();
+	}//make the coeffs integer.
+
+}//findFacets
+
+/**
+ * Assumes facets and amb. dim has already been found and read in.
+ * inserts the equations at the end of the facets vector.
+ */
+
+void BuildPolytope::findAffineHull()
+{
+	ifstream file;
+	string line;
+	string term;
+	file.open(getPolymakeFile().c_str());
+	for (getline(file, line, '\n'); line != "AFFINE_HULL"; getline(file, line, '\n'))
+			;
 
 	getline(file, line, '\n');
 	numAffineHull = 0;
@@ -263,17 +325,8 @@ void BuildPolytope::findFacets(bool dilateFacets)
 		numAffineHull += 1;
 		getline(file, line, '\n');
 	}//while
-
-	file.close();	
-	if ( dilateFacets)
-	{
-		dilateFacetEquations();
-	}//make the coeffs integer. If the facets are the vertices to the dual, it does it in way that dilates the polytope.
-	else
-	{
-		convertFacetEquations();
-	}//make coeffs. integer. If the facets are the vertices to the dual, the dual vertex information is lost.
-}//findFacets
+	file.close();
+}//findAffineHull
 
 /**
  * Given array of facets, will reduce the elements in the vectors from rationals to integers
@@ -326,58 +379,28 @@ void BuildPolytope::convertFacetEquations()
 }//convertFacetEquations();
 
 /**
- * Goal: dilate dual vertices to integers.
- *
- * Mult. each equations by the same number to clear the denominators for latte.
- * The constant term is not forced to be integer.
- *
- * Here is the idea:
- *   input: b -Ax
- *   output: (b -Ax)*currentLCM
- *          where each element in the A-matrix is integer when mult by currentLCM.
- *          However, each element in the b vector could not be integer.
- *
- * This is important when finding V-reps of the dual! If instead, convertFacetEquations() was used, then each vertex(facet) is scaled by a different number.
- *
+ * The dualVertices are in the form [1, v1, .. v2], where vi are in Q.
+ * We will mult. every vertex by the same number so that all the vi are in Z.
  *
  */
-void BuildPolytope::dilateFacetEquations()
+void BuildPolytope::dilateDualVertices()
 {
 	mpz_t currentLCM;
 	mpz_init_set_si(currentLCM, 1);
 
-	//first, we must center the polytope about 0.
-	vector<mpq_class> translation; //starts off as zero.
-	translation.resize(ambientDim);
-	for(int i = 0; i <(int) facets.size(); ++i)
-	{
-		for(int k = 1; k <= ambientDim; ++k)
-			translation[k-1] += facets[i][k];
-	}
-	//next divide to get the average pont.
-	for(int k = 0; k < ambientDim; ++k)
-		translation[k] /= (int)facets.size();
-	//next, subtract the translation.
-	for(int i = 0; i <(int) facets.size(); ++i)
-	{
-		for(int k = 1; k <= ambientDim; ++k)
-			facets[i][k] -= translation[k-1];
-	}
-
-
-
 	//currentLCM = 1
 	//loop over everything and find the lcm of the denom.
-	for (int i = 0; i < (int) facets.size(); ++i)
+	for (int i = 0; i < (int) dualVertices.size(); ++i)
 	{
 		//k=1 not 0 because we do not care about
 		//the b value (0 < b -Ax)
-		for (int k = 1; k < ambientDim + 1; ++k)
+		assert(dualVertices[i][0] == 1);
+		for (int k = 1; k < dualVertices[i].size(); ++k)
 		{
-			if (facets[i][k] != mpq_class(0))
+			if (dualVertices[i][k] != mpq_class(0))
 			{
 				mpz_lcm(currentLCM, currentLCM,
-						facets[i][k].get_den_mpz_t());
+						dualVertices[i][k].get_den_mpz_t());
 			}//if not zero.
 		}//for k
 	}//for i
@@ -385,15 +408,15 @@ void BuildPolytope::dilateFacetEquations()
 	assert(currentLCM > 0);
 
 	//loop over everything again and times by the lcm.
-	for (int i = 0; i < (int) facets.size(); ++i)
+	for (int i = 0; i < (int) dualVertices.size(); ++i)
 	{
-		for (int k = 0; k < ambientDim + 1; ++k)
+		for (int k = 0; k < dualVertices[i].size(); ++k)
 		{
-			facets[i][k] = facets[i][k]* mpz_class(currentLCM);
+			dualVertices[i][k] = dualVertices[i][k]* mpz_class(currentLCM);
 		}//for k
 	}//for i
 
-}//dilateFacetEquations.
+}//dilateDualVertices.
 
 
 /**
@@ -438,17 +461,37 @@ void BuildPolytope::findVertices()
 }
 
 /**
- * finds the facet equations.
+ * finds the dual vertices.
+ * After this call, dualVertices have the form [1, vi], vi are rational.
  */
 void BuildPolytope::findVerticesDual()
 {
-	findFacets(true); //the vertices are dilated!
+	if ( dualVertices.size() > 0)
+		return;
+	findFacets(false); //do not rationalize the facets.
+
+	if ( isCentered() == false)
+	{
+		system((string("center "+getPolymakeDualFile()+" "+getPolymakeFile())).c_str());
+		BuildPolytope dual;
+		dual.setBaseFileName(getDualFileBaseName());
+		dual.setBuildPolymakeFile(true);
+		dual.findFacets(false);
+		dualVertices = dual.getFacets();
+	}
+	else
+	{
+		dualVertices = getFacets();
+	}
+	homogenizeDualVertices(); //after this, dualVertices are in the form [1, vij], vij are rational
 }
 
 
 //int BuildPolytope::gcd(int a, int b) const;
 int BuildPolytope::getAmbientDim() const {return ambientDim;}
 int BuildPolytope::getDim() const {return dim;}
+
+vector<vector<mpq_class> > BuildPolytope::getFacets() const {return facets;}
 
 
 string BuildPolytope::getLatteVRepFile() const {return fileBaseName + ".vrep.latte";}
@@ -469,9 +512,90 @@ int BuildPolytope::getVertexCount()
 int BuildPolytope::getVertexDualCount()
 {
 	findVerticesDual();
-	return facets.size();
+	return dualVertices.size();
 }
 
+/**
+ * Right now the dualVertices are in the form [b v1 ... vn], after this call
+ * they will be in form [1, v1/b, ..., vn/b].
+ */
+void BuildPolytope::homogenizeDualVertices()
+{
+	for(int i = 0; (int) i < dualVertices.size(); ++i)
+	{
+		assert(dualVertices[i][0] > 0);
+
+		for(int j = 1; j < (int) dualVertices[i].size(); ++j)
+			dualVertices[i][j] /= dualVertices[i][0];
+		dualVertices[i][0] = 1;
+	}//for i;
+}//homogenizeDualVertices
+
+bool BuildPolytope::isCentered()
+{
+	buildPolymakeFile();
+
+	//ask polymake
+	system((string("polymake ") + getPolymakeFile() + " CENTERED > /dev/null ").c_str());
+
+	//next, read the polymake file.
+	ifstream file;
+	string line;
+	file.open(getPolymakeFile().c_str());
+
+	for (getline(file, line, '\n'); line != "CENTERED"; getline(file, line, '\n'))
+		;
+
+	char ans;
+	ans = file.get();
+	file.close();
+
+	return (ans == '1');
+}//isCentered
+
+
+/**
+ * true if s is a number in for form 4, 4.5, or 4/5
+ */
+bool BuildPolytope::isStringNumber(const string & s) const
+{
+	bool signCount =0, decimalCount=0, rationalCount=0;
+
+	if ( s.length() == 0)
+		return false;
+
+	for(int i = 0; i < s.length(); ++i)
+	{
+		if ( isdigit(s[i]))
+			continue;
+
+		if ( s[i] == '-')
+		{
+			if (signCount)
+				return false; //too many signs
+			else
+				signCount++;
+		}
+		else if (s[i] == '.')
+		{
+			if (decimalCount)
+				return false; //too many decimal points
+			else
+				decimalCount++;
+		}
+		else if ( s[i] == '/')
+		{
+			if (rationalCount)
+				return false; //too many /
+			else
+				rationalCount++;
+		}
+		else
+			return false;
+
+	}//for i
+	return true;
+}//isStringNumber
 
 bool BuildPolytope::isSimplicial()
 {
@@ -496,24 +620,21 @@ bool BuildPolytope::isSimplicial()
 	return (ans == '1');
 }
 
-//I could not find a polymake command that would give this w/o making a new polymake file.
-//Because of this, I had to add a "buildPolymakeDualFile()" function.
-bool BuildPolytope::isDualSimplicial()
+bool BuildPolytope::isSimple()
 {
-	fstream file;
+	buildPolymakeFile();
 
-	buildPolymakeDualFile();
+	//ask polymake
+	system((string("polymake ") + getPolymakeFile() + " DIM > /dev/null ").c_str());
+	system((string("polymake ") + getPolymakeFile() + " SIMPLE > /dev/null ").c_str());
 
-	//call polymake. I do not know why, but if I do all this in 1 call, polymake gives an error.
-	system((string("polymake ") + getPolymakeDualFile() + " DIM > /dev/null ").c_str());
-	system((string("polymake ") + getPolymakeDualFile() + " N_VERTICES SIMPLICIAL > /dev/null ").c_str());
 
-	//look and see if the dual is simple.
-
-    file.open(getPolymakeDualFile().c_str(), ios::in);
+	//next, read the polymake file.
+	ifstream file;
 	string line;
+	file.open(getPolymakeFile().c_str());
 
-	for (getline(file, line, '\n'); line != "SIMPLICIAL"; getline(file, line, '\n'))
+	for (getline(file, line, '\n'); line != "SIMPLE"; getline(file, line, '\n'))
 		;
 
 	char ans;
@@ -521,10 +642,24 @@ bool BuildPolytope::isDualSimplicial()
 	file.close();
 
 	return (ans == '1');
+}
 
+
+/**
+ * If a polytope is simplicial, then its dual is simple.
+ */
+bool BuildPolytope::isDualSimplicial()
+{
+	return ! isSimple();
 }//isDualSimplicial().
 
-
+/**
+ * If a polytope is simple, then its dual is simplicial.
+ */
+bool BuildPolytope::isDualSimple()
+{
+	return ! isSimplicial();
+}//isDualSimplicial().
 	
 void BuildPolytope::setBaseFileName(const string & n) {fileBaseName = n;}
 
@@ -532,14 +667,15 @@ void BuildPolytope::setBaseFileName(const string & n) {fileBaseName = n;}
  * Children of this class can use this method when building polytopes.
  */
 void BuildPolytope::setIntegerPoints(bool t) { integerPoints = t; }
+void BuildPolytope::setBuildPolymakeFile(bool t) { createdPolymakeFile = true;}
 
 
 void BuildPolytope::forDebugging()
 {
-	ambientDim = 6;
+	ambientDim = 2;
 	srand(time(NULL));
 	
-	for (int i = 0; i < ambientDim*2; ++i)
+	for (int i = 0; i < ambientDim+1; ++i)
 	{
 		vector<mpq_class> onePoint;
 		for(int j = 0; j < ambientDim; ++j)
