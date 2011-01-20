@@ -719,9 +719,9 @@ void BuildPolytope::makeIntegerList(vector<vector<mpq_class> > &list)
 		}//for k
 	}//for i
 
-	cout << "makeIntegerList::" << endl;
-	debugPrintList(list);
-	cout << "makeIntegerList:: the lcm is " << mpz_class(currentLCM) << endl;
+	//cout << "makeIntegerList::" << endl;
+	//debugPrintList(list);
+	//cout << "makeIntegerList:: the lcm is " << mpz_class(currentLCM) << endl;
 
 	assert(currentLCM > 0);
 	
@@ -750,10 +750,10 @@ void BuildPolytope::setBuildPolymakeFile(bool t) { createdPolymakeFile = t;}
  */
 void BuildPolytope::forDebugging()
 {
-	ambientDim = 3;
+	ambientDim = 5;
 	srand(time(NULL));
 	
-	for (int i = 0; i < ambientDim+1+2; ++i)
+	for (int i = 0; i < ambientDim+1+5; ++i)
 	{
 		vector<mpq_class> onePoint;
 		onePoint.push_back(1);
