@@ -2,15 +2,15 @@
  *
  *
  *  Created on: June 15, 2010
- *      Author: bedutra
+ *
  *
  *  Base class for making polytopes.
  *
  *  h-reps: will scale the coeff. to integers
  *  v-reps: no scaling is performed.
  *
- *  h-reps dual: not implemented...I never needed this yet!
- *  v-reps dual: finds the scaled facet equations (so the dual is dilated to integer points).
+ *  h-reps dual: scales the vertices to integers.
+ *  v-reps dual: scales the facets to integers (be finding the lcm of every denominator)
  */
 
 #ifndef BUILD_POLYTOPE_H_
@@ -49,19 +49,23 @@ protected:
     bool createdLatteHRepDualFile; //save as above, only for a dual polytope
     bool createdLatteVRepDualFile;
 
-    vector< vector<mpq_class> > points; //each point lives in ambientDim space. Assumes the points do not have a leading 1.
+
     vector< vector<mpq_class> > facets; //facets of the polytope found by polymake
     vector< vector<mpq_class> > dualVertices;//assumes points DO have a leading "1"..so the length is (dim+1)
+    vector< vector<mpq_class> > dualFacets;//could be different from the vertices if the org. polytope is not centered.
     int numAffineHull;		//number of affine hull facets found by polymake (saved at the end of the facets vector)
 
     string getDualFileBaseName() const;
-    bool isStringNumber(const string & s) const;
+private:
+    vector< vector<mpq_class> > points; //each point lives in ambientDim space. Assumes the points DO have a leading 1.
 public:
     BuildPolytope();
 	
 	//A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
+    void addPoint(vector<mpq_class> onePoint); //adds [1 onePoint] ot the point vector
     void centerPolytope();
+    void clearPoints();
 
     //Delete the generated files.
 	void deletePolymakeFile();
@@ -71,17 +75,18 @@ public:
 	void deleteLatteHRepFile();
 	void deleteLatteHRepDualFile();
 
-	void dilateDualVertices();
 
 	void buildPolymakeFile(); //builds the polymake file.
 	void buildPolymakeDualFile(); //build the dual polymake file.
 	void buildLatteHRepFile();//builds the h-rep file in latte style
+	void buildLatteHRepDualFile(); //builds h-rep of the dual.
 	void buildLatteVRepFile();//build the v-rep file in latte style.
 	void buildLatteVRepDualFile(); //build the v-rep for the dual (dilated) polytope
 
 
 	void findDimentions(); //finds the dim of the polytope form polymake.
-	void findFacets(bool rationalize = true);     //saves the facets in our vector.
+	void findFacets();     //saves the facets in our vector.
+	void findFacetsDual();//find the dual facets.
 	void findAffineHull();//find the rests of the facets.
 	void findVertices();   //saves the vertices in points (overrides the org. points vector).
 	void findVerticesDual();//finds the facet equations.
@@ -98,6 +103,7 @@ public:
 	string getPolymakeFile() const;
 	string getPolymakeDualFile() const;
 
+	vector<vector<mpq_class> > getVertices();
 	int getVertexCount();
 	int getVertexDualCount();
 
@@ -109,12 +115,14 @@ public:
 	bool isDualSimplicial();
 	bool isDualSimple();
 	
-	void convertFacetEquations();//mult. each equations by a (different) number to clear the denominators for latte.
+	void makeIntegerRows(vector<vector<mpq_class> > &list);//mult. each equations by a (different) number to clear the denominators for latte.
+	void makeIntegerList(vector<vector<mpq_class> > &list);//mult. each equations by a number to clear the denominators for latte.
 	void setBaseFileName(const string & n); //sets the file name root.
 	void setIntegerPoints(bool t); //should the polytope be interger?
 	void setBuildPolymakeFile(bool t); //used for finding the dual vertices.
 	
 	void forDebugging();
+	void debugPrintList(const vector<vector<mpq_class> > &list);
 };//BuildRandomPolytope
 
 

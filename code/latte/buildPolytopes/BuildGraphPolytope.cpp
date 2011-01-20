@@ -23,7 +23,7 @@ BuildGraphPolytope::BuildGraphPolytope(): BuildPolytope()
 void BuildGraphPolytope::findEdgePolytope(const vector< vector<int> > &edges)
 {
 	ambientDim = edges.size();
-	points.clear();
+	clearPoints(); //base class.
 
 	for(int k = 0; k < edges.size(); ++k)
 	{
@@ -32,7 +32,7 @@ void BuildGraphPolytope::findEdgePolytope(const vector< vector<int> > &edges)
 			vector<mpq_class> oneEdge(ambientDim, 0);
 			oneEdge[k] = 1;
 			oneEdge[edges[k][j]] = 1;
-			points.push_back(oneEdge);
+			addPoint(oneEdge); //base class.
 		}//for each edge.
 	}//for each row
 }//findEdgePolytope
@@ -46,7 +46,7 @@ void BuildGraphPolytope::findEdgePolytope(const vector< vector<int> > &edges)
 void BuildGraphPolytope::findSymmetricEdgePolytope(const vector< vector<int> > &edges)
 {
 	ambientDim = edges.size();
-	points.clear();
+	clearPoints(); //base class.
 
 	for(int k = 0; k < edges.size(); ++k)
 	{
@@ -55,10 +55,10 @@ void BuildGraphPolytope::findSymmetricEdgePolytope(const vector< vector<int> > &
 			vector<mpq_class> oneEdge(ambientDim, 0);//make an "ambientDim' long vector filled with zeros.
 			oneEdge[k] = 1;
 			oneEdge[edges[k][j]] = -1;
-			points.push_back(oneEdge);
+			addPoint(oneEdge); //base class.
 			oneEdge[k] = -1;
 			oneEdge[edges[k][j]] = 1;
-			points.push_back(oneEdge);
+			addPoint(oneEdge); //base class.
 		}//for each edge.
 	}//for each row
 }//findSymmetricEdgePolytope

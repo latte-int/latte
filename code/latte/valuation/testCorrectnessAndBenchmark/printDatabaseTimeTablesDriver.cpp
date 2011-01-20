@@ -40,14 +40,14 @@ void printHTMLtable(char * dbFile, int dim)
 	cout << "<html><head><title>Integration results</title>" << endl;
 
 	cout << "<style type=\"text/css\">" << endl;
-	cout << ".time  {background-color: #eeeeee}" << endl;
-	cout << ".dualTime {background-color: #eeeeee}" << endl;
-	cout << ".fasterTime {color:green;}" << endl;
+	cout << ".time  {background-color: #ffffff}" << endl;
+	cout << ".dualTime {background-color: #ffffff}" << endl;
+	cout << ".fasterTime {color:green; font-weight:bold; text-decoration: underline;}" << endl;
 	cout << ".slowerTime {color:red;}" << endl;
-	cout << ".range {background-color: #8b6ed7}" << endl;
-	cout << ".dualRange {background-color: #8b6ed7}" << endl;
-	cout << ".countNum {background-color: #5fc0ce}" << endl;
-	cout << ".dualCountNum {background-color: #5fc0ce}" << endl;
+	cout << ".range {background-color: #EBEBEB}" << endl;
+	cout << ".dualRange {background-color: #EBEBEB}" << endl;
+	cout << ".countNum {background-color: #C4C4C4}" << endl;
+	cout << ".dualCountNum {background-color: #C4C4C4}" << endl;
 
 	cout << "</style></head><body>" << endl;
 	cout << "Dim " << dim << ":: row number is vertex count, and column is polynomial degree<br />\n";

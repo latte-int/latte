@@ -32,13 +32,12 @@ void BuildRandomPolytope::makePoints(int ambient_dim, int numberPoints)
 	assert(numberPoints >= ambient_dim +1);
 	ambientDim = ambient_dim;
 
-	points.clear();
+	clearPoints();//base class
 	for (int i = 0; i < numberPoints; ++i)
 	{
 		vector<mpq_class> onePoint;
 
-		onePoint.resize(ambientDim+1);
-		//onePoint[0] = 1;
+		onePoint.resize(ambientDim);
 		for(int j = 0; j < ambientDim; ++j)
 		{
 			if ( integerPoints == true)
@@ -49,7 +48,7 @@ void BuildRandomPolytope::makePoints(int ambient_dim, int numberPoints)
 			if ( rand() < RAND_MAX * _probNegative)
 				onePoint[j] *= -1;//make negative.
 		}//build one point.
-		points.push_back(onePoint);
+		addPoint(onePoint);//base class.
 
 		//for(int j = 0; j <(int)onePoint.size(); ++j)
 		//	cout << onePoint[j] << ", ";

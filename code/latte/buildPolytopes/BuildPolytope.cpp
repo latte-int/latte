@@ -33,13 +33,45 @@ BuildPolytope::BuildPolytope():
 	fileBaseName = ss.str();
 }
 
+/**
+ * Takes a point and adds it to our point vector.
+ * @onePoint: one point to add. Assumes this does not have a leading 1.
+ * We will add [1 onePoint] to the point vector
+ */
+void BuildPolytope::addPoint(vector<mpq_class> onePoint)
+{
+	onePoint.insert(onePoint.begin(), 1);
+	points.push_back(onePoint);
+}//addPoint
 
+
+/**
+ * Checks to see if this polytope is centered, and then
+ * centers it if not.
+ * The center command keeps important properties like vertices and facets, but some are
+ * lost like SIMPLE and SIMPLICIAL.
+ *
+ * The origional un-centered polytope is lost.
+ */
 void BuildPolytope::centerPolytope()
 {
-	system((string("center ") + getPolymakeFile() + " " + getPolymakeFile()).c_str());
+	if ( isCentered() )
+		return;
+	//I do not know why, but in the terminal I can type center f.polymake f.polymake,
+	//but here, it does not like it when the output and input files are the same.
+	//Hence the ".temp" file that is made and renamed.
+	system((string("center ") + getPolymakeFile() + ".temp " + getPolymakeFile()).c_str());
+	system((string("mv " + getPolymakeFile()+".temp " + getPolymakeFile())).c_str());
+	points.clear();
+	facets.clear();
+	dualFacets.clear();
+	dualVertices.clear();
 }
 
-
+void BuildPolytope::clearPoints()
+{
+	points.clear();
+}
 
 /**
  * Deletes the generated file if it has been created.
@@ -69,9 +101,7 @@ void BuildPolytope::buildPolymakeFile()
 	
 	for (int k = 0; k < (int)points.size(); ++k)
 	{
-		file << 1 << ' ';
-
-		for (int vectorElm = 0; vectorElm < ambientDim; ++vectorElm)
+		for (int vectorElm = 0; vectorElm < ambientDim+1; ++vectorElm)
 		{
 			file << points[k][vectorElm] << ' ';
 		}//vectorElm
@@ -84,9 +114,11 @@ void BuildPolytope::buildPolymakeFile()
 
 /**
  * Finds the dual vertices and prints them to a new polymake file.
+ * If this polytope is not centered, will center it.
  */
 void BuildPolytope::buildPolymakeDualFile()
 {
+
 	if (createdPolymakeDualFile == true)
 		return;
 
@@ -96,8 +128,7 @@ void BuildPolytope::buildPolymakeDualFile()
 	file << "VERTICES" << endl;
 	for(int i = 0; i < (int) dualVertices.size(); ++i)
 	{
-		file << "1 ";
-		for(int k = 1; k < dualVertices[i].size(); ++k)
+		for(int k = 0; k < dualVertices[i].size(); ++k)
 			file << dualVertices[i][k] << " ";
 		file << endl;
 	}//for i.
@@ -118,6 +149,7 @@ void BuildPolytope::buildLatteHRepFile()
 		
 	createdLatteHRepFile = true;
 	findFacets(); //facets information is saved in facets.
+	makeIntegerRows(facets);
 	
 	//now print to a latte file.
 	ofstream file;
@@ -144,6 +176,38 @@ void BuildPolytope::buildLatteHRepFile()
 	file.close();}
 
 /**
+ * Makes a latte dual h-rep file.
+ */
+void BuildPolytope::buildLatteHRepDualFile()
+{
+	centerPolytope();
+	findFacetsDual();
+
+	if ( createdLatteHRepDualFile == true)
+		return; //already did this.
+
+	createdLatteHRepDualFile = true;
+	findFacetsDual(); //facets information is saved in facets.
+	makeIntegerRows(dualFacets);
+
+	//now print to a latte file.
+	ofstream file;
+
+	file.open(getLatteHRepDualFile().c_str());
+
+
+	file << dualFacets.size() << " " << ambientDim + 1 << endl;
+	for (int i = 0; i < (int) dualFacets.size(); ++i)
+	{
+		for (int k = 0; k < ambientDim + 1; ++k)
+			file << dualFacets[i][k] << " ";
+		file << endl;
+	}//for i
+
+	file.close();
+}//buildLatteHRepDualFile
+
+/**
  * Prints a file containing the vertices of the polytope for Latte.
  * filename: fileBaseName.vrep.latte.
  */
@@ -154,6 +218,7 @@ void BuildPolytope::buildLatteVRepFile()
 		
 	createdLatteVRepFile = true;
 	findVertices(); //facets information is saved in facets.
+	makeIntegerList(points);
 	
 	//now print to a latte file.
 	ofstream file;
@@ -172,7 +237,9 @@ void BuildPolytope::buildLatteVRepFile()
 	file.close();
 }
 
-
+/**
+ * Makes a latte dual v-rep from the facets information.
+ */
 void BuildPolytope::buildLatteVRepDualFile()
 {
 	if ( createdLatteVRepDualFile == true)
@@ -180,7 +247,7 @@ void BuildPolytope::buildLatteVRepDualFile()
 
 	createdLatteVRepDualFile = true;
 	findVerticesDual();
-	dilateDualVertices(); //after this, dualVertices are in the form [a, vij], vij are integer
+	makeIntegerList(dualVertices);//after this, dualVertices are in the form [a, vij], vij are integer
 
 	//now print to a latte file.
 	ofstream file;
@@ -189,9 +256,8 @@ void BuildPolytope::buildLatteVRepDualFile()
 
 
 	file << dualVertices.size() << " " << ambientDim + 1 << endl;
-	for (int i = 0; i < (int) facets.size(); ++i)
+	for (int i = 0; i < (int) dualVertices.size(); ++i)
 	{
-		//file << "1 "; //ignore the fist entry in the facets array.
 		file << dualVertices[i][0] << " ";
 		for (int k = 1; k < ambientDim + 1; ++k)
 			file << dualVertices[i][k] << " ";
@@ -232,7 +298,7 @@ void BuildPolytope::findDimentions()
  * Builds the polymake file if needed.
  * @rationalize: default is true. If true, each facet equation is mult. by a different positive number s.t. each slot is integer.
  */
-void BuildPolytope::findFacets(bool rationalize)
+void BuildPolytope::findFacets()
 {
 	buildPolymakeFile();
 	
@@ -285,15 +351,11 @@ void BuildPolytope::findFacets(bool rationalize)
 
 	*/
 	file.close();
-	findAffineHull();
+	findAffineHull(); //we need to close and reopen the file to find this because we do not know which one (facets or affineHull) comes first, and I'm not worried about the time cost of doing this.
 
-
-	if ( rationalize)
-	{
-		convertFacetEquations();
-	}//make the coeffs integer.
 
 }//findFacets
+
 
 /**
  * Assumes facets and amb. dim has already been found and read in.
@@ -328,95 +390,14 @@ void BuildPolytope::findAffineHull()
 	file.close();
 }//findAffineHull
 
-/**
- * Given array of facets, will reduce the elements in the vectors from rationals to integers
- */
-void BuildPolytope::convertFacetEquations()
+void BuildPolytope::findFacetsDual()
 {
+	centerPolytope();
+	dualFacets = getVertices();
+}//findFacetsDual()
 
-	for (int i = 0; i < (int) facets.size(); ++i)
-	{
-		mpz_class product(1);
 
-		//find the prod. of all the denominators
-		for (int k = 0; k < ambientDim + 1; ++k)
-		{
-			product = product * facets[i][k].get_den();
-		}//for k
 
-		mpz_class currentGCD(facets[i][0] * product);
-		mpz_t ans;
-		mpz_init(ans);
-		for (int k = 0; k < ambientDim + 1; ++k)
-		{
-			facets[i][k] = product * facets[i][k];
-			if (facets[i][k] != mpq_class(0))
-			{
-				mpz_gcd(ans, currentGCD.get_mpz_t(),
-						facets[i][k].get_num_mpz_t());
-				currentGCD = mpz_class(ans);
-			}//if
-		}//for k	
-
-		if (currentGCD != mpz_class(1))
-		{
-			for (int k = 0; k < ambientDim + 1; ++k)
-			{
-				facets[i][k] = facets[i][k] / currentGCD;
-			}//for k	
-		}//divide by the gcd
-	}//for i
-
-	//check everything looks ok.
-	//for(int i = 0; i < (int) facets.size(); ++i)
-	//{
-	//	cout << "reduced facet " << i << " = ";
-	//	for(int k = 0; k < ambientDim+1; ++k)
-	//		cout << facets[i][k] << ", ";
-	//	cout << endl;
-	//}//for i
-
-}//convertFacetEquations();
-
-/**
- * The dualVertices are in the form [1, v1, .. v2], where vi are in Q.
- * We will mult. every vertex by the same number so that all the vi are in Z.
- *
- */
-void BuildPolytope::dilateDualVertices()
-{
-	mpz_t currentLCM;
-	mpz_init_set_si(currentLCM, 1);
-
-	//currentLCM = 1
-	//loop over everything and find the lcm of the denom.
-	for (int i = 0; i < (int) dualVertices.size(); ++i)
-	{
-		//k=1 not 0 because we do not care about
-		//the b value (0 < b -Ax)
-		assert(dualVertices[i][0] == 1);
-		for (int k = 1; k < dualVertices[i].size(); ++k)
-		{
-			if (dualVertices[i][k] != mpq_class(0))
-			{
-				mpz_lcm(currentLCM, currentLCM,
-						dualVertices[i][k].get_den_mpz_t());
-			}//if not zero.
-		}//for k
-	}//for i
-
-	assert(currentLCM > 0);
-
-	//loop over everything again and times by the lcm.
-	for (int i = 0; i < (int) dualVertices.size(); ++i)
-	{
-		for (int k = 0; k < dualVertices[i].size(); ++k)
-		{
-			dualVertices[i][k] = dualVertices[i][k]* mpz_class(currentLCM);
-		}//for k
-	}//for i
-
-}//dilateDualVertices.
 
 
 /**
@@ -442,22 +423,22 @@ void BuildPolytope::findVertices()
 
 	points.clear(); //remove old points information.
 
+	getline(file, line, '\n');
 	string term;
-	file >> term;
-	do
-	{				
-		vector<mpq_class> onePoint;
-		for (int i = 0; i < ambientDim + 1; ++i)
+	while (line != "")
+	{
+		stringstream ss(line);
+		vector<mpq_class> oneRay;
+
+		for (int k = 0; k < ambientDim + 1; ++k)
 		{
-			onePoint.push_back(mpq_class(term));
-			file >> term;
-		}//for i
-
-		points.push_back(onePoint);//hyperplane has interger coeffs.
-	} while ( strcmp(term.c_str(), "1") == 0);
-
+			ss >> term;
+			oneRay.push_back(mpq_class(term));
+		}//for k
+		points.push_back(oneRay);//points are rational.
+		getline(file, line, '\n');
+	}//while
 	file.close();	
-
 }
 
 /**
@@ -468,21 +449,14 @@ void BuildPolytope::findVerticesDual()
 {
 	if ( dualVertices.size() > 0)
 		return;
-	findFacets(false); //do not rationalize the facets.
 
-	if ( isCentered() == false)
-	{
-		system((string("center "+getPolymakeDualFile()+" "+getPolymakeFile())).c_str());
-		BuildPolytope dual;
-		dual.setBaseFileName(getDualFileBaseName());
-		dual.setBuildPolymakeFile(true);
-		dual.findFacets(false);
-		dualVertices = dual.getFacets();
-	}
-	else
-	{
-		dualVertices = getFacets();
-	}
+	centerPolytope();
+	assert( getDim() == getAmbientDim() ); //duals are only defined for full dim.
+
+	findFacets();
+
+	dualVertices = getFacets();
+
 	homogenizeDualVertices(); //after this, dualVertices are in the form [1, vij], vij are rational
 }
 
@@ -502,6 +476,15 @@ string BuildPolytope::getPolymakeFile() const { return fileBaseName + ".polymake
 string BuildPolytope::getPolymakeDualFile() const { return getDualFileBaseName() +".polymake";}
 string BuildPolytope::getDualFileBaseName() const { return fileBaseName + ".dual";} //private function.
 
+
+/**
+ * Returns the homogenize vertices
+ */
+vector<vector<mpq_class> > BuildPolytope::getVertices()
+{
+	findVertices();
+	return points;
+}//getVertices
 
 int BuildPolytope::getVertexCount()
 {
@@ -556,7 +539,7 @@ bool BuildPolytope::isCentered()
 
 /**
  * true if s is a number in for form 4, 4.5, or 4/5
- */
+
 bool BuildPolytope::isStringNumber(const string & s) const
 {
 	bool signCount =0, decimalCount=0, rationalCount=0;
@@ -596,6 +579,7 @@ bool BuildPolytope::isStringNumber(const string & s) const
 	}//for i
 	return true;
 }//isStringNumber
+ */
 
 bool BuildPolytope::isSimplicial()
 {
@@ -660,34 +644,141 @@ bool BuildPolytope::isDualSimple()
 {
 	return ! isSimplicial();
 }//isDualSimplicial().
+
+
+/**
+ * @list: a vector of facets or vertices. Will mult each row by a different number to clear each denominators for latte
+ *
+ */
+void BuildPolytope::makeIntegerRows(vector<vector<mpq_class> > &list)
+{
+
+	for (int i = 0; i < (int) list.size(); ++i)
+	{
+		mpz_class currentLCM(1);  //sorry, I was having a hard time calling with mpz_class
+								  //it seems to only work with mpz_t, hence these two variables. (currentLCM and currentlcm)
+
+
+		//find the lcm of al the denominator for this row only.
+		for (int k = 0; k < ambientDim + 1; ++k)
+		{
+			mpz_t currentlcm; //set the output variable to 1.
+			mpz_init_set_si(currentlcm, 1);
+
+			if ( list[i][k] == mpz_class(0))
+				continue;
+
+			mpz_lcm(currentlcm, currentLCM.get_mpz_t(), list[i][k].get_den_mpz_t());
+			currentLCM = mpz_class(currentlcm);//save the current lcm in the c++ object.
+		}//for k
+
+		assert(currentLCM > 0);
+
+		//mult each element in this row by the lcm.
+		if (currentLCM != mpz_class(1))
+		{
+			for (int k = 0; k < ambientDim + 1; ++k)
+			{
+				list[i][k] = list[i][k] * currentLCM;
+				assert(list[i][k].get_den() == mpz_class(1));
+			}//for k
+		}//divide by the gcd
+	}//for i
+
+	//check everything looks ok.
+	//for(int i = 0; i < (int) facets.size(); ++i)
+	//{
+	//	cout << "reduced facet " << i << " = ";
+	//	for(int k = 0; k < ambientDim+1; ++k)
+	//		cout << facets[i][k] << ", ";
+	//	cout << endl;
+	//}//for i
+
+}//makeIntegerRows();
+
+/**
+ * @list: a vector of facets or vertices. Will mult each row by the same number to clear each denominators for latte
+ *
+ */
+void BuildPolytope::makeIntegerList(vector<vector<mpq_class> > &list)
+{
+	mpz_t currentLCM;
+	mpz_init_set_si(currentLCM, 1);
+
+	//currentLCM = 1
+	//loop over everything and find the lcm of the denom.
+	for (int i = 0; i < (int) list.size(); ++i)
+	{
+		for (int k = 0; k < (int) list[i].size(); ++k)
+		{
+			if (list[i][k] != mpq_class(0))
+			{
+				mpz_lcm(currentLCM, currentLCM,
+						list[i][k].get_den_mpz_t());
+			}//if not zero.
+		}//for k
+	}//for i
+
+	cout << "makeIntegerList::" << endl;
+	debugPrintList(list);
+	cout << "makeIntegerList:: the lcm is " << mpz_class(currentLCM) << endl;
+
+	assert(currentLCM > 0);
 	
+	//loop over everything again and times by the lcm.
+	for (int i = 0; i < (int) list.size(); ++i)
+	{
+		for (int k = 0; k < list[i].size(); ++k)
+		{
+			list[i][k] = list[i][k]* mpz_class(currentLCM);
+		}//for k
+	}//for i
+}//makeIntegerList
+
+
 void BuildPolytope::setBaseFileName(const string & n) {fileBaseName = n;}
 
 /**
  * Children of this class can use this method when building polytopes.
  */
 void BuildPolytope::setIntegerPoints(bool t) { integerPoints = t; }
-void BuildPolytope::setBuildPolymakeFile(bool t) { createdPolymakeFile = true;}
+void BuildPolytope::setBuildPolymakeFile(bool t) { createdPolymakeFile = t;}
 
 
+/**
+ * This method makes a random polytope.
+ */
 void BuildPolytope::forDebugging()
 {
-	ambientDim = 2;
+	ambientDim = 3;
 	srand(time(NULL));
 	
-	for (int i = 0; i < ambientDim+1; ++i)
+	for (int i = 0; i < ambientDim+1+2; ++i)
 	{
 		vector<mpq_class> onePoint;
+		onePoint.push_back(1);
 		for(int j = 0; j < ambientDim; ++j)
 			if ( integerPoints )
 				onePoint.push_back(mpq_class(rand()%100,1));
 			else
 				onePoint.push_back(mpq_class(rand()%100, rand()%25));
 		points.push_back(onePoint);
-		
 	}
 }
 
+/**
+ * Prints a facet, vertex, dual facet, or dual vertex list.
+ */
+void BuildPolytope::debugPrintList(const vector<vector<mpq_class> > &list)
+{
+	for(int i = 0; i < (int) list.size(); ++i)
+	{
+		cout << "i " << i << "= ";
+		for(int j = 0; j < (int) list[i].size(); ++j)
+			cout << list[i][j] << " ";
+		cout << endl;
+	}//for i
+}//debugPrintList
 
 
 

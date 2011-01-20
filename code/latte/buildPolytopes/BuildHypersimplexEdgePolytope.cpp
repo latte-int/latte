@@ -105,15 +105,20 @@ void BuildHypersimplexEdgePolytope::generatePoints(int ambient_dim, int numones)
 	ambientDim = ambient_dim;
 	_numOnes = numones;
 
-	points.clear();
+	clearPoints(); //base class
 	vector<mpq_class> starter;
+	vector<vector<mpq_class> > nonHomogenizedPoints;
+
 	for(int k = 0; k < _numOnes; ++k)
 		starter.push_back(1);
 	for(int k = _numOnes; k < ambientDim; ++k)
 		starter.push_back(0); // ex: starter = 1110000
 
-	addToPoints(points, starter, 0, true);
-	//points now contains all the points we need.
+	addToPoints(nonHomogenizedPoints, starter, 0, true);
+	//nonHomogenizedPoints now contains all the points we need.
+
+	for(int k = 0; k < (int) nonHomogenizedPoints.size(); ++k)
+		addPoint(nonHomogenizedPoints[k]);//base class.
 }
 
 

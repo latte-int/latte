@@ -34,6 +34,12 @@
 
 using namespace std;
 
+/**
+ * Brandon: observation:
+ * This class takes a string (of max length  200) and converts it into a ZZ
+ * The string must be positive and integer.
+ * Note that this can be done in RationalNTL (and it also covers the negative and rational classes)
+ */
 class HugInt
 {
 public:

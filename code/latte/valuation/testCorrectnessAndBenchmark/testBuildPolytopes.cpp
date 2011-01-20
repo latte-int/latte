@@ -25,11 +25,15 @@
 	cout << "making latte V-rep" << endl;
 	p.buildLatteVRepFile();
 
+	cout << "copy non-centered polymake file" << endl;
+	system((string("cp ")+p.getPolymakeFile() +" "+p.getPolymakeFile()+".org").c_str());
+
 	cout << "Making dual polymake file" << endl;
 	p.buildPolymakeDualFile();
-	cout << "making latte dual V-rep" << endl;
+	cout << "making latte dual V-rep." << endl;
 	p.buildLatteVRepDualFile();
-	cout << "making latte dual H-rep...not implemented." << endl;
+	cout << "making latte dual H-rep." << endl;
+	p.buildLatteHRepDualFile();
 
 	cout << "Polytope " << (p.isSimplicial() ? "is" : "is NOT") << " simplicial" << endl;
 	cout << "Polytope " << (p.isSimple() ? "is" : "is NOT") << " simple" << endl;

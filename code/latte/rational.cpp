@@ -553,6 +553,11 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator)
 	 everytime, it is called.
 	 March 4th, 2005: Change tmpString[200] to tmpString[2000].
 	 */
+
+	/*
+	 * Jan 18, 2011: Brandon: removed everything, and used the RationalNTL class.
+	 *
+	 *
 	int i, len;
 	char* tmpString = new char[2000];
 	in >> tmpString;
@@ -614,6 +619,13 @@ int ReadCDD(ifstream & in, ZZ & numerator, ZZ & denominator)
 	delete[] s2;
 	delete[] t2;
 	delete[] tmpString;
+	return 1;
+	*/
+	string rationalString;
+	in >> rationalString;
+	RationalNTL rational(rationalString);
+	numerator   = rational.getNumerator();
+	denominator = rational.getDenominator();
 	return 1;
 }
 /* ----------------------------------------------------------------- */
