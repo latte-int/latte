@@ -31,22 +31,29 @@ public:
 	IntegrationDB();
 
 	bool canTestFinish(AlgorithemUsed alg, int dim, int vertex, int degree, bool useDual, int seconds);
+	bool canSpecficFileFinish(AlgorithemUsed alg, const char *polymakeFile, int degree, int useDual, int secondsLimit);
 
 	void deletePolynomial(int id);
 	int doesPolynomialExist(const char * p);
 	int doesPolytopeExist(const char *polymake);
 
+	vector<vector<string> > getAllPolymakeFiles();
 	int getNumberPolynomials(int dim, int degree);
 	int getNumberPolytopes(int dim, int vertexCount, bool useDuals);
 	int getNumberIntegrationTest(int dim, int vertexCount, int degree, bool useDuals);
 	int getNumberIntegrationTest(int polytopeID, int degree);
+	int getNumberIntegrationTest(const string &polymakeFile, int degree, bool useDual);
 
 
 	vector<vector<string> > getRowsToIntegrate(int dim, int vertex, int degree, bool useDual, int limit);
+	vector<vector<string> > getRowsToIntegrateGivenSpecficFile(char *polymakeFile, int degree, bool useDual, int limit);
 
 	vector<vector<IntegrationPrintData> > getStatisticsByDim(int dim, bool useDual);
+	vector<vector<IntegrationPrintData> > getStatisticsByFile(const vector<vector<string> > &polymakeFile, bool useDual);
 	IntegrationPrintData getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual);
+	IntegrationPrintData getStatisticsByFileDegree(const string & polymakeFile, int degree, bool useDual);
 	vector<double> getStatisticsAvgMinMaxCount(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual);
+	vector<double> getStatisticsAvgMinMaxCount(AlgorithemUsed alg, const string &polymakeFile, int degree, bool useDual);
 
 	void insertEmptyIntegrationTest(const char* polynomialPath, int dim, int degree,
 											const char* polytopePath, const char* polymakePath, int vertexCount, int simple,

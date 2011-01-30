@@ -63,7 +63,7 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 		cout << "**" << newPolytope.getPolymakeFile().c_str() << " degree " << degree << endl;
 		newPolytope.buildLatteVRepFile();
 		newPolytope.buildPolymakeDualFile();
-		newPolytope.buildLatteVRepDualFile();
+		newPolytope.buildLatteHRepDualFile();
 
 
 		//get info about this polytope.
@@ -83,7 +83,7 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 		db.open(dbFile);
 		int dualID;
 		dualID = db.insertPolytope(buildDim, buildVertexCount, simple    , -1    , newPolytope.getLatteVRepFile().c_str()    , newPolytope.getPolymakeFile().c_str());
-		         db.insertPolytope(buildDim, dualVertexCount, dualSimple, dualID, newPolytope.getLatteVRepDualFile().c_str(), newPolytope.getPolymakeDualFile().c_str());
+		         db.insertPolytope(buildDim, dualVertexCount, dualSimple, dualID, newPolytope.getLatteHRepDualFile().c_str(), newPolytope.getPolymakeDualFile().c_str());
 		db.close();
 		newPolytope.deletePolymakeDualFile();
 	}//insert this polytope into the database.
@@ -209,7 +209,7 @@ void buildPolytopes(char *dbFile, int count, int dim, int vertexCount)
 				//make the polymake file and latte file.
 				cout << "**dim = " << toBuildList[i].dim << " vertex=" << max(toBuildList[i].vertex, toBuildList[i].vertex + additionalPoints) <<endl;
 				newPolytope.makePoints(toBuildList[i].dim, max(toBuildList[i].vertex, toBuildList[i].vertex + additionalPoints), 50, 0.5);
-				newPolytope.buildLatteVRepFile();//also makes a polymake file
+
 
 				//get info about this polytope.
 				buildVertexCount = newPolytope.getVertexCount();
@@ -219,17 +219,16 @@ void buildPolytopes(char *dbFile, int count, int dim, int vertexCount)
 				{
 					cout << "Deleting " << baseFileName.str().c_str() << " because vertex count=" << buildVertexCount << "and dim=" << buildDim << " additionalPoints=" << additionalPoints << endl;
 					newPolytope.deletePolymakeFile();
-					newPolytope.deleteLatteVRepFile();
 
 					//if the vertex count is wrong, adjust the number of points used.
 					additionalPoints += toBuildList[i].vertex - buildVertexCount; //will add/sub points if the current polytope's vertex count is too low/high.
 					continue; //for the while loop.
 				}//if polytope is not built to the requirements.
 
-				//now make the latte file and the dual polymake and dual latte file.
-				cout << "dual not being made";
+				//now make the latte v-file and dual latte h-file.
+				newPolytope.buildLatteVRepFile();
 				newPolytope.buildPolymakeDualFile();
-				newPolytope.buildLatteVRepDualFile();
+				newPolytope.buildLatteHRepDualFile();
 
 				//collect more statistics
 				int dualVertexCount;
@@ -241,15 +240,14 @@ void buildPolytopes(char *dbFile, int count, int dim, int vertexCount)
 				//print to screen --debugging.
 				cout << newPolytope.getLatteVRepFile().c_str() << " dim: " << buildDim << "\tvertex " << buildVertexCount << "\tsimple " << simple << endl;
 				cout << "  polymake: " << newPolytope.getPolymakeFile().c_str() << endl;
-				cout << "  " << newPolytope.getLatteVRepDualFile().c_str() << " dim: " << buildDim << "\tvertex " << dualVertexCount << "\tsimple " << dualSimple << endl;
-				cout << "  polymake: " << newPolytope.getPolymakeDualFile().c_str() << endl;
+				cout << "  " << newPolytope.getLatteHRepDualFile().c_str() << " dim: " << buildDim << "\tvertex " << dualVertexCount << "\tsimple " << dualSimple << endl;
 				correctFlag = true;
 
 				//save the polytopes in the database.
 				db.open(dbFile);
 				int dualID;
 				dualID = db.insertPolytope(toBuildList[i].dim, toBuildList[i].vertex, simple    , -1    , newPolytope.getLatteVRepFile().c_str()    , newPolytope.getPolymakeFile().c_str());
-				         db.insertPolytope(toBuildList[i].dim, dualVertexCount      , dualSimple, dualID, newPolytope.getLatteVRepDualFile().c_str(), newPolytope.getPolymakeDualFile().c_str());
+				         db.insertPolytope(toBuildList[i].dim, dualVertexCount      , dualSimple, dualID, newPolytope.getLatteHRepDualFile().c_str(), newPolytope.getPolymakeDualFile().c_str());
 
 				newPolytope.deletePolymakeDualFile();
 				//yes, we are done! Let the deconstructor clean things up.

@@ -119,7 +119,8 @@ public:
 	void makeIntegerList(vector<vector<mpq_class> > &list);//mult. each equations by a number to clear the denominators for latte.
 	void setBaseFileName(const string & n); //sets the file name root.
 	void setIntegerPoints(bool t); //should the polytope be interger?
-	void setBuildPolymakeFile(bool t); //used for finding the dual vertices.
+	void setBuildPolymakeFile(bool t); //used for registering the existence of files.
+	void setBuildLatteVRepDualFile(bool t); //used for registering the existence of files.
 	
 	void forDebugging();
 	void debugPrintList(const vector<vector<mpq_class> > &list);

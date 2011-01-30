@@ -743,14 +743,14 @@ void BuildPolytope::setBaseFileName(const string & n) {fileBaseName = n;}
  */
 void BuildPolytope::setIntegerPoints(bool t) { integerPoints = t; }
 void BuildPolytope::setBuildPolymakeFile(bool t) { createdPolymakeFile = t;}
-
+void BuildPolytope::setBuildLatteVRepDualFile(bool t) { createdLatteVRepDualFile = t;}
 
 /**
  * This method makes a random polytope.
  */
 void BuildPolytope::forDebugging()
 {
-	ambientDim = 5;
+	ambientDim = 3;
 	srand(time(NULL));
 	
 	for (int i = 0; i < ambientDim+1+5; ++i)

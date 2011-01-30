@@ -4,11 +4,8 @@
  *  Created on: Jan 13, 2011
  *      Author: bedutra
  *
- *  When making the database of polytopes, I was inserting file paths to dual polytoes
- *  but I was not making the files on disk because I did not know how.
- *
- *  Now I do. This program will look at all the dual polytopes in the database
- *  and make their latte file if it does not already exist.
+ * 1st goal: Fix the dual v-reps files
+ * 2nd gola: repace the dual v-reps with h-reps.
  */
 
 #include <string>
@@ -21,80 +18,176 @@
 #include "../../buildPolytopes/BuildRandomPolynomials.h"
 #include "../../sqlite/IntegrationDB.h"
 
-
-
-
 using namespace std;
 
-// db file,   dim       vertex-count
+/**
+ * At first, I was making dual v-reps. This is a bad idea because the files become HUGE
+ * Go back, center every polymake file,
+ */
+void makeDualHrepFiles(char *dbFile, int dim, int vertexCount)
+{
+	if (dim == 3 || dim == 4)
+	{
+		cout	<< "makeDualHrepFiles::sorry, this test case was done before this function was written. I will not overwite the latte files for which you already tested!!!"
+				<< endl;
+		return;
+	}//if dim 3 or 4.
+
+	//first get the rows that we need to update.
+	IntegrationDB db;
+	vector<vector<string> > rows;
+	stringstream sql;
+	sql		<< "select p.rowid, p.latteFilePath, p.polymakeFilePath, org.polymakeFilePath as origionalPolytope"
+			<< " from polytope as p, polytope as org "
+			<< " where p.dual = org.rowid and p.dual is not null "
+			<< " and org.dim = " << dim << " and org.vertexCount = "<< vertexCount
+			<< " and p.latteFilePath not like '.vrep.dual.latte' ";
+	db.open(dbFile);
+	rows = db.query(sql.str().c_str());
+	db.close();
+
+
+	if ( rows.size() == 0)
+	{
+		cout << "Nothing to fix for " << dim << " " << vertexCount << endl;
+		return;
+	}
+
+	//now loop over everything and make sure it exist.
+	for (int i = 0; i < (int) rows.size(); ++i)
+	{
+		string rowid = rows[i][0];
+		string dualLatteFile = rows[i][1];
+		string dualPolymakeFile = rows[i][2]; //this file should not exist.
+		string polymakeFile = rows[i][3];
+
+		string ext = ".polymake";
+		string dualExt = ".dual.polymake";
+
+		//get the base file name.
+		string baseFileName = polymakeFile;
+		assert(string::npos == baseFileName.rfind(dualExt)); //this better by the org. polymake file.
+		baseFileName.replace(baseFileName.rfind(ext), ext.length(), ""); //replace the last use of .polymake with ""
+
+		cout << "Going to center polytope, remake latte v-file, delete dual v-file, and make dual h-file for: " << baseFileName.c_str() << endl;
+
+		//read the org. polymake file.
+		BuildPolytope bp;
+		bp.setBaseFileName(baseFileName);
+		bp.setBuildPolymakeFile(true);
+
+		if (bp.getLatteVRepDualFile() != dualLatteFile
+				|| bp.getPolymakeDualFile() != dualPolymakeFile)
+		{
+			cout << "new and old dual polymake file names differ\n"
+				 << " dual latte file expected: " << bp.getLatteVRepDualFile().c_str()
+				 << " dual latte file recieved: " << dualLatteFile.c_str()
+				 << " dual polymake file expected: " << bp.getPolymakeDualFile().c_str()
+				 << " dual polymkae file recieved: " << dualPolymakeFile.c_str();
+			exit(1);
+		}//if error. the database should contain vrep.dual.latte files.
+
+		//center the polytope and build the files.
+		bp.centerPolytope();
+		bp.buildLatteVRepFile(); //over write latte file.
+		bp.buildLatteHRepDualFile(); //make a dual h-rep
+		bp.setBuildLatteVRepDualFile(true); //set to true so we can delete it
+		bp.deleteLatteVRepDualFile(); //delete it.
+
+		sql.str("");
+		sql << "update polytope set  latteFilePath= '" << bp.getLatteHRepDualFile() << "'"
+				<< " where rowid = " << rowid;
+		cout << sql.str().c_str() << endl;
+		db.open(dbFile);
+		db.query(sql.str().c_str());
+		db.close();
+		cout << endl;
+	}//for i. for every row.
+
+}//makeDualHrepFiles
+
+/**
+ * This function should never be used again. I have here 'just in case'
+ * It's job: find references to dual v-rep latte files in the db and check that they exist
+ * If they do, ok. If no, make them.
+ */
 void makeDualFiles(char *dbFile, int dim, int vertexCount)
 {
 	//first get the rows that we need to update.
 	IntegrationDB db;
 	vector<vector<string> > rows;
 	stringstream sql;
-	sql << "select p.rowid, p.latteFilePath, p.polymakeFilePath, org.polymakeFilePath as origionalPolytope,  org.simple, p.simple, p.vertexCount "
-		<< " from polytope as p, polytope as org "
-		<< " where p.dual = org.rowid and p.dual is not null "
-		<< " and org.dim = " << dim
-		<< " and org.vertexCount = " << vertexCount;
+	sql
+			<< "select p.rowid, p.latteFilePath, p.polymakeFilePath, org.polymakeFilePath as origionalPolytope,  org.simple, p.simple, p.vertexCount "
+			<< " from polytope as p, polytope as org "
+			<< " where p.dual = org.rowid and p.dual is not null "
+			<< " and org.dim = " << dim << " and org.vertexCount = "
+			<< vertexCount;
 	db.open(dbFile);
 	rows = db.query(sql.str().c_str());
 	db.close();
 
-	if ( rows.size() == 0)
+	if (rows.size() == 0)
 	{
 		cout << "Nothing to do for dim " << dim << " and vertexCount" << endl;
 		return;
 	}
 
 	//now loop over everything and make sure it exist.
-	for(int i = 0; i < (int) rows.size(); ++i)
+	for (int i = 0; i < (int) rows.size(); ++i)
 	{
-		string rowid            = rows[i][0];
-		string dualLatteFile    = rows[i][1];
+		string rowid = rows[i][0];
+		string dualLatteFile = rows[i][1];
 		string dualPolymakeFile = rows[i][2]; //this file should not exist.
-		string polymakeFile     = rows[i][3];
-		string orgSimple        = rows[i][4];
-		string dualSimple       = rows[i][5];
-		string vertexCountStr   = rows[i][6]; //of the dual poly.
+		string polymakeFile = rows[i][3];
+		string orgSimple = rows[i][4];
+		string dualSimple = rows[i][5];
+		string vertexCountStr = rows[i][6]; //of the dual poly.
 
 		string ext = ".polymake";
+		string dualExt = ".dual.polymake";
 
 		ifstream dualLatte(dualLatteFile.c_str());
 
 		cout << "\n\nProcessing " << rowid.c_str() << endl;
-		if ( dualLatte.is_open()
-			&& dualSimple != "-1" && vertexCountStr != "-1")
+		if (dualLatte.is_open() && dualSimple != "-1" && vertexCountStr != "-1")
 		{
 			cout << "Skipping dual polytope generation." << endl;
 			cout << "  Latte file exist: " << dualLatteFile.c_str() << endl;
-			cout << "  Polymake file exist: " << dualPolymakeFile.c_str() << endl;
+			cout << "  Polymake file exist: " << dualPolymakeFile.c_str()
+					<< endl;
 			dualLatte.close();
 			continue;
 		}//if both files already exist. or if the database does not have a record of its vertex/simple (again, really simplicial) count.
 
+		//get the base file name.
 		string baseFileName = polymakeFile;
-		baseFileName.replace( baseFileName.rfind(ext), ext.length(),""); //replace the last use of .polymake with ""
+		assert(string::npos == baseFileName.rfind(dualExt)); //this better by the org. polymake file.
+		baseFileName.replace(baseFileName.rfind(ext), ext.length(), ""); //replace the last use of .polymake with ""
 
-		cout << "Going to build polytope and latte files for: " << baseFileName.c_str() << endl;
+		cout << "Going to build polytope and latte files for: "
+				<< baseFileName.c_str() << endl;
 
+		//read the org. polymake file.
 		BuildPolytope bp;
 		bp.setBaseFileName(baseFileName);
 		bp.setBuildPolymakeFile(true);
 
-		if ( bp.getLatteVRepDualFile() != dualLatteFile
+
+		if (bp.getLatteVRepDualFile() != dualLatteFile
 				|| bp.getPolymakeDualFile() != dualPolymakeFile)
 		{
-			cout << "new and old file names differ\n"
-				 << " dual latte v rep: " << bp.getLatteVRepDualFile().c_str()
-				 << " dual polymake   : " << bp.getPolymakeDualFile().c_str()
-				 << " db d latte v rep: " << dualLatteFile.c_str()
-				 << " db dual polymake: " << dualPolymakeFile.c_str();
+			cout << "new and old file names differ\n" << " dual latte v rep: "
+					<< bp.getLatteVRepDualFile().c_str()
+					<< " dual polymake   : "
+					<< bp.getPolymakeDualFile().c_str()
+					<< " db d latte v rep: " << dualLatteFile.c_str()
+					<< " db dual polymake: " << dualPolymakeFile.c_str();
 			exit(1);
-		}
+		}//if error. somehow my naming is off :(
 
-		bp.buildPolymakeDualFile();
+		//make the dual latte files
+		//bp.buildPolymakeDualFile(); //don't, it will take too much space.
 		bp.buildLatteVRepDualFile();
 
 		int dualVertexCount = bp.getVertexDualCount();
@@ -102,9 +195,9 @@ void makeDualFiles(char *dbFile, int dim, int vertexCount)
 
 		sql.str("");
 		//yes, I know, all sql should go through the IntegrationDB class, but this is only a fix.
+		//update the vertex count
 		sql << "update polytope set vertexCount = " << dualVertexCount
-			<< ", simple = " << simplicial
-			<< " where rowid = " << rowid;
+				<< ", simple = " << simplicial << " where rowid = " << rowid;
 		cout << sql.str().c_str() << endl;
 		db.open(dbFile);
 		db.query(sql.str().c_str());
@@ -115,25 +208,33 @@ void makeDualFiles(char *dbFile, int dim, int vertexCount)
 }//makeDualFiles
 
 
-
 int main(int argc, char *argv[])
 {
-	if (argc <= 3 )
+	if (argc <= 3)
 	{
-		cout << "Hello,\n I was incorrectly making dual polytope files."
-			 << " The database contains file paths to dual polymake and dual "
-			 << " vrep files. This program will go back and physically build the "
-			 << " latte files that the database says exist. Dual polymake files should not exist (waste of space)\n"
-			 << endl;
+		cout
+				<< "Hello,\n I was making v reps for the org. poly and for its dual."
+				<< "But this is a bad idea because after dilation, the dual v-rep has HUGE numbers that slow donw the \"vertex-to-tanget-cones\""
+				<< " alg. that is done when latte reads in files."
+				<< "This program will go back, center the latte files, remove the dual v-reps, and make dual h-reps, and update the database."
+				<< endl;
 
-		cout << "error. usage: " << argv[0] << " sqlite-db-file dim vertex-count" << endl;
+		cout << "error. usage: " << argv[0]
+				<< " sqlite-db-file dim vertex-count" << endl;
 
 		cout << "Example: " << argv[0] << " file.sqlite3 polytope 15 30\n"
-			 << "        \t will build dual polymake and dual latte files for (org.) polytopes of dim 15 and vertex count 30 (the dual does not have to have 30 vertices)" << endl;
+				<< "        \t will build dual polymake and dual latte files for (org.) polytopes of dim 15 and vertex count 30 (the dual does not have to have 30 vertices)"
+				<< endl;
 		exit(1);
 	}
-					// db file,   dim       vertex-count
-	makeDualFiles(argv[1], atoi(argv[2]),atoi(argv[3]));
+
+	//There was also a point in time where I was not making dual latte files at all,
+	//this function goes back and makes them. This function should never be needed again
+	//because the next "fix" function supersedes it.
+	// db file,   dim       vertex-count
+	//	makeDualFiles(argv[1], atoi(argv[2]),atoi(argv[3]));
+
+	makeDualHrepFiles(argv[1], atoi(argv[2]), atoi(argv[3]));
 
 	return 0;
 }//main

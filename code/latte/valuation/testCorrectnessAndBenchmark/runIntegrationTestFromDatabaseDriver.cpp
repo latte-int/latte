@@ -56,21 +56,29 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 			}
 		}//check to see if the test is already done or not
 
-		const char *argv[6];
-		argv[0] = "./runTheTests";
-		argv[1] =  "--valuation=integrate";
+		const char *argv[7];
+		int index = 0;
+		argv[index++] = "./runTheTests";
+		argv[index++] = "--redundancy-check=none";
+		argv[index++] =  "--valuation=integrate";
 		if (alg == 1) //if you cange this, allso need to chage the other alg get below.
-			argv[2] = "--lawrence";
+			argv[index++] = "--lawrence";
 		else if (alg == 2)
-			argv[2] = "--triangulate";
+			argv[index++] = "--triangulate";
 		else
 		{
 			cout << "runTheTests::unknown alg." << endl;
 			exit(1);
 		}
-		argv[3] = polynomial.c_str();
-		argv[4] = "--vrep";
-		argv[5] = latte.c_str();
+		argv[index++] = polynomial.c_str();
+		if ( string::npos != latte.rfind(".vrep."))
+			argv[index++] = "--vrep";
+		else if (string::npos == latte.rfind(".hrep."))
+		{
+			cout << "unknown latte file data type: " << latte.c_str() << endl;
+			exit(1);
+		}//if not a vrep or hrep file, error.
+		argv[index++] = latte.c_str();
 
 		//open the log file and print what we are about to do.
 		ofstream log(logFileName.c_str(), ios::app);
@@ -79,13 +87,12 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		time ( &rawtime );
 		timeinfo = localtime ( &rawtime );
 
-		log << "\n" << asctime (timeinfo) << ": Testing " << (alg == 1? "lawrence" : "triangulate") << endl;
-		log << "\tLatte: " << latte.c_str()
-			<< "\n\tPolynomial: " << polynomial.c_str()
-			<< "\n\trowid: " << rowid.c_str();
+		log << "\n" << asctime (timeinfo) << ": Testing rowid" << rowid.c_str();
+		for(int i = 0; i < index; ++i)
+			log << "\n\t" << argv[i];
 		log.close();
 		//RUN IT. finally.
-		Valuation::ValuationContainer vc = Valuation::mainValuationDriver(argv, 6);
+		Valuation::ValuationContainer vc = Valuation::mainValuationDriver(argv, index);
 
 		//ok, now save the results.
 
@@ -163,6 +170,34 @@ void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool use
 }
 
 
+//db file, file name, degree,   use dual, alg, limit, log
+void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, int degree, bool useDual, int alg, int limit, string log)
+{
+	vector<vector<string> > toTest;
+	IntegrationDB db;
+	db.open(dbFile);
+	if ( db.canSpecficFileFinish((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence), polymakeFile, degree, useDual, 600) )
+	{
+		toTest = db.getRowsToIntegrateGivenSpecficFile(polymakeFile, degree, useDual, limit);
+		cout << "runSpecficPolytopeTest::" << polymakeFile << " with deg " << degree << "dual " << useDual << " has " << toTest.size() << " tests!" << endl;
+		/*if ( ! strcmp(polymakeFile, "./Various/3simp3simp.polymake") )
+		{
+			cout << "what the heck, the db test should have failed :(" << endl;
+			exit(1);
+		}*/
+	}
+	else
+	{
+		cout << "runSpecficPolytopeTest:: skipping " << polymakeFile << " " << degree << " " << useDual << " " << alg << endl;
+	}
+	db.close();
+
+	runTheTests(toTest, alg, dbFile, log);
+
+}
+
+
+
 int main(int argc, char *argv[])
 {
 	//if (argc != 2)
@@ -173,10 +208,17 @@ int main(int argc, char *argv[])
 	if( argc != 7 )
 	{
 		cout << "error: usage: " << argv[0] << " database-file dim vertex degree dual[true|false] algorithm[1=lawrence,2=triangulate] " << endl;
+		cout << "error: usage: " << argv[0] << " database-file specficFile fileName degree dual[true|fale] algorithm[1|2]" << endl;
 		exit(1);
 	}
 
 //	char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit)
-	runIntegrationTest(argv[1], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
+	if (argc == 7 && strcmp(argv[2], "specficFile"))
+		runIntegrationTest(argv[1], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
+	else if ( argc == 7 && !strcmp(argv[2], "specficFile") )
+		                     //db file, file name, degree,   use dual, alg, limit, log
+		runSpecficPolytopeTest(argv[1], argv[3], atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
+	else
+		cout << "unkown sequence of parameters" << endl;
 	return 0;
 }//main

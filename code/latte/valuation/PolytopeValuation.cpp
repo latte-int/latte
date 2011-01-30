@@ -578,6 +578,7 @@ RationalNTL PolytopeValuation::findVolumeUsingDeterminant(
 RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 {
 	RationalNTL answer;
+	bool dividedByZero;
 
 	vec_ZZ c = vec_ZZ();
 	ZZ scale = ZZ();
@@ -594,45 +595,60 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 	mat.SetDims(numOfVars, numOfVars);
 
 	c.SetLength(numOfVars);
-	for (int i = 0; i < numOfVars; i++)
-		c[i] = rand() % 10000;
 
-	for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
-			= simplicialCone->rest)
-	{
-		//find vertex
-		vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
-				numOfVars, tempDenom);
 
-		//raise f(vertex) to the power of the dimension
-		tempNum = vert * c;
-		tempNum = power(tempNum, numOfVars);
-		tempDenom = power(tempDenom, numOfVars);
+	do{
+		dividedByZero = false;
+		answer = 0;
 
-		int col = 0;
+		//pick the random c vector.
+		for (int i = 0; i < numOfVars; i++)
+			c[i] = rand() % 10000;
 
-		for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
-				= currentRay->rest, col++)
+		for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
+				= simplicialCone->rest)
 		{
-			tempDenom *= -1 * c * currentRay->first;
+			//find vertex
+			vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
+					numOfVars, tempDenom);
 
-			//generate matrix
-			for (int row = 0; row < numOfVars; row++)
+			//raise f(vertex) to the power of the dimension
+			tempNum = vert * c;
+			tempNum = power(tempNum, numOfVars);
+			tempDenom = power(tempDenom, numOfVars);
+
+			int col = 0;
+
+			for (listVector * currentRay = simplicialCone->rays; currentRay; currentRay
+				= currentRay->rest, col++)
 			{
-				mat[row][col] = currentRay->first[row];
-			}//for every component of the ray
+				tempDenom *= -1 * c * currentRay->first;
 
-		}//for every ray in the simple cone
+				//generate matrix
+				for (int row = 0; row < numOfVars; row++)
+				{
+					mat[row][col] = currentRay->first[row];
+				}//for every component of the ray
 
-		//get the determinant
-		determinant(det, mat);
+			}//for every ray in the simple cone
 
-		//multiply by the absolute value of the determinant
-		tempNum *= abs(det) * simplicialCone->coefficient;
+			//get the determinant
+			determinant(det, mat);
 
-		//add current term to the running total
-		answer.add(tempNum, tempDenom);
-	}//for every simple cone in the cone
+			//multiply by the absolute value of the determinant
+			tempNum *= abs(det) * simplicialCone->coefficient;
+
+			if ( tempDenom == 0)
+			{
+				cerr << "findVolumeUsingLawrence:: divided by zero, trying again" << endl;
+				dividedByZero = true;
+				break; //leave the for loop and the do-while loop will start over.
+			}
+
+			//add current term to the running total
+			answer.add(tempNum, tempDenom);
+		}//for every simple cone in the cone
+	} while ( dividedByZero == true);
 
 	ZZ one;
 	one = 1;

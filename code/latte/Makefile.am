@@ -226,6 +226,15 @@ integrate_database_polytopes_LDFLAGS = -lsqlite3
 integrate_database_polytopes_LDADD = $(LDADD)
 integrate_database_polytopes_LDADD += liblatteintegration.a
 
+#This is used to test volume classes from the database
+bin_PROGRAMS += find-volume-database-polytopes
+find_volume_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp
+find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
+find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+find_volume_database_polytopes_LDFLAGS = -lsqlite3
+find_volume_database_polytopes_LDADD = $(LDADD)
+find_volume_database_polytopes_LDADD += liblatteintegration.a
+
 
 #This is used to test integration classes from the database
 bin_PROGRAMS += fix-dual-database-polytopes
