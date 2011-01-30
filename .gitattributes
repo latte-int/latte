@@ -10449,6 +10449,7 @@ code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh 
 code/latte/valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp -text
+code/latte/valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testBuildPolytopes.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testVolumeForSLDriver.cpp -text
