@@ -6,6 +6,7 @@
  */
 
 #include "valuation.h"
+#include <iomanip>
 
 /**
  * Computes the volume of the polytope.
@@ -54,7 +55,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 
 	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
 	{
-		cerr << "Driver.cpp: the two methods are different." << ans1 << "!="
+		cerr << "valuation.cpp: the two methods are different." << ans1 << "!="
 				<< ans2 << endl;
 		exit(1);
 	}//if error.
@@ -126,7 +127,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 
 	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
 	{
-		cerr << "Driver.cpp: the two methods are different.\n"
+		cerr << "Valuation.cpp: the two methods are different.\n"
 			 << "triangulateion: " << ans1
 			 << "\nlawrence       " << ans2
 			 << endl;
@@ -603,8 +604,12 @@ void Valuation::ValuationContainer::printResults(ostream & out) const
 			continue;
 		}
 
+		RR decimalAns;
+		decimalAns = answers[i].answer.to_RR();
+		decimalAns.SetOutputPrecision(32);
+
 		out << "     Answer: " << answers[i].answer << endl;
-		out << "     Decimal: " << answers[i].answer.to_RR() << endl;
+		out << "     Decimal: " << decimalAns  << endl;
 		out << "     Time" << answers[i].timer;
 	}//for each valuation entry.
 

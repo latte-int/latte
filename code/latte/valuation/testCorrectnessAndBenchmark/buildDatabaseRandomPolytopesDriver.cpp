@@ -39,11 +39,13 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 	baseFileName.replace(baseFileName.find(fileEnding),fileEnding.length(),"");
 	//now baseFileName does not contain the .polymake file extention.
 
+	//cout << "entered main fun" << endl;
 	BuildPolytope newPolytope;
 	newPolytope.setBaseFileName(baseFileName);
 	newPolytope.setBuildPolymakeFile(true);
 	newPolytope.findVertices();
-	newPolytope.findFacets();
+	//newPolytope.findFacets();
+	//cout << "found verties ok" << endl;
 
 	//first insert the polytopes into the polytope table.
 	IntegrationDB db;
@@ -61,10 +63,13 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 
 		//make the polymake file and latte file.
 		cout << "**" << newPolytope.getPolymakeFile().c_str() << " degree " << degree << endl;
+		newPolytope.centerPolytope();
 		newPolytope.buildLatteVRepFile();
+		//cout << "got here" << endl;
 		newPolytope.buildPolymakeDualFile();
+		//cout << "got here 2" << endl;
 		newPolytope.buildLatteHRepDualFile();
-
+		//cout << "got her 3" << endl;
 
 		//get info about this polytope.
 		buildVertexCount = newPolytope.getVertexCount();
@@ -73,6 +78,7 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 		simple           = -1;//save time, don't compute this. newPolytope.isSimplicial(); //again, historical naming error.
 		dualSimple       = -1;//newPolytope.isDualSimplicial();
 
+		//cout << "got her 4" << endl;
 		//print to screen --debugging.
 		cout << newPolytope.getLatteVRepFile().c_str() << " dim: " << buildDim << "\tvertex " << buildVertexCount << "\tsimple " << simple << endl;
 		cout << "  polymake: " << newPolytope.getPolymakeFile().c_str() << endl;

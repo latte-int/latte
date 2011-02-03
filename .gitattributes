@@ -10378,6 +10378,7 @@ code/latte/buildPolytopes/Driver.cpp -text
 code/latte/buildPolytopes/GraphMaker.cpp -text
 code/latte/buildPolytopes/GraphMaker.h -text
 code/latte/burstmapletest.mpl -text
+code/latte/cdd2latteDriver.cpp -text
 code/latte/convertCDD_ext_to_latte.cpp -text
 code/latte/ehrhart2 -text
 code/latte/ehrhart3.cpp -text

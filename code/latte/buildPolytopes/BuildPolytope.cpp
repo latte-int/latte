@@ -51,7 +51,7 @@ void BuildPolytope::addPoint(vector<mpq_class> onePoint)
  * The center command keeps important properties like vertices and facets, but some are
  * lost like SIMPLE and SIMPLICIAL.
  *
- * The origional un-centered polytope is lost.
+ * The origional un-centered polytope is lost. Also, we do not automatically re-read vertex and facet information.
  */
 void BuildPolytope::centerPolytope()
 {

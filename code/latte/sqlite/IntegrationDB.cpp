@@ -382,6 +382,8 @@ int IntegrationDB::getNumberIntegrationTest(int polytopeID, int degree)
 		<< " where i.polytopeID = t.rowid and i.polynomialID = p.rowid " //join
 		<< " and t.rowid = " << polytopeID
 		<< " and p.degree = " << degree;
+
+	cout << sql.str().c_str() << endl;
 	return queryAsInteger(sql.str().c_str());
 }//getNumberIntegrationTest
 
@@ -909,7 +911,12 @@ void  IntegrationDB::insertSpecficPolytopeIntegrationTest(string polymakeFile, i
 		throw SqliteDBexception("insertSpecficPolytopeIntegrationTest::Not enough polynomials exist");
 	if ( count - numIntegrationTests <= 0)
 	{
-		cout << "There already exist " << numIntegrationTests << " tests; in fact, there might be more." << endl;
+		cout << "polytope dim: " << dim
+			 << "\n number of polynomials: " << numPolynomials
+			 << "\n rowid of polytope (" << polymakeFile.c_str() << "): " << rowid
+			 << "\n number of current integration tests: " << numIntegrationTests << endl;
+		cout << "There already exist " << numIntegrationTests << " tests." << endl;
+
 		return;
 	}
 

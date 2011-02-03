@@ -184,9 +184,9 @@ void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, bool useDual, in
 	VolumeDB db;
 
 	db.open(dbFile);
-	//if ( db.canSpecficFileFinish((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence), polymakeFile, degree, useDual, 600) )
-	//{
-		toTest = db.getRowsToFindVolumeGivenSpecficFile(polymakeFile, useDual);
+
+	toTest = db.getRowsToFindVolumeGivenSpecficFile(polymakeFile, useDual);
+
 	assert(toTest.size() == 1);
 	if ( (atof(toTest[0][1].c_str()) == -2.0 && alg == 1)
 		|| (atof(toTest[0][2].c_str()) == -2.0 && alg == 2) )
@@ -203,7 +203,6 @@ void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, bool useDual, in
 	//}
 	db.close();
 
-	cout << "going to run tets" << endl;
 	runTheTests(toTest, alg, dbFile, log);
 
 }
@@ -212,25 +211,8 @@ void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, bool useDual, in
 
 int main(int argc, char *argv[])
 {
-/*
-	ZZ a,b;
-	a = 0;
-	b = 2;
 
-	try {
-		b = b/a;
-	}
-	catch (const exception &e)
-	{
-		cout << "catch except:: " << e.what() << endl;
-	}
-	catch(...)
-	{
-		cout << "catch ...!!!" << endl;
-	}
-*/
 
-	exit(1);
 	if( argc != 6 )
 	{
 		cout << "error: usage: " << argv[0] << " database-file dim vertex dual[true|false] algorithm[1=lawrence,2=triangulate] " << endl;
