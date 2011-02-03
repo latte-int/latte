@@ -5,7 +5,7 @@ SUBDIRS += normalize
 
 TESTS =
 
-bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext cdd2latte
+bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext
 
 latte_maximize_SOURCES = maximize.cpp
 latte_minimize_SOURCES = minimize.cpp
@@ -13,7 +13,7 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 latte2ine_SOURCES = latte2ine.cpp
 latte2ext_SOURCES = latte2ext.cpp
-cdd2latte_SOURCES = cdd2latteDriver.cpp
+
 
 LDADD = liblatte.a
 AM_CPPFLAGS = -I$(top_srcdir)/code
