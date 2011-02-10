@@ -152,7 +152,6 @@ EXAMPLES/volumeIntegrationPaperComparison/notStarted/Fausto[!!-~]Bernardini.pdf 
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/RATHOD.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/alanGenz.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/notStarted/shaoweiLin.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/zhiqiangXu.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/createScript.sqlite -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim10/ext12/polytope10_vertex12_num1.polymake -text
@@ -10360,6 +10359,7 @@ EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/polynomials/dim8/deg50
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/polynomials/dim8/deg50/poly8_deg50_num7.polynomial -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/polynomials/dim8/deg50/poly8_deg50_num8.polynomial -text
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/polynomials/dim8/deg50/poly8_deg50_num9.polynomial -text
+EXAMPLES/volumeIntegrationPaperComparison/shaoweiLin/shaoweiLin.pdf -text
 code/gnulib/alloca_.h -text
 code/gnulib/stdbool_.h -text
 code/gnulib/stdlib_.h -text
