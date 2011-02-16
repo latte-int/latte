@@ -153,6 +153,12 @@ EXAMPLES/volumeIntegrationPaperComparison/notStarted/RATHOD.pdf -text svneol=uns
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/alanGenz.pdf -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/notStarted/zhiqiangXu.pdf -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/createScript.sqlite -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/createVolume.sql -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dbBackup/polynomialBackup.1.20.9pm.tar.gzip -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/fixDuals.sh -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/makeDatabase.sh -text
+EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/randomPolytoepDB.2.15.2011.tar.gzip -text
 EXAMPLES/volumeIntegrationPaperComparison/shaoweiLin/shaoweiLin.pdf -text
 code/gnulib/alloca_.h -text
 code/gnulib/stdbool_.h -text
