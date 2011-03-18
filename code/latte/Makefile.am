@@ -251,6 +251,7 @@ fix_dual_database_polytopes_LDFLAGS = -lsqlite3
 bin_PROGRAMS += print-database-time-table 
 print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
 print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
+print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
 print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
 print_database_time_table_LDFLAGS = -lsqlite3
 
@@ -295,6 +296,16 @@ bin_PROGRAMS += ConvertCDDineToLatte
 ConvertCDDineToLatte_SOURCES = convertCDD_ine_to_latte.cpp
 ConvertCDDineToLatte_LDADD = $(LDADD)
 
+#convert a cdd V-rep to latte V-rep
+bin_PROGRAMS += ConvertCDDextToLatte
+ConvertCDDextToLatte_SOURCES = convertCDD_ext_to_latte.cpp
+ConvertCDDextToLatte_LDADD = $(LDADD)
+
+
+#converts a really big fraction to decimal.
+#bin_PROGRAMS += convert-rational-to-decimal
+#convert_rational_to_decimal_SOURCES = valuation/testCorrectnessAndBenchmark/convertRationalToDecimalDriver.cpp
+#convert_rational_to_decimal_LDADD = $(LDADD)
 
 #Run ./valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh 
 #  to start a maple script that will test integration of polynomials over rectangles in many dimentions.
@@ -302,6 +313,13 @@ check_PROGRAMS += test-hyperrectangle-integration
 test_hyperrectangle_integration_SOURCES = valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesDriver.cpp 
 test_hyperrectangle_integration_LDADD = $(LDADD)
 test_hyperrectangle_integration_LDADD += liblatteintegration.a
+
+
+#check_PROGRAMS += test-rationalNTL
+#test_rationalNTL_SOURCES = testRationalNTLDriver.cpp 
+#test_rationalNTL_SOURCES += rational.cpp
+#test_rationalNTL_LDADD = $(LDADD)
+
 
 
 #Computes the volums of standard hypersimplex
