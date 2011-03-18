@@ -8,7 +8,7 @@
 #include <vector>
 #include <sstream>
 #include "BuildRandomPolynomials.h"
-
+#include <cstdlib>
 
 /**
  * makes a random monomial in dim variables of a set degree.
