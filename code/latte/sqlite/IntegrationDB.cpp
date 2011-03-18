@@ -52,7 +52,7 @@ bool IntegrationDB::canTestFinish(AlgorithemUsed alg, int dim, int vertexCount, 
 	sql.str("");
 	if ( useDual == true)
 	{
-		sql << "select avg(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << ")"
+		sql << "select avg(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << "), count(*)"
 			<< " from polynomial as p, integrate as i, polytope as dualP, polytope as orgP "
 			<< " where i.polytopeID = dualP.rowid and i.polynomialID = p.rowid " //joint dual-integrate-polynomial
 			<< " and dualP.dual = orgP.rowid and dualP.dual is not null" //join the dual and org. polytope.
@@ -64,7 +64,7 @@ bool IntegrationDB::canTestFinish(AlgorithemUsed alg, int dim, int vertexCount, 
 	}
 	else
 	{
-		sql << "select avg(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << ")"
+		sql << "select avg(" << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << "), count(*)"
 			<< " from polynomial as p, integrate as i, polytope as t "
 			<< " where i.polytopeID = t.rowid and i.polynomialID = p.rowid "
 			<< " and t.dim = " << dim
@@ -74,11 +74,11 @@ bool IntegrationDB::canTestFinish(AlgorithemUsed alg, int dim, int vertexCount, 
 	}//else not using the dual.
 
 	result = query(sql.str().c_str());
-	if ( result[0][0] != "NULL")
-		return (atof(result[0][0].c_str()) < secondsLimit);
+	if ( result[0][0] != "NULL" && atoi(result[0][1].c_str()) >= 1 )
+		return (atof(result[0][0].c_str()) < secondsLimit); //if there are at least 1 test case
 
-	//darn, if we are here, then there where no test cases of this class.
-	//now look at the previous vertexCount and keeping everything the same.
+	//darn, if we are here, then there where no (or less than 3) test cases of this class.
+	//now look at the previous tests and see if they did not finish.
 	if (vertexCount <= dim + 3)
 		return true; //always do the basic cases!
 
@@ -147,7 +147,10 @@ bool IntegrationDB::canSpecficFileFinish(AlgorithemUsed alg, const char *polymak
 			<< " and " << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << " = -2";
 	}//else not using the dual.
 
-	if ( queryAsInteger(sql.str().c_str()) )
+	//cout << "check -2: " << sql.str().c_str() << "\n" << endl;
+	result = query(sql.str().c_str());
+	//cout << "check-2 ans: " << result[0][0].c_str() << '\n' << endl;
+	if ( atoi(result[0][0].c_str()) )
 		return false; //skip this test case.
 
 	sql.str("");
@@ -172,7 +175,9 @@ bool IntegrationDB::canSpecficFileFinish(AlgorithemUsed alg, const char *polymak
 			<< " and " << (alg == Lawrence ? " i.timeLawrence " : " i.timeTriangulate ") << " >= 0";
 	}//else not using the dual.
 
+	//cout << "get avg: " << sql.str().c_str() << '\n' << endl;
 	result = query(sql.str().c_str());
+	//cout << "get avg: ans " << result[0][0].c_str() << endl;
 	/*
 	if ( !strcmp(polymakeFile, "./Various/3simp3simp.polymake") && degree == 50)
 	{
@@ -190,7 +195,7 @@ bool IntegrationDB::canSpecficFileFinish(AlgorithemUsed alg, const char *polymak
 	if ( result[0][0] != "NULL")
 		return (atof(result[0][0].c_str()) < secondsLimit);
 
-	//if we got here, we never say this file with this degree before.
+	//if we got here, we never saw this file with this degree before.
 	//now look at the previous degrees and see what was the last degree it finished at.
 	if (degree <= 3)
 		return true; //always do the basic cases!
@@ -218,6 +223,7 @@ bool IntegrationDB::canSpecficFileFinish(AlgorithemUsed alg, const char *polymak
 	}//else not using the dual.
 
 
+	//cout << "avg anything: " << sql.str().c_str() << '\n' << endl;
 	result = query(sql.str().c_str());
 
 	/*
@@ -286,6 +292,85 @@ vector<vector<string> > IntegrationDB::getAllPolymakeFiles()
 	sql << "select distinct polymakeFilePath from polytope where dual is null order by dim, vertexCount asc";
 	return query(sql.str().c_str());
 }//getAllPolymakeFiles
+
+/*
+ * Returns true if this case contained a "-2" as the time value for a test.
+ */
+bool IntegrationDB::getLimit(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual)
+{
+	stringstream sql;
+	string strAlg;
+
+	if (alg == Lawrence)
+		strAlg = "timeLawrence";
+	else
+		strAlg = "timeTriangulate";
+
+
+	if (useDual == true)
+	{
+		sql << "select count(i." << strAlg << ")"
+			<< " from integrate as i"
+			<< " join polytope as dualP on dualP.rowid = i.polytopeID"
+			<< " join polytope as orgP on orgP.rowid = dualP.dual"
+			<< " join polynomial as p on p.rowid = i.polynomialID"
+			<< " where dualP.dual is not null " //and with orgp
+			<< " and orgP.dim = " << dim
+			<< " and orgP.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " = -2 ";
+	}//if dual
+	else
+	{
+
+		sql << "select avg(i." << strAlg << ") "
+			<< " from integrate as i"
+			<< " join polynomial as p on p.rowid = i.polynomialID"
+			<< " join polytope as t on t.rowid = i.polytopeID"
+			<< " where t.dual is null"
+			<< " and t.dim = " << dim
+			<< " and t.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " = -2 ";
+	}//regular
+
+	return (queryAsInteger(sql.str().c_str()) > 0);
+}
+
+/*
+ * Returns true if this test case as a -2 as a time for a test result.
+ */
+bool IntegrationDB::getLimitByFile(AlgorithemUsed alg, const string &polymakeFile, int degree, bool useDual)
+{
+	stringstream sql;
+	string strAlg;
+
+	strAlg = (alg == Lawrence ? "timeLawrence" : "timeTriangulate");
+
+	if (useDual == true)
+	{
+		sql << "select count(i." << strAlg << ") "
+			<< " from polynomial as p, polytope as dualP, polytope as orgP, integrate as i "
+			<< " where i.polynomialID = p.rowid and i.polytopeID = dualP.rowid " //join with p, i, dualP
+			<< " and dualP.dual is not null and dualP.dual = orgP.rowid" //and with orgp
+			<< " and orgP.polymakeFilePath = '" << polymakeFile << "'"
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " = -2 ";
+	}//if dual
+	else
+	{
+
+		sql << "select count(i." << strAlg << ") "
+			<< " from polynomial as p, polytope as t, integrate as i "
+			<< " where i.polynomialID = p.rowid and i.polytopeID = t.rowid " //join with p, i, dualP
+			<< " and t.dual is null"
+			<< " and t.polymakeFilePath = '" << polymakeFile << "'"
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " = -2 ";
+	}//regular
+
+	return (queryAsInteger(sql.str().c_str()) > 0);
+}
 
 
 /**
@@ -449,7 +534,7 @@ vector<vector<string> > IntegrationDB::getRowsToIntegrateGivenSpecficFile(char *
 			<< " and orgP.polymakeFilePath = '" << polymakeFile << "'"
 			<< " limit " << limit;
 	}
-	//cout << "getRowsToIntegrateGivenSpecficFile:: " << sql.str().c_str() << endl;
+	cout << "getRowsToIntegrateGivenSpecficFile:: " << sql.str().c_str() << endl;
 	return query(sql.str().c_str());
 
 }//getRowsToIntegrateGivenSpecficFile
@@ -468,9 +553,9 @@ vector<vector<string> > IntegrationDB::getRowsToIntegrateGivenSpecficFile(char *
  * answer[i][k] contains information on polytope vertex-count case i and
  *   polynomial degree case k.
  */
-vector<vector<IntegrationPrintData> >  IntegrationDB::getStatisticsByDim(int dim, bool useDual)
+vector<vector<ValuationDBStatistics> >  IntegrationDB::getStatisticsByDim(int dim, bool useDual)
 {
-	vector<vector<IntegrationPrintData> > ans;
+	vector<vector<ValuationDBStatistics> > ans;
 	vector<vector<string> > polynomialDegrees;
 	vector<vector<string> > vertexCounts;
 	stringstream sql;
@@ -503,9 +588,9 @@ vector<vector<IntegrationPrintData> >  IntegrationDB::getStatisticsByDim(int dim
 }//getResultsByDim
 
 
-vector<vector<IntegrationPrintData> > IntegrationDB::getStatisticsByFile(const vector<vector<string> > &polymakeFile, bool useDual)
+vector<vector<ValuationDBStatistics> > IntegrationDB::getStatisticsByFile(const vector<vector<string> > &polymakeFile, bool useDual)
 {
-	vector<vector<IntegrationPrintData> > ans;
+	vector<vector<ValuationDBStatistics> > ans;
 	vector<vector<string> > polynomialDegrees;
 	vector<vector<string> > vertexCounts;
 	stringstream sql;
@@ -540,72 +625,78 @@ vector<vector<IntegrationPrintData> > IntegrationDB::getStatisticsByFile(const v
  * Given the (dual) polytope dim, vertex count, and polynomial degree,
  * Will find and return basic statistics (avg time, min/max, totals, etc) about this test class.
  */
-IntegrationPrintData IntegrationDB::getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual)
+ValuationDBStatistics IntegrationDB::getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual)
 {
-	IntegrationPrintData ipd;
+	ValuationDBStatistics vdbs;
 	vector<double> avgMinMaxCountLawrence, avgMinMaxCountTriangulate;
 
 	//save how this function was called.
-	ipd.dim = dim;
-	ipd.vertexCount = vertexCount;
-	ipd.degree = degree;
-	ipd.useDual = useDual;
+	vdbs.dim = dim;
+	vdbs.vertexCount = vertexCount;
+	vdbs.degree = degree;
+	vdbs.useDual = useDual;
 
 	//get avg, min, man, and number finished
 	avgMinMaxCountLawrence    = getStatisticsAvgMinMaxCount(Lawrence, dim, vertexCount, degree, useDual);
 	avgMinMaxCountTriangulate = getStatisticsAvgMinMaxCount(Triangulate, dim, vertexCount, degree, useDual);
 
-	ipd.avgTriangulationTime = avgMinMaxCountTriangulate[0];
-	ipd.avgLawrenceTime      = avgMinMaxCountLawrence[0];
+	vdbs.avgTriangulationTime = avgMinMaxCountTriangulate[0];
+	vdbs.avgLawrenceTime      = avgMinMaxCountLawrence[0];
 
-	ipd.minTriangulationTime = avgMinMaxCountTriangulate[1];
-	ipd.minLawrenceTime      = avgMinMaxCountLawrence[1];
+	vdbs.minTriangulationTime = avgMinMaxCountTriangulate[1];
+	vdbs.minLawrenceTime      = avgMinMaxCountLawrence[1];
 
-	ipd.maxTriangulationTime = avgMinMaxCountTriangulate[2];
-	ipd.maxLawrenceTime      = avgMinMaxCountLawrence[2];
+	vdbs.maxTriangulationTime = avgMinMaxCountTriangulate[2];
+	vdbs.maxLawrenceTime      = avgMinMaxCountLawrence[2];
 
-	ipd.totalFinishedTriangulationTestCases = avgMinMaxCountTriangulate[3];
-	ipd.totalFinishedLawrenceTestCases      = avgMinMaxCountLawrence[3];
+	vdbs.totalFinishedTriangulationTestCases = avgMinMaxCountTriangulate[3];
+	vdbs.totalFinishedLawrenceTestCases      = avgMinMaxCountLawrence[3];
 
-	ipd.totalTestCases = getNumberIntegrationTest(dim, vertexCount, degree, useDual);
+	vdbs.totalTestCases = getNumberIntegrationTest(dim, vertexCount, degree, useDual);
 
-	return ipd;
+	vdbs.manuallyLimitedLawrence = getLimit(Lawrence, dim, vertexCount, degree, useDual);
+	vdbs.manuallyLimitedTriangulation = getLimit(Triangulate, dim, vertexCount, degree, useDual);
+
+	return vdbs;
 }//getStatisticsByDimVertexDegree
 
 
-IntegrationPrintData IntegrationDB::getStatisticsByFileDegree(const string & polymakeFile, int degree, bool useDual)
+ValuationDBStatistics IntegrationDB::getStatisticsByFileDegree(const string & polymakeFile, int degree, bool useDual)
 {
-	IntegrationPrintData ipd;
+	ValuationDBStatistics vdbs;
 	vector<double> avgMinMaxCountLawrence, avgMinMaxCountTriangulate;
 
 	//save how this function was called.
 	stringstream d, v;
 	d << "select dim from polytope where polymakeFilePath = '" << polymakeFile << "'";
 	v << "select vertexCount from polytope where polymakeFilePath = '" << polymakeFile << "'";
-	ipd.dim = queryAsInteger(d.str().c_str());
-	ipd.vertexCount = queryAsInteger(v.str().c_str());
-	ipd.degree = degree;
-	ipd.useDual = useDual;
+	vdbs.dim = queryAsInteger(d.str().c_str());
+	vdbs.vertexCount = queryAsInteger(v.str().c_str());
+	vdbs.degree = degree;
+	vdbs.useDual = useDual;
 
 	//get avg, min, man, and number finished
 	avgMinMaxCountLawrence    = getStatisticsAvgMinMaxCount(Lawrence, polymakeFile, degree, useDual);
 	avgMinMaxCountTriangulate = getStatisticsAvgMinMaxCount(Triangulate, polymakeFile, degree, useDual);
 
-	ipd.avgTriangulationTime = avgMinMaxCountTriangulate[0];
-	ipd.avgLawrenceTime      = avgMinMaxCountLawrence[0];
+	vdbs.avgTriangulationTime = avgMinMaxCountTriangulate[0];
+	vdbs.avgLawrenceTime      = avgMinMaxCountLawrence[0];
 
-	ipd.minTriangulationTime = avgMinMaxCountTriangulate[1];
-	ipd.minLawrenceTime      = avgMinMaxCountLawrence[1];
+	vdbs.minTriangulationTime = avgMinMaxCountTriangulate[1];
+	vdbs.minLawrenceTime      = avgMinMaxCountLawrence[1];
 
-	ipd.maxTriangulationTime = avgMinMaxCountTriangulate[2];
-	ipd.maxLawrenceTime      = avgMinMaxCountLawrence[2];
+	vdbs.maxTriangulationTime = avgMinMaxCountTriangulate[2];
+	vdbs.maxLawrenceTime      = avgMinMaxCountLawrence[2];
 
-	ipd.totalFinishedTriangulationTestCases = avgMinMaxCountTriangulate[3];
-	ipd.totalFinishedLawrenceTestCases      = avgMinMaxCountLawrence[3];
+	vdbs.totalFinishedTriangulationTestCases = avgMinMaxCountTriangulate[3];
+	vdbs.totalFinishedLawrenceTestCases      = avgMinMaxCountLawrence[3];
 
-	ipd.totalTestCases = getNumberIntegrationTest(polymakeFile, degree, useDual);
+	vdbs.totalTestCases = getNumberIntegrationTest(polymakeFile, degree, useDual);
 
-	return ipd;
+	vdbs.manuallyLimitedLawrence = getLimitByFile(Lawrence, polymakeFile, degree, useDual);
+	vdbs.manuallyLimitedTriangulation = getLimitByFile(Triangulate, polymakeFile, degree, useDual);
+
+	return vdbs;
 }///getStatisticsByFileDegree
 
 
@@ -621,9 +712,11 @@ vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, in
 	if (useDual == true)
 	{
 		sql << "select avg(i." << strAlg << "), min(i." << strAlg << "), max(i." << strAlg << "), count(*) "
-			<< " from polynomial as p, polytope as dualP, polytope as orgP, integrate as i "
-			<< " where i.polynomialID = p.rowid and i.polytopeID = dualP.rowid " //join with p, i, dualP
-			<< " and dualP.dual is not null and dualP.dual = orgP.rowid" //and with orgp
+			<< " from integrate as i"
+			<< " join polytope as dualP on dualP.rowid = i.polytopeID"
+			<< " join polytope as orgP on orgP.rowid = dualP.dual"
+			<< " join polynomial as p on p.rowid = i.polynomialID"
+			<< " where dualP.dual is not null " //and with orgp
 			<< " and orgP.dim = " << dim
 			<< " and orgP.vertexCount = " << vertexCount
 			<< " and p.degree = " << degree
@@ -633,14 +726,14 @@ vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, in
 	{
 
 		sql << "select avg(i." << strAlg << "), min(i." << strAlg << "), max(i." << strAlg << "), count(*) "
-			<< " from polynomial as p, polytope as t, integrate as i "
-			<< " where i.polynomialID = p.rowid and i.polytopeID = t.rowid " //join with p, i, dualP
-			<< " and t.dual is null"
+			<< " from integrate as i"
+			<< " join polynomial as p on p.rowid = i.polynomialID"
+			<< " join polytope as t on t.rowid = i.polytopeID"
+			<< " where t.dual is null"
 			<< " and t.dim = " << dim
 			<< " and t.vertexCount = " << vertexCount
 			<< " and p.degree = " << degree
 			<< " and i." << strAlg << " >= 0 ";
-
 	}//regular
 
 	//get the data and save it

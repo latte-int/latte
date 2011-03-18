@@ -9,13 +9,13 @@
 
 #include "SqliteDB.h"
 #include "../rational.h"
+#include "ValuationDBStatistics.h"
 
 using namespace std;
 //A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 
 
-//hold information/stats about a test class.
-struct IntegrationPrintData;
+
 
 class IntegrationDB: public SqliteDB
 {
@@ -38,6 +38,8 @@ public:
 	int doesPolytopeExist(const char *polymake);
 
 	vector<vector<string> > getAllPolymakeFiles();
+	bool getLimit(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual);
+	bool getLimitByFile(AlgorithemUsed alg, const string &polymakeFile, int degree, bool useDual);
 	int getNumberPolynomials(int dim, int degree);
 	int getNumberPolytopes(int dim, int vertexCount, bool useDuals);
 	int getNumberIntegrationTest(int dim, int vertexCount, int degree, bool useDuals);
@@ -48,10 +50,10 @@ public:
 	vector<vector<string> > getRowsToIntegrate(int dim, int vertex, int degree, bool useDual, int limit);
 	vector<vector<string> > getRowsToIntegrateGivenSpecficFile(char *polymakeFile, int degree, bool useDual, int limit);
 
-	vector<vector<IntegrationPrintData> > getStatisticsByDim(int dim, bool useDual);
-	vector<vector<IntegrationPrintData> > getStatisticsByFile(const vector<vector<string> > &polymakeFile, bool useDual);
-	IntegrationPrintData getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual);
-	IntegrationPrintData getStatisticsByFileDegree(const string & polymakeFile, int degree, bool useDual);
+	vector<vector<ValuationDBStatistics> > getStatisticsByDim(int dim, bool useDual);
+	vector<vector<ValuationDBStatistics> > getStatisticsByFile(const vector<vector<string> > &polymakeFile, bool useDual);
+	ValuationDBStatistics getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual);
+	ValuationDBStatistics getStatisticsByFileDegree(const string & polymakeFile, int degree, bool useDual);
 	vector<double> getStatisticsAvgMinMaxCount(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual);
 	vector<double> getStatisticsAvgMinMaxCount(AlgorithemUsed alg, const string &polymakeFile, int degree, bool useDual);
 
@@ -78,29 +80,6 @@ public:
 
 
 
-struct IntegrationPrintData
-{
-	//description parameters
-	int dim;
-	int vertexCount;
-	int degree;
-	bool useDual;
-
-	//output parameters.
-	double avgTriangulationTime;
-	double avgLawrenceTime;
-
-	double minTriangulationTime;
-	double minLawrenceTime;
-
-	double maxTriangulationTime;
-	double maxLawrenceTime;
-
-	int totalFinishedTriangulationTestCases;
-	int totalFinishedLawrenceTestCases;
-
-	int totalTestCases; //includes finished and not finished. same value for Lawrence and triangulation
-};
 
 
 

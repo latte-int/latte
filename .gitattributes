@@ -221,6 +221,9 @@ code/latte/sqlite/IntegrationDB.cpp -text
 code/latte/sqlite/IntegrationDB.h -text
 code/latte/sqlite/SqliteDB.cpp -text
 code/latte/sqlite/SqliteDB.h -text
+code/latte/sqlite/ValuationDBStatistics.h -text
+code/latte/sqlite/VolumeDB.cpp -text
+code/latte/sqlite/VolumeDB.h -text
 code/latte/sqlite/select.sqlite -text
 code/latte/testingSLandTopEhrhart/SL/Data/tableTimeSLVolume_6_3.txt -text
 code/latte/testingSLandTopEhrhart/SL/SL_lib.mpl -text
