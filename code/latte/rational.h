@@ -34,11 +34,20 @@
 
 using namespace std;
 
+
+//classes in this file.
+class HugInt;
+class rationalVector;
+class RationalNTL;
+class vec_RationalNTL;
+
+//There are some function headers at the end of the file too.
+
 /**
  * Brandon: observation:
  * This class takes a string (of max length  200) and converts it into a ZZ
  * The string must be positive and integer.
- * Note that this can be done in RationalNTL (and it also covers the negative and rational classes)
+ * Note that this can be done in RationalNTL
  */
 class HugInt
 {
@@ -95,7 +104,11 @@ public:
 	// Construct a zero vector.
 	rationalVector(int dimension = 0);
 	// Construct a rational vector from an integer vector and a scalar denominator.
-	rationalVector(const vec_ZZ &numer, const ZZ &denom);
+	rationalVector(const vec_ZZ & numer, const ZZ & denom);
+	// Construct a rational vector from two integer vectors.
+	rationalVector(const vec_ZZ & numer, const vec_ZZ & denom);
+	// Construct a rational vector from 1  rational vectors.
+	rationalVector(const vector<RationalNTL> & rational);
 	const vec_ZZ &numerators() const
 	{
 		return enumerator;
@@ -169,7 +182,7 @@ public:
 
 
 	void canonicalize(); // reduces the fraction to lowest terms, and makes
-						//	the denominator positive.
+						//	the denominator positive if it can be.
 
 	//ADDITION
 	RationalNTL & add(const ZZ &num, const ZZ& denom); // adds fractions and then reduces them.
@@ -207,6 +220,8 @@ public:
 
 	// I/O
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
+	friend istream& operator >>(istream &in, RationalNTL & rationalNTL);
+	static ZZ readNumber(istream &in);
 
 	//COMPARE
 	bool operator==(const RationalNTL & rhs) const;

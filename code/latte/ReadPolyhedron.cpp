@@ -341,7 +341,7 @@ ReadPolyhedronData::read_polyhedron_from_vertex_cone_input(BarvinokParameters *p
     numOfVars = 0;
   else
     numOfVars = ambient_cone_dimension(Poly->cones);
-  printListCone(Poly->cones, numOfVars);
+  //printListCone(Poly->cones, numOfVars);
   Poly->numOfVars = numOfVars;
   Poly->homogenized = false;
   Poly->dualized = input_dualized;

@@ -45,6 +45,8 @@ triangulate_cone_with_cdd(listCone *cone,
   
   if((m == 0) || (n == 0)){
     cerr << "The polytope is empty!" << endl;
+    cerr << "m = " << m << ", n = " << n << endl;
+    cerr << "numOfVars = " << numOfVars << ", numOfRays = " << numOfRays << endl;
     exit(2);
   }
   int Face = 1, Faces = 10000;

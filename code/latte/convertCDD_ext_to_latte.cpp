@@ -24,13 +24,15 @@ int main( int argc, const char* argv[] )
 		cout << "usage: " << argv[0] << "inputFileName.ine outputFileName" << endl;
 		exit(1);
 	}
+	cout << "not implemented yet" << endl;
+	exit(1);
 
 	ifstream input(argv[1]);
 	ofstream output(argv[2]);
 	string line;
-	vector<RationalNTL> hRep;
+	string temp;
 	long numRows, ambDim;
-	ZZ lcmDenom;
+
 
 	while ( getline(input, line))
 		if ( line == "begin")
@@ -40,24 +42,26 @@ int main( int argc, const char* argv[] )
 	input >> numRows >> ambDim;
 	input.ignore(250, '\n');
 	output << numRows << " " << ambDim << endl;
-	hRep.resize(ambDim);
+//	hRep.resize(ambDim);
 
 	for(int i = 0; i < numRows; ++i )
 	{
-		lcmDenom = 1;
 		for(int k  = 0; k < ambDim; ++k)
 		{
-			string temp;
+
 			input >> temp;
-			hRep[k] = RationalNTL(temp);
-			RationalNTL product;
-			lcmDenom = (hRep[k].getDenominator() * lcmDenom)/ (GCD(lcmDenom, hRep[k].getDenominator()));
+			output << temp << " ";
+			//hRep[k] = RationalNTL(temp);
+			//RationalNTL product;
+			//lcmDenom = (hRep[k].getDenominator() * lcmDenom)/ (GCD(lcmDenom, hRep[k].getDenominator()));
 		}
-		for(int k = 0; k < ambDim; ++k)
-			output << (hRep[k] * lcmDenom) << " " ;
+		//for(int k = 0; k < ambDim; ++k)
+		//	output << (hRep[k] * lcmDenom) << " " ;
 		output << endl;
 
 	}//for each row.
+	input >> temp;
+	assert(temp == "end");
 
 	input.close();
 	output.close();

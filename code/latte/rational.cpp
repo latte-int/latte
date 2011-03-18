@@ -56,6 +56,27 @@ rationalVector::rationalVector(const vec_ZZ &numer, const ZZ &denom)
 	computed_integer_scale = true;
 }
 
+rationalVector::rationalVector(const vec_ZZ &numer, const vec_ZZ & denom)
+{
+	assert(numer.length() == denom.length());
+	enumerator = numer;
+	denominator = denom;
+	computed_integer_scale = false;
+}
+// Construct a rational vector from 1  rational vectors.
+rationalVector::rationalVector(const vector<RationalNTL> & rational)
+{
+	enumerator.SetLength(rational.size());
+	denominator.SetLength(rational.size());
+
+	for(int i = 0; i < rational.size(); ++i)
+	{
+		enumerator[i] = rational[i].getNumerator();
+		denominator[i] = rational[i].getDenominator();
+	}
+	computed_integer_scale = false;
+}
+
 /* ----------------------------------------------------------------- */
 /**
  * Computes new_rationalVector = old_rationalVector * numer / denom.
@@ -428,6 +449,83 @@ ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
 	return out;
 }
 
+/**]
+ * Friend function, looks at the stream for numbers in the form
+ * +-a
+ * +-a/b
+ *
+ * Example: if the stream is "   -12/-23]blah"
+ * We will set rationalNTL to 12/23 and leave the stream at "]blah"
+ *
+ * Example: if the stream is "a12/4" this should break the function.
+ *
+ * Example: if the stream is "12 / 4hello" or "12 / 4   " this should read and leave
+ * the stream with "hello" or "    ".
+ */
+istream& operator >>(istream &in, RationalNTL & rationalNTL)
+{
+	//goal break the string "   - 12/-23" in  to "-12"  and "-23"
+
+	ZZ num, denum;
+
+	num = rationalNTL.readNumber(in);
+
+
+	while ( isspace(in.peek()) )
+		in.get();
+
+	if (in.peek() == '/')
+	{
+		in.get();
+		denum = rationalNTL.readNumber(in);
+
+	}
+	else
+	{
+		denum = 1;
+	}
+
+	rationalNTL = RationalNTL(num,denum);
+
+	return in;
+} //operator >>.
+
+/**
+ * Reads in integer numbers and removes white space from the stream
+ *
+ * Example: if the steam is "   -2b  ", then we return -2 and the steam is now "b  "
+ */
+
+ZZ RationalNTL::readNumber(istream &in)
+{
+	//static int count = 0;
+	//++count;
+	stringstream s;
+	char currentChar;
+
+	while (isspace(in.peek()))
+	{
+		in.get();
+		//cout << "space:" << in.get() << "." << endl;
+	}
+
+	currentChar = in.get();
+
+	assert('+' == currentChar || '-' == currentChar || isdigit(currentChar));
+	assert(in.eof() == false);
+
+	//cout << "currentChar=" << currentChar << '.' << endl;
+	s << currentChar;
+
+	while( isdigit(in.peek()) )
+	{
+		//currentChar = in.get();
+		//cout << "digit=" << currentChar << '.' << endl;
+		//s << currentChar;
+		s << (char) in.get(); //must cast it to a char, otherwise you will get it as an int.
+	}
+	return to_ZZ(s.str().c_str());
+}//readNumber
 
 /* ----------------------------------------------------------------- */
 

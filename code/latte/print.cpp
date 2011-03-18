@@ -250,6 +250,26 @@ readListVector(istream &in)
   return result;
 }
 
+/**
+ * The input file contains cones in the form
+==========
+Cone.
+Coefficient: int
+Vertex: [-a/b c/d ... z]
+Extreme rays:
+[-a b c ... ]
+[-a b c ... ]
+[-a b c ... ]
+[-a b c ... ]
+Determinant: (not sure on data-type, could be rational?)
+Facets:
+[]
+Dual determinant:0
+Lattice points in parallelepiped:
+[]
+==========
+ */
+
 listCone *
 readConeFromFile(istream &in)
 {
@@ -261,13 +281,34 @@ readConeFromFile(istream &in)
   if (!look_for(in, "Vertex:")) return NULL;
   /* FIXME: Actually need to handle rational data */
   skip_space(in);
+
+  //read in a vertex.
   if (in.peek() != '[') return NULL;
-  vec_ZZ v;
-  in >> v;
-  if (!in.good()) return NULL;
-  ZZ denom;
-  denom = 1;
-  cone->vertex = new Vertex(new rationalVector(v, denom));
+  in.get(); //delete the [
+  vector<RationalNTL> elements;
+  RationalNTL oneTerm;
+
+  while(in.peek() != ']')
+  {
+	  in >> oneTerm;
+	  skip_space(in);
+	  elements.push_back(oneTerm);
+  }
+
+
+
+  //vec_ZZ v;
+  //in >> v;
+  if (!in.good()) return NULL; //not sure what this does.--Brandon
+  //ZZ denom;
+  //denom = 1;
+  //cone->vertex = new Vertex(new rationalVector(v, denom));
+
+  //now save the vertex information.
+  cone->vertex = new Vertex(new rationalVector(elements));
+
+  //end of reading 1 vertex.
+
   if (!look_for(in, "rays:")) return NULL;
   cone->rays = readListVector(in);
   if (!look_for(in, "Facets:")) return NULL;

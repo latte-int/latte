@@ -14,7 +14,7 @@ with(numapprox,laurent):
 # The test is done by comparing against known-good Maple code.
 #
 # Test limits:
-maxDim := 8:
+maxDim := 3:
 maxDegree := 8:
 
 read("integration/createLinear.mpl"):

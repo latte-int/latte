@@ -121,9 +121,7 @@ triangulateCone(listCone *cone, int numOfVars,
     return;
   }
 
-//  cout << "***triangulation type is:: " << params->triangulation << endl;
-//  cout << "calling exit on triangulate.cpp:125" << endl;
-//exit(1);
+  cout << "triangulation type is:: " << params->triangulation << '\n';
   switch(params->triangulation) {
   case BarvinokParameters::RegularTriangulationWithCdd:
     triangulate_cone_with_cdd(cone, params, consumer);
