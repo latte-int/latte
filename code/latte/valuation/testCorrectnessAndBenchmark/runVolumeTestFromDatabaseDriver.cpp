@@ -5,12 +5,6 @@
  *      Author: bedutra
  */
 
-/*
- * runIntegrationTestFromDatabaseDriver.cpp
- *
- *  Created on: Jan 5, 2011
- *      Author: bedutra
- */
 
 #include <string>
 #include <cstdio>
@@ -32,12 +26,12 @@
  * @toTest: sql query listing what rows in the integrate table we need to run.
  * @logFileName : print the current test info to the log file.
  */
-void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFile, string logFileName)
+void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFile, string logFileName, string directoryPrefix)
 {
 	ofstream log;
 	for(vector<vector<string> >::const_iterator row = toTest.begin(); row != toTest.end(); ++row)
 	{
-		string latte       =  "."+(*row)[0];//look at ../filePath (assumes latte is in the form ./filePath).
+		string latte       =  directoryPrefix+(*row)[0];//look at ../filePath (assumes latte is in the form ./filePath for specfic files). OR look at ./filePath (assumes random database is in the form filepath).
 		string lawrence    = (*row)[1];
 		string triangulate = (*row)[2];
 		string value       = (*row)[3];
@@ -148,32 +142,37 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 
 
 
-void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit, string log)
+void runVolumeTest(char * dbFile, int dim, int vertex, bool useDual, int alg, int limit, string log)
 {
-	/*
+
 	vector<vector<string> > toTest;
-	IntegrationDB db;
+	int numberFinished;
+
+	VolumeDB db;
 	db.open(dbFile);
-	if ( limit <= db.testCasesCompleted((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence),dim, vertex, degree, useDual) )
+	numberFinished = db.volumeTestsCompleted((alg == 2 ? VolumeDB::Triangulate : VolumeDB::Lawrence),dim, vertex, useDual);
+	if ( limit <= numberFinished)
 	{
-		cout << "Skipping " << dim << " " << vertex << " " << degree << " " << useDual << " " << alg << ":: test class already done" << endl;
+		cout << "Skipping " << dim << " " << vertex << " " << " " << useDual << " " << alg << ":: test class already done " << numberFinished << endl;
 		db.close();
 		exit(1);
 	}//if test already done
-	if( db.canTestFinish((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence),dim, vertex, degree, useDual, 600) )
-	{
-		toTest = db.getRowsToIntegrate(dim, vertex, degree, useDual, limit);
-	}//if we think the test can finish in 600 sec, then do it.
-	db.close();
 
-	if (! toTest.size() )
+	if( db.canVolumeTestFinish((alg == 2 ? VolumeDB::Triangulate : VolumeDB::Lawrence), dim, vertex, useDual, 600) )
 	{
-		cout << "test case is empty" << endl;
-		db.close();
+		toTest = db.getRowsToFindVolume(dim, vertex, useDual, limit);
+	}//if we think the test can finish in 600 sec, then do it.
+	else
+	{
+		cout << "I bet test "<< dim << " " << vertex << " " << " " << useDual << " " << alg << " will not finish" << endl;
 		exit(1);
 	}
-	runTheTests(toTest, alg, dbFile, log);
-	*/
+	db.close();
+
+	assert(toTest.size()); //non-empty.
+
+	runTheTests(toTest, alg, dbFile, log, "../");
+
 }
 
 
@@ -195,16 +194,9 @@ void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, bool useDual, in
 		db.close();
 		return;
 	}
-
-	//}
-	//else
-	//{
-	//	cout << "runSpecficPolytopeTest:: skipping " << polymakeFile << " " << degree << " " << useDual << " " << alg << endl;
-	//}
 	db.close();
 
-	runTheTests(toTest, alg, dbFile, log);
-
+	runTheTests(toTest, alg, dbFile, log, ".");
 }
 
 
@@ -227,9 +219,8 @@ int main(int argc, char *argv[])
 	//	char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit)
 	if (argc == 6 && strcmp(argv[2], "specficFile"))
 	{
-		cout << "sorry, volume for regular polytopes not finished yet." << endl;
-		exit(1);
-		//runIntegrationTest(argv[1], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
+					//db file  dim             vertex         use dual,                 alg,           log
+		runVolumeTest(argv[1], atoi(argv[2]), atoi(argv[3]), string(argv[4]) == "true", atoi(argv[5]), 50, string(argv[0])+".log");
 	}
 	else if ( argc == 6 && !strcmp(argv[2], "specficFile") )
 		                     //db file, file name, use dual, alg, log

@@ -145,12 +145,14 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 
 void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit, string log)
 {
+	cout << "runIntegrationTest called" << dim << " " << vertex << " " << degree << " " << useDual << " " << alg << endl;
+
 	vector<vector<string> > toTest;
 	IntegrationDB db;
 	db.open(dbFile);
 	if ( limit <= db.testCasesCompleted((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence),dim, vertex, degree, useDual) )
 	{
-		cout << "Skipping " << dim << " " << vertex << " " << degree << " " << useDual << " " << alg << ":: test class already done" << endl;
+		cout << "Skipping, test class already done" << endl;
 		db.close();
 		exit(1);
 	}//if test already done
@@ -158,11 +160,15 @@ void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool use
 	{
 		toTest = db.getRowsToIntegrate(dim, vertex, degree, useDual, limit);
 	}//if we think the test can finish in 600 sec, then do it.
+	else
+	{
+		cout << "will not finish." << endl;
+	}
 	db.close();
 
 	if (! toTest.size() )
 	{
-		cout << "test case is empty" << endl;
+		cout << "test case is empty or will not finish" << endl;
 		db.close();
 		exit(1);
 	}
@@ -173,13 +179,14 @@ void runIntegrationTest(char * dbFile, int dim, int vertex, int degree, bool use
 //db file, file name, degree,   use dual, alg, limit, log
 void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, int degree, bool useDual, int alg, int limit, string log)
 {
+	cout << "runSpecficPolytopeTest called with " << polymakeFile << " with deg " << degree << "dual " << useDual << endl;
 	vector<vector<string> > toTest;
 	IntegrationDB db;
 	db.open(dbFile);
 	if ( db.canSpecficFileFinish((alg == 2 ? IntegrationDB::Triangulate : IntegrationDB::Lawrence), polymakeFile, degree, useDual, 600) )
 	{
 		toTest = db.getRowsToIntegrateGivenSpecficFile(polymakeFile, degree, useDual, limit);
-		cout << "runSpecficPolytopeTest::" << polymakeFile << " with deg " << degree << "dual " << useDual << " has " << toTest.size() << " tests!" << endl;
+
 		/*if ( ! strcmp(polymakeFile, "./Various/3simp3simp.polymake") )
 		{
 			cout << "what the heck, the db test should have failed :(" << endl;
@@ -188,7 +195,7 @@ void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, int degree, bool
 	}
 	else
 	{
-		cout << "runSpecficPolytopeTest:: skipping " << polymakeFile << " " << degree << " " << useDual << " " << alg << endl;
+		cout << "skipping, it might not finish" << endl;
 	}
 	db.close();
 
@@ -214,10 +221,14 @@ int main(int argc, char *argv[])
 
 //	char * dbFile, int dim, int vertex, int degree, bool useDual, int alg, int limit)
 	if (argc == 7 && strcmp(argv[2], "specficFile"))
+	{
 		runIntegrationTest(argv[1], atoi(argv[2]), atoi(argv[3]), atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
+	}
 	else if ( argc == 7 && !strcmp(argv[2], "specficFile") )
+	{
 		                     //db file, file name, degree,   use dual, alg, limit, log
 		runSpecficPolytopeTest(argv[1], argv[3], atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
+	}
 	else
 		cout << "unkown sequence of parameters" << endl;
 	return 0;

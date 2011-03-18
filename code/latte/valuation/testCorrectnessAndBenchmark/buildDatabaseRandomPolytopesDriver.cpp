@@ -43,7 +43,7 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 	BuildPolytope newPolytope;
 	newPolytope.setBaseFileName(baseFileName);
 	newPolytope.setBuildPolymakeFile(true);
-	newPolytope.findVertices();
+
 	//newPolytope.findFacets();
 	//cout << "found verties ok" << endl;
 
@@ -62,14 +62,12 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 		int simple, dualSimple;
 
 		//make the polymake file and latte file.
-		cout << "**" << newPolytope.getPolymakeFile().c_str() << " degree " << degree << endl;
+		cout << "** Finding vertices and building latte files for" << newPolytope.getPolymakeFile().c_str() << endl;
 		newPolytope.centerPolytope();
+		newPolytope.findVertices();
 		newPolytope.buildLatteVRepFile();
-		//cout << "got here" << endl;
-		newPolytope.buildPolymakeDualFile();
-		//cout << "got here 2" << endl;
 		newPolytope.buildLatteHRepDualFile();
-		//cout << "got her 3" << endl;
+		cout << "Finished making v-rep and dual h-rep files." << endl;
 
 		//get info about this polytope.
 		buildVertexCount = newPolytope.getVertexCount();
@@ -78,7 +76,7 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 		simple           = -1;//save time, don't compute this. newPolytope.isSimplicial(); //again, historical naming error.
 		dualSimple       = -1;//newPolytope.isDualSimplicial();
 
-		//cout << "got her 4" << endl;
+
 		//print to screen --debugging.
 		cout << newPolytope.getLatteVRepFile().c_str() << " dim: " << buildDim << "\tvertex " << buildVertexCount << "\tsimple " << simple << endl;
 		cout << "  polymake: " << newPolytope.getPolymakeFile().c_str() << endl;
@@ -91,7 +89,6 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 		dualID = db.insertPolytope(buildDim, buildVertexCount, simple    , -1    , newPolytope.getLatteVRepFile().c_str()    , newPolytope.getPolymakeFile().c_str());
 		         db.insertPolytope(buildDim, dualVertexCount, dualSimple, dualID, newPolytope.getLatteHRepDualFile().c_str(), newPolytope.getPolymakeDualFile().c_str());
 		db.close();
-		newPolytope.deletePolymakeDualFile();
 	}//insert this polytope into the database.
 
 	//now that the polytope is in the database, lets add testcases for the given polynomial degree.

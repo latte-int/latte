@@ -49,19 +49,22 @@ using namespace std;
 class PolytopeValuation
 {
 private:
-	BarvinokParameters parameters; //Barvinok Parameters.
+	BarvinokParameters &parameters; //Barvinok Parameters.
 	Polyhedron * poly;				//The polyhedron, vertexRayCones or PolytopeAsOneCone points to the polyhedron's cones.
 	listCone * vertexRayCones;		//list of  vertex-ray pairs.
 	listCone * polytopeAsOneCone;	//From poly, create one code with vertex=[0,0...0], rays={[1, v] | v is a vertex of the polytope}
 	listCone * triangulatedPoly;	//The triangulation of polytopeAsOneCone.
-	int numOfVars;
+	int numOfVars, numOfVarsOneCone;
 	bool freeVertexRayCones, freePolytopeAsOneCone, freeTriangulatedPoly; //denotes if we made these objects (and should free them) or if they were passed in.
 
 
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone. Then late you can triangulate the polytope into simpleces
-	void dilatePolytope(const RationalNTL & factor); //dilates polytope by changing the vertices.
+	void dilatePolytopeOneCone(const ZZ & factor); //dilates polytope by changing the vertices.
+	void dilatePolytopeVertexRays(const RationalNTL & factor); //dilates polytope by changing the vertices.
 	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor); //given a polynomial and a dilation factor, replaces x_i^k --> factor^k*x_i^k
+	ZZ findDilationFactorOneCone() const;
+	ZZ findDilationFactorVertexRays() const;
 	RationalNTL findIntegralUsingTriangulation(linFormSum &forms) const; //computes the integral over every simplex
 	RationalNTL findIntegralUsingLawrence(linFormSum &forms) const;      //computes the integral over every simple cone.
 	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const; //computes the volume over every simplex
