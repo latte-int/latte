@@ -11,7 +11,10 @@
 using namespace std;
 
 /**
- * Currently, we can only take non-homogenized polytopes.
+ * If the polytpe is non-homogenized, (we have vertex-rays) we save the
+ *   polytope in vertexRayCones; otherwise we have a lifted polytope-cone
+ *   and we save it in polytopeAsOneCone.
+ *
  */
 PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 	parameters(bp), poly(p), vertexRayCones(NULL), polytopeAsOneCone(NULL),
@@ -27,21 +30,24 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 		exit(1);
 	}//check the polytope is bounded.
 
-	//cout << "Cones during construction" << endl;
-	//printListCone(p->cones, numOfVars);
-	//cout << "end of cones during concstruction" << endl;
 
 	if (p->homogenized == false)
 	{
 		vertexRayCones = p->cones; //Polyhedron is a list of vertex-ray cones.
 		numOfVarsOneCone = numOfVars+1;
-	}
+	}//we are given vertex-tangent-cone information.
 	else
 	{
 		polytopeAsOneCone = p->cones;//the polytope is 1 cone.
 		//the rays of the cone are in the form [vertex of p, 1].
 		numOfVarsOneCone = numOfVars;
-	}//else the polyhedron is given by one cone.
+	}//else the polyhedron is given by one cone, where the rays are the vertices
+	//with a tailing 1 in each vertex.
+
+	//cout << "constructor start" << endl;
+	//printListCone(vertexRayCones, numOfVars);
+	//printListCone(polytopeAsOneCone, numOfVarsOneCone);
+	//cout << "constructor end" << endl;
 
 	srand(time(0));
 }//constructor
@@ -66,7 +72,7 @@ PolytopeValuation::~PolytopeValuation()
  *
  *  Example: if the polytope has vertex { (3, 3/4), (5, 1/2), (1/2, 1/2)} then the new cone
  *  will have vertex (0 0 0) and integer rays
- *  (1, 3, 3/4)*4, (1, 5, 1/2)*2, (1, 1/2, 1/2)*2
+ *  (3, 3/4, 1)*4, (5, 1/2, 1)*2, (1/2, 1/2, 1)*2
  *
  *
  *
@@ -74,7 +80,7 @@ PolytopeValuation::~PolytopeValuation()
 void PolytopeValuation::convertToOneCone()
 {
 	if (polytopeAsOneCone)
-		return; //already did computation.
+		return; //already did computation, or we where given a homo. polytope in the constructor.
 	if (triangulatedPoly)
 		return; //don't care about converting to one cone for triangulation because already triangulated!
 	if (!vertexRayCones)
@@ -186,8 +192,6 @@ void PolytopeValuation::dilatePolytopeVertexRays(const RationalNTL & factor)
  */
 void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor)
 {
-	cout << "start:dilatePolynomialToLinearForms" << endl;
-	cout << originalPolynomial.varCount << " poly var" << numOfVars << " as cone" << numOfVarsOneCone << endl;
 	//Goal: find new polynomial.
 	//define the new polynomial.
 	monomialSum transformedPolynomial; //updated coefficients.
@@ -242,7 +246,6 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
 
 	delete originalPolynomialIterator;
 	delete transformedPolynomialIterator;
-	cout << "end::dilatePolynomialToLinearForms" << endl;
 }
 
 
@@ -356,8 +359,8 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 	{
 		convertToOneCone(); //every vertex should be integer
 		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
-		cout << lengthListCone(triangulatedPoly) << " triangulations done.\n"
-			 << " starting to integrate " << linearForms.termCount << " linear forms.";
+		cout << " starting to integrate " << linearForms.termCount << " linear forms.\n";
+
 		answer.add(findIntegralUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
 	}//if computing the integral by triangulating to simplex polytopes.
 	else
@@ -402,11 +405,15 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 RationalNTL PolytopeValuation::findIntegralUsingTriangulation(linFormSum &forms) const
 {
 	RationalNTL answer;
-
+	int simplicesFinished = 0;
+	int totalSimplicesToIntegrate = lengthListCone(triangulatedPoly);
 	//set up itrator to loop over the linear forms.
 	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
 			RationalNTL, ZZ> ();
 	linearFormIterator->setTrie(forms.myForms, forms.varCount);
+
+
+
 
 	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
 			= currentCone->rest)
@@ -422,7 +429,7 @@ RationalNTL PolytopeValuation::findIntegralUsingTriangulation(linFormSum &forms)
 
 		for (listVector * rays = currentCone->rays; rays; rays = rays->rest, ++vertexCount)
 		{
-			oneSimplex.s[vertexCount].SetLength(numOfVars);
+			oneSimplex.s[vertexCount].SetLength(numOfVarsOneCone-1);
 //			assert( rays->first[numOfVarsOneCone-1] == 1); //make sure the triangulation is such that the vertices of the original polytope is integer.
 
 			for (int k = 0; k < numOfVarsOneCone -1; ++k)
@@ -444,6 +451,9 @@ RationalNTL PolytopeValuation::findIntegralUsingTriangulation(linFormSum &forms)
 				oneSimplex);
 
 		answer.add(numerator, denominator);
+		++simplicesFinished;
+		if ( simplicesFinished % 1000 == 0)
+			cout << "Finished integrating " << simplicesFinished << "/" << totalSimplicesToIntegrate << " over " << forms.termCount << " linear forms\n";
 		//answer.add(numerator * coefficient.getNumerator(), denominator * coefficient.getDenominator());
 	}//for every triangulated simplex.
 	delete linearFormIterator;
@@ -475,6 +485,7 @@ RationalNTL PolytopeValuation::findIntegralUsingTriangulation(linFormSum &forms)
 RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) const
 {
 	RationalNTL ans;
+	int linearFormesFinished = 0;
 	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
 			RationalNTL, ZZ> ();
 	linearFormIterator->setTrie(forms.myForms, forms.varCount); //make iterators to loop over the lin. forms.
@@ -530,9 +541,9 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 
 		ans += integralAns;
 
-		//cout << "integrateLinFormSumLawrence:: " << l << "^" << m << " gave: " << integralAns << endl;
-		//if ( ++numberFinished % 1000)
-		//	cout << "Finished integrating " << numberFinished << "/" << forms.termCount << " linear forms\n";
+		++linearFormesFinished;
+		if ( linearFormesFinished % 10000 == 0)
+			cout << "Finished integrating " << linearFormesFinished << "/" << forms.termCount << " linear forms\n";
 	}//while there are more linear forms to integrate
 
 	return ans;
@@ -861,9 +872,6 @@ void PolytopeValuation::triangulatePolytopeVertexRayCone()
 
 		currentCone = currentCone->rest;
 	}
-
-	cout << lengthListCone(triangulatedPoly) << " simple tangent cones found\n";
-
 
 /*
 	triangulatedPoly = decomposeCones(vertexRayCones,
