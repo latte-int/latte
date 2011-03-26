@@ -34,6 +34,7 @@ BarvinokParameters parameters;
 ReadPolyhedronData read_polyhedron_data;
 
 string output_filename;
+string vector_input_filename;
 
 int main(int argc, char *argv[])
 {
@@ -42,6 +43,9 @@ int main(int argc, char *argv[])
     if (read_polyhedron_data.parse_option(argv[i])) {}
     else if (strncmp(argv[i], "--output-cones=", 15) == 0) {
       output_filename = argv[i] + 15;
+    }
+    else if (strncmp(argv[i], "--input-completion-vector=", 26) == 0) {
+      vector_input_filename = argv[i] + 26;
     }
     else {
       cerr << "Unknown argument: " << argv[i] << endl;
@@ -60,8 +64,24 @@ int main(int argc, char *argv[])
   parameters.Number_of_Variables
     = cone->rays->first.length();
   
-  complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
-    (Poly->cones, &parameters, *consumer);
+  if (vector_input_filename.size() == 0) { //try to find a vector to complete triangulation
+    complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
+      (Poly->cones, &parameters, *consumer);
+  }
+  else {    //use the vector from file
+    ifstream cv_in(vector_input_filename);
+
+//  listVector *cvl = readListVector(cvin);
+//	 vec_ZZ completion_vector = cvl->first;
+	 vec_ZZ completion_vector;
+	 cv_in >> completion_vector;
+	 if(!cv_in.good()) {
+      cerr << "Problems reading completion_vector!"<<endl;
+      exit(1);
+    }
+    complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
+      (Poly->cones, &parameters, completion_vector, *consumer);
+  }
   // this consumes Poly->cones, so:
   Poly->cones = NULL;
   

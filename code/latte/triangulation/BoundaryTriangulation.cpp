@@ -303,6 +303,68 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
   }
 }
 
+ZZ determinant(listVector* rows, int numOfVars) {
+  mat_ZZ row_matrix;
+  row_matrix.SetDims(numOfVars, numOfVars);
+  for (int i = 0; rows!=NULL; i++, rows = rows->rest) {
+    row_matrix[i] = rows->first;
+  }
+  /* Simple and stupid method: Try all unit vectors. */
+  return determinant(row_matrix);
+}
+
+
+void
+complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
+(listCone *boundary_triangulation, BarvinokParameters *Parameters, vec_ZZ &interior_ray_vector, ConeConsumer &consumer)
+{
+  int numOfVars = Parameters->Number_of_Variables;
+  /* Complete the cones with an interior ray. */
+  ZZ det;
+  cerr << "Interior ray vector: " << interior_ray_vector << endl;
+  listCone *resulting_triangulation = NULL;
+
+  listCone *simplicial_cone, *next_simplicial_cone;
+  int i;
+  for (simplicial_cone = boundary_triangulation, i = 0;
+   simplicial_cone!=NULL;
+   simplicial_cone = next_simplicial_cone, i++) {
+
+    next_simplicial_cone = simplicial_cone->rest;
+    simplicial_cone->rays
+      = appendVectorToListVector(interior_ray_vector, simplicial_cone->rays);
+    det = determinant(simplicial_cone->rays, numOfVars);
+    if (det != 0) {
+      /* A full-dimensional cone is created. */
+      simplicial_cone->rest = resulting_triangulation;
+      resulting_triangulation = simplicial_cone;
+    }
+    else {
+      /* A lower-dimensional cone is created -- discard it. */
+      freeCone(simplicial_cone);
+    }
+  }
+
+  dualizeCones(resulting_triangulation, Parameters->Number_of_Variables, Parameters);
+  listCone *cone;
+  for (cone = resulting_triangulation; cone!=NULL; cone=cone->rest) {
+    if (!rays_ok(cone, Parameters->Number_of_Variables)) {
+      cerr << "Note: The following dualized-back cone has bad rays." << endl;
+      printCone(cone, numOfVars);
+    }
+  }
+  dualizeCones(resulting_triangulation, Parameters->Number_of_Variables, Parameters);
+
+  {
+    listCone *next = NULL;
+    for (cone = resulting_triangulation; cone!=NULL; cone=next) {
+      next = cone->rest;
+      cone->rest = NULL;
+      consumer.ConsumeCone(cone);
+    }
+  }
+}
+
 void
 boundary_triangulation_of_cone_with_subspace_avoiding_facets
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer)
