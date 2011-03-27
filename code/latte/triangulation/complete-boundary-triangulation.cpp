@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
       (Poly->cones, &parameters, *consumer);
   }
   else {    //use the vector from file
-    ifstream cv_in(vector_input_filename);
+    ifstream cv_in(vector_input_filename.c_str());
 
 //  listVector *cvl = readListVector(cvin);
 //	 vec_ZZ completion_vector = cvl->first;
