@@ -157,6 +157,9 @@ main(int argc, char *argv[])
     else if (strncmp(argv[i], "--multivariate-generating-function", 7) == 0) {
       params->substitution = BarvinokParameters::NoSubstitution;
     }
+    else if (strncmp(argv[i], "--singlevariate-generating-function", 8) == 0) {
+      params->substitution = BarvinokParameters::TrivialSubstitution;
+    }
     else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0) {
       ehrhart_polynomial = true;
       params->substitution = BarvinokParameters::ExponentialSubstitution;
@@ -424,6 +427,34 @@ main(int argc, char *argv[])
       for (cone = Poly->cones; cone != NULL; cone = cone->rest)
 	barvinokDecomposition_Single(cone, write_params);
       cerr << "Multivariate generating function written to `"
+	   << rat_filename << "'." << endl;
+      break;
+    }
+  case BarvinokParameters::TrivialSubstitution:
+    {
+      if (!Poly->homogenized) {
+        cerr << "TrivialSubstitution method only works for homogenizations of polyhedrons!" << endl;
+        exit(1);
+      }
+      string rat_filename = read_polyhedron_data.filename + ".rat";
+      DelegatingSingleConeParameters *write_params
+	= new DelegatingSingleConeParameters(*params);
+      delete params;
+      params = write_params;
+      ConeConsumer *writing_consumer
+	= new TrivialSubstitutionWritingConeConsumer(rat_filename);
+      if (Poly->projecting_up_transducer)
+	writing_consumer = compose(Poly->projecting_up_transducer,
+				   writing_consumer);
+      writing_consumer = compose(new PointsInParallelepipedComputingConeTransducer(write_params),
+        writing_consumer);
+      write_params->SetConsumer(writing_consumer);
+      cerr << "Writing singlevariate generating function to `"
+	   << rat_filename << "'." << endl;
+      listCone *cone;
+      for (cone = Poly->cones; cone != NULL; cone = cone->rest)
+	barvinokDecomposition_Single(cone, write_params);
+      cerr << "Singlevariate generating function written to `"
 	   << rat_filename << "'." << endl;
       break;
     }

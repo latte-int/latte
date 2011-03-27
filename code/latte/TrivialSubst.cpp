@@ -65,4 +65,22 @@ TrivialMonomialSubstitutionMapleOutput(ostream &out,
   }
 }
   
+/**************** CLASS IMPLEMENTATION ***************/
 
+  
+TrivialSubstitutionWritingConeConsumer::TrivialSubstitutionWritingConeConsumer(const string &filename)
+  : genfun_stream(filename.c_str()), first_term(true)
+{}
+
+int TrivialSubstitutionWritingConeConsumer::ConsumeCone(listCone *cone) {
+  if (cone->latticePoints != NULL) {
+    if (!first_term)
+      genfun_stream << " + ";
+
+    TrivialMonomialSubstitutionMapleOutput_Single(genfun_stream, cone,
+                                          cone->latticePoints->first.length());
+    genfun_stream << endl;
+    first_term = false;
+  }
+  freeCone(cone);
+}

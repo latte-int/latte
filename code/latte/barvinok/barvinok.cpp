@@ -43,7 +43,7 @@
 #include "barvinok/SubspaceAvoidingDecomposition.h"
 #endif
 
-#undef SHOWDETS
+#define SHOWDETS
 
 BarvinokParameters::BarvinokParameters() :
   substitution(PolynomialSubstitution),

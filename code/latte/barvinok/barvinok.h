@@ -38,7 +38,8 @@ public:
   //   - or no substitution, keeping a multivariate generating function
   enum { PolynomialSubstitution,
 	 ExponentialSubstitution,
-	 NoSubstitution
+	 NoSubstitution,
+	 TrivialSubstitution
   } substitution;
   // Whether to use
   //  - traditional dual decomposition

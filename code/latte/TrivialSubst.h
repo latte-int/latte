@@ -24,7 +24,10 @@
 #define TRIVIALSUBST_H
 
 #include <iostream>
+#include <fstream>
+#include <string>
 #include "cone.h"
+#include "cone_consumer.h"
 
 // We substitute (x_1,\dots,x_n) -> x_n.
 void
@@ -35,4 +38,12 @@ void
 TrivialMonomialSubstitutionMapleOutput(ostream &out,
 				       listCone *cones, int numOfVars);
 
+class TrivialSubstitutionWritingConeConsumer : public ConeConsumer {
+public:
+  TrivialSubstitutionWritingConeConsumer(const std::string &filename);
+  virtual int ConsumeCone(listCone *cone);
+private:
+  ofstream genfun_stream;
+  bool first_term;
+};
 #endif
