@@ -273,7 +273,7 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 static bool
 computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
 			    const vec_ZZ &Z, int m, 
-			    mat_ZZ &mat, vec_ZZ &Dets, bool nondecrease_ok = false)
+			    mat_ZZ &mat, vec_ZZ &Dets, bool nondecrease_ok = true)
 {
   bool decrease = true;
   ZZ absDet = abs(Det);
@@ -323,12 +323,21 @@ barvinokStep(const listCone *Cone,
     // --mkoeppe, Fri Nov 24 17:01:37 MET 2006
     bool success
       = computeAndCheckDeterminants(generator, Cone->determinant, Z,
-				    m, mat, Dets);
+				    m, mat, Dets, true);
     if (!success) {
       cerr << "Second loop... " << endl;
-      Z = ComputeOmega(generator, dual, m, 2, 2);
+      Z = ComputeOmega(generator, dual, m, 1, 1);
       Z = CheckOmega(generator, Z);
       success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
+					    m, mat, Dets);
+     // assert(success);
+    }
+			mat = generator;
+				if (!success) {
+      				cerr << "Third loop... " << endl << endl << endl;
+     				 Z = ComputeOmega(generator, dual, m, 2, 2);
+      					Z = CheckOmega(generator, Z);
+    					  success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
 					    m, mat, Dets);
       assert(success);
     }

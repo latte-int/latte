@@ -97,6 +97,30 @@ cddlib_matrix_to_cone(dd_MatrixPtr matrix)
   return result;
 }
 
+
+
+mat_ZZ
+cddlib_matrix_to_mat_ZZ(dd_MatrixPtr matrix)
+{
+  int col = matrix->colsize - 1;
+  int row = matrix->rowsize - 1;
+  mat_ZZ new_matrix;
+  new_matrix.SetDims(row,col);
+
+  for (int i = 1; i <= row; i++) {
+    
+    for (int j = 0; j<col; j++) {
+      new_matrix(i,j) = convert_mpq_to_ZZ(matrix->matrix[i][j + 1]);
+    }
+  }
+  return new_matrix;
+}
+
+
+
+
+
+
 void
 cddlib_matrix_to_equations_and_inequalities(dd_MatrixPtr matrix,
 					    listVector **equations,

@@ -3,7 +3,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 SUBDIRS = .
 SUBDIRS += normalize
 
-bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext
+bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext cvp
 
 latte_maximize_SOURCES = maximize.cpp
 latte_minimize_SOURCES = minimize.cpp
@@ -11,6 +11,7 @@ count_SOURCES = count.cpp
 ehrhart_SOURCES = ehrhart.cpp
 latte2ine_SOURCES = latte2ine.cpp
 latte2ext_SOURCES = latte2ext.cpp
+cvp_SOURCES = cvp.cpp
 
 LDADD = liblatte.a
 AM_CPPFLAGS = -I$(top_srcdir)/code
