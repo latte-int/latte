@@ -157,9 +157,6 @@ main(int argc, char *argv[])
     else if (strncmp(argv[i], "--multivariate-generating-function", 7) == 0) {
       params->substitution = BarvinokParameters::NoSubstitution;
     }
-    else if (strncmp(argv[i], "--singlevariate-generating-function", 8) == 0) {
-      params->substitution = BarvinokParameters::TrivialSubstitution;
-    }
     else if (strncmp(argv[i], "--ehrhart-polynomial", 11) == 0) {
       ehrhart_polynomial = true;
       params->substitution = BarvinokParameters::ExponentialSubstitution;
@@ -179,6 +176,11 @@ main(int argc, char *argv[])
       strcpy(read_polyhedron_data.taylor, "yes");
       read_polyhedron_data.degree = atoi(argv[i] + 17);
       strcpy(read_polyhedron_data.dualApproach,"yes");
+    }
+    else if (strncmp(argv[i], "--singularity-avoiding-ehrhart-series", 4) == 0) {
+      // FIXME: Should be --ehrhart-series --avoid-singularities
+      params->substitution = BarvinokParameters::TrivialSubstitution;
+      params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
     }
     else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
