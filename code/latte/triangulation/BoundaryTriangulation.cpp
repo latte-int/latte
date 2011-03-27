@@ -258,10 +258,10 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
   int numOfVars = Parameters->Number_of_Variables;
   /* Complete the cones with an interior ray. */
   vec_ZZ det_vector;
-  vec_ZZ interior_ray_vector
+  vec_ZZ extra_ray_vector
     = construct_interior_vector(boundary_triangulation, Parameters->Number_of_Variables, det_vector);
-  cerr << "Interior ray vector: " << interior_ray_vector << endl;
-  cerr << "Reuslting determinants: " << det_vector << endl;
+  cerr << "Interior ray vector: " << extra_ray_vector << endl;
+  cerr << "Resulting determinants: " << det_vector << endl;
   listCone *resulting_triangulation = NULL;
 
   listCone *simplicial_cone, *next_simplicial_cone;
@@ -273,7 +273,7 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
     if (det_vector[i] != 0) {
       /* A full-dimensional cone is created. */
       simplicial_cone->rays
-	= appendVectorToListVector(interior_ray_vector, simplicial_cone->rays);
+	= appendVectorToListVector(extra_ray_vector, simplicial_cone->rays);
       simplicial_cone->rest = resulting_triangulation;
       resulting_triangulation = simplicial_cone;
     }
@@ -309,30 +309,39 @@ ZZ determinant(listVector* rows, int numOfVars) {
   for (int i = 0; rows!=NULL; i++, rows = rows->rest) {
     row_matrix[i] = rows->first;
   }
-  /* Simple and stupid method: Try all unit vectors. */
   return determinant(row_matrix);
 }
 
 
 void
 complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
-(listCone *boundary_triangulation, BarvinokParameters *Parameters, vec_ZZ &interior_ray_vector, ConeConsumer &consumer)
+(listCone *boundary_triangulation, BarvinokParameters *Parameters, vec_ZZ &extra_ray_vector, ConeConsumer &consumer)
 {
   int numOfVars = Parameters->Number_of_Variables;
   /* Complete the cones with an interior ray. */
-  ZZ det;
-  cerr << "Interior ray vector: " << interior_ray_vector << endl;
+  ZZ det, scalar;
+  cerr << "Extra ray vector: " << extra_ray_vector << endl;
+  vec_ZZ interior_vector;
+  interior_vector.SetLength(numOfVars);
+  vec_ZZ seperating_hyperplane;
+  seperating_hyperplane.SetLength(numOfVars);
   listCone *resulting_triangulation = NULL;
 
   listCone *simplicial_cone, *next_simplicial_cone;
   int i;
+  listVector* rays;
   for (simplicial_cone = boundary_triangulation, i = 0;
    simplicial_cone!=NULL;
    simplicial_cone = next_simplicial_cone, i++) {
-
     next_simplicial_cone = simplicial_cone->rest;
+    
+    rays = simplicial_cone->rays;
+    for (; rays!=NULL; rays = rays->rest) {
+      interior_vector += rays->first;
+    }
+
     simplicial_cone->rays
-      = appendVectorToListVector(interior_ray_vector, simplicial_cone->rays);
+      = appendVectorToListVector(extra_ray_vector, simplicial_cone->rays);
     det = determinant(simplicial_cone->rays, numOfVars);
     if (det != 0) {
       /* A full-dimensional cone is created. */
@@ -354,13 +363,30 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
     }
   }
   dualizeCones(resulting_triangulation, Parameters->Number_of_Variables, Parameters);
+  cerr << "Interior vector: " << interior_vector << endl;
 
   {
     listCone *next = NULL;
     for (cone = resulting_triangulation; cone!=NULL; cone=next) {
       next = cone->rest;
       cone->rest = NULL;
+		
+      //update Coefficient
+      InnerProduct(scalar, interior_vector, cone->facets->first);
+      //scalar always non-zero because interior_vector is not in the boundary
+      assert(scalar != 0);
+      //cerr<<scalar<<" ";
+      cone->coefficient = (scalar>0)?-1:1;
+      //add up to get a seperating hyperplane
+      seperating_hyperplane += cone->coefficient * cone->facets->first;
+
       consumer.ConsumeCone(cone);
+    }
+    cerr << "Seperating hyperplane: " << seperating_hyperplane << endl;
+    InnerProduct(scalar, extra_ray_vector, seperating_hyperplane);
+    if (scalar>0) {
+      cerr << "Resulting Cone may be not pointed, change the sign of the extra vector!" << endl;
+      exit(1);
     }
   }
 }

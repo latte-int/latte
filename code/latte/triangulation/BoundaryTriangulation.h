@@ -45,8 +45,9 @@ void
 complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
 (listCone *boundary_triangulation, BarvinokParameters *Parameters, ConeConsumer &consumer);
 
+/* complete the triangulaton with a given extra vector*/
 void
 complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
-(listCone *boundary_triangulation, BarvinokParameters *Parameters, vec_ZZ &interior_ray_vector, ConeConsumer &consumer);
+(listCone *boundary_triangulation, BarvinokParameters *Parameters, vec_ZZ &extra_ray_vector, ConeConsumer &consumer);
 
 #endif
