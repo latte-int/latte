@@ -166,6 +166,7 @@ code/latte/Makefile
 code/latte/Makefile.in
 code/latte/SunWS_cache
 code/latte/aggregation/.deps
+code/latte/aggregation/.dirstamp
 code/latte/barvinok/.deps
 code/latte/barvinok/.dirstamp
 code/latte/barvinok/SunWS_cache
