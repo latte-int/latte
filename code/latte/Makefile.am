@@ -274,6 +274,12 @@ integrate_polynomial_for_paper_LDADD = $(LDADD)
 integrate_polynomial_for_paper_LDADD += liblatteintegration.a
 
 
+#counts the number of linear forms in a polynomial.
+bin_PROGRAMS += count-linear-forms-from-polynomial
+count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolynomialDriver.cpp
+count_linear_forms_from_polynomial_LDADD = $(LDADD)
+count_linear_forms_from_polynomial_LDADD += liblatteintegration.a
+
 bin_PROGRAMS += testPolynomialInterpolation
 testPolynomialInterpolation_SOURCES = interpolation/PolynomialInterpolation.cpp
 testPolynomialInterpolation_SOURCES += interpolation/testDriver.cpp

@@ -244,6 +244,7 @@ code/latte/valuation/Perturbation.cpp -text
 code/latte/valuation/Perturbation.h -text
 code/latte/valuation/PolytopeValuation.cpp -text
 code/latte/valuation/PolytopeValuation.h -text
+code/latte/valuation/countLinearFormsFromPolynomialDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.h -text
 code/latte/valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp -text
