@@ -79,7 +79,8 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 		return;
 	}; //vertex vanishes, return 0;
 	int k, i, j;
-	int counter[1000];//counter counts number of appearances of each index[i]
+	int *counter = new int[d];
+					//counter counts number of appearances of each index[i]
 					//again, put this on the stack. Don't want the time requesting memory from the heap because this function is called many times.
 	vec_ZZ index;//collecting different terms in the innerProDiff passed in
 	bool found;

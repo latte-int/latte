@@ -237,6 +237,8 @@ find_volume_database_polytopes_LDADD = $(LDADD)
 find_volume_database_polytopes_LDADD += liblatteintegration.a
 
 
+
+
 #This is used to test integration classes from the database
 bin_PROGRAMS += fix-dual-database-polytopes
 fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp

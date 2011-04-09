@@ -406,6 +406,7 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params)
 	/* Don't homogenize. */
 	Polyhedron *P = new Polyhedron;
 	P->cones = computeVertexConesFromVrep(filename.c_str(), P->numOfVars);
+
 	P->dualized = false;
 	P->homogenized = false;
 	return P;		/* Directly deliver the polyhedron. */

@@ -46,6 +46,7 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 
 	//cout << "constructor start" << endl;
 	//printListCone(vertexRayCones, numOfVars);
+	//cout << "constructor end of vertex-ray, start of lifted cone" << endl;
 	//printListCone(polytopeAsOneCone, numOfVarsOneCone);
 	//cout << "constructor end" << endl;
 
