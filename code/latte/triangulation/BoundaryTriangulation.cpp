@@ -1,6 +1,7 @@
 /* BoundaryTriangulation.cpp -- Boundary triangulation
 	       
    Copyright 2006, 2007 Matthias Koeppe
+   Copyright 2011       Christof Soeger
 
    This file is part of LattE.
    
@@ -27,6 +28,10 @@
 #include "print.h"
 #include "dual.h"
 #include "genFunction/IntCombEnum.h"
+
+#include "./simplify_helpers.cpp"
+#include <list>
+#include <algorithm>
 
 using namespace std;
 
@@ -127,14 +132,14 @@ singularity_avoiding(int num_cones, int numOfVars,
   return true;
 }
 
-static vec_ZZ 
-construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_ZZ &det_vector)
+static void 
+prepare_interior_vector_data(listCone *boundary_triangulation, int numOfVars,
+  mat_ZZ &alpha, mat_ZZ &U, mat_ZZ &UF)
 {
   /* Create a matrix whose rows generate a d-dimensional lattice. */
   int num_cones = lengthListCone(boundary_triangulation);
-  mat_ZZ alpha;
   alpha.SetDims(numOfVars, num_cones);
-  mat_ZZ F;
+  mat_ZZ F; //need to avoid zeros here (for standart basis)
   F.SetDims(numOfVars, num_cones * (numOfVars - 1));
   listCone *cone;
   int k;
@@ -147,16 +152,22 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
        << F << endl;
   /* Find a short vector in this lattice. */
   ZZ det2;
-  mat_ZZ U;
   U.SetDims(numOfVars, numOfVars);
   cerr << "Computing LLL basis: " << endl;
   long rank = LLL(det2, alpha, U, 1, 1);
   cerr << "Rank: " << rank << " Variables: " << numOfVars << endl;
   assert(rank == numOfVars);
 
-  /* Determine if the LLL basis vectors avoid the zeros. */
-  mat_ZZ UF;
+  /* avoid zeros here (in L3 basis) */
   UF = U * F;
+}
+
+static vec_ZZ 
+construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_ZZ &det_vector)
+{
+  int num_cones = lengthListCone(boundary_triangulation);
+  mat_ZZ alpha, U, UF;
+  prepare_interior_vector_data(boundary_triangulation, numOfVars, alpha, U, UF);
   cerr << "L3 basis: " << endl
        << U << endl;
   cerr << "In auxiliary space:" << endl
@@ -164,6 +175,7 @@ construct_interior_vector(listCone *boundary_triangulation, int numOfVars, vec_Z
   cerr << "In zero-avoidance space:" << endl
        << UF;
   
+  /* Determine if the LLL basis vectors avoid the zeros. */
   /* We simply choose the first vector of the reduced basis. */
   /* Check basis vectors. */
   int i;
@@ -251,6 +263,73 @@ compute_triangulation_of_boundary
   }
 }
 
+
+void
+generate_interior_vector_simplified_data(listCone *boundary_triangulation, int numOfVars,
+  mat_ZZ &alpha, mat_ZZ &basis, mat_ZZ &F)
+{
+  prepare_interior_vector_data(boundary_triangulation, numOfVars, alpha, basis, F);
+  cerr << "Simplify data" << endl;
+  // transpose and work on the rows
+  alpha = transpose(alpha); //the determinants
+  F = transpose(F);         //the last components of the facet normal vectors
+  list<vec_ZZ> a_list, F_list;
+  for (int i=0; i<alpha.NumRows(); i++) {
+    a_list.push_back(alpha[i]);
+  }
+  for (int i=0; i<F.NumRows(); i++) {
+    F_list.push_back(F[i]);
+  }
+  //make the first row entry positive by row*(-1) if needed
+  for_each(a_list.begin(), a_list.end(), make_first_entry_positive);
+  for_each(F_list.begin(), F_list.end(), make_first_entry_positive);
+  //make the rows in F prime
+  for_each(F_list.begin(), F_list.end(), make_coprime);
+  //sort
+  a_list.sort(vec_ZZ_is_less);
+  F_list.sort(vec_ZZ_is_less);
+  //unique
+  a_list.unique();
+  F_list.unique();
+  //remove zero vector if existent (it has to be on the first position)
+  if(IsZero(a_list.front())!=0) a_list.pop_front();
+  if(IsZero(F_list.front())!=0) F_list.pop_front();
+  //remove rows of alpha that have multiples
+  list<vec_ZZ>::iterator it = a_list.begin();
+  list<vec_ZZ>::const_iterator cit;
+  int fnz; //first non zero position
+  ZZ factor; 
+  while (it!=a_list.end()) {
+    fnz = first_non_zero_pos(*it);
+    cit = it; ++cit;
+    while (cit!=a_list.end() && fnz == first_non_zero_pos(*cit)) {
+      factor = (*cit)[fnz]/(*it)[fnz];
+      if ( factor>1 && (*cit)[fnz]%(*it)[fnz] == 0 && //first position is multiple
+           (*it)*factor == (*cit) ) {
+        fnz = -1; //to mark success
+        it = a_list.erase(it);
+		break;
+      }
+	  ++cit;
+	}
+    if (fnz >= 0) ++it;
+  }
+  //transpose back
+  alpha.SetDims(a_list.size(), numOfVars);
+  F.SetDims(F_list.size(), numOfVars);
+  for (int i=0; i<alpha.NumRows(); i++) {
+    alpha[i] = a_list.front();
+	a_list.pop_front();
+  }
+  for (int i=0; i<F.NumRows(); i++) {
+    F[i] = F_list.front();
+	F_list.pop_front();
+  }
+  alpha = transpose(alpha);
+  F = transpose(F);
+}
+
+
 void
 complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
 (listCone *boundary_triangulation, BarvinokParameters *Parameters, ConeConsumer &consumer)
@@ -262,45 +341,8 @@ complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
     = construct_interior_vector(boundary_triangulation, Parameters->Number_of_Variables, det_vector);
   cerr << "Interior ray vector: " << extra_ray_vector << endl;
   cerr << "Resulting determinants: " << det_vector << endl;
-  listCone *resulting_triangulation = NULL;
-
-  listCone *simplicial_cone, *next_simplicial_cone;
-  int i;
-  for (simplicial_cone = boundary_triangulation, i = 0;
-       simplicial_cone!=NULL;
-       simplicial_cone = next_simplicial_cone, i++) {
-    next_simplicial_cone = simplicial_cone->rest;
-    if (det_vector[i] != 0) {
-      /* A full-dimensional cone is created. */
-      simplicial_cone->rays
-	= appendVectorToListVector(extra_ray_vector, simplicial_cone->rays);
-      simplicial_cone->rest = resulting_triangulation;
-      resulting_triangulation = simplicial_cone;
-    }
-    else {
-      /* A lower-dimensional cone is created -- discard it. */
-      freeCone(simplicial_cone);
-    }
-  }
-
-  dualizeCones(resulting_triangulation, Parameters->Number_of_Variables, Parameters);
-  listCone *cone;
-  for (cone = resulting_triangulation; cone!=NULL; cone=cone->rest) {
-    if (!rays_ok(cone, Parameters->Number_of_Variables)) {
-      cerr << "Note: The following dualized-back cone has bad rays." << endl;
-      printCone(cone, numOfVars);
-    }
-  }
-  dualizeCones(resulting_triangulation, Parameters->Number_of_Variables, Parameters);
-
-  {
-    listCone *next = NULL;
-    for (cone = resulting_triangulation; cone!=NULL; cone=next) {
-      next = cone->rest;
-      cone->rest = NULL;
-      consumer.ConsumeCone(cone);
-    }
-  }
+  complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
+    (boundary_triangulation, Parameters, extra_ray_vector, consumer);
 }
 
 ZZ determinant(listVector* rows, int numOfVars) {

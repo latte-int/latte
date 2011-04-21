@@ -3,6 +3,7 @@
 /* BoundaryTriangulation.h -- Boundary triangulation
 	       
    Copyright 2006, 2007 Matthias Koeppe
+   Copyright 2011       Christof Soeger
 
    This file is part of LattE.
    
@@ -37,6 +38,11 @@ boundary_triangulation_of_cone_with_subspace_avoiding_facets
 void
 compute_triangulation_of_boundary
 (listCone *cone, BarvinokParameters *Parameters, ConeConsumer &consumer);
+
+/* generate data that helps to find an interior vector st the triangulation avoids the subspace */
+void       
+generate_interior_vector_simplified_data(listCone *boundary_triangulation, int numOfVars,
+  mat_ZZ &alpha, mat_ZZ &basis, mat_ZZ &F);
 
 /* The second part:
    Compute an extra ray to complete the triangulation of the boundary

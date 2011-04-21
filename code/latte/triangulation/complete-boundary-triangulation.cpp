@@ -1,6 +1,7 @@
 /* complete-boundary-triangulation.cpp -- 
 	       
    Copyright 2007 Matthias Koeppe
+   Copyright 2011 Christof Soeger
 
    This file is part of LattE.
    
@@ -34,6 +35,7 @@ BarvinokParameters parameters;
 ReadPolyhedronData read_polyhedron_data;
 
 string output_filename;
+string output_completion_data_filename;
 string vector_input_filename;
 
 int main(int argc, char *argv[])
@@ -41,6 +43,9 @@ int main(int argc, char *argv[])
   int i;
   for (i = 1; i<argc; i++) {
     if (read_polyhedron_data.parse_option(argv[i])) {}
+    else if (strncmp(argv[i], "--output-completion-data=", 25) == 0) {
+      output_completion_data_filename = argv[i] + 25;
+    }
     else if (strncmp(argv[i], "--output-cones=", 15) == 0) {
       output_filename = argv[i] + 15;
     }
@@ -52,8 +57,8 @@ int main(int argc, char *argv[])
       exit(1);
     }
   }
-  if (output_filename.size() == 0) {
-    cerr << "The option --output-cones=FILENAME must be given." << endl;
+  if (output_filename.size() == 0 && output_completion_data_filename.size() == 0) {
+    cerr << "The option --output-cones=FILENAME or --output-completion-data=FILENAME must be given." << endl;
     exit(1);
   }
   Polyhedron *Poly = read_polyhedron_data.read_polyhedron(&parameters);
@@ -64,7 +69,24 @@ int main(int argc, char *argv[])
   parameters.Number_of_Variables
     = cone->rays->first.length();
   
-  if (vector_input_filename.size() == 0) { //try to find a vector to complete triangulation
+  if (output_completion_data_filename.size() != 0) { // generate data which helps to find a vector to complete triangulation
+    mat_ZZ alpha; //determinantes
+    mat_ZZ basis; //LLL-Basis
+    mat_ZZ F;     //avoid zeros
+    generate_interior_vector_simplified_data
+      (Poly->cones, parameters.Number_of_Variables, alpha, basis, F);
+    //output
+    ofstream out_alpha((output_completion_data_filename+".alpha").c_str());
+	out_alpha << alpha;
+	out_alpha.close();
+    ofstream out_basis((output_completion_data_filename+".basis").c_str());
+	out_basis << basis;
+	out_basis.close();
+    ofstream out_F(output_completion_data_filename.append(".F").c_str());
+	out_F << F;
+	out_F.close();
+  }
+  else if (vector_input_filename.size() == 0) { //try to find a vector to complete triangulation
     complete_boundary_triangulation_of_cone_with_subspace_avoiding_facets
       (Poly->cones, &parameters, *consumer);
   }
@@ -87,8 +109,10 @@ int main(int argc, char *argv[])
   
   delete Poly;
   delete consumer;
+  if (output_filename.size() != 0) {
   cerr << "Wrote complete boundary triangulation to file `"
        << output_filename << "'" << endl;
+  }
   return 0;
 };
 
