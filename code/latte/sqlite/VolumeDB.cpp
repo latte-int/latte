@@ -354,6 +354,7 @@ void VolumeDB::updateVolumeTimeAndValue(AlgorithemUsed alg, double time, Rationa
 					+"\n\trowid: " + rowid);
 		}
 	}
+	sql << " , flagValue = '" << -1 << "', flagType = '" << LAWRENCE_VOLUME_VERSION << "'";
 	sql << " where rowid = " << rowid << endl;
 
 

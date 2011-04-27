@@ -734,6 +734,7 @@ void Valuation::ValuationContainer::add(const ValuationData & d)
 
 void Valuation::ValuationContainer::printResults(ostream & out) const
 {
+	out << "\n";
 	for (int i = 0; i < answers.size(); ++i)
 	{
 		if (answers[i].valuationType == ValuationData::volumeLawrence)

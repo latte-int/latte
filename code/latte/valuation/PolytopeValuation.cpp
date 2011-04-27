@@ -353,7 +353,7 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 	{
 		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
 		cout << lengthListCone(triangulatedPoly) << " triangulations done.\n"
-			 << " starting to integrate " << linearForms.termCount << " linear forms.";
+			 << " starting to integrate " << linearForms.termCount << " linear forms.\n";
 		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
 	}// if computing the integral using the lawrence style method.
 	else if ( integrationType == TriangulationIntegration)

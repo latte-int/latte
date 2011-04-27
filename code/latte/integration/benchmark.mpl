@@ -398,7 +398,7 @@ get_table13_entry:=proc(N,d, M, r)
 end:
 
 random_linearform_given_degree_dimension_maxcoef_maxterm:=proc(N,d, M, r)
-  random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(N, d, M, r, 1):
+  random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(N, d, M, r, 1, 0):
 end:
 
 test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen)
@@ -489,7 +489,7 @@ for myDim from 2 to 50 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
     if timedOut = 0 then
       result:= test_integration(50, 1000, 1, myDim, myDegree, 1, random_sparse_homogeneous_polynomial_with_degree):
-      if result = -1 then
+      if result = -1 then                                        
        timedOut:= 1:
       end if:
     else

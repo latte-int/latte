@@ -186,7 +186,13 @@ void runSpecficPolytopeTest(char * dbFile, char * polymakeFile, bool useDual, in
 
 	toTest = db.getRowsToFindVolumeGivenSpecficFile(polymakeFile, useDual);
 
-	assert(toTest.size() == 1);
+
+	if ( toTest.size() != 1)
+	{
+		cout << "error: file " << polymakeFile << " with dual " << useDual << " has " << toTest.size() << " many test rows\n";
+		exit(1);
+	}
+
 	if ( (atof(toTest[0][1].c_str()) == -2.0 && alg == 1)
 		|| (atof(toTest[0][2].c_str()) == -2.0 && alg == 2) )
 	{

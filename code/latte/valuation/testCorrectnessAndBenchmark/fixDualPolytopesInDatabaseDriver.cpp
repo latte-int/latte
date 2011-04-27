@@ -20,6 +20,97 @@
 
 using namespace std;
 
+
+void addDualIntegrationRowsFromVolume(char *dbFile, int dim, int vertexCount)
+{
+	stringstream sql;
+	string countStr;
+	int preExistingCount;
+	IntegrationDB db;
+	int degrees[] = { 1, 2, 5, 10, 20, 30, 40, 50 };
+	const int degreeSize = 8;
+
+
+	db.open(dbFile);
+
+	for(int i = 0; i < degreeSize; ++i)
+	{
+
+		sql.str("");
+		sql << "select distinct p.rowid from polynomial as p where p.dim =" << dim << " and degree = " << degrees[i];
+		vector<vector<string> > polynomialID = db.query(sql.str().c_str());
+
+		sql.str("");
+		sql << "select count(*) from "
+			<<	" integrate as v"
+			<<  " join polytope as dp on dp.rowid = v.polytopeID"
+			<<  " join polytope as p on p.rowid = dp.dual "
+			<<  " join polynomial as mon on mon.rowid = v.polynomialID"
+		    <<  " where dp.dim = " << dim
+		    <<  " and p.vertexCount = " << vertexCount
+		    <<  " and mon.degree = " << degrees[i];
+		countStr = sql.str();
+
+		preExistingCount = db.queryAsInteger(countStr.c_str());
+		if ( preExistingCount >= 50)
+			continue;
+
+		sql.str("");
+		sql << "select distinct v.polytopeID from "
+			<<	"volume as v"
+			<<  " join polytope as dp on dp.rowid = v.polytopeID"
+			<<  " join polytope as p on p.rowid = dp.dual "
+		    <<  " where dp.dim = " << dim
+		    <<  " and p.vertexCount = " << vertexCount;
+		vector<vector<string> > polytopeID = db.query(sql.str().c_str());
+
+		assert(polynomialID.size() >= polytopeID.size());
+
+		int newRows = 0;
+		for(int j = 0; j < polytopeID.size() ; ++j)
+		{
+			if ( newRows + preExistingCount >= 50)
+				break;//the j loop
+
+			//check if this is missing.
+			//note, I am adding 49-50 new rows (so I don't really need to check that this polynomial has not already been used.
+			sql.str("");
+			sql << "select count(*) from integrate where polynomialID = " << polynomialID[j][0] << " and polytopeID = " << polytopeID[j][0];
+			if ( db.queryAsInteger(sql.str().c_str()) )
+				continue;
+
+			//insert a new row.
+			sql.str("");
+			sql << "insert into integrate ("
+				<< "polynomialID, "
+				<< "polytopeID, "
+				<< "timeLawrence, "
+				<< "timeTriangulate, "
+				<< "integral) "
+				<< "values ("
+				<< polynomialID[j][0] << ","
+				<< polytopeID[j][0] << ","
+				<< "-1,"
+				<< "-1,"
+				<< "'NA'"
+				<< ")";
+
+			cout << "insert sql::" << sql.str().c_str() << endl;
+			++newRows;
+			db.query(sql.str().c_str());
+
+
+		}//for j. loop over every (polynomial/polytope) pair and add it to the integration table if missing.
+
+		assert(db.queryAsInteger(countStr.c_str()) >= 50);
+
+	}
+
+
+
+	db.close();
+}//addDualIntegrationRowsFromVolume
+
 /**
  * At first, I was making dual v-reps. This is a bad idea because the files become HUGE
  * Go back, center every polymake file,
@@ -234,8 +325,14 @@ int main(int argc, char *argv[])
 	// db file,   dim       vertex-count
 	//	makeDualFiles(argv[1], atoi(argv[2]),atoi(argv[3]));
 
-	makeDualHrepFiles(argv[1], atoi(argv[2]), atoi(argv[3]));
+	//makeDualHrepFiles(argv[1], atoi(argv[2]), atoi(argv[3]));
 
+
+
+	//I'm not sure why, but the integration table seems to be missing integration test case (the polytope dual files exist, but their dual test rows do not).
+	//However, the volume table has volumes test rows for these missing dual polytopes.
+	//This function asses the missing integration test cases to the integration db table.
+	addDualIntegrationRowsFromVolume(argv[1], atoi(argv[2]), atoi(argv[3]));
 	return 0;
 }//main
 

@@ -534,7 +534,7 @@ vector<vector<string> > IntegrationDB::getRowsToIntegrateGivenSpecficFile(char *
 			<< " and orgP.polymakeFilePath = '" << polymakeFile << "'"
 			<< " limit " << limit;
 	}
-	cout << "getRowsToIntegrateGivenSpecficFile:: " << sql.str().c_str() << endl;
+	//cout << "getRowsToIntegrateGivenSpecficFile:: " << sql.str().c_str() << endl;
 	return query(sql.str().c_str());
 
 }//getRowsToIntegrateGivenSpecficFile
@@ -1208,6 +1208,7 @@ void IntegrationDB::updateIntegrationTimeAndValue(AlgorithemUsed alg, double tim
 					+"\n\trowid: " + rowid);
 		}
 	}
+	sql << " , flagValue = '" << -1 << "', flagType = '" << LAWRECE_INTEGRATE_VERSION << "'";
 	sql << " where rowid = " << rowid << endl;
 	query(sql.str().c_str());
 

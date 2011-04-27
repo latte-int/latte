@@ -11,6 +11,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <vector>
+#include <cassert>
 
 #include <NTL/vec_ZZ.h>
 #include <NTL/vec_RR.h>
@@ -25,10 +27,11 @@ using namespace std;
 int main(int argc, char * argv[])
 
 {
-	ZZ sumCount, minCount, maxCount;
+	RR sumCount, avg, sumMeanDifference, standardDeviation;
+	vector<RR> allCounts;
 	sumCount = 0;
-	minCount = 0;
-	maxCount = 0;
+	avg = 0;
+
 	
 	
 	if ( argc == 1)
@@ -71,19 +74,28 @@ int main(int argc, char * argv[])
 
 		//finally, count the terms.
 		sumCount += linearForms.termCount;
-		if ( minCount > linearForms.termCount || minCount == 0)
-			minCount = linearForms.termCount;
-		if ( maxCount < linearForms.termCount || maxCount == 0)
-			maxCount = linearForms.termCount;
-		
+		allCounts.push_back(to_RR(linearForms.termCount));
+
 		//delete the linear form.
 		destroyLinForms(linearForms);
 	}//for each file.
 
-	cout << "Total count " << sumCount
-		<< "\nAvg count " << to_RR(sumCount)/argc
-		<< "\nMin Count " << minCount
-		<< "\nMax Count " << maxCount;
+	assert(argc -1 == allCounts.size());
+
+	//find the std. deviation
+	avg = to_RR(sumCount)/(argc-1);
+	sumMeanDifference = 0;
+	for (int i = 0; i < allCounts.size(); ++i)
+	{
+		sumMeanDifference += (allCounts[i] - avg)*(allCounts[i] - avg);
+	}
+	sumMeanDifference /= allCounts.size();
+	standardDeviation = sqrt(sumMeanDifference);
+
+
+	cout << "Number polynomials " << argc -1
+		<< "\nAvg count " << avg
+		<< "\nStandard Deviation " << standardDeviation << endl;
 
 	return 0;
 }

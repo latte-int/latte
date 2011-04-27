@@ -1077,9 +1077,9 @@ listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars)
 		cones = readCddExtFile(ext_numOfVars);
 		numOfVars = ext_numOfVars - 1;
 	}
-	cout << "*****Start of printing list cone in computeVertexConesFromVrep\n";
-	printListCone(cones, numOfVars);
-	cout << "*****end of printing list cone in computeVertexConesFromVrep\n";
+	//cout << "*****Start of printing list cone in computeVertexConesFromVrep\n";
+	//printListCone(cones, numOfVars);
+	//cout << "*****end of printing list cone in computeVertexConesFromVrep\n";
 
 	cones = readCddEadFileFromVrep(cones, numOfVars + 1);
 

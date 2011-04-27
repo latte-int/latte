@@ -248,6 +248,16 @@ fix_dual_database_polytopes_LDFLAGS = -lsqlite3
 #fix_dual_database_polytopes_LDADD = $(LDADD)
 #fix_dual_database_polytopes_LDADD += liblatteintegration.a
 
+#This is used update the lawrence valuations.
+bin_PROGRAMS += fix-lawrence-valuation
+fix_lawrence_valuation_SOURCES = valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp
+fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
+fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
+fix_lawrence_valuation_LDFLAGS = -lsqlite3
+fix_lawrence_valuation_LDADD = $(LDADD)
+fix_lawrence_valuation_LDADD += liblatteintegration.a
+
+
 
 #This is used to test integration classes from the database
 bin_PROGRAMS += print-database-time-table 

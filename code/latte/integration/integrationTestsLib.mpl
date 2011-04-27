@@ -15,7 +15,7 @@ with(numapprox,laurent):
 #
 # Test limits:
 maxDim := 3:
-maxDegree := 8:
+maxDegree := 2:
 
 read("integration/createLinear.mpl"):
 
