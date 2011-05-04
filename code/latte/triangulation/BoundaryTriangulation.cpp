@@ -269,6 +269,10 @@ generate_interior_vector_simplified_data(listCone *boundary_triangulation, int n
   mat_ZZ &alpha, mat_ZZ &basis, mat_ZZ &F)
 {
   prepare_interior_vector_data(boundary_triangulation, numOfVars, alpha, basis, F);
+  cerr << "Determinantes depending on vector in LLL-basis:" << endl
+       << alpha << endl;
+  cerr << "Avoid zeros here:" << endl
+       << F << endl;
   cerr << "Simplify data" << endl;
   // transpose and work on the rows
   alpha = transpose(alpha); //the determinants
@@ -326,6 +330,10 @@ generate_interior_vector_simplified_data(listCone *boundary_triangulation, int n
   }
   alpha = transpose(alpha);
   F = transpose(F);
+  cerr << "To minimize:" << endl
+       << alpha << endl;
+  cerr << "Avoid zeros here:" << endl
+       << F;
 }
 
 
