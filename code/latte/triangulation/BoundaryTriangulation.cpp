@@ -293,7 +293,6 @@ generate_interior_vector_simplified_data(listCone *boundary_triangulation, int n
   F_list.unique();
   //remove zero vector if existent (it has to be on the first position)
   if(IsZero(a_list.front())!=0) a_list.pop_front();
-  if(IsZero(F_list.front())!=0) F_list.pop_front();
   //remove rows of alpha that have multiples
   list<vec_ZZ>::iterator it = a_list.begin();
   list<vec_ZZ>::const_iterator cit;
