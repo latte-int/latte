@@ -85,6 +85,7 @@ main(int argc, char *argv[])
     removeFiles[127], command[PATH_MAX];
   bool approx;
   bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
+  bool avoid_singularities = false;
   bool triangulation_specified = false;
   double sampling_factor = 1.0;
   long int num_samples = -1;
@@ -114,6 +115,8 @@ main(int argc, char *argv[])
   strcpy(Print, "no");
   approx = false;
   ehrhart_polynomial = false;
+  ehrhart_series = false;
+  ehrhart_taylor = false;
   params->substitution = BarvinokParameters::PolynomialSubstitution;
   params->decomposition = BarvinokParameters::DualDecomposition;
   params->max_determinant = 1;
@@ -163,9 +166,7 @@ main(int argc, char *argv[])
     }
     else if (strncmp(argv[i], "--ehrhart-series", 11) == 0) {
       ehrhart_series = true;
-      strcpy(read_polyhedron_data.dualApproach,"yes");
-      strcpy(printfile,"yes");
-      flags |= PRINT;
+      //further handling later
     }
     else if (strncmp(argv[i], "--simplified-ehrhart-series", 14) == 0) {
       ehrhart_series = true;
@@ -177,13 +178,15 @@ main(int argc, char *argv[])
       read_polyhedron_data.degree = atoi(argv[i] + 17);
       strcpy(read_polyhedron_data.dualApproach,"yes");
     }
+    /* Is now --ehrhart-series --avoid-singularities
     else if (strncmp(argv[i], "--singularity-avoiding-ehrhart-series", 4) == 0) {
-      // FIXME: Should be --ehrhart-series --avoid-singularities
       params->substitution = BarvinokParameters::TrivialSubstitution;
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
-    }
+    } */
     else if (strncmp(argv[i], "--avoid-singularities", 7) == 0) {
+      avoid_singularities = true;
       params->shortvector = BarvinokParameters::SubspaceAvoidingLLL;
+      params->substitution = BarvinokParameters::TrivialSubstitution;
     }
     else if (parse_standard_triangulation_option(argv[i], params)) {
       if (strncmp(argv[i], "--triangulation=", 16) == 0)
@@ -239,6 +242,19 @@ main(int argc, char *argv[])
     else {
       cerr << "Unknown command/option " << argv[i] << endl;
       exit(1);
+    }
+  }
+
+  
+  if (ehrhart_series) {
+    if (!avoid_singularities) {
+      strcpy(read_polyhedron_data.dualApproach,"yes");
+      strcpy(printfile,"yes");
+      flags |= PRINT;
+	} 
+	else {
+      params->substitution = BarvinokParameters::TrivialSubstitution;
+	  params->decomposition = BarvinokParameters::IrrationalPrimalDecomposition;
     }
   }
 
@@ -352,6 +368,8 @@ main(int argc, char *argv[])
   params->Flags = flags;
   params->File_Name = (char*) fileName;
   params->Number_of_Variables = Poly->numOfVars;
+
+cerr<<"Decomposition to use:"<<params->decomposition<<endl;
 
   switch (params->decomposition) {
   case BarvinokParameters::DualDecomposition:

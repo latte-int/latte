@@ -50,11 +50,11 @@ BarvinokParameters::BarvinokParameters() :
   decomposition(DualDecomposition),
   triangulation(
 #ifdef HAVE_FORTYTWO_LIB
-		RegularTriangulationWith4ti2
+    RegularTriangulationWith4ti2
 #else
-		RegularTriangulationWithCdd
+    RegularTriangulationWithCdd
 #endif
-		),
+    ),
   triangulation_max_height(10000),
   triangulation_bias(-1),
   nonsimplicial_subdivision(false),
@@ -63,19 +63,19 @@ BarvinokParameters::BarvinokParameters() :
   triangulation_assume_fulldim(true),
   dualization(
 #ifdef HAVE_FORTYTWO_LIB
-	      DualizationWith4ti2
+        DualizationWith4ti2
 #else
-	      DualizationWithCdd
+        DualizationWithCdd
 #endif
-	      ),
+        ),
   shortvector(LatteLLL),
   smithform(
 #ifdef HAVE_LIDIA
-	    LidiaSmithForm
+      LidiaSmithForm
 #else
-	    IlioSmithForm
+      IlioSmithForm
 #endif
-	    ),
+      ),
   max_determinant(0),
   File_Name(NULL),
   Number_of_Variables(0),
@@ -183,11 +183,11 @@ void MatrixGCD(mat_ZZ & B, long & m){
   for(int i = 1; i <= m; i++)
     for(int j = 1; j <= m; j++)
       if(B(i, j) != 0)
-	gcds[i-1] = GCD(gcds[i-1], B(i, j));
+  gcds[i-1] = GCD(gcds[i-1], B(i, j));
   for(int i = 1; i <= m; i++)
     for(int j = 1; j <= m; j++)
       if(B(i, j) != 0)
-	B(i, j) = B(i, j) / gcds[i-1];
+  B(i, j) = B(i, j) / gcds[i-1];
 
 }
 /**********************************************************************/
@@ -199,67 +199,67 @@ barvinok_DFS(listCone *cone, Single_Cone_Parameters *Parameters);
 
 int
 barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
-		const Vertex *vertex)
+    const Vertex *vertex)
 {
-	//cerr << "barvinok_Single Called." << endl;;
-	
-	long m, n;
-  	m = B.NumRows();
-  	n = B.NumCols();
+  //cerr << "barvinok_Single Called." << endl;;
+  
+  long m, n;
+    m = B.NumRows();
+    n = B.NumCols();
 
-   	if (m != n) {
-	  cerr << "Input must be square (have " << m << " rows, "
-	       << n << " cols). " << endl;
-	  exit(2);
-   	}
+     if (m != n) {
+    cerr << "Input must be square (have " << m << " rows, "
+         << n << " cols). " << endl;
+    exit(2);
+     }
 
-   	ZZ D = determinant(B);
+     ZZ D = determinant(B);
 
          if( D == 0)
-   	{
-       		cerr << "Input must be linearly independent. " << endl;
-       		exit(3);
-   	}
+     {
+           cerr << "Input must be linearly independent. " << endl;
+           exit(3);
+     }
 
-	 Parameters->Total_Simplicial_Cones++;
-	 
-   	/* The following routine is to get the minimal
-      	integral generators for the cone.  */
+   Parameters->Total_Simplicial_Cones++;
+   
+     /* The following routine is to get the minimal
+        integral generators for the cone.  */
 
-   	MatrixGCD(B, m);
+     MatrixGCD(B, m);
 
-   	listCone *dummy = createListCone();
-   	dummy->coefficient = 1;
-	dummy->determinant = D;
-	dummy->vertex = new Vertex(*vertex);
-	dummy->rays = transformArrayBigVectorToListVector(B, m, n);
+     listCone *dummy = createListCone();
+     dummy->coefficient = 1;
+  dummy->determinant = D;
+  dummy->vertex = new Vertex(*vertex);
+  dummy->rays = transformArrayBigVectorToListVector(B, m, n);
 
-	switch (Parameters->decomposition) {
-	case BarvinokParameters::DualDecomposition:
-	  // Keep the dual cones during Barvinok decomposition
-	  computeDetAndFacetsOfSimplicialCone(dummy, n);
-	  break;
-	case BarvinokParameters::IrrationalPrimalDecomposition:
-	  // Do Barvinok decomposition on the primal cones.
-	  dualizeCone(dummy, Parameters->Number_of_Variables, Parameters);
-	  irrationalizeCone(dummy, Parameters->Number_of_Variables);
-	  break;
-	case BarvinokParameters::IrrationalAllPrimalDecomposition:
-	  // We already have primal cones; do Barvinok decomposition
-	  // on them.
-	  computeDetAndFacetsOfSimplicialCone(dummy, n);
-	  break;
-	default:
-	  cerr << "Unknown BarvinokParameters::decomposition" << endl;
-	  abort();
-	}
-	
-	int result;
-	result = barvinok_DFS(dummy, Parameters);
+  switch (Parameters->decomposition) {
+  case BarvinokParameters::DualDecomposition:
+    // Keep the dual cones during Barvinok decomposition
+    computeDetAndFacetsOfSimplicialCone(dummy, n);
+    break;
+  case BarvinokParameters::IrrationalPrimalDecomposition:
+    // Do Barvinok decomposition on the primal cones.
+    dualizeCone(dummy, Parameters->Number_of_Variables, Parameters);
+    irrationalizeCone(dummy, Parameters->Number_of_Variables);
+    break;
+  case BarvinokParameters::IrrationalAllPrimalDecomposition:
+    // We already have primal cones; do Barvinok decomposition
+    // on them.
+    computeDetAndFacetsOfSimplicialCone(dummy, n);
+    break;
+  default:
+    cerr << "Unknown BarvinokParameters::decomposition" << endl;
+    abort();
+  }
+  
+  int result;
+  result = barvinok_DFS(dummy, Parameters);
 
-	return result;
+  return result;
 }
-	
+  
 /* Let GENERATOR and MAT be the same matrix, with determinant DET.
    Copy the vector Z into each row of the matrix (we are dealing with
    the row space) and compute the determinant of the resulting matrix;
@@ -272,8 +272,8 @@ barvinok_Single(mat_ZZ B, Single_Cone_Parameters *Parameters,
 */
 static bool
 computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
-			    const vec_ZZ &Z, int m, 
-			    mat_ZZ &mat, vec_ZZ &Dets, bool nondecrease_ok = true)
+          const vec_ZZ &Z, int m, 
+          mat_ZZ &mat, vec_ZZ &Dets, bool nondecrease_ok = true)
 {
   bool decrease = true;
   ZZ absDet = abs(Det);
@@ -303,8 +303,8 @@ computeAndCheckDeterminants(const mat_ZZ &generator, const ZZ &Det,
 */
 bool
 barvinokStep(const listCone *Cone, 
-	     vector <listCone *> &Cones, vec_ZZ &Dets,
-	     int m, Single_Cone_Parameters *Parameters)
+       vector <listCone *> &Cones, vec_ZZ &Dets,
+       int m, Single_Cone_Parameters *Parameters)
 {
   mat_ZZ generator = createConeDecMatrix(Cone, m, m);
   mat_ZZ dual = createFacetMatrix(Cone, m, m);
@@ -323,34 +323,37 @@ barvinokStep(const listCone *Cone,
     // --mkoeppe, Fri Nov 24 17:01:37 MET 2006
     bool success
       = computeAndCheckDeterminants(generator, Cone->determinant, Z,
-				    m, mat, Dets, true);
+            m, mat, Dets, true);
     if (!success) {
       cerr << "Second loop... " << endl;
       Z = ComputeOmega(generator, dual, m, 1, 1);
       Z = CheckOmega(generator, Z);
       success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
-					    m, mat, Dets);
+              m, mat, Dets);
      // assert(success);
     }
-			mat = generator;
-				if (!success) {
-      				cerr << "Third loop... " << endl << endl << endl;
-     				 Z = ComputeOmega(generator, dual, m, 2, 2);
-      					Z = CheckOmega(generator, Z);
-    					  success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
-					    m, mat, Dets);
+    mat = generator;
+    if (!success) {
+      cerr << "Third loop... " << endl << endl << endl;
+      Z = ComputeOmega(generator, dual, m, 2, 2);
+      Z = CheckOmega(generator, Z);
+      success = computeAndCheckDeterminants(generator, Cone->determinant, Z,
+              m, mat, Dets);
       assert(success);
     }
     break;
   }
   case BarvinokParameters::SubspaceAvoidingLLL: {
 #ifdef HAVE_EXPERIMENTS
+//cerr<<"Gens:"<<endl<<generator<<endl;
+//cerr<<"Dual:"<<endl<<dual<<endl;
     Z = ComputeShortVectorAvoidingSubspace(generator, dual);
-    Z = CheckOmega(generator, Z);
+    Z = CheckOmega(generator, Z); //may change the sign
     mat = generator;
     bool decrease
       = computeAndCheckDeterminants(generator, Cone->determinant, Z,
-				    m, mat, Dets, true);
+            m, mat, Dets, true);
+    cerr <<"SVAS: "<< Z << " decreases det? " << decrease << endl;
     if (!decrease)
       return false;
 #else
@@ -369,22 +372,21 @@ barvinokStep(const listCone *Cone,
     else {
       Cones[i] = createListCone();
       {
-	/* Create the rays: */
-	/* Copy in the row */
-	for(int j = 1; j <= m; j++)
-	  mat(i+1, j) = Z(j);
-	Cones[i]->rays
-	  = transformArrayBigVectorToListVector(mat, m, m);
-	/* Restore the original row */
-	for(int j = 1; j <= m; j++)
-	  mat(i+1, j) = generator(i+1, j);
+        /* Create the rays: */
+        /* Copy in the row */
+        for(int j = 1; j <= m; j++)
+          mat(i+1, j) = Z(j);
+        Cones[i]->rays = transformArrayBigVectorToListVector(mat, m, m);
+        /* Restore the original row */
+        for(int j = 1; j <= m; j++)
+          mat(i+1, j) = generator(i+1, j);
       }
       Cones[i]->determinant = Dets[i];
       {
-	/* Compute the sign: */
-	long signDet = sign(Cone->determinant);
-	long signDeti = sign(Dets[i]);
-	Cones[i]->coefficient = Cone->coefficient * signDet * signDeti;
+        /* Compute the sign: */
+        long signDet = sign(Cone->determinant);
+        long signDeti = sign(Dets[i]);
+        Cones[i]->coefficient = Cone->coefficient * signDet * signDeti;
       }
       Cones[i]->vertex = new Vertex(*Cone->vertex);
       computeDetAndFacetsOfSimplicialCone(Cones[i], m);
@@ -399,12 +401,12 @@ deliver_cone(listCone *C, Single_Cone_Parameters *Parameters)
   Parameters->Total_Uni_Cones += 1;
   if ( Parameters->Total_Uni_Cones % 1000 == 0)
     cerr << Parameters->Total_Uni_Cones
-	 << (Parameters->max_determinant == 0
-	     ? " simplicial cones done."
-	     : (Parameters->max_determinant == 1
-		? " unimodular cones done."
-		: " low-index cones done."))
-	 << endl;
+   << (Parameters->max_determinant == 0
+       ? " simplicial cones done."
+       : (Parameters->max_determinant == 1
+    ? " unimodular cones done."
+    : " low-index cones done."))
+   << endl;
   switch (Parameters->decomposition) {
   case BarvinokParameters::DualDecomposition:
     dualizeCone(C, Parameters->Number_of_Variables, Parameters);
@@ -439,11 +441,11 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     Parameters->Max_Depth = Parameters->Current_Depth;
   
   ZZ absDet = criterion_abs_det(C, Parameters);
-       	
+         
   if (absDet == 0) {
     cerr << "barvinok_DFS: Det = 0." << endl;
-    return 1;	
-  }		     
+    return 1;  
+  }         
   else {
     switch (Parameters->decomposition) {
     case BarvinokParameters::DualDecomposition:
@@ -457,7 +459,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
       abort();
     }
     if (Parameters->max_determinant == 0
-	   || absDet <= Parameters->max_determinant)
+     || absDet <= Parameters->max_determinant)
       return deliver_cone(C, Parameters);
   }
   
@@ -467,7 +469,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   long m = Parameters->Number_of_Variables;
 
   vec_ZZ Dets;
-  Dets.SetLength(m);	     
+  Dets.SetLength(m);       
   vector<listCone *> cones1(m);
 
   bool success = barvinokStep(C, cones1, Dets, m, Parameters);
@@ -490,28 +492,28 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
   cerr << "Level " << Parameters->Current_Depth << ": Index " << absDet << " -> ";
 #endif
   for(int i = 0; i < m; i++)
-    {
-      Dets[i] = abs(Dets[i]);
-      if(Dets[i] > max)
-	max = Dets[i];
+  {
+    Dets[i] = abs(Dets[i]);
+    if(Dets[i] > max)
+      max = Dets[i];
       
-      if (Dets[i] > 0) {
-	Parameters->Current_Simplicial_Cones_Total ++;
+    if (Dets[i] > 0) {
+  Parameters->Current_Simplicial_Cones_Total ++;
 
 #ifdef SHOWDETS
-	cerr << criterion_abs_det(cones1[i], Parameters) << ", ";
+  cerr << criterion_abs_det(cones1[i], Parameters) << ", ";
 #endif
-	switch (Parameters->decomposition) {
-	case BarvinokParameters::DualDecomposition:
-	  break;
-	case BarvinokParameters::IrrationalPrimalDecomposition:
-	case BarvinokParameters::IrrationalAllPrimalDecomposition:
-	  checkConeIrrational(cones1[i], Parameters->Number_of_Variables);
-	  break;
-	default:
-	  cerr << "Unknown BarvinokParameters::decomposition";
-	  abort();
-	}
+  switch (Parameters->decomposition) {
+  case BarvinokParameters::DualDecomposition:
+    break;
+  case BarvinokParameters::IrrationalPrimalDecomposition:
+  case BarvinokParameters::IrrationalAllPrimalDecomposition:
+    checkConeIrrational(cones1[i], Parameters->Number_of_Variables);
+    break;
+  default:
+    cerr << "Unknown BarvinokParameters::decomposition";
+    abort();
+  }
       }
     }
 #ifdef SHOWDETS
@@ -531,15 +533,15 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
     current = -1;
     for(int j = 0; j < m; j++) {
       if(Dets[j] < min && Dets[j] != 0)
-	{
-	  current = j;
-	  min = Dets[j];
-	}
+  {
+    current = j;
+    min = Dets[j];
+  }
     }
     if (current >= 0) {
       Dets[current] = 0; // mark done
       if(barvinok_DFS(cones1[current], Parameters) == -1)
-	result = -1;
+  result = -1;
       Parameters->Current_Simplicial_Cones_Total--;
     }
   } while (current >= 0 && result == 1);
@@ -556,7 +558,7 @@ int barvinok_DFS(listCone *C, Single_Cone_Parameters *Parameters)
 
 int
 barvinokDecomposition_Single (listCone *cone,
-			      Single_Cone_Parameters *Parameters)
+            Single_Cone_Parameters *Parameters)
 {
   int status = 1;
   listCone *triang = triangulateCone(cone, Parameters->Number_of_Variables, Parameters);
