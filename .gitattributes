@@ -250,6 +250,7 @@ code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp -
 code/latte/valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.h -text
 code/latte/valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp -text
+code/latte/valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangle.mpl -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh -text
 code/latte/valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp -text
