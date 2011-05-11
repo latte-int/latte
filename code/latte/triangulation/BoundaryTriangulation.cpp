@@ -29,9 +29,9 @@
 #include "dual.h"
 #include "genFunction/IntCombEnum.h"
 
-#include "./simplify_helpers.cpp"
 #include <list>
 #include <algorithm>
+#include "./simplify_helpers.cpp"
 
 using namespace std;
 
@@ -298,25 +298,7 @@ generate_interior_vector_simplified_data(listCone *boundary_triangulation, int n
   //remove zero vector if existent (it has to be on the first position)
   if(IsZero(a_list.front())!=0) a_list.pop_front();
   //remove rows of alpha that have multiples
-  list<vec_ZZ>::iterator it = a_list.begin();
-  list<vec_ZZ>::const_iterator cit;
-  int fnz; //first non zero position
-  ZZ factor; 
-  while (it!=a_list.end()) {
-    fnz = first_non_zero_pos(*it);
-    cit = it; ++cit;
-    while (cit!=a_list.end() && fnz == first_non_zero_pos(*cit)) {
-      factor = (*cit)[fnz]/(*it)[fnz];
-      if ( factor>1 && (*cit)[fnz]%(*it)[fnz] == 0 && //first position is multiple
-           (*it)*factor == (*cit) ) {
-        fnz = -1; //to mark success
-        it = a_list.erase(it);
-		break;
-      }
-	  ++cit;
-	}
-    if (fnz >= 0) ++it;
-  }
+  remove_dominated_rows(a_list);
   //transpose back
   alpha.SetDims(a_list.size(), numOfVars);
   F.SetDims(F_list.size(), numOfVars);
