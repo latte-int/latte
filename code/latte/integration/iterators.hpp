@@ -4,7 +4,10 @@ class BTrieIterator: public PolyIterator<T, S>
 public:
 	BTrieIterator()
 	{
-
+		myTrie = NULL;
+		storedTerm = NULL;
+		triePath = NULL;
+		curTerm.exps = NULL;
 	}
 
 	void setTrie(BurstTrie<T, S>* trie, int myDim)
@@ -129,8 +132,10 @@ public:
 
 	~BTrieIterator()
 	{
-		delete[] triePath;
-		delete[] curTerm.exps;
+		if (triePath)
+			delete[] triePath;
+		if (curTerm.exps)
+			delete[] curTerm.exps;
 	}
 
 private:

@@ -62,7 +62,7 @@ private:
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone. Then late you can triangulate the polytope into simpleces
 	void dilatePolytopeOneCone(const ZZ & factor); //dilates polytope by changing the vertices.
 	void dilatePolytopeVertexRays(const RationalNTL & factor); //dilates polytope by changing the vertices.
-	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor); //given a polynomial and a dilation factor, replaces x_i^k --> factor^k*x_i^k
+	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor, RationalNTL & constantMonomial); //given a polynomial and a dilation factor, replaces x_i^k --> factor^k*x_i^k
 	ZZ findDilationFactorOneCone() const;
 	ZZ findDilationFactorVertexRays() const;
 	RationalNTL findIntegralUsingTriangulation(linFormSum &forms) const; //computes the integral over every simplex

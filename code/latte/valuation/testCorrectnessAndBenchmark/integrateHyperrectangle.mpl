@@ -29,7 +29,7 @@ printf("random seed = %d \n", seed);
 
 
 fileName:="valuation/hyerrectangleIntegrationTest.latte":
-for myDim from 2 to 8 do
+for myDim from 2 to 5 do
 	for myDegree from 2 to 10 do
 	
 		printf("Testing polynomials of dimension %d, and at most degree %d\n", myDim, myDegree);

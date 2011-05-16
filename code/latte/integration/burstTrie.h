@@ -23,6 +23,11 @@ struct monomialSum
 {
 	int termCount, varCount;
 	BurstTrie<RationalNTL, int>* myMonomials;
+
+	monomialSum(): termCount(0), varCount(0), myMonomials(NULL)
+	{
+	}//constructor
+
 };
 
 //linear forms: sort on degree first, then the form coefficients
@@ -30,6 +35,11 @@ struct linFormSum
 {
 	int termCount, varCount;
 	BurstTrie<RationalNTL, ZZ>* myForms;
+
+	linFormSum(): 	termCount(0), varCount(0), myForms(NULL)
+	{
+	}//constructor.
+
 };
 
 #include "burstTrie.hpp"

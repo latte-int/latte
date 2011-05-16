@@ -125,9 +125,9 @@ test_hyperrectangle_integtation:=proc(polyMaxDegree, polytopeDimension, maxNumbe
 	randNumber2:= rand(100); #used for the denominator.
 	positive := rand(2); #positive() is 0 or 1.
   
-  
+   
 	#get a random polynomial.
-	randomPoly:=random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(5000, polytopeDimension, polyMaxDegree, maxNumberOfTermsPerDegree, rationalCoeff):
+	randomPoly:=random_sparse_nonhomogeneous_polynomial_with_degree_mapleEncoded(5000, polytopeDimension, polyMaxDegree, maxNumberOfTermsPerDegree, rationalCoeff):
   
 	lowerIntegrationBound:=Vector(polytopeDimension);
 	upperIntegrationBound:=Vector(polytopeDimension);

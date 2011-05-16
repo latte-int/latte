@@ -151,7 +151,7 @@ void PolytopeValuation::convertToOneCone()
  * Dilates the polytope by computing new_vertex = old_vertex * factor, and overriding the
  * polytopeAsOneCone
  *
- * The original polytope is lost.
+ * The original polytope is NOT lost (you can recover it by dividing by the last element in each ray)
  */
 void PolytopeValuation::dilatePolytopeOneCone(const ZZ & factor)
 {
@@ -190,9 +190,13 @@ void PolytopeValuation::dilatePolytopeVertexRays(const RationalNTL & factor)
 /*
  * Dilates the polynomial by setting x_i -->dilationFactor * x_i
  * Then converts this new polynomial to linear forms.
+ * If the input polynomial has a constant term, it is returned (constant terms are not converted to linear forms)
  */
-void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor)
+void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor, RationalNTL & constantMonomial)
 {
+	constantMonomial = 0; //assume the originalPolynomial is homogeneous, we will update this if needed.
+	int numberConstantTerms = 0; //used for error checking.
+
 	//Goal: find new polynomial.
 	//define the new polynomial.
 	monomialSum transformedPolynomial; //updated coefficients.
@@ -225,26 +229,44 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
 		//cout << "length = " << originalMonomial->length << endl;
 		coefficient.div(power(dilationFactor, totalDegree));
 
-		transformedPolynomialLoader->ConsumeMonomial(coefficient,
-				originalMonomial->exps);
+		if (totalDegree == 0)
+		{
+			constantMonomial += coefficient;
+			++numberConstantTerms; //count the number of constant terms we have. This should be one.
+		}
+		else
+		{
+			transformedPolynomialLoader->ConsumeMonomial(coefficient,
+					originalMonomial->exps);
+		}//insert the non-constant monomial
 	}//for every term in the originalPolynomial
 
-	assert(originalPolynomial.termCount == transformedPolynomial.termCount
+	assert(originalPolynomial.termCount == transformedPolynomial.termCount + numberConstantTerms
 			&& originalPolynomial.varCount == transformedPolynomial.varCount );
+	assert(numberConstantTerms <= 1);
+
 
 	//make an iterator for the transformed polynomial and decompose it into linear forms.
 	BTrieIterator<RationalNTL, int>* transformedPolynomialIterator =
 			new BTrieIterator<RationalNTL, int> ();
 	linearForms.termCount = 0;
 	linearForms.varCount = transformedPolynomial.varCount;
-	transformedPolynomialIterator->setTrie(transformedPolynomial.myMonomials,
-			transformedPolynomial.varCount);
-	decompose(transformedPolynomialIterator, linearForms);
 
-	destroyMonomials(transformedPolynomial);
+	//at this point, transformedPolynomial could be empty if originalPolynomial only contained a constant term.
+	if ( transformedPolynomial.termCount == 0)
+	{
+		; //do nothing, we are already returning the constant via the constantMonomial parameter.
+	}//if originalPolynomial only had a constant term
+	else
+	{
+		transformedPolynomialIterator->setTrie(transformedPolynomial.myMonomials,
+				transformedPolynomial.varCount);
+		decompose(transformedPolynomialIterator, linearForms);
+		destroyMonomials(transformedPolynomial);
+	}//else, decompost it to linear forms.
+
 
 	delete transformedPolynomialLoader;
-
 	delete originalPolynomialIterator;
 	delete transformedPolynomialIterator;
 }
@@ -323,10 +345,13 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 {
 	linFormSum linearForms;
 	RationalNTL answer;
+	RationalNTL constantMonomial;
+
 
 	//find the dilation factor.
 	ZZ dilationFactor;
 
+	cout << "Integrating " << polynomial.termCount << " monomials." << endl;
 	//dilate the polytope
 	if ( numOfVars != numOfVarsOneCone)
 	{
@@ -342,19 +367,31 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 	}//we started with the lifted polytope.
 
 
+	//the input polynomial have have a constant term, but the integration functions can only
+	//work with non-constant monomials. We need to remove any constant terms from the input polynomial.
+	//This will be done in dilatePolynomialToLinearForms
 
 
 	//dilate the polynomial..
-	//cout << "dilation factor = " << dilationFactor << endl;
-	//dilatePolytope(RationalNTL(dilationFactor, to_ZZ(1))); //dilate so that every vertex is integer
-	dilatePolynomialToLinearForms(linearForms, polynomial, dilationFactor);
+    //after this call, linearForms is filled in, and constantMonomial is the constant term in the input polynomial.
+	dilatePolynomialToLinearForms(linearForms, polynomial, dilationFactor, constantMonomial);
 
+	//Note the difference between lawrence and integration on how we compute the volume
+	//if dilatePolytopeVertexRays was used: 1) integrate 2) volume 3) jacobian term
+	//if dilatePolytopeOneCone    was used: 1) integrate 2) jacobian term 3)volume
+	//This is due to the fact that dilatePolytopeVertexRays permanently dilates the polytope.
+	//But dilatePolytopeOneCone records the dilation in the last slot, and so nothing is lost.
 	if ( integrationType == LawrenceIntegration)
 	{
 		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
 		cout << lengthListCone(triangulatedPoly) << " triangulations done.\n"
 			 << " starting to integrate " << linearForms.termCount << " linear forms.\n";
 		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
+
+		if ( constantMonomial != 0)
+			answer.add(findVolume(LawrenceVolume)*constantMonomial);
+
+		answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
 	}// if computing the integral using the lawrence style method.
 	else if ( integrationType == TriangulationIntegration)
 	{
@@ -363,6 +400,19 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 		cout << " starting to integrate " << linearForms.termCount << " linear forms.\n";
 
 		answer.add(findIntegralUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
+
+		answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+
+
+		if ( constantMonomial != 0)
+		{
+			RationalNTL volume;
+			volume = findVolume(DeterminantVolume)*constantMonomial;
+			if (numOfVars != numOfVarsOneCone)
+				volume.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+			answer.add(volume);
+		}
+
 	}//if computing the integral by triangulating to simplex polytopes.
 	else
 	{
@@ -370,7 +420,7 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 		exit(1);
 	}//else error.
 
-	answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+
 	destroyLinForms(linearForms);
 	return answer;
 }
@@ -408,6 +458,10 @@ RationalNTL PolytopeValuation::findIntegralUsingTriangulation(linFormSum &forms)
 	RationalNTL answer;
 	int simplicesFinished = 0;
 	int totalSimplicesToIntegrate = lengthListCone(triangulatedPoly);
+
+	if ( forms.termCount == 0)
+		return RationalNTL(); //nothing to do.
+
 	//set up itrator to loop over the linear forms.
 	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
 			RationalNTL, ZZ> ();
@@ -487,6 +541,10 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 {
 	RationalNTL ans;
 	int linearFormesFinished = 0;
+
+	if(forms.termCount == 0)
+		return RationalNTL(); //nothing to do.
+
 	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
 			RationalNTL, ZZ> ();
 	linearFormIterator->setTrie(forms.myForms, forms.varCount); //make iterators to loop over the lin. forms.
@@ -578,6 +636,7 @@ RationalNTL PolytopeValuation::findVolume(VolumeType v)
 
 		//cout << "findVolumeUsingLawrence(): VOLUME: " << answer << endl;
 	}
+
 
 	return answer;
 
@@ -842,7 +901,7 @@ void PolytopeValuation::triangulatePolytopeCone()
 	parameters.Number_of_Variables = numOfVarsOneCone;
 	triangulatedPoly = triangulateCone(polytopeAsOneCone, numOfVarsOneCone,
 			&parameters);
-	parameters.Number_of_Variables = numOfVars; //convert back. This is not really needed, because we never look at this value again.
+	parameters.Number_of_Variables = numOfVars; //convert back.
 	freeTriangulatedPoly = 1; //Delete this in the deconstructor.
 }//triangulateCone()
 
@@ -866,7 +925,6 @@ void PolytopeValuation::triangulatePolytopeVertexRayCone()
 	while ( currentCone)
 	{
 		listCone* newTriangulation;
-
 		newTriangulation = triangulateCone(currentCone, numOfVars, &parameters);
 
 		triangulatedPoly = appendListCones(newTriangulation, triangulatedPoly);

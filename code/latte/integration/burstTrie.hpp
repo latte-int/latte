@@ -1,4 +1,7 @@
 //abstraction used in burst tries to allow tries to contain either tries or terms as children
+
+
+
 struct trieElem
 {
 	bool isTrie;

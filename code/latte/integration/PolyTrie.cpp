@@ -306,7 +306,8 @@ string printLinForms(const linFormSum &myForm)
 //Deallocates space and nullifies internal pointers and counters
 void destroyLinForms(linFormSum &myPoly)
 {
-	delete myPoly.myForms;
+	if (myPoly.myForms)
+		delete myPoly.myForms;
 	myPoly.myForms = NULL;
 	myPoly.termCount = myPoly.varCount = 0;
 }
@@ -321,14 +322,20 @@ void decompose(BTrieIterator<RationalNTL, int>* it, linFormSum &lForm)
 	term<RationalNTL, int>* temp;
 	//BTrieIterator<ZZ, int>* it = new BTrieIterator<ZZ, int>();
 
+
 	//it->setTrie(myPoly.myMonomials, myPoly.varCount);
 	it->begin();
 
+	//cout << "in decompost()::\n";
 	temp = it->nextTerm();
+
 	do
 	{
+		//cout << "monomial " << temp->coef;
+		//for(int i = 0; i < temp->length; ++i)
+		//	cout << temp->exps[i];
+		//cout << "\n";
 		decompose(temp, lForm);
-		//cout << "decomposed term" << endl;
 		temp = it->nextTerm();
 	} while (temp);
 
@@ -340,6 +347,8 @@ void decompose(term<RationalNTL, int>* myTerm, linFormSum &lForm)
 	vec_ZZ myExps;
 	myExps.SetLength(lForm.varCount);
 
+	//April 27. 2011 Brandon: I don't think this if is ever true. If I insert [[[1,[0,0]]], I get a monomial of length 2 still.
+	//This or the "string to polynomial" function is not  correct. I think we can delete this if statement.
 	if (myTerm->length == 0) //constant
 	{
 		for (int j = 0; j < lForm.varCount; j++)
@@ -350,6 +359,7 @@ void decompose(term<RationalNTL, int>* myTerm, linFormSum &lForm)
 		return;
 	}
 
+
 	ZZ formsCount = to_ZZ(myTerm->exps[0] + 1); //first exponent
 	int totalDegree = myTerm->exps[0];
 	for (int i = 1; i < myTerm->length; i++)
@@ -358,6 +368,18 @@ void decompose(term<RationalNTL, int>* myTerm, linFormSum &lForm)
 		totalDegree += myTerm->exps[i];
 	}
 	formsCount--;
+
+	//If this is zero, then the term is a constant [c,[0,0,0,0...0]]
+	if ( formsCount == 0)
+	{
+		for (int j = 0; j < lForm.varCount; j++)
+		{
+			myExps[j] = 0;
+		}
+		insertLinForm(myTerm->coef, 0, myExps, lForm);
+		return;
+	}//if formsCount
+
 	//cout << "At most " << formsCount << " linear forms will be required for this decomposition." << endl;
 	//cout << "Total degree is " << totalDegree << endl;
 

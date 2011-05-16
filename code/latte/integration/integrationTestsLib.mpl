@@ -252,7 +252,7 @@ random_sparse_homogeneous_polynomial_with_degree:=proc(N,d,M,r, rationalCoeff)
 end:
 
 
-#Makes a random polynomial. Each polynomial contains at most r monomilas of degree between [1, M].
+#Makes a random homogeneous polynomial. Each polynomial contains at most r monomilas of degree between [1, M].
 random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r, rationalCoeff) 
   local p, R, currentDegree, negative, R_denom;
   ## Give up if too large polynomials requested
@@ -261,8 +261,7 @@ random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r, rat
   fi;
   R := rand(N);
   R_denom:=rand(100);
-  
-  negative:= rand(N); #negative() = 0 or 1
+  negative:= rand(2); #negative() = 0 or 1
   
   if ( rationalCoeff = 0) then #make integer coeff. polynomials.
     p := randpoly([ seq(x[i], i=1..d) ], 
@@ -287,7 +286,16 @@ random_sparse_homogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r, rat
   p;
 end:
 
+#Makes a random non-homogeneous polynomial. Each polynomial contains at most r monomilas of degree between [1, M].
+random_sparse_nonhomogeneous_polynomial_with_degree_mapleEncoded:=proc(N,d,M,r, rationalCoeff)
+  local R, R_denom, negative;
+  R := rand(N);
+  R_denom:=rand(100);
+  negative:= rand(2); #negative() = 0 or 1
 
+
+	return random_sparse_homogeneous_polynomial_with_degree_mapleEncoded(N,d,M,r, rationalCoeff)  + (R()*(-1)^(negative()))/(R_denom() + 1);
+end:
 
 test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, decomposing, randomGen, rationalCoeff)
   global filename:

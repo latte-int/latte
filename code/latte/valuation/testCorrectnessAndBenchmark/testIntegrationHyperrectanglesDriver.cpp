@@ -28,29 +28,66 @@ int main(int argc, char *argv[])
 
 
 	RationalNTL correctAnswer(argv[1]);
-	Valuation::ValuationContainer valuationContainer;
+	Valuation::ValuationContainer valuationContainerLaw, valuationContainerTri;
 
 	char * options[5];
 
 	options[0] = "./exe";
 	options[1] = "--valuation=integrate";
-	//options[2] = "--triangulate";
 	options[2] = "--all";
 	options[3] = new char[strlen(argv[2]) + 13];
 	strcpy(options[3], "--monomials=");
 	strcat(options[3], argv[2]);
 	options[4] = argv[3];
 
-	cout << "Running main valuation Driver" << endl;
-	valuationContainer = Valuation::mainValuationDriver((const char **)options, 5);
+
+	char *lawrenceOptions[5], *triOptions[5];
+	for (int i = 0; i < 5; ++ i)
+	{
+		lawrenceOptions[i] = options[i];
+		triOptions[i] = options[i];
+	}
+
+
+	//if we want to test both methods starting from the vertex-cone or the lifted-cone representation.
+#if 1
+	lawrenceOptions[2] = "--lawrence";
+	triOptions[2] = "--triangulate";
+
+	//run lawrence and triangulate on their own (not using --all) to make sure the tangent and lifted cone methods are working.
+	cout << "Running main valuation Driver with Lawrence" << endl;
+	valuationContainerLaw = Valuation::mainValuationDriver((const char **)lawrenceOptions, 5);
+
+	cout << "Running main valuation Driver with Triangulate" << endl;
+	valuationContainerTri = Valuation::mainValuationDriver((const char **)triOptions, 5);
+#else //else, test both methods starting from vertex-cones.
+	cout << "Running main valuation Driver with both" << endl;
+	valuationContainerLaw = Valuation::mainValuationDriver((const char **)lawrenceOptions, 5);
+	valuationContainerTri = valuationContainerLaw;
+#endif
+
 	delete options[3];
 
+	RationalNTL triAns, lawAns;
+	for(int i = 0; i < valuationContainerLaw.answers.size(); ++i)
+	{
+		if (valuationContainerLaw.answers[i].valuationType == Valuation::ValuationData::integrateLawrence)
+			lawAns = valuationContainerLaw.answers[i].answer;
+	}
 
-	if ( valuationContainer.answers[0].answer != correctAnswer)
+
+	for(int i = 0; i < valuationContainerTri.answers.size(); ++i)
+	{
+		if (valuationContainerTri.answers[i].valuationType == Valuation::ValuationData::integrateTriangulation)
+			triAns = valuationContainerTri.answers[i].answer;
+	}
+
+	if ( triAns != correctAnswer || lawAns != correctAnswer)
 	{
 		cout << "******ERROR*******" << endl;
-		cout << "correct answer  = " << correctAnswer << endl;
-		cout << "computed answer = " << valuationContainer.answers[0].answer << endl;
+		cout << "correct answer    = " << correctAnswer << endl;
+		cout << "Lawrence answer   = " << lawAns << endl;
+		cout << "Triangulate anser = " << triAns << endl;
 
 		return 2;
 	}
