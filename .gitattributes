@@ -133,6 +133,9 @@ EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/plotFuctionNorm.mw -text
 EXAMPLES/volumeIntegrationPaperComparison/Henrion/paper/appVolumeIntegrationBasicSemiAlgebraicSets.pdf -text
 EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/makeVotePolytope.mpl -text
 EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope3.hrep.latte -text
+EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope4.hrep.latte -text
+EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope5.hrep.latte -text
+EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope6.hrep.latte -text
 EXAMPLES/volumeIntegrationPaperComparison/Lepelley/paper/On[!!-~]Ehrhart[!!-~]polynomials[!!-~]and[!!-~]probability[!!-~]calculations.PDF -text svneol=unset#unset
 EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/README.txt -text
 EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/ch3.1 -text
