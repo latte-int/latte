@@ -184,10 +184,12 @@ dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
 
 #main valuation headers and source
 noinst_HEADERS += valuation/PolytopeValuation.h
+noinst_HEADERS += valuation/RecursivePolytopeValuation.h
 noinst_HEADERS += valuation/valuation.h
 noinst_HEADERS += valuation/Perturbation.h
 
 liblatte_a_SOURCES += valuation/PolytopeValuation.cpp
+liblatte_a_SOURCES += valuation/RecursivePolytopeValuation.cpp
 liblatte_a_SOURCES += valuation/valuation.cpp
 liblatte_a_SOURCES += valuation/Perturbation.cpp
 
