@@ -19,9 +19,12 @@ using namespace std;
 PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 	parameters(bp), poly(p), vertexRayCones(NULL), polytopeAsOneCone(NULL),
 			triangulatedPoly(NULL), freeVertexRayCones(0),
-			freePolytopeAsOneCone(0), freeTriangulatedPoly(0)
+			freePolytopeAsOneCone(0), freeTriangulatedPoly(0),
+			latticeInverse(NULL), latticeInverseDilation(NULL)
+
 {
 	numOfVars = parameters.Number_of_Variables; //keep number of origional variables.
+	dimension = numOfVars;
 
 	if (p->unbounded)
 	{
@@ -44,6 +47,8 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 	}//else the polyhedron is given by one cone, where the rays are the vertices
 	//with a tailing 1 in each vertex.
 
+	//cout << "PolytopeValuation::num of var one cone=" << numOfVarsOneCone << endl;
+	//cout << "PolytopeValuation::numovvars" << numOfVars << endl;
 	//cout << "constructor start" << endl;
 	//printListCone(vertexRayCones, numOfVars);
 	//cout << "constructor end of vertex-ray, start of lifted cone" << endl;
@@ -272,8 +277,6 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
 }
 
 
-
-
 /**
  * Computes n!, n >= 0.
  */
@@ -351,7 +354,7 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 	//find the dilation factor.
 	ZZ dilationFactor;
 
-	cout << "Integrating " << polynomial.termCount << " monomials." << endl;
+	//cout << "Integrating " << polynomial.termCount << " monomials." << endl;
 	//dilate the polytope
 	if ( numOfVars != numOfVarsOneCone)
 	{
@@ -425,6 +428,60 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 	return answer;
 }
 
+/**
+ * Currently, this is only used by the stokes formula. One day, we should extend this.
+ */
+RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms)
+{
+	RationalNTL answer;
+	RationalNTL constantForm;
+	//linFormSum linearForms;
+
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+
+	cout << "Integrating " << linearForms.termCount << " powers of linear forms." << endl;
+	//dilate the polytope
+	if ( numOfVars != numOfVarsOneCone)
+	{
+		dilationFactor = findDilationFactorVertexRays();
+		if ( dilationFactor != 1)
+		{
+			cout << "dilation factor = " << dilationFactor << endl;
+			cout << "sorry, cannot dilate polytope in stokes because cannot integrate rational linear forms" << endl;
+			exit(1);
+		}
+	}//if we started with vertex-rays
+	else
+	{
+		cout << "Sorry, PolytopeValuation::findIntegral(const linFormSum& linForm) only works for lawrence type methods." << endl;
+		exit(1);
+	}//we started with the lifted polytope.
+
+
+	//we only have 1 method lawrence/stokes
+	//assume linear forms is homogenous (we cannot integrate a constant in this function currently).
+	triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
+
+	//cout << "find integral stokes" << endl;
+	//printListCone(triangulatedPoly, numOfVars);
+	//cout << "end finnd integral stokes" << endl;
+
+	cout << lengthListCone(triangulatedPoly) << " triangulations done.\n"
+		 << " starting to integrate " << linearForms.termCount << " linear forms.\n";
+	cout << "triangulated cones";
+	printListCone(triangulatedPoly, numOfVars);
+	answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
+
+	//answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+
+
+	destroyLinForms(linearForms);
+	return answer;
+
+
+}//findIntegral
 
 
 /* computes the integral of a polytope by summing the integral of over each simplex
@@ -554,7 +611,7 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 	unsigned int i;
 	vec_ZZ l;
 	ZZ de, numerator, denominator;
-	int dim = numOfVars;
+	int dim = dimension; //numOfVars;
 	int numberFinished = 0;
 
 	l.SetLength(numOfVars);
@@ -568,6 +625,7 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 	//It also is in charge of integrating the linear form or calling friend functions to do this.
 	LinearPerturbationContainer lpc;
 	lpc.setListCones(numOfVars, triangulatedPoly);
+	lpc.setLatticeInformation(latticeInverse, latticeInverseDilation);
 	//cout << "lpc got past construction" << endl;
 
 
@@ -589,14 +647,17 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 		//linear form with different powers, you would have to reset the powers in the
 		// linearPerturbation data structure.
 		RationalNTL integralAns = lpc.integratePolytope(m);
+		//cout << "int ans after lpc " << integralAns << endl;
 
 		de = 1;
 		for (i = 1; i <= dim + m; i++)
 		{
 			de = de * i;
 		} //de is (d+m)!. Note this is different from the factor in the paper because in the storage of a linear form, any coefficient is automatically adjusted by m!
+		//cout << "times coe" << coe << ", div de=" << de << ", dim=" << dim << ", m=" << m << endl;
 		integralAns.mult(coe);
 		integralAns.div(de);
+		//cout << "int ans after mul div" << integralAns << endl;
 
 		ans += integralAns;
 
@@ -726,6 +787,8 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 
 
 	ZZ det = ZZ();
+	RationalNTL detRational;
+	detRational = 1;
 	mat.SetDims(numOfVars, numOfVars);
 
 	c.SetLength(numOfVars);
@@ -737,11 +800,11 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 
 		//pick the random c vector.
 		for (int i = 0; i < numOfVars; i++)
-			c[i] = rand() % 10000;
-
+			c[i] =rand() % 10000;
 		for (listCone * simplicialCone = triangulatedPoly; simplicialCone; simplicialCone
 				= simplicialCone->rest)
 		{
+
 			//find vertex
 			vert = scaleRationalVectorToInteger(simplicialCone->vertex->vertex,
 					numOfVars, tempDenom);
@@ -767,11 +830,25 @@ RationalNTL PolytopeValuation::findVolumeUsingLawrence()
 			}//for every ray in the simple cone
 
 			//get the determinant
-			determinant(det, mat);
+			//cout << "findVol Law:: dim=" << dimension << ", num of var =" << numOfVars << endl;
+			if(dimension == numOfVars)
+			{
+				determinant(det, mat);
+			}
+			else
+			{
+				//todo: find the volume of a non-full-din polytope.
+				detRational = abs(NTL::determinant((*latticeInverse) * mat));
+				detRational = detRational / power(*latticeInverseDilation, latticeInverse->NumCols());
+				det = detRational.getNumerator();
+				cout << "this is not tested yet" << endl;
+				exit(1);
+			}//need to use the integer linear space basis to find the volume.
 
 			//multiply by the absolute value of the determinant
 			tempNum *= abs(det) * simplicialCone->coefficient;
-
+			//tempDenom *= detRational.getDenominator(); //init to 1.
+			//cout << "detRational = " << detRational.getNumerator() << "/" << detRational.getNumerator()<< endl;
 			if ( tempDenom == 0)
 			{
 				cerr << "findVolumeUsingLawrence:: divided by zero, trying again" << endl;
@@ -881,6 +958,18 @@ void PolytopeValuation::printLawrenceVolumeFunction()
 	// divide the sum by the factorial
 	cout << ") / ( " << parameters.Number_of_Variables << "!";
 	cout << " )" << endl;
+}
+
+
+void PolytopeValuation::setLatticeInverse(const mat_ZZ * _latticeInverse, const ZZ * _latticeInverseDilation)
+{
+	latticeInverse = _latticeInverse;
+	latticeInverseDilation = _latticeInverseDilation;
+}
+
+void PolytopeValuation::setFullDimension(int d)
+{
+	dimension = d;
 }
 
 /**

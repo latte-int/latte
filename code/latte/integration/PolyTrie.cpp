@@ -189,7 +189,7 @@ void parseLinForms(FormSumConsumer<RationalNTL>* consumer, const string& line)
 	{
 		if (line[i] == '[')
 		{
-			int degreeFactorial;
+			ZZ degreeFactorial;
 			switch (flag)
 			{
 				case 0: //coefficient
@@ -228,7 +228,7 @@ void parseLinForms(FormSumConsumer<RationalNTL>* consumer, const string& line)
 						degreeFactorial *= j;
 						//coefficient *= j;
 					} //in linFormSum, coefficient is assumed to be divided by the factorial of the form degree
-					coefficient *= to_ZZ(degreeFactorial);
+					coefficient *= degreeFactorial;
 					consumer->ConsumeLinForm(coefficient, degree, coefs);
 					flag = 0;
 					break;

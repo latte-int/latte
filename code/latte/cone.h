@@ -79,6 +79,8 @@ struct listCone {
   vec_ZZ lattice_points_scalar_products;
   int index_hint;
   struct listCone *rest;
+
+  listCone();
 };
 
 /* Allocate a single listCone element and initialize all members. */

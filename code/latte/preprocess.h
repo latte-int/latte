@@ -22,6 +22,7 @@
 #define PREPROCESS__H
 int ihermite(vec_ZZ *S, vec_ZZ *U, vec_ZZ* rhs, int m, int n);
 listVector* preprocessProblem(listVector*, listVector*, vec_ZZ**, int*, vec_ZZ&, mat_ZZ &, char*, int);
+listVector* preprocessProblem_hack(listVector*, listVector*, vec_ZZ**, int*, vec_ZZ&, mat_ZZ &, char*, int);
  listVector* TransformToDualCone(listVector* matrix, int& numOfVars);
 void dilateListVector(listVector* basis, int numOfVars, int dil);
 vec_ZZ transpose(vec_ZZ mat, int numOfVars, int numOfRows);

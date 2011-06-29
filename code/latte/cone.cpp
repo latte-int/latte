@@ -23,6 +23,11 @@
 #include <stdlib.h>
 #include "ramon.h"
 
+listCone::listCone(): vertex(NULL), rays(NULL), subspace_generators(NULL),
+	facets(NULL), equalities(NULL), latticePoints(NULL), rest(NULL)
+{
+}
+
 /* ----------------------------------------------------------------- */
 int lengthListVector(const listVector* LIST) {
   int len=0;

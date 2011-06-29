@@ -261,6 +261,8 @@ RationalNTL RationalNTL::operator/(const RationalNTL & rhs) const
 	return answer.div(rhs);
 }
 
+
+
 RationalNTL RationalNTL::operator/(const ZZ & rhs) const
 {
 	RationalNTL answer(*this);

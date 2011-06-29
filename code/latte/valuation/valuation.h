@@ -23,6 +23,7 @@
 #include <NTL/mat_ZZ.h>
 
 #include "valuation/PolytopeValuation.h"
+#include "valuation/RecursivePolytopeValuation.h"
 
 #include "CheckEmpty.h"
 #include "Polyhedron.h"
@@ -118,6 +119,8 @@ ValuationContainer computeIntegral(Polyhedron *poly,
 		const char * polynomialString);
 
 ValuationContainer mainValuationDriver(const char *argv[], int argc);
+
+void polyhedronToCones(const char valuationAlg[], Polyhedron *Poly, BarvinokParameters * params);
 
 static void usage(const char *progname);
 

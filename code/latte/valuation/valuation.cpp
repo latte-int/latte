@@ -54,8 +54,9 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 
 	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
 	{
-		cerr << "valuation.cpp: the two methods are different." << ans1 << "!="
-				<< ans2 << endl;
+		cerr << "valuation.cpp: the two methods are different." << endl;
+		cerr << "Lawrence:      " << ans2 << endl;
+		cerr << "Triangulation: " << ans1 << endl;
 		exit(1);
 	}//if error.
 
@@ -167,9 +168,11 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	bool approx;
 	bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
 	bool triangulation_specified = false;
+	bool useStokes = false;
 	double sampling_factor = 1.0;
 	long int num_samples = -1;
 	ReadPolyhedronData read_polyhedron_data;
+	//ReadPolyhedronDataRecursive read_polyhedron_data;
 
 	struct BarvinokParameters *params = new BarvinokParameters;
 
@@ -348,6 +351,8 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			strcpy(valuationType, "integrate");
 		else if (strcmp(argv[i], "--valuation=volume") == 0)
 			strcpy(valuationType, "volume");
+		else if ( strcmp(argv[i], "--stokes") == 0)
+			useStokes = true;
 		else if (strncmp(argv[i], "--monomials=", 12) == 0)
 		{
 			if (strlen(argv[i]) > 127)
@@ -464,203 +469,138 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		exit(0);
 	}
 
-	Polyhedron *Poly = read_polyhedron_data.read_polyhedron(params);
 
 
 
-	params->Flags = flags;
-	params->Number_of_Variables = Poly->numOfVars;
-	params->max_determinant = 1;
-	params->File_Name = (char*) fileName;
-
-
-
- /*
-	cout << "#####valuation.cpp, first printing of the cones" << endl;
-	printListCone(Poly->cones, Poly->numOfVars);
-	cout << "end valuation.cpp, first printing of the cones" << endl;
-*/
-
-	assert(Poly->cones != NULL);
-//	cout << "poly.homogenized:" << Poly->homogenized << endl;
-//	cout << "poly.dualized:" << Poly->dualized << endl;
-//	cout << "read:dualApproach:" << read_polyhedron_data.dualApproach << endl;
-//	cout << "raed.input_dualized" << read_polyhedron_data.input_dualized << endl;
-
-	if (strcmp(valuationAlg, "lawrence") == 0 || strcmp(valuationAlg, "all") == 0 )
+	if ( useStokes == false)
 	{
-		assert(Poly->homogenized == false);
-		if (Poly->dualized)
+		Polyhedron *Poly = read_polyhedron_data.read_polyhedron(params);
+
+		params->Flags = flags;
+		params->Number_of_Variables = Poly->numOfVars;
+		params->max_determinant = 1;
+		params->File_Name = (char*) fileName;
+
+		//poly is updated.
+		polyhedronToCones(valuationAlg, Poly, params);
+
+		//now the cones of poly are the tangent cones or the lifted cone of the vertices.
+		if (strcmp(valuationType, "volume") == 0)
 		{
-			cerr << "(First dualizing back... ";
-			cerr.flush();
-			dualizeCones(Poly->cones, Poly->numOfVars, params);
-			cerr << "done.) ";
-			cerr.flush();
-		}
-		if (Poly->cones->rays == NULL)
+			valuationAnswers = computeVolume(Poly, *params, valuationAlg,
+					printLawrence);
+		} else if (strcmp(valuationType, "integrate") == 0) //add input of polynomial.
 		{
-			// dualize twice tocompute the rays.
-			cerr << "(First computing their rays... ";
-			cerr.flush();
-			dualizeCones(Poly->cones, Poly->numOfVars, params);
-			dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
-			cerr << "done!) ";
-			cerr.flush();
-		}
+			//read the polynomial from the file or from std in.
+			ifstream inFile;
+			istream inStream(cin.rdbuf());
 
-	}//find vertex-rays
-	else if ( strcmp(valuationAlg, "triangulate") == 0)
-	{
-		assert(Poly->homogenized == true);
-		if (Poly->dualized)
-		{
-			cerr << "(First dualizing back... ";
-			cerr.flush();
-			dualizeCones(Poly->cones, Poly->numOfVars, params);
-			cerr << "done!) ";
-			cerr.flush();
-		}
-	}//only need vertices
-	else
-	{
-		cerr << "Valuation.cpp:: unknown valuation type: " << valuationAlg << '.' << endl;
-		exit(1);
-	}//else error.
-
-
-/*  //OLD WAY OF SETTING UP THE POLYTOPE...NEW WAY IS ABOVE.
-	if ( read_polyhedron_data.Vrepresentation[0] != 'y')
-	{
-	switch (params->decomposition)
-	{
-		case BarvinokParameters::DualDecomposition:
-		case BarvinokParameters::IrrationalPrimalDecomposition:
-			if (not Poly->dualized)
+			if (strcmp(polynomialFile, "") != 0)
 			{
-				if (read_polyhedron_data.Vrepresentation[0] != 'y')
+				inFile.open(polynomialFile);
+				if (!inFile.is_open())
 				{
-					// Compute all inequalities tight at the respective vertex.
-					// Then dualizeCones just needs to swap rays and facets.
-					computeTightInequalitiesOfCones(Poly->cones,
-							read_polyhedron_data.matrix, Poly->numOfVars);
+					cerr << "Error: cannot open " << polynomialFile;
+					exit(1);
 				}
-				dualizeCones(Poly->cones, Poly->numOfVars, params);
-				Poly->dualized = true;
-			}
-			break;
-		case BarvinokParameters::IrrationalAllPrimalDecomposition:
-			cerr << "Irrationalizing polyhedral cones... ";
-			cerr.flush();
-			if (Poly->dualized)
+				inStream.rdbuf(inFile.rdbuf());
+			}//set the inStream.
+
+
+			string polynomialLine;
+			polynomialLine = "";
+
+			if (inFile.is_open())
 			{
-				cerr << "(First dualizing back... ";
-				cerr.flush();
-				dualizeCones(Poly->cones, Poly->numOfVars, params);
-				cerr << "done; sorry for the interruption.) ";
-				cerr.flush();
-			} else if (Poly->cones != NULL)
+				cerr << "Reading polynomial from file " << polynomialFile << endl;
+				getline(inStream, polynomialLine, '\n');
+				inFile.close();
+			} else
 			{
+				cerr << "Enter Polynomial of dimension "
+						<< (Poly->homogenized ? Poly->numOfVars - 1
+								: Poly->numOfVars) << ">";
+				getline(inStream, polynomialLine, '\n');
+			}//user supplied polynomial in file.
 
-				if (Poly->cones->facets == NULL)
-				{
-					cerr << "(First computing facets for them... ";
-					cerr.flush();
-					dualizeCones(Poly->cones, Poly->numOfVars, params);
-					dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
-					cerr << "done; sorry for the interruption.) ";
-					cerr.flush();
-				} else if (Poly->cones->rays == NULL)
-				{
-					// Only facets computed, for instance by using the 4ti2
-					// method of computing vertex cones.  So dualize twice to
-					// compute the rays.
-					cerr << "(First computing their rays... ";
-					cerr.flush();
-					dualizeCones(Poly->cones, Poly->numOfVars, params);
-					dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
-					cerr << "done; sorry for the interruption.) ";
-					cerr.flush();
-				}
-			}
-			params->irrationalize_time.start();
-			{
-				listCone *cone;
-				for (cone = Poly->cones; cone; cone = cone->rest)
-					assert(lengthListVector(cone->facets) >= Poly->numOfVars);
-			}
-			//irrationalizeCones(Poly->cones, Poly->numOfVars);
-			//params->irrationalize_time.stop();
-			//cerr << params->irrationalize_time;
-			break;
-		default:
-			cerr << "Unknown BarvinokParameters::decomposition" << endl;
-			abort();
-	}//switch
-	}//if lawrence (or all) and h-rep.
-*/
-
-	/*
-	cout << "#####valuation.cpp, cones after" << endl;
-	printListCone(Poly->cones, Poly->numOfVars);
-	cout << "end valuation.cpp, cones after" << endl;
-	exit(1);
-	//*/
-
-	if (strcmp(valuationType, "volume") == 0)
-	{
-		valuationAnswers = computeVolume(Poly, *params, valuationAlg,
-				printLawrence);
-	} else if (strcmp(valuationType, "integrate") == 0) //add input of polynomial.
-	{
-		//read the polynomial from the file or from std in.
-		ifstream inFile;
-		istream inStream(cin.rdbuf());
-
-		if (strcmp(polynomialFile, "") != 0)
-		{
-			inFile.open(polynomialFile);
-			if (!inFile.is_open())
-			{
-				cerr << "Error: cannot open " << polynomialFile;
-				exit(1);
-			}
-			inStream.rdbuf(inFile.rdbuf());
-		}//set the inStream.
-
-
-		string polynomialLine;
-		polynomialLine = "";
-
-		if (inFile.is_open())
-		{
-			cerr << "Reading polynomial from file " << polynomialFile << endl;
-			getline(inStream, polynomialLine, '\n');
-			inFile.close();
+			valuationAnswers = computeIntegral(Poly, *params, valuationAlg,
+					polynomialLine.c_str());
 		} else
 		{
-			cerr << "Enter Polynomial of dimension "
-					<< (Poly->homogenized ? Poly->numOfVars - 1
-							: Poly->numOfVars) << ">";
-			getline(inStream, polynomialLine, '\n');
-		}//user supplied polynomial in file.
+			cerr << "ops, valuation type is not known: " << valuationType << endl;
+			exit(1);
+		}//else error. This else block should not be reachable!
+		ValuationData totalValuationTimer;
+		totalValuationTimer.valuationType = ValuationData::entireValuation;
+		params->total_time.stop();
+		totalValuationTimer.timer = params->total_time;
+		valuationAnswers.add(totalValuationTimer);
 
-		valuationAnswers = computeIntegral(Poly, *params, valuationAlg,
-				polynomialLine.c_str());
-	} else
-	{
-		cerr << "ops, valuation type is not known: " << valuationType << endl;
+		freeListVector(read_polyhedron_data.templistVec);
+		freeListVector(read_polyhedron_data.matrix);
+		delete Poly;
+	}
+	else
+	{ //use strokes
+
+		ReadPolyhedronDataRecursive rpdr(read_polyhedron_data);
+		rpdr.readHrepMatrixFromFile(read_polyhedron_data.filename, params);
+
+		RecursivePolytopeValuation rpv;
+		rpv.setMaxRecursiveLevel(4);
+		int d;
+		cout << "min dim: ";
+		cin >> d;
+		if ( d >= 0)
+		{
+			rpv.setMinDimension(d);
+			rpv.findVolume(rpdr, params);
+		}
+		else
+		{
+			d *= (-1);
+			linFormSum linform;
+			Polyhedron *Poly2 = rpdr.findTangentCones();
+			vec_ZZ exp;
+			exp.SetLength(Poly2->numOfVars);
+			for(int i = 0; i < exp.length(); ++i)
+				exp[i]=i+1;
+			//exp[0]=0;
+			//exp[1]=1;
+			//exp[2]=2;
+			//exp[3]=0;
+
+			linform.termCount = 0;
+			linform.varCount = Poly2->numOfVars;
+			int powerFactorial = 1;
+			for(int i = 1; i <= d; ++i)
+				powerFactorial *= i;
+			insertLinForm(RationalNTL(powerFactorial,1), d, exp, linform);
+
+			rpdr.latticeInverse();
+
+			PolytopeValuation pv(Poly2, *params);
+			if ( rpdr.getFullDimensionCount() < Poly2->numOfVars)
+			{
+				cout << " getFull dim = " << rpdr.getFullDimensionCount() << endl;
+				pv.setLatticeInverse(rpdr.getLatticeInverse(), rpdr.getLatticeInverseDilation());
+				pv.setFullDimension(rpdr.getFullDimensionCount());
+			}
+
+			RationalNTL ans;
+			//ans = pv.findIntegral(linform);
+			ans = pv.findVolume(PolytopeValuation::LawrenceVolume);
+
+			cout << "volume non-stokes, not full-dim" << ans << endl;
+			destroyLinForms(linform);
+		}
+		cout << "valuation.cPP exit called" << endl;
 		exit(1);
-	}//else error. This else block should not be reachable!
-	ValuationData totalValuationTimer;
-	totalValuationTimer.valuationType = ValuationData::entireValuation;
-	params->total_time.stop();
-	totalValuationTimer.timer = params->total_time;
-	valuationAnswers.add(totalValuationTimer);
 
-	freeListVector(read_polyhedron_data.templistVec);
-	freeListVector(read_polyhedron_data.matrix);
-	delete Poly;
+	}//else. use strokes.
+
+
+
 
 	if (read_polyhedron_data.rationalCone[0] == 'y')
 	{
@@ -721,6 +661,149 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	delete params;
 	return valuationAnswers;
 }//mainValuationDriver
+
+
+void Valuation::polyhedronToCones(const char valuationAlg[], Polyhedron *Poly, BarvinokParameters * params)
+{
+	/*
+		cout << "#####valuation.cpp, first printing of the cones" << endl;
+		printListCone(Poly->cones, Poly->numOfVars);
+		cout << "end valuation.cpp, first printing of the cones" << endl;
+	*/
+
+		assert(Poly->cones != NULL);
+	//	cout << "poly.homogenized:" << Poly->homogenized << endl;
+	//	cout << "poly.dualized:" << Poly->dualized << endl;
+	//	cout << "read:dualApproach:" << read_polyhedron_data.dualApproach << endl;
+	//	cout << "raed.input_dualized" << read_polyhedron_data.input_dualized << endl;
+
+		if (strcmp(valuationAlg, "lawrence") == 0 || strcmp(valuationAlg, "all") == 0 )
+		{
+			assert(Poly->homogenized == false);
+			if (Poly->dualized)
+			{
+				cerr << "(First dualizing back... ";
+				cerr.flush();
+				dualizeCones(Poly->cones, Poly->numOfVars, params);
+				cerr << "done.) ";
+				cerr.flush();
+			}
+			if (Poly->cones->rays == NULL)
+			{
+				// dualize twice tocompute the rays.
+				cerr << "(First computing their rays... ";
+				cerr.flush();
+				dualizeCones(Poly->cones, Poly->numOfVars, params);
+				dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
+				cerr << "done!) ";
+				cerr.flush();
+			}
+
+		}//find vertex-rays
+		else if ( strcmp(valuationAlg, "triangulate") == 0)
+		{
+			assert(Poly->homogenized == true);
+			if (Poly->dualized)
+			{
+				cerr << "(First dualizing back... ";
+				cerr.flush();
+				dualizeCones(Poly->cones, Poly->numOfVars, params);
+				cerr << "done!) ";
+				cerr.flush();
+			}
+		}//only need vertices
+		else
+		{
+			cerr << "Valuation.cpp:: unknown valuation type: " << valuationAlg << '.' << endl;
+			exit(1);
+		}//else error.
+
+		/*
+			cout << "#####valuation.cpp, 2nd printing of the cones" << endl;
+			printListCone(Poly->cones, Poly->numOfVars);
+			cout << "end valuation.cpp, 2nd printing of the cones" << endl;
+		*/
+
+
+
+	/*  //OLD WAY OF SETTING UP THE POLYTOPE...NEW WAY IS ABOVE.
+		if ( read_polyhedron_data.Vrepresentation[0] != 'y')
+		{
+		switch (params->decomposition)
+		{
+			case BarvinokParameters::DualDecomposition:
+			case BarvinokParameters::IrrationalPrimalDecomposition:
+				if (not Poly->dualized)
+				{
+					if (read_polyhedron_data.Vrepresentation[0] != 'y')
+					{
+						// Compute all inequalities tight at the respective vertex.
+						// Then dualizeCones just needs to swap rays and facets.
+						computeTightInequalitiesOfCones(Poly->cones,
+								read_polyhedron_data.matrix, Poly->numOfVars);
+					}
+					dualizeCones(Poly->cones, Poly->numOfVars, params);
+					Poly->dualized = true;
+				}
+				break;
+			case BarvinokParameters::IrrationalAllPrimalDecomposition:
+				cerr << "Irrationalizing polyhedral cones... ";
+				cerr.flush();
+				if (Poly->dualized)
+				{
+					cerr << "(First dualizing back... ";
+					cerr.flush();
+					dualizeCones(Poly->cones, Poly->numOfVars, params);
+					cerr << "done; sorry for the interruption.) ";
+					cerr.flush();
+				} else if (Poly->cones != NULL)
+				{
+
+					if (Poly->cones->facets == NULL)
+					{
+						cerr << "(First computing facets for them... ";
+						cerr.flush();
+						dualizeCones(Poly->cones, Poly->numOfVars, params);
+						dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
+						cerr << "done; sorry for the interruption.) ";
+						cerr.flush();
+					} else if (Poly->cones->rays == NULL)
+					{
+						// Only facets computed, for instance by using the 4ti2
+						// method of computing vertex cones.  So dualize twice to
+						// compute the rays.
+						cerr << "(First computing their rays... ";
+						cerr.flush();
+						dualizeCones(Poly->cones, Poly->numOfVars, params);
+						dualizeCones(Poly->cones, Poly->numOfVars, params); // just swaps
+						cerr << "done; sorry for the interruption.) ";
+						cerr.flush();
+					}
+				}
+				params->irrationalize_time.start();
+				{
+					listCone *cone;
+					for (cone = Poly->cones; cone; cone = cone->rest)
+						assert(lengthListVector(cone->facets) >= Poly->numOfVars);
+				}
+				//irrationalizeCones(Poly->cones, Poly->numOfVars);
+				//params->irrationalize_time.stop();
+				//cerr << params->irrationalize_time;
+				break;
+			default:
+				cerr << "Unknown BarvinokParameters::decomposition" << endl;
+				abort();
+		}//switch
+		}//if lawrence (or all) and h-rep.
+	*/
+
+		/*
+		cout << "#####valuation.cpp, cones after" << endl;
+		printListCone(Poly->cones, Poly->numOfVars);
+		cout << "end valuation.cpp, cones after" << endl;
+		exit(1);
+		//*/
+}//polyhedronToCones
 
 Valuation::ValuationData::ValuationData() :
 	timer(string(""), false)

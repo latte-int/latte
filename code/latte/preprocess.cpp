@@ -282,6 +282,10 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 	ind = numOfIndependentRows * (*numOfVars);
 	numOfVectors = (*numOfVars) - numOfIndependentRows;
 
+	//cout << "num of indepen rows=" << numOfIndependentRows << endl;
+	//cout << "nom of vars" << *numOfVars << endl;
+	//cout << "ind=" << ind << endl;
+
 	basis = createListVector(createVector(*numOfVars));
 	endBasis = basis;
 
@@ -293,6 +297,18 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 		endBasis = endBasis->rest;
 		ind += (*numOfVars);
 	}
+
+	/*cout << "printing bas" << endl;
+	for (int i = 0; i < bas.length(); ++i)
+	{
+		if (i % *numOfVars == 0)
+			cout << "\n";
+		cout << bas[i] << ',';
+	}
+	*/
+	//cout << "\nbasis list vector" << endl;
+	//printListVector(basis, *numOfVars);
+	//cout << "end basis list vector" << endl;
 
 	{
 		// Drop the dummy head.
@@ -401,11 +417,14 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 					+ j] * sol[j];
 		}
 	}
-	//    cerr << "Particular solution:\n";
-	//    printVector(particularSolution,*numOfVars);
-	//    cerr << "Basis:\n";
-	//    printListVector(basis,*numOfVars);
+	cerr << "Particular solution:\n";
+	printVector(particularSolution,*numOfVars);
+	cerr << "Basis:\n";
+	printListVector(basis,*numOfVars);
 
+	//cout << "basis before generators" << lengthListVector(basis);
+	//printListVector(basis, *numOfVars);
+	//cout << "end basis before generators" << endl;
 	newNumOfVars = lengthListVector(basis) + 1;
 
 	(*generators) = createArrayVector(newNumOfVars - 1);
@@ -415,12 +434,46 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 		tmp = tmp->rest;
 	}
 
-	M.SetDims(newNumOfVars, *numOfVars);
+	/*
+	cout << "generators from basis list" << endl;
+	for(int i = 0; i < newNumOfVars - 0; ++i)
+	{
+		cout << "\n";
+		for(int j = 0; j < (*generators)[i].length(); ++j)
+			cout << (*generators)[i][j] << ',';
+
+	}
+	cout << "end generators from basis list" << endl;
+	*/
+
+	M.SetDims(newNumOfVars-1, *numOfVars);
+	//I don't know why, but this used to be newNumOfVars - 1.
 	for (i = 0; i < newNumOfVars - 1; i++)
 		M[i] = (*generators)[i];
-	LLL(det, M, unimodM);
 
-	for (i = 0; i < newNumOfVars - 1; i++)
+	/*cout << "M before lll" << endl;
+	for(int i = 0; i < M.NumRows(); ++i)
+	{
+		cout << "\n";
+		for(int j = 0; j < M.NumCols(); ++j)
+			cout << M[i][j] << ',';
+	}
+	cout << "\n";
+	cout << "calling lll" << endl;
+	*/
+	LLL(det, M, unimodM);
+	/*	cout << "end callking lll" << endl;
+
+	cout << "M after lll" << endl;
+	for(int i = 0; i < M.NumRows(); ++i)
+	{
+		cout << "\n";
+		for(int j = 0; j < M.NumCols(); ++j)
+			cout << M[i][j] << ',';
+	}
+	cout << "end M after lll" << endl;
+	*/
+	for (i = 0; i < M.NumRows(); i++)
 		(*generators)[i] = M[i];
 
 	newInequalities = createListVector(createVector(*numOfVars));
@@ -459,7 +512,7 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 				ProjU[i][m] = Proj[i][m];
 		} //cerr << ProjU << endl;
 
-		//  cerr << tmpcost << endl;
+		//cerr << tmpcost << endl;
 		/*   cost[0]=tmpcost[0];
 		 for (k=0; k<(*numOfVars); k++) {
 		 cost[0]=cost[0]+tmpcost[k]*particularSolution[k];
@@ -477,6 +530,7 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 			}
 		}
 	}
+	cout << "got here" << endl;
 	for (i = 0; i < lengthListVector(inequalities); i++) {
 		a = tmp->first;
 		b = createVector(newNumOfVars + 1);
@@ -536,6 +590,294 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 	(*numOfVars) = newNumOfVars - 1;
 	return (newInequalities);
 }
+
+
+/* ----------------------------------------------------------------- */
+//Brandon I need to finish the stokes method yesterday.
+//TODO: fix the preprocessProblem function and rename this function to something better.
+listVector* preprocessProblem_hack(listVector *equations, listVector *inequalities,
+		vec_ZZ **generators, int *numOfVars, vec_ZZ & cost, mat_ZZ & ProjU,
+		char* interior, int dil) {
+	int i, j, k, ind, ind2, indSol, lenOfMatrix, lenOfBasis,
+			numOfIndependentRows, numOfRows, numOfVectors, newNumOfVars;
+	ZZ det;
+	vec_ZZ a, b, bas, rhs, A, U, H, sol, particularSolution;
+	listVector *tmp, *tmp2, *basis, *endBasis, *newInequalities,
+			*endNewInequalities;
+	mat_ZZ M, unimodM, Solve;
+	//  cerr << *numOfVars << lengthListVector(equations) << endl;
+	if (inequalities == 0) {
+		if (lengthListVector(equations) == *numOfVars) {
+			tmp = equations;
+			i = 0;
+			sol.SetLength(*numOfVars);
+			Solve.SetDims(*numOfVars, *numOfVars);
+			for (i = 0; i < *numOfVars; i++) {
+				sol[i] = tmp -> first[0];
+				for (j = 1; j < *numOfVars + 1; j++)
+					Solve[i][j - 1] = -tmp -> first[j];
+				tmp = tmp -> rest;
+			}
+			// cerr << Solve << sol << endl;
+			vec_ZZ x;
+			x.SetLength(*numOfVars);
+			ZZ d, sum, sum2;
+			mat_ZZ Inv;
+			inv(d, Inv, Solve);
+			x = Inv * sol;
+			for (i = 0; i < *numOfVars; i++)
+				sum += x[i];
+			for (i = 0; i < *numOfVars; i++)
+				sum2 += x[i] / d;
+			//cerr << d << " " <<sum << " " <<d*sum2 << x << endl; exit(0);
+			if (sum == d * sum2) {
+				ofstream OUT("numOfLatticePoints");
+				cerr << "The number of lattice points is 1." << endl;
+				OUT << 1 << endl;
+				exit(0);
+			} else {
+				cerr << "The number of lattice points is 0." << endl;
+				ofstream OUT("numOfLatticePoints");
+				OUT << 0 << endl;
+				exit(0);
+			}
+		} else {
+			cerr << "The polytope is not bounded." << endl;
+			exit(1);
+		}
+	}
+	numOfRows = lengthListVector(equations);
+
+	lenOfMatrix = (*numOfVars) * numOfRows;
+	lenOfBasis = (*numOfVars) * (*numOfVars);
+	H = createVector(lenOfMatrix);
+	rhs = createVector(numOfRows);
+
+	tmp = equations;
+	ind = 0;
+	ind2 = 0;
+	int flag = 0;
+	if (cost.length() != 0)
+		flag = 1;
+
+	while (tmp) {
+		rhs[ind2] = (tmp->first)[0];
+		for (i = 0; i < (*numOfVars); i++) {
+			H[ind] = (tmp->first)[i + 1];
+			ind++;
+		}
+		ind2++;
+		tmp = tmp->rest;
+	}
+	H = -H;
+	A = H;
+
+	H = transpose(H, *numOfVars, numOfRows);
+
+	bas = createVector(lenOfBasis);
+	numOfIndependentRows = ihermite(&H, &bas, &rhs, numOfRows, *numOfVars);
+
+	U = bas;
+	ind = numOfIndependentRows * (*numOfVars);
+	numOfVectors = (*numOfVars) - numOfIndependentRows;
+
+	//cout << "num of indepen rows=" << numOfIndependentRows << endl;
+	//cout << "nom of vars" << *numOfVars << endl;
+	//cout << "ind=" << ind << endl;
+
+	basis = createListVector(createVector(*numOfVars));
+	endBasis = basis;
+
+	for (i = 0; i < numOfVectors; i++) {
+		b = createVector(*numOfVars);
+		for (j = 0; j < (*numOfVars); j++)
+			b[j] = bas[ind + j];
+		endBasis->rest = createListVector(b);
+		endBasis = endBasis->rest;
+		ind += (*numOfVars);
+	}
+
+	/*cout << "printing bas" << endl;
+	for (int i = 0; i < bas.length(); ++i)
+	{
+		if (i % *numOfVars == 0)
+			cout << "\n";
+		cout << bas[i] << ',';
+	}
+	*/
+	//cout << "\nbasis list vector" << endl;
+	//printListVector(basis, *numOfVars);
+	//cout << "end basis list vector" << endl;
+
+	{
+		// Drop the dummy head.
+		listVector *b = basis->rest;
+		delete basis;
+		basis = b;
+	}
+
+	H = transpose(H, numOfRows, *numOfVars);
+	U = transpose(U, *numOfVars, *numOfVars);
+
+	/* Now basis contains the generators of the integer lattice.
+	 A contains the original matrix,
+	 U contains the unimodular transformation matrix, and
+	 H contains the Hermite normal form.
+	 We have A.U = H. */
+	mat_ZZ UU, HH, HHH;
+	UU.SetDims(*numOfVars, *numOfVars);
+	HH.SetDims(numOfRows, *numOfVars);
+	HHH.SetDims(numOfRows, numOfRows);
+
+	int counter = 0;
+	for (i = 0; i < *numOfVars; i++) {
+		for (j = 0; j < *numOfVars; j++) {
+			UU[i][j] = U[counter];
+			counter++;
+		}
+	}
+
+	counter = 0;
+	for (i = 0; i < numOfRows; i++) {
+		for (j = 0; j < *numOfVars; j++) {
+			HH[i][j] = H[counter];
+			counter++;
+		}
+	}
+
+	for (i = 0; i < numOfRows; i++) {
+		for (j = 0; j < numOfRows; j++) {
+			HHH[i][j] = HH[i][j];
+		}
+	}
+
+	// cerr << HH << UU << endl;
+	//  cerr << rhs << endl;
+	ZZ DD, zeros;
+	mat_ZZ invHH;
+	inv(DD, invHH, HHH);
+	//  cerr <<  invHH <<endl << rhs << endl << DD << endl;
+	vec_ZZ sol2;
+	sol = createVector(*numOfVars);
+	sol2 = createVector(*numOfVars);
+	if (DD != 0)
+		sol2 = (invHH * rhs);
+
+	for (i = 0; i < (*numOfVars); i++)
+		sol[i] = 0;
+	//    cerr << "sol:\n";
+	//    printVector(sol,*numOfVars);
+	//    cerr << "numOfRows " << numOfRows << endl;
+	//    cerr << "numOfVars " << *numOfVars << endl;
+
+	indSol = 0;
+	for (i = 0; i < numOfRows; i++) {
+		if (H[(*numOfVars) * i + i] != 0) {
+			//    cerr << "numOfRows " << numOfRows << endl;
+			//    cerr << "numOfVars " << *numOfVars << endl;
+			//    cerr << "lenOfMatrix " << lenOfMatrix << endl;
+			//    cerr << "(i,i) " << (*numOfVars)*i+i << endl;
+			//        cerr << i << " " << indSol << " " << rhs[i] << " "
+			//  	   << H[(*numOfVars)*i+i] << endl;
+			// cerr << "Mmm..." << endl;
+			sol[i] = rhs[i] / H[(*numOfVars) * i + i];
+			indSol++;
+			for (j = i + 1; j < numOfRows; j++) {
+				rhs[j] = rhs[j] - sol[i] * H[j * (*numOfVars) + i];
+				//	H[j*(*numOfVars)+i]=0;
+			}
+		}
+	}
+	cerr << "sol:\n";
+	//    int flag_sol = 0;
+	printVectorToFile(cerr, sol, *numOfVars);
+	if (DD != 0) {
+		for (i = 0; i < *numOfVars; i++) {
+			zeros = abs(sol2[i] - sol[i] * DD);
+			if (zeros != 0) {
+				cerr << "Integrally empty polytope." << endl;
+				cerr << "\n\n**** Total number of lattice points: 0 ****"
+						<< endl << endl;
+				ofstream OutZero("numOfLatticePoints");
+				OutZero << 0 << endl;
+				exit(0);
+			}
+			zeros = 0;
+		}
+	}//cerr << sol << endl;
+	particularSolution = createVector(*numOfVars);
+	for (i = 0; i < (*numOfVars); i++)
+		particularSolution[i] = 0;
+
+	for (i = 0; i < (*numOfVars); i++) {
+		particularSolution[i] = 0;
+		for (j = 0; j < (*numOfVars); j++) {
+			particularSolution[i] = particularSolution[i] + U[i * (*numOfVars)
+					+ j] * sol[j];
+		}
+	}
+	cerr << "Particular solution:\n";
+	printVector(particularSolution,*numOfVars);
+	cerr << "Basis:\n";
+	printListVector(basis,*numOfVars);
+
+	//cout << "basis before generators" << lengthListVector(basis);
+	//printListVector(basis, *numOfVars);
+	//cout << "end basis before generators" << endl;
+	newNumOfVars = lengthListVector(basis) + 1;
+
+	(*generators) = createArrayVector(newNumOfVars - 1);
+	tmp = basis;
+	for (i = 0; i < newNumOfVars - 1; i++) {
+		(*generators)[i] = tmp->first;
+		tmp = tmp->rest;
+	}
+
+	/*
+	cout << "generators from basis list" << endl;
+	for(int i = 0; i < newNumOfVars - 0; ++i)
+	{
+		cout << "\n";
+		for(int j = 0; j < (*generators)[i].length(); ++j)
+			cout << (*generators)[i][j] << ',';
+
+	}
+	cout << "end generators from basis list" << endl;
+	*/
+
+	M.SetDims(newNumOfVars-1, *numOfVars);
+	//I don't know why, but this used to be newNumOfVars - 1.
+	for (i = 0; i < newNumOfVars - 1; i++)
+		M[i] = (*generators)[i];
+
+	/*cout << "M before lll" << endl;
+	for(int i = 0; i < M.NumRows(); ++i)
+	{
+		cout << "\n";
+		for(int j = 0; j < M.NumCols(); ++j)
+			cout << M[i][j] << ',';
+	}
+	cout << "\n";
+	cout << "calling lll" << endl;
+	*/
+	LLL(det, M, unimodM);
+	/*	cout << "end callking lll" << endl;
+
+	cout << "M after lll" << endl;
+	for(int i = 0; i < M.NumRows(); ++i)
+	{
+		cout << "\n";
+		for(int j = 0; j < M.NumCols(); ++j)
+			cout << M[i][j] << ',';
+	}
+	cout << "end M after lll" << endl;
+	*/
+	for (i = 0; i < M.NumRows(); i++)
+		(*generators)[i] = M[i];
+
+	*numOfVars = M.NumRows();
+	return (NULL);
+}//brandont's hack for stokes.
 
 /******************************************************************/
 

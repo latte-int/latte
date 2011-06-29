@@ -25,7 +25,9 @@
 #define VERTICES_CDD__H
 
 #include "cone.h"
+#include "latte_cddlib.h"
 
+void createCddIneFile(const dd_MatrixPtr M);
 void createCddIneFile(listVector*, int);
 void createCddExtFile(listVector*, int);
 void createCddIneLPFile(listVector* matrix, int numOfVars, vec_ZZ & cost);
@@ -39,6 +41,7 @@ rationalVector* ReadLpsFile(int numOfVars, bool verbose = true);
 listCone* readCddEadFile(listCone*, int);
 listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars);
 listCone* computeVertexCones(const char* fileName, listVector*, int);
+listCone* computeVertexCones(const char* fileName, const dd_MatrixPtr M);
 rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
 		   bool verbose = true);
 listCone* CopyListCones(listCone* RudyCones, int numOfVars, 

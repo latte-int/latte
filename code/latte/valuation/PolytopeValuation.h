@@ -57,12 +57,15 @@ private:
 	int numOfVars, numOfVarsOneCone;
 	bool freeVertexRayCones, freePolytopeAsOneCone, freeTriangulatedPoly; //denotes if we made these objects (and should free them) or if they were passed in.
 
+	const mat_ZZ *latticeInverse;		//used if polytope is not full-dimensional.
+	const ZZ *latticeInverseDilation;
 
+	int dimension; //of the affine hull.
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 	void convertToOneCone(); //convert from poly to polytopeAsOneCone. Then late you can triangulate the polytope into simpleces
+	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor, RationalNTL & constantMonomial);
 	void dilatePolytopeOneCone(const ZZ & factor); //dilates polytope by changing the vertices.
 	void dilatePolytopeVertexRays(const RationalNTL & factor); //dilates polytope by changing the vertices.
-	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor, RationalNTL & constantMonomial); //given a polynomial and a dilation factor, replaces x_i^k --> factor^k*x_i^k
 	ZZ findDilationFactorOneCone() const;
 	ZZ findDilationFactorVertexRays() const;
 	RationalNTL findIntegralUsingTriangulation(linFormSum &forms) const; //computes the integral over every simplex
@@ -84,11 +87,13 @@ public:
 
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 	RationalNTL findIntegral(const monomialSum& polynomial, const IntegrationType integrationType);
+	RationalNTL findIntegral(linFormSum& linearForms);
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
 	ZZ static lcm(const ZZ &a, const ZZ & b);
 	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.
-
+	void setLatticeInverse(const mat_ZZ * _latticeInverse, const ZZ * _latticeInverseDilation);
+	void setFullDimension(int d);
 };
 
 #endif /* POLYTOPEVALUATION_H_ */

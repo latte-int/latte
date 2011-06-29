@@ -196,6 +196,7 @@ public:
 	RationalNTL & div(const ZZ & rhs); // divides by rhs.
 	RationalNTL & div(const RationalNTL & rhs);
 	RationalNTL operator/(const RationalNTL & rhs) const;
+
 	RationalNTL operator/(const ZZ & rhs) const;
 
 	//GET FUNCTIONS

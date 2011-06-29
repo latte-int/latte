@@ -12,6 +12,20 @@
 using namespace std;
 
 
+
+LinearPerturbationContainer::LinearPerturbationContainer()
+  :divideByZero(false), dimention(0), latticeInverse(NULL), latticeInverseDilation(NULL), numOfRays(0)
+{
+
+}
+
+
+void LinearPerturbationContainer::setLatticeInformation(const mat_ZZ *_latticeInverse, const ZZ * _latticeInverseDilation)
+{
+	latticeInverse  = _latticeInverse;
+	latticeInverseDilation = _latticeInverseDilation;
+}
+
 /**
  * Allocates space for each term in the integration formula.
  * @dim: dimention of the polytope (number of slots in each vertex).
@@ -24,12 +38,13 @@ void LinearPerturbationContainer::setListCones(int dim,
 	coneTerms.resize(lengthListCone(simpleConeList));
 	currentPerturbation.SetLength(dim);
 	dimention = dim;
+	numOfRays = lengthListVector(simpleConeList->rays);
 
 	//build the vector of cones.
 	listCone* ptr = simpleConeList;
 	for (unsigned int i = 0; i < coneTerms.size(); ++i)
 	{
-		coneTerms[i].setSimplicialCone(ptr, dim);
+		coneTerms[i].setSimplicialCone(ptr, numOfRays);
 		ptr = ptr->rest;
 	}//for every cone.
 }
@@ -64,7 +79,7 @@ bool LinearPerturbationContainer::tryNoPerturbation(const vec_ZZ &l)
 {
 	divideByZero = false;
 	for (unsigned int i = 0; i < coneTerms.size(); ++i)
-		if (coneTerms[i].computeDotProducts(l))
+		if (coneTerms[i].computeDotProducts(l, latticeInverse, latticeInverseDilation))
 			divideByZero = true; //don't break b/c want to find all inner products w/o pertrubation.
 	return divideByZero;
 }
@@ -126,6 +141,10 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 		for (long i = 1; i < currentPerturbation.length(); ++i)
 			currentPerturbation[i] = currentPerturbation[i] / gcdValue;
 
+	//cout << "HEY, I'm forcing a perturbation" << endl;
+	//currentPerturbation[0] = 1;
+	//currentPerturbation[1] = 2;
+	//currentPerturbation[2] = 3;
 
 	while (tryCurrentPerturbation(l) == true)
 	{
@@ -179,11 +198,11 @@ void LinearPerturbationContainer::findPerturbation(const vec_ZZ &l)
 RationalNTL LinearPerturbationContainer::integratePolytope(int m)
 {
 	RationalNTL totalSum; //contains the sum. init. to zero.
-
+	//cout << "integratePolytope:: number of coneTerms is " << coneTerms.size() << endl;
 	for (unsigned int i = 0; i < coneTerms.size(); ++i)
-		coneTerms[i].integrateTerm(totalSum, m, dimention);
+		coneTerms[i].integrateTerm(totalSum, m, numOfRays);
 
-	if (dimention %2)
+	if (numOfRays %2)
 		totalSum.changeSign();
 	return totalSum; //integral of l over the polytope!
 }
@@ -194,11 +213,7 @@ RationalNTL LinearPerturbationContainer::integratePolytope(int m)
 //--------------------------------------
 //--------------------------------------
 
-LinearLawrenceIntegration::LinearLawrenceIntegration() :
-	divideByZero(0), simplicialCone(NULL)
-{
 
-}
 
 LinearLawrenceIntegration::LinearLawrenceIntegration(listCone * cone) :
 	divideByZero(0), simplicialCone(cone)
@@ -206,10 +221,16 @@ LinearLawrenceIntegration::LinearLawrenceIntegration(listCone * cone) :
 
 }
 
-void LinearLawrenceIntegration::setSimplicialCone(listCone *cone, int dim)
+LinearLawrenceIntegration::LinearLawrenceIntegration():
+	divideByZero(0), simplicialCone(NULL)
+{
+
+}
+
+void LinearLawrenceIntegration::setSimplicialCone(listCone *cone, int numOfRays)
 {
 	simplicialCone = cone;
-	rayDotProducts.resize(dim);
+	rayDotProducts.resize(numOfRays);
 
 
 }
@@ -225,11 +246,13 @@ void LinearLawrenceIntegration::setSimplicialCone(listCone *cone, int dim)
  *
  *  We set the coeff. of the epsilon term and power term to zero to denote that the powers have not yet been processed.
  *
- *  @l: linear form.
+ *  @parm l: linear form.
+ *  @parm latticeInverse: left inverse to the lattice generators. Used for finding volume of rays.
+ *  @parm latticeInverseDilation: divide latticeInverse by this number to get the true inverse.
  *  @return: true=we divided by zero wen <v,l>!= 0 (and so we need to find a perturbation for this term).
  *           false=we did not divide by zero or <v,l> = 0.
  */
-bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
+bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l, const mat_ZZ * latticeInverse, const ZZ * latticeInverseDilation)
 {
 	//polytope should be dilated...should be integer!
 	const vec_ZZ &vertex = simplicialCone->vertex->vertex->numerators();
@@ -237,6 +260,7 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
 	//update the vertex dot products. if <v,l>=0, we are done processing this cone
 	//and so report that we did not divide by zero.
 	numeratorDotProduct.constant = vertex * l;
+	//cout << "computeDotProducts:: v=" << vertex << ", l=" << l << ", dot=" << vertex * l << endl;
 	if (numeratorDotProduct.constant == 0)
 	{
 		divideByZero = false;
@@ -246,15 +270,15 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
 	}
 
 	//for every ray, find <l, r>. report true if we divided by zero.
-	unsigned int i = 0;
+	int i = 0;
 	divideByZero = false;
 	//cout << "printing cone" << endl;
 	//printCone(simplicialCone, l.length());
 
 
-	//now find the abs. value of the det.
+	//build the ray matrix and compute the dot products and init. epsilon and power.
 	mat_ZZ rayMatrix;
-	rayMatrix.SetDims(rayDotProducts.size(), rayDotProducts.size());//dimention.
+	rayMatrix.SetDims((simplicialCone->rays->first).length(), rayDotProducts.size());//dimention.
 	for (listVector * ray = simplicialCone->rays; ray; ray = ray->rest, ++i)
 	{
 		//cout << "i=" << i << endl;
@@ -266,13 +290,50 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l)
 		if (rayDotProducts[i].constant == 0)
 			divideByZero = true;
 
-		for(unsigned int j = 0; j < rayDotProducts.size(); ++j)
-			rayMatrix[i][j]  = ray->first[j];
+		//save the rays in the column.
+		for(int j = 0; j < l.length(); ++j)
+			rayMatrix[j][i]  = ray->first[j];
+		//cout << "start of ray i" << endl;
+		//printVector(ray->first, l.length());
 	}//for each ray.
-	determinant = abs(NTL::determinant(rayMatrix));
+	//cout << "ray matrix fromed from cone" << endl;
+	//printCone(simplicialCone, l.length());
+	//now find the abs. value of the det. of the rays
+	if ( latticeInverse == NULL) //or we could check that length of rays = # of rays.
+	{
+		determinant = abs(NTL::determinant(rayMatrix));
+	}//cone if full-dimensional
+	else
+	{
+		/*
+		cout << "lattice size: " << latticeInverse->NumRows() << "x"
+				                 << latticeInverse->NumCols()
+	         << " rayMatrix  : " << rayMatrix.NumRows() << "x"
+	                             << rayMatrix.NumCols() << endl;
+		cout << "ray matrix:";
+		for(int i = 0; i < rayMatrix.NumRows(); ++i)
+		{
+			for(int j = 0; j < rayMatrix.NumCols(); ++j)
+				cout << rayMatrix[i][j] << ", ";
+			cout << endl;
+		}
+		cout << "lattice inverse matrix:";
+		for(int i = 0; i < latticeInverse->NumRows(); ++i)
+		{
+			for(int j = 0; j < latticeInverse->NumCols(); ++j)
+				cout << (*latticeInverse)[i][j] << ", ";
+			cout << endl;
+		}
+		cout << endl;
+		*/
+		determinant = abs(NTL::determinant((*latticeInverse) * rayMatrix));
+		determinant = determinant / power(*latticeInverseDilation, latticeInverse->NumCols());
+	}//the cone is not-full dimensional
+	//cout << " det = " << determinant << endl;
 	//cout << "going to return " << divideByZero << endl;
 	return divideByZero;
 }
+
 
 /** Finds the dot products of the vertex and rays for each term with the perturbation term ONLY.
 *
@@ -321,7 +382,7 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &e,
  *
  * @totalSum: output parameter
  * @m: the power of the linear form
- * @dim: dimension of the polytope.
+ * @dim: dimension of the polytope.( dim <= n, polytope lives in R^n)
  *
  * It is here that we merge/update the powers in the denominator.
  *
@@ -333,16 +394,18 @@ void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 
 	//cout << endl;
 	denominator = 1;
+	//cout << "got here integrateTerm  1" << endl;
 	if (numeratorDotProduct.constant == 0)
 		return; //integral over cone is zero!!!
-
+	//cout << "got here integrateTerm 2" << endl;
 	if (divideByZero == false)
 	{
 		numerator = power(numeratorDotProduct.constant, m + dim);
-		for (unsigned int i = 0; i < dim; ++i)
+		for (unsigned int i = 0; i < rayDotProducts.size(); ++i)
 			denominator *= rayDotProducts[i].constant;
 
-		totalSum.add(numerator * determinant, denominator);
+		//cout << "integrateTerm::" << numerator << "/" << denominator << "* " << determinant << endl;
+		totalSum.add( RationalNTL(numerator, denominator).mult(determinant));
 		//cout << "--compute redidue not needed."
 		//	 << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
 		return;
@@ -363,8 +426,15 @@ void LinearLawrenceIntegration::integrateTerm(RationalNTL &totalSum, int m,
 	//cout << "--going to call computeResidueLawrence(" << dim << ", " << m <<" this, " << numerator << ", " <<  denominator << endl;
 	computeResidueLawrence(dim, m, *this, numerator, denominator);
 	//cout << "--returned from computeResidueLawrence ok" << endl;
-	//cout << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator);
-	totalSum.add(numerator * determinant, denominator);
+	//cout << "det * term = " << determinant << "* " << RationalNTL(numerator, denominator) << endl;
+	totalSum.add( RationalNTL(numerator, denominator).mult(determinant));
+
+
+	//cout << "integrateTerm, printTerm" << endl;
+	//printTerm();
+	//cout << "end integrateTerm, printTerm" << endl;
+	//cout << endl;
+
 
 }//integrateTerm
 

@@ -145,6 +145,46 @@ void createCddIneFile(listVector* matrix, int numOfVars)
 
 	return;
 }
+
+void createCddIneFile(const dd_MatrixPtr M)
+{
+	ofstream OUT;
+	OUT.open("latte_cdd.ine");
+	OUT << "H-representation" << endl;
+	OUT << "begin " << endl;
+	OUT << M->rowsize << " " << M->colsize << ((M->numbtype == dd_Integer) ? " integer" : " rational") << endl;
+
+	//print out matrix and add equation index to stack array.
+	vector<int> stack;
+	for(int i = 0; i < M->rowsize; ++i)
+	{
+		for(int j = 0; j < M->colsize; ++j)
+			OUT << M->matrix[i][j] << " ";
+		OUT << endl;
+
+		if ( set_member(i+1, M->linset) )
+			stack.push_back(i+1);
+	}
+	OUT << "end" << endl;
+	OUT << "adjacency" << endl;
+	OUT << "incidence" << endl;
+
+
+	if ( stack.size())
+	{
+		OUT << "partial_enumeration " << stack.size();
+		for (int i = 0; i < stack.size(); ++i)
+		{
+			OUT << " " << stack[i];
+		}
+		OUT << endl;
+	}//if equations exist
+
+
+	OUT.close();
+
+	return;
+}//createCddIneFile
 /* ----------------------------------------------------------------- */
 void createLrsIneFile(listVector* matrix, int numOfVars)
 {
@@ -456,7 +496,7 @@ listCone* readCddExtFile(int &numOfVars)
 	endCones = cones;
 	if (numOfVertices == 0)
 	{
-		cerr << "Empty Polytope." << endl;
+		cerr << "readCddExtFile:: Empty Polytope." << endl;
 		ofstream OUT("numOfLatticePoints");
 		OUT << 0 << endl;
 		exit(0);
@@ -477,7 +517,7 @@ listCone* readCddExtFile(int &numOfVars)
 			in.get(read);
 			if (read == '0')
 			{
-				cerr << "\n\nUnbounded polytope!" << endl << endl;
+				cerr << "\n\nreadCddExtFile:: Unbounded polytope!" << endl << endl;
 				exit(0);
 			}
 		}
@@ -528,7 +568,7 @@ listCone* readCddExtFile(int &numOfVars)
 			{
 				if (x == 0)
 				{
-					cerr << "\n\nGiven polyhedron is unbounded!!!\n\n";
+					cerr << "\n\nreadCddExtFile:: Given polyhedron is unbounded!!!(2)\n\n";
 					ofstream Empty("numOfLatticePoints");
 					Empty << 0 << endl;
 					exit(0);
@@ -840,6 +880,34 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
 	return (cones);
 }
 
+
+
+/* ----------------------------------------------------------------- */
+listCone* computeVertexCones(const char* fileName, const dd_MatrixPtr M)
+{
+	char cddOutFileName[PATH_MAX], command[PATH_MAX];
+	listCone *cones;
+
+	/* Compute vertices and edges with cdd. */
+
+	createCddIneFile(M);
+
+	cerr << "Computing vertices and edges with cdd...";
+	cerr.flush();
+	system_with_error_check(relocated_pathname(CDD_PATH)
+			+ " latte_cdd.ine > latte_cdd.out");
+	cerr << "done." << endl;
+
+	{
+		int ext_numOfVars;
+		cones = readCddExtFile(ext_numOfVars);
+		assert(ext_numOfVars == M->colsize);
+	}
+	cones = readCddEadFile(cones, M->colsize);
+	system_with_error_check("rm -f latte_cdd.*");
+
+	return (cones);
+}//computeVertexCones
 /* ----------------------------------------------------------------- */
 
 listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix,
