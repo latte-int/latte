@@ -10,6 +10,8 @@
 \usepackage{rotating}
 \usepackage{url}
 \usepackage{xspace}
+\usepackage[breaklinks=true,colorlinks,citecolor=blue]{hyperref}
+
 
 \newcommand{\Q}{{\mathbb Q}}
 \newcommand{\OO}{{\mathbb O}}
@@ -18,6 +20,12 @@
 \newcommand{\N}{{\mathbb N}}
 \newcommand{\X}{{\mathbb X}}
 \newcommand{\latte}{{\tt LattE}\xspace}
+\newcommand{\vinci}{{\tt Vinci}\xspace}
+\newcommand{\maple}{{\tt Maple}\xspace}
+\newcommand{\cdd}{{\tt CDD}\xspace}
+\newcommand{\fourtitwo}{{\tt 4ti2}\xspace}
+\newcommand{\cubpack}{{\tt CUBPACK}\xspace}
+
 
 \DeclareMathOperator{\vol}{vol}     %%% Denotes volume
 \DeclareMathOperator{\Res}{Res}  %% Residue
@@ -183,18 +191,408 @@ The integral $\int_P x  \d{x}\d{y} = 0 + 0 -2/6 + 5/6 = 1/2$ as it should be.
 
 
 
-
-
 \subsection{What can {\tt LattE} compute?}
 
-In the following we list the operations that {\tt LattE} v1.1 can
-perform on bounded convex polyhedra (more commonly referred to as 
-\textit{polytopes}). For the reader's convenience, we already include
-the basic commands to actually do the tasks. Let us assume that a
-description of a polytope $P$ is given in the file ``fileName'' (see
-Section \ref{Input Files} for format) and that a cost vector is
-specified in the file ``fileName.cost'' (needed for the optimization
-part, see Section \ref{Input Files} for format).
+\latte contains three key executables:
+\begin{description}
+	\item[count] counts lattice points, computes ehrhart polynomials and series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
+	\item[integrate] integrates polynomials over polytopes
+	\item[max/minimize] perform linear integer programming.
+\end{description}
+
+The other executables in latte are drivers, converters, and other small utility function described in section ???
+
+%***********************************************************************************
+%***********************************************************************************
+%***********************************************************************************
+%***********************************************************************************
+%***********************************************************************************
+
+\section{Input Files}\label{Input Files}
+
+A polytope can be defined from a list of vertices (a v-rep) or a list of hyperplane inequalities (h-rep) and so \latte can start from either representation in different formats. Here are four common file formats:
+\begin{enumerate}
+	\item \latte style vertex file
+	\item \latte style hyperplane file
+	\item \cdd style vertex file
+	\item \cdd style hyperplane file
+\end{enumerate}
+
+We now explore the file syntax of each.
+
+\subsection{\latte h-rep}
+
+\subsubsection{Inequality Description}
+Let $P$ be a polytope described by a
+system of inequalities $Ax\leq b$, where $A\in\Z^{m\times d}$, 
+$A=(a_{ij})$, and $b\in\Z^m$. Note that any hyperplane representation with rational coefficients can be brought into this form; for example $x + 1/2y \leq 5/9$ should be written as $18x +9y \leq 10$. With $P=\{x : Ax \leq b\}$, the input file is;
+\begin{verbatim}
+m d+1
+b  -A
+\end{verbatim}
+
+\textbf{EXAMPLE.}
+Let $P=\{(x,y): x\leq 1, y\leq 1, x+y\leq 1, x\geq 0, y\geq 0\}$.
+Thus
+\[
+\begin{array}{ccc}
+A=\left(
+\begin{array}{rr} 
+ 1 &  0 \\ 
+ 0 &  1 \\ 
+ 1 &  1 \\
+-1 &  0 \\ 
+ 0 & -1 \\ 
+\end{array} 
+\right) 
+& , &
+b = \left( 
+\begin{array}{r} 
+1 \\ 
+1 \\ 
+1 \\ 
+0 \\
+0 \\ 
+\end{array} 
+\right)
+\end{array}
+\]
+and the {\tt LattE} input file would be
+\begin{verbatim}
+5 3
+1 -1  0
+1  0 -1
+1 -1 -1
+0  1  0
+0  0  1
+\end{verbatim}
+
+\subsubsection{Equality Constraints}
+
+By default, a constraint is an inequality of type $a^Tx\leq b$. But to input an equality constraint $a^Tx=b$ we need to add a keyword.
+
+\textbf{EXAMPLE.}
+Let $P$ be as in the previous example, but require $x+y=1$ instead of
+$x+y\leq 1$, thus, 
+$P=\{(x,y): x\leq 1, y\leq 1, x+y=1, x\geq 0, y\geq 0\}$.
+Then the {\tt LattE} input file that describes $P$ would be as such:
+\begin{verbatim}
+5  3
+1 -1  0
+1  0 -1
+1 -1 -1
+0  1  0
+0  0  1
+linearity 1 3
+\end{verbatim}
+The last line states that among the $5$ inequalities one is to be
+considered an equality, the third one.
+
+In general, the linearity syntax is :
+\begin{verbatim}
+	linearity <number of equations> <row index of constraint, start counting from 1>
+\end{verbatim}
+
+\subsubsection{Nonnegativity Constraints}
+For bigger examples it quickly becomes cumbersome to state all
+nonnegativity constraints for the variables one by one. Instead, you
+may use another short-hand.
+
+\textbf{EXAMPLE.}
+Let $P$ be as in the previous example, then the {\tt LattE} input file
+that describes $P$ could also be described as such: 
+\begin{verbatim}
+3  3
+1 -1  0
+1  0 -1
+1 -1 -1
+linearity 1 3
+nonnegative 2 1 2
+\end{verbatim}
+The last line states that there are two nonnegativity constraints and
+that the first and second variables are required to be nonnegative. 
+{\bf NOTE} that the first line reads ``3 3'' and not ``5 3'' as above! 
+
+In general, the nonnegative syntax is :
+\begin{verbatim}
+	nonnegative <number of variables in list> <variable index, start counting from 1>
+\end{verbatim}
+
+
+\subsubsection{Cost Vector}
+The functions maximize and minimize solve the integer linear programs
+\[
+\max\{c^\intercal x: x\in P\cap\Z^d\}
+\]
+and
+\[
+\min\{c^\intercal x: x\in P\cap\Z^d\}.
+\]
+Besides a description of the polyhedron $P$, these functions need a
+linear objective function given by a certain cost vector $c \in \Z^d$, where the input style is very similar to a \latte h-rep file. If the
+polyhedron is given in the file ``fileName''
+\begin{verbatim}
+4  4
+1 -1  0  0
+1  0 -1  0
+1  0  0 -1
+1 -1 -1 -1
+linearity 1 4
+nonnegative 3 1 2 3
+\end{verbatim}
+the cost vector must be given in the file ``fileName.cost'', as for
+example in the following three-dimensional problem: 
+\begin{verbatim}
+1 3
+2 4 7
+\end{verbatim}
+The first two entries state the size of a $1\times n$ matrix (encoding
+the cost vector), followed by the $1\times n$ matrix itself. Assuming
+that we call maximize, this whole data encodes the integer program
+\[
+\max\{2x_1+4x_2+7x_3: x_1+x_2+x_3=1, x_1,x_2,x_3\in\{0,1\}\}.
+\]
+
+
+\subsection{\latte v-rep}
+
+{\tt \bf TODO::photo of homogenization}
+
+
+Let $v_1, \dots, v_k$ be the vertices(???) of a polytope $P \subseteq \R^n$, then the \latte file format is:
+
+\begin{stack}
+	k\: n+1\\
+	1\: v_1\\
+	\dots \\
+	1\: v_k
+\end{stack}
+
+
+\textbf{EXAMPLE.}
+Note, unlike \latte h-reps files, v-reps files can contain rationals, and you are free to scale each homogenized vertex by any scaler. Below are the vertices of a rectangle $(0,0), (2/3,0), (0,1/4), (2/3, 1/4)$:
+\begin{verbatim}
+4 3
+5 10/3 0
+1 0 1/4
+1/99 0 0
+1 2/3 1/4
+\end{verbatim}
+
+\subsection{\cdd Input Files}
+In addition to the formats described above, {\tt LattE} can also
+accept input files in standard {\tt cdd} format. (See Subsection 
+\ref{Command Syntax} for
+details on how to run {\tt LattE} on a {\tt cdd} input file.) Below is
+an example of {\tt cdd} input that is readable into {\tt LattE}.
+\begin{verbatim}
+H-representation
+begin
+4  4  integer
+2 -2  4 -1
+3 -2 -2  3
+6  2 -4 -3
+1  2  2  1
+end
+\end{verbatim}
+
+For a complete description of \cdd file syntax, see ????
+
+\subsection{\latte vs. \cdd file formats}
+There are a few key differences between \latte and \cdd file formats.
+
+\begin{enumerate}
+	\item \cdd used the file extension *.ine for h-rep files, and *.ext for v-rep files. However, \latte makes not assumption on the file extensions of files. We recomment *.vrep.latte and *.hrep.latte for \latte style files, but you are free to name your files anything.
+	\item \cdd also requires ``H-representation'' or ``V-representation'' keywords in the file. Forgetting about the ``linearity'' and ``nonnegative'' keywords, there is no difference between a \latte v- and h-rep file.
+	\item Currently, not all commands work starting from a \cdd v-rep file.
+\end{enumerate}
+
+
+%*****************************************************************
+%*****************************************************************
+%*****************************************************************
+%*****************************************************************
+%*****************************************************************
+
+\section{Running {\tt LattE}}\label{Running LattE}
+
+\subsection{How to use {\tt count}}
+
+{\tt count} has a nice help menu, to view it, run
+
+\begin{verbatim}
+	./count --help
+\end{verbatim}
+
+The following options control what {\tt count} computes.
+
+\begin{itemize}
+\item Count the number of lattice points in polytope $P$, where $P$  is given in a file named ``fileName.hrep.latte'' in different file formats.
+	\begin{verbatim}
+     ./count fileName.hrep.latte
+     ./count --vrep fileName.vrep.latte
+     ./count --cdd fileName.ine
+	\end{verbatim} 
+
+\item Count the number of lattice points in $nP$, the dilation of $P$ by the integer factor $n$.
+	\begin{verbatim}
+     ./count --dilation=n fileName.hrep.latte
+	\end{verbatim} 
+\item Count the number of lattice points in the interior of the  polytope $P$, where $P$ is given in ``fileName''.
+	\begin{verbatim}
+     ./count --interior fileName.hrep.latte
+	\end{verbatim} 
+\item Use the homogenized Barvinok algorithm \cite{latte3} to count  the number of lattice points in the polytope $P$. Use if number of vertices of $P$ is big compared to the number of constraints. 
+	\begin{verbatim}
+     ./count --homog fileName.hrep.latte
+	\end{verbatim} 
+\item Compute the number of lattice points (default)
+	\begin{verbatim}
+     ./count --count-lattice-points  fileName.hrep.latte
+	\end{verbatim} 
+\item Compute the multivariate generating function of the set of lattice points of the polyhedron
+	\begin{verbatim}
+     ./count --multivariate-generating-function  fileName.hrep.latte
+	\end{verbatim} 
+\item Compute the Ehrhart polynomial of an integral polytope
+	\begin{verbatim}
+     ./count --ehrhart-polynomial  fileName.hrep.latte
+	\end{verbatim} 
+\item Compute the unsimplified Ehrhart series as a univariate rational function
+	\begin{verbatim}
+     ./count --ehrhart-series  fileName.hrep.latte
+	\end{verbatim} 
+\item Compute the simplified Ehrhart series as a univariate rational function (needs \maple).
+	\begin{verbatim}
+     ./count --simplified-ehrhart-series  fileName.hrep.latte
+	\end{verbatim} 
+\item Compute the first N terms of the Ehrhart series
+	\begin{verbatim}
+     ./count --ehrhart-taylor=N  fileName.hrep.latte
+	\end{verbatim} 
+\end{itemize}
+
+The following options relate to the Barvinok algorithm.
+\begin{itemize}
+\item Triangulate and signed-decompose in the dual space (traditional method, default)
+	\begin{verbatim}
+     ./count --dual  fileName.hrep.latte
+	\end{verbatim} 
+\item Triangulate in the dual space, signed-decompose in the primal space using irrationalization
+	\begin{verbatim}
+     ./count --irrational-primal  fileName.hrep.latte
+	\end{verbatim} 
+\item Triangulate and signed-decompose in the primal space  using irrationalization
+	\begin{verbatim}
+     ./count --irrational-all-primal  fileName.hrep.latte
+	\end{verbatim} 
+\item  Decompose cones down to an index (determinant) of N instead down to unimodular cones (which have an index of 1).
+	\begin{verbatim}
+     ./count --maxdet=N  fileName.hrep.latte
+	\end{verbatim} 
+\item Do not signed-decompose simplicial cones
+	\begin{verbatim}
+     ./count --no-decomposition   fileName.hrep.latte
+	\end{verbatim} 
+\item Use polynomial substitution for specialization (traditional method, default)
+	\begin{verbatim}
+     ./count --polynomial  fileName.hrep.latte
+	\end{verbatim} 	
+\item Use exponential substitution for specialization (recommended for maxdet larger than 1)
+	\begin{verbatim}
+     ./count --exponential   fileName.hrep.latte
+	\end{verbatim} 	
+			
+\end{itemize}
+
+\subsection{How to use {\tt integrate}}
+
+Like {\tt count}, {\tt integrate} has a help menu. To view the menu, run
+
+\begin{verbatim}
+	./integrate --help
+\end{verbatim}	
+
+There are two different integration (and volume) algorithms. The triangulation method triangulates the entire polytope and integrates over each simplex. In the cone decomposition method, each tangent cone is triangulated and we integrate over each cone. Unlike other integration software, \latte integrates polynomials and powers of linear forms exactly.
+
+\begin{itemize}
+\item Integrates using the cone-decomposition method.
+	\begin{verbatim}
+     --cone-decompose
+	\end{verbatim} 	
+\item Integrates using the triangulation method.
+	\begin{verbatim}
+     --triangulate
+	\end{verbatim} 	
+\item Sets what you want to compute: a volume or an integral.
+	\begin{verbatim}
+     --valuation=integrate
+     --valuation=volume
+	\end{verbatim} 	
+\item Prints the cone-decomposition rational function for volumes
+	\begin{verbatim}
+     --valuation=volume --cone-decompose --print-cone-decompose-function
+	\end{verbatim} 	
+\item Sets the file that contains the polynomial. If this option is not set, and the valuation is integration, the polynomial will be read from stdin.
+	\begin{verbatim}
+     --monomials=FILE
+	\end{verbatim} 	
+\end{itemize}
+
+Let us view a few examples of the above options
+
+\begin{itemize}
+\item Integrates a polynomial in file ``FILE'' using the triangulation method. 
+	\begin{verbatim}
+	./integrate --valuation=integral --triangulate --monomials=FILE fileName.hrep.latte
+	\end{verbatim} 	
+\item Find a volume using the cone decomposition method from a \latte v-rep file.
+	\begin{verbatim}
+	./integrate --valuation=volume --cone-decompose --vrep fileName.vrep.latte
+	\end{verbatim} 	
+\item Find a volume using both methods from a \latte v-rep file.
+	\begin{verbatim}
+	./integrate --valuation=volume --vrep fileName.vrep.latte
+	./integrate --valuation=volume --all --vrep fileName.vrep.latte	
+	\end{verbatim} 	
+\end{itemize}
+           
+\subsection{Command Syntax}\label{Command Syntax}
+
+
+
+
+\subsection{Ehrhart Series}
+\begin{itemize}
+\item Compute the Ehrhart series encoded as a rational function for
+  the polytope given in ``fileName''. {\bf NEEDS} Maple for
+  simplification of terms. Writes the simplified rational function to
+  file ``fileName.rat''. 
+\begin{verbatim}
+     ./ehrhart simplify fileName
+\end{verbatim} 
+\end{itemize}
+
+\subsection{Optimizing}
+This functions {\bf NEEDS} a cost vector specified in ``fileName.cost''!!!
+\begin{itemize}
+\item Maximizes/Minimizes given linear cost function over the lattice
+  points in the polytope given in ``fileName''. Digging algorithm
+  \cite{latte3} is used. Optimal point and optimal value is returned. 
+\begin{verbatim}
+     ./maximize fileName
+     ./minimize fileName
+\end{verbatim} 
+\item Maximizes/Minimizes given linear cost function over the lattice
+  points in the polytope given in ``fileName''. Binary search
+  algorithm is used. Only optimal value is returned. 
+\begin{verbatim}
+     ./maximize bbs fileName
+     ./minimize bbs fileName
+\end{verbatim} 
+\end{itemize}
+
+
 
 Tasks performed by {\tt LattE} v1.1:
 \begin{enumerate}
@@ -232,8 +630,6 @@ In addition to these basic functions, there are more specific calls to
 {\tt LattE}. For example to use the homogenized Barvinok algorithm
 instead of the original one in order to count the lattice points. These
 details will be explained in Section \ref{Running LattE}.
-
-
 
 \newpage
 
@@ -289,258 +685,13 @@ administrator, a friend, or send us an email.)
 
 
 
-\newpage
-
-\section{Input Files}\label{Input Files}
-
-\subsection{{\tt LattE} Input Files}
-
-\subsubsection{Inequality Description}
-For computations involving a polytope $P$ described by a
-system of inequalities $Ax\leq b$, where $A\in\Z^{m\times d}$, 
-$A=(a_{ij})$, and $b\in\Z^m$, the {\tt LattE} readable input file
-would be as follows: 
-\begin{verbatim}
-m d+1
-b  -A
-\end{verbatim}
-
-\textbf{EXAMPLE.}
-Let $P=\{(x,y): x\leq 1, y\leq 1, x+y\leq 1, x\geq 0, y\geq 0\}$.
-Thus
-\[
-\begin{array}{ccc}
-A=\left(
-\begin{array}{rr} 
- 1 &  0 \\ 
- 0 &  1 \\ 
- 1 &  1 \\
--1 &  0 \\ 
- 0 & -1 \\ 
-\end{array} 
-\right) 
-& , &
-b = \left( 
-\begin{array}{r} 
-1 \\ 
-1 \\ 
-1 \\ 
-0 \\
-0 \\ 
-\end{array} 
-\right)
-\end{array}
-\]
-and the {\tt LattE} input file would be as such:
-\begin{verbatim}
-5 3
-1 -1  0
-1  0 -1
-1 -1 -1
-0  1  0
-0  0  1
-\end{verbatim}
-
-\subsubsection{Equations}
-In {\tt LattE}, polytopes are represented by {\bf linear constraints},
-i.e. equalities or inequalities. By default a constraint is an
-inequality of type $ax\leq b$ unless we specify, by using a single
-additional line, the line numbers of constraints that are linear
-equalities. 
-
-\textbf{EXAMPLE.}
-Let $P$ be as in the previous example, but require $x+y=1$ instead of
-$x+y\leq 1$, thus, 
-$P=\{(x,y): x\leq 1, y\leq 1, x+y=1, x\geq 0, y\geq 0\}$.
-Then the {\tt LattE} input file that describes $P$ would be as such:
-\begin{verbatim}
-5  3
-1 -1  0
-1  0 -1
-1 -1 -1
-0  1  0
-0  0  1
-linearity 1 3
-\end{verbatim}
-The last line states that among the $5$ inequalities one is to be
-considered an equality, the third one.
-
-\subsubsection{Nonnegativity Constraints}
-For bigger examples it quickly becomes cumbersome to state all
-nonnegativity constraints for the variables one by one. Instead, you
-may use another short-hand.
-
-\textbf{EXAMPLE.}
-Let $P$ be as in the previous example, then the {\tt LattE} input file
-that describes $P$ could also be described as such: 
-\begin{verbatim}
-3  3
-1 -1  0
-1  0 -1
-1 -1 -1
-linearity 1 3
-nonnegative 2 1 2
-\end{verbatim}
-The last line states that there are two nonnegativity constraints and
-that the first and second variables are required to be nonnegative. 
-{\bf NOTE} that the first line reads ``3 3'' and not ``5 3'' as above! 
-
-\subsubsection{Cost Vector}
-The functions maximize and minimize solve the integer linear programs
-\[
-\max\{c^\intercal x: x\in P\cap\Z^d\}
-\]
-and
-\[
-\min\{c^\intercal x: x\in P\cap\Z^d\}.
-\]
-Besides a description of the polyhedron $P$, these functions need a
-linear objective function given by a certain cost vector $c$. If the
-polyhedron is given in the file ``fileName''
-\begin{verbatim}
-4  4
-1 -1  0  0
-1  0 -1  0
-1  0  0 -1
-1 -1 -1 -1
-linearity 1 4
-nonnegative 3 1 2 3
-\end{verbatim}
-the cost vector must be given in the file ``fileName.cost'', as for
-example in the following three-dimensional problem: 
-\begin{verbatim}
-1 3
-2 4 7
-\end{verbatim}
-The first two entries state the size of a $1\times n$ matrix (encoding
-the cost vector), followed by the $1\times n$ matrix itself. Assuming
-that we call maximize, this whole data encodes the integer program
-\[
-\max\{2x_1+4x_2+7x_3: x_1+x_2+x_3=1, x_1,x_2,x_3\in\{0,1\}\}.
-\]
 
 
 
-\subsection{{\tt cdd} Input Files}
-In addition to the formats described above, {\tt LattE} can also
-accept input files in standard {\tt cdd} format. (See Subsection 
-\ref{Command Syntax} for
-details on how to run {\tt LattE} on a {\tt cdd} input file.) Below is
-an example of {\tt cdd} input that is readable into {\tt LattE}.
-\begin{verbatim}
-H-representation
-begin
-4  4  integer
-2 -2  4 -1
-3 -2 -2  3
-6  2 -4 -3
-1  2  2  1
-end
-\end{verbatim}
-It is important to note that {\tt LattE} can only read 
-{\em integer} input.  Clearly, {\tt cdd}'s rational data files can be
-converted into integer files by multiplying by the right constants. In
-the packaged release of {\tt LattE} we include a binary version of
-{\tt cdd}. 
 
 
 \newpage
 
-\section{Running {\tt LattE}}\label{Running LattE}
- 	
-\subsection{Command Syntax}\label{Command Syntax}
-The basic syntax to invoke the various functions of {\tt LattE} is:
-\begin{verbatim}
-./count fileName
-./ehrhart fileName
-./maximize fileName
-./minimize fileName
-\end{verbatim}
-Note that the last two functions require a cost vector specified in
-the file ``fileName.cost''!
-
-Additionally, a variety of options can be used. All options should be
-space-delimited in the command. 
-
-One option that can be set in addition to the options given below is
-``cdd'' which tells {\tt LattE} to read its input from a {\tt cdd}
-input file. Thus, the above invocations for {\tt cdd} input files would be
-\begin{verbatim}
-./count cdd fileName
-./ehrhart cdd fileName
-./maximize cdd fileName
-./minimize cdd fileName
-\end{verbatim}
-
-
-\subsection{Counting}
-\begin{itemize}
-\item Count the number of lattice points in polytope $P$, where $P$
-  is given in ``fileName''.
-\begin{verbatim}
-     ./count fileName
-\end{verbatim} 
-\item Count the number of lattice points in $nP$, the dilation of $P$
-  by the integer factor $n$.
-\begin{verbatim}
-     ./count dil n fileName
-\end{verbatim} 
-\item Count the number of lattice points in the interior of the
-  polytope $P$, where $P$ is given in ``fileName''.
-\begin{verbatim}
-     ./count int fileName
-\end{verbatim} 
-\item Use the homogenized Barvinok algorithm \cite{latte3} to count
-  the number of lattice points in the polytope $P$, where $P$ is given
-  in ``fileName''. Use if number of vertices of $P$ is big compared to
-  the number of constraints. 
-\begin{verbatim}
-     ./count homog fileName
-\end{verbatim} 
-\end{itemize}
-
-
-
-\subsection{Ehrhart Series}
-\begin{itemize}
-\item Compute the Ehrhart series encoded as a rational function for the
-  polytope given in ``fileName''. Writes the unsimplified rational function
-  to file ``fileName.rat''.
-\begin{verbatim}
-     ./ehrhart fileName
-\end{verbatim} 
-\item Compute the Ehrhart series encoded as a rational function for
-  the polytope given in ``fileName''. {\bf NEEDS} Maple for
-  simplification of terms. Writes the simplified rational function to
-  file ``fileName.rat''. 
-\begin{verbatim}
-     ./ehrhart simplify fileName
-\end{verbatim} 
-\item Compute the Taylor series expansion of Ehrhart generating
-  function up to degree $n$ for the polytope given in ``fileName''. 
-\begin{verbatim}
-     ./ehrhart n fileName
-\end{verbatim} 
-\end{itemize}
-
-\subsection{Optimizing}
-This functions {\bf NEEDS} a cost vector specified in ``fileName.cost''!!!
-\begin{itemize}
-\item Maximizes/Minimizes given linear cost function over the lattice
-  points in the polytope given in ``fileName''. Digging algorithm
-  \cite{latte3} is used. Optimal point and optimal value is returned. 
-\begin{verbatim}
-     ./maximize fileName
-     ./minimize fileName
-\end{verbatim} 
-\item Maximizes/Minimizes given linear cost function over the lattice
-  points in the polytope given in ``fileName''. Binary search
-  algorithm is used. Only optimal value is returned. 
-\begin{verbatim}
-     ./maximize bbs fileName
-     ./minimize bbs fileName
-\end{verbatim} 
-\end{itemize}
 	
 
 
