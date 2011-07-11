@@ -109,7 +109,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
 			|| strcmp(valuationAlg, "all") == 0)
 	{
-		cout << "Going to run the lawrence integration method" << endl;
+		cout << "Going to run the cone-decomposition integration method" << endl;
 		monomialSum originalPolynomial;// polynomial without the updated coefficients.
 		PolytopeValuation polytopeValuation(poly2, myParameters);
 
