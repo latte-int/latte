@@ -21,11 +21,13 @@
 \newcommand{\N}{{\mathbb N}}
 \newcommand{\X}{{\mathbb X}}
 \newcommand{\latte}{{\tt LattE}\xspace}
+\newcommand{\latteV}{v1.3}
 \newcommand{\vinci}{{\tt Vinci}\xspace}
 \newcommand{\maple}{{\tt Maple}\xspace}
 \newcommand{\cdd}{{\tt CDD}\xspace}
 \newcommand{\fourtitwo}{{\tt 4ti2}\xspace}
 \newcommand{\cubpack}{{\tt CUBPACK}\xspace}
+
 
 
 \DeclareMathOperator{\vol}{vol}     %%% Denotes volume
@@ -36,19 +38,21 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2ex plus 0.4ex minus 0.4ex}
 
-\title{A User's Guide for {\tt LattE} v1.1 \\ (Linux Release)
+\title{A User's Guide for {\tt LattE integrale} \latteV \\ (Linux Release)
 \footnote{Research supported by NSF grants DMS-0309694, NSF grants
 DMS-0073815, and by NSF VIGRE Grant DMS-0135345. $\copyright$ 
-Department of Mathematics, University of California, Davis, 2003. This
+Department of Mathematics, University of California, Davis, 2011. This
 software is released under the GNU license agreement}}
 
 \author{Jes\'us A. De Loera \and
-        David Haws \and
-        Raymond Hemmecke \and
-        Peter Huggins \and 
-        Jeremy Tauzer \and 
-        Ruriko Yoshida }
-\date{December 2003}
+Brandon Dutra \and
+Matthias K\"oppe \and 
+Stanislav Moreinis \and
+Gregory Pinto \and
+Jianqiu Wu \and
+}
+ 
+ \date{July 2011}
 
 \begin{document}
 
@@ -68,9 +72,9 @@ The name ``{\tt LattE}'' is an abbreviation for ``{\bf Latt}ice point
 {\bf E}numeration.'' \latte was developed in 2001 to count lattice points contained in 
 convex polyhedra defined by linear equations and inequalities with 
 integer coefficients. The polyhedra can be of any (reasonably small) 
-dimension. In 2007, \latte macchiato was released and contained many 
-algorithmic improvements. The newest edition, \latte integrale, developed in 2010
-can compute integrals of polynomials and volumes of rational polytopes. 
+dimension. In 2007, {\tt LattE macchiato} was released and contained many 
+algorithmic improvements. The newest edition, {\tt LattE integrale}, developed
+in 2010 can compute integrals of polynomials and volumes of rational polytopes. 
 All these algorithms run in polynomial
 time for fixed dimension. To
 learn more about the exact details of our implementation for lattice point enumeration, the interested reader can consult 
@@ -94,12 +98,13 @@ a rather long sum, in fact for a polyhedral cone it can be infinite, but
 the good news is that it admits short representations.
 
 \noindent {\bf Example:} Let $P$ be the quadrangle with vertices 
-$V_1=(0,0)$, $V_2=(5,0)$, $V_3=(4,2)$, and $V_4=(0,2)$. 
+$V_1=(0,0)$, $V_2=(5,0)$, $V_3=(4,2)$, and $V_4=(0,2)$, see Figure \ref{fig:quadrangle}.
 
 \begin{figure}[thb]
-\begin{center}
-     \includegraphics[scale=.79]{examplebrion.eps}
-\end{center}
+	\centering
+	\includegraphics[width=0.7\textwidth]{examplebrion.jpg}
+	\caption{Quadrangle with vertices $V_1=(0,0)$, $V_2=(5,0)$, $V_3=(4,2)$, and $V_4=(0,2)$.}
+	\label{fig:quadrangle}
 \end{figure}
 
 {\small
@@ -201,7 +206,7 @@ The integral $\int_P x  \d{x}\d{y} = 0 + 0 -2/6 + 5/6 = 1/2$ as it should be.
 	\item[max/minimize] perform linear integer programming.
 \end{description}
 
-The other executables in latte are drivers, converters, and other small utility function described in section ???
+The other executables in latte are drivers, converters, and other small utility function described in Section \ref{section:file-descriptions}.
 
 %***********************************************************************************
 %***********************************************************************************
@@ -211,7 +216,7 @@ The other executables in latte are drivers, converters, and other small utility 
 
 \section{Input Files}\label{Input Files}
 
-A polytope can be defined from a list of vertices (a v-rep) or a list of hyperplane inequalities (h-rep) and so \latte can start from either representation in different formats. Here are four common file formats:
+A polytope can be defined from a list of vertices (a v-representation) or a list of hyperplane inequalities (h-representation) and so \latte can start from either representation in different formats. Here are four common file formats:
 \begin{enumerate}
 	\item \latte style vertex file
 	\item \latte style hyperplane file
@@ -221,7 +226,7 @@ A polytope can be defined from a list of vertices (a v-rep) or a list of hyperpl
 
 We now explore the file syntax of each.
 
-\subsection{\latte h-rep}
+\subsection{\latte h-representation}
 
 \subsubsection{Inequality Description}
 Let $P$ be a polytope described by a
@@ -330,7 +335,7 @@ and
 \min\{c^\intercal x: x\in P\cap\Z^d\}.
 \]
 Besides a description of the polyhedron $P$, these functions need a
-linear objective function given by a certain cost vector $c \in \Z^d$, where the input style is very similar to a \latte h-rep file. If the
+linear objective function given by a certain cost vector $c \in \Z^d$, where the input style is very similar to a \latte h-representation file. If the
 polyhedron is given in the file ``fileName''
 \begin{verbatim}
 4  4
@@ -355,23 +360,31 @@ that we call maximize, this whole data encodes the integer program
 \]
 
 
-\subsection{\latte v-rep}
+\subsection{\latte v-representation}
 
-{\tt \bf TODO::photo of homogenization}
+\latte can start from a homoenized v-representation of the polytope. To homogenize a vertex, simply add an leading 1 to the vertex. This has the affect of lifting the polytope to a cone in one dimension higher such that the original polytope can be extracted by intercecting the cone with the $x_1 = 1$ plane. For example, take a triangle in the plane, then Figure \ref{fig:homogenized-triangle} shows the resulting cone.
 
 
-Let $v_1, \dots, v_k$ be the vertices(???) of a polytope $P \subseteq \R^n$, then the \latte file format is:
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{homogenizedTriangle.jpg}
+\caption{Homogenized triangule.}
+\label{fig:homogenized-triangle}
+\end{figure}
 
-\begin{stack}
-	k\: n+1\\
-	1\: v_1\\
-	\dots \\
-	1\: v_k
-\end{stack}
+
+Let $v_1, \dots, v_k$ be the vertices of a polytope $P \subseteq \R^n$, then the \latte v-representation file format is:
+
+\begin{align*}
+	k &\: (n+1)\\
+	1 &\: v_1\\
+	\vdots & \\
+	1 &\: v_k
+\end{align*}
 
 
 \textbf{EXAMPLE.}
-Note, unlike \latte h-reps files, v-reps files can contain rationals, and you are free to scale each homogenized vertex by any scaler. Below are the vertices of a rectangle $(0,0), (2/3,0), (0,1/4), (2/3, 1/4)$:
+Note, unlike \latte h-representations files, v-representations files can contain rationals, and you are free to scale each homogenized vertex by any scaler. Below are the vertices of a rectangle $(0,0), (2/3,0), (0,1/4), (2/3, 1/4)$:
 \begin{verbatim}
 4 3
 5 10/3 0
@@ -382,8 +395,8 @@ Note, unlike \latte h-reps files, v-reps files can contain rationals, and you ar
 
 \subsection{\cdd Input Files}
 In addition to the formats described above, {\tt LattE} can also
-accept input files in standard {\tt cdd} format. Below is
-an example of {\tt cdd} input that is readable into {\tt LattE}.
+accept input files in standard \cdd format. Below is
+an example of \cdd input that is readable into \latte.
 \begin{verbatim}
 H-representation
 begin
@@ -395,15 +408,15 @@ begin
 end
 \end{verbatim}
 
-For a complete description of \cdd file syntax, see ????
+For a complete description of \cdd file syntax, see the \cdd manual \cite{fukuda}.
 
 \subsection{\latte vs. \cdd file formats}
 There are a few key differences between \latte and \cdd file formats.
 
 \begin{enumerate}
-	\item \cdd used the file extension *.ine for h-rep files, and *.ext for v-rep files. However, \latte makes not assumption on the file extensions of files. We recomment *.vrep.latte and *.hrep.latte for \latte style files, but you are free to name your files anything.
-	\item \cdd also requires ``H-representation'' or ``V-representation'' keywords in the file. Forgetting about the ``linearity'' and ``nonnegative'' keywords, there is no difference between a \latte v- and h-rep file.
-	\item Currently, not all commands work starting from a \cdd v-rep file.
+	\item \cdd used the file extension *.ine for h-representation files, and *.ext for v-representation files. However, \latte makes no assumption on the file extensions of files. We recommend *.vrep.latte and *.hrep.latte for \latte style files, but you are free to name your files anything.
+	\item \cdd also requires ``H-representation'' or ``V-representation'' keywords in the file. Forgetting about the ``linearity'' and ``nonnegative'' keywords, there is no difference between a \latte v- and h-representation file.
+	\item Currently, not all commands work starting from a \cdd v-representation file.
 \end{enumerate}
 
 
@@ -611,11 +624,11 @@ Let us view a few examples of the above options
 	\begin{verbatim}
 	./integrate --valuation=integral --triangulate --monomials=FILE fileName.hrep.latte
 	\end{verbatim} 	
-\item Find a volume using the cone decomposition method from a \latte v-rep file.
+\item Find a volume using the cone decomposition method from a \latte v-representation file.
 	\begin{verbatim}
 	./integrate --valuation=volume --cone-decompose --vrep fileName.vrep.latte
 	\end{verbatim} 	
-\item Find a volume using both methods from a \latte v-rep file.
+\item Find a volume using both methods from a \latte v-representation file.
 	\begin{verbatim}
 	./integrate --valuation=volume --vrep fileName.vrep.latte
 	./integrate --valuation=volume --all --vrep fileName.vrep.latte	
@@ -638,7 +651,7 @@ A common subproblem in counting lattice points and integration requires finding 
 	--dualization={cdd,4ti2}
   \end{verbatim}
 
-\item By default, \latte assumes the h-rep may contain redundant hyperplanes and tries to find and remove them. You can control how much mork \latte should spend checking the input h-rep with the following option.
+\item By default, \latte assumes the h-representation may contain redundant hyperplanes and tries to find and remove them. You can control how much mork \latte should spend checking the input h-representation with the following option.
 
 	\begin{verbatim}
 	--redundancy-check={none,cddlib,full-cddlib}.
@@ -1046,9 +1059,9 @@ provided.
 
 Let us integrate the polynomial $w^2x^2y^4z^8 -3/8x^2$ and the power of a linear form $3(w +2x + 4y + 6z)^{10}$ over the $24$-cell.
 
+ 
 
-
-Create a file named ``even.polynomial'' that has on its first line the polynomial (see Section \label{input-file:polynomial-and-linear-form} for a review of the syntax)
+Create a file named ``even.polynomial'' that has on its first line the polynomial. See Section \ref{input-file:polynomial-and-linear-form} for a review of the syntax.
 	
 	\begin{verbatim}
 	[[1,[2,2,4,8]], [-3/8,[0,2,0,0]]]
@@ -1056,7 +1069,7 @@ Create a file named ``even.polynomial'' that has on its first line the polynomia
 
 After running the integration command using the triangulation method
 	\begin{verbatim}
-	./integrate --valuation=integrate --triangulate --monomials=even.polynomial 24\_cell
+	./integrate --valuation=integrate --triangulate --monomials=even.polynomial 24_cell
 	\end{verbatim}
 
 
@@ -1076,14 +1089,28 @@ Computational time (algorithms + processing + program control)
 
 
 
-Now create a new file named ``power10.linearform'' that has in its first line the power of a linear form:
+Now create a new file named ``power10.linearforms'' that has in its first line the power of a linear form:
 
 	\begin{verbatim}
 	[[3,[10,[1,2,4,6]]]]
 	\end{verbatim}
 	
+Then integrate this power of a linear form over the 24\_cell using the cone decomposition method with the following command:	
+	\begin{verbatim}
+	./integrate --cone-decompose --linear-forms=power10.linearforms  24_cell
+	\end{verbatim}
 	
-TODO;	
+We see the answer is computed very quickly.
+	
+\begin{verbatim}	
+Integration (using the cone decomposition method)
+     Answer: 59555515086/77
+     Decimal: 773448247.87012987012987012987013
+     Time: 0.02 sec
+Computational time (algorithms + processing + program control)
+     Total time: 0.07 sec
+\end{verbatim}	
+	
 \section{Release Information}
 
 \subsection{System Requirements}
@@ -1114,6 +1141,7 @@ no problem. Please let us know about any problem you experience with
 our connection to \maple.
 
 \subsection{File Descriptions} 
+\label{section:file-descriptions}
 The {\tt LattE} Linux release consists a single archive file,
 \textbf{latte\_v1.*.tar.gz}. The archive contains the following files:
 
@@ -1183,9 +1211,9 @@ Although {\tt LattE} is free software, your acknowledgment
 is requested.  If {\tt LattE} is useful in your research or
 applications please acknowledge it by referencing this manual as
 
-De Loera, J.A., Haws, D., Hemmecke, R., Huggins, P.,
-Tauzer, J., Yoshida, R.\\ 
-{\em A User's Guide for {\tt LattE} v1.1}, 2003, 
+De Loera, J.A., Dutra, B., K\"oppe, M., Moreinis, S.,
+Pinto, G., Wu, J.\\ 
+{\em A User's Guide for {\tt LattE integrale} \latteV}, 2011, 
 software package {\tt LattE} is available at 
 {\tt http://www.math.ucdavis.edu/$\sim$latte/}
 	
@@ -1193,7 +1221,7 @@ software package {\tt LattE} is available at
 \begin{description}
 \item[Project directors]  Prof. Jes\'us A. De Loera and Prof. Matthias K\"oppe
 \item[Students currently working on the project] Brandon Dutra
-\item[Distinguished \latte Scientists, Collaborators and Advisors]
+\item[Distinguished \latte Scientists, Collaborators and Advisors] \hfill \\
 	\begin{itemize} 
 		\item Dr. Raymond Hemmecke
 		\item Prof. Ruriko Yoshida
@@ -1206,7 +1234,7 @@ software package {\tt LattE} is available at
 		\item Prof. Alexander Barvinok
 		\item Prof. Bernd Sturmfels 
 	\end{itemize}
-\item[Alumni of the project]	
+\item[Alumni of the project]	\hfill \\
 	\begin{itemize}
 		\item Gregory Pinto	
 		\item Stanislav Moreinis
@@ -1222,12 +1250,12 @@ software package {\tt LattE} is available at
 \subsection{Acknowledgments}
 
 \par {\tt LattE} currently uses many wonderful pieces of software.
-First is {\tt cdd}, developed by Komei Fukuda, whose webpage can be
+First is {\tt cdd} \cite{fukuda}, developed by Komei Fukuda, whose webpage can be
 found at:
 
 \makebox[12 cm]{http://www.cs.mcgill.ca/$\sim$fukuda/}
 
-Next, \latte uses \fourtitwo, developed by ???, whose webpage can be found at:
+Next, \latte uses \fourtitwo \cite{4ti2} whose webpage can be found at:
 
 \makebox[12 cm]{http://www.4ti2.de}
 
@@ -1249,10 +1277,15 @@ DMS-0309694, NSF DMS-0073815, and by NSF VIGRE grant DMS-0135345.
 
 %\newpage
 
-\begin{thebibliography}{99}
+\bibliographystyle{amsabbrv}
+\bibliography{bibliography}
 
+\begin{comment}
+\begin{thebibliography}{99}
+\bibitem{4ti2}{4ti2 team}{\em \: 4ti2---A software package for algebraic, geometric and 
+combinatorial problems on linear spaces}. Available at \url{www.4ti2.de}.
 \bibitem{howToIntegratePolynomialSimplex} {V. Baldoni, N. Berline, J. A. De 
-Loera, M. K{\"o}ppe, and M. Vergne} {How to integrate a polynomial over a
+Loera, M. K{\"o}ppe, and M. Vergne} {\em How to integrate a polynomial over a
 simplex}, Mathematics of Computation 80 (2011), no. 273, 297–325.
 \bibitem{BarviPom} {Barvinok, A.I. and Pommersheim, J.} {\em An
 algorithmic theory of lattice points in polyhedra}, in: {\sl New
@@ -1265,7 +1298,7 @@ R. E. Burkard, G. J. Woeginger, eds., {\em Algorithms}--ESA 97.
 Lecture Notes in Computer Science 1284, Springer-Verlag, 92--103, 1997. 
 \bibitem{latte1}{De Loera, J.A., Hemmecke, R., Tauzer, J., and Yoshida, R.}
 {\em Effective lattice point counting in rational convex polytopes},
-to appear in Journal of Symbolic Computation.
+Journal of Symbolic Computation, Volume 38, Issue 4, Symbolic Computation in Algebra and Geometry, October 2004, Pages 1273-1302, ISSN 0747-7171, DOI: 10.1016/j.jsc.2003.04.003.
 \bibitem{latte2}{De Loera, J.A., Haws, D., Hemmecke, R., Huggins, P.,
 Sturmfels, B., and Yoshida, R.} {\em Short rational functions for
 toric algebra and applications}, e-print, Available via 
@@ -1285,7 +1318,7 @@ polytopes}, university lecture series, vol. 8, AMS, Providence RI,
 Volume I, Cambridge, 1997.
 \end{thebibliography}	
 
-
+\end{comment}
 
 %\newpage
 

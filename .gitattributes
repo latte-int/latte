@@ -283,7 +283,11 @@ code/test-suite/test-irr-exp-maxdet1000-4ti2.sh -text
 code/test-suite/test-irr-exp-maxdet1000.sh -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
+doc/amsabbrv.bst -text
+doc/bibliography.bib -text
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
+doc/examplebrion.jpg -text
+doc/homogenizedTriangle.jpg -text
 /install-reloc -text
 /link-warning.h -text
 /manual_v1.1.pdf -text
