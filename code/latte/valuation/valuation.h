@@ -110,13 +110,15 @@ public:
 };
 
 
+typedef enum {inputPolynomial, inputLinearForm, nothing} IntegrandType;
+
 ValuationContainer computeVolume(Polyhedron * poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
 		const char * print);
 
 ValuationContainer computeIntegral(Polyhedron *poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
-		const char * polynomialString);
+		const char * polynomialString, const IntegrandType);
 
 ValuationContainer mainValuationDriver(const char *argv[], int argc);
 

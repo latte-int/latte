@@ -117,7 +117,11 @@ public:
 		curTerm.coef = storedTerm->coef;
 		curTerm.degree = storedTerm->degree;
 		storedTerm = storedTerm->next;
-		//cout << "got term w/coef " << curTerm->coef << endl;
+
+		//cout << "got term curT.coef=" << curTerm.coef << endl;
+		//cout << "got term curT.deg =" << curTerm.degree << endl;
+		//for(int i = 0; i < curTerm.length; ++i)
+		//	cout << "got term curT.exps[" << i << "=" << curTerm.exps[i] << endl;
 
 		if (curTerm.coef == 0)
 			return nextTerm(); //skip this term because has a zero coeff.

@@ -277,6 +277,32 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
 }
 
 
+void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const ZZ & dilationFactor)
+{
+	BTrieIterator<RationalNTL, ZZ>* linearFormsItr =
+			new BTrieIterator<RationalNTL, ZZ> ();
+	linearFormsItr->setTrie(linearForms.myForms, linearForms.varCount);
+	linearFormsItr->begin();
+
+	term<RationalNTL, ZZ>* lform;
+	cout << "starting loop" << endl;
+	//loop over the original polynomial, and insert the updated monomial into the transformedPolynomial
+	for (lform = linearFormsItr->nextTerm(); lform; lform
+			= linearFormsItr->nextTerm())
+	{
+		cout << "got here" << endl;
+		for(int i = 0; i < lform->length; ++i)
+			cout << "i:exp=" << i << "], " << lform->exps[i] << endl;
+		cout << "degree=" << lform->degree << endl;
+		cout << "coef  =" << lform->coef << endl;
+		(lform->coef).div(power(dilationFactor, lform->degree));
+	}//for every term in the originalPolynomial
+	cout << "number: " << linearForms.termCount << endl;
+	cout << "ptr   : " << linearForms.myForms   << endl;
+	delete linearFormsItr;
+}//dilateLinearForms
+
+
 /**
  * Computes n!, n >= 0.
  */
@@ -436,7 +462,16 @@ RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms)
 	RationalNTL answer;
 	RationalNTL constantForm;
 	//linFormSum linearForms;
+}
 
+/**
+ * Save as the other findIntegral, only this one starts with linear forms, not polynomials.
+ */
+RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms, const IntegrationType integrationType )
+{
+/*	cout << "find int with linear forms called" << endl;
+	//linFormSum linearForms;
+	RationalNTL answer;
 
 	//find the dilation factor.
 	ZZ dilationFactor;
@@ -480,7 +515,7 @@ RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms)
 	destroyLinForms(linearForms);
 	return answer;
 
-
+*/
 }//findIntegral
 
 

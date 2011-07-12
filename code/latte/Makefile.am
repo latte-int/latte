@@ -306,10 +306,10 @@ my_test_ehrhart_SOURCES += buildPolytopes/GraphMaker.cpp
 my_test_ehrhart_SOURCES += buildPolytopes/BuildGraphPolytope.cpp
 
 #main program to find volumes and integrals of polytopes.
-bin_PROGRAMS += valuation-computation
-valuation_computation_SOURCES = valuation/Driver.cpp
-valuation_computation_LDADD = $(LDADD)
-valuation_computation_LDADD += liblatteintegration.a
+bin_PROGRAMS += integrate
+integrate_SOURCES = valuation/Driver.cpp
+integrate_LDADD = $(LDADD)
+integrate_LDADD += liblatteintegration.a
 
 #convert a cdd H-rep to latte H-rep (by clearing the fractions)
 bin_PROGRAMS += ConvertCDDineToLatte

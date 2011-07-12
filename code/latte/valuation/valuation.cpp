@@ -8,6 +8,8 @@
 #include "valuation.h"
 #include <iomanip>
 
+//defines the input file/string.
+
 /**
  * Computes the volume of the polytope.
  * The triangulation method will not change the org. polytope, but the
@@ -70,7 +72,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
  */
 Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 		BarvinokParameters &myParameters, const char *valuationAlg,
-		const char * polynomialString)
+		const char * integrandString, const IntegrandType integrandType)
 {
 	ValuationContainer answer;
 	ValuationData tiangulate_timer_and_result;
@@ -80,29 +82,50 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 
 	if (strcmp(valuationAlg, "all") == 0)
 	{
-		poly2 = new Polyhedron(*poly); //copy org. polytope
+		poly2 = new Polyhedron(*poly); //copy org. polytope, because it will be dilated.
 	}
 
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
 	{
-		//the org. polytope is dilated.
 		cout << "Going to run the triangulation integration method" << endl;
-		monomialSum originalPolynomial;// polynomial without the updated coefficients.
 		PolytopeValuation polytopeValuation(poly, myParameters);
 
-		loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
-		tiangulate_timer_and_result.timer.start();
-		ans1 = polytopeValuation.findIntegral(originalPolynomial,
-				PolytopeValuation::TriangulationIntegration);
-		tiangulate_timer_and_result.timer.stop();
+		if (integrandType == inputPolynomial)
+		{
+			monomialSum originalPolynomial;// polynomial without the updated coefficients.
+			loadMonomials(originalPolynomial, integrandString); //get the polynomial from the string.
 
-		tiangulate_timer_and_result.valuationType
-				= ValuationData::integrateTriangulation;
-		tiangulate_timer_and_result.answer = ans1;
-		answer.add(tiangulate_timer_and_result);
+			tiangulate_timer_and_result.timer.start();
+			ans1 = polytopeValuation.findIntegral(originalPolynomial,
+					PolytopeValuation::TriangulationIntegration);
+			tiangulate_timer_and_result.timer.stop();
 
-		destroyMonomials(originalPolynomial);
+			tiangulate_timer_and_result.valuationType
+					= ValuationData::integrateTriangulation;
+			tiangulate_timer_and_result.answer = ans1;
+			answer.add(tiangulate_timer_and_result);
+
+			destroyMonomials(originalPolynomial);
+		}
+		else
+		{
+			linFormSum originalLinearForm;
+			loadLinForms(originalLinearForm, integrandString);
+
+			tiangulate_timer_and_result.timer.start();
+			ans1 = polytopeValuation.findIntegral(originalLinearForm,
+					PolytopeValuation::TriangulationIntegration);
+			tiangulate_timer_and_result.timer.stop();
+
+			tiangulate_timer_and_result.valuationType
+					= ValuationData::integrateTriangulation;
+			tiangulate_timer_and_result.answer = ans1;
+			answer.add(tiangulate_timer_and_result);
+
+			destroyLinForms(originalLinearForm);
+
+		}
 	}//if doing triangulation method.
 
 
@@ -110,21 +133,42 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 			|| strcmp(valuationAlg, "all") == 0)
 	{
 		cout << "Going to run the cone-decomposition integration method" << endl;
-		monomialSum originalPolynomial;// polynomial without the updated coefficients.
-		PolytopeValuation polytopeValuation(poly2, myParameters);
+		if (integrandType == inputPolynomial)
+		{
+			monomialSum originalPolynomial;// polynomial without the updated coefficients.
+			PolytopeValuation polytopeValuation(poly2, myParameters);
 
-		loadMonomials(originalPolynomial, polynomialString); //get the polynomial from the string.
-		lawrence_timer_and_result.timer.start();
-		ans2 = polytopeValuation.findIntegral(originalPolynomial,
-				PolytopeValuation::LawrenceIntegration);
-		lawrence_timer_and_result.timer.stop();
+			loadMonomials(originalPolynomial, integrandString); //get the polynomial from the string.
+			lawrence_timer_and_result.timer.start();
+			ans2 = polytopeValuation.findIntegral(originalPolynomial,
+					PolytopeValuation::LawrenceIntegration);
+			lawrence_timer_and_result.timer.stop();
 
-		lawrence_timer_and_result.valuationType
-				= ValuationData::integrateLawrence;
-		lawrence_timer_and_result.answer = ans2;
-		answer.add(lawrence_timer_and_result);
+			lawrence_timer_and_result.valuationType
+					= ValuationData::integrateLawrence;
+			lawrence_timer_and_result.answer = ans2;
+			answer.add(lawrence_timer_and_result);
 
-		destroyMonomials(originalPolynomial);
+			destroyMonomials(originalPolynomial);
+		}
+		else
+		{
+			linFormSum originalLinearForm;// polynomial without the updated coefficients.
+			PolytopeValuation polytopeValuation(poly2, myParameters);
+
+			loadLinForms(originalLinearForm, integrandString); //get the polynomial from the string.
+			lawrence_timer_and_result.timer.start();
+			ans2 = polytopeValuation.findIntegral(originalLinearForm,
+					PolytopeValuation::LawrenceIntegration);
+			lawrence_timer_and_result.timer.stop();
+
+			lawrence_timer_and_result.valuationType
+					= ValuationData::integrateLawrence;
+			lawrence_timer_and_result.answer = ans2;
+			answer.add(lawrence_timer_and_result);
+
+			destroyLinForms(originalLinearForm);
+		}
 	}
 
 	if (strcmp(valuationAlg, "all") == 0 && ans1 != ans2)
@@ -164,7 +208,8 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	char printfile[127], Save_Tri[127], Load_Tri[127], Print[127],
 			removeFiles[127], command[127];
 	char valuationAlg[127], valuationType[127], printLawrence[127],
-			polynomialFile[127];
+			integrandFile[127];
+	IntegrandType integrandType = nothing;
 	bool approx;
 	bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
 	bool triangulation_specified = false;
@@ -200,7 +245,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	strcpy(Print, "no");
 	strcpy(valuationAlg, "all");
 	strcpy(printLawrence, "no");
-	strcpy(polynomialFile, "");
+	strcpy(integrandFile, "");
 	//strcpy(valuationType, "volume");
 	strcpy(valuationType, "integrate");
 
@@ -314,7 +359,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			cerr << "Options that control what to compute:" << endl
 					<< "  valuation types: --valuation=volume, or --valuation=integrate\n"
 					<< "volume algorithms and options:\n"
-					<< "  --lawrence  [--print-lawrence-function]       Computes the volume using the Lawrence formula and\n"
+					<< "  --cone-decompose                            Computes the volume using the Lawrence formula and\n"
 					<< "                                              and prints the Lawrence rational function.\n"
 					<< "  --triangulate                               Computes the volume using the triangulation method.\n"
 					<< "  --all                                       Computes the volume using all the methods.\n"
@@ -323,14 +368,14 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 					<< "                                              encoded in maple-syntax: [ [coef, [exponent vector]], ...]\n"
 					<< "                                              If cannot open file, the line is read from std in.\n"
 					<< "Example: " << argv[0]
-					<< " --valuation=volume --lawrence --print-lawrence-function file.latte\n"
-					<< "         (will print the volume found by the Lawrence method along with the Lawrence rational function.)\n"
+					<< " --valuation=volume --cone-decompose --print-cone-decompose-function file.latte\n"
+					<< "         (will print the volume found by the cone decomposition method along with the Lawrence rational function.)\n"
 					<< "Example: " << argv[0]
 					<< " --valuation=integrate --monomials=poly.txt file.latte\n"
 					<< "         (will compute the integral of the polynomial in poly.txt over the polytope in file.latte.)\n"
 					<< endl;
 			exit(0);
-		} else if (strcmp(argv[i], "--lawrence") == 0)
+		} else if (strcmp(argv[i], "--lawrence") == 0 || strcmp(argv[i], "--cone-decompose") == 0)
 		{
 			strcpy(valuationAlg, "lawrence");
 			strcpy(read_polyhedron_data.dualApproach, "no");
@@ -360,8 +405,19 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 				cerr << "polynomial file name is too long" << endl;
 				exit(1);
 			}
-			strncpy(polynomialFile, argv[i] + 12, strlen(argv[i]) - 12 + 1);
-		} else if (read_polyhedron_data.parse_option(argv[i]))
+			strncpy(integrandFile, argv[i] + 12, strlen(argv[i]) - 12 + 1);
+			integrandType = inputPolynomial;
+		} else if ( strncmp(argv[i], "--linear-forms=", 15) == 0 )
+		{
+			if ( strlen(argv[i]) > 127)
+			{
+				cerr << "linear form file name is too long " << endl;
+				exit(1);
+			}
+			strncpy(integrandFile, argv[i] + 15, strlen(argv[i]) - 15 + 1);
+			integrandType = inputLinearForm;
+		}
+		else if (read_polyhedron_data.parse_option(argv[i]))
 		{
 		} else
 		{
@@ -495,36 +551,48 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			ifstream inFile;
 			istream inStream(cin.rdbuf());
 
-			if (strcmp(polynomialFile, "") != 0)
+			if (integrandType != nothing)
 			{
-				inFile.open(polynomialFile);
+				inFile.open(integrandFile);
 				if (!inFile.is_open())
 				{
-					cerr << "Error: cannot open " << polynomialFile;
+					cerr << "Error: cannot open " << integrandFile;
 					exit(1);
 				}
 				inStream.rdbuf(inFile.rdbuf());
 			}//set the inStream.
 
 
-			string polynomialLine;
-			polynomialLine = "";
+			string integrandLine;
+			integrandLine = "";
 
 			if (inFile.is_open())
 			{
-				cerr << "Reading polynomial from file " << polynomialFile << endl;
-				getline(inStream, polynomialLine, '\n');
+				cerr << "Reading " << (integrandType == inputPolynomial ? "polynomial" : "linear forms" ) << " from file " << integrandFile << endl;
+				getline(inStream, integrandLine, '\n');
 				inFile.close();
 			} else
 			{
-				cerr << "Enter Polynomial of dimension "
-						<< (Poly->homogenized ? Poly->numOfVars - 1
-								: Poly->numOfVars) << ">";
-				getline(inStream, polynomialLine, '\n');
+				cerr << "Enter a 'p' or a 'l' if you want to integrate a"
+					 << (Poly->homogenized ? Poly->numOfVars - 1 : Poly->numOfVars)
+					 << " dimensional "
+					 << "\n polynomial or a power of a linear form respectively"
+					 << "\n followed by the integrand >";
+				char pl = cin.get();
+				if (pl == 'p')
+					integrandType = inputPolynomial;
+				else if (pl = 'l')
+					integrandType = inputLinearForm;
+				else
+				{
+					cerr << "The character " << pl << " is not a p or l" << endl;
+					exit(1);
+				}
+				getline(inStream, integrandLine, '\n');
 			}//user supplied polynomial in file.
 
 			valuationAnswers = computeIntegral(Poly, *params, valuationAlg,
-					polynomialLine.c_str());
+					integrandLine.c_str(), integrandType);
 		} else
 		{
 			cerr << "ops, valuation type is not known: " << valuationType << endl;
@@ -653,10 +721,9 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	}
 
 
-
-	valuationAnswers.printResults(cout);
 	cout << params->triangulate_time << endl;
 	cout << params->dualize_time << endl;
+	valuationAnswers.printResults(cout);
 
 	delete params;
 	return valuationAnswers;
