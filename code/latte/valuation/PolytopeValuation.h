@@ -66,7 +66,7 @@ private:
 	void dilatePolynomialToLinearForms(linFormSum &linearForms, const monomialSum& originalPolynomial, const ZZ &dilationFactor, RationalNTL & constantMonomial);
 	void dilatePolytopeOneCone(const ZZ & factor); //dilates polytope by changing the vertices.
 	void dilatePolytopeVertexRays(const RationalNTL & factor); //dilates polytope by changing the vertices.
-	void dilateLinearForms(linFormSum &linearForms, const linFormSum & originalLinearForms, const ZZ & dilationFactor, RationalNTL constantMonomial); //given a linear form and a dilation factor, replaces (sum x_i)^k --> factor^k*(sum x_i)^k
+	void dilateLinearForms(linFormSum &linearForms, const linFormSum & originalLinearForms, const ZZ & dilationFactor, RationalNTL &constantMonomial); //given a linear form and a dilation factor, replaces (sum x_i)^k --> factor^k*(sum x_i)^k
 	ZZ findDilationFactorOneCone() const;
 	ZZ findDilationFactorVertexRays() const;
 	RationalNTL findIntegralUsingTriangulation(linFormSum &forms) const; //computes the integral over every simplex

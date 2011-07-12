@@ -280,7 +280,7 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
 /**
  *
  */
-void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const linFormSum & originalLinearForms, const ZZ & dilationFactor, RationalNTL constantMonomial)
+void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const linFormSum & originalLinearForms, const ZZ & dilationFactor, RationalNTL &constantMonomial)
 {
 	BTrieIterator<RationalNTL, ZZ>* linearFormsItr =
 			new BTrieIterator<RationalNTL, ZZ> ();
@@ -516,6 +516,7 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 	//dilate the polynomial..
     //after this call, linearForms is filled in, and constantMonomial is the constant term in the input polynomial.
 	dilateLinearForms(linearForms, originalLinearForms, dilationFactor, constantMonomial);
+	cout << "constantMonomial=" << constantMonomial << endl;
 
 	//Note the difference between lawrence and integration on how we compute the volume
 	//if dilatePolytopeVertexRays was used: 1) integrate 2) volume 3) jacobian term
