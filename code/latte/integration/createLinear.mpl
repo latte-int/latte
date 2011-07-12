@@ -1,17 +1,18 @@
 with(LinearAlgebra):
-#This function takes in degree, dimension and some bounds, creates a random linear form
+#This function takes in degree, dimension and some bounds, creates a random linear form in list form.
 random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,maxcoef,componentmax,maxterm, rationalCoeff)
 	local temp,l,termcount,i,j,R, R_denom;
-	R:=rand(maxterm);
+	R:=rand(maxterm); #max number of powers of linear forms.
 	R_denom:=rand(100);
 	termcount:=R() + 1;
+	R:=rand(componentmax); #now R will give the coeff. inside the linear form: (coeff.)^power.
 	l:=[];
 	for i from 1 to termcount do
 		temp:=[];
 			for j from 1 to d do
-				R:=rand(componentmax);
-				#temp:=[R(),op(temp)];
-				temp:=[1, op(temp)];
+				
+				temp:=[R(),op(temp)];
+				#temp:=[1, op(temp)];
 			od;
 		temp:=[m,temp];
 		R:=rand(maxcoef);
@@ -25,6 +26,49 @@ random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm:=proc(m,d,
 	#printf("Random Linear Form:\n\n");
 	#print(l);
 	l;
+end:
+
+random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm_nonhomogen:=proc(m,d,maxcoef,componentmax,maxterm, rationalCoeff)
+	local l;
+	 
+	l:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(m,d,maxcoef,componentmax,maxterm, rationalCoeff);
+	l:=[op(l), [rand(maxcoef)()*(-1)^(rand(2)())/(rand(maxcoef)()+1), [0, [seq(1, i=1..d)] ]
+	           ] 
+	   ]; #add c(1+...+1)^0
+	return l;
+end;
+
+
+#
+# Given a linear form in list form [ [coeff, [power, [linear form]]] ], we convert it to an
+# expression in the variables x[1],..., x[d].
+#
+#@parm l : the linear form in list form
+#@parm d : number of variables
+#@return : maple expression
+convert_linearFormList_to_maple_expression:=proc(l, d)
+	local lformList;
+	local lformMaple;
+	local coeff;
+	local power;
+	local ans, i;
+	
+	ans:=0;
+	for lformList in l do
+	
+		lformMaple:=0;
+		
+		coeff:=lformList[1];
+		power:=lformList[2][1];
+		for i from 1 to d do
+			lformMaple:= lformMaple + lformList[2][2][i]*x[i];
+		end;
+		lformMaple:= coeff*(lformMaple)^power;
+		
+		ans:=ans + lformMaple
+	end; #for each linear form in the list
+
+	return ans;
 end:
 
 del_space:=proc(s)

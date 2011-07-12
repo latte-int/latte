@@ -20,9 +20,6 @@ print("Testing integration of hyper-rectangles...");
 
 local myDim, myDegree, fileName, totalErrors, returnStatus, seed:
 
-
-totalErrors:= 0:
-
  
 seed := randomize():
 printf("random seed = %d \n", seed);
@@ -35,21 +32,24 @@ for myDim from 2 to 5 do
 		printf("Testing polynomials of dimension %d, and at most degree %d\n", myDim, myDegree);
   
 #                   the parameters are:  polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
-    	returnStatus:=test_hyperrectangle_integtation(myDegree, myDim, 10, 30000, fileName, 1):
+    	returnStatus:=test_hyperrectangle_integtation_polynomials(myDegree, myDim, 10, 30000, fileName, 1):
    
 		if ( not(returnStatus = 0)) then 
-			totalErrors:= totalErrors + 1; 
+			printf("\n\n An error was reported in integrating polynomials, please see the polytope and polynomial files.\n");
+			`quit`(5); 
 		end if:
-	
-		#this if could be commented out if you want.
-		if (totalErrors > 0) then
-			printf("\n\n%d total errors.\n", totalErrors):
-    		quit:
-    	end if:
+		
+		printf("Testing powers of linear forms of dimension %d, and at most degree %d\n", myDim, myDegree);
+  
+#                   the parameters are:  formMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
+    	returnStatus:=test_hyperrectangle_integtation_linear_forms(myDegree, myDim, 10, 30000, fileName, 1):
+   
+		if ( not(returnStatus = 0)) then 
+			printf("\n\n An error was reported in integrating powers of linear forms, please see the polytope and polynomial files.\n");
+			`quit`(5); 
+		end if:
+
+		
 	od:
 od:
- 
 
-printf("\n\n%d total errors.\n", totalErrors):
-printf("random seed = %d \n", seed):
- 
