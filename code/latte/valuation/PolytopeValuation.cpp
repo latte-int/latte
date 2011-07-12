@@ -277,29 +277,54 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
 }
 
 
-void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const ZZ & dilationFactor)
+/**
+ *
+ */
+void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const linFormSum & originalLinearForms, const ZZ & dilationFactor, RationalNTL constantMonomial)
 {
 	BTrieIterator<RationalNTL, ZZ>* linearFormsItr =
 			new BTrieIterator<RationalNTL, ZZ> ();
-	linearFormsItr->setTrie(linearForms.myForms, linearForms.varCount);
+	linearFormsItr->setTrie(originalLinearForms.myForms, originalLinearForms.varCount);
 	linearFormsItr->begin();
 
+
+
+	FormLoadConsumer<RationalNTL>* transformedFormLoader =
+				new FormLoadConsumer<RationalNTL> ();
+	transformedFormLoader->setFormSum(linearForms);
+	transformedFormLoader->setDimension(originalLinearForms.varCount);
+
 	term<RationalNTL, ZZ>* lform;
-	cout << "starting loop" << endl;
+	vec_ZZ exp;
+	exp.SetLength(originalLinearForms.varCount);
+
 	//loop over the original polynomial, and insert the updated monomial into the transformedPolynomial
 	for (lform = linearFormsItr->nextTerm(); lform; lform
 			= linearFormsItr->nextTerm())
 	{
-		cout << "got here" << endl;
-		for(int i = 0; i < lform->length; ++i)
-			cout << "i:exp=" << i << "], " << lform->exps[i] << endl;
-		cout << "degree=" << lform->degree << endl;
-		cout << "coef  =" << lform->coef << endl;
-		(lform->coef).div(power(dilationFactor, lform->degree));
+
+		//for(int i = 0; i < lform->length; ++i)
+		//	cout << "i:exp=" << i << "], " << lform->exps[i] << endl;
+		//cout << "degree=" << lform->degree << endl;
+		//cout << "coef  =" << lform->coef << endl;
+
+		if (lform->degree != 0)
+		{
+			(lform->coef).div(power(dilationFactor, lform->degree));
+
+			for(int i = 0; i < exp.length(); ++i)
+				exp[i] = lform->exps[i]; //convert ZZ* to vec_ZZ.
+
+			transformedFormLoader->ConsumeLinForm(lform->coef, lform->degree, exp);
+		}
+		else
+		{
+			constantMonomial += lform->coef;
+		}
 	}//for every term in the originalPolynomial
-	cout << "number: " << linearForms.termCount << endl;
-	cout << "ptr   : " << linearForms.myForms   << endl;
+
 	delete linearFormsItr;
+	delete transformedFormLoader;
 }//dilateLinearForms
 
 
@@ -455,23 +480,106 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 }
 
 /**
- * Currently, this is only used by the stokes formula. One day, we should extend this.
+ * Save as the other findIntegral, only this one starts with linear forms, not polynomials.
+ */
+RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForms, const IntegrationType integrationType )
+{
+	linFormSum linearForms;
+	RationalNTL answer;
+	RationalNTL constantMonomial;
+
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+
+	//cout << "Integrating " << polynomial.termCount << " monomials." << endl;
+	//dilate the polytope
+	if ( numOfVars != numOfVarsOneCone)
+	{
+		dilationFactor = findDilationFactorVertexRays();
+		cout << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeVertexRays(RationalNTL(dilationFactor, to_ZZ(1)));
+	}//if we started with vertex-rays
+	else
+	{
+		dilationFactor = findDilationFactorOneCone();
+		cout << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeOneCone(dilationFactor);
+	}//we started with the lifted polytope.
+
+
+	//the input polynomial have have a constant term, but the integration functions can only
+	//work with non-constant monomials. We need to remove any constant terms from the input polynomial.
+	//This will be done in dilatePolynomialToLinearForms
+
+
+	//dilate the polynomial..
+    //after this call, linearForms is filled in, and constantMonomial is the constant term in the input polynomial.
+	dilateLinearForms(linearForms, originalLinearForms, dilationFactor, constantMonomial);
+
+	//Note the difference between lawrence and integration on how we compute the volume
+	//if dilatePolytopeVertexRays was used: 1) integrate 2) volume 3) jacobian term
+	//if dilatePolytopeOneCone    was used: 1) integrate 2) jacobian term 3)volume
+	//This is due to the fact that dilatePolytopeVertexRays permanently dilates the polytope.
+	//But dilatePolytopeOneCone records the dilation in the last slot, and so nothing is lost.
+	if ( integrationType == LawrenceIntegration)
+	{
+		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
+		cout << lengthListCone(triangulatedPoly) << " triangulations done.\n"
+			 << " starting to integrate " << linearForms.termCount << " linear forms.\n";
+		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
+
+		if ( constantMonomial != 0)
+			answer.add(findVolume(LawrenceVolume)*constantMonomial);
+
+		answer.div(power(dilationFactor, linearForms.varCount)); //factor in the Jacobian term.
+	}// if computing the integral using the lawrence style method.
+	else if ( integrationType == TriangulationIntegration)
+	{
+		convertToOneCone(); //every vertex should be integer
+		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+		cout << " starting to integrate " << linearForms.termCount << " linear forms.\n";
+
+		answer.add(findIntegralUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
+
+		answer.div(power(dilationFactor, linearForms.varCount)); //factor in the Jacobian term.
+
+
+		if ( constantMonomial != 0)
+		{
+			RationalNTL volume;
+			volume = findVolume(DeterminantVolume)*constantMonomial;
+			if (numOfVars != numOfVarsOneCone)
+				volume.div(power(dilationFactor, linearForms.varCount)); //factor in the Jacobian term.
+			answer.add(volume);
+		}
+
+	}//if computing the integral by triangulating to simplex polytopes.
+	else
+	{
+		cerr << "Integration Type not known" << endl;
+		exit(1);
+	}//else error.
+
+
+	destroyLinForms(linearForms);
+	return answer;
+
+}//findIntegral
+
+
+/**
+ * Currently, this is only used by the stokes formula. This is not done.
  */
 RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms)
 {
 	RationalNTL answer;
 	RationalNTL constantForm;
 	//linFormSum linearForms;
-}
 
-/**
- * Save as the other findIntegral, only this one starts with linear forms, not polynomials.
- */
-RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms, const IntegrationType integrationType )
-{
-/*	cout << "find int with linear forms called" << endl;
+	cout << "find int with linear forms called" << endl;
 	//linFormSum linearForms;
-	RationalNTL answer;
+
 
 	//find the dilation factor.
 	ZZ dilationFactor;
@@ -515,8 +623,9 @@ RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms, const Integ
 	destroyLinForms(linearForms);
 	return answer;
 
-*/
-}//findIntegral
+}
+
+
 
 
 /* computes the integral of a polytope by summing the integral of over each simplex

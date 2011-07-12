@@ -573,11 +573,10 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 				inFile.close();
 			} else
 			{
-				cerr << "Enter a 'p' or a 'l' if you want to integrate a"
+				cerr << "\nEnter 'p monomial-list' or 'l linear-form-list' if you want to integrate a "
 					 << (Poly->homogenized ? Poly->numOfVars - 1 : Poly->numOfVars)
 					 << " dimensional "
-					 << "\n polynomial or a power of a linear form respectively"
-					 << "\n followed by the integrand >";
+					 << "\n polynomial or a power of a linear form respectively >";
 				char pl = cin.get();
 				if (pl == 'p')
 					integrandType = inputPolynomial;
@@ -588,8 +587,13 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 					cerr << "The character " << pl << " is not a p or l" << endl;
 					exit(1);
 				}
+				//remove the space between the p/l and the start of the list.
+				while (cin.peek() == ' ') cin.get();
+
 				getline(inStream, integrandLine, '\n');
 			}//user supplied polynomial in file.
+
+			cout << "integrnadLine=" << integrandLine.c_str() << endl;
 
 			valuationAnswers = computeIntegral(Poly, *params, valuationAlg,
 					integrandLine.c_str(), integrandType);
