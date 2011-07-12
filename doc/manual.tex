@@ -3,6 +3,7 @@
 \usepackage{amsmath}
 \textheight20cm 
 
+\usepackage{verbatim}
 \usepackage[dvips]{color}
 \usepackage{amsfonts}
 \usepackage{graphicx}
@@ -381,9 +382,7 @@ Note, unlike \latte h-reps files, v-reps files can contain rationals, and you ar
 
 \subsection{\cdd Input Files}
 In addition to the formats described above, {\tt LattE} can also
-accept input files in standard {\tt cdd} format. (See Subsection 
-\ref{Command Syntax} for
-details on how to run {\tt LattE} on a {\tt cdd} input file.) Below is
+accept input files in standard {\tt cdd} format. Below is
 an example of {\tt cdd} input that is readable into {\tt LattE}.
 \begin{verbatim}
 H-representation
@@ -408,6 +407,35 @@ There are a few key differences between \latte and \cdd file formats.
 \end{enumerate}
 
 
+\subsection{Polynomials and linear forms}
+\label{input-file:polynomial-and-linear-form}
+
+\latte can also integrate polynomials and linear forms over polytopes. Next, we describe the syntax of polynomials and linear forms.
+
+\begin{itemize}
+\item A polynomial is represented as a list of its monomials in the form
+  \begin{quote}
+    \texttt{[{\itshape monomial}$_1$,{\itshape monomial}$_2$,$\dots$]},
+  \end{quote}
+  where \texttt{{\itshape monomial}$_i$} is represented by
+  \begin{quote}
+    \texttt{[{\itshape coefficient},[{\itshape exponent-vector}]]}.
+  \end{quote}
+  For example, $3x_0^2x_1^4x_2^6 + 7x_1^3x_2^5$ is input as \texttt{[[3,[2,4,6]], [7,[0,3,5]]]}. 
+
+\item To deal directly with powers of linear forms, the input format is 
+  \begin{quote}
+    \texttt{[{\itshape linear-term$_1$}, {\itshape linear-term$_2$}, $\dots$]},
+    \end{quote}
+    where \texttt{{\itshape linear-term}$_i$} is represented by
+    \begin{quote}
+      \texttt{[{\itshape coefficient},[{\itshape power},[{\itshape coefficient-vector}]]]}.
+    \end{quote}
+    For example, $3(2x_0 + 4x_1 + 6x_2)^{10} + 7(3x_1 + 5x_2)^{12}$ is input
+    as \texttt{[[3,[10,[2,4,6]]], [7,[12,[0,3,5]]]]}. 
+
+\end{itemize}
+
 %*****************************************************************
 %*****************************************************************
 %*****************************************************************
@@ -423,6 +451,7 @@ There are a few key differences between \latte and \cdd file formats.
 \begin{verbatim}
 	./count --help
 \end{verbatim}
+
 
 The following options control what {\tt count} computes.
 
@@ -454,6 +483,15 @@ The following options control what {\tt count} computes.
 	\begin{verbatim}
      ./count --multivariate-generating-function  fileName.hrep.latte
 	\end{verbatim} 
+For unbounded polyhedra, one needs to combine
+  this with {\tt --compute-vertex-cones=4ti2}, as other methods in \latte currently refuse to handle unbounded polyhedra. For example, 
+	\begin{verbatim}
+  	count --compute-vertex-cones=4ti2 --multivariate-generating-function fileName
+	\end{verbatim}
+  writes the multivariate generating function (in Maple notation) to ``fileName.rat.''
+	
+	
+	
 \item Compute the Ehrhart polynomial of an integral polytope
 	\begin{verbatim}
      ./count --ehrhart-polynomial  fileName.hrep.latte
@@ -486,6 +524,12 @@ The following options relate to the Barvinok algorithm.
 	\begin{verbatim}
      ./count --irrational-all-primal  fileName.hrep.latte
 	\end{verbatim} 
+	This gives a new method for computing Ehrhart polynomials of integral polytopes 
+   in the primal space
+	\begin{verbatim}
+     ./count --all-primal --ehrhart-polynomial fileName.hrep.latte
+	\end{verbatim} 
+   
 \item  Decompose cones down to an index (determinant) of N instead down to unimodular cones (which have an index of 1).
 	\begin{verbatim}
      ./count --maxdet=N  fileName.hrep.latte
@@ -504,6 +548,27 @@ The following options relate to the Barvinok algorithm.
 	\end{verbatim} 	
 			
 \end{itemize}
+
+\subsection{How to use {\tt ehrhart}}
+
+The functionality of {\tt ehrhart} has been merged into {\tt count}:
+
+\begin{verbatim} 
+	count --ehrhart-series FILENAME
+	
+	      (replaces: ehrhart FILENAME)
+
+	count --simplified-ehrhart-series FILENAME
+
+	      (replaces: ehrhart simplify FILENAME)
+
+	count --ehrhart-taylor=N FILENAME
+
+	      (replaces: ehrhart N FILENAME)
+\end{verbatim}
+
+The {\tt ehrhart} program is still available, but it does not accept
+   the new command-line options of {\tt count}.
 
 \subsection{How to use {\tt integrate}}
 
@@ -557,88 +622,83 @@ Let us view a few examples of the above options
 	\end{verbatim} 	
 \end{itemize}
            
-\subsection{Command Syntax}\label{Command Syntax}
 
+\subsection{Options common to both {\tt count} and {\tt integrate}}
 
+A common subproblem in counting lattice points and integration requires finding triangulations and tangent cones. Also, there are many different software tools available to do this. Instead of reinventing the wheel, \latte links with other software tools to compute these basic objects. In this section, we describe how you can control which software tool is used.
 
-
-\subsection{Ehrhart Series}
 \begin{itemize}
-\item Compute the Ehrhart series encoded as a rational function for
-  the polytope given in ``fileName''. {\bf NEEDS} Maple for
-  simplification of terms. Writes the simplified rational function to
-  file ``fileName.rat''. 
-\begin{verbatim}
-     ./ehrhart simplify fileName
-\end{verbatim} 
+\item The \fourtitwo program can be used instead of {\tt cddlib} and {\tt CDD+}
+  to compute the vertex cones of polytopes, triangulations, and duals of cones.
+  In many cases, \fourtitwo is faster.
+  
+  \begin{verbatim}
+	--compute-vertex-cones={cdd,4ti2}
+	--triangulation={cddlib,4ti2}
+	--dualization={cdd,4ti2}
+  \end{verbatim}
+
+\item By default, \latte assumes the h-rep may contain redundant hyperplanes and tries to find and remove them. You can control how much mork \latte should spend checking the input h-rep with the following option.
+
+	\begin{verbatim}
+	--redundancy-check={none,cddlib,full-cddlib}.
+	\end{verbatim}
+
+	\begin{itemize}
+  	\item ``full-cddlib'' (the default) uses cddlib to compute an irredundant
+    system of linear equations and inequalities describing the
+    polyhedron.  This corresponds to the traditional \latte behavior;
+    it can be expensive.
+
+	\item ``cddlib'' (used to be the default in the 1.2+mk-0.9.x series) uses
+    cddlib to compute some implicit linearities only; it often fails
+    but is faster than full-cddlib.
+
+	\item ``none'' does nothing, the input description of the polytope should
+    be irredundant.
+		
+	\end{itemize}
+
 \end{itemize}
+
 
 \subsection{Optimizing}
-This functions {\bf NEEDS} a cost vector specified in ``fileName.cost''!!!
+
+
+\latte can also optimize over the integer points of a polytope. The optimization executables {\bf require} a cost vector specified in ``fileName.cost'' if the polytope file is named ``fileName.''
+
 \begin{itemize}
-\item Maximizes/Minimizes given linear cost function over the lattice
-  points in the polytope given in ``fileName''. Digging algorithm
+\item Maximizes/Minimizes a given linear cost function over the lattice
+  points in the polytope. The Digging algorithm
   \cite{latte3} is used. Optimal point and optimal value is returned. 
 \begin{verbatim}
-     ./maximize fileName
-     ./minimize fileName
+     ./latte-maximize fileName
+     ./latte-minimize fileName
 \end{verbatim} 
-\item Maximizes/Minimizes given linear cost function over the lattice
-  points in the polytope given in ``fileName''. Binary search
+\item Maximizes/Minimizes a given linear cost function over the lattice
+  points in the polytope. The Binary search
   algorithm is used. Only optimal value is returned. 
 \begin{verbatim}
-     ./maximize bbs fileName
-     ./minimize bbs fileName
+     ./latte-maximize bbs fileName
+     ./latte-minimize bbs fileName
 \end{verbatim} 
 \end{itemize}
 
 
 
-Tasks performed by {\tt LattE} v1.1:
-\begin{enumerate}
-\item Count the number of lattice points in $P$.
-\begin{verbatim}
-     ./count fileName
-\end{verbatim} 
-\item Count the number of lattice points in $nP$, the dilation of $P$
-  by the integer factor $n$.
-\begin{verbatim}
-     ./count dil n fileName
-\end{verbatim} 
-\item Calculate a rational function that encodes the \textit{Ehrhart
-  series} associated with the polytope. By definition, the $n$-th
-  coefficient in the Ehrhart series equals the number of lattice
-  points in $nP$. For more details on Ehrhart counting functions see,
-  for example, Chapter 4 of \cite{stanley}. 
-\begin{verbatim}
-     ./ehrhart fileName
-\end{verbatim} 
-\item Calculate the first $n+1$ terms of the Ehrhart series associated
-  with the polytope.  
-\begin{verbatim}
-     ./ehrhart n fileName
-\end{verbatim} 
-\item Maximize or minimize a given linear function of the lattice
-  points in $P$.
-\begin{verbatim}
-     ./maximize fileName
-     ./minimize fileName
-\end{verbatim} 
-\end{enumerate}	
-
-In addition to these basic functions, there are more specific calls to
-{\tt LattE}. For example to use the homogenized Barvinok algorithm
-instead of the original one in order to count the lattice points. These
-details will be explained in Section \ref{Running LattE}.
-
-\newpage
+%\newpage
 
 \section{Downloading and Installing {\tt LattE}}
 
 {\tt LattE} is downloadable from the following website:
 
-\makebox[12 cm]{http://www.math.ucdavis.edu/$\sim$latte/downloads/}
+\makebox[12 cm]{http://www.math.ucdavis.edu/$\sim$latte/}
 
+
+
+\latte uses the GNU Autoconf and Automake tools. Please see the {\tt README} file in the \latte directory for detailed directions for installing \latte.
+
+\begin{comment}
 \textbf{Step 1: Create directory for {\tt LattE}}
 
 \begin{verbatim}
@@ -683,19 +743,14 @@ administrator, a friend, or send us an email.)
      ./install
 \end{verbatim}
 
+\end{comment}
 
 
 
 
 
 
-
-\newpage
-
-	
-
-
-\newpage
+%\newpage
 
 \section{A Brief Tutorial}
 In this section we invite the reader to follow along a few examples
@@ -752,7 +807,7 @@ to create a new file. Instead, we use the option ``dil'' to indicate
 that we want to count the number of lattice points of a dilation of
 the given polytope:
 \begin{verbatim}
-    ./count dil 12 EXAMPLES/magic4x4
+    ./count --dilation=12 EXAMPLES/magic4x4
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -783,7 +838,7 @@ $4\times 4$ squares that have the magic constant $s$.
 For this, simply type (note that {\tt LattE} invokes {\tt Maple} to
 simplify intermediate expressions):
 \begin{verbatim}
-    ./ehrhart simplify EXAMPLES/magic4x4
+    ./count --simplified-ehrhart-series EXAMPLES/magic4x4
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen looks
 as follows:
@@ -821,7 +876,7 @@ $t$ and due to long integer coefficients that appear.
 However, even if we cannot compute the full Ehrhart series, we can at
 least try and find the first couple of terms of it. 
 \begin{verbatim}
-    ./ehrhart 15 EXAMPLES/magic4x4
+    ./count --ehrhart-taylor=15 EXAMPLES/magic4x4
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -901,7 +956,7 @@ Time: 0.429686 sec
 Therefore, there are exactly $33$ lattice points in the $24$-cell. We
 get the same result by using the homogenized Barvinok algorithm:
 \begin{verbatim}
-    ./count homog EXAMPLES/24_cell
+    ./count --homog EXAMPLES/24_cell
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -916,7 +971,7 @@ Time: 0.957031 sec
 But how many of these $33$ points lie in the interior of the
 $24$-cell?
 \begin{verbatim}
-    ./count int EXAMPLES/24_cell
+    ./count --interior EXAMPLES/24_cell
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -930,7 +985,7 @@ Therefore, there only one of the $33$ lattice points in the $24$-cell
 lies in the interior.
 
 \subsection{Maximizing Over a Knapsack Polytope}
-Finally, let us solve the problem ``cuww1'' \cite{cuww,latte3}. Its
+Next, let us solve the problem ``cuww1'' \cite{cuww,latte3}. Its
 description is given in the file ``EXAMPLES/cuww1'': 
 \begin{verbatim}
 1 6
@@ -947,7 +1002,7 @@ Now let us maximize this cost function over the given knapsack
 polytope. Note that by default, the digging algorithm as described in
 \cite{latte3} is used.
 \begin{verbatim}
-    ./maximize EXAMPLES/cuww1
+    ./latte-maximize EXAMPLES/cuww1
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -971,7 +1026,7 @@ The solution $(7334,0,0,0,0)$ is quickly found. Now let us try to
 find the optimal value again by a different algorithm, the binary
 search algorithm.
 \begin{verbatim}
-    ./maximize bbs EXAMPLES/cuww1
+    ./latte-maximize bbs EXAMPLES/cuww1
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -987,42 +1042,80 @@ Note that we get the same optimal value, but no optimal solution is
 provided.
 
 
-\newpage
+\subsection{Integrating over a polytope}
 
+Let us integrate the polynomial $w^2x^2y^4z^8 -3/8x^2$ and the power of a linear form $3(w +2x + 4y + 6z)^{10}$ over the $24$-cell.
+
+
+
+Create a file named ``even.polynomial'' that has on its first line the polynomial (see Section \label{input-file:polynomial-and-linear-form} for a review of the syntax)
+	
+	\begin{verbatim}
+	[[1,[2,2,4,8]], [-3/8,[0,2,0,0]]]
+	\end{verbatim}
+
+After running the integration command using the triangulation method
+	\begin{verbatim}
+	./integrate --valuation=integrate --triangulate --monomials=even.polynomial 24\_cell
+	\end{verbatim}
+
+
+we see that the two monomials where decomposed into 406 powers of linear forms and the answer is
+
+
+\begin{verbatim}
+starting to integrate 406 linear forms.
+
+Integration (using the triangulation method)
+     Answer: -110535307/170059500
+     Decimal: -0.64998019516698567266162725399052
+     Time: 1.92 sec
+Computational time (algorithms + processing + program control)
+     Total time: 2.00 sec
+\end{verbatim}
+
+
+
+Now create a new file named ``power10.linearform'' that has in its first line the power of a linear form:
+
+	\begin{verbatim}
+	[[3,[10,[1,2,4,6]]]]
+	\end{verbatim}
+	
+	
+TODO;	
 \section{Release Information}
 
 \subsection{System Requirements}
 
 \subsubsection{Platform} 
-The binaries for {\tt LattE} v1.1 as well as for {\tt cdd} (by
-K. Fukuda \cite{fukuda}) are for platforms that run Linux. Both codes
-were compiled using {\tt gcc} version 2.96. This or a higher version
-of {\tt gcc} is needed to run {\tt LattE}. 
+The binaries for \latte v1.1 as well as for {\tt cdd} (by
+K. Fukuda \cite{fukuda}) are for platforms that run Unix, that is, Mac and Linux.
 
 \subsubsection{Memory Requirements} 
 The memory requirements are essentially problem dependent; however,
-{\tt LattE} runs in a ``memory saving mode'' whenever appropriate.
-In this mode {\tt LattE} rarely uses more than around 20 MB beyond the
+{\tt LattE count} runs in a ``memory saving mode'' whenever appropriate.
+In this mode {\tt count} rarely uses more than around 20 MB beyond the
 amount of memory needed to calculate triangulations. 
 
-\subsection{Additional {\tt MAPLE} Connection}
+\subsection{Additional \maple Connection}
 The call
 \begin{verbatim}
-./ehrhart simplify fileName
+./count --simplified-ehrhart-series  fileName
 \end{verbatim}
-requires {\tt MAPLE} for simplifications of expressions. It should be
-sufficient to have a copy of {\tt MAPLE} installed on your machine,
-without any additional special configuration required.  {\tt LattE}
-will still run even if {\tt MAPLE} is not installed, but this
-simplification feature to ``ehrhart'' will not be available. 
+requires \maple for simplifications of expressions. It should be
+sufficient to have a copy of \maple installed on your machine,
+without any additional special configuration required.  \latte
+will still run even if \maple is not installed, but this
+simplification feature to ``count'' will not be available. 
 
-We have tested this connection with Maple 5.1 and 8.0 and experienced
+We have tested this connection with \maple 5.1 and 8.0 and experienced
 no problem. Please let us know about any problem you experience with
-our connection to Maple.
+our connection to \maple.
 
 \subsection{File Descriptions} 
-The {\tt LattE} v1.1 Linux release consists a single archive file,
-\textbf{latte\_v1.1.tar.gz}. The archive contains the following files:
+The {\tt LattE} Linux release consists a single archive file,
+\textbf{latte\_v1.*.tar.gz}. The archive contains the following files:
 
 \begin{tabular}{|l|l|}
 \hline
@@ -1032,8 +1125,9 @@ Name & Description\\
 & \\
 count & Main program executables\\
 ehrhart & \\
-maximize & \\
-minimize & \\
+latte-maximize & \\
+latte-minimize & \\
+integrate      & \\
 & \\
 
 simplify2.add & additional files used by {\tt LattE}\\
@@ -1049,8 +1143,8 @@ EXAMPLES/ & Subdirectory containing sample input files\\
 & \\
 \hline
 & \\
-manual\_v1.1.ps & User's guide in Postscript and PDF formats\\
-manual\_v1.1.pdf & \\
+manual.ps & User's guide in Postscript and PDF formats\\
+manual.pdf & \\
 & \\
 \hline 
 & \\
@@ -1096,24 +1190,48 @@ software package {\tt LattE} is available at
 {\tt http://www.math.ucdavis.edu/$\sim$latte/}
 	
 \subsection{The {\tt LattE} Team}
-\begin{itemize}
-\item \textbf{Project director}:  Prof. Jes\'us A. De Loera 	
-\item \textbf{Postdoctoral scientist}:  Dr. Raymond Hemmecke	
-\item \textbf{Graduate Student}:  Ruriko Yoshida
-\item \textbf{Undergraduate Students}:  David Haws, Peter Huggins, 
-  Jeremy Tauzer 
-\item \textbf{Webmaster}:  Jon Brooks
-\end{itemize}
+\begin{description}
+\item[Project directors]  Prof. Jes\'us A. De Loera and Prof. Matthias K\"oppe
+\item[Students currently working on the project] Brandon Dutra
+\item[Distinguished \latte Scientists, Collaborators and Advisors]
+	\begin{itemize} 
+		\item Dr. Raymond Hemmecke
+		\item Prof. Ruriko Yoshida
+		\item Dr. David Haws
+		\item Dr. Peter Huggins
+		\item Prof. Tyrrell McAllister
+		\item Prof. Velleda Baldoni
+		\item Prof. Nicole Berline
+		\item Prof. Michele Vergne
+		\item Prof. Alexander Barvinok
+		\item Prof. Bernd Sturmfels 
+	\end{itemize}
+\item[Alumni of the project]	
+	\begin{itemize}
+		\item Gregory Pinto	
+		\item Stanislav Moreinis
+		\item Jianqiu Wu
+		\item Jeremy Tauzer
+		\item Jonathan Brooks
+		\item Carol Shih
+		\item Esteban Pauli
+		\item Mike Zhang	
+	\end{itemize}
+\end{description}
 
 \subsection{Acknowledgments}
 
-\par {\tt LattE} currently uses two wonderful pieces of software.
+\par {\tt LattE} currently uses many wonderful pieces of software.
 First is {\tt cdd}, developed by Komei Fukuda, whose webpage can be
 found at:
 
 \makebox[12 cm]{http://www.cs.mcgill.ca/$\sim$fukuda/}
 
-{\tt cdd} is used for finding vertices of polytopes and the
+Next, \latte uses \fourtitwo, developed by ???, whose webpage can be found at:
+
+\makebox[12 cm]{http://www.4ti2.de}
+
+{\tt cdd} and \fourtitwo is used for finding vertices of polytopes and the
 triangulation of cones.
 
 In addition, {\tt LattE} currently uses NTL, a
@@ -1129,7 +1247,7 @@ useful conversations that improved our software.  We thank the National
 Science Foundation for support to this project via grants NSF
 DMS-0309694, NSF DMS-0073815, and by NSF VIGRE grant DMS-0135345.
 
-\newpage
+%\newpage
 
 \begin{thebibliography}{99}
 
@@ -1169,7 +1287,7 @@ Volume I, Cambridge, 1997.
 
 
 
-\newpage
+%\newpage
 
 
 
@@ -1602,7 +1720,7 @@ may consider it more useful to permit linking proprietary applications
 with the library.  If this is what you want to do, use the GNU Library
 General Public License instead of this License.
 
-\input{secrets}
+%\input{secrets}
 
 \end{document}
 
