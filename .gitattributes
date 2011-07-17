@@ -288,6 +288,8 @@ doc/bibliography.bib -text
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
 doc/examplebrion.jpg -text
 doc/homogenizedTriangle.jpg -text
+doc/latte-integrale.jpg -text
+doc/truncatedCube.jpg -text
 /install-reloc -text
 /link-warning.h -text
 /manual_v1.1.pdf -text

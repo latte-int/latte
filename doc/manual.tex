@@ -27,7 +27,7 @@
 \newcommand{\cdd}{{\tt CDD}\xspace}
 \newcommand{\fourtitwo}{{\tt 4ti2}\xspace}
 \newcommand{\cubpack}{{\tt CUBPACK}\xspace}
-
+\newcommand{\example}{{\bf Example:\space}}
 
 
 \DeclareMathOperator{\vol}{vol}     %%% Denotes volume
@@ -38,11 +38,13 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2ex plus 0.4ex minus 0.4ex}
 
-\title{A User's Guide for {\tt LattE integrale} \latteV \\ (Linux Release)
+\title{A User's Guide for {\tt LattE integrale} \latteV \\ (Linux Release) 
 \footnote{Research supported by NSF grants DMS-0309694, NSF grants
 DMS-0073815, and by NSF VIGRE Grant DMS-0135345. $\copyright$ 
 Department of Mathematics, University of California, Davis, 2011. This
-software is released under the GNU license agreement}}
+software is released under the GNU license agreement}
+\\ \includegraphics[width=0.25\textwidth]{latte-integrale.jpg}
+}%close title brace
 
 \author{Jes\'us A. De Loera \and
 Brandon Dutra \and
@@ -51,6 +53,8 @@ Stanislav Moreinis \and
 Gregory Pinto \and
 Jianqiu Wu \and
 }
+ 
+
  
  \date{July 2011}
 
@@ -97,7 +101,7 @@ Here each lattice point is given by one monomial. Note that this can be
 a rather long sum, in fact for a polyhedral cone it can be infinite, but 
 the good news is that it admits short representations.
 
-\noindent {\bf Example:} Let $P$ be the quadrangle with vertices 
+\example Let $P$ be the quadrangle with vertices 
 $V_1=(0,0)$, $V_2=(5,0)$, $V_3=(4,2)$, and $V_4=(0,2)$, see Figure \ref{fig:quadrangle}.
 
 \begin{figure}[thb]
@@ -173,7 +177,7 @@ vertices~$s$ of the polytope~$P$ we have
 	
 
 
-As an example, let us integrate the polynomial $x$ over the unit square with vertices $(0,0), (1,0), (0,1)$ and $(1,1)$ using the above formual at each simple tangent cone. The polynomial is already a power of a linear form so $\ell = (1,0)$. The polytope has four vertices that we need to consider, and each tangent cone is already simple.
+As an example, let us integrate the polynomial $x$ over the unit square with vertices $(0,0), (1,0), (0,1)$ and $(1,1)$ using the above formula at each simple tangent cone. The polynomial is already a power of a linear form so $\ell = (1,0)$. The polytope has four vertices that we need to consider, and each tangent cone is already simple.
 
 
 
@@ -187,7 +191,7 @@ Vertex $s_3 = (1,0)$: At this vertex, the rays are $u_1 = (0,1), u_2=(-1,0)$. Be
  \frac{M!}{(M+d)!} \vol(\Pi_C) \Res_{\epsilon=0}\frac{(1 + \epsilon)^{1+2}}{\epsilon (\epsilon) (-1 - \epsilon)} = \frac{1!}{(1+2)!} \times 1 \times -2 = -2/6.
 \end{displaymath}
 
-Vertex $s_4 = (1,1):$ The rays are $u_1 = (-1,0), u_2= (0,-1)$. Again, we divide by zero, so we perturbate $\ell$ by the same $\hat \epsilon$. The integral on this cone  is
+Vertex $s_4 = (1,1):$ The rays are $u_1 = (-1,0), u_2= (0,-1)$. Again, we divide by zero, so we perturb $\ell$ by the same $\hat \epsilon$. The integral on this cone  is
 \begin{displaymath}
  \frac{M!}{(M+d)!} \vol(\Pi_C) \Res_{\epsilon=0}\frac{(1 + 2\epsilon)^{1+2}}{\epsilon (-\epsilon) (-1 - \epsilon)} = \frac{1!}{(1+2)!} \times 1 \times 5 = 5/6.
 \end{displaymath}
@@ -201,8 +205,8 @@ The integral $\int_P x  \d{x}\d{y} = 0 + 0 -2/6 + 5/6 = 1/2$ as it should be.
 
 \latte contains three key executables:
 \begin{description}
-	\item[count] counts lattice points, computes ehrhart polynomials and series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
-	\item[integrate] integrates polynomials over polytopes
+	\item[count] counts lattice points, computes Ehrhart polynomials and series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
+	\item[integrate] integrates polynomials over polytopes.
 	\item[max/minimize] perform linear integer programming.
 \end{description}
 
@@ -237,7 +241,7 @@ m d+1
 b  -A
 \end{verbatim}
 
-\textbf{EXAMPLE.}
+\example
 Let $P=\{(x,y): x\leq 1, y\leq 1, x+y\leq 1, x\geq 0, y\geq 0\}$.
 Thus
 \[
@@ -277,7 +281,7 @@ and the {\tt LattE} input file would be
 
 By default, a constraint is an inequality of type $a^Tx\leq b$. But to input an equality constraint $a^Tx=b$ we need to add a keyword.
 
-\textbf{EXAMPLE.}
+\example
 Let $P$ be as in the previous example, but require $x+y=1$ instead of
 $x+y\leq 1$, thus, 
 $P=\{(x,y): x\leq 1, y\leq 1, x+y=1, x\geq 0, y\geq 0\}$.
@@ -304,7 +308,7 @@ For bigger examples it quickly becomes cumbersome to state all
 nonnegativity constraints for the variables one by one. Instead, you
 may use another short-hand.
 
-\textbf{EXAMPLE.}
+\example
 Let $P$ be as in the previous example, then the {\tt LattE} input file
 that describes $P$ could also be described as such: 
 \begin{verbatim}
@@ -335,8 +339,11 @@ and
 \min\{c^\intercal x: x\in P\cap\Z^d\}.
 \]
 Besides a description of the polyhedron $P$, these functions need a
-linear objective function given by a certain cost vector $c \in \Z^d$, where the input style is very similar to a \latte h-representation file. If the
-polyhedron is given in the file ``fileName''
+linear objective function given by a certain cost vector $c \in \Z^d$, where the input style is very similar to a \latte h-representation file. 
+
+\example 
+If the polyhedron is given in the file ``fileName''
+
 \begin{verbatim}
 4  4
 1 -1  0  0
@@ -362,7 +369,7 @@ that we call maximize, this whole data encodes the integer program
 
 \subsection{\latte v-representation}
 
-\latte can start from a homoenized v-representation of the polytope. To homogenize a vertex, simply add an leading 1 to the vertex. This has the affect of lifting the polytope to a cone in one dimension higher such that the original polytope can be extracted by intercecting the cone with the $x_1 = 1$ plane. For example, take a triangle in the plane, then Figure \ref{fig:homogenized-triangle} shows the resulting cone.
+\latte can start from a homogenized v-representation of the polytope. To homogenize a vertex, simply add an leading 1 to the vertex. This has the affect of lifting the polytope to a cone in one dimension higher such that the original polytope can be extracted by intersecting the cone with the $x_1 = 1$ plane. For example, take a triangle in the plane, then Figure \ref{fig:homogenized-triangle} shows the resulting cone.
 
 
 \begin{figure}
@@ -383,14 +390,14 @@ Let $v_1, \dots, v_k$ be the vertices of a polytope $P \subseteq \R^n$, then the
 \end{align*}
 
 
-\textbf{EXAMPLE.}
-Note, unlike \latte h-representations files, v-representations files can contain rationals, and you are free to scale each homogenized vertex by any scaler. Below are the vertices of a rectangle $(0,0), (2/3,0), (0,1/4), (2/3, 1/4)$:
+\example
+Note, like \latte h-representations files, it is safer to input a rational-vertex polytope with integer data by scaling each homogenized vertex. Below are the vertices of a rectangle $(0,0), (2/3,0), (0,1/4), (2/3, 1/4)$:
 \begin{verbatim}
 4 3
-5 10/3 0
-1 0 1/4
-1/99 0 0
-1 2/3 1/4
+1 0 0
+3 2 0
+4 0 1
+12 8 3
 \end{verbatim}
 
 \subsection{\cdd Input Files}
@@ -611,12 +618,14 @@ There are two different integration (and volume) algorithms. The triangulation m
 	\begin{verbatim}
      --valuation=volume --cone-decompose --print-cone-decompose-function
 	\end{verbatim} 	
-\item Sets the file that contains the polynomial. If this option is not set, and the valuation is integration, the polynomial will be read from stdin.
+\item Sets the file that contains the polynomial or powers of linear forms. If this option is not set, and the valuation is integration, the polynomial or powers of linear forms will be read from stdin.
 	\begin{verbatim}
      --monomials=FILE
+     --linear-forms=FILE
 	\end{verbatim} 	
 \end{itemize}
 
+\example
 Let us view a few examples of the above options
 
 \begin{itemize}
@@ -651,7 +660,7 @@ A common subproblem in counting lattice points and integration requires finding 
 	--dualization={cdd,4ti2}
   \end{verbatim}
 
-\item By default, \latte assumes the h-representation may contain redundant hyperplanes and tries to find and remove them. You can control how much mork \latte should spend checking the input h-representation with the following option.
+\item By default, \latte assumes the h-representation may contain redundant hyperplanes and tries to find and remove them. You can control how much more \latte should spend checking the input h-representation with the following option.
 
 	\begin{verbatim}
 	--redundancy-check={none,cddlib,full-cddlib}.
@@ -816,7 +825,7 @@ have the magic constant $1$. This is not yet impressive, as we could
 have done that by hand. Therefore, let us try and find the
 corresponding number for the magic constant $12$. Since this problem
 is a dilation (by factor $12$) of the original problem, we do not have
-to create a new file. Instead, we use the option ``dil'' to indicate
+to create a new file. Instead, we use the option ``dilation'' to indicate
 that we want to count the number of lattice points of a dilation of
 the given polytope:
 \begin{verbatim}
@@ -1111,6 +1120,65 @@ Computational time (algorithms + processing + program control)
      Total time: 0.07 sec
 \end{verbatim}	
 	
+\begin{figure}[thb]
+	\centering
+	\includegraphics[width=0.3\textwidth]{truncatedCube.jpg}
+\caption{The truncated cube.}
+	\label{fig:truncated-cube}
+\end{figure}	
+	
+For the next example, consider the truncated cube in Figure \ref{fig:truncated-cube}	
+
+	
+The vertices are
+\begin{verbatim}
+24 4
+1 3 1 1
+1 3 1 -1
+1 3 -1 1
+1 3 -1 -1
+1 -3 1 1
+1 -3 1 -1
+1 -3 -1 1
+1 -3 -1 -1
+1 1 3 1
+1 1 3 -1
+1 1 -3 1
+1 1 -3 -1
+1 -1 3 1
+1 -1 3 -1
+1 -1 -3 1
+1 -1 -3 -1
+1 1 1 3
+1 1 1 -3
+1 1 -1 3
+1 1 -1 -3
+1 -1 1 3
+1 -1 1 -3
+1 -1 -1 3
+1 -1 -1 -3
+\end{verbatim}
+
+This time, let us enter the polynomial $x^{40}y^{40}z^{40}$ from stdin, which
+will be decomposed into $68,920$ powers of linear forms. Run
+	
+	\begin{verbatim}
+	./integrate --cone-decompose --triangulation=4ti2 --vrep truncatedCube.vrep.latte 
+	\end{verbatim}
+
+and type
+	\begin{verbatim}
+	p [[1,[40,40,40]]]
+	\end{verbatim}
+
+
+We see the exact answer is 
+\begin{displaymath}
+\frac{93991283632941965714919247928639002510318209692293688827363993265109276641003769553256}{2795239135836124463932439643671211584534957465679791608181565}
+\end{displaymath}
+	
+This answer displays the power of using exact rational arithmetic!	
+	
 \section{Release Information}
 
 \subsection{System Requirements}
@@ -1214,7 +1282,7 @@ applications please acknowledge it by referencing this manual as
 De Loera, J.A., Dutra, B., K\"oppe, M., Moreinis, S.,
 Pinto, G., Wu, J.\\ 
 {\em A User's Guide for {\tt LattE integrale} \latteV}, 2011, 
-software package {\tt LattE} is available at 
+software package \latte is available at 
 {\tt http://www.math.ucdavis.edu/$\sim$latte/}
 	
 \subsection{The {\tt LattE} Team}
