@@ -9,8 +9,7 @@ bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext
 
 latte_maximize_SOURCES = maximize.cpp
 latte_minimize_SOURCES = minimize.cpp
-count_SOURCES = count.cpp
-count_SOURCES += countDriver.cpp
+count_SOURCES = countDriver.cpp
 ehrhart_SOURCES = ehrhart.cpp
 latte2ine_SOURCES = latte2ine.cpp
 latte2ext_SOURCES = latte2ext.cpp
@@ -32,6 +31,7 @@ LDADD += ../gnulib/libgnu.a
 noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES =							\
 	barvinok/dec.cpp barvinok/barvinok.cpp  barvinok/Cone.cpp	\
+	count.cpp \
 	barvinok/Triangulation.cpp					\
 	genFunction/piped.cpp genFunction/maple.cpp vertices/cdd.cpp	\
 	preprocess.cpp rational.cpp cone.cpp print.cpp ramon.cpp	\
@@ -58,6 +58,7 @@ liblatte_a_SOURCES =							\
 
 noinst_HEADERS =							\
 	CheckEmpty.h							\
+	count.h 								\
 	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
 	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
 	preprocess.h print.h ramon.h rational.h timing.h		\

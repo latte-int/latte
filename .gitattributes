@@ -272,6 +272,7 @@ code/latte/valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesD
 code/latte/valuation/testCorrectnessAndBenchmark/testVolumeForSLDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/testVolumeHypersimplexDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/valuationTestsLib.mpl -text
+code/latte/valuation/testLibraryExamples.cpp -text
 code/latte/valuation/valuation.cpp -text
 code/latte/valuation/valuation.h -text
 code/test-suite/test-4ti2.sh -text
