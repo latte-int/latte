@@ -487,10 +487,12 @@ The following options control what {\tt count} computes.
 	\begin{verbatim}
      ./count --dilation=n fileName.hrep.latte
 	\end{verbatim} 
+\begin{comment}	
 \item Count the number of lattice points in the interior of the  polytope $P$, where $P$ is given in ``fileName''.
 	\begin{verbatim}
      ./count --interior fileName.hrep.latte
 	\end{verbatim} 
+\end{comment}	
 \item Use the homogenized Barvinok algorithm \cite{latte3} to count  the number of lattice points in the polytope $P$. Use if number of vertices of $P$ is big compared to the number of constraints. 
 	\begin{verbatim}
      ./count --homog fileName.hrep.latte
@@ -990,6 +992,8 @@ Memory Save Mode: Taylor Expansion:
 Computation done. 
 Time: 0.957031 sec
 \end{verbatim}
+
+\begin{comment}
 But how many of these $33$ points lie in the interior of the
 $24$-cell?
 \begin{verbatim}
@@ -1005,6 +1009,7 @@ Reading .ext file...
 \end{verbatim}
 Therefore, there only one of the $33$ lattice points in the $24$-cell
 lies in the interior.
+\end{comment}
 
 \subsection{Maximizing Over a Knapsack Polytope}
 Next, let us solve the problem ``cuww1'' \cite{cuww,latte3}. Its
