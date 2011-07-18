@@ -41,8 +41,9 @@
 using namespace std;
 
 /***********************************************************************************/
-void ResidueFunction(listCone* cones, int numOfVars, int print_flag, 
+vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		     int degree, int output_cone, BarvinokParameters *params) {
+	vec_ZZ polynomialAns; //returns this vector.
   int numOfTerms, DEGREE = 1;
 //  char outFileName[127];
   listVector *tmp;
@@ -1225,10 +1226,13 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	// The quotient function internaly will multiply its results by Ten_Power
 	// So to print out the correct number, divide by Ten_Power
 	
+	polynomialAns.SetLength(DEGREE + 1);
 	for (int i = 0; i <= DEGREE; i++)
 	{
 		//Coefficient_Total += (Final_Parameters->Result[i] + *Ten_Power/2) / *Ten_Power;
-		cout << (Final_Taylor_Result[i] + *Ten_Power/2) /  *Ten_Power; 
+		ZZ number =  (Final_Taylor_Result[i] + *Ten_Power/2) /  *Ten_Power;
+		cout <<  number;
+		polynomialAns[i] = number;
 		if ( i != 0)
 			cout << "t^" << i;
 		if ( i != DEGREE)
@@ -1237,14 +1241,16 @@ void ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 	cout << endl << endl; }
 	else if(DEGREE == 1){
-
-	  params->deliver_number_of_lattice_points((Final_Taylor_Result[1] + *Ten_Power/2) /  *Ten_Power);
+      ZZ number = (Final_Taylor_Result[1] + *Ten_Power/2) /  *Ten_Power;
+	  params->deliver_number_of_lattice_points(number);
+	  polynomialAns.SetLength(2);
+	  polynomialAns[1] = number;
 	}
 	
 	delete[] Cone_Taylor_Parameters->Result;
 	delete	Cone_Taylor_Parameters;	
   	delete	Ten_Power;
 	
-	return ;
+	return polynomialAns;
 }
 

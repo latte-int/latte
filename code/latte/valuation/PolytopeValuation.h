@@ -53,7 +53,7 @@ private:
 	Polyhedron * poly;				//The polyhedron, vertexRayCones or PolytopeAsOneCone points to the polyhedron's cones.
 	listCone * vertexRayCones;		//list of  vertex-ray pairs.
 	listCone * polytopeAsOneCone;	//From poly, create one code with vertex=[0,0...0], rays={[1, v] | v is a vertex of the polytope}
-	listCone * triangulatedPoly;	//The triangulation of polytopeAsOneCone.
+	listCone * triangulatedPoly;	//The triangulation of polytopeAsOneCone or vertexRayCones
 	int numOfVars, numOfVarsOneCone;
 	bool freeVertexRayCones, freePolytopeAsOneCone, freeTriangulatedPoly; //denotes if we made these objects (and should free them) or if they were passed in.
 

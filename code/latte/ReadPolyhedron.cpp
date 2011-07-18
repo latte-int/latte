@@ -175,6 +175,7 @@ bool ReadPolyhedronData::parse_option(const char *arg) {
 		cerr
 				<< "WARNING: Options `--interior' and `int' are broken for most methods."
 				<< endl;
+		exit(1); //If we cannot stand by our computation, we should not let the user run it ~Brandon 2010. (I added the exit statement).
 		strcpy(interior, "yes");
 	} else if (strcmp(arg, "--vrep") == 0) {
 		strcpy(Vrepresentation, "yes");

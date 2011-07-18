@@ -88,7 +88,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
 	{
-		cout << "Going to run the triangulation integration method" << endl;
+		cerr << "Going to run the triangulation integration method" << endl;
 		PolytopeValuation polytopeValuation(poly, myParameters);
 
 		if (integrandType == inputPolynomial)
@@ -132,7 +132,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	if (strncmp(valuationAlg, "lawrence", 8) == 0
 			|| strcmp(valuationAlg, "all") == 0)
 	{
-		cout << "Going to run the cone-decomposition integration method" << endl;
+		cerr << "Going to run the cone-decomposition integration method" << endl;
 		if (integrandType == inputPolynomial)
 		{
 			monomialSum originalPolynomial;// polynomial without the updated coefficients.
@@ -390,7 +390,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			strcpy(valuationAlg, "all");
 			strcpy(read_polyhedron_data.dualApproach, "no");
 		}
-		else if (strcmp(argv[i], "--print-lawrence-function") == 0)
+		else if (strcmp(argv[i], "--print-lawrence-function") == 0 || strcmp(argv[i], "--print-cone-decompose-function") == 0)
 			strcpy(printLawrence, "yes");
 		else if (strcmp(argv[i], "--valuation=integrate") == 0)
 			strcpy(valuationType, "integrate");
@@ -573,7 +573,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 				inFile.close();
 			} else
 			{
-				cerr << "\nEnter 'p monomial-list' or 'l linear-form-list' if you want to integrate a "
+				cout << "\nEnter 'p monomial-list' or 'l linear-form-list' if you want to integrate a "
 					 << (Poly->homogenized ? Poly->numOfVars - 1 : Poly->numOfVars)
 					 << " dimensional "
 					 << "\n polynomial or a power of a linear form respectively >";
@@ -593,7 +593,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 				getline(inStream, integrandLine, '\n');
 			}//user supplied polynomial in file.
 
-			cout << "integrnadLine=" << integrandLine.c_str() << endl;
+
 
 			valuationAnswers = computeIntegral(Poly, *params, valuationAlg,
 					integrandLine.c_str(), integrandType);
@@ -725,8 +725,8 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	}
 
 
-	cout << params->triangulate_time << endl;
-	cout << params->dualize_time << endl;
+	//cout << params->triangulate_time << endl;
+	//cout << params->dualize_time << endl;
 	valuationAnswers.printResults(cout);
 
 	delete params;
@@ -892,7 +892,7 @@ void Valuation::ValuationContainer::printResults(ostream & out) const
 	for (int i = 0; i < answers.size(); ++i)
 	{
 		if (answers[i].valuationType == ValuationData::volumeLawrence)
-			out << "Volume (using the Lawrence method)" << endl;
+			out << "Volume (using the cone decomposition method)" << endl;
 		else if (answers[i].valuationType == ValuationData::volumeTriangulation)
 			out << "Volume (using the triangulation-determinant method)"
 					<< endl;

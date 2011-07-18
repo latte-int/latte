@@ -108,7 +108,8 @@ class Standard_Single_Cone_Parameters
 // perform residue calculations and print results.  When DUALIZE is
 // true, the CONES are given in primal space, so dualize before
 // triangulating; otherwise CONES must be given in dual space already.
-void
+// returns the polynomial series.
+vec_ZZ
 decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
 			   Standard_Single_Cone_Parameters &param);
 

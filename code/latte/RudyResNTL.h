@@ -29,7 +29,7 @@
 #include "barvinok/dec.h" // for Standard_Single_Cone_Parameters
 
 /* Consumes CONES. */
-void ResidueFunction(listCone* cones, int numOfVars, int print_flag, int degree, int output_cone,
+vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag, int degree, int output_cone,
 		     BarvinokParameters *params);
 
 // Returns -1 if a Dot Product is zero in the denominator, otherwise 1

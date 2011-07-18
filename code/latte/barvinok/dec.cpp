@@ -197,10 +197,11 @@ Standard_Single_Cone_Parameters::ConsumeCone(listCone *Cone)
     }	
 }
 
-void
+vec_ZZ
 decomposeAndComputeResidue(listCone *cones, int degree, bool dualize, 
 			   Standard_Single_Cone_Parameters &param)
 {
+	vec_ZZ polynomialAnswer;
   int numOfAllCones;
   mat_ZZ mat;
 
@@ -220,6 +221,7 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
 
   cerr << "decomposeCones_Single: degree = " << degree << endl;
   param.Taylor_Expansion_Result = new ZZ [degree + 1 ];
+  polynomialAnswer.SetLength(degree+1);
 	
   param.Degree_of_Taylor_Expansion = degree;
   param.Controller = new Node_Controller(param.Number_of_Variables + 1, degree);			
@@ -240,7 +242,11 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
       if(degree > 1){		
 	for (int i = 0; i<= degree; i++)
 	  {
-	    cout <<	( param.Taylor_Expansion_Result[i] + param.Ten_Power/2)/(param.Ten_Power) ;
+		ZZ number;
+		number = ( param.Taylor_Expansion_Result[i] + param.Ten_Power/2)/(param.Ten_Power) ;
+	    cout <<	number;
+	    polynomialAnswer[i] = number;
+
 	    if (i != 0)
 	      {
 		cout << "t^" << i;
@@ -252,17 +258,28 @@ decomposeAndComputeResidue(listCone *cones, int degree, bool dualize,
 	Integer numOfLatticePoints
 	  = ( param.Taylor_Expansion_Result[1] + param.Ten_Power/2)/param.Ten_Power;
 	param.deliver_number_of_lattice_points(numOfLatticePoints);
+	polynomialAnswer.SetLength(2);
+	polynomialAnswer[0] = 0;
+	polynomialAnswer[1] = numOfLatticePoints;
       }
     }
   else {
     param.Total_Lattice_Points = abs(param.Total_Lattice_Points);
-    param.deliver_number_of_lattice_points((param.Total_Lattice_Points + param.Ten_Power/2)/param.Ten_Power);
+    ZZ number;
+    number = (param.Total_Lattice_Points + param.Ten_Power/2)/param.Ten_Power;
+    param.deliver_number_of_lattice_points(number);
+
+    polynomialAnswer.SetLength(2);
+    polynomialAnswer[0] = 0;
+    polynomialAnswer[1] = number;
+
   }
 	
   //cerr << lengthListCone(newCones->rest) << " cones in total.\n";
 
   delete param.Controller;
   delete [] param.Taylor_Expansion_Result;
+  return polynomialAnswer;
 	
 }
 

@@ -25,6 +25,7 @@
 
 #include "cone.h"
 #include "cone_consumer.h"
+#include "print.h"
 
 class Polyhedron {
 public:
@@ -53,6 +54,16 @@ public:
   Polyhedron() : numOfVars(0), homogenized(false), dualized(false),
 		 unbounded(false), cones(0), projecting_up_transducer(0) {}
   ~Polyhedron() { freeListCone(cones); }
+
+  //good for debugging.
+  void printPolyhedron()
+  {
+	  cerr << "numofvars   : " << numOfVars << endl;
+	  cerr << "homogenized : " << homogenized << endl;
+	  cerr << "dualized    : " << dualized << endl;
+	  cerr << "unbounded   : " << unbounded << endl;
+	  printListCone(cones, numOfVars);
+  }
 };
 
 #endif

@@ -10,6 +10,7 @@ bin_PROGRAMS = latte-maximize latte-minimize count ehrhart latte2ine latte2ext
 latte_maximize_SOURCES = maximize.cpp
 latte_minimize_SOURCES = minimize.cpp
 count_SOURCES = count.cpp
+count_SOURCES += countDriver.cpp
 ehrhart_SOURCES = ehrhart.cpp
 latte2ine_SOURCES = latte2ine.cpp
 latte2ext_SOURCES = latte2ext.cpp
@@ -354,6 +355,13 @@ check_PROGRAMS += test-volume-for-SL
 test_volume_for_SL_SOURCES = valuation/testCorrectnessAndBenchmark/testVolumeForSLDriver.cpp
 test_volume_for_SL_LDADD = $(LDADD)
 test_volume_for_SL_LDADD += liblatteintegration.a
+
+
+#A collection of examples of how to use latte as a lib.
+check_PROGRAMS += test-library-examples
+test_library_examples_SOURCES = valuation/testLibraryExamples.cpp
+test_library_examples_LDADD = $(LDADD)
+test_library_examples_LDADD += liblatteintegration.a
 
 
 
