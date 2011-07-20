@@ -265,7 +265,6 @@ code/latte/valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDrive
 code/latte/valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangle.mpl -text
 code/latte/valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh -text
-code/latte/valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp -text
 code/latte/valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp -text

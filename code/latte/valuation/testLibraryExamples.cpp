@@ -23,7 +23,7 @@
 
 //global option on how to build the polytopes.
 int USE_FILES = 0;
-bool PRINT_POLYHEDRA = false;
+bool PRINT_POLYHEDRA = false ;
 
 
 /*****************************************************************************/

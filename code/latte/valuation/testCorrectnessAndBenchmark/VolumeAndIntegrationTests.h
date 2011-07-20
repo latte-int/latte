@@ -21,17 +21,7 @@
 #include "../valuation.h"
 
 
-//These functions are used to populate data tables for an integration paper we are working on.
-namespace IntegrationPaper
-{
-	//Giving a path to a directory, will return a list of all the .latte files in that directory. This is NOT recursive and only works on unix boxes I think.
-	void findAllLatteFilesInDirectory(const string &dir, vector<string> &latteFiles);
 
-
-	//integrates each file with a polynomial/monomial and save it to a log file.
-	void integrateFiles(const string &logFileName, const vector<string> &files, const int dim, const int polynomialDegree);
-
-}//IntegrationPaper
 
 namespace VolumeTests
 {

@@ -87,86 +87,85 @@ noinst_HEADERS =							\
 	ReadSubcones.h
 
 if HAVE_TOPCOM_LIB
-liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
-noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
+	liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
+	noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
 else
-if HAVE_TOPCOM_BIN
-liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
-noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
-endif
+	if HAVE_TOPCOM_BIN
+		liblatte_a_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
+		noinst_HEADERS += triangulation/TriangulationWithTOPCOM.h
+	endif
 endif
 
 if HAVE_CDDLIB
-
-liblatte_a_SOURCES += latte_cddlib.cpp
-liblatte_a_SOURCES += triangulation/RegularTriangulationWithCddlib.cpp
-noinst_HEADERS += triangulation/RegularTriangulationWithCddlib.h
+	liblatte_a_SOURCES += latte_cddlib.cpp
+	liblatte_a_SOURCES += triangulation/RegularTriangulationWithCddlib.cpp
+	noinst_HEADERS += triangulation/RegularTriangulationWithCddlib.h
 endif
 
 if HAVE_LIDIA
-liblatte_a_SOURCES += genFunction/NTL_to_LiDIA.cpp
-noinst_HEADERS += genFunction/NTL_to_LiDIA.h
+	liblatte_a_SOURCES += genFunction/NTL_to_LiDIA.cpp
+	noinst_HEADERS += genFunction/NTL_to_LiDIA.h
 endif
 
 if HAVE_FORTYTWO_LIB
-liblatte_a_SOURCES += latte_4ti2.cpp
-liblatte_a_SOURCES += triangulation/RegularTriangulationWith4ti2.cpp
-liblatte_a_SOURCES += VertexConesWith4ti2.cpp
-noinst_HEADERS += latte_4ti2.h
-noinst_HEADERS += triangulation/RegularTriangulationWith4ti2.h
-noinst_HEADERS += VertexConesWith4ti2.h
+	liblatte_a_SOURCES += latte_4ti2.cpp
+	liblatte_a_SOURCES += triangulation/RegularTriangulationWith4ti2.cpp
+	liblatte_a_SOURCES += VertexConesWith4ti2.cpp
+	noinst_HEADERS += latte_4ti2.h
+	noinst_HEADERS += triangulation/RegularTriangulationWith4ti2.h
+	noinst_HEADERS += VertexConesWith4ti2.h
 
-liblatte_a_SOURCES += DualizationWith4ti2.cpp
-noinst_HEADERS += DualizationWith4ti2.h
+	liblatte_a_SOURCES += DualizationWith4ti2.cpp
+	noinst_HEADERS += DualizationWith4ti2.h
 
-liblatte_a_SOURCES += latte_4ti2_zsolve.cpp
-noinst_HEADERS += latte_4ti2_zsolve.h
+	liblatte_a_SOURCES += latte_4ti2_zsolve.cpp
+	noinst_HEADERS += latte_4ti2_zsolve.h
 endif
 
 bin_PROGRAMS += polyhedron-to-cones
 polyhedron_to_cones_SOURCES = polyhedron-to-cones.cpp
 
 if HAVE_EXPERIMENTS
-# Experimental stuff
+#Experimental stuff
 
-nodist_liblatte_a_SOURCES =				\
-	ExponentialApprox.cpp				\
-	heap.cpp					\
-	TrivialSubst.cpp				\
-	barvinok/SubspaceAvoidingDecomposition.cpp	\
-	triangulation/BoundaryTriangulation.cpp	
+	nodist_liblatte_a_SOURCES =				\
+		ExponentialApprox.cpp				\
+		heap.cpp					\
+		TrivialSubst.cpp				\
+		barvinok/SubspaceAvoidingDecomposition.cpp	\
+		triangulation/BoundaryTriangulation.cpp	
 
-nodist_noinst_HEADERS =					\
-	ExponentialApprox.h				\
-	heap.h						\
-	TrivialSubst.h					\
-	barvinok/SubspaceAvoidingDecomposition.h	\
-	triangulation/BoundaryTriangulation.h
+	nodist_noinst_HEADERS =					\
+		ExponentialApprox.h				\
+		heap.h						\
+		TrivialSubst.h					\
+		barvinok/SubspaceAvoidingDecomposition.h	\
+		triangulation/BoundaryTriangulation.h
 
-bin_PROGRAMS += test-todd 
-nodist_test_todd_SOURCES = todd/test-todd.cpp
+	bin_PROGRAMS += test-todd 
+	nodist_test_todd_SOURCES = todd/test-todd.cpp
 
-bin_PROGRAMS += aggregate
-nodist_aggregate_SOURCES = aggregation/aggregation.cpp
+	bin_PROGRAMS += aggregate
+	nodist_aggregate_SOURCES = aggregation/aggregation.cpp
 
-bin_PROGRAMS += triangulate-boundary
-nodist_triangulate_boundary_SOURCES = triangulation/triangulate-boundary.cpp 
+	bin_PROGRAMS += triangulate-boundary
+	nodist_triangulate_boundary_SOURCES = triangulation/triangulate-boundary.cpp 
 
-bin_PROGRAMS += complete-boundary-triangulation
-nodist_complete_boundary_triangulation_SOURCES = triangulation/complete-boundary-triangulation.cpp 
+	bin_PROGRAMS += complete-boundary-triangulation
+	nodist_complete_boundary_triangulation_SOURCES = triangulation/complete-boundary-triangulation.cpp 
 
-if HAVE_CPLEX
-AM_LDFLAGS += $(CPLEX_LDFLAGS)
-AM_CXXFLAGS += $(CPLEX_CFLAGS)
+	if HAVE_CPLEX
+		AM_LDFLAGS += $(CPLEX_LDFLAGS)
+		AM_CXXFLAGS += $(CPLEX_CFLAGS)
+	
+		nodist_liblatte_a_SOURCES += triangulation/SpecialSimplex.cpp 
+		nodist_noinst_HEADERS += triangulation/SpecialSimplex.h
 
-nodist_liblatte_a_SOURCES += triangulation/SpecialSimplex.cpp 
-nodist_noinst_HEADERS += triangulation/SpecialSimplex.h
-
-bin_PROGRAMS += special-simplex
-nodist_special_simplex_SOURCES = triangulation/special-simplex.cpp
-special_simplex_LDFLAGS = $(CPLEX_LDFLAGS)
-special_simplex_CXXFLAGS = $(AM_CXXFLAGS) $(CPLEX_CFLAGS)
-endif
+		bin_PROGRAMS += special-simplex
+		nodist_special_simplex_SOURCES = triangulation/special-simplex.cpp
+		special_simplex_LDFLAGS = $(CPLEX_LDFLAGS)
+		special_simplex_CXXFLAGS = $(AM_CXXFLAGS) $(CPLEX_CFLAGS)
+		endif
 
 endif
 
@@ -176,13 +175,14 @@ triangulate_SOURCES = triangulation/test-triangulation.cpp
 check_PROGRAMS =
 
 if HAVE_LIDIA
-check_PROGRAMS += ilio_test
-ilio_test_SOURCES = genFunction/ilio.cpp
+	check_PROGRAMS += ilio_test
+	ilio_test_SOURCES = genFunction/ilio.cpp
 endif
 
 # Maple code
 dist_pkgdata_DATA = simplify.add simplify2.add simplify3.add
 
+############################################################
 ###### VOLUME COMPUTATION AND RATIONAL VALUATIONS ##########
 
 
@@ -216,77 +216,69 @@ liblatte_a_SOURCES  += buildPolytopes/BuildRandomPolynomials.cpp
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
 if HAVE_DATABASE
-
 #This is used to make many polytopes for the new research paper.
-bin_PROGRAMS += build-database-polytopes
-build_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp
-build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-#build_database_polytopes_CPPFLAGS = -lsqlite3
-build_database_polytopes_LDFLAGS = -lsqlite3
+	bin_PROGRAMS += build-database-polytopes
+	build_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp
+	build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+	build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+#	build_database_polytopes_CPPFLAGS = -lsqlite3
+	build_database_polytopes_LDFLAGS = -lsqlite3
 
 
-#This is used to test integration classes from the database
-bin_PROGRAMS += integrate-database-polytopes
-integrate_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp
-integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-integrate_database_polytopes_LDFLAGS = -lsqlite3
-integrate_database_polytopes_LDADD = $(LDADD)
-integrate_database_polytopes_LDADD += liblatteintegration.a
+#	This is used to test integration classes from the database
+	bin_PROGRAMS += integrate-database-polytopes
+	integrate_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp
+	integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+	integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+	integrate_database_polytopes_LDFLAGS = -lsqlite3
+	integrate_database_polytopes_LDADD = $(LDADD)
+	integrate_database_polytopes_LDADD += liblatteintegration.a
 
-#This is used to test volume classes from the database
-bin_PROGRAMS += find-volume-database-polytopes
-find_volume_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp
-find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
-find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-find_volume_database_polytopes_LDFLAGS = -lsqlite3
-find_volume_database_polytopes_LDADD = $(LDADD)
-find_volume_database_polytopes_LDADD += liblatteintegration.a
+#	This is used to test volume classes from the database
+	bin_PROGRAMS += find-volume-database-polytopes
+	find_volume_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp
+	find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
+	find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+	find_volume_database_polytopes_LDFLAGS = -lsqlite3
+	find_volume_database_polytopes_LDADD = $(LDADD)
+	find_volume_database_polytopes_LDADD += liblatteintegration.a
 
-#This is used to test integration classes from the database
-bin_PROGRAMS += fix-dual-database-polytopes
-fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp
-fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-fix_dual_database_polytopes_LDFLAGS = -lsqlite3
-#fix_dual_database_polytopes_LDADD = $(LDADD)
-#fix_dual_database_polytopes_LDADD += liblatteintegration.a
+#	This is used to test integration classes from the database
+	bin_PROGRAMS += fix-dual-database-polytopes
+	fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp
+	fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+	fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+	fix_dual_database_polytopes_LDFLAGS = -lsqlite3
+#	fix_dual_database_polytopes_LDADD = $(LDADD)
+#	fix_dual_database_polytopes_LDADD += liblatteintegration.a
 
-#This is used update the lawrence valuations.
-bin_PROGRAMS += fix-lawrence-valuation
-fix_lawrence_valuation_SOURCES = valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp
-fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
-fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
-fix_lawrence_valuation_LDFLAGS = -lsqlite3
-fix_lawrence_valuation_LDADD = $(LDADD)
-fix_lawrence_valuation_LDADD += liblatteintegration.a
-
-
-#This is used to test integration classes from the database
-bin_PROGRAMS += print-database-time-table 
-print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
-print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
-print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
-print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
-print_database_time_table_LDFLAGS = -lsqlite3
-
-#not used. to delete.
-bin_PROGRAMS += integrate-polynomial-for-paper
-integrate_polynomial_for_paper_SOURCES = valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp
-integrate_polynomial_for_paper_SOURCES += valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp
-integrate_polynomial_for_paper_LDADD = $(LDADD)
-integrate_polynomial_for_paper_LDADD += liblatteintegration.a
+#	This is used update the lawrence valuations.
+	bin_PROGRAMS += fix-lawrence-valuation
+	fix_lawrence_valuation_SOURCES = valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp
+	fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
+	fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
+	fix_lawrence_valuation_LDFLAGS = -lsqlite3
+	fix_lawrence_valuation_LDADD = $(LDADD)
+	fix_lawrence_valuation_LDADD += liblatteintegration.a
 
 
-#counts the number of linear forms in a polynomial.
-bin_PROGRAMS += count-linear-forms-from-polynomial
-count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolynomialDriver.cpp
-count_linear_forms_from_polynomial_LDADD = $(LDADD)
-count_linear_forms_from_polynomial_LDADD += liblatteintegration.a
+#	This is used to test integration classes from the database
+	bin_PROGRAMS += print-database-time-table 
+	print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
+	print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
+	print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
+	print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
+	print_database_time_table_LDFLAGS = -lsqlite3
 
 
-endif #end of HAVE_DATABASE
+
+#	counts the number of linear forms in a polynomial.
+	bin_PROGRAMS += count-linear-forms-from-polynomial
+	count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolynomialDriver.cpp
+	count_linear_forms_from_polynomial_LDADD = $(LDADD)
+	count_linear_forms_from_polynomial_LDADD += liblatteintegration.a
+endif 
+#end of HAVE_DATABASE
 
 
  
