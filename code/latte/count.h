@@ -11,6 +11,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <cassert>
+#include <sstream>
 
 #include "config.h"
 #include "latte_ntl_integer.h"
@@ -48,6 +49,7 @@
 #include "Polyhedron.h"
 #include "ReadPolyhedron.h"
 #include "ProjectUp.h"
+#include "LattException.h"
 
 #include "gnulib/progname.h"
 #include "gnulib/pathmax.h"

@@ -27,6 +27,7 @@
 #include "Polyhedron.h"
 #include "latte_cddlib.h"
 #include "barvinok/barvinok.h"
+#include "LattException.h"
 
 class ReadPolyhedronData {
 public:

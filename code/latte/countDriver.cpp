@@ -25,7 +25,12 @@ int main(int argc, char *argv[])
 
 	CountAnswerContainer ans;
 	cout << "going to call main" << endl;
-	ans = mainCountDriver(argc,  argv);
+	try {
+		ans = mainCountDriver(argc,  argv);
+	} catch ( LattException & e)
+	{
+		;//do nothing, a message has already been displayed.
+	}
 
 	/*
 	cout <<"*%*%*%*%*%**%**%*" << endl;
@@ -37,6 +42,8 @@ int main(int argc, char *argv[])
 	cout << "seriesExpansion" << endl;
 	for(int i = 0; i < ans.seriesExpansion.length(); ++i)
 		cout << "  " << ans.seriesExpansion[i] << "t^" << i << endl;
-	*/
 
+
+	THROW_LATTE(LattException::bug_Unknown);
+	*/
 }//main

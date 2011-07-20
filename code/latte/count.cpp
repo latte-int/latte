@@ -43,6 +43,8 @@ void CountAnswerContainer::checkPolynomial()
 }//checkPolynomial
 
 
+
+
 /* ----------------------------------------------------------------- */
 CountAnswerContainer mainCountDriver(int argc, char *argv[])
 {
@@ -69,7 +71,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 		cerr << "usage: " << argv[0] << " [OPTIONS...] " << "INPUTFILE" << endl;
 		cerr << "Type `" << argv[0] << " --help' \n"
 				<< "for a list of options and input specifications." << endl;
-		exit(1);
+		THROW_LATTE(LattException::ue_BadCommandLineOptionCount);
 	}
 
 	//setbuf(stdout,0);
@@ -242,20 +244,20 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 			show_standard_smith_option(cerr);
 			show_standard_dualization_option(cerr);
 			show_standard_triangulation_options(cerr);
-			exit(0);
+			THROW_LATTE(LattException::ue_HelpMenuDisplayed);
 		} else if (read_polyhedron_data.parse_option(argv[i]))
 		{
 		} else
 		{
 			cerr << "Unknown command/option " << argv[i] << endl;
-			exit(1);
+			THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, argv[i]);
 		}
 	}//for i.
 
 	if (read_polyhedron_data.expect_filename)
 	{
 		cerr << "Filename missing" << endl;
-		exit(1);
+		THROW_LATTE(LattException::ue_FileNameMissing);
 	}
 
 	if (params->shortvector == BarvinokParameters::SubspaceAvoidingLLL)
@@ -343,12 +345,12 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 	if (read_polyhedron_data.grobner[0] == 'y')
 	{
 		CheckGrobner(fileName, read_polyhedron_data.cddstyle);
-		SolveGrobner(fileName, read_polyhedron_data.nonneg,
+		countAnswerContainer.numLaticePoints = SolveGrobner(fileName, read_polyhedron_data.nonneg,
 				read_polyhedron_data.dualApproach,
 				read_polyhedron_data.grobner,
 				read_polyhedron_data.equationsPresent,
 				read_polyhedron_data.cddstyle);
-		exit(0);
+		return countAnswerContainer;
 	}
 
 	Polyhedron *Poly = read_polyhedron_data.read_polyhedron(params);
@@ -386,7 +388,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 						<< "for integral polytopes." << endl
 						<< "Use `--ehrhart-series' or `--simplfied-ehrhart-series' for computing "
 						<< "the Ehrhart series of rational polytopes." << endl;
-				exit(1);
+				THROW_LATTE(LattException::pe_RationalPolytope);
 			}
 			delete cone->vertex->vertex;
 			cone->vertex->vertex = new rationalVector(Poly->numOfVars);
@@ -479,6 +481,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 			params = write_params;
 			ConeConsumer *writing_consumer =
 					new GeneratingFunctionWritingConeConsumer(rat_filename);
+
 			if (Poly->projecting_up_transducer)
 				writing_consumer = compose(Poly->projecting_up_transducer,
 						writing_consumer);
@@ -486,13 +489,12 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 					new PointsInParallelepipedComputingConeTransducer(
 							write_params), writing_consumer);
 			write_params->SetConsumer(writing_consumer);
-			cerr << "Writing multivariate generating function to `"
-					<< rat_filename << "'." << endl;
+			cerr << "Computing multivariate generating function" << endl;
+
 			listCone *cone;
 			for (cone = Poly->cones; cone != NULL; cone = cone->rest)
 				barvinokDecomposition_Single(cone, write_params);
-			cerr << "Multivariate generating function written to `"
-					<< rat_filename << "'." << endl;
+			cerr << "Multivariate generating function written to "<< rat_filename.c_str() << endl;
 			countAnswerContainer.multivariateGenFunctionFileName = rat_filename;
 			break;
 		}
@@ -503,12 +505,12 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 				cerr
 						<< "Computation of Ehrhart polynomials is only implemented "
 						<< "for the exponential substitution (--exp)." << endl;
-				exit(1);
+				THROW_LATTE(LattException::ue_BadCommandLineOption);
 			}
 			if (Poly->unbounded)
 			{
 				cerr << "The polyhedron is unbounded." << endl;
-				exit(1);
+				THROW_LATTE(LattException::pe_Unbounded);
 			}
 			if (read_polyhedron_data.assumeUnimodularCones[0] == 'n')
 			{
@@ -548,14 +550,14 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 			if (Poly->unbounded)
 			{
 				cerr << "The polyhedron is unbounded." << endl;
-				exit(1);
+				THROW_LATTE(LattException::pe_Unbounded);
 			}
 			if (read_polyhedron_data.dualApproach[0] == 'y')
 			{
 				cerr
 						<< "Exponential substitution is not yet implemented for the homogenized version."
 						<< endl;
-				exit(1);
+				THROW_LATTE(LattException::ue_BadCommandLineOption);
 			} else
 			{
 				if (approx)
@@ -573,7 +575,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 #else
 					cerr << "Approximation code is not compiled in, sorry."
 							<< endl;
-					exit(1);
+					THROW_LATTE(LattException::ue_BadCommandLineOption);
 #endif
 				} else if (ehrhart_polynomial)
 				{
@@ -700,7 +702,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 	} catch (NotIrrationalException)
 	{
 		cerr << "Bug: Irrationalization failed" << endl;
-		exit(1);
+		THROW_LATTE(LattException::bug_Unknown);
 	}; //end of try-catch.
 
 

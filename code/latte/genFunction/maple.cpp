@@ -43,7 +43,7 @@ void writeTermToFile(ofstream & out, const vec_ZZ &v, int numOfVars) {
   return ;
 }
 /* ----------------------------------------------------------------- */
-void writeTermOfGeneratingFunctionToFile(ofstream & out, listCone *cone, 
+void writeTermOfGeneratingFunctionToFile(ofstream & out, listCone *cone,
 					 int numOfVars) {
   int len;
   vec_ZZ v;
@@ -139,6 +139,7 @@ GeneratingFunctionWritingConeConsumer::GeneratingFunctionWritingConeConsumer(con
     first_term(true)
 {
 }
+
 
 int GeneratingFunctionWritingConeConsumer::ConsumeCone(listCone *cone)
 {

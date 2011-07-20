@@ -628,7 +628,7 @@ listVector* Grobner(listVector *equations,
 
 
 /* -------------------------------------------------------------- */
-void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
+ZZ SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
 	char * grobner, char * equationsPresent, char * cdd){
   
  ZZ bignum;
@@ -698,6 +698,7 @@ void SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
   cerr << "*******************************************************" << endl;
   cerr <<"\nThe total number of lattice points is: " << TotalNumLattice << "." << endl << endl;
   cerr << "*******************************************************" << endl;
+  return TotalNumLattice;
  
 }
 

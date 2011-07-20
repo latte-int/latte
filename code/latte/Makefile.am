@@ -32,6 +32,7 @@ noinst_LIBRARIES = liblatte.a
 liblatte_a_SOURCES =							\
 	barvinok/dec.cpp barvinok/barvinok.cpp  barvinok/Cone.cpp	\
 	count.cpp \
+	LattException.cpp \
 	barvinok/Triangulation.cpp					\
 	genFunction/piped.cpp genFunction/maple.cpp vertices/cdd.cpp	\
 	preprocess.cpp rational.cpp cone.cpp print.cpp ramon.cpp	\
@@ -59,6 +60,7 @@ liblatte_a_SOURCES =							\
 noinst_HEADERS =							\
 	CheckEmpty.h							\
 	count.h 								\
+	LattException.h						\
 	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
 	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
 	preprocess.h print.h ramon.h rational.h timing.h		\
