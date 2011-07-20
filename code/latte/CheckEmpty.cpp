@@ -173,7 +173,7 @@ void CheckEmpty(const char * Filename){
     cerr << "Empty polytope or unbounded polytope!"<< endl;
     ofstream NOL("numOfLatticePoints");
     NOL << 0 << endl;
-    exit (0);
+    THROW_LATTE(LattException::pe_Unbounded);
   }
   cerr << "done." << endl;
 }

@@ -26,6 +26,7 @@
 #include "latte_gmp.h"
 #include "latte_cddlib.h"
 #include "vertices/cdd.h"
+#include "LattException.h"
 #include <vector>
 
 using namespace std;
@@ -35,7 +36,7 @@ static void check_stream(const istream &f, const char *fileName,
 	if (f.bad() || f.fail()) {
 		cerr << "Read error on input file " << fileName << " in " << proc
 				<< "." << endl;
-		exit(1);
+		THROW_LATTE(LattException::fe_Open);
 	}
 }
 ;
@@ -46,7 +47,7 @@ dd_MatrixPtr ReadLatteStyleMatrix(const char *fileName, bool vrep,
 	if (!f) {
 		cerr << "Cannot open input file " << fileName
 				<< " in ReadLatteStyleMatrix." << endl;
-		exit(1);
+		THROW_LATTE(LattException::fe_Open);
 	}
 	return ReadLatteStyleMatrix(f, vrep, homogenize, fileName, nonnegativity);
 }
@@ -129,7 +130,7 @@ dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep, bool homogenize,
 			if (vrep) {
 				cerr << "Keyword `" << buffer << "' not valid in vrep mode."
 						<< endl;
-				exit(1);
+				THROW_LATTE(LattException::ue_BadFileOption);
 			}
 			int num_nonnegative;
 			f >> num_nonnegative;
@@ -151,7 +152,7 @@ dd_MatrixPtr ReadLatteStyleMatrix(istream &f, bool vrep, bool homogenize,
 		} else {
 			cerr << "Unknown keyword `" << buffer << "' in input file "
 					<< fileName << " in ReadLatteStyleMatrix." << endl;
-			exit(1);
+			THROW_LATTE(LattException::ue_BadFileOption);
 		}
 		// Skip whitespace
 		while (!f.eof() && isspace(f.peek())) {

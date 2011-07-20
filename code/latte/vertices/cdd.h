@@ -26,6 +26,7 @@
 
 #include "cone.h"
 #include "latte_cddlib.h"
+#include "../LattException.h"
 
 void createCddIneFile(const dd_MatrixPtr M);
 void createCddIneFile(listVector*, int);
@@ -52,6 +53,16 @@ listCone* CopyListCones(listCone* RudyCones, int numOfVars);
    Return a list of the vertex cones.  Return the dimension in
    NUMOFVARS. */
 listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars);
+
+/* Read a cdd-style matrix containing a V-representation.
+   Return a list of the vertex cones.  Return the dimension in
+   NUMOFVARS. */
+listCone* computeVertexConesFromVrep(const dd_MatrixPtr M, int &numOfVars);
+
+/* Read a cdd ext file, and eturns a list of the vertex cones.
+ * Return the dimension in
+   NUMOFVARS. */
+listCone *computeVertexConesFromExtFile(int &numOfVars);
 
 listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix, 
 				   int numOfVars);

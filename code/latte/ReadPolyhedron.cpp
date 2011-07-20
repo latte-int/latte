@@ -36,6 +36,7 @@
 #  include "VertexConesWith4ti2.h"
 #endif
 #include "print.h"
+#include "dual.h"
 
 ReadPolyhedronData::ReadPolyhedronData() {
 	strcpy(Vrepresentation, "no");
@@ -143,6 +144,7 @@ bool ReadPolyhedronData::parse_option(const char *arg) {
 		cerr
 				<< "WARNING: Options `--interior' and `int' are broken for most methods."
 				<< endl;
+		THROW_LATTE(LattException::bug_Unknown);
 	} else if (strncmp(arg, "homog", 3) == 0)
 		strcpy(dualApproach, "yes");
 	else if (strncmp(arg, "equ", 3) == 0) {
@@ -363,7 +365,7 @@ listVector *ReadPolyhedronData::read_full_rank_inequality_matrix(BarvinokParamet
 
 	if (expect_filename) {
 		cerr << "The input file name is missing." << endl;
-		exit(2);
+		THROW_LATTE(LattException::ue_FileNameMissing);
 	}
 
 	dd_MatrixPtr M;
@@ -373,7 +375,7 @@ listVector *ReadPolyhedronData::read_full_rank_inequality_matrix(BarvinokParamet
 		if (Vrepresentation[0] == 'y') {
 			cerr
 					<< "ReadPolyhedronData::read_full_rank_inequality_matrix:: Sorry, cannot compute projected H-rep starting from a V-rep.";
-			exit(2);
+			THROW_LATTE(LattException::bug_NotImplementedHere);
 		}
 		cerr << "Warning: Not performing check for empty polytope, "
 				<< "because it is unimplemented for the CDD-style input format. "
@@ -385,7 +387,7 @@ listVector *ReadPolyhedronData::read_full_rank_inequality_matrix(BarvinokParamet
 			/* The polyhedron is given by its V-representation in a
 			 LattE-style input format. */
 			cerr << "ReadPolyhedronData::read_full_rank_inequality_matrix:: Sorry, cannot compute projected H-rep starting from a V-rep.";
-			exit(2);
+			THROW_LATTE(LattException::bug_NotImplementedHere);
 
 		}
 
@@ -423,6 +425,85 @@ ReadPolyhedronData::read_polyhedron(BarvinokParameters *params) {
 	else
 		return read_polyhedron_hairy(params);
 }
+
+
+Polyhedron *ReadPolyhedronData::read_polyhedron(dd_MatrixPtr M, BarvinokParameters *params, const ReadPolyhedronOutput readPolyhedronOutput)
+{
+	Polyhedron * Poly;
+
+
+
+	if ( set_card(M->linset) )
+		strcpy(equationsPresent, "yes");
+	else
+		strcpy(equationsPresent, "no");
+
+
+	if ( readPolyhedronOutput == ReadPolyhedronData::computeVertices)
+	{
+		strcpy(dualApproach, "yes");
+	}
+	else if ( readPolyhedronOutput == ReadPolyhedronData::computePrimalCones)
+	{
+		strcpy(dualApproach, "no");
+	}
+
+	switch (M->representation) {
+	case dd_Generator: //given v-rep, want v-rep. done.
+		if ( dualApproach[0] == 'y')
+			Poly = PolyhedronFromVrepMatrix(M, true);
+		else
+			Poly = PolyhedronFromVrepMatrix(M, false);
+		break;
+	case dd_Inequality: //given h-rep, want v-rep.
+		Poly = PolyhedronFromHrepMatrix(M, params);
+		break;
+	default:
+		cerr << "Unknown representation" << endl;
+		THROW_LATTE(LattException::bug_Unknown);
+	}
+
+	params->Number_of_Variables = Poly->numOfVars;
+
+	/*
+	cout << "poly before anything" << endl;
+	Poly->printPolyhedron();
+	cout << "poly after anything" << endl;
+	cout << "dd h=" << ( M->representation == dd_Inequality ? 1 : 0) << endl;
+	cout << "find cone" << (readPolyhedronOutput == ReadPolyhedronData::computePrimalCones ? 1 : 0) << endl;
+	//find the primal rep.
+	*/
+
+	if ( Poly->dualized)
+	{
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+		Poly->dualized = false;
+	}
+	if ( Poly->cones->rays == NULL)
+	{
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+	}
+
+	/*
+	//if hrep to vertices
+	if ( M->representation == dd_Inequality && readPolyhedronOutput == ReadPolyhedronData::computeVertices)
+	{
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+		Poly->dualized = false;
+	}
+	else if (M->representation == dd_Inequality && readPolyhedronOutput == ReadPolyhedronData::computePrimalCones)
+	{
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+		dualizeCones(Poly->cones, Poly->numOfVars, params);
+	}
+	*/
+
+	return Poly;
+}//read_polyhedron
+
 
 Polyhedron *
 ReadPolyhedronData::read_polyhedron_from_homog_cone_input(
@@ -544,7 +625,11 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params) {
 				THROW_LATTE(LattException::ue_BadCommandLineOption);
 			}
 			if (dualApproach[0] != 'y') {
-				/* FIXME: Special case that ought to be handled uniformly. */
+				/* FIXME: Special case that ought to be handled uniformly.
+				 *
+				 * Brandon: I think I fixed this by changing PolyhedronFromVrepMatrix.
+				 *          I think we can just delete this if-statement, and it will work.
+				 */
 				/* Don't homogenize. */
 				Polyhedron *P = new Polyhedron;
 				P->cones = computeVertexConesFromVrep(filename.c_str(),
@@ -575,7 +660,7 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params) {
 		return PolyhedronFromHrepMatrix(M, params);
 	default:
 		cerr << "Unknown representation" << endl;
-		abort();
+		THROW_LATTE(LattException::bug_Unknown);
 	}
 }
 
@@ -811,8 +896,14 @@ listVector * ReadPolyhedronData::projectOutVariables(dd_MatrixPtr &M, int &numOf
 	return basis;
 }//findLatticeBasis
 
+ /**
+  * @parm matrix: vertex matrix.
+  * @parm homogenize: true = we want to compute the vertices of the polytope.
+  * 				  false = we want to compute the tangent cones.
+  */
 Polyhedron *PolyhedronFromVrepMatrix(dd_MatrixPtr matrix, bool homogenize) {
 	Polyhedron *P = new Polyhedron;
+
 	if (homogenize) {
 		/* Homogenize. */
 		dd_ErrorType error;
@@ -831,8 +922,7 @@ Polyhedron *PolyhedronFromVrepMatrix(dd_MatrixPtr matrix, bool homogenize) {
 				 LattE expects it in the last coordinate. */
 				for (j = 0; j < matrix->colsize - 1; j++)
 					ray[j] = convert_mpq_to_ZZ(matrix->matrix[i - 1][j + 1]);
-				ray[matrix->colsize - 1] = convert_mpq_to_ZZ(matrix->matrix[i
-						- 1][0]);
+				ray[matrix->colsize - 1] = convert_mpq_to_ZZ(matrix->matrix[i - 1][0]);
 				cone->rays = appendVectorToListVector(ray, cone->rays);
 				cone->vertex = new Vertex(createRationalVector(P->numOfVars));
 			}
@@ -842,10 +932,11 @@ Polyhedron *PolyhedronFromVrepMatrix(dd_MatrixPtr matrix, bool homogenize) {
 		P->dualized = false;
 		P->homogenized = true;
 	} else {
-		/* Don't homogenize. */
-		cerr << "PolyhedronFromVrepMatrix: Unimplemented for homogenize=false."
-				<< endl;
-		abort();
+		/* Don't homogenize: compute the tangetn cones. */
+
+		P->cones = computeVertexConesFromVrep(matrix, P->numOfVars);
+		P->dualized = false;
+		P->homogenized = false;
 	}
 	return P;
 }

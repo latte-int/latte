@@ -27,6 +27,7 @@ public:
 		//user errors (ue)
 		ue_UnknownCommandLineOption,   //bad option
 		ue_BadCommandLineOption,		//bad combination of options.
+		ue_BadFileOption,				//bad file keyword or style
 		ue_BadCommandLineOptionCount,	//unexpected command count
 		ue_HelpMenuDisplayed,			//not really an error.
 		ue_FileNameMissing,				//missing file name
@@ -42,6 +43,7 @@ public:
 
 		//unknown
 		bug_Unknown,					//somthing really bad happened.
+		bug_NotImplementedHere,			//this case does not exist is the function that throw it.
 	};
 
 

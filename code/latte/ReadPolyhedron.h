@@ -69,6 +69,12 @@ public:
     FullRedundancyCheckWithCddlib
   } RedundancyCheckType;
   RedundancyCheckType redundancycheck;
+
+  //this enum is to be used by the user in describing the output of Polyhedron.
+  typedef enum {
+	  computePrimalCones,
+	  computeVertices,
+  } ReadPolyhedronOutput;
 public:
   // A maze of twisty intermediate data, all alike.
   vec_ZZ cost;
@@ -83,6 +89,7 @@ public:
   bool parse_option(const char *arg);
 
   Polyhedron *read_polyhedron(BarvinokParameters *params);
+  Polyhedron *read_polyhedron(dd_MatrixPtr M, BarvinokParameters *params, const ReadPolyhedronOutput readPolyhedronOutput);
   listVector * read_full_rank_inequality_matrix(BarvinokParameters *params); //Returns the system Ax <= b where the polytope is full dimensional, starting from the file name.
 protected:
   void matrixToVerticesOrCones(listVector * theMatrix, int numOfVars, Polyhedron *& Poly, BarvinokParameters *&params);
@@ -102,6 +109,8 @@ public:
 /**
  * Class ReadPolyhedronDataRecursive's job is to set each facet inequalities to equality
  *   and compute the reduced polytope.
+ *
+ *  DO NOT USE THIS CLASS: it is only partly finished.
  */
 class ReadPolyhedronDataRecursive: public ReadPolyhedronData
 {

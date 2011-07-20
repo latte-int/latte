@@ -30,6 +30,7 @@
 #include "latte_relocatable.h"
 #include "latte_cddlib.h"
 #include "gnulib/pathmax.h"
+#include "../LattException.h"
 
 using namespace std;
 /* ----------------------------------------------------------------- */
@@ -336,6 +337,39 @@ void createCddExtFile2(const char* filename)
 
 	return;
 }
+/* ----------------------------------------------------------------- */
+/**
+ * Creats a cdd ext file from a dd_matrix of rays.
+ */
+void createCddExtFile2(const dd_MatrixPtr M)
+{
+
+	if (M->representation != dd_Generator)
+	{
+		cerr << "dd_Generator vertex type expected" << endl;
+		THROW_LATTE(LattException::pe_UnexpectedRepresentation);
+	}
+
+	ofstream OUT;
+	OUT.open("latte_cdd.ext");
+	OUT << "V-representation" << endl;
+	OUT << "begin" << endl;
+	OUT << M->rowsize << " " << M->colsize << " rational" << endl;
+	for(int i = 0; i < M->rowsize; i++)
+	{
+		for(int j = 0; j < M->colsize; ++j)
+			OUT << M->matrix[i][j] << " ";
+		OUT << endl;
+	}
+	OUT << "end" << endl;
+	OUT << "hull" << endl;
+	OUT.close();
+
+	return;
+}//createCddExtFile2
+
+
+
 /* ----------------------------------------------------------------- */
 void createCddIneLPFile(listVector* matrix, int numOfVars, vec_ZZ & cost)
 {
@@ -1100,14 +1134,10 @@ static int compute_adjacency(int argc, char *argv[])
 		return 0;
 }
 
-listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars)
+
+listCone *computeVertexConesFromExtFile(int &numOfVars)
 {
-	char cddOutFileName[PATH_MAX], command[PATH_MAX];
 	listCone *cones;
-
-	/* Compute vertices and edges with cdd. */
-
-	createCddExtFile2(fileName);
 
 #if 0
 	cerr << "Computing vertices and edges with cdd...";
@@ -1123,7 +1153,7 @@ listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars)
 		if (compute_adjacency(2, argv) != 0)
 		{
 			cerr << "failed." << endl;
-			exit(1);
+			THROW_LATTE(LattException::bug_Unknown);
 		};
 	}
 	cerr << "done.\n\n";
@@ -1159,6 +1189,30 @@ listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars)
 
 	return (cones);
 }
+
+/**
+ * Writes the matrix v-rep to a file and then calls
+ * computeVertexConesFromExtFile
+ */
+listCone* computeVertexConesFromVrep(const dd_MatrixPtr M, int &numOfVars)
+{
+	createCddExtFile2(M);
+
+	return computeVertexConesFromExtFile(numOfVars);
+}//computeVertexConesFromVrep
+
+/**
+ * Copes the latte file to a cdd v-rep file and calls
+ * computeVertexConesFromExtFile
+ */
+listCone* computeVertexConesFromVrep(const char* fileName, int &numOfVars)
+{
+	/* Compute vertices and edges with cdd. */
+	createCddExtFile2(fileName);
+	return computeVertexConesFromExtFile(numOfVars);
+}
+
+
 
 /* ----------------------------------------------------------------- */
 rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
