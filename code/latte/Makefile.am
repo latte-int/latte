@@ -215,6 +215,8 @@ liblatte_a_SOURCES  += buildPolytopes/BuildRandomPolynomials.cpp
 #interpolation. to delete this.
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
+if HAVE_DATABASE
+
 #This is used to make many polytopes for the new research paper.
 bin_PROGRAMS += build-database-polytopes
 build_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp
@@ -242,9 +244,6 @@ find_volume_database_polytopes_LDFLAGS = -lsqlite3
 find_volume_database_polytopes_LDADD = $(LDADD)
 find_volume_database_polytopes_LDADD += liblatteintegration.a
 
-
-
-
 #This is used to test integration classes from the database
 bin_PROGRAMS += fix-dual-database-polytopes
 fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp
@@ -264,7 +263,6 @@ fix_lawrence_valuation_LDADD = $(LDADD)
 fix_lawrence_valuation_LDADD += liblatteintegration.a
 
 
-
 #This is used to test integration classes from the database
 bin_PROGRAMS += print-database-time-table 
 print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
@@ -272,17 +270,6 @@ print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
 print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
 print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
 print_database_time_table_LDFLAGS = -lsqlite3
-
-
- 
-#we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
-bin_PROGRAMS += testBuildPolytope
-testBuildPolytope_SOURCES = valuation/testCorrectnessAndBenchmark/testBuildPolytopes.cpp
-testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
-
-bin_PROGRAMS += ehrhart3
-ehrhart3_SOURCES = ehrhart3.cpp
-ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 
 #not used. to delete.
 bin_PROGRAMS += integrate-polynomial-for-paper
@@ -297,6 +284,21 @@ bin_PROGRAMS += count-linear-forms-from-polynomial
 count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolynomialDriver.cpp
 count_linear_forms_from_polynomial_LDADD = $(LDADD)
 count_linear_forms_from_polynomial_LDADD += liblatteintegration.a
+
+
+endif #end of HAVE_DATABASE
+
+
+ 
+#we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
+bin_PROGRAMS += testBuildPolytope
+testBuildPolytope_SOURCES = valuation/testCorrectnessAndBenchmark/testBuildPolytopes.cpp
+testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
+
+bin_PROGRAMS += ehrhart3
+ehrhart3_SOURCES = ehrhart3.cpp
+ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
+
 
 bin_PROGRAMS += testPolynomialInterpolation
 testPolynomialInterpolation_SOURCES = interpolation/PolynomialInterpolation.cpp

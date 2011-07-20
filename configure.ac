@@ -142,4 +142,11 @@ if test x$enable_experiments = xyes ; then
    AC_DEFINE(HAVE_EXPERIMENTS, 1, [Define if experimental code is enabled])
 fi
 
+AC_ARG_ENABLE(DATABASE, AS_HELP_STRING([--enable-database],
+	[use database code]))
+AM_CONDITIONAL(HAVE_DATABASE, test x$enable_database = xyes)
+if test x$enable_database = xyes ; then
+   AC_DEFINE(HAVE_DATABASE, 1, [Define if database code is enabled])
+fi
+
 AC_OUTPUT
