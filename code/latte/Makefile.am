@@ -215,63 +215,7 @@ liblatte_a_SOURCES  += buildPolytopes/BuildRandomPolynomials.cpp
 #interpolation. to delete this.
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
-#This is used to make many polytopes for the new research paper.
-bin_PROGRAMS += build-database-polytopes
-build_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp
-build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-#build_database_polytopes_CPPFLAGS = -lsqlite3
-build_database_polytopes_LDFLAGS = -lsqlite3
 
-
-#This is used to test integration classes from the database
-bin_PROGRAMS += integrate-database-polytopes
-integrate_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp
-integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-integrate_database_polytopes_LDFLAGS = -lsqlite3
-integrate_database_polytopes_LDADD = $(LDADD)
-integrate_database_polytopes_LDADD += liblatteintegration.a
-
-#This is used to test volume classes from the database
-bin_PROGRAMS += find-volume-database-polytopes
-find_volume_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp
-find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
-find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-find_volume_database_polytopes_LDFLAGS = -lsqlite3
-find_volume_database_polytopes_LDADD = $(LDADD)
-find_volume_database_polytopes_LDADD += liblatteintegration.a
-
-
-
-
-#This is used to test integration classes from the database
-bin_PROGRAMS += fix-dual-database-polytopes
-fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp
-fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-fix_dual_database_polytopes_LDFLAGS = -lsqlite3
-#fix_dual_database_polytopes_LDADD = $(LDADD)
-#fix_dual_database_polytopes_LDADD += liblatteintegration.a
-
-#This is used update the lawrence valuations.
-bin_PROGRAMS += fix-lawrence-valuation
-fix_lawrence_valuation_SOURCES = valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp
-fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
-fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
-fix_lawrence_valuation_LDFLAGS = -lsqlite3
-fix_lawrence_valuation_LDADD = $(LDADD)
-fix_lawrence_valuation_LDADD += liblatteintegration.a
-
-
-
-#This is used to test integration classes from the database
-bin_PROGRAMS += print-database-time-table 
-print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
-print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
-print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
-print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
-print_database_time_table_LDFLAGS = -lsqlite3
 
 
  
@@ -366,7 +310,66 @@ test_library_examples_SOURCES = valuation/testLibraryExamples.cpp
 test_library_examples_LDADD = $(LDADD)
 test_library_examples_LDADD += liblatteintegration.a
 
+if HAVE_DATABASE
+#	This is used to make many polytopes for the new research paper.
+	bin_PROGRAMS += build-database-polytopes
+	build_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp
+	build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+	build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+#	build_database_polytopes_CPPFLAGS = -lsqlite3
+	build_database_polytopes_LDFLAGS = -lsqlite3
 
+
+#This is used to test integration classes from the database
+	bin_PROGRAMS += integrate-database-polytopes
+	integrate_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp
+	integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+	integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+	integrate_database_polytopes_LDFLAGS = -lsqlite3
+	integrate_database_polytopes_LDADD = $(LDADD)
+	integrate_database_polytopes_LDADD += liblatteintegration.a
+
+#This is used to test volume classes from the database
+	bin_PROGRAMS += find-volume-database-polytopes
+	find_volume_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp
+	find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
+	find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+	find_volume_database_polytopes_LDFLAGS = -lsqlite3
+	find_volume_database_polytopes_LDADD = $(LDADD)
+	find_volume_database_polytopes_LDADD += liblatteintegration.a
+
+
+
+
+#This is used to test integration classes from the database
+	bin_PROGRAMS += fix-dual-database-polytopes
+	fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp
+	fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+	fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+	fix_dual_database_polytopes_LDFLAGS = -lsqlite3
+#	fix_dual_database_polytopes_LDADD = $(LDADD)
+#	fix_dual_database_polytopes_LDADD += liblatteintegration.a
+
+#This is used update the lawrence valuations.
+	bin_PROGRAMS += fix-lawrence-valuation
+	fix_lawrence_valuation_SOURCES = valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp
+	fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
+	fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
+	fix_lawrence_valuation_LDFLAGS = -lsqlite3
+	fix_lawrence_valuation_LDADD = $(LDADD)
+	fix_lawrence_valuation_LDADD += liblatteintegration.a
+
+
+
+#This is used to test integration classes from the database
+	bin_PROGRAMS += print-database-time-table 
+	print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
+	print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
+	print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
+	print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
+	print_database_time_table_LDFLAGS = -lsqlite3
+
+endif
 
 
 ################ INTEGRATION ####################
