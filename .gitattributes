@@ -168,6 +168,7 @@ EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/randomPolytoepDB.2.15.
 EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/vinciCyclicPolytopes/vinciCyclicPolytopesDriver.pl -text
 EXAMPLES/volumeIntegrationPaperComparison/shaoweiLin/shaoweiLin.pdf -text
 code/gnulib/alloca_.h -text
+code/gnulib/setenv.h -text
 code/gnulib/stdbool_.h -text
 code/gnulib/stdlib_.h -text
 code/gnulib/unistd_.h -text
