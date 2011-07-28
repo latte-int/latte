@@ -221,7 +221,7 @@ noinst_HEADERS += interpolation/PolynomialInterpolation.h
  
 #we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
 bin_PROGRAMS += testBuildPolytope
-testBuildPolytope_SOURCES = valuation/testCorrectnessAndBenchmark/testBuildPolytopes.cpp
+testBuildPolytope_SOURCES = valuation/test/testBuildPolytopes.cpp
 testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
 
 bin_PROGRAMS += ehrhart3
@@ -230,8 +230,8 @@ ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 
 #not used. to delete.
 #bin_PROGRAMS += integrate-polynomial-for-paper
-#integrate_polynomial_for_paper_SOURCES = valuation/testCorrectnessAndBenchmark/integratePolynomialForPaperDriver.cpp
-#integrate_polynomial_for_paper_SOURCES += valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp
+#integrate_polynomial_for_paper_SOURCES = valuation/test/integratePolynomialForPaperDriver.cpp
+#integrate_polynomial_for_paper_SOURCES += valuation/test/VolumeAndIntegrationTests.cpp
 #integrate_polynomial_for_paper_LDADD = $(LDADD)
 #integrate_polynomial_for_paper_LDADD += liblatteintegration.a
 
@@ -272,13 +272,13 @@ ConvertCDDextToLatte_LDADD = $(LDADD)
 
 #converts a really big fraction to decimal.
 #bin_PROGRAMS += convert-rational-to-decimal
-#convert_rational_to_decimal_SOURCES = valuation/testCorrectnessAndBenchmark/convertRationalToDecimalDriver.cpp
+#convert_rational_to_decimal_SOURCES = valuation/test/convertRationalToDecimalDriver.cpp
 #convert_rational_to_decimal_LDADD = $(LDADD)
 
-#Run ./valuation/testCorrectnessAndBenchmark/integrateHyperrectangleTest.sh 
+#Run ./valuation/test/integrateHyperrectangleTest.sh 
 #  to start a maple script that will test integration of polynomials over rectangles in many dimentions.
 check_PROGRAMS += test-hyperrectangle-integration
-test_hyperrectangle_integration_SOURCES = valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesDriver.cpp 
+test_hyperrectangle_integration_SOURCES = valuation/test/testIntegrationHyperrectanglesDriver.cpp 
 test_hyperrectangle_integration_LDADD = $(LDADD)
 test_hyperrectangle_integration_LDADD += liblatteintegration.a
 
@@ -292,14 +292,14 @@ test_hyperrectangle_integration_LDADD += liblatteintegration.a
 
 #Computes the volums of standard hypersimplex
 check_PROGRAMS += test-volume-hypersimplex
-test_volume_hypersimplex_SOURCES = valuation/testCorrectnessAndBenchmark/testVolumeHypersimplexDriver.cpp
-test_volume_hypersimplex_SOURCES += valuation/testCorrectnessAndBenchmark/VolumeAndIntegrationTests.cpp
+test_volume_hypersimplex_SOURCES = valuation/test/testVolumeHypersimplexDriver.cpp
+test_volume_hypersimplex_SOURCES += valuation/test/VolumeAndIntegrationTests.cpp
 test_volume_hypersimplex_LDADD = $(LDADD)
 test_volume_hypersimplex_LDADD += liblatteintegration.a  
 
 #A maple script can find the volume of many simplices at once using the PolytopeValuation class.
 check_PROGRAMS += test-volume-for-SL
-test_volume_for_SL_SOURCES = valuation/testCorrectnessAndBenchmark/testVolumeForSLDriver.cpp
+test_volume_for_SL_SOURCES = valuation/test/testVolumeForSLDriver.cpp
 test_volume_for_SL_LDADD = $(LDADD)
 test_volume_for_SL_LDADD += liblatteintegration.a
 
@@ -310,10 +310,10 @@ test_library_examples_SOURCES = valuation/testLibraryExamples.cpp
 test_library_examples_LDADD = $(LDADD)
 test_library_examples_LDADD += liblatteintegration.a
 
-if HAVE_DATABASE
+#if HAVE_DATABASE
 #	This is used to make many polytopes for the new research paper.
 	bin_PROGRAMS += build-database-polytopes
-	build_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/buildDatabaseRandomPolytopesDriver.cpp
+	build_database_polytopes_SOURCES = valuation/test/buildDatabaseRandomPolytopesDriver.cpp
 	build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
 	build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
 #	build_database_polytopes_CPPFLAGS = -lsqlite3
@@ -322,7 +322,7 @@ if HAVE_DATABASE
 
 #This is used to test integration classes from the database
 	bin_PROGRAMS += integrate-database-polytopes
-	integrate_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp
+	integrate_database_polytopes_SOURCES = valuation/test/runIntegrationTestFromDatabaseDriver.cpp
 	integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
 	integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
 	integrate_database_polytopes_LDFLAGS = -lsqlite3
@@ -331,7 +331,7 @@ if HAVE_DATABASE
 
 #This is used to test volume classes from the database
 	bin_PROGRAMS += find-volume-database-polytopes
-	find_volume_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/runVolumeTestFromDatabaseDriver.cpp
+	find_volume_database_polytopes_SOURCES = valuation/test/runVolumeTestFromDatabaseDriver.cpp
 	find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
 	find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
 	find_volume_database_polytopes_LDFLAGS = -lsqlite3
@@ -343,7 +343,7 @@ if HAVE_DATABASE
 
 #This is used to test integration classes from the database
 	bin_PROGRAMS += fix-dual-database-polytopes
-	fix_dual_database_polytopes_SOURCES = valuation/testCorrectnessAndBenchmark/fixDualPolytopesInDatabaseDriver.cpp
+	fix_dual_database_polytopes_SOURCES = valuation/test/fixDualPolytopesInDatabaseDriver.cpp
 	fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
 	fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
 	fix_dual_database_polytopes_LDFLAGS = -lsqlite3
@@ -352,7 +352,7 @@ if HAVE_DATABASE
 
 #This is used update the lawrence valuations.
 	bin_PROGRAMS += fix-lawrence-valuation
-	fix_lawrence_valuation_SOURCES = valuation/testCorrectnessAndBenchmark/fixLawrenceValuationDriver.cpp
+	fix_lawrence_valuation_SOURCES = valuation/test/fixLawrenceValuationDriver.cpp
 	fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
 	fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
 	fix_lawrence_valuation_LDFLAGS = -lsqlite3
@@ -363,13 +363,13 @@ if HAVE_DATABASE
 
 #This is used to test integration classes from the database
 	bin_PROGRAMS += print-database-time-table 
-	print_database_time_table_SOURCES = valuation/testCorrectnessAndBenchmark/printDatabaseTimeTablesDriver.cpp
+	print_database_time_table_SOURCES = valuation/test/printDatabaseTimeTablesDriver.cpp
 	print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
 	print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
 	print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
 	print_database_time_table_LDFLAGS = -lsqlite3
 
-endif
+#endif
 
 
 ################ INTEGRATION ####################
