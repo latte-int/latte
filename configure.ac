@@ -149,4 +149,13 @@ if test x$enable_database = xyes ; then
    AC_DEFINE(HAVE_DATABASE, 1, [Define if database code is enabled])
 fi
 
+#builds mini integration drivers
+#	or programs only latte programmers care about
+AC_ARG_ENABLE(PROGRAMMER_HELPER, AS_HELP_STRING([--enable-programmer-helper],
+	[build extra programs]))
+AM_CONDITIONAL(HAVE_PROGRAMMER_HELPER, test x$enable_programmer_helper = xyes)
+if test x$enable_programmer_helper = xyes ; then
+   AC_DEFINE(HAVE_PROGRAMMER_HELPER, 1, [Define if database code is enabled])
+fi
+
 AC_OUTPUT
