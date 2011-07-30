@@ -1,7 +1,10 @@
-This is LattE macchiato, an improved version of LattE derived from the
-official Release 1.2.
+This is LattE integrale, a new version of LattE that can compute volumes
+and integrate polynomials and powers of linear forms over polytopes.
 
-It requires the following programs and libraries: 
+This release also includes LattE macchiato, an improved version of 
+LattE derived from the official Release 1.2.
+
+LattE requires the following programs and libraries: 
 
   * GMP, compiled with --enable-cxx
   * NTL, version 5.4 or newer
@@ -15,23 +18,23 @@ If you do not have these libraries installed yet, follow the
 instructions below to install them.  However, we also package a source
 code distribution called
 
-   "latte-for-tea-too"
+   "latte-integrale"
 
 that includes all of these libraries and will build them automatically. 
 You can get it at the same place where you got LattE macchiato,
 
-    http://www.math.ucdavis.edu/~mkoeppe/latte/
+    http://www.math.ucdavis.edu/~latte/
 
 
 Building and installing LattE
 -----------------------------
 
 It is STRONGLY RECOMMENDED to use the source code distribution called
-"latte-for-tea-too".  It contains all prerequisite libraries and also
+"latte-integrale".  It contains all prerequisite libraries and also
 PATCHES for some of the libraries that fix configuration and build
 problems that are not yet included in upstream releases of the library.
 
-If you do not wish to use "latte-for-tea-too", follow the instructions
+If you do not wish to use "latte-integrale", follow the instructions
 below.  The instructions assume you want to install LattE and all its
 prerequisites into your home directory, namely into a hierarchy rooted
 at the directory $HOME/latte.
@@ -89,11 +92,9 @@ More information
 
  * Authors: see AUTHORS
 
- * Documentation: See the old LattE manual (file `manual_v1.1.pdf') to get started.
-   		  For brief information on the new features of LattE macchiato,
-		  see the file `NEWS'.
+ * Documentation: See the LattE manual (file `manual_v1.5.pdf') to get started.
 
  * Changes since the official release 1.2: see NEWS and ChangeLog
 
- * Website: http://www.math.ucdavis.edu/~mkoeppe/latte
+ * Website: http://www.math.ucdavis.edu/~latte
 

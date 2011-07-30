@@ -1,3 +1,24 @@
+Changes since release 1.4:
+
+ * New program for computing volumes and integrating polynomials or powers of linear forms over polytopes.
+ 
+ * Computing volume by triangulating 
+ 		
+        integrate --triangulate --valuation=volume
+
+ * Computing volume by cone decomposition
+         
+        integrate --cone-decompose --valuation=volume
+        
+ * Computing integrals by triangulating 
+         
+        integrate --triangulate --valuation=integrate [--monomials=file | --linear-forms=file]
+
+ * Computing integrals by cone decomposition
+         
+        integrate --cone-decompose --valuation=integrate [--monomials=file | --linear-forms=file]
+        
+        
 Changes since the official release 1.2:
 
  * Use GNU Autoconf and Automake.
