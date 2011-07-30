@@ -97,7 +97,6 @@ endif
 endif
 
 if HAVE_CDDLIB
-
 liblatte_a_SOURCES += latte_cddlib.cpp
 liblatte_a_SOURCES += triangulation/RegularTriangulationWithCddlib.cpp
 noinst_HEADERS += triangulation/RegularTriangulationWithCddlib.h
@@ -127,15 +126,13 @@ bin_PROGRAMS += polyhedron-to-cones
 polyhedron_to_cones_SOURCES = polyhedron-to-cones.cpp
 
 if HAVE_EXPERIMENTS
-# Experimental stuff
-
+#Experimental stuff
 nodist_liblatte_a_SOURCES =				\
 	ExponentialApprox.cpp				\
 	heap.cpp					\
 	TrivialSubst.cpp				\
 	barvinok/SubspaceAvoidingDecomposition.cpp	\
 	triangulation/BoundaryTriangulation.cpp	
-
 nodist_noinst_HEADERS =					\
 	ExponentialApprox.h				\
 	heap.h						\
@@ -161,14 +158,12 @@ AM_CXXFLAGS += $(CPLEX_CFLAGS)
 
 nodist_liblatte_a_SOURCES += triangulation/SpecialSimplex.cpp 
 nodist_noinst_HEADERS += triangulation/SpecialSimplex.h
-
 bin_PROGRAMS += special-simplex
 nodist_special_simplex_SOURCES = triangulation/special-simplex.cpp
 special_simplex_LDFLAGS = $(CPLEX_LDFLAGS)
 special_simplex_CXXFLAGS = $(AM_CXXFLAGS) $(CPLEX_CFLAGS)
 endif
-
-endif
+endif #end HAVE_EXPERIMENTS
 
 bin_PROGRAMS += triangulate
 triangulate_SOURCES = triangulation/test-triangulation.cpp
@@ -178,6 +173,7 @@ check_PROGRAMS =
 if HAVE_LIDIA
 check_PROGRAMS += ilio_test
 ilio_test_SOURCES = genFunction/ilio.cpp
+TESTS += ilio_test
 endif
 
 # Maple code
@@ -217,42 +213,6 @@ noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
 
 
-
- 
-#we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
-bin_PROGRAMS += testBuildPolytope
-testBuildPolytope_SOURCES = valuation/test/testBuildPolytopes.cpp
-testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
-
-bin_PROGRAMS += ehrhart3
-ehrhart3_SOURCES = ehrhart3.cpp
-ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
-
-#not used. to delete.
-#bin_PROGRAMS += integrate-polynomial-for-paper
-#integrate_polynomial_for_paper_SOURCES = valuation/test/integratePolynomialForPaperDriver.cpp
-#integrate_polynomial_for_paper_SOURCES += valuation/test/VolumeAndIntegrationTests.cpp
-#integrate_polynomial_for_paper_LDADD = $(LDADD)
-#integrate_polynomial_for_paper_LDADD += liblatteintegration.a
-
-
-#counts the number of linear forms in a polynomial.
-bin_PROGRAMS += count-linear-forms-from-polynomial
-count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolynomialDriver.cpp
-count_linear_forms_from_polynomial_LDADD = $(LDADD)
-count_linear_forms_from_polynomial_LDADD += liblatteintegration.a
-
-bin_PROGRAMS += testPolynomialInterpolation
-testPolynomialInterpolation_SOURCES = interpolation/PolynomialInterpolation.cpp
-testPolynomialInterpolation_SOURCES += interpolation/testDriver.cpp
-
-bin_PROGRAMS += my-test-ehrhart
-my_test_ehrhart_SOURCES = buildPolytopes/Driver.cpp
-my_test_ehrhart_SOURCES += buildPolytopes/BuildRandomPolytope.cpp
-my_test_ehrhart_SOURCES += buildPolytopes/BuildHypersimplexEdgePolytope.cpp
-my_test_ehrhart_SOURCES += buildPolytopes/GraphMaker.cpp
-my_test_ehrhart_SOURCES += buildPolytopes/BuildGraphPolytope.cpp
-
 #main program to find volumes and integrals of polytopes.
 bin_PROGRAMS += integrate
 integrate_SOURCES = valuation/Driver.cpp
@@ -270,11 +230,6 @@ ConvertCDDextToLatte_SOURCES = convertCDD_ext_to_latte.cpp
 ConvertCDDextToLatte_LDADD = $(LDADD)
 
 
-#converts a really big fraction to decimal.
-#bin_PROGRAMS += convert-rational-to-decimal
-#convert_rational_to_decimal_SOURCES = valuation/test/convertRationalToDecimalDriver.cpp
-#convert_rational_to_decimal_LDADD = $(LDADD)
-
 #Run ./valuation/test/integrateHyperrectangleTest.sh 
 #  to start a maple script that will test integration of polynomials over rectangles in many dimentions.
 check_PROGRAMS += test-hyperrectangle-integration
@@ -283,19 +238,57 @@ test_hyperrectangle_integration_LDADD = $(LDADD)
 test_hyperrectangle_integration_LDADD += liblatteintegration.a
 
 
+#A collection of examples of how to use latte as a lib.
+check_PROGRAMS += test-library-examples
+test_library_examples_SOURCES = valuation/testLibraryExamples.cpp
+test_library_examples_LDADD = $(LDADD)
+test_library_examples_LDADD += liblatteintegration.a
+TESTS += test-library-examples
+
+if HAVE_PROGRAMMER_HELPER
+
+ 
+#we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
+bin_PROGRAMS += testBuildPolytope
+testBuildPolytope_SOURCES = valuation/test/testBuildPolytopes.cpp
+testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
+
+
+#counts the number of linear forms in a polynomial.
+bin_PROGRAMS += ehrhart3
+ehrhart3_SOURCES = ehrhart3.cpp
+ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
+
+
+#counts the number of linear forms in a polynomial.
+bin_PROGRAMS += count-linear-forms-from-polynomial
+count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolynomialDriver.cpp
+count_linear_forms_from_polynomial_LDADD = $(LDADD)
+count_linear_forms_from_polynomial_LDADD += liblatteintegration.a
+
+#we should remove this at some point. 
+bin_PROGRAMS += testPolynomialInterpolation
+testPolynomialInterpolation_SOURCES = interpolation/PolynomialInterpolation.cpp
+testPolynomialInterpolation_SOURCES += interpolation/testDriver.cpp
+
+#we should remove this at some point.
+bin_PROGRAMS += my-test-ehrhart
+my_test_ehrhart_SOURCES = buildPolytopes/Driver.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/BuildRandomPolytope.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/BuildHypersimplexEdgePolytope.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/GraphMaker.cpp
+my_test_ehrhart_SOURCES += buildPolytopes/BuildGraphPolytope.cpp
+
+#converts a really big fraction (say 70000 digits) to decimal.
+#bin_PROGRAMS += convert-rational-to-decimal
+#convert_rational_to_decimal_SOURCES = valuation/test/convertRationalToDecimalDriver.cpp
+#convert_rational_to_decimal_LDADD = $(LDADD)
+
 #check_PROGRAMS += test-rationalNTL
 #test_rationalNTL_SOURCES = testRationalNTLDriver.cpp 
 #test_rationalNTL_SOURCES += rational.cpp
 #test_rationalNTL_LDADD = $(LDADD)
 
-
-
-#Computes the volums of standard hypersimplex
-check_PROGRAMS += test-volume-hypersimplex
-test_volume_hypersimplex_SOURCES = valuation/test/testVolumeHypersimplexDriver.cpp
-test_volume_hypersimplex_SOURCES += valuation/test/VolumeAndIntegrationTests.cpp
-test_volume_hypersimplex_LDADD = $(LDADD)
-test_volume_hypersimplex_LDADD += liblatteintegration.a  
 
 #A maple script can find the volume of many simplices at once using the PolytopeValuation class.
 check_PROGRAMS += test-volume-for-SL
@@ -303,73 +296,70 @@ test_volume_for_SL_SOURCES = valuation/test/testVolumeForSLDriver.cpp
 test_volume_for_SL_LDADD = $(LDADD)
 test_volume_for_SL_LDADD += liblatteintegration.a
 
+endif #end of  HAVE_PROGRAMMER_HELPER
 
-#A collection of examples of how to use latte as a lib.
-check_PROGRAMS += test-library-examples
-test_library_examples_SOURCES = valuation/testLibraryExamples.cpp
-test_library_examples_LDADD = $(LDADD)
-test_library_examples_LDADD += liblatteintegration.a
 
-#if HAVE_DATABASE
-#	This is used to make many polytopes for the new research paper.
-	bin_PROGRAMS += build-database-polytopes
-	build_database_polytopes_SOURCES = valuation/test/buildDatabaseRandomPolytopesDriver.cpp
-	build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-	build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-#	build_database_polytopes_CPPFLAGS = -lsqlite3
-	build_database_polytopes_LDFLAGS = -lsqlite3
+
+if HAVE_DATABASE
+
+#This is used to make many polytopes for the new research paper.
+bin_PROGRAMS += build-database-polytopes
+build_database_polytopes_SOURCES = valuation/test/buildDatabaseRandomPolytopesDriver.cpp
+build_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+build_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+#build_database_polytopes_CPPFLAGS = -lsqlite3
+build_database_polytopes_LDFLAGS = -lsqlite3
 
 
 #This is used to test integration classes from the database
-	bin_PROGRAMS += integrate-database-polytopes
-	integrate_database_polytopes_SOURCES = valuation/test/runIntegrationTestFromDatabaseDriver.cpp
-	integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-	integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-	integrate_database_polytopes_LDFLAGS = -lsqlite3
-	integrate_database_polytopes_LDADD = $(LDADD)
-	integrate_database_polytopes_LDADD += liblatteintegration.a
+bin_PROGRAMS += integrate-database-polytopes
+integrate_database_polytopes_SOURCES = valuation/test/runIntegrationTestFromDatabaseDriver.cpp
+integrate_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+integrate_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+integrate_database_polytopes_LDFLAGS = -lsqlite3
+integrate_database_polytopes_LDADD = $(LDADD)
+integrate_database_polytopes_LDADD += liblatteintegration.a
 
 #This is used to test volume classes from the database
-	bin_PROGRAMS += find-volume-database-polytopes
-	find_volume_database_polytopes_SOURCES = valuation/test/runVolumeTestFromDatabaseDriver.cpp
-	find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
-	find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-	find_volume_database_polytopes_LDFLAGS = -lsqlite3
-	find_volume_database_polytopes_LDADD = $(LDADD)
-	find_volume_database_polytopes_LDADD += liblatteintegration.a
+bin_PROGRAMS += find-volume-database-polytopes
+find_volume_database_polytopes_SOURCES = valuation/test/runVolumeTestFromDatabaseDriver.cpp
+find_volume_database_polytopes_SOURCES += sqlite/VolumeDB.cpp
+find_volume_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+find_volume_database_polytopes_LDFLAGS = -lsqlite3
+find_volume_database_polytopes_LDADD = $(LDADD)
+find_volume_database_polytopes_LDADD += liblatteintegration.a
 
 
 
 
 #This is used to test integration classes from the database
-	bin_PROGRAMS += fix-dual-database-polytopes
-	fix_dual_database_polytopes_SOURCES = valuation/test/fixDualPolytopesInDatabaseDriver.cpp
-	fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
-	fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
-	fix_dual_database_polytopes_LDFLAGS = -lsqlite3
-#	fix_dual_database_polytopes_LDADD = $(LDADD)
-#	fix_dual_database_polytopes_LDADD += liblatteintegration.a
+bin_PROGRAMS += fix-dual-database-polytopes
+fix_dual_database_polytopes_SOURCES = valuation/test/fixDualPolytopesInDatabaseDriver.cpp
+fix_dual_database_polytopes_SOURCES += sqlite/IntegrationDB.cpp
+fix_dual_database_polytopes_SOURCES += sqlite/SqliteDB.cpp
+fix_dual_database_polytopes_LDFLAGS = -lsqlite3
+#fix_dual_database_polytopes_LDADD = $(LDADD)
+#fix_dual_database_polytopes_LDADD += liblatteintegration.a
 
 #This is used update the lawrence valuations.
-	bin_PROGRAMS += fix-lawrence-valuation
-	fix_lawrence_valuation_SOURCES = valuation/test/fixLawrenceValuationDriver.cpp
-	fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
-	fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
-	fix_lawrence_valuation_LDFLAGS = -lsqlite3
-	fix_lawrence_valuation_LDADD = $(LDADD)
-	fix_lawrence_valuation_LDADD += liblatteintegration.a
-
+bin_PROGRAMS += fix-lawrence-valuation
+fix_lawrence_valuation_SOURCES = valuation/test/fixLawrenceValuationDriver.cpp
+fix_lawrence_valuation_SOURCES += sqlite/IntegrationDB.cpp
+fix_lawrence_valuation_SOURCES += sqlite/SqliteDB.cpp
+fix_lawrence_valuation_LDFLAGS = -lsqlite3
+fix_lawrence_valuation_LDADD = $(LDADD)
+fix_lawrence_valuation_LDADD += liblatteintegration.a
 
 
 #This is used to test integration classes from the database
-	bin_PROGRAMS += print-database-time-table 
-	print_database_time_table_SOURCES = valuation/test/printDatabaseTimeTablesDriver.cpp
-	print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
-	print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
-	print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
-	print_database_time_table_LDFLAGS = -lsqlite3
+bin_PROGRAMS += print-database-time-table 
+print_database_time_table_SOURCES = valuation/test/printDatabaseTimeTablesDriver.cpp
+print_database_time_table_SOURCES += sqlite/IntegrationDB.cpp
+print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
+print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
+print_database_time_table_LDFLAGS = -lsqlite3
 
-#endif
+endif #HAVE_DATABASE
 
 
 ################ INTEGRATION ####################
@@ -387,13 +377,18 @@ liblatteintegration_a_SOURCES = 		\
 noinst_HEADERS +=				\
 	integration/multiply.h			\
 	integration/iterators.h			\
+	integration/iterators.hpp		\
 	integration/consumers.h			\
 	integration/PolyRep.h			\
 	integration/PolyTrie.h			\
 	integration/newIntegration.h		\
 	integration/burstTrie.h			\
+	integration/burstTrie.hpp		\
 	integration/blockReps.h			\
 	integration/residue.h	
+
+
+if HAVE_PROGRAMMER_HELPER
 
 bin_PROGRAMS += BlockIntegrate
 BlockIntegrate_SOURCES = integration/blockInt.cpp
@@ -415,21 +410,29 @@ bin_PROGRAMS += integrate_demo
 integrate_demo_SOURCES =    integration/integrateDemo.cpp
 integrate_demo_LDADD = liblatteintegration.a liblatte.a
 
-check_PROGRAMS += integrate_test
-integrate_test_SOURCES =    integration/integrateTest.cpp
-integrate_test_LDADD = liblatteintegration.a liblatte.a
-
-check_PROGRAMS += multiply_test
-multiply_test_SOURCES =   integration/multiplyTest.cpp
-multiply_test_LDADD = liblatteintegration.a liblatte.a
 
 check_PROGRAMS += compare
 compare_SOURCES = integration/versusMode.cpp
 compare_LDADD = liblatteintegration.a liblatte.a
 
+endif #end of HAVE_PROGRAMMER_HELPER
 
-TESTS +=  integration/testMultiply.sh
+check_PROGRAMS += integrate_test
+integrate_test_SOURCES =    integration/integrateTest.cpp
+integrate_test_LDADD = liblatteintegration.a liblatte.a
 TESTS += integration/testIntegration.sh
+
+check_PROGRAMS += multiply_test
+multiply_test_SOURCES =   integration/multiplyTest.cpp
+multiply_test_LDADD = liblatteintegration.a liblatte.a
+TESTS +=  integration/testMultiply.sh
+
+
+
+
+
+
+
 
 bench-table5: 
 	integration/benchmark.sh 5 integration/table5.txt

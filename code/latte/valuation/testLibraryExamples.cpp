@@ -75,6 +75,7 @@ string FILE_BASE;
 
 int main(int argc, char *argv[])
 {
+	/*	//feel free to comment this back in if you want.
 	cout << "Hello, this file is designed to help developers use LattE as\n"
 			<< " a library. I recommend commenting out the examples you do\n"
 			<< " not care to see and un-commenting the print statements\n"
@@ -84,12 +85,13 @@ int main(int argc, char *argv[])
 			<< " depending on how many examples you have compiled." << endl;
 	cin.get(); //stop, so user can read the message above.
 
+	*/
 
 	//global variable. Used to make temp. files.
 	FILE_BASE = argv[0];
 
 
-	/*
+	/* //I should delete this block
 	int file, num;
 	for(cin >> file >> num; file != -1; cin >> file >> num)
 	{
@@ -575,9 +577,7 @@ void finding_volume_triangulation()
 void finding_lattice_count()
 {
 	string fileName = FILE_BASE + ".hrep";
-	ifstream ifile(fileName.c_str());
-	assert( ifile ); //assume the hrep file has allready been created.
-	ifile.close();
+	building_h_file();
 
 	char * argv[] = { "./dummyName", "--count-lattice-points", "" };
 	argv[2] = (char *) fileName.c_str();
@@ -596,9 +596,7 @@ void finding_lattice_count()
 void finding_ehrhart_polynomial()
 {
 	string fileName = FILE_BASE + ".hrep";
-	ifstream ifile(fileName.c_str());
-	assert( ifile ); //assume the hrep file has allready been created.
-	ifile.close();
+	building_h_file();
 
 	char * argv[] = { "./dummyName", "--ehrhart-polynomial", "" };
 	argv[2] = (char *) fileName.c_str();
@@ -620,9 +618,7 @@ void finding_ehrhart_polynomial()
 void finding_ehrhart_taylor()
 {
 	string fileName = FILE_BASE + ".hrep";
-	ifstream ifile(fileName.c_str());
-	assert( ifile ); //assume the hrep file has allready been created.
-	ifile.close();
+	building_h_file();
 
 	char * argv[] = { "./dummyName", "--ehrhart-taylor=5", "" };
 	argv[2] = (char *) fileName.c_str();
