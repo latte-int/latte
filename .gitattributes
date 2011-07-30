@@ -298,4 +298,5 @@ doc/truncatedCube.jpg -text
 /install-reloc -text
 /link-warning.h -text
 /manual_v1.1.pdf -text
+/manual_v1.5.pdf -text svneol=unset#unset
 /reloc-ldflags -text
