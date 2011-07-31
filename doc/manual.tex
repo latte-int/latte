@@ -408,6 +408,10 @@ end
 
 For a complete description of \cdd file syntax, see the \cdd manual \cite{fukuda}.
 
+\subsection{Non-full dimensional polytopes}
+
+When the input polytope is not full dimensional, \latte projects that polytope such that it becomes full dimensional. This transformation preserves the lattice count and volume of the input polytope. The current \latteInt cannot integrate non-full dimensional polytopes.
+
 \subsection{\latte vs. \cdd file formats}
 There are a few key differences between \latte and \cdd file formats.
 
