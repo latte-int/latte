@@ -215,7 +215,9 @@ void fixTheVolume(const char * dbFile)
 			<< " , flagValue = '" << correctionFactor << "'"
 			<< " where rowid = '" << results[i][0] << "'";
 		//cout << sql.str().c_str() <<  endl;
-		db.query(sql.str().c_str());
+		//db.query(sql.str().c_str()); //comment this out when done...so we don't run it again.
+		cout << "not running query, edit source file." << endl;
+		exit(1);
 	}//for i
 
 	db.close();
@@ -322,7 +324,9 @@ void fixTheIntegration(const char * dbFile)
 			<< " , flagValue = '" << correctionFactor << "'"
 			<< " where rowid = '" << results[i][0] << "'";
 		//cout << sql.str().c_str() <<  endl;
-		db.query(sql.str().c_str());
+		//db.query(sql.str().c_str());
+		cout << "not running query, edit source file." << endl;
+		exit(1);
 	}//for i
 
 	db.close();
