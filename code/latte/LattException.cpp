@@ -20,9 +20,8 @@ LattException::LattException(UserError ue, const char * file, const int line, co
 
 
 
-string & LattException::printErrorMessages() const
+void LattException::printErrorMessages() const
 {
-	cout << "Exception message: " << exception::what();
 	cout << "\nLatte message    : "
 		 << "\n  error code: " << userError
 		 << "\n  Optional message: " << msg.c_str()
@@ -32,5 +31,6 @@ string & LattException::printErrorMessages() const
 
 const char* LattException::what() const throw()
 {
-	return printErrorMessages().c_str();
+	printErrorMessages();
+	return exception::what();
 }

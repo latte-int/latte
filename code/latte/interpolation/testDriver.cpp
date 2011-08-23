@@ -29,69 +29,8 @@ void test1Poly();
 int main()
 {
 	srand(44);
-/*
-	//c style 
-    int polyTopC[] = {4, 5, -20, 4, -8, 9};
-    int polyBotC[] = {1, 2,   1, 3,  5, 10};
-    //int polyBotC[] = {1, 1,   1, 1,  1, 1};
-    int const POLYSIZE = 6;
 
-    int xValueTopC[] = {1, 2, -3, 5, -7, 10};
-    int xValueBotC[] = {1, 3, 1 , 2,  4, 3};
-    
-
-    
-    
-    vector<mpq_class> xValue;
-    vector<mpq_class> poly;
-    
-    xValue.reserve(POLYSIZE);
-    poly.  reserve(POLYSIZE);
-    
-    mpq_class temp;
-    
-    for(int i = 0; i < POLYSIZE; ++i)
-	{
-		//xValue[i] = mpq_class(xValueTopC[i], xValueBotC[i]);
-		//poly[i] = mpq_class(polyTopC[i], polyBotC[i]);
-    	xValue.push_back(mpq_class(xValueTopC[i], xValueBotC[i]));
-    	poly.push_back(mpq_class(polyTopC[i], polyBotC[i]));
-		xValue[i].canonicalize();
-		poly[i].canonicalize();
-	}
-
-    cout << "the Poly nominal = ";
-    //for(int i = 0; i < POLYSIZE; ++i)
-    for(int i = 0; i < (int) poly.size(); ++i)
-    {
-    	cout << poly[i];
-    	if (i == 0)
-    		cout << " ";
-    	else
-    		cout << "x^" << i << " ";
-    }
-    cout << endl;
-
-cout << "hello world" << endl;
-	
-	PolynomialInterpolation p(POLYSIZE -1);
-	for(int i = 0; i < POLYSIZE; ++i)
-	{
-
-		temp = evaluatePoly(xValue[i], poly);
-		temp.canonicalize();
-		cout << "( " << xValue[i] << ", " << temp << " )" << endl;
-		//mpq_set(fValue[i], temp);
-		p.addPoint(xValue[i], temp);
-	}	
-
-   	p.printMatrix();
-   	p.GE();
-   	p.printMatrix();
-	
-	cout << "testing one poly" << endl;
-*/
-	for(int k = 0; k < 100000; ++k)
+	for(int k = 0; k < 10; ++k)
 	{
 		cout << "k=" << k << "\n";
 		test1Poly();

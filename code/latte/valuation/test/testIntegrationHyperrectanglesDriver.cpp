@@ -20,15 +20,15 @@ int main(int argc, char *argv[])
 {
 	if ( argc != 5)
 	{
-		cout << "Usage: " << argv[0] << " correct-answer [p or l] [polynomial-file or linear-form-file] latte-file\n";
+		cout << "Usage: " << argv[0] << " correct-answer [p or l or d] [polynomial-file or linear-form-file or product-linear-form-file] latte-file\n";
 		cout << "the correct-answer could be a fraction, but should not have spaces.\n\n";
-		cout << "Description: Tests that integrating a polynomial or power of a linear form over the polytope gives the same answer as what is passed in." << endl;
+		cout << "Description: Tests that integrating a polynomial or power of a linear form or a product of linear forms over the polytope gives the same answer as what is passed in." << endl;
 		return 1;
 	}
 
 
 	RationalNTL correctAnswer(argv[1]);
-	Valuation::ValuationContainer valuationContainerLaw, valuationContainerTri;
+	Valuation::ValuationContainer valuationContainerLaw, valuationContainerTri, valuationContainterTriProd;
 
 	char * options[5];
 
@@ -42,6 +42,12 @@ int main(int argc, char *argv[])
 		strcat(options[3], argv[3]);
 	}
 	else if ( strcmp(argv[2], "l") == 0)
+	{
+		options[3] = new char[strlen(argv[3]) + 16];
+		strcpy(options[3], "--linear-forms=");
+		strcat(options[3], argv[3]);
+	}
+	else if ( strcmp(argv[2], "d") == 0)
 	{
 		options[3] = new char[strlen(argv[3]) + 16];
 		strcpy(options[3], "--linear-forms=");
@@ -63,6 +69,8 @@ int main(int argc, char *argv[])
 	}
 
 
+	if (strcmp(argv[2], "l") == 0 || strcmp(argv[2], "p") == 0)
+	{
 	//if we want to test both methods starting from the vertex-cone or the lifted-cone representation.
 #if 1
 	lawrenceOptions[2] = "--cone-decompose";
@@ -79,10 +87,15 @@ int main(int argc, char *argv[])
 	valuationContainerLaw = Valuation::mainValuationDriver((const char **)lawrenceOptions, 5);
 	valuationContainerTri = valuationContainerLaw;
 #endif
-
+	}//integrate a polynomial or power of a linear form
+	else
+	{
+		options[2] = "--products-powers";
+		valuationContainterTriProd = Valuation::mainValuationDriver((const char**) options, 5);
+	}//integrate product of powers of linear forms.
 	delete options[3];
 
-	RationalNTL triAns, lawAns;
+	RationalNTL triAns, lawAns, triProdAns;
 	for(int i = 0; i < valuationContainerLaw.answers.size(); ++i)
 	{
 		if (valuationContainerLaw.answers[i].valuationType == Valuation::ValuationData::integrateLawrence)
@@ -96,17 +109,40 @@ int main(int argc, char *argv[])
 			triAns = valuationContainerTri.answers[i].answer;
 	}
 
-	if ( triAns != correctAnswer || lawAns != correctAnswer)
+	for(int i = 0; i < valuationContainterTriProd.answers.size(); ++i)
 	{
-		cout << "******ERROR*******" << endl;
-		cout << "correct answer    = " << correctAnswer << endl;
-		cout << "Lawrence answer   = " << lawAns << endl;
-		cout << "Triangulate anser = " << triAns << endl;
-		cout << "Input options:" << endl;
-		for(int i = 0; i < 5; ++i)
-			cout << "     " << options[i] << endl;
+		if (valuationContainterTriProd.answers[i].valuationType == Valuation::ValuationData::integrateProductTriangulation)
+			triProdAns = valuationContainterTriProd.answers[i].answer;
+	}
 
-		return 2;
+	if (strcmp(argv[2], "l") == 0 || strcmp(argv[2], "p") == 0)
+	{
+		if ( triAns != correctAnswer || lawAns != correctAnswer)
+		{
+			cout << "******ERROR*******" << endl;
+			cout << "correct answer    = " << correctAnswer << endl;
+			cout << "Lawrence answer   = " << lawAns << endl;
+			cout << "Triangulate anser = " << triAns << endl;
+			cout << "Input options:" << endl;
+			for(int i = 0; i < 5; ++i)
+				cout << "     " << options[i] << endl;
+
+			return 2;
+		}
+	}
+	else
+	{
+		if ( triProdAns != correctAnswer)
+		{
+			cout << "******ERROR*******" << endl;
+			cout << "correct answer    = " << correctAnswer << endl;
+			cout << "Triangulate Prod. answer = " << triProdAns << endl;
+			cout << "Input options:" << endl;
+			for(int i = 0; i < 5; ++i)
+				cout << "     " << options[i] << endl;
+
+			return 2;
+		}
 	}
 
 	return 0; //no errors!

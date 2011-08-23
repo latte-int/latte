@@ -276,6 +276,187 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
 	}
 }//integrateLinFormSum
 
+//integrates products of linear forms over a simplex
+RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex, const int productCount)
+{
+	//cout << "integrateLinFormProducts called" << endl;
+	ZZ seriesCoeff;
+	int * M;
+	ZZ lenM; // |M|
+	RationalNTL coef;
+	RationalNTL answer;
+	ZZ monomialCount;
+
+	monomialCount = 1;
+	coef = 1;
+
+	M = new int[productCount];
+	it->begin();
+	term<RationalNTL, ZZ>* temp;
+	int i = 0;
+	while (temp = it->nextTerm())
+	{
+		M[i] = temp->degree;
+		++i;
+		lenM += temp->degree;
+
+		coef *= temp->coef; // M1! M2! ... MD! * (coefficents ^ powers)
+
+		monomialCount *= (temp->degree+1); //monomialCount = number of monomials (m1, ..., md) <= (deg1, ..., degD).
+	}
+	if ( i != productCount)
+		THROW_LATTE_MSG(LattException::ue_BadPolynomialLinFormInput, "count of terms differ");
+
+	ZZ factorialDim = to_ZZ(1); // = (|M|+d)!
+	for (ZZ j = to_ZZ(2); j <=  lenM + mySimplex.d; ++j)
+	{
+		factorialDim *= j;
+	}
+
+	// 1/factorialDim = 1 / (|M| + d)!
+	//cout << "coeff before " << coef << " volume=" << mySimplex.v << endl;
+	answer = coef * mySimplex.v;
+	answer.div(factorialDim);
+	//cout << "coeff factorial term: " << answer << endl;
+
+
+
+	//ok, now we just need to find the coeff of M in the polynomial expansion.
+	//cout << "working on polynomial finding" << endl;
+
+
+	vec_ZZ tVector;
+	int* counter;
+	tVector.SetLength(productCount);
+	counter = new int[productCount];
+	int* minDegree = new int[productCount];
+
+	monomialSum polynomialProduct;
+	polynomialProduct.termCount = 0;
+	polynomialProduct.varCount = productCount;
+
+	for(int i = 0; i < productCount; ++i)
+		minDegree[i] = 0;
+
+	//cout << "going to insert 1" << endl;
+	insertMonomial(RationalNTL(1,1), minDegree, polynomialProduct);
+	//cout << "end going to insert 1" << endl;
+
+
+	for(int i = 0; i < mySimplex.d +1; ++i)
+	{
+		it->begin();
+		int j = 0;
+		while (temp = it->nextTerm())
+		{
+			tVector[j] = 0;
+			for (int len = 0; len < temp->length; ++len)
+			{
+				tVector[j] += mySimplex.s[i][len] * temp->exps[len];
+			}//dot l  and vertex i
+			tVector[j] *= -1;
+
+			++j;
+		}//while.
+
+		//now tVector is in the form [-<l_1, s_i>, ..., -<l_D, s_i>]
+		//expand tVecotr into a polynomial series.
+
+
+		monomialSum thePolynomial;
+		thePolynomial.termCount = 0;
+		thePolynomial.varCount = productCount;
+
+		for(j = 0; j < productCount; ++j)
+			counter[j] = 0;
+
+		insertMonomial(RationalNTL(1,1), counter, thePolynomial);
+
+		for(ZZ currentMonomialCount = to_ZZ(0); currentMonomialCount < monomialCount-1; ++currentMonomialCount)
+		{
+			counter[0] += 1;
+			for (int myIndex = 0; counter[myIndex] > M[myIndex]; myIndex++)
+			{
+				counter[myIndex] = 0;
+				counter[myIndex + 1] += 1;
+			}
+
+			//insert the polynomial in counter.
+
+			RationalNTL c(1,1);
+			int lenC = 0;
+			for(int k = 0; k < productCount; ++k)
+				lenC += counter[k];
+
+			int lenC_copy = lenC;
+
+			for(int k = 0; k < productCount; ++k)
+			{
+				c *= AChooseB(lenC, counter[k]);
+				c *= power(tVector[k], counter[k]);
+				lenC -= counter[k];
+			}
+
+			if ( lenC_copy % 2 == 1)
+				c.changeSign();
+
+			//cout << "going to insert polynomail term" << endl;
+			//cout << " c=" << c << " exp= ";
+			//for(int k = 0; k < productCount; ++k)
+			//	cout << counter[k] << ", " ;
+			//cout << endl;
+			insertMonomial(c, counter, thePolynomial);
+			//cout << "end going to insert polynomail term" << endl;
+
+		}//make the polynomial.
+
+		//cout << "\n\ndoing poly multiplication" << endl;
+		BTrieIterator<RationalNTL, int>* it3 = new BTrieIterator<RationalNTL, int> ();
+		BTrieIterator<RationalNTL, int>* it2 = new BTrieIterator<RationalNTL, int> ();
+		it3->setTrie(thePolynomial.myMonomials, thePolynomial.varCount);
+		it2->setTrie(polynomialProduct.myMonomials, polynomialProduct.varCount);
+
+		monomialSum tempProducts;
+		tempProducts.varCount = productCount;
+		multiply<RationalNTL> (it3, it2, tempProducts, minDegree, M);
+		destroyMonomials(thePolynomial);
+		destroyMonomials(polynomialProduct);
+		delete it3;
+		delete it2;
+
+		polynomialProduct.myMonomials = tempProducts.myMonomials;
+		polynomialProduct.termCount = tempProducts.termCount;
+		polynomialProduct.varCount =  tempProducts.varCount;
+		//cout << "end poly multiplication" << endl;
+	}//for every simplex vertex
+
+	//now find the coeff of M.
+
+	BTrieIterator<RationalNTL, int>* finalPoly = new BTrieIterator<RationalNTL, int> ();
+	finalPoly->setTrie(polynomialProduct.myMonomials, polynomialProduct.varCount);
+	finalPoly->begin();
+	term<RationalNTL, int>* storedTerm;
+	bool found;
+	while (storedTerm = finalPoly->nextTerm())
+	{
+		found = true;
+		for(int i = 0; i < productCount; ++i)
+			if ( storedTerm->exps[i] != M[i])
+			{
+				found = false;
+				break;
+			}
+
+		if (found == true )
+		{
+			answer.mult(storedTerm->coef);
+			break;
+		}//found coeff. of highest term.
+	}//while
+
+	return answer;
+}//integrateLinFormProducts
+
 void integrateMonomialSum(ZZ &a, ZZ &b, monomialSum &monomials,
 		const simplexZZ &mySimplex)//integrate a polynomial stored as a Burst Trie
 {

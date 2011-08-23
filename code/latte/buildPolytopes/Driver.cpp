@@ -3,6 +3,11 @@
  *
  *  Created on: June 15, 2010
  *      Author: Brandon
+ *
+ *  This was created to check a conjecture about the roots of the ehrhart
+ *  polynomial for graph polytopes.
+ *
+ *  This no longer works because it uses an old version of polymake.
  */
 #include <iostream>
 #include <sstream>

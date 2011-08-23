@@ -84,6 +84,9 @@ void insertMonomial(const RationalNTL& coefficient, int* exponents,
 {
 	BurstTrie<RationalNTL, int>* curTrie;
 
+	if ( coefficient == 0)
+		return;
+
 	if (monomials.termCount == 0) //need to construct the first burst trie (sorted on the first variable) and first container 
 	{
 		if (PT_DEBUG)
@@ -249,6 +252,10 @@ void insertLinForm(const RationalNTL& coef, int degree, const vec_ZZ& coeffs,
 {
 	BurstTrie<RationalNTL, ZZ> *curTrie;
 	//cout << "inserting into linear form with " << formSum.varCount << " variables" << endl;
+
+	if (coef == 0)
+		return;
+
 	if (formSum.termCount == 0) //need to construct the first burst trie (sorted on the first variable) and first container 
 	{
 		formSum.myForms = new BurstTrie<RationalNTL, ZZ> ();

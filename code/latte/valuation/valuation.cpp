@@ -77,6 +77,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	ValuationContainer answer;
 	ValuationData tiangulate_timer_and_result;
 	ValuationData lawrence_timer_and_result;
+	ValuationData product_time_and_result;
 	RationalNTL ans1, ans2;
 	Polyhedron *poly2 = poly;//if doing both methods, make a deep copy of the origional polytopel.
 
@@ -84,6 +85,37 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	{
 		poly2 = new Polyhedron(*poly); //copy org. polytope, because it will be dilated.
 	}
+
+	//for now, handle here. (todo: use the product method to integrate polynomials (do nothing if integrating 1 linear form))
+	if ( strcmp(valuationAlg, "products-powers") == 0)
+	{
+		cerr << "Going to run the product of linear forms method" << endl;
+		PolytopeValuation polytopeValuation(poly, myParameters);
+
+		if ( integrandType == inputLinearForm)
+		{
+			linFormSum originalLinearForm;
+			loadLinForms(originalLinearForm, integrandString);
+
+
+			ans1 = polytopeValuation.findIntegral(originalLinearForm, 0);
+
+
+			product_time_and_result.timer.start();
+			ans1 = polytopeValuation.findIntegral(originalLinearForm, 0);
+			product_time_and_result.timer.stop();
+
+			product_time_and_result.valuationType
+					= ValuationData::integrateProductTriangulation;
+			product_time_and_result.answer = ans1;
+			answer.add(product_time_and_result);
+
+			destroyLinForms(originalLinearForm);
+
+		}
+	}
+
+
 
 	if (strcmp(valuationAlg, "triangulate") == 0 || strcmp(valuationAlg, "all")
 			== 0)
@@ -124,7 +156,6 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 			answer.add(tiangulate_timer_and_result);
 
 			destroyLinForms(originalLinearForm);
-
 		}
 	}//if doing triangulation method.
 
@@ -383,6 +414,11 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		else if (strcmp(argv[i], "--triangulate") == 0)
 		{
 			strcpy(valuationAlg, "triangulate");
+			strcpy(read_polyhedron_data.dualApproach, "yes");
+		}
+		else if ( strcmp(argv[i], "--products-powers") == 0)
+		{
+			strcpy(valuationAlg, "products-powers");
 			strcpy(read_polyhedron_data.dualApproach, "yes");
 		}
 		else if (strcmp(argv[i], "--all") == 0)
@@ -771,7 +807,8 @@ void Valuation::polyhedronToCones(const char valuationAlg[], Polyhedron *Poly, B
 			}
 
 		}//find vertex-rays
-		else if ( strcmp(valuationAlg, "triangulate") == 0)
+		else if ( strcmp(valuationAlg, "triangulate") == 0
+				|| strcmp(valuationAlg, "products-powers") == 0 )
 		{
 			assert(Poly->homogenized == true);
 			if (Poly->dualized)
@@ -901,6 +938,8 @@ void Valuation::ValuationContainer::printResults(ostream & out) const
 			out << "Integration (using the triangulation method)" << endl;
 		else if (answers[i].valuationType == ValuationData::integrateLawrence)
 			out << "Integration (using the Lawrence method)" << endl;
+		else if ( answers[i].valuationType == ValuationData::integrateProductTriangulation)
+			out << "integration of product of linear forms (using the triangulation method)" << endl;
 		else if (answers[i].valuationType == ValuationData::entireValuation)
 		{
 			out

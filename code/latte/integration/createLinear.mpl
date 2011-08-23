@@ -71,6 +71,40 @@ convert_linearFormList_to_maple_expression:=proc(l, d)
 	return ans;
 end:
 
+
+#
+# Given a linear form in list form [ [coeff, [power, [linear form]]] ], we convert it 
+# to a product of powers of linear fomrs and then convert this to an 
+# expression in the variables x[1],..., x[d] 
+#
+#@parm l : the linear form in list form
+#@parm d : number of variables
+#@return : maple expression
+convert_linearFormList_to_product_maple_expression:=proc(l, d)
+	local lformList;
+	local lformMaple;
+	local coeff;
+	local power;
+	local ans, i;
+	
+	ans:=1;
+	for lformList in l do
+	
+		lformMaple:=0;
+		
+		coeff:=lformList[1];
+		power:=lformList[2][1];
+		for i from 1 to d do
+			lformMaple:= lformMaple + lformList[2][2][i]*x[i];
+		end;
+		lformMaple:= coeff*(lformMaple)^power;
+		
+		ans:=ans * lformMaple
+	end; #for each linear form in the list
+
+	return ans;
+end:
+
 del_space:=proc(s)
 local i,str;
 str:="";

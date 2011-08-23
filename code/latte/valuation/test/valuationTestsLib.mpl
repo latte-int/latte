@@ -240,3 +240,65 @@ test_hyperrectangle_integtation_linear_forms:=proc(polyMaxDegree, polytopeDimens
 	status; #return the status.
 end:
 
+
+test_hyperrectangle_integtation_product_linear_forms:=proc(polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, fileName, rationalCoeff) 
+	local randomLFormMaple, randomLFormList;
+	local lowerIntegrationBound, upperIntegrationBound;
+	local randNumber, randNumber2, positive, i;
+	local integratedPoly, correctAnswer, polynomialFileName, systemCommand, correctAnswerString, status;
+	local lFormFileName, lFormFile;
+	  
+	randNumber:= rand(30000 + 1);
+	randNumber2:= rand(100); #used for the denominator.
+	positive := rand(2); #positive() is 0 or 1.
+  
+	#get a random linear form in list form and convert it to a maple expression
+	#																		 			(m,d,maxcoef,componentmax,maxterm, rationalCoeff)
+	#randomLFormList:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm_nonhomogen(polyMaxDegree,polytopeDimension,200,100,maxNumberOfTermsPerDegree, 1);
+	randomLFormList:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(polyMaxDegree,polytopeDimension,200,100,polytopeDimension, 1);
+	randomLFormMaple:=convert_linearFormList_to_product_maple_expression(randomLFormList, polytopeDimension);
+	
+	print("Integrand:", randomLFormList); 
+	print("Integrand:", randomLFormMaple);  
+	  
+	lowerIntegrationBound:=Vector(polytopeDimension);
+	upperIntegrationBound:=Vector(polytopeDimension);
+  
+
+	#find the upper and lower integration bounds.
+	for i from 1 to polytopeDimension do
+		lowerIntegrationBound[i] := (randNumber() / (randNumber2() + 1)) * (-1)^positive();
+		upperIntegrationBound[i] := lowerIntegrationBound[i] + randNumber() + 1;
+	od:
+  
+  
+	print(Transpose(lowerIntegrationBound));
+	print(Transpose(upperIntegrationBound));
+  
+  
+	#integrate the polynomial.
+	correctAnswer := integrate_expression_over_rectangle(upperIntegrationBound, lowerIntegrationBound, randomLFormMaple, polytopeDimension):
+
+    #now make the latte file.
+    printf("Making latte file\n");
+	make_hyperrectangle_latte_file(lowerIntegrationBound, upperIntegrationBound, polytopeDimension, fileName);
+
+	
+	#make the linear form file
+	lFormFileName:=fileName||".linearform"; #concat. the strings.
+	
+	#save the linear form list.
+	lFormFile:=fopen(lFormFileName,WRITE,TEXT):
+	writeline(lFormFile, convert(randomLFormList, string));
+	close(lFormFile);
+
+	
+	#Finally, now test our code.
+	correctAnswerString :=convert(correctAnswer, string):
+	#                 usage: exe correct-answer [p or l] [polynomial-file or linear-form-file] latte-file
+	systemCommand:= "./test-hyperrectangle-integration " || correctAnswerString || " d " || lFormFileName || " " || fileName :
+	#print(systemCommand);
+	status:=system(systemCommand):
+	printf("status=%d\n", status);
+	status; #return the status.
+end:

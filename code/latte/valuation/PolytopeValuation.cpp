@@ -282,6 +282,7 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
  */
 void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const linFormSum & originalLinearForms, const ZZ & dilationFactor, RationalNTL &constantMonomial)
 {
+	cout << "dilateLinearForms called" << endl;
 	BTrieIterator<RationalNTL, ZZ>* linearFormsItr =
 			new BTrieIterator<RationalNTL, ZZ> ();
 	linearFormsItr->setTrie(originalLinearForms.myForms, originalLinearForms.varCount);
@@ -325,6 +326,7 @@ void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const linForm
 
 	delete linearFormsItr;
 	delete transformedFormLoader;
+	cout << "dilateLinearForms done" << endl;
 }//dilateLinearForms
 
 
@@ -568,6 +570,63 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 
 }//findIntegral
 
+
+/**
+ * Integrates products of powers of linear forms.
+ */
+RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForms, int dummy)
+{
+	linFormSum linearForms;
+	RationalNTL answer;
+	RationalNTL constantMonomial;
+
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+
+	//cout << "Integrating " << polynomial.termCount << " monomials." << endl;
+	//dilate the polytope
+	if ( numOfVars != numOfVarsOneCone)
+	{
+		dilationFactor = findDilationFactorVertexRays();
+		cerr << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeVertexRays(RationalNTL(dilationFactor, to_ZZ(1)));
+	}//if we started with vertex-rays
+	else
+	{
+		dilationFactor = findDilationFactorOneCone();
+		cerr << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeOneCone(dilationFactor);
+	}//we started with the lifted polytope.
+
+
+	//dilate the polynomial..
+    //after this call, linearForms is filled in, and constantMonomial is the constant term in the input polynomial.
+	dilateLinearForms(linearForms, originalLinearForms, dilationFactor, constantMonomial);
+
+	if ( constantMonomial != 0 )
+	{
+		THROW_LATTE_MSG(LattException::ue_BadPolynomialLinFormInput, "no constants allowed");
+	}
+
+	if (true )//  integrationType == TriangulationIntegration)
+	{
+		convertToOneCone(); //every vertex should be integer
+		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+		cerr << " starting to integrate " << linearForms.termCount << " product of linear forms.\n";
+
+		answer.add(findIntegralProductsUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
+
+		answer.div(power(dilationFactor, linearForms.varCount)); //factor in the Jacobian term.
+
+	}//if computing the integral by triangulating to simplex polytopes.
+
+
+
+	destroyLinForms(linearForms);
+	return answer;
+
+}//findIntegral
 
 /**
  * Currently, this is only used by the stokes formula. This is not done.
@@ -814,6 +873,67 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 	return ans;
 
 }//integratePolytopeLawrence()
+
+RationalNTL PolytopeValuation::findIntegralProductsUsingTriangulation(linFormSum &forms) const
+{
+	RationalNTL answer;
+	int simplicesFinished = 0;
+	int totalSimplicesToIntegrate = lengthListCone(triangulatedPoly);
+
+	if ( forms.termCount == 0)
+		return RationalNTL(); //nothing to do.
+
+	//set up itrator to loop over the linear forms.
+	BTrieIterator<RationalNTL, ZZ>* linearFormIterator = new BTrieIterator<
+			RationalNTL, ZZ> ();
+	linearFormIterator->setTrie(forms.myForms, forms.varCount);
+
+
+
+
+	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
+			= currentCone->rest)
+	{
+		//First construct a simplex.
+		simplexZZ oneSimplex;
+		oneSimplex.d = numOfVarsOneCone -1;
+
+
+
+		int vertexCount = 0; //the current vertex number being processed.
+		oneSimplex.s.SetLength(numOfVarsOneCone);
+
+		for (listVector * rays = currentCone->rays; rays; rays = rays->rest, ++vertexCount)
+		{
+			oneSimplex.s[vertexCount].SetLength(numOfVarsOneCone-1);
+//			assert( rays->first[numOfVarsOneCone-1] == 1); //make sure the triangulation is such that the vertices of the original polytope is integer.
+
+			for (int k = 0; k < numOfVarsOneCone -1; ++k)
+				oneSimplex.s[vertexCount][k] = rays->first[k];//save the vertex.
+
+		}//create the simplex. Don't copy the leading 1.
+
+		//compute the volume of the Parallelepiped
+		mat_ZZ matt;
+		matt.SetDims(oneSimplex.d, oneSimplex.d);
+		for (int j = 1; j <= oneSimplex.d; j++)
+			matt[j - 1] = oneSimplex.s[j] - oneSimplex.s[0];
+		oneSimplex.v = abs(determinant(matt));
+
+		//Finally, we are ready to integrate the products of linear forms over the simplex!
+		RationalNTL integral;
+		integral = integrateLinFormProducts(linearFormIterator, oneSimplex, forms.termCount);
+
+		answer.add(integral);
+		++simplicesFinished;
+		if ( simplicesFinished % 1000 == 0)
+			cerr << "Finished integrating " << simplicesFinished << "/" << totalSimplicesToIntegrate << " over " << forms.termCount << " linear forms\n";
+		//answer.add(numerator * coefficient.getNumerator(), denominator * coefficient.getDenominator());
+	}//for every triangulated simplex.
+	delete linearFormIterator;
+
+	return answer;
+}//findIntegralProductsUsingTriangulation
 
 
 /** Finds the volume of the current polytope using one of two methods

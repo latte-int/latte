@@ -9,6 +9,7 @@
 //#include "PolyTrie.cpp"
 #include "residue.h"
 #include "cone.h"
+#include "LattException.h"
 
 NTL_CLIENT
 
@@ -39,6 +40,7 @@ void update(ZZ &a, ZZ &b, vec_ZZ l, simplexZZ mySimplex,int m, RationalNTL coe, 
 void delSpace(string &line);
 void convertToSimplex(simplexZZ&, string);
 void integrateLinFormSum(ZZ &a, ZZ &b, PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex);
+RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex, const int productCount);
 void integrateMonomialSum(ZZ &numerator, ZZ &denominator, monomialSum &monomials, const simplexZZ &mySimplex);
 void _integrateMonomialSum(ZZ &numerator, ZZ &denominator, _monomialSum &monomials, const simplexZZ &mySimplex);
 

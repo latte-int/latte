@@ -11,6 +11,7 @@
 #include <exception>
 #include <string>
 #include <iostream>
+#include <sstream>
 
 using namespace std;
 
@@ -31,6 +32,7 @@ public:
 		ue_BadCommandLineOptionCount,	//unexpected command count
 		ue_HelpMenuDisplayed,			//not really an error.
 		ue_FileNameMissing,				//missing file name
+		ue_BadPolynomialLinFormInput,   //incorrect polynomial or linear form input
 
 		//polyhedra errors
 		pe_RationalPolytope, 			//expecting integer-vertex polytope.
@@ -54,7 +56,7 @@ public:
 	virtual const char* what() const throw();
 
 private:
-	string & printErrorMessages() const;
+	void printErrorMessages() const;
 
 	UserError userError;
 

@@ -1,4 +1,4 @@
-read("valuation/testCorrectnessAndBenchmark/valuationTestsLib.mpl"):
+read("valuation/test/valuationTestsLib.mpl"):
 
 
 #	integrateHyperrectangle.mpl
@@ -14,7 +14,7 @@ $
 # class, and compare for any differences. 
 #
 # Note that we assume polynomial dimension = dimension of the polytope.
-#
+#	
 
 print("Testing integration of hyper-rectangles...");
 
@@ -26,6 +26,22 @@ printf("random seed = %d \n", seed);
 
 
 fileName:="valuation/hyerrectangleIntegrationTest.latte":
+for myDim from 2 to 5 do
+	for myDegree from 2 to 5 do
+
+		printf("Testing products of powers of linear forms of dimension %d, and at most degree %d\n", myDim, myDegree);
+  
+#                   the parameters are:  formMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
+    	returnStatus:=test_hyperrectangle_integtation_product_linear_forms(myDegree, myDim, 10, fileName, 1):
+   
+		if ( not(returnStatus = 0)) then 
+			printf("\n\n An error was reported in integrating products of powers of linear forms, please see the polytope and linear form files.\n");
+			`quit`(5); 
+		end if:		
+	od:
+od:
+
+#test integrating polynomials and powers of linear forms over rectangles.
 for myDim from 2 to 5 do
 	for myDegree from 2 to 10 do
 	
@@ -49,7 +65,6 @@ for myDim from 2 to 5 do
 			`quit`(5); 
 		end if:
 
-		
 	od:
 od:
 

@@ -71,6 +71,7 @@ private:
 	ZZ findDilationFactorVertexRays() const;
 	RationalNTL findIntegralUsingTriangulation(linFormSum &forms) const; //computes the integral over every simplex
 	RationalNTL findIntegralUsingLawrence(linFormSum &forms) const;      //computes the integral over every simple cone.
+	RationalNTL findIntegralProductsUsingTriangulation(linFormSum &forms) const;
 	RationalNTL findVolumeUsingDeterminant(const listCone * oneSimplex) const; //computes the volume over every simplex
 	RationalNTL findVolumeUsingLawrence();								 //computes the volume over every simple cone.
 	void triangulatePolytopeCone();  			//convert polytopeAsOneCone to triangulatedPoly (triangulates the polytope)
@@ -90,6 +91,7 @@ public:
 	RationalNTL findIntegral(const monomialSum& polynomial, const IntegrationType integrationType);
 	RationalNTL findIntegral(const linFormSum& linearForms, const IntegrationType integrationType);
 	RationalNTL findIntegral(linFormSum& linearForms);
+	RationalNTL findIntegral(const linFormSum& linearForms, int); //integrate product of linear forms.
 
 	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
