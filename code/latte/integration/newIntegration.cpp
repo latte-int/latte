@@ -276,16 +276,56 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
 	}
 }//integrateLinFormSum
 
-//integrates products of linear forms over a simplex
+/* computes the integral of a product of powers of linear forms over a  simplex
+ * @input it: iterator to the linear forms.
+ * @input mySimplex: a simplex
+ * @input productCount: the number of products in the linear form.
+ * @return RationalNTL: the integral over the simplex.
+ *
+ * Math: integral(over simplex) <l_1, x>^m_1 ... <l_d, x>^m_D =
+ *
+ *               abs(det(matrix formed by the rays))* M!/(d+|M|)!
+ *  --------------------------------------------------------------------------
+ *  product(over j)(1 - <l_1, s_j>t_1 - <l_2, s_j>t_2 - ... - <l_D, s_j>t_D )
+ *                                 \          \_these are numbers (tVector)
+ *                                  \_the t are symbolic.
+ *
+ *  where we want the coefficient of t_1^m_1 ... t_D^m_D in the polynomial
+ *  expansion of the RHS,
+ *
+ * and where s_j is a vertex,
+ *       l_i is a linear form
+ *       D is any number of products
+ *       M is the power vector
+ *       M! = m_1! m_2! ... m_D!
+ *       |M| = m_1 + m_2 + ... + m_D.
+ *
+ * Note that we cannot divide by zero, so don't worry.
+ *
+ * To find such an expansion, we use a Tayler expansion on each
+ * 1/(1 +a_1t_1 + ... +a_Dt_D ) up to degree M for each such product. We then
+ * multiply all these polynomials together (ignoring degrees larger than M)
+ * and then we find the coefficient of t^M. (Again, M is a vector of powers)
+ *
+ * Taylor Expansion about zero (x is a vector)
+ * f(x) = 1/(1-a_1x_1 + ... + a_d x_d)
+ *      = sum_{n \in \Z^d_{>= 0}}  x^n / n! * d^{n|} f(x)     (0,0,...0)
+ *                                         ------------------
+ *                                        dx_1^{n_1}...dx_d^{n_d}
+ *      = sum_{n \in \Z^d_{>= 0}}  x^n / n! * (-1)(-2)...(-1 * |n|) (1 - 0)^{-|n|-1} a_1^{n_1} ... a_d^{n_d}
+ *      = sum_{n \in \Z^d_{>= 0}}  x^n (-1)^|n|  (|n| choose n_1, ..., n_d) a_1^{n_1} ... a_d^{n_d}
+ *      where (|n| choose n_1, ..., n_d) is a multinomial coefficient.
+ *
+ * See the paper: "How to Integrate a Polynomial over a Simplex" by  V. BALDONI, N. BERLINE, J. A. DE LOERA, M. VERGNE.
+ */
 RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const simplexZZ &mySimplex, const int productCount)
 {
 	//cout << "integrateLinFormProducts called" << endl;
-	ZZ seriesCoeff;
-	int * M;
+	int * M; //the power vector.
 	ZZ lenM; // |M|
-	RationalNTL coef;
+	RationalNTL coef; //temp. coefficient.
 	RationalNTL answer;
-	ZZ monomialCount;
+	ZZ monomialCount; //number of power vectors less than M component wise.
 
 	monomialCount = 1;
 	coef = 1;
@@ -296,9 +336,9 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 	int i = 0;
 	while (temp = it->nextTerm())
 	{
-		M[i] = temp->degree;
+		M[i] = temp->degree; //save the power
 		++i;
-		lenM += temp->degree;
+		lenM += temp->degree; //add the power
 
 		coef *= temp->coef; // M1! M2! ... MD! * (coefficents ^ powers)
 
@@ -314,19 +354,18 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 	}
 
 	// 1/factorialDim = 1 / (|M| + d)!
-	//cout << "coeff before " << coef << " volume=" << mySimplex.v << endl;
+
 	answer = coef * mySimplex.v;
 	answer.div(factorialDim);
-	//cout << "coeff factorial term: " << answer << endl;
 
+	//now, answer = [vol(simplex)*d!] M! / (|M|+d)!.
 
 
 	//ok, now we just need to find the coeff of M in the polynomial expansion.
-	//cout << "working on polynomial finding" << endl;
 
 
-	vec_ZZ tVector;
-	int* counter;
+	vec_ZZ tVector; //the coefficent vector of ( 1- a_1t_1 - ... - a_Dt_D) (we don't save the leading 1)
+	int* counter; //current power n
 	tVector.SetLength(productCount);
 	counter = new int[productCount];
 	int* minDegree = new int[productCount];
@@ -338,11 +377,12 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 	for(int i = 0; i < productCount; ++i)
 		minDegree[i] = 0;
 
-	//cout << "going to insert 1" << endl;
+	//insert 1.
 	insertMonomial(RationalNTL(1,1), minDegree, polynomialProduct);
-	//cout << "end going to insert 1" << endl;
 
 
+
+	//for every 1/(1 + stuff) term in the denominator.
 	for(int i = 0; i < mySimplex.d +1; ++i)
 	{
 		it->begin();
@@ -357,7 +397,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 			tVector[j] *= -1;
 
 			++j;
-		}//while.
+		}//while. build the t-vector.
 
 		//now tVector is in the form [-<l_1, s_i>, ..., -<l_D, s_i>]
 		//expand tVecotr into a polynomial series.
@@ -372,19 +412,20 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 
 		insertMonomial(RationalNTL(1,1), counter, thePolynomial);
 
-		for(ZZ currentMonomialCount = to_ZZ(0); currentMonomialCount < monomialCount-1; ++currentMonomialCount)
+		//for every monomial less than or equal to M.
+		for(ZZ currentMonomialCount = to_ZZ(0); currentMonomialCount < monomialCount-1 /*-1 because we already added 1x^0*/; ++currentMonomialCount)
 		{
 			counter[0] += 1;
 			for (int myIndex = 0; counter[myIndex] > M[myIndex]; myIndex++)
 			{
 				counter[myIndex] = 0;
 				counter[myIndex + 1] += 1;
-			}
+			}//add one and do a carry if you have to.
 
 			//insert the polynomial in counter.
 
 			RationalNTL c(1,1);
-			int lenC = 0;
+			int lenC = 0; // = |n|
 			for(int k = 0; k < productCount; ++k)
 				lenC += counter[k];
 
@@ -395,10 +436,10 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 				c *= AChooseB(lenC, counter[k]);
 				c *= power(tVector[k], counter[k]);
 				lenC -= counter[k];
-			}
+			}// find (|n| choose n_1, ..., n_d) and a^n
 
 			if ( lenC_copy % 2 == 1)
-				c.changeSign();
+				c.changeSign(); // (-1)^|n|
 
 			//cout << "going to insert polynomail term" << endl;
 			//cout << " c=" << c << " exp= ";
@@ -453,6 +494,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 			break;
 		}//found coeff. of highest term.
 	}//while
+	assert(found == true);
 
 	return answer;
 }//integrateLinFormProducts

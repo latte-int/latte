@@ -380,8 +380,7 @@ ZZ PolytopeValuation::findDilationFactorVertexRays() const
 
 
 /**
- * Integrates the polynomial over the polytope. The polytope is written in maple syntax.
- * Example: 2*X_0^3*X_1^4 + 5 ==> [ [2, [3, 4], [5, [0, 0]] ]
+ * Integrates the polynomial over the polytope.
  *
  * In the non-integer case, we compute
  *  1/a^n * \sum_{i}{coefficient_i * integral( m_i(x1/a, x2/a, ..., xn/a) dX }
@@ -572,7 +571,14 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 
 
 /**
- * Integrates products of powers of linear forms.
+ * Integrates the sum of products of powers of linear forms.
+ * Example: 3 * (x +y +0z)^3 (-x +5y +z)^10 (x + 0y + 0z)^1
+ *
+ * The input polytope is dilated to have integer vertices.
+ *
+ * The integral is computed by triangulating the polytope and then
+ *
+ * TODO: change linFormSum to ProdLinFormSum or something like that.
  */
 RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForms, int dummy)
 {
@@ -625,11 +631,10 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 
 	destroyLinForms(linearForms);
 	return answer;
-
 }//findIntegral
 
 /**
- * Currently, this is only used by the stokes formula. This is not done.
+ * Currently, this is only used by the stokes formula. This is NOT done.
  */
 RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms)
 {
@@ -691,7 +696,7 @@ RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms)
 /* computes the integral of a polytope by summing the integral of over each simplex
  * in the triangulation of the polytope.
  * @Assumes: polytope has integer vertices and it is triangulated.
- * @input: linear forms after the polynomial and polytope after it has been dilated
+ * @input: linear forms after the polynomial and polytope has been dilated
  * @return RationalNTL: the integral of the polytope over every linear form.
  *
  * Math: For each simplex, we sum the fractions
@@ -874,6 +879,35 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 
 }//integratePolytopeLawrence()
 
+
+/* computes the integral of a product of powers of linear forms over each simplex
+ * in the triangulation of the polytope.
+ * @Assumes: polytope has integer vertices and it is triangulated.
+ * @input: product of linear forms after the polytope has been dilated
+ * @return RationalNTL: the integral of the polytope over every product.
+ *
+ * Math: integral(over simplex) <l_1, x>^m_1 ... <l_d, x>^m_D =
+ *
+ *               abs(det(matrix formed by the rays))* M!/(d+|M|)!
+ *  --------------------------------------------------------------------------
+ *  product(over j)(1 - <l_1, s_j>t_1 - <l_2, s_j>t_2 - ... - <l_D, s_j>t_d )
+ *                                 \          \_these are numbers
+ *                                  \_the t are symbolic.
+ *
+ *  where we want the coefficient of t_1^m_1 ... t_D^m_D in the polynomial
+ *  expansion of the RHS,
+ *
+ * and where s_j is a vertex,
+ *       l_i is a linear form
+ *       D is any number of products
+ *       M is the power vector
+ *       M! = m_1! m_2! ... m_D!
+ *       |M| = m_1 + m_2 + ... + m_D.
+ *
+ * Note that we cannot divide by zero.
+ *
+ * See the paper: "How to Integrate a Polynomial over a Simplex" by  V. BALDONI, N. BERLINE, J. A. DE LOERA, M. VERGNE.
+ */
 RationalNTL PolytopeValuation::findIntegralProductsUsingTriangulation(linFormSum &forms) const
 {
 	RationalNTL answer;
@@ -890,7 +924,7 @@ RationalNTL PolytopeValuation::findIntegralProductsUsingTriangulation(linFormSum
 
 
 
-
+	//loop over every simplex.
 	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
 			= currentCone->rest)
 	{
