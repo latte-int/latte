@@ -9,6 +9,7 @@ Defines the BurstTrie class, used for storing monomials and powers of linear for
 #include <NTL/ZZ.h>
 #include <NTL/vec_ZZ.h>
 #include <stdio.h>
+#include <vector>
 #include <sstream>
 #include <assert.h>
 #include "rational.h"
@@ -40,6 +41,27 @@ struct linFormSum
 	{
 	}//constructor.
 
+};
+
+//sum of products of powers of linear forms.
+struct linFormProductSum
+{
+	int varCount;
+	vector<linFormSum> myFormProducts;
+
+	linFormProductSum(): varCount(0)
+	{
+	}//constructor.
+
+
+	linFormSum & operator[]( int i ) {return myFormProducts[i];}
+	const linFormSum & operator[]( int i ) const {return myFormProducts[i];}
+	void addProduct(linFormSum &lf)
+	{
+		assert(lf.varCount == varCount);
+		assert(lf.termCount > 0);
+		myFormProducts.push_back(lf);
+	}
 };
 
 #include "burstTrie.hpp"

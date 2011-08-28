@@ -42,7 +42,7 @@ for myDim from 2 to 5 do
 od:
 
 #test integrating polynomials and powers of linear forms over rectangles.
-for myDim from 2 to 5 do
+for myDim from 2 to -5 do
 	for myDegree from 2 to 10 do
 	
 		printf("Testing polynomials of dimension %d, and at most degree %d\n", myDim, myDegree);

@@ -282,7 +282,7 @@ void PolytopeValuation::dilatePolynomialToLinearForms(linFormSum &linearForms, c
  */
 void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const linFormSum & originalLinearForms, const ZZ & dilationFactor, RationalNTL &constantMonomial)
 {
-	cout << "dilateLinearForms called" << endl;
+
 	BTrieIterator<RationalNTL, ZZ>* linearFormsItr =
 			new BTrieIterator<RationalNTL, ZZ> ();
 	linearFormsItr->setTrie(originalLinearForms.myForms, originalLinearForms.varCount);
@@ -326,7 +326,7 @@ void PolytopeValuation::dilateLinearForms(linFormSum &linearForms, const linForm
 
 	delete linearFormsItr;
 	delete transformedFormLoader;
-	cout << "dilateLinearForms done" << endl;
+
 }//dilateLinearForms
 
 
@@ -396,7 +396,7 @@ ZZ PolytopeValuation::findDilationFactorVertexRays() const
  */
 
 
-RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const IntegrationType integrationType)
+RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const ValuationAlgorithm algorithm)
 {
 	linFormSum linearForms;
 	RationalNTL answer;
@@ -436,7 +436,7 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 	//if dilatePolytopeOneCone    was used: 1) integrate 2) jacobian term 3)volume
 	//This is due to the fact that dilatePolytopeVertexRays permanently dilates the polytope.
 	//But dilatePolytopeOneCone records the dilation in the last slot, and so nothing is lost.
-	if ( integrationType == LawrenceIntegration)
+	if ( algorithm == integratePolynomialAsLinearFormCone)
 	{
 		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
 		cerr << lengthListCone(triangulatedPoly) << " triangulations done.\n"
@@ -444,11 +444,11 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
 
 		if ( constantMonomial != 0)
-			answer.add(findVolume(LawrenceVolume)*constantMonomial);
+			answer.add(findVolume(volumeCone)*constantMonomial);
 
 		answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
 	}// if computing the integral using the lawrence style method.
-	else if ( integrationType == TriangulationIntegration)
+	else if ( algorithm == integratePolynomialAsLinearFormTriangulation)
 	{
 		convertToOneCone(); //every vertex should be integer
 		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
@@ -462,7 +462,7 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 		if ( constantMonomial != 0)
 		{
 			RationalNTL volume;
-			volume = findVolume(DeterminantVolume)*constantMonomial;
+			volume = findVolume(volumeTriangulation)*constantMonomial;
 			if (numOfVars != numOfVarsOneCone)
 				volume.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
 			answer.add(volume);
@@ -483,7 +483,7 @@ RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const
 /**
  * Save as the other findIntegral, only this one starts with linear forms, not polynomials.
  */
-RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForms, const IntegrationType integrationType )
+RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForms, const ValuationAlgorithm algorithm )
 {
 	linFormSum linearForms;
 	RationalNTL answer;
@@ -524,7 +524,7 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 	//if dilatePolytopeOneCone    was used: 1) integrate 2) jacobian term 3)volume
 	//This is due to the fact that dilatePolytopeVertexRays permanently dilates the polytope.
 	//But dilatePolytopeOneCone records the dilation in the last slot, and so nothing is lost.
-	if ( integrationType == LawrenceIntegration)
+	if ( algorithm == integrateLinearFormCone)
 	{
 		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
 		cerr << lengthListCone(triangulatedPoly) << " triangulations done.\n"
@@ -532,11 +532,11 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
 
 		if ( constantMonomial != 0)
-			answer.add(findVolume(LawrenceVolume)*constantMonomial);
+			answer.add(findVolume(volumeCone)*constantMonomial);
 
 		answer.div(power(dilationFactor, linearForms.varCount)); //factor in the Jacobian term.
 	}// if computing the integral using the lawrence style method.
-	else if ( integrationType == TriangulationIntegration)
+	else if ( algorithm == integrateLinearFormTriangulation)
 	{
 		convertToOneCone(); //every vertex should be integer
 		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
@@ -550,7 +550,7 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 		if ( constantMonomial != 0)
 		{
 			RationalNTL volume;
-			volume = findVolume(DeterminantVolume)*constantMonomial;
+			volume = findVolume(volumeTriangulation)*constantMonomial;
 			if (numOfVars != numOfVarsOneCone)
 				volume.div(power(dilationFactor, linearForms.varCount)); //factor in the Jacobian term.
 			answer.add(volume);
@@ -578,19 +578,19 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
  *
  * The integral is computed by triangulating the polytope and then
  *
- * TODO: change linFormSum to ProdLinFormSum or something like that.
  */
-RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForms, int dummy)
+RationalNTL PolytopeValuation::findIntegral(const linFormProductSum& originalLinearFormProducts, ValuationAlgorithm algorithm)
 {
-	linFormSum linearForms;
+	linFormProductSum linearFormProducts;
 	RationalNTL answer;
 	RationalNTL constantMonomial;
 
+	linearFormProducts.varCount = originalLinearFormProducts.varCount;
 
 	//find the dilation factor.
 	ZZ dilationFactor;
 
-	//cout << "Integrating " << polynomial.termCount << " monomials." << endl;
+	cout << "Integrating " << originalLinearFormProducts.myFormProducts.size() << " products of powers of linear forms." << endl;
 	//dilate the polytope
 	if ( numOfVars != numOfVarsOneCone)
 	{
@@ -606,30 +606,49 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 	}//we started with the lifted polytope.
 
 
-	//dilate the polynomial..
+	//dilate the integrand..
     //after this call, linearForms is filled in, and constantMonomial is the constant term in the input polynomial.
-	dilateLinearForms(linearForms, originalLinearForms, dilationFactor, constantMonomial);
-
-	if ( constantMonomial != 0 )
+	for(int i = 0; i < originalLinearFormProducts.myFormProducts.size(); ++i)
 	{
-		THROW_LATTE_MSG(LattException::ue_BadPolynomialLinFormInput, "no constants allowed");
+		linFormSum linearForms;
+		RationalNTL currentConstantMonomial;
+		dilateLinearForms(linearForms, originalLinearFormProducts[i], dilationFactor, currentConstantMonomial);
+
+		if ( linearForms.termCount > 0 && currentConstantMonomial != 0)
+		{
+			cout << "lf: " << printLinForms(originalLinearFormProducts[i]).c_str() << endl;
+			THROW_LATTE_MSG(LattException::ie_badIntegrandFormat, "product of linear forms contains a constant factor");
+		}
+
+		if ( currentConstantMonomial != 0)
+			constantMonomial += currentConstantMonomial;
+		else
+		{
+			linearFormProducts.addProduct(linearForms);
+		}//add the new product of linear forms.
 	}
 
-	if (true )//  integrationType == TriangulationIntegration)
+
+	convertToOneCone(); //every vertex should be integer
+	triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+	cerr << " starting to integrate " << linearFormProducts.myFormProducts.size() << " product of linear forms.\n";
+
+	for(int i = 0; i < linearFormProducts.myFormProducts.size(); ++i)
+		answer.add(findIntegralProductsUsingTriangulation(linearFormProducts.myFormProducts[i])); //finally, we are ready to do the integration!
+
+	answer.div(power(dilationFactor, linearFormProducts.varCount)); //factor in the Jacobian term.
+
+	if ( constantMonomial != 0)
 	{
-		convertToOneCone(); //every vertex should be integer
-		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
-		cerr << " starting to integrate " << linearForms.termCount << " product of linear forms.\n";
-
-		answer.add(findIntegralProductsUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
-
-		answer.div(power(dilationFactor, linearForms.varCount)); //factor in the Jacobian term.
-
-	}//if computing the integral by triangulating to simplex polytopes.
+		RationalNTL volume;
+		volume = findVolume(volumeTriangulation)*constantMonomial;
+		if (numOfVars != numOfVarsOneCone)
+			volume.div(power(dilationFactor, linearFormProducts.varCount)); //factor in the Jacobian term.
+		answer.add(volume);
+	}
 
 
-
-	destroyLinForms(linearForms);
+	destroyLinFormProducts(linearFormProducts);
 	return answer;
 }//findIntegral
 
@@ -974,11 +993,11 @@ RationalNTL PolytopeValuation::findIntegralProductsUsingTriangulation(linFormSum
  *  Triangulate Method: find a triangulation and sum a bunch of determinants.
  *  Lawrence Method: Sum over every simple cone.
  */
-RationalNTL PolytopeValuation::findVolume(VolumeType v)
+RationalNTL PolytopeValuation::findVolume(ValuationAlgorithm algorithm)
 {
 	RationalNTL answer;
 
-	if (v == DeterminantVolume)
+	if (algorithm == volumeTriangulation)
 	{
 
 		convertToOneCone();
@@ -989,7 +1008,7 @@ RationalNTL PolytopeValuation::findVolume(VolumeType v)
 			answer.add(findVolumeUsingDeterminant(oneSimplex));
 
 		//cout << "findVolumeUsingDeterminant(): VOLUME: " << answer << endl;
-	} else if (v == LawrenceVolume)
+	} else if (algorithm == volumeCone)
 	{
 		triangulatePolytopeVertexRayCone();
 		answer = findVolumeUsingLawrence();

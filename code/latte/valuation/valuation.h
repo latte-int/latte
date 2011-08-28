@@ -82,13 +82,12 @@ class ValuationData
 {
 public:
 	//Notes:
-	//1) volumeLawrence, volumeTriangulation, and integrateTriangulation timers
+	//1) for all volumeLawrence, volumeTriangulation, and integrateTriangulation timers
 	//start from when the tangent cones are computed to the volume/integral computation.
 	//2) entireValuation timer starts from when mainValuationDriver is called to when it finishes.
 	//Also "answer" is meaningless for "entireValuation".
-
-	enum ValuationType { unknown, volumeLawrence, volumeTriangulation, integrateTriangulation, integrateLawrence, integrateProductTriangulation, entireValuation};
-	ValuationType valuationType;
+								//dummy, saves the total computational time.
+	PolytopeValuation::ValuationAlgorithm valuationType;
 	RationalNTL answer;
 	Timer timer;
 
@@ -109,20 +108,44 @@ public:
 	void printResults(ostream & out) const;
 };
 
+class IntegrationInput
+{
+public:
+	typedef enum {inputVolume, inputPolynomial, inputLinearForm, inputProductLinearForm, nothing} IntegrandType;
+	IntegrandType integrandType;
+	string fileName;
+	string integrand;
 
-typedef enum {inputPolynomial, inputLinearForm, nothing} IntegrandType;
+	bool volumeCone;									//volume using the cone method.
+	bool volumeTriangulation;							//volume using triangulation
+	bool integratePolynomialAsLinearFormTriangulation; 	//decompose polynomial to LF, use triangulation.
+	bool integratePolynomialAsLinearFormCone;			//decompose polynomila to LF, use cone method.
+	bool integrateLinearFormTriangulation;				//integrate linear forms using triangulation
+	bool integrateLinearFormCone;						//integrate linear forms using cone method
+	bool integrateProductLinearFormsTriangulation;		//integrate product of linear forms using triangulation.
+	bool all;
+
+	IntegrationInput();
+};
 
 ValuationContainer computeVolume(Polyhedron * poly,
-		BarvinokParameters &myParameters, const char *valuationAlg,
+		BarvinokParameters &myParameters, const IntegrationInput &intInput,
 		const char * print);
 
+//Does integration on specific integrands.
 ValuationContainer computeIntegral(Polyhedron *poly,
-		BarvinokParameters &myParameters, const char *valuationAlg,
-		const char * polynomialString, const IntegrandType);
+		BarvinokParameters &myParameters, const IntegrationInput &intInput);
+ValuationContainer computeIntegralPolynomial(Polyhedron *poly,
+		BarvinokParameters &myParameters, const IntegrationInput & intInput);
+ValuationContainer computeIntegralLinearForm(Polyhedron *poly,
+		BarvinokParameters &myParameters, const IntegrationInput & intInput);
+ValuationContainer computeIntegralProductLinearForm(Polyhedron *poly,
+		BarvinokParameters &myParameters, const IntegrationInput & intInput);
+
 
 ValuationContainer mainValuationDriver(const char *argv[], int argc);
 
-void polyhedronToCones(const char valuationAlg[], Polyhedron *Poly, BarvinokParameters * params);
+void polyhedronToCones(const IntegrationInput &intInput, Polyhedron *Poly, BarvinokParameters * params);
 
 static void usage(const char *progname);
 

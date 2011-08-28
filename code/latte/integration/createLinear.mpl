@@ -38,6 +38,63 @@ random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm_nonhomogen
 	return l;
 end;
 
+# @parm pairwiseDegree: max power of 1 linear form
+# @parm dimension: variable count
+# @parm maxNumberTerms: in the sum (not including the constant.
+# @return random non-homogenous sum of products of powers of linear forms in list notation.
+random_linearFormProduct_nonhomogen:=proc(pairwiseDegree, dimension, maxNumberTerms)
+	local answer;
+	local numberOfTerms, randNum, oneProduct;
+
+	numberOfTerms:= rand(1..maxNumberTerms)();
+	randNum := rand(100);
+	answer:=[];
+		
+	for i from 1 to numberOfTerms do
+	
+		 numberProducts:=ceil(stats[random, uniform[0.5, 1.3]]()*dimension + 1); #in one terms. this number is D : l_1^m_1 ... l_D^m_D
+		 
+		 oneProduct:=[];
+		 for j from 1 to numberProducts do
+		 	 oneProduct:=[op(oneProduct), [rand(pairwiseDegree)()+1, [seq(randNum(), k=1..dimension)]]];
+		 end; #j
+		 
+		 oneProduct:=[ randNum()/(randNum()+1), oneProduct];
+	
+		answer:=[op(answer), oneProduct]; 
+	end; #for i
+
+	#now add the constent term.
+	
+	answer:=[op(answer), [randNum()+1,[[0,[seq(1, k=1..dimension)]]]]]; 
+	
+	return answer;
+end;
+
+# @parm plfList (product of linear form) list
+# @parm dimension: var count
+# @return: maxple expression for the plf.
+convert_linearFormProductList_to_product_maple_expression:=proc(plfList, dimension)
+	local answer;
+	local term, onePLF, k;
+
+	answer:=0;
+
+	for term in plfList do  #term is [c, [[p, [l]], [p, [l]], ...]]
+		mapleTerm:=term[1]; #coefficient.
+		
+		for onePLF in term[2] do
+			mapleTerm:=mapleTerm* (sum(x[k]*onePLF[2][k], k=1..dimension))^onePLF[1]
+		end; #onePLF
+		
+		answer:=answer + mapleTerm;
+	
+	end;
+
+	return answer;
+end;
+
+
 
 #
 # Given a linear form in list form [ [coeff, [power, [linear form]]] ], we convert it to an

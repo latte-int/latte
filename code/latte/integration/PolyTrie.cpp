@@ -148,6 +148,8 @@ void destroyMonomials(monomialSum &myPoly)
 	myPoly.termCount = myPoly.varCount = 0;
 }
 
+// -------------------------------------------------------------------------
+
 void loadLinForms(linFormSum &forms, const string line)
 {
 	forms.termCount = 0;
@@ -318,6 +320,158 @@ void destroyLinForms(linFormSum &myPoly)
 	myPoly.myForms = NULL;
 	myPoly.termCount = myPoly.varCount = 0;
 }
+
+// -------------------------------------------------------------------------
+
+void loadLinFormProducts(linFormProductSum &forms, const string line)
+{
+	forms.varCount = 0;
+	FormProductLoadConsumer<RationalNTL>* myLoader =
+			new FormProductLoadConsumer<RationalNTL> ();
+	myLoader->setFormProductSum(forms);
+	parseLinFormProducts(myLoader, line);
+	delete myLoader;
+}
+//Loads a string by parsing it as a sum of linear forms
+//linear form: a * (c^b * f^e * h^g) + ...
+//nested list: [ [a, [[b, [c]], [e, [f]], [g, [h]]]], ... ]
+void parseLinFormProducts(FormProductLoadConsumer<RationalNTL>* consumer, const string& line)
+{
+	int termIndex = 0;
+	int lastPos = 0;
+	int varCount = 0;
+	int k;
+	int flag = 0; //0 means we expect coefficient, 1 means we expect degree, 2 means we expect coefficient vector
+
+	//cout << "parseLinForms: line = " << line.c_str() << endl;
+	for (int i = 0; line[i] != ']'; i++)
+	{
+		varCount += (line[i] == ',');
+	}
+	//varCount is now the number of commas in a linear form - there is 1 less variable;
+	varCount--;
+	if (varCount < 1)
+	{
+		cout << "line: `" << line << "'" << endl;
+		cout << "There are " << varCount << " variables, error." << endl;
+		exit(1);
+	}
+	consumer->setDimension(varCount);
+
+	vec_ZZ coefs;
+	coefs.SetLength(varCount);
+	int degree;
+	RationalNTL coefficient;
+
+	int productIndex = 0;
+	for (int i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
+	{
+		if (line[i] == '[')
+		{
+			ZZ degreeFactorial;
+			switch (flag)
+			{
+				case 0: //coefficient
+					lastPos = i + 1;
+					for (; line[i] != ','; i++)
+						;
+					coefficient = RationalNTL(
+							(line.substr(lastPos, i - lastPos).c_str()));
+					flag = 1;
+					break;
+				case 1: //start of a product of linear forms [[p, [l]], ...],
+					productIndex = consumer->initializeNewProduct();
+					//cout << "new index:" << productIndex << endl;
+					flag = 2;
+					break;
+				case 2: //start of a power of linear form [p, [l]]
+					lastPos = i + 1;
+					for (; line[i] != ','; i++)
+						;
+					degree = atoi(line.substr(lastPos, i - lastPos).c_str());
+					flag = 3;
+					break;
+				case 3: //coefficient vector
+					k = 0;
+					for (i++; line[i] != ']'; i++)
+					{
+						if (line[i] != ' ')
+						{
+							lastPos = i;
+							for (; line[i] != ',' && line[i] != ']'; i++)
+								;
+
+							coefs[k++] = to_ZZ(
+									line.substr(lastPos, i - lastPos).c_str());
+
+						}
+					}//end of exponent vector.
+
+					//cout << "inserting " << coefficient << " ";
+					//for(int w = 0; w < coefs.length(); ++w)
+					//	cout << coefs[w] << ", ";
+					//cout << "into " << productIndex << endl;
+					consumer->ConsumeLinForm(productIndex, coefficient, degree, coefs);
+					coefficient = 1; //the other coefficients in this product are 1.
+
+					for(; line[i] != ']'; ++i); //end of linear form list: [[p, [l]] ]
+					//for(; line[i] != ']'; ++i); //end of linear form list: [[[p, [l]] ]
+					//check to see if there are any more products.
+					while(true)
+					{
+						++i;
+						if ( line[i] == ',')
+						{
+							flag = 2; //read next power of linear form into the current product.
+							break;
+						}
+						else if ( line[i] == ']')
+						{
+							flag = 0; //new product
+							break;
+						}
+					}
+					break;
+				default: //error
+					cout << "Flag is " << flag << ", error." << endl;
+					exit(1);
+			}
+		}
+	}
+}
+
+
+
+
+//Deallocates space and nullifies internal pointers and counters
+void destroyLinFormProducts(linFormProductSum &myProd)
+{
+	for(int i = 0; i < myProd.myFormProducts.size(); ++i)
+	{
+		destroyLinForms(myProd.myFormProducts[i]);
+	}
+	myProd.myFormProducts.clear();
+}
+
+
+/**
+ * Unlike printLinForms(), this function is more for debugging.
+ */
+string printLinFormProducts(const linFormProductSum &plf)
+{
+	stringstream out;
+	for(int i = 0; i < plf.myFormProducts.size(); ++i)
+	{
+		cout << i << " started" << endl;
+		cout << printLinForms(plf[i]).c_str() << endl;
+		out << "Term " << i << " " << printLinForms(plf[i]) << "\n";
+		cout << i << " finished" << endl;
+	}
+	return out.str();
+}
+
+
+// -------------------------------------------------------------------------
 
 //INPUT: monomial specified by myPoly.coefficientBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]
 //	and myPoly.exponentBlocks[mIndex / BLOCK_SIZE].data[mIndex % BLOCK_SIZE]

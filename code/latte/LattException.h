@@ -43,6 +43,9 @@ public:
 		fe_Open,						//cannot open file or does not exist.
 		fe_Parse,						//parse error
 
+		//integration errors.
+		ie_badIntegrandFormat,			//something's wrong with the integrand.
+
 		//unknown
 		bug_Unknown,					//somthing really bad happened.
 		bug_NotImplementedHere,			//this case does not exist is the function that throw it.

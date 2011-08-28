@@ -50,10 +50,9 @@ int main(int argc, char *argv[])
 	}
 
 	arguments[0] = (const char *) argv[0];
-	arguments[1] = (const char *) "--valuation=volume";
-	arguments[2] = (const char *) "--triangulate";
-	arguments[3] = (const char *) "--redundancy-check=none";
-	//arguments[4] = file name.
+	arguments[1] = (const char *) "--valuation-alg=volume-triangulation";
+	arguments[2] = (const char *) "--redundancy-check=none";
+	//arguments[3] = file name.
 
 
 	for(int i = 1; i <= numberTests; ++i)
@@ -67,12 +66,12 @@ int main(int argc, char *argv[])
 		char fileName[100];
 		ss << argv[1] << i;
 		strcpy(fileName, ss.str().c_str());
-		arguments[4] = (const char *)fileName;
+		arguments[3] = (const char *)fileName;
 
-		answer_times = Valuation::mainValuationDriver(arguments, 5);
+		answer_times = Valuation::mainValuationDriver(arguments, 4);
 
 		for(int k = 0; k < answer_times.answers.size(); ++k)
-			if ( answer_times.answers[k].valuationType == Valuation::ValuationData::volumeTriangulation)//ValuationData
+			if ( answer_times.answers[k].valuationType == PolytopeValuation::volumeTriangulation)//ValuationData
 			{
 				ouput << answer_times.answers[k].answer << endl;
 				cout.rdbuf(cout_strbuf); //revert cout back to cout!

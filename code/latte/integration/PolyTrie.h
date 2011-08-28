@@ -26,6 +26,14 @@ void insertLinForm(const RationalNTL& coef, int degree, const vec_ZZ& coeffs, li
 string printLinForms(const linFormSum&);
 void destroyLinForms(linFormSum&);
 
+void loadLinFormProducts(linFormProductSum &forms, const string line);
+//string parsing
+void parseLinFormProducts(FormProductLoadConsumer<RationalNTL>* consumer, const string& line);
+//data structure operations
+void destroyLinFormProducts(linFormProductSum &myProd);
+string printLinFormProducts(const linFormProductSum &plf);
+
+
 void decompose(term<RationalNTL, int>*, linFormSum&);
 void decompose(BTrieIterator<RationalNTL, int>* it, linFormSum&);
 #endif

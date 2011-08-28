@@ -354,7 +354,14 @@ RationalNTL RationalNTL::operator*(const RationalNTL & rhs) const
 RationalNTL RationalNTL::operator*(const ZZ & rhs) const
 {
 	RationalNTL answer(*this);
-	return answer.mult(rhs, to_ZZ(1));
+	return answer.mult(rhs);
+}
+
+
+RationalNTL RationalNTL::operator*(const int & rhs) const
+{
+	RationalNTL answer(*this);
+	return answer.mult(to_ZZ(rhs));
 }
 
 RationalNTL & RationalNTL::operator*=(const RationalNTL & rhs)
@@ -364,8 +371,14 @@ RationalNTL & RationalNTL::operator*=(const RationalNTL & rhs)
 
 RationalNTL & RationalNTL::operator*=(const ZZ & rhs)
 {
-	return mult(rhs, to_ZZ(1));
+	return mult(rhs);
 }
+
+RationalNTL & RationalNTL::operator*=(const int & rhs)
+{
+	return mult(to_ZZ(rhs));
+}
+
 
 RR RationalNTL::to_RR() const
 {

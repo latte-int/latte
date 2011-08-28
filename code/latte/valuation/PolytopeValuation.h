@@ -20,7 +20,6 @@
 #include "print.h"
 #include "gnulib/progname.h"
 #include "barvinok/dec.h"
-#include "valuation/PolytopeValuation.h"
 #include <NTL/vec_ZZ.h>
 #include <NTL/vec_RR.h>
 #include "rational.h"
@@ -33,18 +32,7 @@
 
 using namespace std;
 
-/*
- * Constructing:
- * 1) Pass in a Polyhedron *.
- *
- * Finding Volume:
- * 1) Call findVolume(DeterminantVolume) if you want to use the Determinant method. Will convert first
- * 		convert  vertexRayCones into a triangulation if needed.
- * 2) Call findVolume(LawrenceVolume) if you want to use the Lawrence method. Will convert first
- * 		convert  vertexRayCones into a triangulation if needed using decomposeCones
- *
- */
-
+							//dummy, used to record total time in ValuationData.
 
 class PolytopeValuation
 {
@@ -82,18 +70,27 @@ public:
 	typedef enum {DeterminantVolume, LawrenceVolume} VolumeType;
 	typedef enum {TriangulationIntegration, LawrenceIntegration} IntegrationType;
 	typedef enum {VertexRayCones, TriangulatedCones} ConeType;
+	enum ValuationAlgorithm {
+		volumeCone,									//volume using the cone method.
+		volumeTriangulation,							//volume using triangulation
+		integratePolynomialAsLinearFormTriangulation, 	//decompose polynomial to LF, use triangulation.
+		integratePolynomialAsLinearFormCone,			//decompose polynomila to LF, use cone method.
+		integrateLinearFormTriangulation,				//integrate linear forms using triangulation
+		integrateLinearFormCone,						//integrate linear forms using cone method
+		integrateProductLinearFormsTriangulation,		//integrate product of linear forms using triangulation.
+		entireValuation};
 
 	PolytopeValuation(Polyhedron *p, BarvinokParameters &bp);
 	virtual ~PolytopeValuation();
 
 
 	// A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	RationalNTL findIntegral(const monomialSum& polynomial, const IntegrationType integrationType);
-	RationalNTL findIntegral(const linFormSum& linearForms, const IntegrationType integrationType);
+	RationalNTL findIntegral(const monomialSum& polynomial, const ValuationAlgorithm integrationType);
+	RationalNTL findIntegral(const linFormSum& linearForms, const ValuationAlgorithm integrationType);
 	RationalNTL findIntegral(linFormSum& linearForms);
-	RationalNTL findIntegral(const linFormSum& linearForms, int); //integrate product of linear forms.
+	RationalNTL findIntegral(const linFormProductSum& originalLinearForms, ValuationAlgorithm algorithm); //integrate product of linear forms.
 
-	RationalNTL findVolume(const VolumeType v);	//finds the volume of the Polyhedron.
+	RationalNTL findVolume(const ValuationAlgorithm v);	//finds the volume of the Polyhedron.
 	ZZ static factorial(const int n);			//computes n!
 	ZZ static lcm(const ZZ &a, const ZZ & b);
 	void printLawrenceVolumeFunction();			//Finds the Lawrence rational function for the volume. triangulates vertexRayCones if needed.

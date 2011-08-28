@@ -255,8 +255,8 @@ test_hyperrectangle_integtation_product_linear_forms:=proc(polyMaxDegree, polyto
 	#get a random linear form in list form and convert it to a maple expression
 	#																		 			(m,d,maxcoef,componentmax,maxterm, rationalCoeff)
 	#randomLFormList:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm_nonhomogen(polyMaxDegree,polytopeDimension,200,100,maxNumberOfTermsPerDegree, 1);
-	randomLFormList:=random_linearform_given_degree_dimension_maxcoef_componentmax_maxterm(polyMaxDegree,polytopeDimension,200,100,polytopeDimension, 1);
-	randomLFormMaple:=convert_linearFormList_to_product_maple_expression(randomLFormList, polytopeDimension);
+	randomLFormList:=random_linearFormProduct_nonhomogen(polyMaxDegree,polytopeDimension,5);
+	randomLFormMaple:=convert_linearFormProductList_to_product_maple_expression(randomLFormList, polytopeDimension);
 	
 	print("Integrand:", randomLFormList); 
 	print("Integrand:", randomLFormMaple);  

@@ -470,7 +470,7 @@ void finding_integral_polynomial_coneDecomp()
 
 	//the cone-decomposition method needs to start from tangent-cones
 	ans = polytopeValuation.findIntegral(polynomial,
-			PolytopeValuation::LawrenceIntegration);
+			PolytopeValuation::integratePolynomialAsLinearFormCone);
 	//If a dilation is needed, the polyhedron will now be dilated.
 	//If you wanted to use the triangulation method, you just need to preplace
 	// LawrenceIntegration with TriangulationIntegration. Also, you could
@@ -500,7 +500,7 @@ void finding_integral_linearForm_triangulation()
 	linFormSum lForms = getLinearForms();
 
 	ans = polytopeValuation.findIntegral(lForms,
-			PolytopeValuation::TriangulationIntegration);
+			PolytopeValuation::integrateLinearFormTriangulation);
 
 	cout << "Integral using the triangulation method is \n" << "Rational: "
 			<< ans << '\n' << "Real    : " << ans.to_RR() << endl;
@@ -527,7 +527,7 @@ void finding_volume_coneDecomp()
 
 
 	//the cone-decomposition method needs to start from tangent-cones
-	ans = polytopeValuation.findVolume(PolytopeValuation::LawrenceVolume);
+	ans = polytopeValuation.findVolume(PolytopeValuation::volumeCone);
 	//if a dilation is needed, the polyhedron will now be dilated.
 
 	cout << "Volume using the cone decomposition method is \n" << "Rational: "
@@ -551,7 +551,7 @@ void finding_volume_triangulation()
 	PolytopeValuation polytopeValuation(poly, *params);
 
 	//note, the triangulation method could start from the tangent-cones or a v-rep.
-	ans = polytopeValuation.findVolume(PolytopeValuation::DeterminantVolume);
+	ans = polytopeValuation.findVolume(PolytopeValuation::volumeTriangulation);
 	//the original polytope is not lost if we started from a v-rep.
 
 	cout << "Volume using the triangulation method is \n" << "Rational: "

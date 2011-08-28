@@ -211,8 +211,10 @@ public:
 	static RationalNTL power(const RationalNTL & base, long e); //(base)^e
 	RationalNTL operator*(const RationalNTL & rhs) const;
 	RationalNTL operator*(const ZZ & rhs) const;
+	RationalNTL operator*(const int & rhs) const;
 	RationalNTL & operator*=(const RationalNTL & rhs);
 	RationalNTL & operator*=(const ZZ & rhs);
+	RationalNTL & operator*=(const int & hrs);
 
 	//OTHER
 	RR to_RR() const; // converts the fraction to a float.

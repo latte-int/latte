@@ -23,12 +23,12 @@ void VolumeTests::printVolumeTest(const RationalNTL &correctVolumeAnswer,
 	int found = 0;
 
 	for(int i = 0; i < valuationResults.answers.size(); ++i)
-		if ( valuationResults.answers[i].valuationType == Valuation::ValuationData::volumeLawrence)
+		if ( valuationResults.answers[i].valuationType == PolytopeValuation::volumeCone)
 		{
 			++found;
 			lawrence = valuationResults.answers[i].answer;
 		}
-		else if ( valuationResults.answers[i].valuationType == Valuation::ValuationData::volumeTriangulation)
+		else if ( valuationResults.answers[i].valuationType == PolytopeValuation::volumeTriangulation)
 		{
 			++found;
 			triangulate = valuationResults.answers[i].answer;
@@ -62,7 +62,7 @@ void VolumeTests::printVolumeTest(const RationalNTL &correctVolumeAnswer,
 void VolumeTests::runOneTest(int ambientDim, int numPoints)
 {
 	const char * argv[] =
-	{ "runTests()", "--valuation=volume", "--all", 0 };
+	{ "runTests()", "--valuation-alg=volume", 0 };
 	stringstream comments;
 	comments << "Making random integer polytope with " << numPoints
 			<< " points in R^" << ambientDim << " for volume testing";
@@ -76,8 +76,8 @@ void VolumeTests::runOneTest(int ambientDim, int numPoints)
 
 	char * sFile = new char[file.size() + 1];
 	strcpy(sFile, file.c_str());
-	argv[3] = sFile;
-	Valuation::mainValuationDriver(argv, 4);
+	argv[2] = sFile;
+	Valuation::mainValuationDriver(argv, 3);
 	delete[] sFile;
 	buildPolytope.deleteLatteHRepFile();
 	buildPolytope.deletePolymakeFile();
@@ -109,7 +109,7 @@ void VolumeTests::runTests()
 void VolumeTests::runHyperSimplexTests()
 {
 	const char * argv[] =
-	{ "runHyperSimplexTests()", "--valuation=volume", "--all", 0 };
+	{ "runHyperSimplexTests()", "--valuation-alg=volume", 0 };
 	//   n  k  num/denom
 	int hyperSimplexData[][4] =
 	{ {4, 1, 1, 6},
@@ -170,8 +170,8 @@ void VolumeTests::runHyperSimplexTests()
 
 		char * sFile = new char[file.size() + 1];
 		strcpy(sFile, file.c_str());
-		argv[3] = sFile;
-		volumeAnswer = Valuation::mainValuationDriver(argv, 4);
+		argv[2] = sFile;
+		volumeAnswer = Valuation::mainValuationDriver(argv, 3);
 		delete[] sFile;
 		hyperSimplex.deletePolymakeFile();
 		hyperSimplex.deleteLatteHRepFile();
@@ -204,24 +204,23 @@ void VolumeTests::runBirkhoffTests()
 
 	Valuation::ValuationContainer volumeAnswer;
 	const char * argv[] =
-	{ "runBirkhoffTests()", "--valuation=volume", "--all", 0 };
+	{ "runBirkhoffTests()", "--valuation-alg=volume", 0 };
 
 	for (int i = 0; i < numberTestCases; ++i)
 	{
 		char * sFile = new char[birkhoff[i].length() + 1];
 		strcpy(sFile, birkhoff[i].c_str());
-		argv[3] = sFile;
+		argv[2] = sFile;
 		if ( i != 2)
-			volumeAnswer = Valuation::mainValuationDriver(argv, 4);
+			volumeAnswer = Valuation::mainValuationDriver(argv, 3);
 		else
 		{
-			const char * argv2[5];
+			const char * argv2[4];
 			argv2[0] = argv[0];
 			argv2[1] = argv[1];
-			argv2[2] = argv[2];
-			argv2[3] = "--vrep";
-			argv2[4] = sFile;
-			volumeAnswer = Valuation::mainValuationDriver(argv2, 5);
+			argv2[2] = "--vrep";
+			argv2[3] = sFile;
+			volumeAnswer = Valuation::mainValuationDriver(argv2, 4);
 		}//need to handel the v-rep file differently.
 		delete[] sFile;
 
