@@ -21,6 +21,8 @@ code/gnulib/setenv.h -text
 code/gnulib/stdbool_.h -text
 code/gnulib/stdlib_.h -text
 code/gnulib/unistd_.h -text
+code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl -text
+code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mw -text
 code/latte/top-ehrhart/README -text
 code/latte/top-ehrhart/TopEhrhart_lib.mpl -text
 code/latte/top-ehrhart/testingTopEhrhart.mpl -text
