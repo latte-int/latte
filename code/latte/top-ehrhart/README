@@ -1,0 +1,19 @@
+This a distribution of the MAPLE programs that test the algorithms
+presented in the paper ``Computation of the Highest coefficients
+of Weighted Ehrhart Quasi-polynomials of rational polyhedra'' by
+V. Baldoni, N. Berline, J. De Loera, M. Koeppe, and M. Vergne.
+We thankful for the help we received from students B. Dutra and
+G. Pinto.
+
+The release has 3 files:
+
+testingTopEhrhart_lib.mpl  
+testingTopEhrhart.mpl
+TopEhrhart_lib.mpl
+
+TopEhrhart_lib.mpl is the most important files containing the MAPLE
+implementation of the key algorithms of the paper. The tables used
+in the paper were generated with the help of testingTopEhrhart.mpl
+which is mostly a collection of small reading/writing/timing routines
+and testingTopEhrhart_lib.mpl contains auxiliary utilities to generate
+random simplices and their equations.

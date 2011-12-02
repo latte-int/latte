@@ -21,6 +21,10 @@ code/gnulib/setenv.h -text
 code/gnulib/stdbool_.h -text
 code/gnulib/stdlib_.h -text
 code/gnulib/unistd_.h -text
+code/latte/top-ehrhart/README -text
+code/latte/top-ehrhart/TopEhrhart_lib.mpl -text
+code/latte/top-ehrhart/testingTopEhrhart.mpl -text
+code/latte/top-ehrhart/testingTopEhrhart_lib.mpl -text
 code/test-suite/test-4ti2.sh -text
 code/test-suite/test-allprimal-exp-maxdet1000-4ti2.sh -text
 code/test-suite/test-allprimal-exp-maxdet1000.sh -text
