@@ -52,7 +52,7 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 
 #
 # EXAMPLE
-Delta:=[[0,0],[5/28,0],[5/28,5/14]];
+#Delta:=[[0,0],[5/28,0],[5/28,5/14]];
 #TopEhrhartweightedluckyell(n,Delta,2,[1,1],1);
 #
 #
@@ -63,7 +63,7 @@ Delta:=[[0,0],[5/28,0],[5/28,5/14]];
 #TopEhrhartweighted:=proc(n,Simplex,ell,M,m)
 #
 # EXAMPLE
-Delta:=[[0,0],[5/28,0],[5/28,5/14]];
+#Delta:=[[0,0],[5/28,0],[5/28,5/14]];
 #TopEhrhartweighted(n,Delta,2,[1,0],1);
 #
 #
@@ -443,7 +443,8 @@ nfractionalpartreal:=proc(n,p,q) local our;
     fi;
     our;
 end:
-nfractionalpartreal(1,0,1);
+#nfractionalpartreal(1,0,1);
+
 # Relative volume
 #
 #
@@ -747,8 +748,8 @@ approx_Cone_formulaa:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     fi;
     output;
 end:
-approx_Cone_formulaa([s,1/2], [[1,0],[1,2]],2,xi);
-approx_Cone_formulaa([s1,s2], [[1,0],[1,2]],1,xi);
+#approx_Cone_formulaa([s,1/2], [[1,0],[1,2]],2,xi);
+#approx_Cone_formulaa([s1,s2], [[1,0],[1,2]],1,xi);
 #
 #
 # Input:  s a vector in Q^d,  or a symbolic variable (but has to be entered as a list of d symbolic variables,
@@ -778,8 +779,8 @@ approx_Cone_formulab:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     fi;
     output;
 end:
-approx_Cone_formulab([1/2,1/2], [[1,0],[1,2]],1,xi);
-approx_Cone_formulab([s1,s2], [[1,0],[1,2]],1,xi);
+#approx_Cone_formulab([1/2,1/2], [[1,0],[1,2]],1,xi);
+#approx_Cone_formulab([s1,s2], [[1,0],[1,2]],1,xi);
 # ADDING THE CONES APPROXIMATIONS FOR A RATIONAL SIMPLEX;
 # Input: A SIMPLEX entered as a list of d+1 rational vectors in R^d; order is an integer, xi is a variable.
 # xi can also be entered as a numeric list of lenght d, but there can be then an error message (division by zero).

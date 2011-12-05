@@ -44,6 +44,12 @@
 #endif
 
 #undef SHOWDETS
+#undef SHOWCONES
+//#define SHOWDETS 1
+//#define SHOWCONES 
+#ifdef SHOWCONES
+#include "print.h"
+#endif
 
 BarvinokParameters::BarvinokParameters() :
   substitution(PolynomialSubstitution),
@@ -306,6 +312,11 @@ barvinokStep(const listCone *Cone,
 	     vector <listCone *> &Cones, vec_ZZ &Dets,
 	     int m, Single_Cone_Parameters *Parameters)
 {
+#ifdef SHOWCONES
+  cerr << "############ Decomposing: ############" << endl;
+  printCone((listCone*)Cone, m);
+  cerr << "************** Results: **************" << endl;
+#endif
   mat_ZZ generator = createConeDecMatrix(Cone, m, m);
   mat_ZZ dual = createFacetMatrix(Cone, m, m);
   /* ComputeOmega(const mat_ZZ &, long& ) computes
@@ -379,6 +390,9 @@ barvinokStep(const listCone *Cone,
       }
       Cones[i]->vertex = new Vertex(*Cone->vertex);
       computeDetAndFacetsOfSimplicialCone(Cones[i], m);
+#ifdef SHOWCONES
+      printCone(Cones[i], m); 
+#endif
     }
   }
   return true;
