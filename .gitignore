@@ -261,6 +261,7 @@ code/test-suite/results
 code/test-suite/set-max-cpu-time
 code/test-suite/test.pl
 code/test-suite/totalTime
+/config.cache
 /config.guess
 /config.h.in
 /config.libpath

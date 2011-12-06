@@ -1,0 +1,2319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Worksheet>
+<Version major="13" minor="0"/>
+<Label-Scheme value="2" prefix=""/>
+<View-Properties presentation="false"><Zoom percentage="125"/></View-Properties>
+<MapleNet-Properties elisiondigitsbefore="100" labelling="true" indentamount="4" elisiontermsthreshold="10000" ansi="false" errorbreak="1" useclientjvm="true" echo="1" imaginaryunit="I" labelwidth="20" plotdriver="openviz" elisiondigitsafter="100" plotoutput="terminal" rtablesize="10" elisiontermsbefore="100" elisiondigitsthreshold="10000" typesetting="standard" plotdevice="inline" verboseproc="1" showassumed="1" errorcursor="false" longdelim="true" plotoptions="" quiet="false" elisiontermsafter="100" screenwidth="79" preplot="" prettyprint="3" displayprecision="-1" warnlevel="3" screenheight="25" latexwidth="6.0" postplot="" prompt="&gt; " ShowLabels="true"/>
+<Styles><Font name="Annotation Text" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Ordered List 1" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Ordered List 2" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Ordered List 3" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Ordered List 4" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Ordered List 5" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Maple Name" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[104,64,92]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name232" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Bold" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name231" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Menus" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name234" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Annotation Title" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="18" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name233" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Fixed Width" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Text Output" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,255]" italic="false" opaque="false" readonly="true" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Normal" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Plot Text" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="8" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name" background="[255,255,255]" bold="true" executable="true" family="Monospaced" foreground="[255,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Nonterminal" background="[255,255,255]" bold="true" executable="false" family="Monospaced" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Heading" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="14" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Italic" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Variable" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Italic Bold" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Default" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Underlined Italic" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="Dash Item" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Maple Input" background="[255,255,255]" bold="true" executable="true" family="Monospaced" foreground="[255,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Output" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,255]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="HyperlinkError" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[255,0,255]" italic="false" opaque="false" readonly="true" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="2D Math Bold Small" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Small" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Page Number" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Output Labels" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="8" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Bullet Item" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Plot Title" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Emphasized" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Symbol 2" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Maple Comment" background="[255,255,255]" bold="true" executable="false" family="Monospaced" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Author" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name215" background="[255,255,255]" bold="false" executable="true" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Warning" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,255]" italic="false" opaque="false" readonly="true" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small202" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name218" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small202205208" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name217" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small204" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Maple Input Placeholder" background="[255,255,255]" bold="true" executable="true" family="Monospaced" foreground="[200,0,200]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small203" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Code" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[255,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Maple Plot" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Line Printed Output" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,255]" italic="false" opaque="false" readonly="true" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small205" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,255]" italic="false" opaque="false" readonly="true" size="9" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Diagnostic" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[64,128,64]" italic="false" opaque="false" readonly="true" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Inert Output" background="[255,255,255]" bold="false" executable="true" family="Times New Roman" foreground="[144,144,144]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Normal" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small204204" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Comment" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Underlined Bold" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Copyright" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Hyperlink" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,128,128]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="Help Underlined" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="No Name220" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Maple Output" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Prompt" background="[255,255,255]" bold="true" executable="false" family="Monospaced" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Input" background="[255,255,255]" bold="false" executable="true" family="Times New Roman" foreground="[255,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name225" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="No Name224" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Header and Footer" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Title" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="18" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="Error" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[255,0,255]" italic="false" opaque="false" readonly="true" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small205210" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Heading 1" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="18" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Text" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Notes" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Bold" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Equation Label" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Heading 4" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="LaTeX" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="2D Math Italic Small202205" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="1" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Heading 3" background="[255,255,255]" bold="true" executable="false" family="Serif" foreground="[0,0,0]" italic="true" opaque="false" readonly="false" size="14" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="HyperlinkWarning" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,255]" italic="false" opaque="false" readonly="true" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="Heading 2" background="[255,255,255]" bold="true" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="14" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Popup" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,128,128]" italic="true" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="Dictionary Hyperlink" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[147,0,15]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="true" placeholder="false"/>
+<Font name="Left Justified Maple Output" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="List Item" background="[255,255,255]" bold="false" executable="false" family="Times New Roman" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="12" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Font name="Help Fixed" background="[255,255,255]" bold="false" executable="false" family="Monospaced" foreground="[0,0,0]" italic="false" opaque="false" readonly="false" size="10" subscript="false" superscript="false" underline="false" placeholder="false"/>
+<Layout name="Ordered List 1" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Ordered List 2" alignment="left" bullet="none" firstindent="0" leftmargin="36" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Ordered List 3" alignment="left" bullet="none" firstindent="0" leftmargin="72" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Ordered List 4" alignment="left" bullet="none" firstindent="0" leftmargin="108" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name232" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Ordered List 5" alignment="left" bullet="none" firstindent="0" leftmargin="144" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name231" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name234" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Author" alignment="centred" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="8" spacebelow="8" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name215" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name233" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Warning" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Annotation Title" alignment="centred" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="12" spacebelow="12" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Fixed Width" alignment="centred" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name218" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name217" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Maple Plot" alignment="centred" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Line Printed Output" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Help" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Text Output" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Diagnostic" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Normal" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name220" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Maple Output" alignment="centred" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Dash Item" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="HyperlinkError" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name225" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="No Name224" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Error" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Title" alignment="centred" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="12" spacebelow="12" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Heading 1" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="8" spacebelow="4" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Bullet Item" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Heading 4" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Heading 3" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Heading 2" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="8" spacebelow="2" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="HyperlinkWarning" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="Left Justified Maple Output" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="0" spacebelow="0" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Layout name="List Item" alignment="left" bullet="none" firstindent="0" leftmargin="0" rightmargin="0" linespacing="0.0" spaceabove="3" spacebelow="3" linebreak="space" pagebreak-before="false" initial="0" bulletsuffix=""/>
+<Pencil-style name="Pencil 5" pen-color="[255,0,0]" pen-height="5.0" pen-width="5.0" pen-opacity="1.0"/>
+<Pencil-style name="Pencil 4" pen-color="[0,0,255]" pen-height="3.0" pen-width="3.0" pen-opacity="1.0"/>
+<Pencil-style name="Pencil 3" pen-color="[0,0,0]" pen-height="3.0" pen-width="3.0" pen-opacity="1.0"/>
+<Pencil-style name="Pencil 2" pen-color="[0,0,255]" pen-height="1.0" pen-width="1.0" pen-opacity="1.0"/>
+<Pencil-style name="Pencil 1" pen-color="[0,0,0]" pen-height="1.0" pen-width="1.0" pen-opacity="1.0"/>
+<Highlighter-style name="Highlighter 2" pen-color="[255,204,0]" pen-height="14.0" pen-width="14.0" pen-opacity="0.8"/>
+<Highlighter-style name="Highlighter 1" pen-color="[255,153,255]" pen-height="12.0" pen-width="8.0" pen-opacity="0.8"/>
+<Highlighter-style name="Highlighter 4" pen-color="[0,255,255]" pen-height="32.0" pen-width="32.0" pen-opacity="0.8"/>
+<Highlighter-style name="Highlighter 3" pen-color="[51,255,0]" pen-height="24.0" pen-width="24.0" pen-opacity="0.8"/>
+<Highlighter-style name="Highlighter 5" pen-color="[255,255,0]" pen-height="48.0" pen-width="48.0" pen-opacity="0.8"/>
+</Styles>
+<Task-table>
+    <Task-category name="&lt;default&gt;">
+    </Task-category>
+</Task-table>
+<Task>
+</Task>
+<Group labelreference="L3" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">with(linalg):with(LinearAlgebra):with(combinat):
+kernelopts(assertlevel=1):       ### Enable checking ASSERTions</Text-field>
+</Input>
+</Group>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Group labelreference="L1981" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Text-field style="Heading 1" layout="Heading 1">PEDAGOCICAL PROGRAM FOR COMPUTING EXAMPLES FOR ARTICLE:
+HIGHEST EHRHART  COEFFICIENTS;
+Version of November 10 -2010 : I have added the Ehrhart polynomial over the reals.
+
+I PUT SOME EXAMPLES AFTER THE PROCEDURE.
+
+
+
+HERE IS THE LIST OF WHAT THE PROGRAM DOES.</Text-field></Title>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">I</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 2" size="12" layout="Heading 2"><Font size="12">PROGRAM FOR  FORMULAE A and b for S^{L^I}(s+c) .
+This function  is expressed in terms of the &quot;black box functions&quot; TODD and EXP.
+TODD(s,x) representing the function e^(sx) x/(1-e^x); IF we want to evaluate S_C_k(x) at a regular element reg; the command eval and subs (TODD=Todd, EXP=exp) should be used.
+ 
+The commands are  EITHER;
+S_Ispace_Coneformulaa:=proc(vertex,cone, ISpace,xi);
+S_Ispace_Coneformulab:=proc(vertex,cone, ISpace,xi);
+Here  vertex should be entered  as a symbolic variable [s_1,s_2,s_3,....,s_d] ;
+ cone is our cone  with generators v_i; I space is given by  a subset of [1,2,...,d];
+
+Thus if  I is [];  we get S(s+c);
+ if S is [1,2,...,d] we get I(s+c) ;
+There are some examples  in another sheet:</Font></Text-field></Title>
+<Group labelreference="L1798" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#S_Ispace_Coneformulaa([s[1],s[2]],[[1,0],[1,2]],[1],xi);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1807" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#S_Ispace_Coneformulab([s[1],s[2]],[[1,0],[1,2]],[1],xi);</Text-field>
+</Input>
+</Group>
+</Section>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 2" layout="Heading 2">It computes the coefficient in n^m of the weighted Ehrhart quasi polynomial  of a rational simplex;  Eh(Simplex,ell^M)(n)=sum _m E_m(n)*n^m; 
+it return  E_m(n) a  periodic function of n; However, it might return an error message: say division by zero;
+In this case we have to use the next procedure.</Text-field></Title>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L1803" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweightedluckyell(n,Simplex,ell,M,m);
+</Text-field>
+</Input>
+</Group>
+</Section>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 2" layout="Heading 2">EXAMPLE </Text-field></Title>
+<Group labelreference="L1804" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">Delta:=[[0,0],[5/28,0],[5/28,5/14]];</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbWlHRiQ2JVEnJiM5MTY7RicvJSdpdGFsaWNHUSZmYWxzZUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIzo9RidGMi8lJmZlbmNlR0YxLyUqc2VwYXJhdG9yR0YxLyUpc3RyZXRjaHlHRjEvJSpzeW1tZXRyaWNHRjEvJShsYXJnZW9wR0YxLyUubW92YWJsZWxpbWl0c0dGMS8lJ2FjY2VudEdGMS8lJ2xzcGFjZUdRLDAuMjc3Nzc3OGVtRicvJSdyc3BhY2VHRkktSShtZmVuY2VkR0YkNiYtRiM2KS1GTTYmLUYjNictSSNtbkdGJDYkUSIwRidGMi1GNjYtUSIsRidGMkY5L0Y8USV0cnVlRidGPUY/RkFGQ0ZFL0ZIUSYwLjBlbUYnL0ZLUSwwLjMzMzMzMzNlbUYnRlUvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRjJGMi8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJ0ZZLUZNNiYtRiM2Jy1JJm1mcmFjR0YkNigtRlY2JFEiNUYnRjItRlY2JFEjMjhGJ0YyLyUubGluZXRoaWNrbmVzc0dRIjFGJy8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZncC8lKWJldmVsbGVkR0YxRllGVUZcb0YyRjJGX29GYm9GWS1GTTYmLUYjNidGaW9GWS1Gam82KEZccC1GVjYkUSMxNEYnRjJGYnBGZXBGaHBGanBGXG9GMkYyRl9vRmJvRlxvRjJGMkZfb0Zib0Zcb0Yy">NyU3JCIiIUYkNyQjIiImIiNHRiQ3JEYmI0YnIiM5</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1882" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweightedluckyell(n,Delta,2,[1,1],1);</Text-field>
+</Input>
+</Group>
+</Section>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 2" layout="Heading 2">If luckyell  return an error message: that is ell is singular for one of the thousands cone occuring in the procedure, uses
+the next procedure. it might also return an error message:;
+In this case we have to rerun (there is a random choice there).</Text-field></Title>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L1806" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted:=proc(n,Simplex,ell,M,m) </Text-field>
+</Input>
+</Group>
+</Section>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 2" layout="Heading 2">EXAMPLE </Text-field></Title>
+<Group labelreference="L1890" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">Delta:=[[0,0],[5/28,0],[5/28,5/14]];</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbWlHRiQ2JVEnJiM5MTY7RicvJSdpdGFsaWNHUSZmYWxzZUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIzo9RidGMi8lJmZlbmNlR0YxLyUqc2VwYXJhdG9yR0YxLyUpc3RyZXRjaHlHRjEvJSpzeW1tZXRyaWNHRjEvJShsYXJnZW9wR0YxLyUubW92YWJsZWxpbWl0c0dGMS8lJ2FjY2VudEdGMS8lJ2xzcGFjZUdRLDAuMjc3Nzc3OGVtRicvJSdyc3BhY2VHRkktSShtZmVuY2VkR0YkNiYtRiM2KS1GTTYmLUYjNictSSNtbkdGJDYkUSIwRidGMi1GNjYtUSIsRidGMkY5L0Y8USV0cnVlRidGPUY/RkFGQ0ZFL0ZIUSYwLjBlbUYnL0ZLUSwwLjMzMzMzMzNlbUYnRlUvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRjJGMi8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJ0ZZLUZNNiYtRiM2Jy1JJm1mcmFjR0YkNigtRlY2JFEiNUYnRjItRlY2JFEjMjhGJ0YyLyUubGluZXRoaWNrbmVzc0dRIjFGJy8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZncC8lKWJldmVsbGVkR0YxRllGVUZcb0YyRjJGX29GYm9GWS1GTTYmLUYjNidGaW9GWS1Gam82KEZccC1GVjYkUSMxNEYnRjJGYnBGZXBGaHBGanBGXG9GMkYyRl9vRmJvRlxvRjJGMkZfb0Zib0Zcb0Yy">NyU3JCIiIUYkNyQjIiImIiNHRiQ3JEYmI0YnIiM5</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1891" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,Delta,2,[1,0],1);</Text-field>
+</Input>
+</Group>
+</Section>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Programs on lists: addition on lists, complement of a list, sublist,etc...</Text-field></Title>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L114" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: K a subset of integers, L a list.<Font foreground="[51,153,0]">The output takes the elements of the list L in the position of the list K</Font></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">insert:=proc(K,L) local out;
+out:=[seq(L[K[i]],i=1..nops(K))];
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L119" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font foreground="[51,153,0]">#The output is the Complement  List, within the list [1,..,d]</Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L111" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">ComplementList:=proc(K,d);
+RETURN([seq (`if` (member(i,K)=false, i, op({})),i=1..d)]);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L118" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font foreground="[0,0,0]">#The output is the Complement  List, within the list [a[1],..,a[d]]</Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L117" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">GeneralComplementList:=proc(K,L)local d;d:=nops(L);
+RETURN([seq (`if` (member(L[i],K)=false, L[i], op({})),i=1..d)]);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L110" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#GeneralComplementList([2,3],[1,2,3,7]);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1630" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">special_lincomb_v:=proc(a,v,n) local out;
+ASSERT(nops(a)=nops(v),&quot; the number of coefficients and vectors do not match&quot;);
+if v=[]   then out:=[seq(0,i=1..n)];else
+out:=[seq(add(a[i]*v[i][j],i=1..nops(v)),j=1..nops(v[1]))];
+fi;
+out;
+end:</Text-field>
+</Input>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Miscellanea</Text-field></Title>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L1320" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: A :a vector with rational coordinates.</Text-field>
+<Text-field style="Text" layout="Normal">Output: A vector with integral coordinates:
+Math: the primitive vector on the half line R^+A;
+Example: #primitive_vector([0,-1/2])-&gt;[0,-1];
+</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">primitive_vector:=proc(A) local d,n,g;
+d:=nops(A);
+n:=ilcm(seq(denom(A[i]),i=1..d));
+g:=igcd(seq(n*A[i],i=1..d));if g&lt;&gt;0 then
+[seq(n*A[i]/g,i=1..d)];else [seq(n*A[i],i=1..d)];fi;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L125" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">ortho_basis:=proc(d) local i,v;
+for i from 1 to d do
+v[i]:=[seq(0,j=1..i-1),1,seq(0,j=i+1..d)]
+od;[seq(v[j],j=1..d)];
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1754" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">fracpart:=proc(x); x-floor(x);
+end:
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1755" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">fracpart(1);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output">IiIh</Equation></Text-field>
+</Output>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1"><Font background="[0,0,0]"> Signed decomposition into unimodular cones</Font></Text-field></Title>
+<Group labelreference="L1315" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="false" style="Heading 1" background="[0,0,0]" size="14">A &quot;simplicial cone&quot; is a list of  d linearly independent  vectors in Z^d, sometimes assumed primitive. </Font></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1318" drawlabel="true">
+<Input>
+<Text-field style="Text" bold="true" layout="Normal"><Font bold="true" background="[0,0,0]" size="14">short_vector</Font><Font bold="true" background="[0,0,0]">(A)</Font></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"><Font background="[0,0,0]" size="14"># <Font bold="true">Input</Font>:   A is a list of d linearly independent vectors.</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font background="[0,0,0]" size="14"># <Font bold="true">Output</Font>: sho is a vector of dimension d.</Font></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font background="[0,0,0]">short_vector:=proc(A) local n,base,i,sho;  
+n:=nops(A);
+base:=IntegerRelations[LLL](A);
+sho:=base[1];
+i:=1; 
+while i&lt;=n-1 do
+    if max(seq(abs(sho[j]),j=1..n))&lt;=max(seq(abs(base[i+1][j]),j=1..n))
+             then sho:=sho; else sho:=base[i+1];
+    fi;
+    i:=i+1;
+od;
+sho;
+end:</Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1312" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># sign_entries_vector(V)</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14">
+#  Input</Font><Font background="[0,0,0]" size="14"> : vector V of dimension d.</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># Output</Font><Font background="[0,0,0]" size="14">:  L=[ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
+#               according to the signs of the entries of the vector V.</Font></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font background="[0,0,0]">sign_entries_vector:=proc(V) local d,i,Lplus,Lminus,Lzero; 
+       d:=nops(V); Lplus:=[]; Lminus:=[];Lzero:=[];
+
+       for i from 1 to d do 
+          if type(V[i],positive)      then Lplus:=[op(Lplus),i];
+          elif type(V[i],negative) then Lminus:=[op(Lminus),i];
+                                else Lzero:=[op(Lzero),i];
+          fi;
+       od;
+[Lplus,Lminus,Lzero];
+end:</Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1316" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># good_vector(G)</Font><Font background="[0,0,0]" size="14">
+#
+# <Font bold="true">Input   G </Font> is a  &quot;simplicial cone&quot;
+# <Font bold="true">Output </Font>consists of 2 elements: 
+#              V is a vector in Z^d. 
+#               L=[ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
+#               according to the signs of the entries of the vector V. in the basis G. </Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1314" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font background="[0,0,0]">good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L;
+          n:=nops(G);  
+          A:=Transpose(Matrix(G));      
+          Ainverse:=MatrixInverse(A);
+          B:=[seq(convert(Ainverse[1..n,i],list),i=1..n)]; 
+          sho:=short_vector(B); 
+          V :=[seq(add(G[j][i]*sho[j],j=1..n),i=1..n)];
+          L:= sign_entries_vector(sho);
+[V,L];
+end:</Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1311" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># signed_decomp</Font><Font bold="true" background="[0,0,0]">(eps,G,v,L)</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14">
+</Font><Font background="[0,0,0]" size="14"># <Font bold="true">Input :</Font>  eps = 1 or -1
+#             <Font bold="true">G </Font> is a  &quot;simplicial cone&quot;
+#              V is a vector of dim d
+#              L= [ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
+#
+# <Font bold="true">Output :</Font> [Nonuni,Uni] 
+#              Nonuni and Uni are  lists of terms  [eps,detG,G],  where
+#               eps=1 or -1, 
+#               detG is an integer,  <Font bold="true">
+#               G </Font> is a  list of  d linearly independant primitive  vectors in Z^d. </Font><Font background="[0,0,0]">
+</Font></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font background="[0,0,0]">signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,kzero,i,j, C,M, detC, Csigned ; 
+Nonuni:=[]; Uni:=[];
+Lplus:=L[1]; Lminus:=L[2]; Lzero:=L[3];
+ kplus:=nops(Lplus); kminus:=nops(Lminus); kzero:=nops(Lzero);
+if kplus&gt;0 then
+    for i from 1 to kplus do
+        C:=[seq(G[Lplus[j]],j=1..i-1),seq(-G[Lplus[j]],j=i+1..kplus),v,seq(G[Lminus[j]],j=1..kminus),seq(G[Lzero[j]],j=1..kzero)];<Font size="14">
+
+        </Font>detC := Determinant(Matrix(C));        
+        Csigned:=[eps*(-1)^(i+kplus),detC,C];       
+ 
+       if abs(detC)&gt;1 then
+          Nonuni:=[op(Nonuni),Csigned] else Uni:=[op(Uni),Csigned];
+        fi;
+   od;
+ fi;
+
+if kminus&gt;0 then
+   for i from 1 to kminus do
+         C:=[seq(G[Lplus[j]],j=1..kplus),-v,seq(-G[Lminus[j]],j=1..i-1),seq(G[Lminus[j]],j=i+1..kminus),seq(G[Lzero[j]],j=1..kzero)]; 
+        
+         detC := Determinant(Matrix(C));
+         Csigned:=[eps*(-1)^(i+1),detC,C];      <Font size="10">
+       
+        </Font> if abs(detC)&gt;1 then
+            Nonuni:=[op(Nonuni),Csigned] else Uni:=[op(Uni), Csigned];
+         fi;
+    od;
+ end if;
+ [Nonuni,Uni];
+ end:</Font></Text-field>
+</Input>
+</Group>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L1319" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># good_cone_dec</Font><Font bold="true" background="[0,0,0]">(eps,G)<Font size="14">
+#  Input: </Font></Font><Font background="[0,0,0]" size="14">eps = 1 or -1
+#             <Font bold="true">G </Font> is a  simplicial cone
+#</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14">#  Output: </Font><Font background="[0,0,0]" size="14"> two lists [Nonuni,Uni] as in procedure signed_decomp: </Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font background="[0,0,0]" size="14">#</Font></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font background="[0,0,0]">good_cone_dec:=proc(eps,G) local n,A,R,Output;
+n:=nops(G);  A:=Matrix([seq(G[i],i=1..n)]);   
+   if abs(Determinant(A))=1 then  Output:=[[],[[eps,Determinant(A),G]]];
+     else R:=good_vector(G);
+          Output:=signed_decomp(eps,G,R[1],R[2]);
+   fi;
+end:</Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1317" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># more_decomposition_in_cones(cones)</Font></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># Input:  cones =</Font><Font background="[0,0,0]" size="14">[cones[1],cones[2]] as in procedure signed_decomp</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># Output: </Font><Font background="[0,0,0]" size="14">[Newnonuni,Newuni] as in procedure signed_decomp</Font></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font bold="true" style="Text" family="Monospaced" background="[0,0,0]" executable="true" foreground="[255,0,0]">more_decomposition_in_cones:=proc(cones) local i,Newuni,Newnonuni,newcones:
+Newnonuni:=[]; 
+Newuni:=cones[2];
+   for i from 1 to nops(cones[1]) do
+    newcones:=good_cone_dec(cones[1][i][1],cones[1][i][3]);
+   Newnonuni:=[op(Newnonuni),op(newcones[1])];
+   Newuni:=[op(Newuni),op(newcones[2])];
+ od;
+[Newnonuni,Newuni];
+end:  <Font size="10">
+          </Font></Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1313" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># cone_dec(G)</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14">#</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># Input:  </Font><Font background="[0,0,0]" size="14">G is a &quot;simplicial cone&quot;</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true" background="[0,0,0]" size="14"># Output: A list of  terms [eps,detG,G] where</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font background="[0,0,0]" size="14">&quot;               eps =1 or -1, 
+#               detG is an integer ( hopefully 1 or -1),  <Font bold="true">
+#               G </Font> is a  &quot;simplicial cone&quot;, (hopefully unimodular)</Font></Text-field>
+<Text-field style="Text" layout="Normal"><Font background="[0,0,0]" size="14">#</Font></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"><Font background="[0,0,0]">cone_dec:=proc(G) local seed, i,ok;
+if G=[] then RETURN([[1,1,[]]]);fi:
+seed:=good_cone_dec(1,G);
+ ok:=0;
+i:=1; while ok=0  do
+seed:=more_decomposition_in_cones(seed); 
+if seed[1]=[] then
+       ok:=1;else ok:=0;i:=i+1;
+     fi;
+od;
+    RETURN(seed[2]);
+end:</Font></Text-field>
+</Input>
+</Group>
+</Section>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Projections:  </Text-field></Title>
+<Group labelreference="L5" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: W is a list of vectors  of V , [v[1],..v[d]], of lenght d. 
+Cspace =[i[1]..,i[s]],  a list of integers.
+ b is a vector of lenght d.
+Output: a vector of lenght d.</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">Math:  
+We decompose the space V in lin(Cspace)+lin(ISpace) where lin(Cspace) is the linear span  of the vectors v[i], i in Cspace, 
+and lin(ISpace) of the vectors in the complement indices. We project a vector b on lin(Cspace)</Text-field>
+<Text-field style="Text" layout="Normal">Thus we write b=b_Cspace+b_ISpace; 
+Our output is b_Cspace; </Text-field>
+<Text-field style="Text" layout="Normal">Example: <Font style="Normal">projectedvector([[1,0,0],[0,1,2],[0,1,0]],[3],[0,0,1])-&gt;[0,-1/2,0]; </Font></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">projectedvector:=proc(W,Cspace,b) local M,S,j,v,V,m; 
+M:=transpose(matrix([seq(W[i],i=1..nops(W))])); 
+S:=linsolve(M,b); 
+m:=det(M);
+for j from 1 to nops(W) do 
+   v[j]:=add(S[Cspace[i]]*W[Cspace[i]][j],i=1..nops(Cspace));
+od: 
+V:=[seq(v[j],j=1..nops(W))]; 
+end:</Text-field>
+</Input>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Projected lattice</Text-field></Title>
+<Group labelreference="L6" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"># Input:  W=[v1,v2,.., vd];  a &quot;Cone&quot;  in  R^d;
+BE CAREFUl: The vectors in W must have integral coordinates.
+ Cspace a subset of [1,2..d] of cardinal k;  
+</Text-field>
+<Text-field style="Text" layout="Normal"># Output a list [H1,H2,...,Hk] of  k vectors in R^d .</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"> 
+projectedlattice: </Text-field>
+<Text-field style="Normal" layout="Normal"><Font style="Text">Math: we
+decompose V in lin(Cspace)+lin(ISpace);
+ we project the standard lattice (that is Ze[1]+..+Ze[d], that is  Z[1,0,0..0]+... Z.[0,0,0..,1]]) 
+on lin[Cspace] which is a  subspace of dimension k  of a space of dim d.
+output: (using ihermite) a basis of k elements (of lenght d) of the projected lattice  on lin(Cspace).</Font></Text-field>
+<Text-field style="Normal" layout="Normal">We will use over and over again this list H1,H2,..., Hk, so that we will work in Z^k  (embedded in R^d via H1,H2,..Hk).
+EXAMPLE: <Font bold="true" family="Monospaced" executable="true" foreground="[255,0,0]">#projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3])-&gt;</Font><Equation executable="false" style="2D Math" input-equation="" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYlLUkjbWlHRiQ2I1EhRictSShtZmVuY2VkR0YkNiYtRiM2KC1GMDYmLUYjNiotSSNtbkdGJDYkUSIxRicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLUkjbW9HRiQ2LVEiLEYnRjwvJSZmZW5jZUdRJmZhbHNlRicvJSpzZXBhcmF0b3JHUSV0cnVlRicvJSlzdHJldGNoeUdGRS8lKnN5bW1ldHJpY0dGRS8lKGxhcmdlb3BHRkUvJS5tb3ZhYmxlbGltaXRzR0ZFLyUnYWNjZW50R0ZFLyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMzMzMzMzM2VtRictRjk2JFEiM0YnRjxGPy1GOTYkUSIwRidGPC8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRjxGPC8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJ0Y/LUYwNiYtRiM2KkZmbkY/RmZuRj9GOEZpbkZcb0Y8RjxGX29GYm9GaW5GXG9GPEY8Rl9vRmJvRjw=">LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYlLUkjbWlHRiQ2I1EhRictSShtZmVuY2VkR0YkNiYtRiM2KC1GMDYmLUYjNiotSSNtbkdGJDYkUSIxRicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLUkjbW9HRiQ2LVEiLEYnRjwvJSZmZW5jZUdRJmZhbHNlRicvJSpzZXBhcmF0b3JHUSV0cnVlRicvJSlzdHJldGNoeUdGRS8lKnN5bW1ldHJpY0dGRS8lKGxhcmdlb3BHRkUvJS5tb3ZhYmxlbGltaXRzR0ZFLyUnYWNjZW50R0ZFLyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMzMzMzMzM2VtRictRjk2JFEiM0YnRjxGPy1GOTYkUSIwRidGPC8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRjxGPC8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJ0Y/LUYwNiYtRiM2KkZmbkY/RmZuRj9GOEZpbkZcb0Y8RjxGX29GYm9GaW5GXG9GPEY8Rl9vRmJvRjw=</Equation></Text-field>
+<Text-field style="Normal" layout="Normal"></Text-field>
+<Text-field style="Normal" layout="Normal"></Text-field>
+<Text-field style="Normal" layout="Normal"></Text-field>
+<Text-field style="Normal" layout="Normal"></Text-field>
+<Text-field style="Normal" layout="Normal"></Text-field>
+<Text-field style="Normal" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L7" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List;
+d:=nops(W);
+B:=ortho_basis(d); 
+k:=nops(Cspace);
+m:=abs(Determinant(Transpose(Matrix([seq(W[i],i=1..nops(W))]))));
+for i from 1 to d do 
+ r[i]:=[seq(m*projectedvector(W,Cspace,B[i])[j],j=1..nops(W))];
+od;
+ S:=Matrix([seq(r[i],i=1..d)]);;
+ IS:=ihermite(S);
+ List:=[seq(1/m*convert(row(IS,j),list),j=1..k)];
+List;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1703" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3]);</Text-field>
+</Input>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Projected cone and projected vertex (expressed in the lattice basis) </Text-field></Title>
+<Group labelreference="L8" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: W is a Cone in Z^d and Cspace is a subset of [1,..,d] of cardinal k;
+ Output: A &quot;Cone&quot; in Z^k;
+</Text-field>
+<Text-field style="Text" layout="Normal">Be careful: our input must have integral coordinates.</Text-field>
+<Text-field style="Text" layout="Normal">The ouput then will have integral coordinates.</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">Here W is the cone and we are projecting W over lin( Cspace) and expressing it in term of the basis H_1,H_2,...,H_k of projectedlattice(W,Cspace). 
+<Font encoding="UTF-8"> Example: projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3])\342\206\222[[1,0],[0,1]]</Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L9" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">projectedconeinbasislattice:=proc(W,Cspace) local P,M,output,i,F; 
+P:=projectedlattice(W,Cspace);
+M:=Transpose(Matrix([seq(P[i],i=1..nops(P))]));
+output:=[]; 
+for i from 1 to nops(Cspace) do 
+F:=convert(LinearSolve(M,Vector(W[Cspace[i]])),list); 
+output:=[op(output),primitive_vector(F)];
+ od;
+output;
+end:
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1704" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3]);</Text-field>
+</Input>
+</Group>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 2" layout="Heading 2"></Text-field></Title>
+<Group labelreference="L1383" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">#Input; W a Cone in Z^d;</Text-field>
+<Text-field style="Text" layout="Normal">Cspace a subset of [1,2,..d] of cardinal k;
+s a vector in R^d with rational coordinates (or symbolic coordinates); 
+#Ouput: a vector in R^k with rational coordinates (or symbolic coordinates);
+</Text-field>
+<Text-field style="Text" layout="Normal">Math: Here W is the cone and we are projecting V over lin( Cspace)  using  V:=lin(Cspace) oplus
+ lin(ISpace). We express the projection of s </Text-field>
+<Text-field style="Text" layout="Normal">with respect to the basis of the projected lattice. If the ouput is [a1,a2], this means that our </Text-field>
+<Text-field style="Text" layout="Normal">projected vertex is s_Cspace=a1*H1+a2*H2 where H1,H2 is the basis of the projected lattice computed before.</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">
+Example: projectedvertexinbasislattice([[1,0,0],[0,2,1],[0,1,1]],[1,3],[s1,s2,s3]) -&gt;<Equation executable="false" style="2D Math" input-equation="" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYpLUkjbWlHRiQ2JVEjczFGJy8lJ2l0YWxpY0dRJXRydWVGJy8lLG1hdGh2YXJpYW50R1EnaXRhbGljRictSSNtb0dGJDYtUSIsRicvRjZRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRkAvJSpzeW1tZXRyaWNHRkAvJShsYXJnZW9wR0ZALyUubW92YWJsZWxpbWl0c0dGQC8lJ2FjY2VudEdGQC8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHUSwwLjMzMzMzMzNlbUYnLUYsNiktRi82I1EhRictRiw2KC1JI21uR0YkNiRRIjJGJ0Y8LUY5Ni1RMSZJbnZpc2libGVUaW1lcztGJ0Y8Rj4vRkJGQEZDRkVGR0ZJRktGTS9GUUZPLUYvNiVRI3MzRidGMkY1LyUrZm9yZWdyb3VuZEdRKlswLDAsMjU1XUYnLyUwZm9udF9zdHlsZV9uYW1lR1EqMkR+T3V0cHV0RidGPC1GOTYtUSgmbWludXM7RidGPEY+RltvRkNGRUZHRklGSy9GTlEsMC4yMjIyMjIyZW1GJy9GUUZqby1GLzYlUSNzMkYnRjJGNUZgb0Zjb0Y8RlVGYG9GY29GPEY8LyUlb3BlbkdRIltGJy8lJmNsb3NlR1EiXUYn">LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYpLUkjbWlHRiQ2JVEjczFGJy8lJ2l0YWxpY0dRJXRydWVGJy8lLG1hdGh2YXJpYW50R1EnaXRhbGljRictSSNtb0dGJDYtUSIsRicvRjZRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRkAvJSpzeW1tZXRyaWNHRkAvJShsYXJnZW9wR0ZALyUubW92YWJsZWxpbWl0c0dGQC8lJ2FjY2VudEdGQC8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHUSwwLjMzMzMzMzNlbUYnLUYsNiktRi82I1EhRictRiw2KC1JI21uR0YkNiRRIjJGJ0Y8LUY5Ni1RMSZJbnZpc2libGVUaW1lcztGJ0Y8Rj4vRkJGQEZDRkVGR0ZJRktGTS9GUUZPLUYvNiVRI3MzRidGMkY1LyUrZm9yZWdyb3VuZEdRKlswLDAsMjU1XUYnLyUwZm9udF9zdHlsZV9uYW1lR1EqMkR+T3V0cHV0RidGPC1GOTYtUSgmbWludXM7RidGPEY+RltvRkNGRUZHRklGSy9GTlEsMC4yMjIyMjIyZW1GJy9GUUZqby1GLzYlUSNzMkYnRjJGNUZgb0Zjb0Y8RlVGYG9GY29GPEY8LyUlb3BlbkdRIltGJy8lJmNsb3NlR1EiXUYn</Equation>; </Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1390" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">projectedvertexinbasislattice:=proc(W,Cspace,s) local m,P,M,output,i,F; 
+P:=projectedlattice(W,Cspace);
+if Cspace=[] then RETURN([]);fi;
+M:=Transpose(Matrix([seq(P[i],i=1..nops(P))])); 
+F:=convert(LinearSolve(M,Vector(projectedvector(W,Cspace,s))),list); 
+output:=F;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1411" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: s a vector in R^d with rational coordinates (or symbolic).</Text-field>
+<Text-field style="Text" layout="Normal">W a cone in Z^d; 
+Ispace a subset of [1,2,...,d]; </Text-field>
+<Text-field style="Text" layout="Normal">Output:  a vector in R^d
+
+Math: We decompose V in lin(CSpace) oplus lin (ISpace), (with CSpace spanned by the v|i] in the complementary indices of Ispace );</Text-field>
+<Text-field style="Text" layout="Normal"> and here we write s=s_Cspace+s_(ISpace): Here the output is
+s_(ISpace);
+Example: s_ISpace([s1,s2],[[1,0],[0,1]],[1])-&gt;[s1,0];</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1752" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">s_ISpace:=proc(s,W,ISpace) local M,s_in_cone_coord,s_ISpace;
+M:=Matrix([seq(Vector([W[i]]),i=1..nops(W))]);
+s_in_cone_coord:=convert(LinearSolve(M,Vector(s)),list);
+s_ISpace:=[seq(s_in_cone_coord[ISpace[k]],k=1..nops(ISpace))];
+special_lincomb_v(s_ISpace,[seq(W[ISpace[k]],k=1..nops(ISpace))],nops(W));
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1747" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#s_ISpace([s1,s2],[[1,0],[0,1]],[1]);</Text-field>
+</Input>
+</Group>
+</Section>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Basic functions</Text-field></Title>
+<Text-field style="Text" layout="Normal"> </Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L154" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true">Todd(z,t):  the function (e^(zt)*t/(1-exp(t))); </Font></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">Todd:=proc(z,t);
+exp(z*t)*t/(1-exp(t));
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1692" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#Todd(z,t);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1764" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: a symbolic variable or a number; Output:This gives the formal ceil function or the ceil of a number.
+EXAMPLE : ourceil(t)-&gt;ceil(t); ourceil(1/2)-&gt;1;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1848" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">ourceil:=proc(t) local u:
+if type(t,rational) then  
+ceil(t); 
+else ceil(t);
+fi;
+end:
+</Text-field>
+</Input>
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" alignment="left" firstindent="0" spacebelow="0" leftmargin="0" linespacing="0.0" initial="0" linebreak="space" rightmargin="0" bulletsuffix="" spaceabove="0" bullet="none" pagebreak-before="false">#ourceil(t);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1767" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1763" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: a symbolic variable or a number; Output:This gives the formal  fractionalpart of a function or the fractional part (betwwen 0 and 1) of a number.
+EXAMPLE : fractionalpart(t)-&gt;{t};fractionalpart(3/2);-&gt;1/2</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1849" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">fractionalpart:=proc(s) local our,T;
+if  type(s,rational) then our:=s-floor(s);
+else our:={s};
+fi;
+RETURN(our);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1762" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">fractionalpart(3/2);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output">IyIiIiIiIw==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1867" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">fmod:=proc(p,q,t) local u: 
+u:=modp(p,q);##print(u);
+MOD(u*t,q);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1984" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">ourmod:=proc(p,q,t) local our,T;
+if q=1 or modp(p,q)=0 then our:=0;
+elif type(t,integer) then our:=modp(t*p,q);
+else our:=MOD(modp(p,q)*t,q);
+fi;
+RETURN(our);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1983" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">nfractionalpart:=proc(n,p,q) local our;
+if  type(n,rational) then our:=fractionalpart(p*n/q)
+else our:=1/q*ourmod(p,q,n);
+fi;
+our;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1982" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1866" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">ourmodreal:=proc(p,q,t) local our,T;
+if type(t,integer) then our:=modp(t*p,q);fi;
+if t=0 or p=0 then our:=0; 
+else our:=MOD(p*t,q);
+fi;
+our;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1809" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">nfractionalpartreal:=proc(n,p,q) local our;
+if  type(n,rational) then our:=fractionalpart(p*n/q)
+else our:=1/q*ourmodreal(p,q,n);
+fi;
+our;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1838" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">nfractionalpartreal(1,0,1);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output">IiIh</Equation></Text-field>
+</Output>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Relative volume</Text-field></Title>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L34" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"><Font bold="true">Input</Font>: W is a Cone in R^d and Cspace is a subset of [1,..,d] of cardinal k;
+<Font bold="true">Ouput:</Font> a number;</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"><Font bold="true">Math</Font>; the volume of the Box(v[i], i not in Cspace), with respect to the intersected lattice.
+<Font bold="true">Example</Font>: volume_ISpace([[1,1],[0,1]],[1])-&gt;1;  </Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">volume_ISpace:=proc(W,ISpace) local P,M,H,MM,output;
+if ISpace=[] then output:=1; 
+else P:=matrix([seq(W[ISpace[i]],i=1..nops(ISpace))]);
+  M:=transpose(matrix(P));
+   H:=ihermite(M); 
+   MM:=matrix([seq(row(H,i),i=1..nops(ISpace))]);
+ output:=det(MM);
+fi;
+ output;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1392" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#volume_ISpace([[1,0],[0,1]],[1]); </Text-field>
+</Input>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Necessary  functions to compute S_L</Text-field></Title>
+<Group labelreference="L1354" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: s a vector in R^d;  W a &quot;Cone&quot; in R^d; Ispace a subset of [1, 2,...,d];
+xi a variable (for a list of  d symbolic variables):
+</Text-field>
+<Text-field style="Text" layout="Normal">Output: a list of two functions of xi;
+Math: #We compute integral over the affine cone s+c; sliced by subspaces parallel to ISpace of 
+exp^(xi,x) ; the answer is given as [vol*exp (&lt;q,xi&gt;, product of linear forms]</Text-field>
+<Text-field style="Text" layout="Normal">Representing separately the numerator and the denominator.</Text-field>
+<Text-field style="Text" layout="Normal">Furthermore, we enter exp as a &quot;black box&quot; EXP(.); later on we might want to replace it.</Text-field>
+<Text-field style="Text" layout="Normal">#Example functionIa([0,s], [[1,0],[1,2]],[1,2],xi)-&gt; <Equation executable="false" style="2D Math" input-equation="" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYsLUkjbW5HRiQ2JFEiMkYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RMSZJbnZpc2libGVUaW1lcztGJ0YyLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y7LyUpc3RyZXRjaHlHRjsvJSpzeW1tZXRyaWNHRjsvJShsYXJnZW9wR0Y7LyUubW92YWJsZWxpbWl0c0dGOy8lJ2FjY2VudEdGOy8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHRkotRiw2KC1JI21pR0YkNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YzUSdpdGFsaWNGJy1GNjYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YyRjlGPEY+RkBGQkZERkZGSEZLLUYjNiQtRiw2KC1GUDYlUSJzRidGU0ZWRjUtSSVtc3ViR0YkNiUtRlA2JVEjeGlGJy9GVEY7RjItRiw2JkYuLyUrZm9yZWdyb3VuZEdRKlswLDAsMjU1XUYnLyUwZm9udF9zdHlsZV9uYW1lR1EqMkR+T3V0cHV0RidGMi8lL3N1YnNjcmlwdHNoaWZ0R1EiMEYnRmVvRmhvRjJGMkZlb0Zob0YyLUY2Ni1RIixGJ0YyRjkvRj1GVUY+RkBGQkZERkZGSC9GTFEsMC4zMzMzMzMzZW1GJy1GXW82JUZfby1GLDYmLUYvNiRRIjFGJ0YyRmVvRmhvRjJGW3BGNS1GIzYkLUYsNipGZHAtRjY2LVEiK0YnRjJGOUY8Rj5GQEZCRkRGRi9GSVEsMC4yMjIyMjIyZW1GJy9GTEZjcUYuRjVGXG9GZW9GaG9GMkYyRmVvRmhvRjJGMi8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJw==">LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYsLUkjbW5HRiQ2JFEiMkYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RMSZJbnZpc2libGVUaW1lcztGJ0YyLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y7LyUpc3RyZXRjaHlHRjsvJSpzeW1tZXRyaWNHRjsvJShsYXJnZW9wR0Y7LyUubW92YWJsZWxpbWl0c0dGOy8lJ2FjY2VudEdGOy8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHRkotRiw2KC1JI21pR0YkNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YzUSdpdGFsaWNGJy1GNjYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YyRjlGPEY+RkBGQkZERkZGSEZLLUYjNiQtRiw2KC1GUDYlUSJzRidGU0ZWRjUtSSVtc3ViR0YkNiUtRlA2JVEjeGlGJy9GVEY7RjItRiw2JkYuLyUrZm9yZWdyb3VuZEdRKlswLDAsMjU1XUYnLyUwZm9udF9zdHlsZV9uYW1lR1EqMkR+T3V0cHV0RidGMi8lL3N1YnNjcmlwdHNoaWZ0R1EiMEYnRmVvRmhvRjJGMkZlb0Zob0YyLUY2Ni1RIixGJ0YyRjkvRj1GVUY+RkBGQkZERkZGSC9GTFEsMC4zMzMzMzMzZW1GJy1GXW82JUZfby1GLDYmLUYvNiRRIjFGJ0YyRmVvRmhvRjJGW3BGNS1GIzYkLUYsNipGZHAtRjY2LVEiK0YnRjJGOUY8Rj5GQEZCRkRGRi9GSVEsMC4yMjIyMjIyZW1GJy9GTEZjcUYuRjVGXG9GZW9GaG9GMkYyRmVvRmhvRjJGMi8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJw==</Equation></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">functionIa:=proc(s,W,ISpace,xi)
+local s_on_ISpace,d,T,i,y,r,out;
+d:=nops(W); 
+s_on_ISpace:=s_ISpace(s,W,ISpace);
+if nops(ISpace)=0 
+then out:=[1,1]; 
+else
+r:=volume_ISpace(W,ISpace);
+T:=1;
+for i from 1 to nops(ISpace) do 
+y:=add(W[ISpace[i]][j]*xi[j],j=1..d);
+T:=T*y;
+od;
+T:=(-1)^(nops(ISpace))*T;
+out:=[r*EXP(add(s_on_ISpace[m]*xi[m],m=1..d)),T];
+fi; 
+out;
+end: </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1756" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">For formula b we do not enter theexponential inside.
+</Text-field>
+<Text-field style="Text" layout="Normal">Input: s a vector in R^d;  W a &quot;Cone&quot; in R^d; Ispace a subset of [1, 2,...,d];
+xi a variable (for a list of  d symbolic variables):
+</Text-field>
+<Text-field style="Text" layout="Normal">Output: a list of two functions of xi;
+Math: #We compute integral over the cone with vertex at zero  sliced by subspaces parallel to ISpace of 
+exp^(xi,x) ; the answer is given as [vol, product of linear forms]</Text-field>
+<Text-field style="Text" layout="Normal">Representing separately the numerator and the denominator.</Text-field>
+<Text-field style="Text" layout="Normal">Furthermore, we enter exp as a &quot;black box&quot; EXP(); later on we might want to replace it.</Text-field>
+<Text-field style="Text" layout="Normal">#Example functionIb([0,s], [[1,0],[1,2]],[1,2],xi)-&gt; <Equation executable="false" style="2D Math" input-equation="" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYqLUkjbW5HRiQ2JFEiMkYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIixGJ0YyLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR1EldHJ1ZUYnLyUpc3RyZXRjaHlHRjsvJSpzeW1tZXRyaWNHRjsvJShsYXJnZW9wR0Y7LyUubW92YWJsZWxpbWl0c0dGOy8lJ2FjY2VudEdGOy8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHUSwwLjMzMzMzMzNlbUYnLUklbXN1YkdGJDYlLUkjbWlHRiQ2JVEjeGlGJy8lJ2l0YWxpY0dGO0YyLUYsNiYtRi82JFEiMUYnRjIvJStmb3JlZ3JvdW5kR1EqWzAsMCwyNTVdRicvJTBmb250X3N0eWxlX25hbWVHUSoyRH5PdXRwdXRGJ0YyLyUvc3Vic2NyaXB0c2hpZnRHUSIwRictRjY2LVExJkludmlzaWJsZVRpbWVzO0YnRjJGOS9GPUY7Rj9GQUZDRkVGR0ZJL0ZNRkstRiM2JC1GLDYqRk8tRjY2LVEiK0YnRjJGOUZjb0Y/RkFGQ0ZFRkcvRkpRLDAuMjIyMjIyMmVtRicvRk1GXXBGLkZgby1GUDYlRlItRiw2JkYuRmduRmpuRjJGXW9GZ25Gam5GMkYyRmduRmpuRjJGMi8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJw==">LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYqLUkjbW5HRiQ2JFEiMkYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIixGJ0YyLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR1EldHJ1ZUYnLyUpc3RyZXRjaHlHRjsvJSpzeW1tZXRyaWNHRjsvJShsYXJnZW9wR0Y7LyUubW92YWJsZWxpbWl0c0dGOy8lJ2FjY2VudEdGOy8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHUSwwLjMzMzMzMzNlbUYnLUklbXN1YkdGJDYlLUkjbWlHRiQ2JVEjeGlGJy8lJ2l0YWxpY0dGO0YyLUYsNiYtRi82JFEiMUYnRjIvJStmb3JlZ3JvdW5kR1EqWzAsMCwyNTVdRicvJTBmb250X3N0eWxlX25hbWVHUSoyRH5PdXRwdXRGJ0YyLyUvc3Vic2NyaXB0c2hpZnRHUSIwRictRjY2LVExJkludmlzaWJsZVRpbWVzO0YnRjJGOS9GPUY7Rj9GQUZDRkVGR0ZJL0ZNRkstRiM2JC1GLDYqRk8tRjY2LVEiK0YnRjJGOUZjb0Y/RkFGQ0ZFRkcvRkpRLDAuMjIyMjIyMmVtRicvRk1GXXBGLkZgby1GUDYlRlItRiw2JkYuRmduRmpuRjJGXW9GZ25Gam5GMkYyRmduRmpuRjJGMi8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJw==</Equation></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">
+
+
+
+</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">functionIb:=proc(s,W,ISpace,xi)
+local d,T,i,y,r,out;
+d:=nops(W);
+if nops(ISpace)=0 
+then out:=[1,1]; 
+else
+r:=volume_ISpace(W,ISpace);
+T:=1;
+for i from 1 to nops(ISpace) do 
+y:=add(W[ISpace[i]][j]*xi[j],j=1..d);
+T:=T*y;
+od;
+T:=(-1)^(nops(ISpace))*T;
+out:=[r,T];
+fi; 
+out;
+end: </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1693" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">functionIb([0,s], [[1,0],[1,2]],[1,2],xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYnLUkjbW5HRiQ2JFEiMkYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIixGJ0YyLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR1EldHJ1ZUYnLyUpc3RyZXRjaHlHRjsvJSpzeW1tZXRyaWNHRjsvJShsYXJnZW9wR0Y7LyUubW92YWJsZWxpbWl0c0dGOy8lJ2FjY2VudEdGOy8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHUSwwLjMzMzMzMzNlbUYnLUYsNiYtSSVtc3ViR0YkNiUtSSNtaUdGJDYlUScmIzk1ODtGJy8lJ2l0YWxpY0dGO0YyLUYsNiUtRi82JFEiMUYnRjIvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRjIvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1GNjYtUTEmSW52aXNpYmxlVGltZXM7RidGMkY5L0Y9RjtGP0ZBRkNGRUZHRkkvRk1GSy1GIzYkLUYsNiZGUS1GNjYtUSIrRidGMkY5RmJvRj9GQUZDRkVGRy9GSlEsMC4yMjIyMjIyZW1GJy9GTUZccC1GLDYmRi5GX28tRlI2JUZULUYsNiVGLkZpbkYyRlxvRjJGMkYyRjJGaW5GMkYyLyUlb3BlbkdRIltGJy8lJmNsb3NlR1EiXUYn">NyQiIiMqJiZJI3hpRzYiNiMiIiJGKSwmRiVGKSZGJjYjRiNGI0Yp</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1691" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expressions (or just z,x), W a cone in R^d.</Text-field>
+<Text-field style="Text" layout="Normal">Output: a symbolic expression.</Text-field>
+<Text-field style="Text" layout="Normal">Math: Our cone has generator w1,w2,...,wd. </Text-field>
+<Text-field style="Text" layout="Normal">We replace x by &lt;x,w_i&gt; and we compute  the product of Todd(z_i,&lt;x,w_i&gt;); 
+#Example: prod_Todd(z,[[1,0,0],[1,2,1]],x)-&gt; <Equation executable="false" style="2D Math" input-equation="" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYqLUkjbWlHRiQ2I1EhRictRiM2KC1GLDYlUSVUT0RERicvJSdpdGFsaWNHUSV0cnVlRicvJSxtYXRodmFyaWFudEdRJ2l0YWxpY0YnLUkjbW9HRiQ2LVEwJkFwcGx5RnVuY3Rpb247RicvRjhRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0ZCLyUpc3RyZXRjaHlHRkIvJSpzeW1tZXRyaWNHRkIvJShsYXJnZW9wR0ZCLyUubW92YWJsZWxpbWl0c0dGQi8lJ2FjY2VudEdGQi8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHRlEtSShtZmVuY2VkR0YkNiQtRiM2KC1JJW1zdWJHRiQ2JS1GLDYlUSJ6RidGNEY3LUYjNiYtSSNtbkdGJDYkUSIxRidGPi8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRj4vJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1GOzYtUSIsRidGPkZAL0ZERjZGRUZHRklGS0ZNRk8vRlNRLDAuMzMzMzMzM2VtRictRlo2JS1GLDYlUSJ4RidGNEY3RmluRmVvRl9vRmJvRj5GPkZfb0Zib0Y+LUY7Ni1RMSZJbnZpc2libGVUaW1lcztGJ0Y+RkBGQ0ZFRkdGSUZLRk1GT0ZSLUYjNihGMUY6LUZVNiQtRiM2KS1GWjYlRmZuLUYjNiYtRlxvNiRRIjJGJ0Y+Rl9vRmJvRj5GZW9GaG8tRiM2KkZecC1GOzYtUSIrRidGPkZARkNGRUZHRklGS0ZNL0ZQUSwwLjIyMjIyMjJlbUYnL0ZTRmlxLUYjNihGYHFGY3AtRlo2JUZgcEZecUZlb0Zfb0Zib0Y+RmVxLUZaNiVGYHAtRiM2Ji1GXG82JFEiM0YnRj5GX29GYm9GPkZlb0Zfb0Zib0Y+RitGX29GYm9GPkY+Rl9vRmJvRj5GK0Zfb0Zib0Y+">LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYqLUkjbWlHRiQ2I1EhRictRiM2KC1GLDYlUSVUT0RERicvJSdpdGFsaWNHUSV0cnVlRicvJSxtYXRodmFyaWFudEdRJ2l0YWxpY0YnLUkjbW9HRiQ2LVEwJkFwcGx5RnVuY3Rpb247RicvRjhRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0ZCLyUpc3RyZXRjaHlHRkIvJSpzeW1tZXRyaWNHRkIvJShsYXJnZW9wR0ZCLyUubW92YWJsZWxpbWl0c0dGQi8lJ2FjY2VudEdGQi8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHRlEtSShtZmVuY2VkR0YkNiQtRiM2KC1JJW1zdWJHRiQ2JS1GLDYlUSJ6RidGNEY3LUYjNiYtSSNtbkdGJDYkUSIxRidGPi8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRj4vJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1GOzYtUSIsRidGPkZAL0ZERjZGRUZHRklGS0ZNRk8vRlNRLDAuMzMzMzMzM2VtRictRlo2JS1GLDYlUSJ4RidGNEY3RmluRmVvRl9vRmJvRj5GPkZfb0Zib0Y+LUY7Ni1RMSZJbnZpc2libGVUaW1lcztGJ0Y+RkBGQ0ZFRkdGSUZLRk1GT0ZSLUYjNihGMUY6LUZVNiQtRiM2KS1GWjYlRmZuLUYjNiYtRlxvNiRRIjJGJ0Y+Rl9vRmJvRj5GZW9GaG8tRiM2KkZecC1GOzYtUSIrRidGPkZARkNGRUZHRklGS0ZNL0ZQUSwwLjIyMjIyMjJlbUYnL0ZTRmlxLUYjNihGYHFGY3AtRlo2JUZgcEZecUZlb0Zfb0Zib0Y+RmVxLUZaNiVGYHAtRiM2Ji1GXG82JFEiM0YnRj5GX29GYm9GPkZlb0Zfb0Zib0Y+RitGX29GYm9GPkY+Rl9vRmJvRj5GK0Zfb0Zib0Y+</Equation></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1705" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">prod_Todd:=proc(z,W,xi) local d,E,i,T,y;
+d:=nops(W);
+#ASSERT(d = nops(z) and d = nops(xi),
+#       &quot;z, x, W need to be of the same length&quot;);
+T:=1;
+for i from 1 to d do 
+#ASSERT(nops(W[i])=nops(xi),&quot;W[i], xi need to be of the same length&quot;);
+y:=add(W[i][j]*xi[j],j=1..nops(W[i]));
+T:=T*TODD(z[i],y);
+od;
+T;
+end: </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1694" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">prod_Todd(z,[[1,0,0],[1,2,1]],xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUYjNictSSNtaUdGJDYlUSVUT0RERicvJSdpdGFsaWNHUSV0cnVlRicvJSxtYXRodmFyaWFudEdRJ2l0YWxpY0YnLUkjbW9HRiQ2LVEwJkFwcGx5RnVuY3Rpb247RicvRjVRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y/LyUpc3RyZXRjaHlHRj8vJSpzeW1tZXRyaWNHRj8vJShsYXJnZW9wR0Y/LyUubW92YWJsZWxpbWl0c0dGPy8lJ2FjY2VudEdGPy8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHRk4tSShtZmVuY2VkR0YkNiQtRiM2Jy1JJW1zdWJHRiQ2JS1GLjYlUSJ6RidGMUY0LUYjNiUtSSNtbkdGJDYkUSIxRidGOy8lK2ZvcmVncm91bmRHUShbMCwwLDBdRidGOy8lL3N1YnNjcmlwdHNoaWZ0R1EiMEYnLUY4Ni1RIixGJ0Y7Rj0vRkFGM0ZCRkRGRkZIRkpGTC9GUFEsMC4zMzMzMzMzZW1GJy1GVzYlLUYuNiVRJyYjOTU4O0YnL0YyRj9GO0ZmbkZfb0Zcb0Y7RjtGXG9GOy1GODYtUTEmSW52aXNpYmxlVGltZXM7RidGO0Y9RkBGQkZERkZGSEZKRkxGTy1GIzYnRi1GNy1GUjYkLUYjNictRlc2JUZZLUYjNiUtRmluNiRRIjJGJ0Y7RlxvRjtGX29GYm8tRiM2KEZoby1GODYtUSIrRidGO0Y9RkBGQkZERkZGSEZKL0ZNUSwwLjIyMjIyMjJlbUYnL0ZQRmRxLUYjNiZGW3FGXnAtRlc2JUZqb0ZpcEZfb0Y7RmBxLUZXNiVGam8tRiM2JS1GaW42JFEiM0YnRjtGXG9GO0Zfb0Y7RlxvRjtGO0Zcb0Y7Rjs=">KiYtSSVUT0RERzYiNiQmSSJ6R0YlNiMiIiImSSN4aUdGJUYpRiotRiQ2JCZGKDYjIiIjLChGK0YqJkYsRjBGMSZGLDYjIiIkRipGKg==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L159" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">Input: z =[z1,...,zd], xi=[xi1,xi2,..,xid];  two lists of symbolic expression, or letters (z,xi); W a cone in R^d.</Text-field>
+<Text-field style="Text" layout="Normal">Output: a list of two symbolic expressions [P1,Q1].</Text-field>
+<Text-field style="Text" layout="Normal">Math: P1 is the   product of Todd(z_i,&lt;xi,w_i&gt;), while Q1 is  the product of the (&lt;xi,wi&gt;) 
+Example: functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi) <Equation executable="false" style="2D Math" input-equation="" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYlLUkjbW9HRiQ2LlEoJnNyYXJyO0YnLyUwZm9udF9zdHlsZV9uYW1lR1ElVGV4dEYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy8lJmZlbmNlR1EmZmFsc2VGJy8lKnNlcGFyYXRvckdGNy8lKXN0cmV0Y2h5R0Y3LyUqc3ltbWV0cmljR0Y3LyUobGFyZ2VvcEdGNy8lLm1vdmFibGVsaW1pdHNHRjcvJSdhY2NlbnRHRjcvJSdsc3BhY2VHUSYwLjBlbUYnLyUncnNwYWNlR0ZGLUkobWZlbmNlZEdGJDYmLUYjNjEtSSNtaUdGJDYjUSFGJy1GIzYoLUZPNiVRJVRPRERGJy8lJ2l0YWxpY0dRJXRydWVGJy9GM1EnaXRhbGljRictRiw2LVEwJkFwcGx5RnVuY3Rpb247RidGMkY1RjhGOkY8Rj5GQEZCRkRGRy1GSjYkLUYjNigtSSVtc3ViR0YkNiUtRk82JVEiekYnRldGWi1GIzYmLUkjbW5HRiQ2JFEiMUYnRjIvJStmb3JlZ3JvdW5kR1EqWzAsMCwyNTVdRicvRjBRKjJEfk91dHB1dEYnRjIvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1GLDYtUSIsRidGMkY1L0Y5RllGOkY8Rj5GQEZCRkQvRkhRLDAuMzMzMzMzM2VtRictRl5vNiUtRk82JVEnJiM5NTg7RicvRlhGN0YyLUYjNiVGZW9GV0ZaRl5wRmlvRlxwRjJGMkZpb0ZccEYyLUYsNi1RMSZJbnZpc2libGVUaW1lcztGJ0YyRjVGOEY6RjxGPkZARkJGREZHLUYjNihGVEZmbi1GSjYkLUYjNi4tRl5vNiVGYG8tRiM2Ji1GZm82JFEiMkYnRjJGaW9GXHBGMkZecEZhcC1GXm82JS1GTzYlUSN4aUYnRlxxRjJGY29GXnAtRiw2LVEiK0YnRjJGNUY4RjpGPEY+RkBGQi9GRVEsMC4yMjIyMjIyZW1GJy9GSEZoci1GXm82JUZhckZqcUZecEZkckZcckZfcS1GXm82JUZhci1GIzYmLUZmbzYkUSIzRidGMkZpb0ZccEYyRl5wRmlvRlxwRjJGMkZpb0ZccEYyRl9xLUYjNihGVEZmbi1GSjYkLUYjNiwtRl5vNiVGYG9GXnNGXnBGYXAtRmZvNiRRIjVGJ0YyRl9xRmpyRmRyRlxzRmlvRlxwRjJGMkZpb0ZccEYyRmFwRl9yRl9xLUZKNiQtRiM2LEZfckZkckZqckZkckZcckZfcUZcc0Zpb0ZccEYyRjJGX3EtRko2JC1GIzYqRlt0Rl9xRmpyRmRyRlxzRmlvRlxwRjJGMkZpb0ZccEYyRjIvJSVvcGVuR1EiW0YnLyUmY2xvc2VHUSJdRidGMg==">LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYlLUkjbW9HRiQ2LlEoJnNyYXJyO0YnLyUwZm9udF9zdHlsZV9uYW1lR1ElVGV4dEYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy8lJmZlbmNlR1EmZmFsc2VGJy8lKnNlcGFyYXRvckdGNy8lKXN0cmV0Y2h5R0Y3LyUqc3ltbWV0cmljR0Y3LyUobGFyZ2VvcEdGNy8lLm1vdmFibGVsaW1pdHNHRjcvJSdhY2NlbnRHRjcvJSdsc3BhY2VHUSYwLjBlbUYnLyUncnNwYWNlR0ZGLUkobWZlbmNlZEdGJDYmLUYjNjEtSSNtaUdGJDYjUSFGJy1GIzYoLUZPNiVRJVRPRERGJy8lJ2l0YWxpY0dRJXRydWVGJy9GM1EnaXRhbGljRictRiw2LVEwJkFwcGx5RnVuY3Rpb247RidGMkY1RjhGOkY8Rj5GQEZCRkRGRy1GSjYkLUYjNigtSSVtc3ViR0YkNiUtRk82JVEiekYnRldGWi1GIzYmLUkjbW5HRiQ2JFEiMUYnRjIvJStmb3JlZ3JvdW5kR1EqWzAsMCwyNTVdRicvRjBRKjJEfk91dHB1dEYnRjIvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1GLDYtUSIsRidGMkY1L0Y5RllGOkY8Rj5GQEZCRkQvRkhRLDAuMzMzMzMzM2VtRictRl5vNiUtRk82JVEnJiM5NTg7RicvRlhGN0YyLUYjNiVGZW9GV0ZaRl5wRmlvRlxwRjJGMkZpb0ZccEYyLUYsNi1RMSZJbnZpc2libGVUaW1lcztGJ0YyRjVGOEY6RjxGPkZARkJGREZHLUYjNihGVEZmbi1GSjYkLUYjNi4tRl5vNiVGYG8tRiM2Ji1GZm82JFEiMkYnRjJGaW9GXHBGMkZecEZhcC1GXm82JS1GTzYlUSN4aUYnRlxxRjJGY29GXnAtRiw2LVEiK0YnRjJGNUY4RjpGPEY+RkBGQi9GRVEsMC4yMjIyMjIyZW1GJy9GSEZoci1GXm82JUZhckZqcUZecEZkckZcckZfcS1GXm82JUZhci1GIzYmLUZmbzYkUSIzRidGMkZpb0ZccEYyRl5wRmlvRlxwRjJGMkZpb0ZccEYyRl9xLUYjNihGVEZmbi1GSjYkLUYjNiwtRl5vNiVGYG9GXnNGXnBGYXAtRmZvNiRRIjVGJ0YyRl9xRmpyRmRyRlxzRmlvRlxwRjJGMkZpb0ZccEYyRmFwRl9yRl9xLUZKNiQtRiM2LEZfckZkckZqckZkckZcckZfcUZcc0Zpb0ZccEYyRjJGX3EtRko2JC1GIzYqRlt0Rl9xRmpyRmRyRlxzRmlvRlxwRjJGMkZpb0ZccEYyRjIvJSVvcGVuR1EiW0YnLyUmY2xvc2VHUSJdRidGMg==</Equation></Text-field>
+<Text-field style="Text" layout="Normal">; </Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1706" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">functionS:=proc(z,W,xi) local P,Q,y,i;
+P:=prod_Todd(z,W,xi);
+Q:=1;
+for i from 1 to nops(W) do
+#ASSERT(nops(W[i])=nops(x),&quot;W[i], x need to be of the same length&quot;);
+ y:=add(W[i][j]*xi[j],j=1..nops(W[i]));
+ Q:=Q*y;
+od;
+[P,Q];
+end: </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1695" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYnLUYsNigtRiw2Jy1JI21pR0YkNiVRJVRPRERGJy8lJ2l0YWxpY0dRJXRydWVGJy8lLG1hdGh2YXJpYW50R1EnaXRhbGljRictSSNtb0dGJDYtUTAmQXBwbHlGdW5jdGlvbjtGJy9GOlEnbm9ybWFsRicvJSZmZW5jZUdRJmZhbHNlRicvJSpzZXBhcmF0b3JHRkQvJSlzdHJldGNoeUdGRC8lKnN5bW1ldHJpY0dGRC8lKGxhcmdlb3BHRkQvJS5tb3ZhYmxlbGltaXRzR0ZELyUnYWNjZW50R0ZELyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdGUy1GIzYkLUYsNictSSVtc3ViR0YkNiUtRjM2JVEiekYnRjZGOS1GLDYlLUkjbW5HRiQ2JFEiMUYnRkAvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRkAvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1GPTYtUSIsRidGQEZCL0ZGRjhGR0ZJRktGTUZPRlEvRlVRLDAuMzMzMzMzM2VtRictRmVuNiUtRjM2JVEnJiM5NTg7RicvRjdGREZARmpuRmNvRmBvRkBGQEZgb0ZALUY9Ni1RMSZJbnZpc2libGVUaW1lcztGJ0ZARkJGRUZHRklGS0ZNRk9GUUZULUYsNidGMkY8LUYjNiQtRiw2Jy1GZW42JUZnbi1GLDYlLUZdbzYkUSIyRidGQEZgb0ZARmNvRmZvLUYsNihGXHAtRj02LVEiK0YnRkBGQkZFRkdGSUZLRk1GTy9GUlEsMC4yMjIyMjIyZW1GJy9GVUZocS1GZW42JUZecEZdcUZjb0ZkcS1GLDYmRl9xRmJwLUZlbjYlRl5wLUYsNiUtRl1vNiRRIjNGJ0ZARmBvRkBGY29GQEZARmBvRkBGQEZgb0ZARmJwLUYsNidGMkY8LUYjNiQtRiw2Jy1GZW42JUZnbkZgckZjb0Zmby1GLDYmLUYsNiYtRl1vNiRRIjVGJ0ZARmJwRmpxRkBGZHFGXnJGQEZgb0ZARkBGYG9GQEZARmZvLUYsNihGXHBGYnAtRiM2JEZicUZARmJwLUYjNiRGXXNGQEZARmBvRkBGQC8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJw==">NyQqKC1JJVRPRERHNiI2JCZJInpHRiY2IyIiIiZJI3hpR0YmRipGKy1GJTYkJkYpNiMiIiMsKEYsRismRi1GMUYrJkYtNiMiIiRGMkYrLUYlNiQmRilGNiwmRjQiIiZGNUYrRisqKEYsRitGM0YrRjtGKw==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L46" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">Input: a Cone W;  Cspace a subset of [1..d] of cardinal k; xi a letter:
+Ouput: a list of  k linear forms in variables xi[1],...xi[d].</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"> Math: 
+We write R^d=lin(Cspace)+lin(ISpace). We computed a basis H1,H2...H_k of the projection of the lattice Z^d in lin(Cspace).
+Thus the output is the list i &lt;xi,H_i&gt; where H_i are the basis vectors of the projected lattice.  
+
+Example: changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],xi)-&gt;<Equation executable="false" style="2D Math" input-equation="" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYrLUklbXN1YkdGJDYlLUkjbWlHRiQ2JVEjeGlGJy8lJ2l0YWxpY0dRJmZhbHNlRicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLUYsNiYtSSNtbkdGJDYkUSIxRidGOC8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRjgvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1JI21vR0YkNi1RIixGJ0Y4LyUmZmVuY2VHRjcvJSpzZXBhcmF0b3JHUSV0cnVlRicvJSlzdHJldGNoeUdGNy8lKnN5bW1ldHJpY0dGNy8lKGxhcmdlb3BHRjcvJS5tb3ZhYmxlbGltaXRzR0Y3LyUnYWNjZW50R0Y3LyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMzMzMzMzM2VtRictRiw2KC1JJm1mcmFjR0YkNihGPS1GPjYkUSI5RidGOC8lLmxpbmV0aGlja25lc3NHRkAvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGaW8vJSliZXZlbGxlZEdGNy1GSzYtUTEmSW52aXNpYmxlVGltZXM7RidGOEZOL0ZRRjdGU0ZVRldGWUZlbkZnbi9GW29GaW4tRi82JUYxLUYsNiYtRj42JFEiMkYnRjhGQUZERjhGR0ZBRkRGOC1GSzYtUSIrRidGOEZORmFwRlNGVUZXRllGZW4vRmhuUSwwLjIyMjIyMjJlbUYnL0Zbb0ZecS1GLDYoLUZgbzYoRmdwRmJvRmVvRmdvRmpvRlxwRl5wLUYvNiVGMS1GLDYmLUY+NiRRIjNGJ0Y4RkFGREY4RkdGQUZERjgtRjI2I1EhRidGQUZERjhGOC8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJw==">LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYrLUklbXN1YkdGJDYlLUkjbWlHRiQ2JVEjeGlGJy8lJ2l0YWxpY0dRJmZhbHNlRicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLUYsNiYtSSNtbkdGJDYkUSIxRidGOC8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRjgvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1JI21vR0YkNi1RIixGJ0Y4LyUmZmVuY2VHRjcvJSpzZXBhcmF0b3JHUSV0cnVlRicvJSlzdHJldGNoeUdGNy8lKnN5bW1ldHJpY0dGNy8lKGxhcmdlb3BHRjcvJS5tb3ZhYmxlbGltaXRzR0Y3LyUnYWNjZW50R0Y3LyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMzMzMzMzM2VtRictRiw2KC1JJm1mcmFjR0YkNihGPS1GPjYkUSI5RidGOC8lLmxpbmV0aGlja25lc3NHRkAvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGaW8vJSliZXZlbGxlZEdGNy1GSzYtUTEmSW52aXNpYmxlVGltZXM7RidGOEZOL0ZRRjdGU0ZVRldGWUZlbkZnbi9GW29GaW4tRi82JUYxLUYsNiYtRj42JFEiMkYnRjhGQUZERjhGR0ZBRkRGOC1GSzYtUSIrRidGOEZORmFwRlNGVUZXRllGZW4vRmhuUSwwLjIyMjIyMjJlbUYnL0Zbb0ZecS1GLDYoLUZgbzYoRmdwRmJvRmVvRmdvRmpvRlxwRl5wLUYvNiVGMS1GLDYmLUY+NiRRIjNGJ0Y4RkFGREY4RkdGQUZERjgtRjI2I1EhRidGQUZERjhGOC8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJw==</Equation>;
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1732" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">changeofcoordinates:=proc(W,Cspace,xi) local H,newxi,i,d; 
+H:=projectedlattice(W,Cspace);
+d:=nops(W[1]);
+newxi:=[];
+for i from 1 to nops(H) do 
+newxi:=[op(newxi),add(xi[j]*H[i][j],j=1..d)];
+od; 
+newxi;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1696" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYnLUklbXN1YkdGJDYlLUkjbWlHRiQ2JVEnJiM5NTg7RicvJSdpdGFsaWNHUSZmYWxzZUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1GLDYlLUkjbW5HRiQ2JFEiMUYnRjgvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRjgvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1JI21vR0YkNi1RIixGJ0Y4LyUmZmVuY2VHRjcvJSpzZXBhcmF0b3JHUSV0cnVlRicvJSlzdHJldGNoeUdGNy8lKnN5bW1ldHJpY0dGNy8lKGxhcmdlb3BHRjcvJS5tb3ZhYmxlbGltaXRzR0Y3LyUnYWNjZW50R0Y3LyUnbHNwYWNlR1EmMC4wZW1GJy8lJ3JzcGFjZUdRLDAuMzMzMzMzM2VtRictRiw2Ji1GLDYnLUkmbWZyYWNHRiQ2KEY9LUY+NiRRIjlGJ0Y4LyUubGluZXRoaWNrbmVzc0dGQC8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0Zoby8lKWJldmVsbGVkR0Y3LUZINi1RMSZJbnZpc2libGVUaW1lcztGJ0Y4RksvRk5GN0ZQRlJGVEZWRlhGWi9GaG5GZm4tRiw2JC1GLzYlRjEtRiw2JS1GPjYkUSIyRidGOEZBRjhGREY4RkFGOC1GSDYtUSIrRidGOEZLRmBwRlBGUkZURlZGWC9GZW5RLDAuMjIyMjIyMmVtRicvRmhuRl9xLUYsNictRl9vNihGaHBGYW9GZG9GZm9GaW9GW3BGXXAtRiw2JC1GLzYlRjEtRiw2JS1GPjYkUSIzRidGOEZBRjhGREY4RkFGOEY4RkFGOEY4LyUlb3BlbkdRIltGJy8lJmNsb3NlR1EiXUYn">NyQmSSN4aUc2IjYjIiIiLCYmRiQ2IyIiIyNGJyIiKiZGJDYjIiIkI0YrRi0=</Equation></Text-field>
+</Output>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">THE FUNCTION (S^Ispace) for a cone. Here we sum  the integrals of e^{xi,x}
+ on slices of the cone
+parallel to  L generated by w_i with i in Ispace.
+WE GIVE THE TWO FORMULAE A) and B)</Text-field></Title>
+<Text-field style="Text" layout="Normal">THESE ARE  THE MAIN  TECHNICAL PROCEDURES.</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Group labelreference="L1414" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: s a vector in Q^d,  or a symbolic variable ; BUT THEN IT HAS TO BE ENTERED AS A LIST OF  d SYMBOLIC VARIABLES</Text-field>
+<Text-field style="Text" layout="Normal">s:=[s1,s2,...,sd]; W a cone in Z^d, Ispace a subset of [1,...,d]</Text-field>
+<Text-field style="Text" layout="Normal">xi a list of lenght d  of variable (or xi);
+</Text-field>
+<Text-field style="Text" layout="Normal">The output is a function of xi[i].</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">The subspace $L$ where we integrate is the following face of W: L is the linear span of </Text-field>
+<Text-field style="Text" layout="Normal">&lt;w[j]&gt;, with j running of Ispace. (thus Ispace should be &quot;big&quot;)</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">Here we take out a function of s, ceil</Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLE: S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi)-&gt;  <Equation executable="false" style="2D Math" input-equation="" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNiotSSNtaUdGJDYjUSFGJy1GIzYoLUZMNiVRJVRPRERGJy8lJ2l0YWxpY0dRJXRydWVGJy9GMFEnaXRhbGljRictRiw2LVEwJkFwcGx5RnVuY3Rpb247RidGL0YyRjVGN0Y5RjtGPUY/L0ZCUSYwLjBlbUYnL0ZFRmduLUkobWZlbmNlZEdGJDYkLUYjNipGSy1GIzYoLUZMNiVRJWNlaWxGJy9GVUY0Ri9GWS1Gam42JC1GIzYmLUZMNiVRI3MyRidGVEZXLyUrZm9yZWdyb3VuZEdRKlswLDAsMjU1XUYnLyUwZm9udF9zdHlsZV9uYW1lR1EqMkR+T3V0cHV0RidGL0YvRltwRl5wRi8tRiw2LVEiLEYnRi9GMi9GNkZWRjdGOUY7Rj1GP0Zmbi9GRVEsMC4zMzMzMzMzZW1GJy1GIzYpRkstRiM2KS1GRzYoLUkjbW5HRiQ2JFEiMUYnRi8tRl5xNiRRIjJGJ0YvLyUubGluZXRoaWNrbmVzc0dGYHEvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGaHEvJSliZXZlbGxlZEdGNC1GLDYtUTEmSW52aXNpYmxlVGltZXM7RidGL0YyRjVGN0Y5RjtGPUY/RmZuRmhuLUYjNiYtSSVtc3ViR0YkNiUtRkw2JVElJnhpO0YnRmNvRi8tRiM2JkZdcUZbcEZecEYvLyUvc3Vic2NyaXB0c2hpZnRHUSIwRidGW3BGXnBGL0ZLRltwRl5wRi8tRiw2LVEiK0YnRi9GMkY1RjdGOUY7Rj1GP0ZBRkQtRmNyNiVGZXItRiM2JkZhcUZbcEZecEYvRmpyRltwRl5wRi9GS0ZbcEZecEYvRi9GW3BGXnBGL0Zdci1GIzYoLUZMNiVRJEVYUEYnRlRGV0ZZLUZqbjYkLUYjNihGSy1GIzYoLUZqbjYkLUYjNiktRkw2JVEjczFGJ0ZURlctRiw2LVEoJm1pbnVzO0YnRi9GMkY1RjdGOUY7Rj1GP0ZBRkQtRiM2KUZbcUZdckZmb0ZLRltwRl5wRi9GS0ZbcEZecEYvRi9GXXJGYnJGW3BGXnBGL0ZLRltwRl5wRi9GL0ZbcEZecEYvRktGW3BGXnBGLy1GIzYoLUZqbjYkRmdwRi9GXXJGYnJGW3BGXnBGL0ZkcUZmcUZpcUZbckZbcEZecEYv">LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNiotSSNtaUdGJDYjUSFGJy1GIzYoLUZMNiVRJVRPRERGJy8lJ2l0YWxpY0dRJXRydWVGJy9GMFEnaXRhbGljRictRiw2LVEwJkFwcGx5RnVuY3Rpb247RidGL0YyRjVGN0Y5RjtGPUY/L0ZCUSYwLjBlbUYnL0ZFRmduLUkobWZlbmNlZEdGJDYkLUYjNipGSy1GIzYoLUZMNiVRJWNlaWxGJy9GVUY0Ri9GWS1Gam42JC1GIzYmLUZMNiVRI3MyRidGVEZXLyUrZm9yZWdyb3VuZEdRKlswLDAsMjU1XUYnLyUwZm9udF9zdHlsZV9uYW1lR1EqMkR+T3V0cHV0RidGL0YvRltwRl5wRi8tRiw2LVEiLEYnRi9GMi9GNkZWRjdGOUY7Rj1GP0Zmbi9GRVEsMC4zMzMzMzMzZW1GJy1GIzYpRkstRiM2KS1GRzYoLUkjbW5HRiQ2JFEiMUYnRi8tRl5xNiRRIjJGJ0YvLyUubGluZXRoaWNrbmVzc0dGYHEvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGaHEvJSliZXZlbGxlZEdGNC1GLDYtUTEmSW52aXNpYmxlVGltZXM7RidGL0YyRjVGN0Y5RjtGPUY/RmZuRmhuLUYjNiYtSSVtc3ViR0YkNiUtRkw2JVElJnhpO0YnRmNvRi8tRiM2JkZdcUZbcEZecEYvLyUvc3Vic2NyaXB0c2hpZnRHUSIwRidGW3BGXnBGL0ZLRltwRl5wRi8tRiw2LVEiK0YnRi9GMkY1RjdGOUY7Rj1GP0ZBRkQtRmNyNiVGZXItRiM2JkZhcUZbcEZecEYvRmpyRltwRl5wRi9GS0ZbcEZecEYvRi9GW3BGXnBGL0Zdci1GIzYoLUZMNiVRJEVYUEYnRlRGV0ZZLUZqbjYkLUYjNihGSy1GIzYoLUZqbjYkLUYjNiktRkw2JVEjczFGJ0ZURlctRiw2LVEoJm1pbnVzO0YnRi9GMkY1RjdGOUY7Rj1GP0ZBRkQtRiM2KUZbcUZdckZmb0ZLRltwRl5wRi9GS0ZbcEZecEYvRi9GXXJGYnJGW3BGXnBGL0ZLRltwRl5wRi9GL0ZbcEZecEYvRktGW3BGXnBGLy1GIzYoLUZqbjYkRmdwRi9GXXJGYnJGW3BGXnBGL0ZkcUZmcUZpcUZbckZbcEZecEYv</Equation></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1733" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">S_Ispace_Coneformulaa:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_prime_Cspace,M,newxi,dimL,g,testrank,newP,
+s_Cspace_in_lattice_coord,news;
+Cspace:=ComplementList(ISpace,nops(W)); 
+s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);  
+function_on_ISpace:=functionIa(s,W,ISpace,xi);
+#from here express in terms of the basis lattice for projected cone.
+W_projected:=projectedconeinbasislattice(W,Cspace):
+if W_projected=[] then 
+out1:=function_on_ISpace[1]/function_on_ISpace[2];
+ else
+newxi:=changeofcoordinates(W,Cspace,xi);
+uni_cones:=cone_dec(W_projected);
+out1:=0;
+for j from 1 to nops(uni_cones) do 
+WWW:=uni_cones[j][3];
+signuni:=uni_cones[j][1];
+ASSERT(abs(uni_cones[j][2])=1, &quot;decomposition not unimodular&quot;);
+newP:=MatrixInverse(Transpose(Matrix(WWW)));
+news:=convert(Multiply(newP,Vector(s_Cspace_in_lattice_coord)),list); ##print(news); 
+s_prime_Cspace:=[seq(ourceil(news[f]),f=1..nops(news))]; 
+function_on_Cspace:=functionS(s_prime_Cspace,WWW,newxi);
+out1:=out1+signuni*function_on_Cspace[1]/function_on_Cspace[2]*function_on_ISpace[1]/function_on_ISpace[2];
+od:
+fi;
+out1;
+end:
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1689" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNictRiM2Jy1JI21pR0YkNiVRJVRPRERGJy8lJ2l0YWxpY0dRJXRydWVGJy9GMFEnaXRhbGljRictRiw2LVEwJkFwcGx5RnVuY3Rpb247RidGL0YyRjVGN0Y5RjtGPUY/L0ZCUSYwLjBlbUYnL0ZFRlotSShtZmVuY2VkR0YkNiQtRiM2Jy1GIzYnLUZONiVRJWNlaWxGJy9GUkY0Ri9GVi1GZ242JC1GIzYlLUZONiVRI3MyRidGUUZULyUrZm9yZWdyb3VuZEdRKFswLDAsMF1GJ0YvRi9GaG9GLy1GLDYtUSIsRidGL0YyL0Y2RlNGN0Y5RjtGPUY/RlkvRkVRLDAuMzMzMzMzM2VtRictRiM2Ji1GIzYnLUZHNigtSSNtbkdGJDYkUSIxRidGLy1GaHA2JFEiMkYnRi8vJS5saW5ldGhpY2tuZXNzR0ZqcC8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZicS8lKWJldmVsbGVkR0Y0LUYsNi1RMSZJbnZpc2libGVUaW1lcztGJ0YvRjJGNUY3RjlGO0Y9Rj9GWUZlbi1GIzYkLUklbXN1YkdGJDYlLUZONiVRJyYjOTU4O0YnRmBvRi8tRiM2JUZncEZob0YvLyUvc3Vic2NyaXB0c2hpZnRHUSIwRidGL0Zob0YvLUYsNi1RIitGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUZdcjYlRl9yLUYjNiVGW3FGaG9GL0ZkckYvRmhvRi9GL0Zob0YvRmdxLUYjNictRk42JVEkRVhQRidGUUZURlYtRmduNiQtRiM2JS1GIzYmLUZnbjYkLUYjNiYtRk42JVEjczFGJ0ZRRlQtRiw2LVEoJm1pbnVzO0YnRi9GMkY1RjdGOUY7Rj1GP0ZBRkQtRiM2J0ZlcEZncS1GIzYkRmVvRi9GaG9GL0YvRi9GZ3FGXHJGL0Zob0YvRi9GaG9GL0Zob0YvLUYjNictRmduNiRGYXBGL0ZncUZcckZob0YvRl5xRmBxRmNxRmVxRmhvRi8=">LCQqKi1JJVRPRERHNiI2JC1JJWNlaWxHNiQlKnByb3RlY3RlZEdJKF9zeXNsaWJHRiY2I0kjczJHRiYsJiZJI3hpR0YmNiMiIiIjRjMiIiMmRjE2I0Y1RjNGM0YvISIiLUkkRVhQR0YmNiMqJiwmSSNzMUdGJkYzRi4jRjhGNUYzRjBGM0YzRjBGOEY4</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1769" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: s a vector in Q^d,  or a symbolic variable ; BUT THEN IT HAS TO BE ENTERED AS A LIST OF  d SYMBOLIC VARIABLES</Text-field>
+<Text-field style="Text" layout="Normal">s:=[s1,s2,...,sd]; W a cone in Z^d, Ispace a subset of [1,...,d]</Text-field>
+<Text-field style="Text" layout="Normal">xi a list of lenght d  of variable (or xi);
+</Text-field>
+<Text-field style="Text" layout="Normal">The output is a function of xi[i].</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">The subspace $L$ where we integrate is the following face of W: L is the linear span of </Text-field>
+<Text-field style="Text" layout="Normal">&lt;w[j]&gt;, with j running of Ispace. (thus Ispace should be &quot;big&quot;)</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">Here we take out a function of s, fractionalpart</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1769" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">##EXAMPLE: S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi)-&gt; <Equation executable="false" style="2D Math" input-equation="" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNiotSSNtaUdGJDYjUSFGJy1GIzYoLUZMNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj8vRkJRJjAuMGVtRicvRkVGZ24tSShtZmVuY2VkR0YkNiQtRiM2KEZLLUYjNipGSy1GIzYoLUZMNiVRI3MxRidGVEZXLUYsNi1RMSZJbnZpc2libGVUaW1lcztGJ0YvRjJGNUY3RjlGO0Y9Rj9GZm5GaG4tSSVtc3ViR0YkNiUtRkw2JVElJnhpO0YnL0ZVRjRGLy1GIzYmLUkjbW5HRiQ2JFEiMUYnRi8vJStmb3JlZ3JvdW5kR1EqWzAsMCwyNTVdRicvJTBmb250X3N0eWxlX25hbWVHUSoyRH5PdXRwdXRGJ0YvLyUvc3Vic2NyaXB0c2hpZnRHUSIwRidGZXBGaHBGLy1GLDYtUSIrRidGL0YyRjVGN0Y5RjtGPUY/RkFGRC1GIzYoLUZMNiVRI3MyRidGVEZXRmVvLUZpbzYlRltwLUYjNiYtRmJwNiRRIjJGJ0YvRmVwRmhwRi9GW3FGZXBGaHBGL0ZLRmVwRmhwRi9GS0ZlcEZocEYvRi9GZXBGaHBGL0Zlby1GIzYoLUZMNiVRJVRPRERGJ0ZURldGWS1Gam42JC1GIzYpLUZqbjYmLUYjNihGSy1GIzYnRitGY3FGZXBGaHBGL0ZLRmVwRmhwRi9GLy8lJW9wZW5HUSJ8ZnJGJy8lJmNsb3NlR1EifGhyRictRiw2LVEiLEYnRi9GMi9GNkZWRjdGOUY7Rj1GP0Zmbi9GRVEsMC4zMzMzMzMzZW1GJy1GIzYpRkstRiM2KS1GRzYoRmFwRmpxLyUubGluZXRoaWNrbmVzc0dGZHAvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGYnQvJSliZXZlbGxlZEdGNEZlby1GIzYmRmhvRmVwRmhwRi9GS0ZlcEZocEYvRl5xRmZxRmVwRmhwRi9GS0ZlcEZocEYvRi9GZXBGaHBGL0ZLRmVwRmhwRi8tRiM2KC1Gam42JEZoc0YvRmVvRmhvRmVwRmhwRi9GXnRGYHRGY3RGZXRGZXBGaHBGLw==">LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNiotSSNtaUdGJDYjUSFGJy1GIzYoLUZMNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj8vRkJRJjAuMGVtRicvRkVGZ24tSShtZmVuY2VkR0YkNiQtRiM2KEZLLUYjNipGSy1GIzYoLUZMNiVRI3MxRidGVEZXLUYsNi1RMSZJbnZpc2libGVUaW1lcztGJ0YvRjJGNUY3RjlGO0Y9Rj9GZm5GaG4tSSVtc3ViR0YkNiUtRkw2JVElJnhpO0YnL0ZVRjRGLy1GIzYmLUkjbW5HRiQ2JFEiMUYnRi8vJStmb3JlZ3JvdW5kR1EqWzAsMCwyNTVdRicvJTBmb250X3N0eWxlX25hbWVHUSoyRH5PdXRwdXRGJ0YvLyUvc3Vic2NyaXB0c2hpZnRHUSIwRidGZXBGaHBGLy1GLDYtUSIrRidGL0YyRjVGN0Y5RjtGPUY/RkFGRC1GIzYoLUZMNiVRI3MyRidGVEZXRmVvLUZpbzYlRltwLUYjNiYtRmJwNiRRIjJGJ0YvRmVwRmhwRi9GW3FGZXBGaHBGL0ZLRmVwRmhwRi9GS0ZlcEZocEYvRi9GZXBGaHBGL0Zlby1GIzYoLUZMNiVRJVRPRERGJ0ZURldGWS1Gam42JC1GIzYpLUZqbjYmLUYjNihGSy1GIzYnRitGY3FGZXBGaHBGL0ZLRmVwRmhwRi9GLy8lJW9wZW5HUSJ8ZnJGJy8lJmNsb3NlR1EifGhyRictRiw2LVEiLEYnRi9GMi9GNkZWRjdGOUY7Rj1GP0Zmbi9GRVEsMC4zMzMzMzMzZW1GJy1GIzYpRkstRiM2KS1GRzYoRmFwRmpxLyUubGluZXRoaWNrbmVzc0dGZHAvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGYnQvJSliZXZlbGxlZEdGNEZlby1GIzYmRmhvRmVwRmhwRi9GS0ZlcEZocEYvRl5xRmZxRmVwRmhwRi9GS0ZlcEZocEYvRi9GZXBGaHBGL0ZLRmVwRmhwRi8tRiM2KC1Gam42JEZoc0YvRmVvRmhvRmVwRmhwRi9GXnRGYHRGY3RGZXRGZXBGaHBGLw==</Equation>  <Equation executable="false" style="2D Math" input-equation="" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUkjbWlHRiQ2I1EhRicvJStmb3JlZ3JvdW5kR1EqWzAsMCwyNTVdRicvJTBmb250X3N0eWxlX25hbWVHUSoyRH5PdXRwdXRGJy8lLG1hdGh2YXJpYW50R1Enbm9ybWFsRic=">JSFH</Equation></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">S_Ispace_Coneformulab:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,
+s_Cspace_in_lattice_coord,news;
+Cspace:=ComplementList(ISpace,nops(W));
+s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);  
+function_on_ISpace:=functionIb(s,W,ISpace,xi);
+#from here express in terms of the basis lattice for projected cone.
+W_projected:=projectedconeinbasislattice(W,Cspace):
+if W_projected=[] then 
+out1:=function_on_ISpace[1]/function_on_ISpace[2];
+ else
+newxi:=changeofcoordinates(W,Cspace,xi);
+uni_cones:=cone_dec(W_projected);
+out1:=0;
+for j from 1 to nops(uni_cones) do 
+WWW:=uni_cones[j][3];
+signuni:=uni_cones[j][1];
+ASSERT(abs(uni_cones[j][2])=1, &quot;decomposition not unimodular&quot;);
+newP:=MatrixInverse(Transpose(Matrix(WWW)));
+news:=convert(Multiply(newP,Vector(s_Cspace_in_lattice_coord)),list); ##print(news); 
+s_small_move:=[seq(fractionalpart(-news[f]),f=1..nops(news))]; 
+function_on_Cspace:=functionS(s_small_move,WWW,newxi);
+out1:=out1+signuni*function_on_Cspace[1]/function_on_Cspace[2]*function_on_ISpace[1]/function_on_ISpace[2];
+od:
+fi;
+EXP(add(s[i]*xi[i],i=1..nops(W)))*out1;
+end:
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1997" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"> S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNictRiM2Jy1JI21pR0YkNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj8vRkJRJjAuMGVtRicvRkVGWi1JKG1mZW5jZWRHRiQ2JC1GIzYlLUYjNiYtRiM2Ji1GTjYlUSNzMUYnRlFGVC1GLDYtUTEmSW52aXNpYmxlVGltZXM7RidGL0YyRjVGN0Y5RjtGPUY/RllGZW4tSSVtc3ViR0YkNiUtRk42JVEnJiM5NTg7RicvRlJGNEYvLUYjNiUtSSNtbkdGJDYkUSIxRidGLy8lK2ZvcmVncm91bmRHUShbMCwwLDBdRidGLy8lL3N1YnNjcmlwdHNoaWZ0R1EiMEYnRi8tRiw2LVEiK0YnRi9GMkY1RjdGOUY7Rj1GP0ZBRkQtRiM2Ji1GTjYlUSNzMkYnRlFGVEZiby1GZm82JUZoby1GIzYlLUZfcDYkUSIyRidGL0ZicEYvRmVwRi9GL0ZicEYvRi9GYnBGL0Ziby1GIzYnLUZONiVRJVRPRERGJ0ZRRlRGVi1GZ242JC1GIzYnLUZnbjYmLUYjNiUtRiM2JkYrRl1xRmJwRi9GYnBGL0YvLyUlb3BlbkdRInxmckYnLyUmY2xvc2VHUSJ8aHJGJy1GLDYtUSIsRidGL0YyL0Y2RlNGN0Y5RjtGPUY/RlkvRkVRLDAuMzMzMzMzM2VtRictRiM2Ji1GIzYnLUZHNihGXnBGZHEvJS5saW5ldGhpY2tuZXNzR0ZhcC8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZcdC8lKWJldmVsbGVkR0Y0RmJvLUYjNiRGZW9GL0ZicEYvRmhwRmBxRi9GYnBGL0YvRmJwRi9GYnBGLy1GIzYnLUZnbjYkRmJzRi9GYm9GZW9GYnBGL0Zoc0Zqc0ZddEZfdEZicEYv">LCQqKi1JJEVYUEc2IjYjLCYqJkkjczFHRiYiIiImSSN4aUdGJjYjRitGK0YrKiZJI3MyR0YmRismRi02IyIiI0YrRitGKy1JJVRPRERHRiY2JDwjLCRGMCEiIiwmRiwjRitGM0YxRitGK0Y6RjlGLEY5Rjk=</Equation></Text-field>
+</Output>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1"></Text-field></Title>
+<Group labelreference="L1817" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">WE WILL NOT USE THE FOLLOWING  PROCEDURE, AS OUR CHOICE OF REGULAR VECTOR WILL BE DONE WITH A RANDOM PROCEDURE.
+BUT WE SHOULD WHEN DETERMINING DETERMINISTICALLY A REGULAR VECTOR.
+
+
+Input: W a cone in Z^d, Cspace  a subset of [1,2,..,d]  ,x a variable.</Text-field>
+<Text-field style="Text" layout="Normal">Output: a list of linear forms.</Text-field>
+<Text-field style="Text" layout="Normal"> Math: this is  the forms in denominator of the   function S_Ispace_Cone(W,Cspace,x). In practice we will not use this procedure.
+This is useful to determine a &quot;deterministic regular vector&quot;, but we will plug a random regular vector;
+EXAMPLE linindenom([[1,0],[1,2]],[1,2])-&gt;<Equation executable="false" style="2D Math" input-equation="" display="LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYrLUklbXN1YkdGJDYlLUkjbWlHRiQ2JVEieEYnLyUnaXRhbGljR1EldHJ1ZUYnLyUsbWF0aHZhcmlhbnRHUSdpdGFsaWNGJy1GLDYmLUkjbW5HRiQ2JFEiMUYnL0Y5USdub3JtYWxGJy8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRkEvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1JI21vR0YkNi1RIixGJ0ZBLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y3LyUpc3RyZXRjaHlHRlIvJSpzeW1tZXRyaWNHRlIvJShsYXJnZW9wR0ZSLyUubW92YWJsZWxpbWl0c0dGUi8lJ2FjY2VudEdGUi8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHUSwwLjMzMzMzMzNlbUYnLUYvNiVGMS1GLDYmLUY+NiRRIjJGJ0ZBRkNGRkZBRklGTC1GLDYpRi4tRk02LVEiK0YnRkFGUC9GVEZSRlVGV0ZZRmVuRmduL0ZqblEsMC4yMjIyMjIyZW1GJy9GXW9GXXAtRiw2KEZjby1GTTYtUTEmSW52aXNpYmxlVGltZXM7RidGQUZQRltwRlVGV0ZZRmVuRmduRmluL0Zdb0Zbb0Zfb0ZDRkZGQS1GMjYjUSFGJ0ZDRkZGQUZlcEZDRkZGQUZBLyUlb3BlbkdRInxmckYnLyUmY2xvc2VHUSJ8aHJGJw==">LUkobWZlbmNlZEc2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUklbXJvd0dGJDYrLUklbXN1YkdGJDYlLUkjbWlHRiQ2JVEieEYnLyUnaXRhbGljR1EldHJ1ZUYnLyUsbWF0aHZhcmlhbnRHUSdpdGFsaWNGJy1GLDYmLUkjbW5HRiQ2JFEiMUYnL0Y5USdub3JtYWxGJy8lK2ZvcmVncm91bmRHUSpbMCwwLDI1NV1GJy8lMGZvbnRfc3R5bGVfbmFtZUdRKjJEfk91dHB1dEYnRkEvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJy1JI21vR0YkNi1RIixGJ0ZBLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y3LyUpc3RyZXRjaHlHRlIvJSpzeW1tZXRyaWNHRlIvJShsYXJnZW9wR0ZSLyUubW92YWJsZWxpbWl0c0dGUi8lJ2FjY2VudEdGUi8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHUSwwLjMzMzMzMzNlbUYnLUYvNiVGMS1GLDYmLUY+NiRRIjJGJ0ZBRkNGRkZBRklGTC1GLDYpRi4tRk02LVEiK0YnRkFGUC9GVEZSRlVGV0ZZRmVuRmduL0ZqblEsMC4yMjIyMjIyZW1GJy9GXW9GXXAtRiw2KEZjby1GTTYtUTEmSW52aXNpYmxlVGltZXM7RidGQUZQRltwRlVGV0ZZRmVuRmduRmluL0Zdb0Zbb0Zfb0ZDRkZGQS1GMjYjUSFGJ0ZDRkZGQUZlcEZDRkZGQUZBLyUlb3BlbkdRInxmckYnLyUmY2xvc2VHUSJ8aHJGJw==</Equation></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1813" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">
+</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">linindenom:=proc(W,Cspace) local YY,i,ISpace,g,WW,newx,d,a,z,cc,
+WW_projected,uni_cones,t,cleanYY,r;
+d:=nops(W);
+ YY:={};
+WW_projected:=projectedconeinbasislattice(W,Cspace):
+###print(WW_projected);
+newx:=changeofcoordinates(W,Cspace,x);
+uni_cones:=cone_dec(WW_projected);
+for z from 1 to nops(uni_cones) do
+cc:=uni_cones[z][3]; 
+for t from 1 to nops(cc) do
+YY:={op(YY), add(cc[t][s]*newx[s],s=1..nops(newx))}
+od;
+
+od;
+cleanYY:={};
+for r from 1 to nops(YY) do
+if member(-YY[r],cleanYY)=false then
+cleanYY:={op(cleanYY),YY[r]}
+fi;
+od;
+cleanYY;
+end:
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1814" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#linindenom([[1,0],[1,2]],[1,2]);</Text-field>
+</Input>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1"> Approximation for a cone;</Text-field></Title>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 2" layout="Heading 2"></Text-field></Title>
+<Text-field style="Normal" layout="Normal"></Text-field>
+<Text-field style="Normal" layout="Normal"></Text-field>
+<Group labelreference="L1811" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input:  s a vector in Q^d,  or a symbolic variable (but has to be entered as a list of d symbolic variables,
+W a cone, order  an integer;
+xi a list of variables.</Text-field>
+<Text-field style="Text" layout="Normal">Output a function f(xi); 
+Math:  let C=s+W;  The output is a function f(xi) such that
+the beginning of the Laurent series of f(t*xi) under dilation should  coinciding with S_C(t*xi) for order+1</Text-field>
+<Text-field style="Text" layout="Normal"> terms:  given by formula a (with ceil functions)
+</Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLES ARE GIVEN AFTER;
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1812" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">approx_Cone_formulaa:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+output:=0; P:=order;
+d:=nops(W);
+if P=d then   
+output:=S_Ispace_Coneformulaa(s,W,[],xi) ;
+else
+for j from 0 to P do
+C:=choose(d,j);
+cc[j]:=(-1)^(P-j)*binomial(d-j-1,d-P-1);
+for a from 1 to nops(C) do
+K:=C[a]; KK:=ComplementList(K,nops(W));
+output:=output+cc[j]*S_Ispace_Coneformulaa(s,W,KK,xi) ;
+od;
+od:
+fi;
+output;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1815" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">approx_Cone_formulaa([s,1/2], [[1,0],[1,2]],2,xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUkmbWZyYWNHRiQ2KC1GIzYnLUYjNictSSNtaUdGJDYlUSVUT0RERicvJSdpdGFsaWNHUSV0cnVlRicvJSxtYXRodmFyaWFudEdRJ2l0YWxpY0YnLUkjbW9HRiQ2LVEwJkFwcGx5RnVuY3Rpb247RicvRjpRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0ZELyUpc3RyZXRjaHlHRkQvJSpzeW1tZXRyaWNHRkQvJShsYXJnZW9wR0ZELyUubW92YWJsZWxpbWl0c0dGRC8lJ2FjY2VudEdGRC8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHRlMtSShtZmVuY2VkR0YkNiQtRiM2Jy1JI21uR0YkNiRRIjFGJ0ZALUY9Ni1RIixGJ0ZARkIvRkZGOEZHRklGS0ZNRk9GUS9GVVEsMC4zMzMzMzMzZW1GJy1JJW1zdWJHRiQ2JS1GMzYlUScmIzk1ODtGJy9GN0ZERkAtRiM2JS1GZm42JFEiMkYnRkAvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRkAvJS9zdWJzY3JpcHRzaGlmdEdRIjBGJ0ZbcEZARkBGW3BGQC1GPTYtUTEmSW52aXNpYmxlVGltZXM7RidGQEZCRkVGR0ZJRktGTUZPRlFGVC1GIzYnRjJGPC1GVzYkLUYjNictRiM2Jy1GMzYlUSVjZWlsRidGZW9GQEY8LUZXNiQtRiM2JS1GMzYlUSJzRidGNkY5RltwRkBGQEZbcEZARmluLUZgbzYlRmJvLUYjNiVGZW5GW3BGQEZecEZbcEZARkBGW3BGQEZbcEZALUYjNidGX29GYXBGZnFGW3BGQC8lLmxpbmV0aGlja25lc3NHRmhuLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRmByLyUpYmV2ZWxsZWRHRkQtRj02LVEoJm1pbnVzO0YnRkBGQkZFRkdGSUZLRk1GTy9GUlEsMC4yMjIyMjIyZW1GJy9GVUZpci1GLDYoLUYjNictRiM2J0YyRjwtRlc2JC1GIzYnRmpwRmluLUYjNiZGZnEtRj02LVEiK0YnRkBGQkZFRkdGSUZLRk1GT0ZockZqci1GIzYmRmhvRmFwRl9vRkBGQEZbcEZARkBGW3BGQEZhcC1GIzYnRjJGPC1GVzYkLUYjNictRiM2J0ZccUY8LUZXNiQtRiM2JS1GIzYmLUYjNiZGaG9GYXBGY3FGQEZlci1GLDYoRmVuRmhvRlxyRl5yRmFyRmNyRkBGW3BGQEZARltwRkBGaW4tRiM2Ji1GPTYtUSomdW1pbnVzMDtGJ0ZARkJGRUZHRklGS0ZNRk9GaHJGanJGX29GW3BGQEZbcEZARkBGW3BGQEZbcEZALUYjNictRlc2JEZlc0ZARmFwRl9vRltwRkBGXHJGXnJGYXJGY3JGQA==">LCYqKi1JJVRPRERHNiI2JCIiIiZJI3hpR0YmNiMiIiNGKC1GJTYkLUklY2VpbEc2JCUqcHJvdGVjdGVkR0koX3N5c2xpYkdGJjYjSSJzR0YmJkYqNiNGKEYoRikhIiJGNkY4RigqKi1GJTYkRi8sJkY2RihGKUYsRigtRiU2JC1GMDYjLCZGNUYsI0Y4RixGKCwkRilGOEYoRjxGOEYpRjhGOA==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1816" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">approx_Cone_formulaa([s1,s2], [[1,0],[1,2]],1,xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYpLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNictSSNtbkdGJDYkUSIyRidGLy1GLDYtUTEmSW52aXNpYmxlVGltZXM7RidGL0YyRjVGN0Y5RjtGPUY/L0ZCUSYwLjBlbUYnL0ZFRlMtRiM2Jy1JI21pR0YkNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj9GUkZULUkobWZlbmNlZEdGJDYkLUYjNiUtRiM2Ji1GIzYmLUZYNiVRI3MxRidGZW5GaG5GTy1JJW1zdWJHRiQ2JS1GWDYlUScmIzk1ODtGJy9GZm5GNEYvLUYjNiUtRkw2JFEiMUYnRi8vJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRi8vJS9zdWJzY3JpcHRzaGlmdEdRIjBGJ0YvLUYsNi1RIitGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUYjNiYtRlg2JVEjczJGJ0ZlbkZobkZPLUZqbzYlRlxwLUYjNiVGS0ZlcEYvRmhwRi9GL0ZlcEYvRi9GZXBGL0ZlcEYvLUYjNidGaW9GTy1GXm82JC1GIzYmRmlvRltxLUYjNiZGS0ZPRmNxRi9GL0YvRmVwRi8vJS5saW5ldGhpY2tuZXNzR0ZkcC8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0Zjci8lKWJldmVsbGVkR0Y0RltxLUZHNigtRiM2KUZLRk8tRiM2Jy1GWDYlUSVUT0RERidGZW5GaG5Gam4tRl5vNiQtRiM2Jy1GIzYnLUZYNiVRJWNlaWxGJ0ZfcEYvRmpuLUZebzYkLUYjNiUtRiM2Ji1GIzYmRktGT0Zmb0YvLUYsNi1RKCZtaW51cztGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZERmBxRi9GZXBGL0YvRmVwRi8tRiw2LVEiLEYnRi9GMi9GNkZnbkY3RjlGO0Y9Rj9GUi9GRVEsMC4zMzMzMzMzZW1GJy1GIzYnLUZHNihGYnBGS0ZfckZhckZkckZmckZPLUYjNiRGaW9GL0ZlcEYvRmVwRi9GL0ZlcEYvRk8tRiM2J0ZXRmpuLUZebzYkLUYjNiUtRiM2Ji1GIzYnRl11Rk8tRiM2JkZgcUZPRmlvRi9GZXBGL0ZbcUZecUYvRmVwRi9GL0ZlcEYvRmVwRi8tRiM2J0Zpb0ZPLUZebzYkLUYjNidGK0Zpb0ZidEZdckYvRi9GZXBGL0ZfckZhckZkckZmckZidC1GRzYoLUYjNictRiM2J0Zec0Zqbi1GXm82JC1GIzYnLUYjNidGZ3NGam4tRl5vNiQtRiM2JUZgcUZlcEYvRi9GZXBGL0ZldC1GIzYmRlt1RltxRmNxRi9GZXBGL0YvRmVwRi9GTy1GIzYnRldGam4tRl5vNiQtRiM2JS1GIzYmLUZebzYkLUYjNiZGZm9GYnQtRiM2J0ZddUZPLUYjNiRGYHFGL0ZlcEYvRi9GL0ZPRmlvRi9GZXBGL0YvRmVwRi9GZXBGLy1GIzYnLUZebzYkRmN3Ri9GT0Zpb0ZlcEYvRl9yRmFyRmRyRmZyRi8=">LCgqKC1JJEVYUEc2IjYjLCYqJkkjczFHRiYiIiImSSN4aUdGJjYjRitGK0YrKiZJI3MyR0YmRismRi02IyIiI0YrRitGK0YsISIiLCZGLEYrRjFGM0Y0ISIjKiotSSVUT0RER0YmNiQtSSVjZWlsRzYkJSpwcm90ZWN0ZWRHSShfc3lzbGliR0YmNiMsJkYqRjNGMEY0LCRGLCNGK0YzRitGLEY0LUYlNiMsJiomRjBGK0YsRitGQ0YvRitGKywmRixGNEYxRjZGNEYzKiotRjk2JC1GPDYjRjAsJkYsRkNGMUYrRitGTkY0LUYlNiMqJiwmRipGK0YwI0Y0RjNGK0YsRitGK0YsRjRGNA==</Equation></Text-field>
+</Output>
+</Group>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 3" layout="Heading 3"></Text-field></Title>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 4" layout="Heading 4"></Text-field></Title>
+<Group labelreference="L1841" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input:  s a vector in Q^d,  or a symbolic variable (but has to be entered as a list of d symbolic variables,
+W a cone, order  an integer;
+xi a list of variables.</Text-field>
+<Text-field style="Text" layout="Normal">Output a function f(xi); 
+Math:  let C=s+W; A function f(xi) such that
+the beginning of the Laurent series of f(t*xi) under dilation should  coinciding with S_C(t*xi) for order+1</Text-field>
+<Text-field style="Text" layout="Normal"> terms:  given by formula b (with fractionalparts functions)
+</Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLES ARE GIVEN AFTER;
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1845" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">approx_Cone_formulab:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+output:=0; P:=order;
+d:=nops(W);
+if P=d then   
+output:=S_Ispace_Coneformulab(s,W,[],xi) ;
+else
+for j from 0 to P do
+C:=choose(d,j);
+cc[j]:=(-1)^(P-j)*binomial(d-j-1,d-P-1);
+for a from 1 to nops(C) do
+K:=C[a]; KK:=ComplementList(K,nops(W));
+output:=output+cc[j]*S_Ispace_Coneformulab(s,W,KK,xi) ;
+od;
+od:
+fi;
+output;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1843" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">approx_Cone_formulab([1/2,1/2], [[1,0],[1,2]],1,xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYpLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNictSSNtbkdGJDYkUSIyRidGLy1GLDYtUTEmSW52aXNpYmxlVGltZXM7RidGL0YyRjVGN0Y5RjtGPUY/L0ZCUSYwLjBlbUYnL0ZFRlMtRiM2Jy1JI21pR0YkNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj9GUkZULUkobWZlbmNlZEdGJDYkLUYjNiUtRiM2Ji1GIzYnLUZHNigtRkw2JFEiMUYnRi9GSy8lLmxpbmV0aGlja25lc3NHRmpvLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRl9wLyUpYmV2ZWxsZWRHRjRGTy1GIzYkLUklbXN1YkdGJDYlLUZYNiVRJyYjOTU4O0YnL0ZmbkY0Ri8tRiM2JUZoby8lK2ZvcmVncm91bmRHUShbMCwwLDBdRidGLy8lL3N1YnNjcmlwdHNoaWZ0R1EiMEYnRi9GX3FGLy1GLDYtUSIrRidGL0YyRjVGN0Y5RjtGPUY/RkFGRC1GIzYnRmZvRk8tRiM2JC1GZ3A2JUZpcC1GIzYlRktGX3FGL0ZicUYvRl9xRi9GL0ZfcUYvRi9GX3FGL0ZfcUYvLUYjNidGZnBGTy1GXm82JC1GIzYmRmZwRmVxLUYjNiZGS0ZPRlxyRi9GL0YvRl9xRi9GW3BGXXBGYHBGYnBGZXEtRkc2KC1GIzYpRktGT0ZVRk8tRiM2Jy1GWDYlUSVUT0RERidGZW5GaG5Gam4tRl5vNiQtRiM2J0Zmby1GLDYtUSIsRidGL0YyL0Y2RmduRjdGOUY7Rj1GP0ZSL0ZFUSwwLjMzMzMzMzNlbUYnRmRvRl9xRi9GL0ZfcUYvRl9xRi8tRiM2J0ZmcEZPLUZebzYkLUYjNidGK0ZmcC1GLDYtUSgmbWludXM7RidGL0YyRjVGN0Y5RjtGPUY/RkFGREZmckYvRi9GX3FGL0ZbcEZdcEZgcEZicEZhdC1GRzYoLUYjNidGVUZPLUYjNidGXnNGam4tRl5vNiQtRiM2J0Zmb0Zlcy1GIzYmRmRvRmVxRlxyRi9GX3FGL0YvRl9xRi9GX3FGLy1GIzYnLUZebzYkRl51Ri9GT0ZmcEZfcUYvRltwRl1wRmBwRmJwRi8=">LCgqKC1JJEVYUEc2IjYjLCYmSSN4aUdGJjYjIiIiI0YsIiIjJkYqNiNGLkYtRixGKSEiIiwmRilGLEYvRi5GMSEiIyoqRiRGLC1JJVRPRERHRiY2JEYtLCRGKUYtRixGKUYxLCZGKUYxRi9GM0YxRi4qKkYkRiwtRjY2JEYtLCZGKUYtRi9GLEYsRj1GMUYpRjFGMQ==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1847" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">approx_Cone_formulab([s1,s2], [[1,0],[1,2]],1,xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYpLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNictSSNtbkdGJDYkUSIyRidGLy1GLDYtUTEmSW52aXNpYmxlVGltZXM7RidGL0YyRjVGN0Y5RjtGPUY/L0ZCUSYwLjBlbUYnL0ZFRlMtRiM2Jy1JI21pR0YkNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj9GUkZULUkobWZlbmNlZEdGJDYkLUYjNiUtRiM2Ji1GIzYmLUZYNiVRI3MxRidGZW5GaG5GTy1JJW1zdWJHRiQ2JS1GWDYlUScmIzk1ODtGJy9GZm5GNEYvLUYjNiUtRkw2JFEiMUYnRi8vJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRi8vJS9zdWJzY3JpcHRzaGlmdEdRIjBGJ0YvLUYsNi1RIitGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUYjNiYtRlg2JVEjczJGJ0ZlbkZobkZPLUZqbzYlRlxwLUYjNiVGS0ZlcEYvRmhwRi9GL0ZlcEYvRi9GZXBGL0ZlcEYvLUYjNidGaW9GTy1GXm82JC1GIzYmRmlvRltxLUYjNiZGS0ZPRmNxRi9GL0YvRmVwRi8vJS5saW5ldGhpY2tuZXNzR0ZkcC8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0Zjci8lKWJldmVsbGVkR0Y0RltxLUZHNigtRiM2KUZLRk9GVUZPLUYjNictRlg2JVElVE9EREYnRmVuRmhuRmpuLUZebzYkLUYjNictRl5vNiYtRiM2JS1GIzYnRistRiM2JkZLRk9GZm9GL0ZbcUZgcUYvRmVwRi9GLy8lJW9wZW5HUSJ8ZnJGJy8lJmNsb3NlR1EifGhyRictRiw2LVEiLEYnRi9GMi9GNkZnbkY3RjlGO0Y9Rj9GUi9GRVEsMC4zMzMzMzMzZW1GJy1GIzYnLUZHNihGYnBGS0ZfckZhckZkckZmckZPLUYjNiRGaW9GL0ZlcEYvRmVwRi9GL0ZlcEYvRmVwRi8tRiM2J0Zpb0ZPLUZebzYkLUYjNidGK0Zpby1GLDYtUSgmbWludXM7RidGL0YyRjVGN0Y5RjtGPUY/RkFGREZdckYvRi9GZXBGL0ZfckZhckZkckZmckZldS1GRzYoLUYjNidGVUZPLUYjNidGXnNGam4tRl5vNiQtRiM2Jy1GXm82Ji1GIzYlLUYjNiZGK0ZgcUZlcEYvRmVwRi9GL0ZddEZgdEZjdC1GIzYmRml0RltxRmNxRi9GZXBGL0YvRmVwRi9GZXBGLy1GIzYnLUZebzYkRmh2Ri9GT0Zpb0ZlcEYvRl9yRmFyRmRyRmZyRi8=">LCgqKC1JJEVYUEc2IjYjLCYqJkkjczFHRiYiIiImSSN4aUdGJjYjRitGK0YrKiZJI3MyR0YmRismRi02IyIiI0YrRitGK0YsISIiLCZGLEYrRjFGM0Y0ISIjKipGJEYrLUklVE9EREdGJjYkPCMsJkYqRjZGMEYrLCRGLCNGK0YzRitGLEY0LCZGLEY0RjFGNkY0RjMqKkYkRistRjk2JDwjLCRGMEY0LCZGLEY+RjFGK0YrRkVGNEYsRjRGNA==</Equation></Text-field>
+</Output>
+</Group>
+</Section>
+</Section>
+</Section>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">ADDING THE CONES APPROXIMATIONS FOR A RATIONAL SIMPLEX;</Text-field></Title>
+<Group labelreference="L1850" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: A SIMPLEX entered as a list of d+1 rational vectors in R^d; order is an integer, xi is a variable.
+xi can also be entered as a numeric list of lenght d, but there can be then an error message (division by zero).
+OUTPUT: a function of xi;
+</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLES ARE GIVEN AFTER;
+
+
+</Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">cone_by_cone_approxi_simplex_formulaa:=proc(Simplex,order,xi) local F,W,i,st,d,S,y,P;
+F:=0; P:=order; S:=Simplex;
+d:=nops(S)-1;
+for i from 1 to nops(S) do 
+W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
+#print(datas,S[i],W,P,xi);
+
+F:=F+approx_Cone_formulaa(S[i],W,P,xi);
+od:
+F:=eval(subs({TODD=Todd,EXP=exp},F));
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1851" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">cone_by_cone_approxi_simplex_formulab:=proc(Simplex,order,xi) local F,W,i,st,d,S,y,P;
+F:=0; P:=order; S:=Simplex;
+d:=nops(S)-1;
+for i from 1 to nops(S) do 
+W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
+F:=F+approx_Cone_formulab(S[i],W,P,xi);
+od:
+F:=eval(subs({TODD=Todd,EXP=exp},F));
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L2000" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">cone_by_cone_approxi_simplex_formulab([[0,0],[1,0],[0,1]], 1,xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzY1LUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUkjbW5HRiQ2JFEiMUYnRi8tRiM2Jy1JJW1zdWJHRiQ2JS1JI21pR0YkNiVRJyYjOTU4O0YnLyUnaXRhbGljR0Y0Ri8tRiM2JUZJLyUrZm9yZWdyb3VuZEdRKFswLDAsMF1GJ0YvLyUvc3Vic2NyaXB0c2hpZnRHUSIwRictRiw2LVExJkludmlzaWJsZVRpbWVzO0YnRi9GMkY1RjdGOUY7Rj1GPy9GQlEmMC4wZW1GJy9GRUZeby1GUDYlRlItRiM2JS1GSjYkUSIyRidGL0ZaRi9GZ25GWkYvLyUubGluZXRoaWNrbmVzc0dGTC8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZbcC8lKWJldmVsbGVkR0Y0LUYsNi1RKCZtaW51cztGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUZHNihGSS1GIzYnLUkobWZlbmNlZEdGJDYkLUYjNiZGSUZgcC1JJW1zdXBHRiQ2JS1GLDYtUS8mRXhwb25lbnRpYWxFO0YnRi9GMkY1RjdGOUY7Rj1GP0Zdby9GRVEsMC4xMTExMTExZW1GJ0ZPLyUxc3VwZXJzY3JpcHRzaGlmdEdGaW5GL0YvRmpuRmBvRlpGL0Znb0Zpb0ZccEZecEZgcC1GRzYoRkktRiM2Jy1GaHA2JC1GIzYmRklGYHAtRl1xNiVGX3FGYG9GZHFGL0YvRmpuRk9GWkYvRmdvRmlvRlxwRl5wLUYsNi1RIitGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUZHNigtRiM2JUZccUZaRi8tRiM2J0ZPRmpuLUZocDYkLUYjNidGK0ZPRmByRmBvRi9GL0ZaRi9GZ29GaW9GXHBGXnBGYHItRkc2KEZlci1GIzYnLUZocDYkLUYjNiZGSUZgcC1GXXE2JUZfcS1GIzYmRitGT0ZaRi9GZHFGL0YvRmpuLUZocDYkLUYjNiZGT0ZgcEZgb0YvRi9GWkYvRmdvRmlvRlxwRl5wRmByLUZHNihGZXItRiM2Jy1GaHA2JC1GIzYmRklGYHAtRl1xNiVGX3FGW3NGZHFGL0YvRmpuRk9GWkYvRmdvRmlvRlxwRl5wRmByLUZHNigtRiM2JUZeckZaRi8tRiM2J0Zgb0ZqbkZpc0ZaRi9GZ29GaW9GXHBGXnBGYHItRkc2KEZpdC1GIzYnLUZocDYkLUYjNiZGSUZgcC1GXXE2JUZfcS1GIzYmRitGYG9GWkYvRmRxRi9GL0ZqbkZpckZaRi9GZ29GaW9GXHBGXnBGYHItRkc2KEZpdC1GIzYnLUZocDYkLUYjNiZGSUZgcC1GXXE2JUZfcUZbdEZkcUYvRi9Gam5GYG9GWkYvRmdvRmlvRlxwRl5wRi8=">LDQqJiZJI3hpRzYiNiMiIiIhIiImRiU2IyIiI0YpRikqJiwmRihGKC1JJGV4cEc2JCUqcHJvdGVjdGVkR0koX3N5c2xpYkdGJjYjRiRGKUYpRipGKUYpKiYsJkYoRigtRjA2I0YqRilGKUYkRilGKSooRi9GKEYkRiksJkYkRilGKkYoRilGKCooRi9GKCwmRihGKC1GMDYjLCRGJEYpRilGKSwmRiRGKEYqRilGKUYoKihGL0YoLCZGKEYoLUYwNiNGOkYpRilGJEYpRigqKEY3RihGKkYpRkBGKUYoKihGN0YoLCZGKEYoLUYwNiMsJEYqRilGKUYpRjpGKUYoKihGN0YoLCZGKEYoLUYwNiNGQEYpRilGKkYpRig=</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2001" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+</Section>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Approximate  functions  S^L  for a  dilated  cone ns+Cone; HERE n is an integer.</Text-field></Title>
+<Group labelreference="L1854" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: n a variable,  s a numeric vector in Q^d,
+W a cone, Ispace a subset of [1,2,...d];
+xi a list of variables.</Text-field>
+<Text-field style="Text" layout="Normal">Output a function f(n,xi); </Text-field>
+<Text-field style="Text" layout="Normal">This is the function S^{Isplace}(ns+W)(xi), where we emphasize the dependance in n;
+We use formulab;
+
+</Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLE ARE GIVEN AFTER THE PROCEDURE:
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1860" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
+s_Cspace_in_lattice_coord,news;
+Cspace:=ComplementList(ISpace,nops(W));
+dilateds:=[seq(n*s[i],i=1..nops(W))];
+s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);# I keep n outside;
+ function_on_ISpace:=functionIb(dilateds,W,ISpace,xi);
+#from here express in terms of the basis lattice for projected cone.
+W_projected:=projectedconeinbasislattice(W,Cspace):
+if W_projected=[] then 
+out1:=function_on_ISpace[1]/function_on_ISpace[2];
+ else
+newxi:=changeofcoordinates(W,Cspace,xi);
+uni_cones:=cone_dec(W_projected);
+out1:=0;
+for j from 1 to nops(uni_cones) do 
+WWW:=uni_cones[j][3];
+signuni:=uni_cones[j][1];
+ASSERT(abs(uni_cones[j][2])=1, &quot;decomposition not unimodular&quot;);
+newP:=MatrixInverse(Transpose(Matrix(WWW)));
+news:=convert(Multiply(newP,Vector(s_Cspace_in_lattice_coord)),list); #print(&quot;news&quot;,news); 
+
+s_small_move:=[seq(nfractionalpart(N,-numer(news[f]),denom(news[f])),f=1..nops(news))];  #print(&quot;smallmove&quot;,s_small_move);
+function_on_Cspace:=functionS(s_small_move,WWW,newxi);
+out1:=out1+signuni*function_on_Cspace[1]/function_on_Cspace[2]*function_on_ISpace[1]/function_on_ISpace[2];
+od:
+fi;
+EXP(add(n*s[i]*xi[i],i=1..nops(W)))*out1;
+end:
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L2002" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#dilatedS_Ispace_Cone(n,[1/2,1/2],[[1,0],[1,2]],[1],xi); #Ouput;-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])</Text-field>
+</Input>
+</Group>
+<Group labelreference="L2003" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1878" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: n a variable,  s a numeric vector in Q^d,
+W a cone, order is an integer;
+xi a list of variables.</Text-field>
+<Text-field style="Text" layout="Normal">Output a function f(n,xi); </Text-field>
+<Text-field style="Text" layout="Normal">This is the sulm of the approximate  function S^{Isplace}(ns+W)(xi), where we emphasize the dependance in n;
+</Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLE IS GIVEN  AFTER;
+</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+output:=0; 
+d:=nops(W);
+if order=d then   
+output:=dilatedS_Ispace_Cone(n,s,W,[],xi);
+else
+for j from 0 to order do
+C:=choose(d,j);
+cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
+for a from 1 to nops(C) do
+K:=C[a]; KK:=ComplementList(K,nops(W));
+output:=output+cc[j]*dilatedS_Ispace_Cone(n,s,W,KK,xi) ;
+od;
+od:
+fi;
+output;
+end:</Text-field>
+</Input>
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" alignment="left" firstindent="0" spacebelow="0" leftmargin="0" linespacing="0.0" initial="0" linebreak="space" rightmargin="0" bulletsuffix="" spaceabove="0" bullet="none" pagebreak-before="false"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L2004" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi); # Ouput:-2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1865" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: n a variable,  Simplex  a numeric rational simplex ; given by a list of  rational  vectors in Q^d
+order is an integer;
+xi a list of variables. xi can be numeric but then there can be an error message;</Text-field>
+<Text-field style="Text" layout="Normal">Output a function f(n,N,xi); </Text-field>
+<Text-field style="Text" layout="Normal">This is the sum of the approximate  functions  over the tangent cones  for the dilated simplex nS; where we emphasize the dependance in n;
+N is the same than n, but here the function of N are perodic; 
+I did that,  as we will need to pick  up a polynomial term in n, while N are then considered as constants;</Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLE IS GIVEN  AFTER;
+</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
+F:=0;  S:=Simplex;
+d:=nops(S)-1;
+for i from 1 to nops(S) do 
+W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
+F:=F+dilated_approxi_cone(n,S[i],W,order,xi) ;
+od:
+F:=eval(subs({TODD=Todd,EXP=exp},F));
+end:
+
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L2005" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#ApproxEhrhartSimplexgeneric(n,[[0,0],[1/2,0],[0,1/2]], 1,xi);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1871" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">random_vector:=proc(N,d) local R;
+R:=rand(N);
+[seq(R()+1,i=1..d)]:
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1876" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1879" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#WARNING; THIS WORKS ONLY IF ell is generic;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1880" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
+The ouput is  a periodic function of n;
+Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
+Here I did not employ a deformation vector, so the procedure might return: error; diviasion by zero.</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
+d:=nops(Simplex)-1;
+order:=M+nops(Simplex)-m; 
+xx:=[seq(t*ell[i],i=1..d)];
+AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
+subs({N=n},CC);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1884" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
+The ouput is  a periodic function of n;
+Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
+Here we employ a random deformation vector, so if the procedure might return: error; diviasion by zero. RERUN:</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
+d:=nops(Simplex)-1;
+order:=M+nops(Simplex)-m;
+reg:=random_vector(5000,d); 
+xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
+CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+CCn:=coeff(CCeps,n,m);
+subs({N=n},CCn);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1886" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
+The ouput is  a polynomial with coefficients  periodic function of n;
+Math: the output is Ehrhart polynomial E(n S, ell^M)
+Here we employ a random deformation vector, so if the procedure might return: error; diviasion by zero. RERUN:</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
+d:=nops(Simplex)-1;
+add(TopEhrhartweighted(n,Simplex,ell,M,m)*n^m,m=0..M+d);
+end:  </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1892" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">######################################################################&quot;&quot;&quot;&quot;</Text-field>
+</Input>
+</Group>
+<Section collapsed="false" MultipleChoiceAnswerIndex="-1" MultipleChoiceRandomizeChoices="false" TrueFalseAnswerIndex="-1" EssayAnswerRows="5" EssayAnswerColumns="60"><Title>
+<Text-field style="Heading 1" layout="Heading 1">Approximate  functions  S^L  for a  dilated  cone ns+Cone; HERE n is a real.</Text-field></Title>
+<Group labelreference="L1993" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">Input: n a variable,  s a numeric vector in Q^d,
+W a cone, Ispace a subset of [1,2,...d];
+xi a list of variables.</Text-field>
+<Text-field style="Text" layout="Normal">Output a function f(n,N,xi); 
+</Text-field>
+<Text-field style="Text" layout="Normal">
+</Text-field>
+<Text-field style="Text" layout="Normal">Output a function f(n,N,xi);  where we emphasize the dependance in n;
+N is the same than n, but here the function of N are perodic; 
+I did that,  as we will need to pick  up a polynomial term in n, while N are then considered as constants;</Text-field>
+<Text-field style="Text" layout="Normal">EXAMPLE IS GIVEN  AFTER;</Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal"></Text-field>
+<Text-field style="Text" layout="Normal">
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1988" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
+s_Cspace_in_lattice_coord,news;
+Cspace:=ComplementList(ISpace,nops(W));
+dilateds:=[seq(n*s[i],i=1..nops(W))];
+s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);# I keep n outside;
+ function_on_ISpace:=functionIb(dilateds,W,ISpace,xi);
+#from here express in terms of the basis lattice for projected cone.
+W_projected:=projectedconeinbasislattice(W,Cspace):
+if W_projected=[] then 
+out1:=function_on_ISpace[1]/function_on_ISpace[2];
+ else
+newxi:=changeofcoordinates(W,Cspace,xi);
+uni_cones:=cone_dec(W_projected);
+out1:=0;
+for j from 1 to nops(uni_cones) do 
+WWW:=uni_cones[j][3];
+signuni:=uni_cones[j][1];
+ASSERT(abs(uni_cones[j][2])=1, &quot;decomposition not unimodular&quot;);
+newP:=MatrixInverse(Transpose(Matrix(WWW)));
+news:=convert(Multiply(newP,Vector(s_Cspace_in_lattice_coord)),list); #print(&quot;news&quot;,news); 
+
+s_small_move:=[seq(nfractionalpartreal(N,-numer(news[f]),denom(news[f])),f=1..nops(news))];  #print(&quot;smallmove&quot;,s_small_move);
+function_on_Cspace:=functionS(s_small_move,WWW,newxi);
+out1:=out1+signuni*function_on_Cspace[1]/function_on_Cspace[2]*function_on_ISpace[1]/function_on_ISpace[2];
+od:
+fi;
+EXP(add(n*s[i]*xi[i],i=1..nops(W)))*out1;
+end:
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L2006" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYmLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtSSZtZnJhY0dGJDYoLUYjNictRiM2Jy1JI21pR0YkNiVRJEVYUEYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj8vRkJRJjAuMGVtRicvRkVGWi1JKG1mZW5jZWRHRiQ2JC1GIzYlLUkjbW5HRiQ2JFEiMEYnRi8vJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRi9GL0Zfb0YvLUYsNi1RMSZJbnZpc2libGVUaW1lcztGJ0YvRjJGNUY3RjlGO0Y9Rj9GWUZlbi1GIzYnLUZONiVRJVRPRERGJ0ZRRlRGVi1GZ242JC1GIzYnRltvLUYsNi1RIixGJ0YvRjIvRjZGU0Y3RjlGO0Y9Rj9GWS9GRVEsMC4zMzMzMzMzZW1GJy1GIzYmLUYjNictRkc2KC1GXG82JFEiMUYnRi8tRlxvNiRRIjJGJ0YvLyUubGluZXRoaWNrbmVzc0dGXHEvJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGZHEvJSliZXZlbGxlZEdGNEZiby1GIzYkLUklbXN1YkdGJDYlLUZONiVRJyYjOTU4O0YnL0ZSRjRGLy1GIzYlRmpwRl9vRi8vJS9zdWJzY3JpcHRzaGlmdEdGXm9GL0Zfb0YvLUYsNi1RIitGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUZccjYlRl5yLUYjNiVGXXFGX29GL0ZkckYvRl9vRi9GL0Zfb0YvRl9vRi8tRiM2Jy1GZ242JEZkcEYvRmJvRltyRl9vRi9GYHFGYnFGZXFGZ3FGX29GLw==">LCQqKi1JJEVYUEc2IjYjIiIhIiIiLUklVE9EREdGJjYkRigsJiZJI3hpR0YmNiNGKSNGKSIiIyZGLzYjRjJGKUYpRi0hIiJGLkY1RjU=</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1986" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+output:=0; 
+d:=nops(W);
+if order=d then   
+output:=dilatedS_Ispace_Cone(n,s,W,[],xi);
+else
+for j from 0 to order do
+C:=choose(d,j);
+cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
+for a from 1 to nops(C) do
+K:=C[a]; KK:=ComplementList(K,nops(W));
+output:=output+cc[j]*dilatedS_Ispace_Cone_real(n,s,W,KK,xi) ;
+od;
+od:
+fi;
+output;
+end:</Text-field>
+</Input>
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" alignment="left" firstindent="0" spacebelow="0" leftmargin="0" linespacing="0.0" initial="0" linebreak="space" rightmargin="0" bulletsuffix="" spaceabove="0" bullet="none" pagebreak-before="false"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1990" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">ApproxEhrhartSimplexgeneric_real:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
+F:=0;  S:=Simplex;
+d:=nops(S)-1;
+for i from 1 to nops(S) do 
+W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
+F:=F+dilated_approxi_cone_real(n,S[i],W,order,xi) ;
+od:
+F:=eval(subs({TODD=Todd,EXP=exp},F));
+end:
+
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1992" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">random_vector:=proc(N,d) local R;
+R:=rand(N);
+[seq(R()+1,i=1..d)]:
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1989" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1985" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#WARNING; THIS WORKS ONLY IF ell is generic;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1996" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
+d:=nops(Simplex)-1;
+order:=M+nops(Simplex)-m; 
+xx:=[seq(t*ell[i],i=1..d)];
+AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
+subs({N=n},CC);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1991" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
+d:=nops(Simplex)-1;
+order:=M+nops(Simplex)-m;
+reg:=random_vector(5000,d); 
+xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
+CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+CCn:=coeff(CCeps,n,m);
+subs({N=n},CCn);
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1987" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted_real:=proc(n,Simplex,ell,M) local d;
+d:=nops(Simplex)-1;
+add(TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m,m=0..M+d);
+end:  </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1994" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">######################################################################&quot;&quot;&quot;&quot;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1995" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+</Section>
+<Group labelreference="L1893" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1894" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1895" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">EXAMPLES:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1954" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#VERIFICATION FOR APPROXIMATION;</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1941" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">random_rational_vector:=proc(N,d) local R;
+R:=rand(N);
+[seq(R()/(R()+1),i=1..d)]:
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1955" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">randomaffinecone:=proc(N,d) local S,i,c;
+c:=[]; 
+for i from 1 to d do 
+c:=[op(c),primitive_vector(random_vector(N,d))];
+od;
+      [random_rational_vector(10,d),c];
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1923" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">randomaffinecone(10,4);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output">NyQ3JiMiIiYiIidGJiMiIiQiIiMjIiIoRik3JjcmRisiIiIiIipGJTcmRi4iIiUiIilGJTcmRi5GJSIjNUYlNyZGJUYlRjRGKA==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1943" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">random_rational_simplex:=proc(N,d) local S,i,c;
+c:=[]; 
+for i from 1 to d+1 do 
+c:=[op(c),random_rational_vector(N,d)];
+od;end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1932" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1930" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">####################################################################
+## EXAMPLES OF FORMULA a) versus FORMULA b)
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1939" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#S_Ispace_Coneformulaa([s[1],s[2]],[[1,1],[1,-1]],[1],xi);
+ </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1938" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#S_Ispace_Coneformulab([s[1],s[2]],[[1,1],[1,-1]],[1],xi);
+ </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1920" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1940" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1936" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#S_Ispace_Coneformulaa([s[1],s[2],s[3]],[[1,1,1],[1,-1,0],[1,1,0]],[1],xi);
+ </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1927" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#S_Ispace_Coneformulab([s[1],s[2],s[3]],[[1,1,1],[1,-1,0],[1,1,0]],[1],xi);
+ </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1925" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">###############################################################</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1935" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">##########################
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1933" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#approx_Cone_formulab([s[1],s[2],s[3]],[[1,1,1],[1,-1,0],[1,1,0]],0,xi);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1977" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#approx_Cone_formulab([s[1],s[2],s[3]],[[1,1,1],[1,-1,0],[1,1,0]],1,xi);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1978" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#approx_Cone_formulab([s[1],s[2],s[3]],[[1,1,1],[1,-1,0],[1,1,0]],2,xi);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1979" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1980" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1934" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">##########################
+# VERIFICATION OF THE PROPERTY OF APPROXIMATION; BY EVALUATING IN A RANDOM VECTOR;
+#SEEMS CORRECT;
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1937" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">checkapprox:=proc(s,Cone,k) local FFa,FFb,Fd,xx,xi;
+xi:=random_vector(100,nops(Cone));print(xi);
+xx:=[seq(t*xi[i],i=1..nops(Cone))];print(xx);
+FFa:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulaa(s,Cone,k,xx)));#print(FFa);
+FFb:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab(s,Cone,k,xx)));#print(FFb);
+Fd:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab(s,Cone,nops(Cone),xx)));# print(Fd);
+ [simplify(series(FFa-Fd,t=0,nops(Cone)+2)),simplify(series(FFb-Fd,t=0,nops(Cone)+2))];
+end:
+</Text-field>
+</Input>
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" alignment="left" firstindent="0" spacebelow="0" leftmargin="0" linespacing="0.0" initial="0" linebreak="space" rightmargin="0" bulletsuffix="" spaceabove="0" bullet="none" pagebreak-before="false">#checkapprox([1/2,1/2,1/3,1/4],[[1,1,-1,1],[1,2,0,0],[1,2,3,4],[1,4,5,7]],3);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1945" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" bold="false" layout="Normal"><Font bold="true">#Coneindex2:=[[1,1,1],[1,-1,0],[1,1,0]];
+ </Font></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1946" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#A0:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab([1/2,1/3,1/4],Coneindex2,0,xi)));</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1951" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#A1:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab([1/2,1/3,1/4],Coneindex2,1,xi)));</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1960" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#A2:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab([1/2,1/3,1/4],Coneindex2,2,xi)));</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1928" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#A3:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab([1/2,1/3,1/4],Coneindex2,3,xi)));</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1953" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1948" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1949" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1950" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1952" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#########################################################################
+## SOME EXAMPLES OF WEIGHTED EHRHART. 
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1942" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">Delta:=[[0,0],[5/28,0],[5/28,5/14]];</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbWlHRiQ2JVEnJiM5MTY7RicvJSdpdGFsaWNHUSZmYWxzZUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIzo9RidGMi8lJmZlbmNlR0YxLyUqc2VwYXJhdG9yR0YxLyUpc3RyZXRjaHlHRjEvJSpzeW1tZXRyaWNHRjEvJShsYXJnZW9wR0YxLyUubW92YWJsZWxpbWl0c0dGMS8lJ2FjY2VudEdGMS8lJ2xzcGFjZUdRLDAuMjc3Nzc3OGVtRicvJSdyc3BhY2VHRkktSShtZmVuY2VkR0YkNiYtRiM2KS1GTTYmLUYjNictSSNtbkdGJDYkUSIwRidGMi1GNjYtUSIsRidGMkY5L0Y8USV0cnVlRidGPUY/RkFGQ0ZFL0ZIUSYwLjBlbUYnL0ZLUSwwLjMzMzMzMzNlbUYnRlUvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRjJGMi8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJ0ZZLUZNNiYtRiM2Jy1JJm1mcmFjR0YkNigtRlY2JFEiNUYnRjItRlY2JFEjMjhGJ0YyLyUubGluZXRoaWNrbmVzc0dRIjFGJy8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZncC8lKWJldmVsbGVkR0YxRllGVUZcb0YyRjJGX29GYm9GWS1GTTYmLUYjNidGaW9GWS1Gam82KEZccC1GVjYkUSMxNEYnRjJGYnBGZXBGaHBGanBGXG9GMkYyRl9vRmJvRlxvRjJGMkZfb0Zib0Zcb0Yy">NyU3JCIiIUYkNyQjIiImIiNHRiQ3JEYmI0YnIiM5</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1944" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1919" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#######################################################################################</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1958" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1959" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1921" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">##########
+
+
+</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1956" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted(n,Delta,[1,1],1);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYvLUkjbW9HRiQ2LVEqJnVtaW51czA7RicvJSxtYXRodmFyaWFudEdRJ25vcm1hbEYnLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y0LyUpc3RyZXRjaHlHRjQvJSpzeW1tZXRyaWNHRjQvJShsYXJnZW9wR0Y0LyUubW92YWJsZWxpbWl0c0dGNC8lJ2FjY2VudEdGNC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkMtRiM2Jy1JJm1mcmFjR0YkNigtSSNtbkdGJDYkUSI1RidGLy1GTDYkUSM4NEYnRi8vJS5saW5ldGhpY2tuZXNzR1EiMUYnLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRlcvJSliZXZlbGxlZEdGNC1GLDYtUTEmSW52aXNpYmxlVGltZXM7RidGL0YyRjVGN0Y5RjtGPUY/L0ZCUSYwLjBlbUYnL0ZFRmpuLUYjNiQtRiM2Jy1JI21pR0YkNiVRJE1PREYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GLDYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjJGNUY3RjlGO0Y9Rj9GaW5GW28tSShtZmVuY2VkR0YkNiQtRiM2Jy1GIzYmRktGZm4tRmFvNiVRIm5GJ0Zkb0Znb0YvLUYsNi1RIixGJ0YvRjIvRjZGZm9GN0Y5RjtGPUY/RmluL0ZFUSwwLjMzMzMzMzNlbUYnLUZMNiRRIzI4RidGLy8lK2ZvcmVncm91bmRHUShbMCwwLDBdRidGL0YvRl9xRi9GL0ZfcUYvLUYsNi1RKCZtaW51cztGJ0YvRjJGNUY3RjlGO0Y9Rj9GQUZELUYjNictRkk2KC1GTDYkRlRGLy1GTDYkUSYxNjQ2NEYnRi9GUkZVRlhGWkZmbi1GIzYkLUklbXN1cEdGJDYlRl5vLUZMNiRRIjNGJ0YvLyUxc3VwZXJzY3JpcHRzaGlmdEdRIjBGJ0YvRl9xRi8tRiw2LVEiK0YnRi9GMkY1RjdGOUY7Rj1GP0ZBRkQtRiM2Jy1GSTYoRmNyLUZMNiRRJDc4NEYnRi9GUkZVRlhGWkZmbi1GIzYkLUZhcjYlRl5vLUZMNiRRIjJGJ0YvRmZyRi9GX3FGL0Zpci1GIzYmLUZdcDYkLUYjNigtRiM2Jy1GSTYoRkstRkw2JFElNTQ4OEYnRi9GUkZVRlhGWkZmbkZjc0ZfcUYvRmlyLUZJNigtRkw2JFEjMjVGJ0YvRk9GUkZVRlhGWkZicS1GIzYnLUZJNigtRkw2JFEjMTVGJ0YvLUZMNiRRJDM5MkYnRi9GUkZVRlhGWkZmbkZcb0ZfcUYvRi9GL0ZmbkZjcEYvRmlyLUYjNiYtRl1wNiQtRiM2J0YrLUYjNictRkk2KEZpdEZkdEZSRlVGWEZaRmZuRlxvRl9xRi9GaXItRkk2KC1GTDYkUSM3NUYnRi9GYHNGUkZVRlhGWkYvRi9GZm4tRmFyNiVGY3BGZ3NGZnJGL0Zpci1GIzYnLUZJNigtRkw2JFEkMTI1RidGL0ZbckZSRlVGWEZaRmZuLUYjNiQtRmFyNiVGY3BGY3JGZnJGL0ZfcUYvRi8=">LC4tSSRNT0RHNiI2JCwkSSJuR0YlIiImIiNHIyEiJiIjJSkqJEYjIiIkIyEiIiIma2siKiRGIyIiIyNGLyIkJXkqJiwoRjMjRikiJSlbJiMiI0RGLSIiIkYjIyEjOiIkI1JGPUYoRj1GPSomLCZGIyMhI0RGOiMiI3ZGNkY9Rj1GKEY0Rj0qJEYoRi8jIiREIkYy</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1957" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1918" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">######################################################################################</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1924" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#I verified that it takes integral values; I could verify the complete ehrhart against the one</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1926" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"># computed with S^L; L:=[]; but the two program looks that I cannot run them together... (I #suppose because of linalg)</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1929" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#One example: </Text-field>
+</Input>
+</Group>
+<Group labelreference="L1931" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">knapsack:=proc(n) local ze, S,j,zej; ze:=[seq(0,i=1..n)];
+S:=[ze];
+for j from 1 to n do zej:=subsop(j=1,ze);
+ S:=[op(S),zej/j]; 
+od;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1947" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">Sourat:=proc(n) local ze, S,j,zej; ze:=[seq(0,i=1..n)];
+S:=[ze];
+for j from 1 to n do zej:=subsop(j=j,ze);
+ S:=[op(S),zej/(j+1)];
+od;
+end:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1922" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#############  DIMENSION 4 ###################################################################</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1896" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">R4 := [[0, 1, 1/3, 2], [1, 0, 1/3, 1], [1, 0, 0, 0], [2/3, 1, 0, 2/3], [0, 1/2, 2, 0]];</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbWlHRiQ2JVEjUjRGJy8lJ2l0YWxpY0dRJXRydWVGJy8lLG1hdGh2YXJpYW50R1EnaXRhbGljRictSSNtb0dGJDYtUSM6PUYnL0YzUSdub3JtYWxGJy8lJmZlbmNlR1EmZmFsc2VGJy8lKnNlcGFyYXRvckdGPS8lKXN0cmV0Y2h5R0Y9LyUqc3ltbWV0cmljR0Y9LyUobGFyZ2VvcEdGPS8lLm1vdmFibGVsaW1pdHNHRj0vJSdhY2NlbnRHRj0vJSdsc3BhY2VHUSwwLjI3Nzc3NzhlbUYnLyUncnNwYWNlR0ZMLUkobWZlbmNlZEdGJDYmLUYjNi0tRlA2Ji1GIzYrLUkjbW5HRiQ2JFEiMEYnRjktRjY2LVEiLEYnRjlGOy9GP0YxRkBGQkZERkZGSC9GS1EmMC4wZW1GJy9GTlEsMC4zMzMzMzMzZW1GJy1GWTYkUSIxRidGOUZmbi1JJm1mcmFjR0YkNihGXm8tRlk2JFEiM0YnRjkvJS5saW5ldGhpY2tuZXNzR0Zgby8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZbcC8lKWJldmVsbGVkR0Y9RmZuLUZZNiRRIjJGJ0Y5LyUrZm9yZWdyb3VuZEdRKFswLDAsMF1GJ0Y5RjkvJSVvcGVuR1EiW0YnLyUmY2xvc2VHUSJdRidGZm4tRlA2Ji1GIzYrRl5vRmZuRlhGZm5GYW9GZm5GXm9GY3BGOUY5RmZwRmlwRmZuLUZQNiYtRiM2K0Zeb0ZmbkZYRmZuRlhGZm5GWEZjcEY5RjlGZnBGaXBGZm4tRlA2Ji1GIzYrLUZibzYoRmBwRmRvRmdvRmlvRlxwRl5wRmZuRl5vRmZuRlhGZm5GaHFGY3BGOUY5RmZwRmlwRmZuLUZQNiYtRiM2K0ZYRmZuLUZibzYoRl5vRmBwRmdvRmlvRlxwRl5wRmZuRmBwRmZuRlhGY3BGOUY5RmZwRmlwRmNwRjlGOUZmcEZpcEZjcEY5">Nyc3JiIiISIiIiNGJSIiJCIiIzcmRiVGJEYmRiU3JkYlRiRGJEYkNyYjRihGJ0YlRiRGLDcmRiQjRiVGKEYoRiQ=</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L1961" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#simplify(TopEhrhartweighted(n,R4,[1,1,1,1],0,4));</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1962" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#simplify(TopEhrhartweighted(n,R4,[1,1,1,1],0,3));</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1963" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#simplify(TopEhrhartweighted(n,R4,[1,1,1,1],0,2));</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1964" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R4,[1,1,1,1],1,5);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1965" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R4,[1,1,1,1],1,4);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1966" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R4,[1,1,1,1],1,3);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1967" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L1976" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#############  DIMENSION 5 ###################################################################</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1969" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#R5:=[[0, 4/5, 0, 0, 3/4], [1, 1, 3, 5/6, 4], [0, 5, 3/5, 3/5, 0], [1/5, 4/5, 1/3, 5/6, 0], [1/2, 1/2, 1/4, 0, 1/5], [5/2, 4/5, 0, 1/2, 1/5]];#random_rational_simplex(6,5);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1975" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R5,[1,1,1,1,1],0,5);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1973" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R5,[1,1,1,1,1],0,4);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1974" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R5,[1,1,1,1,1],0,3);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1971" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R5,[1,1,1,1,1],1,6);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1972" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R5,[1,1,1,1,1],1,5);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1970" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#TopEhrhartweighted(n,R4,[1,1,1,1,1],1,4);</Text-field>
+</Input>
+</Group>
+<Group labelreference="L1968" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L2007" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">######################################################################################</Text-field>
+</Input>
+</Group>
+<Group labelreference="L2008" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L2009" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">#EXAMPLES FOR THE REAL EHRHART POLYNOMIAL versus integers:</Text-field>
+</Input>
+</Group>
+<Group labelreference="L2011" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L2012" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted(n,Delta,[1,1],0);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYsLUkjbW5HRiQ2JFEiMUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIitGJ0YvLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y4LyUpc3RyZXRjaHlHRjgvJSpzeW1tZXRyaWNHRjgvJShsYXJnZW9wR0Y4LyUubW92YWJsZWxpbWl0c0dGOC8lJ2FjY2VudEdGOC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkctRiM2Jy1JJm1mcmFjR0YkNihGKy1GLDYkUSQ3ODRGJ0YvLyUubGluZXRoaWNrbmVzc0dGLi8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZWLyUpYmV2ZWxsZWRHRjgtRjM2LVExJkludmlzaWJsZVRpbWVzO0YnRi9GNkY5RjtGPUY/RkFGQy9GRlEmMC4wZW1GJy9GSUZpbi1GIzYkLUklbXN1cEdGJDYlLUYjNictSSNtaUdGJDYlUSRNT0RGJy8lJ2l0YWxpY0dRJXRydWVGJy9GMFEnaXRhbGljRictRjM2LVEwJkFwcGx5RnVuY3Rpb247RidGL0Y2RjlGO0Y9Rj9GQUZDRmhuRmpuLUkobWZlbmNlZEdGJDYkLUYjNictRiM2Ji1GLDYkUSI1RidGL0Zlbi1GY282JVEibkYnRmZvRmlvRi8tRjM2LVEiLEYnRi9GNi9GOkZob0Y7Rj1GP0ZBRkNGaG4vRklRLDAuMzMzMzMzM2VtRictRiw2JFEjMjhGJ0YvLyUrZm9yZWdyb3VuZEdRKFswLDAsMF1GJ0YvRi9GZHFGLy1GLDYkUSIyRidGLy8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRidGL0ZkcUYvLUYzNi1RKCZtaW51cztGJ0YvRjZGOUY7Rj1GP0ZBRkNGRUZILUYjNictRk02KEYrLUYsNiRRIzE0RidGL0ZSRlRGV0ZZRmVuLUYjNiRGYG9GL0ZkcUYvRjItRiM2Ji1GX3A2JC1GIzYnLUYzNi1RKiZ1bWludXMwO0YnRi9GNkY5RjtGPUY/RkFGQ0ZFRkgtRiM2Jy1GTTYoRmVwLUYsNiRRJDM5MkYnRi9GUkZURldGWUZlbkZnckZkcUYvRjItRk02KEZlcEZkckZSRlRGV0ZZRi9GL0ZlbkZocEYvRjItRiM2Jy1GTTYoLUYsNiRRIzI1RidGL0ZPRlJGVEZXRllGZW4tRiM2JC1GXm82JUZocEZncUZqcUYvRmRxRi9GLw==">LCwiIiJGIyokLUkkTU9ERzYiNiQsJEkibkdGJyIiJiIjRyIiIyNGIyIkJXlGJSMhIiIiIzkqJiwmRiUjISImIiQjUiNGK0YyRiNGI0YqRiNGIyokRipGLSMiI0RGLw==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2014" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted_real(n,Delta,[1,1],0);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYsLUkjbW5HRiQ2JFEiMUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIitGJ0YvLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y4LyUpc3RyZXRjaHlHRjgvJSpzeW1tZXRyaWNHRjgvJShsYXJnZW9wR0Y4LyUubW92YWJsZWxpbWl0c0dGOC8lJ2FjY2VudEdGOC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkctRiM2Jy1JJm1mcmFjR0YkNihGKy1GLDYkUSQ3ODRGJ0YvLyUubGluZXRoaWNrbmVzc0dGLi8lK2Rlbm9tYWxpZ25HUSdjZW50ZXJGJy8lKW51bWFsaWduR0ZWLyUpYmV2ZWxsZWRHRjgtRjM2LVExJkludmlzaWJsZVRpbWVzO0YnRi9GNkY5RjtGPUY/RkFGQy9GRlEmMC4wZW1GJy9GSUZpbi1GIzYkLUklbXN1cEdGJDYlLUYjNictSSNtaUdGJDYlUSRNT0RGJy8lJ2l0YWxpY0dRJXRydWVGJy9GMFEnaXRhbGljRictRjM2LVEwJkFwcGx5RnVuY3Rpb247RidGL0Y2RjlGO0Y9Rj9GQUZDRmhuRmpuLUkobWZlbmNlZEdGJDYkLUYjNictRiM2Ji1GLDYkUSI1RidGL0Zlbi1GY282JVEibkYnRmZvRmlvRi8tRjM2LVEiLEYnRi9GNi9GOkZob0Y7Rj1GP0ZBRkNGaG4vRklRLDAuMzMzMzMzM2VtRictRiw2JFEjMjhGJ0YvLyUrZm9yZWdyb3VuZEdRKFswLDAsMF1GJ0YvRi9GZHFGLy1GLDYkUSIyRidGLy8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRidGL0ZkcUYvLUYzNi1RKCZtaW51cztGJ0YvRjZGOUY7Rj1GP0ZBRkNGRUZILUYjNictRk02KEYrLUYsNiRRIzE0RidGL0ZSRlRGV0ZZRmVuLUYjNiRGYG9GL0ZkcUYvRjItRiM2Ji1GX3A2JC1GIzYnLUYzNi1RKiZ1bWludXMwO0YnRi9GNkY5RjtGPUY/RkFGQ0ZFRkgtRiM2Jy1GTTYoRmVwLUYsNiRRJDM5MkYnRi9GUkZURldGWUZlbkZnckZkcUYvRjItRk02KEZlcEZkckZSRlRGV0ZZRi9GL0ZlbkZocEYvRjItRiM2Jy1GTTYoLUYsNiRRIzI1RidGL0ZPRlJGVEZXRllGZW4tRiM2JC1GXm82JUZocEZncUZqcUYvRmRxRi9GLw==">LCwiIiJGIyokLUkkTU9ERzYiNiQsJEkibkdGJyIiJiIjRyIiIyNGIyIkJXlGJSMhIiIiIzkqJiwmRiUjISImIiQjUiNGK0YyRiNGI0YqRiNGIyokRipGLSMiI0RGLw==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2013" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output">NyU3JCIiIUYkNyQjIiImIiNHRiQ3JEYmI0YnIiM5</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2015" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">lattice3:=[[0,0,0],[1,0,0],[1,2,0],[0,0,1]];</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYnLUkjbWlHRiQ2JVEpbGF0dGljZTNGJy8lJ2l0YWxpY0dRJXRydWVGJy8lLG1hdGh2YXJpYW50R1EnaXRhbGljRictSSNtb0dGJDYtUSM6PUYnL0YzUSdub3JtYWxGJy8lJmZlbmNlR1EmZmFsc2VGJy8lKnNlcGFyYXRvckdGPS8lKXN0cmV0Y2h5R0Y9LyUqc3ltbWV0cmljR0Y9LyUobGFyZ2VvcEdGPS8lLm1vdmFibGVsaW1pdHNHRj0vJSdhY2NlbnRHRj0vJSdsc3BhY2VHUSwwLjI3Nzc3NzhlbUYnLyUncnNwYWNlR0ZMLUkobWZlbmNlZEdGJDYmLUYjNistRlA2Ji1GIzYpLUkjbW5HRiQ2JFEiMEYnRjktRjY2LVEiLEYnRjlGOy9GP0YxRkBGQkZERkZGSC9GS1EmMC4wZW1GJy9GTlEsMC4zMzMzMzMzZW1GJ0ZYRmZuRlgvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRjlGOS8lJW9wZW5HUSJbRicvJSZjbG9zZUdRIl1GJ0Zmbi1GUDYmLUYjNiktRlk2JFEiMUYnRjlGZm5GWEZmbkZYRl5vRjlGOUZhb0Zkb0Zmbi1GUDYmLUYjNilGW3BGZm4tRlk2JFEiMkYnRjlGZm5GWEZeb0Y5RjlGYW9GZG9GZm4tRlA2Ji1GIzYpRlhGZm5GWEZmbkZbcEZeb0Y5RjlGYW9GZG9GXm9GOUY5RmFvRmRvRl5vRjk=">NyY3JSIiIUYkRiQ3JSIiIkYkRiQ3JUYmIiIjRiQ3JUYkRiRGJg==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2016" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L2017" drawlabel="true">
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYwLUkjbW5HRiQ2JFEiMUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIitGJ0YvLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y4LyUpc3RyZXRjaHlHRjgvJSpzeW1tZXRyaWNHRjgvJShsYXJnZW9wR0Y4LyUubW92YWJsZWxpbWl0c0dGOC8lJ2FjY2VudEdGOC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkctRiM2Jy1JJm1mcmFjR0YkNigtRiw2JFEiM0YnRi8tRiw2JFEiMkYnRi8vJS5saW5ldGhpY2tuZXNzR0YuLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRlkvJSliZXZlbGxlZEdGOC1GMzYtUTEmSW52aXNpYmxlVGltZXM7RidGL0Y2RjlGO0Y9Rj9GQUZDL0ZGUSYwLjBlbUYnL0ZJRlxvLUYjNiQtSSVtc3VwR0YkNiUtRiM2Jy1JI21pR0YkNiVRJE1PREYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GMzYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjZGOUY7Rj1GP0ZBRkNGW29GXW8tSShtZmVuY2VkR0YkNiQtRiM2Jy1GZm82JVEibkYnRmlvRlxwLUYzNi1RIixGJ0YvRjYvRjpGW3BGO0Y9Rj9GQUZDRltvL0ZJUSwwLjMzMzMzMzNlbUYnRisvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRi9GL0ZfcUYvRlIvJTFzdXBlcnNjcmlwdHNoaWZ0R1EiMEYnRi9GX3FGLy1GMzYtUSgmbWludXM7RidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSC1GIzYnLUZNNihGK0ZPRlVGV0ZaRmZuRmhuLUYjNiQtRmFvNiVGY29GT0ZicUYvRl9xRi9GZXEtRiM2Jy1GTTYoLUYsNiRRIzEzRidGLy1GLDYkUSI2RidGL0ZVRldGWkZmbkZobi1GIzYkRmNvRi9GX3FGL0YyLUYjNidGYnJGaG4tRiM2JEZmcEYvRl9xRi9GMi1GIzYmLUZicDYkLUYjNictRjM2LVEqJnVtaW51czA7RidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSEZjb0YyRkxGL0YvRmhuLUZhbzYlRmZwRlJGYnFGL0YyLUYjNidGanFGaG4tRiM2JC1GYW82JUZmcEZPRmJxRi9GX3FGL0Yv">LDAiIiJGIyokLUkkTU9ERzYiNiRJIm5HRidGIyIiIyMiIiRGKiokRiVGLCMhIiJGLEYlIyEjOCIiJ0YpIyIjOEYyKiYsJkYlRi9GK0YjRiNGKUYqRiMqJEYpRiwjRiNGLA==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2018" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">divlattice:=proc(div); [[0,0,0],[div*1,0,0],[div*1,div*2,0],[0,0,div*1]];end:</Text-field>
+</Input>
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" alignment="left" firstindent="0" spacebelow="0" leftmargin="0" linespacing="0.0" initial="0" linebreak="space" rightmargin="0" bulletsuffix="" spaceabove="0" bullet="none" pagebreak-before="false"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L2021" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted(n,divlattice(1),[1,1,1],0);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYqLUYjNictSSZtZnJhY0dGJDYoLUkjbW5HRiQ2JFEjMTNGJy8lLG1hdGh2YXJpYW50R1Enbm9ybWFsRictRjE2JFEiNkYnRjQvJS5saW5ldGhpY2tuZXNzR1EiMUYnLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRj8vJSliZXZlbGxlZEdRJmZhbHNlRictSSNtb0dGJDYtUTEmSW52aXNpYmxlVGltZXM7RidGNC8lJmZlbmNlR0ZELyUqc2VwYXJhdG9yR0ZELyUpc3RyZXRjaHlHRkQvJSpzeW1tZXRyaWNHRkQvJShsYXJnZW9wR0ZELyUubW92YWJsZWxpbWl0c0dGRC8lJ2FjY2VudEdGRC8lJ2xzcGFjZUdRJjAuMGVtRicvJSdyc3BhY2VHRlktRiM2JC1JI21pR0YkNiVRIm5GJy8lJ2l0YWxpY0dRJXRydWVGJy9GNVEnaXRhbGljRidGNC8lK2ZvcmVncm91bmRHUShbMCwwLDBdRidGNC1GRjYtUSIrRidGNEZJRktGTUZPRlFGU0ZVL0ZYUSwwLjIyMjIyMjJlbUYnL0ZlbkZoby1GIzYnLUYuNigtRjE2JFEiM0YnRjQtRjE2JFEiMkYnRjRGOkY9RkBGQkZFLUYjNiQtSSVtc3VwR0YkNiVGaG5GYXAvJTFzdXBlcnNjcmlwdHNoaWZ0R1EiMEYnRjRGYW9GNEZkby1GIzYnLUYuNigtRjE2JEY8RjRGXnBGOkY9RkBGQkZFLUYjNiQtRmdwNiVGaG5GXnBGaXBGNEZhb0Y0RmRvRmBxRjQ=">LCoqJiMiIzgiIiciIiJJIm5HNiJGJ0YnKiYjIiIkIiIjRicpRihGLUYnRicqJiNGJ0YsRicpRihGLEYnRidGJ0Yn</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2020" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted_real(n,divlattice(1),[1,1,1],0);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYwLUkjbW5HRiQ2JFEiMUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RIitGJ0YvLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y4LyUpc3RyZXRjaHlHRjgvJSpzeW1tZXRyaWNHRjgvJShsYXJnZW9wR0Y4LyUubW92YWJsZWxpbWl0c0dGOC8lJ2FjY2VudEdGOC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkctRiM2Jy1JJm1mcmFjR0YkNigtRiw2JFEiM0YnRi8tRiw2JFEiMkYnRi8vJS5saW5ldGhpY2tuZXNzR0YuLyUrZGVub21hbGlnbkdRJ2NlbnRlckYnLyUpbnVtYWxpZ25HRlkvJSliZXZlbGxlZEdGOC1GMzYtUTEmSW52aXNpYmxlVGltZXM7RidGL0Y2RjlGO0Y9Rj9GQUZDL0ZGUSYwLjBlbUYnL0ZJRlxvLUYjNiQtSSVtc3VwR0YkNiUtRiM2Jy1JI21pR0YkNiVRJE1PREYnLyUnaXRhbGljR1EldHJ1ZUYnL0YwUSdpdGFsaWNGJy1GMzYtUTAmQXBwbHlGdW5jdGlvbjtGJ0YvRjZGOUY7Rj1GP0ZBRkNGW29GXW8tSShtZmVuY2VkR0YkNiQtRiM2Jy1GZm82JVEibkYnRmlvRlxwLUYzNi1RIixGJ0YvRjYvRjpGW3BGO0Y9Rj9GQUZDRltvL0ZJUSwwLjMzMzMzMzNlbUYnRisvJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRi9GL0ZfcUYvRlIvJTFzdXBlcnNjcmlwdHNoaWZ0R1EiMEYnRi9GX3FGLy1GMzYtUSgmbWludXM7RidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSC1GIzYnLUZNNihGK0ZPRlVGV0ZaRmZuRmhuLUYjNiQtRmFvNiVGY29GT0ZicUYvRl9xRi9GZXEtRiM2Jy1GTTYoLUYsNiRRIzEzRidGLy1GLDYkUSI2RidGL0ZVRldGWkZmbkZobi1GIzYkRmNvRi9GX3FGL0YyLUYjNidGYnJGaG4tRiM2JEZmcEYvRl9xRi9GMi1GIzYmLUZicDYkLUYjNictRjM2LVEqJnVtaW51czA7RidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSEZjb0YyRkxGL0YvRmhuLUZhbzYlRmZwRlJGYnFGL0YyLUYjNidGanFGaG4tRiM2JC1GYW82JUZmcEZPRmJxRi9GX3FGL0Yv">LDAiIiJGIyokLUkkTU9ERzYiNiRJIm5HRidGIyIiIyMiIiRGKiokRiVGLCMhIiJGLEYlIyEjOCIiJ0YpIyIjOEYyKiYsJkYlRi9GK0YjRiNGKUYqRiMqJEYpRiwjRiNGLA==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2023" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted(n,divlattice(1/2),[1,1,1],0);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYwLUkjbW5HRiQ2JFEiMUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RKCZtaW51cztGJ0YvLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y4LyUpc3RyZXRjaHlHRjgvJSpzeW1tZXRyaWNHRjgvJShsYXJnZW9wR0Y4LyUubW92YWJsZWxpbWl0c0dGOC8lJ2FjY2VudEdGOC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkctRiM2Jy1JJm1mcmFjR0YkNigtRiw2JFEjMTNGJ0YvLUYsNiRRIzEyRidGLy8lLmxpbmV0aGlja25lc3NHRi4vJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGWS8lKWJldmVsbGVkR0Y4LUYzNi1RMSZJbnZpc2libGVUaW1lcztGJ0YvRjZGOUY7Rj1GP0ZBRkMvRkZRJjAuMGVtRicvRklGXG8tRiM2JC1GIzYnLUkjbWlHRiQ2JVEkTU9ERicvJSdpdGFsaWNHUSV0cnVlRicvRjBRJ2l0YWxpY0YnLUYzNi1RMCZBcHBseUZ1bmN0aW9uO0YnRi9GNkY5RjtGPUY/RkFGQ0Zbb0Zdby1JKG1mZW5jZWRHRiQ2JC1GIzYnLUZjbzYlUSJuRidGZm9GaW8tRjM2LVEiLEYnRi9GNi9GOkZob0Y7Rj1GP0ZBRkNGW28vRklRLDAuMzMzMzMzM2VtRictRiw2JFEiMkYnRi8vJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRi9GL0ZfcUYvRi9GX3FGLy1GMzYtUSIrRidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSC1GIzYnLUZNNigtRiw2JFEiM0YnRi8tRiw2JFEiOEYnRi9GVUZXRlpGZm5GaG4tRiM2JC1JJW1zdXBHRiQ2JUZgb0ZccS8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRidGL0ZfcUYvRjItRiM2Jy1GTTYoRistRiw2JFEjMjRGJ0YvRlVGV0ZaRmZuRmhuLUYjNiQtRmJyNiVGYG9GaXFGZHJGL0ZfcUYvRmJxLUYjNiYtRl9wNiQtRiM2KEZMRjItRiM2Jy1GTTYoRmlxLUYsNiRRIjRGJ0YvRlVGV0ZaRmZuRmhuRl5vRl9xRi9GYnEtRiM2Jy1GTTYoRitGXHJGVUZXRlpGZm5GaG5GX3JGX3FGL0YvRi9GaG5GY3BGL0ZicS1GIzYmLUZfcDYkLUYjNictRjM2LVEqJnVtaW51czA7RidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSC1GIzYnRmF0RmhuRl5vRl9xRi9GYnFGZ3FGL0YvRmhuLUZicjYlRmNwRlxxRmRyRi9GYnEtRiM2J0ZpckZobi1GIzYkLUZicjYlRmNwRmlxRmRyRi9GX3FGL0Yv">LDAiIiJGIy1JJE1PREc2IjYkSSJuR0YmIiIjIyEjOCIjNyokRiRGKSMiIiQiIikqJEYkRi8jISIiIiNDKiYsKCMiIzhGLEYjRiQjISIkIiIlRi0jRiNGMEYjRihGI0YjKiYsJkYkI0YzRjBGLkYjRiNGKEYpRiMqJEYoRi8jRiNGNA==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2022" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal">CompleteEhrhartweighted_real(n,divlattice(1/2),[1,1,1],0);</Text-field>
+</Input>
+<Output>
+<Text-field style="2D Output" layout="Maple Output"><Equation executable="false" style="2D Output" display="LUklbXJvd0c2Iy9JK21vZHVsZW5hbWVHNiJJLFR5cGVzZXR0aW5nR0koX3N5c2xpYkdGJzYwLUkjbW5HRiQ2JFEiMUYnLyUsbWF0aHZhcmlhbnRHUSdub3JtYWxGJy1JI21vR0YkNi1RKCZtaW51cztGJ0YvLyUmZmVuY2VHUSZmYWxzZUYnLyUqc2VwYXJhdG9yR0Y4LyUpc3RyZXRjaHlHRjgvJSpzeW1tZXRyaWNHRjgvJShsYXJnZW9wR0Y4LyUubW92YWJsZWxpbWl0c0dGOC8lJ2FjY2VudEdGOC8lJ2xzcGFjZUdRLDAuMjIyMjIyMmVtRicvJSdyc3BhY2VHRkctRiM2Jy1JJm1mcmFjR0YkNigtRiw2JFEjMTNGJ0YvLUYsNiRRIzEyRidGLy8lLmxpbmV0aGlja25lc3NHRi4vJStkZW5vbWFsaWduR1EnY2VudGVyRicvJSludW1hbGlnbkdGWS8lKWJldmVsbGVkR0Y4LUYzNi1RMSZJbnZpc2libGVUaW1lcztGJ0YvRjZGOUY7Rj1GP0ZBRkMvRkZRJjAuMGVtRicvRklGXG8tRiM2JC1GIzYnLUkjbWlHRiQ2JVEkTU9ERicvJSdpdGFsaWNHUSV0cnVlRicvRjBRJ2l0YWxpY0YnLUYzNi1RMCZBcHBseUZ1bmN0aW9uO0YnRi9GNkY5RjtGPUY/RkFGQ0Zbb0Zdby1JKG1mZW5jZWRHRiQ2JC1GIzYnLUZjbzYlUSJuRidGZm9GaW8tRjM2LVEiLEYnRi9GNi9GOkZob0Y7Rj1GP0ZBRkNGW28vRklRLDAuMzMzMzMzM2VtRictRiw2JFEiMkYnRi8vJStmb3JlZ3JvdW5kR1EoWzAsMCwwXUYnRi9GL0ZfcUYvRi9GX3FGLy1GMzYtUSIrRidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSC1GIzYnLUZNNigtRiw2JFEiM0YnRi8tRiw2JFEiOEYnRi9GVUZXRlpGZm5GaG4tRiM2JC1JJW1zdXBHRiQ2JUZgb0ZccS8lMXN1cGVyc2NyaXB0c2hpZnRHUSIwRidGL0ZfcUYvRjItRiM2Jy1GTTYoRistRiw2JFEjMjRGJ0YvRlVGV0ZaRmZuRmhuLUYjNiQtRmJyNiVGYG9GaXFGZHJGL0ZfcUYvRmJxLUYjNiYtRl9wNiQtRiM2KEZMRjItRiM2Jy1GTTYoRmlxLUYsNiRRIjRGJ0YvRlVGV0ZaRmZuRmhuRl5vRl9xRi9GYnEtRiM2Jy1GTTYoRitGXHJGVUZXRlpGZm5GaG5GX3JGX3FGL0YvRi9GaG5GY3BGL0ZicS1GIzYmLUZfcDYkLUYjNictRjM2LVEqJnVtaW51czA7RidGL0Y2RjlGO0Y9Rj9GQUZDRkVGSC1GIzYnRmF0RmhuRl5vRl9xRi9GYnFGZ3FGL0YvRmhuLUZicjYlRmNwRlxxRmRyRi9GYnEtRiM2J0ZpckZobi1GIzYkLUZicjYlRmNwRmlxRmRyRi9GX3FGL0Yv">LDAiIiJGIy1JJE1PREc2IjYkSSJuR0YmIiIjIyEjOCIjNyokRiRGKSMiIiQiIikqJEYkRi8jISIiIiNDKiYsKCMiIzhGLEYjRiQjISIkIiIlRi0jRiNGMEYjRihGI0YjKiYsJkYkI0YzRjBGLkYjRiNGKEYpRiMqJEYoRi8jRiNGNA==</Equation></Text-field>
+</Output>
+</Group>
+<Group labelreference="L2019" drawlabel="true">
+<Input>
+<Text-field prompt="&gt; " style="Maple Input" layout="Normal"></Text-field>
+</Input>
+</Group>
+<Group labelreference="L2010" drawlabel="true">
+<Input>
+<Text-field style="Text" layout="Normal">I</Text-field>
+</Input>
+</Group>
+</Section>
+</Worksheet>

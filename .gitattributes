@@ -77,6 +77,13 @@ EXAMPLES/cubes/cube_9.ext -text
 EXAMPLES/cubes/cube_9.ine -text
 EXAMPLES/cubes/makeCube -text
 EXAMPLES/cubes/makeCube.cpp -text
+EXAMPLES/deloera/6e.latte -text
+EXAMPLES/deloera/7h.latte -text
+EXAMPLES/deloera/C11.latte -text
+EXAMPLES/deloera/C12.latte -text
+EXAMPLES/deloera/another-birkhoff-simplex.vrep -text
+EXAMPLES/deloera/chan-robbins-yuen-pyramid.vrep -text
+EXAMPLES/deloera/some-birkhoff-simplex.vrep -text
 EXAMPLES/garcia -text
 EXAMPLES/kahle/K4.latte -text
 EXAMPLES/kahle/join.latte -text
@@ -251,6 +258,13 @@ code/latte/testingSLandTopEhrhart/TopEhrhart/TopEhrhart_lib.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhartBirkhoffSimplex.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart_lib.mpl -text
+code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl -text
+code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mw -text
+code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010_examples.mpl -text
+code/latte/top-ehrhart/README -text
+code/latte/top-ehrhart/TopEhrhart_lib.mpl -text
+code/latte/top-ehrhart/testingTopEhrhart.mpl -text
+code/latte/top-ehrhart/testingTopEhrhart_lib.mpl -text
 code/latte/valuation/Driver.cpp -text
 code/latte/valuation/Perturbation.cpp -text
 code/latte/valuation/Perturbation.h -text
