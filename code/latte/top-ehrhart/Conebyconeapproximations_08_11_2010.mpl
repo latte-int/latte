@@ -278,7 +278,17 @@ end:
 # Thus we write b=b_Cspace+b_ISpace;
 # Our output is b_Cspace;
 # Example: projectedvector([[1,0,0],[0,1,2],[0,1,0]],[3],[0,0,1])->[0,-1/2,0];
-projectedvector:=proc(M_inverse, W,Cspace,b) local S,j,v,V;
+projectedvector:=proc(W,Cspace,b) local M,S,j,v,V,m;
+    M:=transpose(matrix([seq(W[i],i=1..nops(W))]));
+    S:=linsolve(M,b);
+    m:=det(M);
+    for j from 1 to nops(W) do
+        v[j]:=add(S[Cspace[i]]*W[Cspace[i]][j],i=1..nops(Cspace));
+    od:
+    V:=[seq(v[j],j=1..nops(W))];
+end:
+## Same, with precomputed inverse (faster)
+projectedvector_with_inverse:=proc(M_inverse, W,Cspace,b) local S,j,v,V;
     S:=multiply(M_inverse,b);
     #m:=det(M);
     for j from 1 to nops(W) do
@@ -318,7 +328,7 @@ projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_pr
     M_inverse:=inverse(transpose(matrix([seq(W[i],i=1..nops(W))])));
     for i from 1 to d do
 
-        temp_projectedVectors:=m*projectedvector(M_inverse, W,Cspace,B[i]);
+        temp_projectedVectors:=m*projectedvector_with_inverse(M_inverse, W,Cspace,B[i]);
         r[i]:=[seq(temp_projectedVectors[j],j=1..nops(W))];
     od;
     S:=matrix([seq(r[i],i=1..d)]);;
@@ -957,6 +967,47 @@ CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
     d:=nops(Simplex)-1;
     add(TopEhrhartweighted(n,Simplex,ell,M,m)*n^m,m=0..M+d);
 end:
+# New functions: --Matthias
+# Compute the highest (k+1) terms.
+TopEhrhartweightedPoly:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
+    d:=nops(Simplex)-1;
+    k := min(M+d, given_k);
+    order:=M+nops(Simplex)-k;
+    reg:=random_vector(5000,d);
+    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
+    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+    CCn:=add(coeff(CCeps,n,m) * N^m, m=M+d-k..M+d);
+    subs({N=n},CCn);
+end:
+#### LATTE INTERFACE FUNCTION:
+printTopEhrhartweightedPoly:=proc(n,Simplex,ell,M,k)
+    printf("%a\n", TopEhrhartweightedPoly(n,Simplex,ell,M,k));
+end:
+# Incrementally compute and print all terms 0f the weighted Ehrhart
+# polynomial.  User can interrupt when computation takes too long.
+#### LATTE INTERFACE FUNCTION:
+printIncrementalEhrhartweightedPoly:=proc(n,Simplex,ell,M) local d;
+    local m, term, poly;
+    d:=nops(Simplex)-1;
+    m := M+d;
+    term := TopEhrhartweighted(n,Simplex,ell,M,m)*n^m;
+    printf("%a\n", term);
+    poly := term;
+    for m from M+d-1 to 0 by -1 do
+        term := TopEhrhartweighted(n,Simplex,ell,M,m)*n^m;
+        printf("+ %a\n", term);
+        poly := poly + term;
+    od;
+    printf("## Evaluation at n=1: %a\n",
+           eval(subs(n=1,MOD=modp, poly)));
+end:
+
+##################################################################
+### CODE FOR REAL DILATIONS
+##################################################################
+
 ######################################################################""""
 # Approximate  functions  S^L  for a  dilated  cone ns+Cone; HERE n is a real.
 # Input: n a variable,  s a numeric vector in Q^d,
@@ -1006,7 +1057,7 @@ dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_o
 end:
 
 
-dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi);
+#dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi);
 dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     output:=0;
     d:=nops(W);
