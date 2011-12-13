@@ -1063,6 +1063,43 @@ CompleteEhrhartweighted_real:=proc(n,Simplex,ell,M) local d;
     d:=nops(Simplex)-1;
     add(TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m,m=0..M+d);
 end:
+# New functions: --Matthias
+# Compute the highest (k+1) terms.
+TopEhrhartweightedPoly_real:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
+    d:=nops(Simplex)-1;
+    k := min(M+d, given_k);
+    order:=M+nops(Simplex)-k;
+    reg:=random_vector(5000,d);
+    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
+    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+    CCn:=add(coeff(CCeps,n,m) * N^m, m=M+d-k..M+d);
+    subs({N=n},CCn);
+end:
+#### LATTE INTERFACE FUNCTION:
+printTopEhrhartweightedPoly_real:=proc(n,Simplex,ell,M,k)
+    printf("%a\n", TopEhrhartweightedPoly_real(n,Simplex,ell,M,k));
+end:
+# Incrementally compute and print all terms 0f the weighted Ehrhart
+# polynomial.  User can interrupt when computation takes too long.
+#### LATTE INTERFACE FUNCTION:
+printIncrementalEhrhartweightedPoly_real:=proc(n,Simplex,ell,M) local d;
+    local m, term, poly;
+    d:=nops(Simplex)-1;
+    m := M+d;
+    term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m;
+    printf("%a\n", term);
+    poly := term;
+    for m from M+d-1 to 0 by -1 do
+        term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m;
+        printf("+ %a\n", term);
+        poly := poly + term;
+    od;
+    printf("## Evaluation at n=1: %a\n",
+           eval(subs(n=1,MOD=modp, poly)));
+end:
+
 ######################################################################""""
 
 
