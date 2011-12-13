@@ -278,10 +278,9 @@ end:
 # Thus we write b=b_Cspace+b_ISpace;
 # Our output is b_Cspace;
 # Example: projectedvector([[1,0,0],[0,1,2],[0,1,0]],[3],[0,0,1])->[0,-1/2,0];
-projectedvector:=proc(W,Cspace,b) local M,S,j,v,V,m;
-    M:=transpose(matrix([seq(W[i],i=1..nops(W))]));
-    S:=linsolve(M,b);
-    m:=det(M);
+projectedvector:=proc(M_inverse, W,Cspace,b) local S,j,v,V;
+    S:=multiply(M_inverse,b);
+    #m:=det(M);
     for j from 1 to nops(W) do
         v[j]:=add(S[Cspace[i]]*W[Cspace[i]][j],i=1..nops(Cspace));
     od:
@@ -310,15 +309,19 @@ end:
 #
 #
 #
-projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List;
+projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_projectedVectors;
     d:=nops(W);
     B:=ortho_basis(d);
     k:=nops(Cspace);
-    m:=abs(Determinant(Transpose(Matrix([seq(W[i],i=1..nops(W))]))));
+    m:=abs(det(transpose(matrix([seq(W[i],i=1..nops(W))]))));
+
+    M_inverse:=inverse(transpose(matrix([seq(W[i],i=1..nops(W))])));
     for i from 1 to d do
-        r[i]:=[seq(m*projectedvector(W,Cspace,B[i])[j],j=1..nops(W))];
+
+        temp_projectedVectors:=m*projectedvector(M_inverse, W,Cspace,B[i]);
+        r[i]:=[seq(temp_projectedVectors[j],j=1..nops(W))];
     od;
-    S:=Matrix([seq(r[i],i=1..d)]);;
+    S:=matrix([seq(r[i],i=1..d)]);;
     IS:=ihermite(S);
     List:=[seq(1/m*convert(row(IS,j),list),j=1..k)];
     List;
@@ -336,10 +339,10 @@ end:
 #  Example: projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3])→[[1,0],[0,1]]
 projectedconeinbasislattice:=proc(W,Cspace) local P,M,output,i,F;
     P:=projectedlattice(W,Cspace);
-    M:=Transpose(Matrix([seq(P[i],i=1..nops(P))]));
+    M:=transpose(matrix([seq(P[i],i=1..nops(P))]));
     output:=[];
     for i from 1 to nops(Cspace) do
-        F:=convert(LinearSolve(M,Vector(W[Cspace[i]])),list);
+        F:=convert(linsolve(M,Vector(W[Cspace[i]])),list);
         output:=[op(output),primitive_vector(F)];
     od;
     output;
