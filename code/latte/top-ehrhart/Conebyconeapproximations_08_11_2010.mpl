@@ -104,23 +104,28 @@ end:
 primitive_vector:=proc(A) local d,n,g;
     d:=nops(A);
     n:=ilcm(seq(denom(A[i]),i=1..d));
-    g:=igcd(seq(n*A[i],i=1..d));if g<>0 then
-                                    [seq(n*A[i]/g,i=1..d)];else [seq(n*A[i],i=1..d)];fi;
+    g:=igcd(seq(n*A[i],i=1..d));
+    if g<>0 then
+        [seq(n*A[i]/g,i=1..d)];
+    else
+        [seq(n*A[i],i=1..d)];
+    fi;
 end:
 ortho_basis:=proc(d) local i,v;
     for i from 1 to d do
         v[i]:=[seq(0,j=1..i-1),1,seq(0,j=i+1..d)]
-    od;[seq(v[j],j=1..d)];
+    od;
+    [seq(v[j],j=1..d)];
 end:
-fracpart:=proc(x); x-floor(x);
+fracpart:=proc(x);
+    x-floor(x);
 end:
+#fracpart(1);
 
-fracpart(1);
-#  Signed decomposition into unimodular cones
+#####################################
+# Computing Barvinok Signed decomposition into unimodular cones
 # A "simplicial cone" is a list of  d linearly independent  vectors in Z^d, sometimes assumed primitive.
-#
 # short_vector(A)
-#
 # # Input:   A is a list of d linearly independent vectors.
 # # Output: sho is a vector of dimension d.
 short_vector:=proc(A) local n,base,i,sho;
@@ -136,8 +141,9 @@ short_vector:=proc(A) local n,base,i,sho;
     od;
     sho;
 end:
+
+
 # # sign_entries_vector(V)
-#
 # #  Input : vector V of dimension d.
 # # Output:  L=[ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
 # #               according to the signs of the entries of the vector V.
@@ -152,8 +158,8 @@ sign_entries_vector:=proc(V) local d,i,Lplus,Lminus,Lzero;
     od;
     [Lplus,Lminus,Lzero];
 end:
+
 # # good_vector(G)
-# #
 # # Input   G  is a  "simplicial cone"
 # # Output consists of 2 elements:
 # #              V is a vector in Z^d.
@@ -161,27 +167,26 @@ end:
 # #               according to the signs of the entries of the vector V. in the basis G.
 good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L;
     n:=nops(G);
-    A:=Transpose(Matrix(G));
-    Ainverse:=MatrixInverse(A);
-    B:=[seq(convert(Ainverse[1..n,i],list),i=1..n)];
+    #A:=Transpose(Matrix(G));
+    Ainverse:=inverse(matrix(G));
+    B:=convert(Ainverse, listlist);
+    #B:=[seq(convert(Ainverse[i,1..n],list),i=1..n)];
     sho:=short_vector(B);
     V :=[seq(add(G[j][i]*sho[j],j=1..n),i=1..n)];
     L:= sign_entries_vector(sho);
     [V,L];
 end:
+
 # # signed_decomp(eps,G,v,L)
-#
 # # Input :  eps = 1 or -1
 # #             G  is a  "simplicial cone"
 # #              V is a vector of dim d
 # #              L= [ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
-# #
 # # Output : [Nonuni,Uni]
 # #              Nonuni and Uni are  lists of terms  [eps,detG,G],  where
 # #               eps=1 or -1,
 # #               detG is an integer,
 # #               G  is a  list of  d linearly independant primitive  vectors in Z^d.
-
 signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,kzero,i,j, C,M, detC, Csigned ;
     Nonuni:=[]; Uni:=[];
     Lplus:=L[1]; Lminus:=L[2]; Lzero:=L[3];
@@ -190,7 +195,7 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
         for i from 1 to kplus do
             C:=[seq(G[Lplus[j]],j=1..i-1),seq(-G[Lplus[j]],j=i+1..kplus),v,seq(G[Lminus[j]],j=1..kminus),seq(G[Lzero[j]],j=1..kzero)];
 
-            detC := Determinant(Matrix(C));
+            detC := det(matrix(C));
             Csigned:=[eps*(-1)^(i+kplus),detC,C];
 
             if abs(detC)>1 then
@@ -203,7 +208,7 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
         for i from 1 to kminus do
             C:=[seq(G[Lplus[j]],j=1..kplus),-v,seq(-G[Lminus[j]],j=1..i-1),seq(G[Lminus[j]],j=i+1..kminus),seq(G[Lzero[j]],j=1..kzero)];
 
-            detC := Determinant(Matrix(C));
+            detC := det(matrix(C));
             Csigned:=[eps*(-1)^(i+1),detC,C];
 
             if abs(detC)>1 then
@@ -213,27 +218,27 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
     end if;
     [Nonuni,Uni];
 end:
-#
-#
+
 # # good_cone_dec(eps,G)
 # #  Input: eps = 1 or -1
 # #             G  is a  simplicial cone
-# #
 # #  Output:  two lists [Nonuni,Uni] as in procedure signed_decomp:
-# #
-good_cone_dec:=proc(eps,G) local n,A,R,Output;
-    n:=nops(G);  A:=Matrix([seq(G[i],i=1..n)]);
-    if abs(Determinant(A))=1 then  Output:=[[],[[eps,Determinant(A),G]]];
+good_cone_dec:=proc(eps,G) local n,A,R,Output, det_A;
+#    printf("good_cone_dec: %A, %A", eps, G);
+    n:=nops(G);  A:=matrix([seq(G[i],i=1..n)]);
+    det_A:=det(A);
+    if abs(det_A)=1 then
+        Output:=[[],[[eps,det_A,G]]];
     else R:=good_vector(G);
         Output:=signed_decomp(eps,G,R[1],R[2]);
     fi;
+    # print(Output);
+    # Output;
 end:
+
 # # more_decomposition_in_cones(cones)
-#
 # # Input:  cones =[cones[1],cones[2]] as in procedure signed_decomp
 # # Output: [Newnonuni,Newuni] as in procedure signed_decomp
-#
-#
 more_decomposition_in_cones:=proc(cones) local i,Newuni,Newnonuni,newcones:
     Newnonuni:=[];
     Newuni:=cones[2];
@@ -246,23 +251,24 @@ more_decomposition_in_cones:=proc(cones) local i,Newuni,Newnonuni,newcones:
 end:
 
 # # cone_dec(G)
-# #
 # # Input:  G is a "simplicial cone"
 # # Output: A list of  terms [eps,detG,G] where
-# "               eps =1 or -1,
+# #               eps =1 or -1,
 # #               detG is an integer ( hopefully 1 or -1),
 # #               G  is a  "simplicial cone", (hopefully unimodular)
-# #
 cone_dec:=proc(G) local seed, i,ok;
-    if G=[] then RETURN([[1,1,[]]]);fi:
+    if G=[] then
+        RETURN([[1,1,[]]]);
+    fi:
     seed:=good_cone_dec(1,G);
     ok:=0;
-    i:=1; while ok=0  do
-              seed:=more_decomposition_in_cones(seed);
-              if seed[1]=[] then
-                  ok:=1;else ok:=0;i:=i+1;
-              fi;
-          od;
+    i:=1;
+    while ok=0  do
+        seed:=more_decomposition_in_cones(seed);
+        if seed[1]=[] then
+            ok:=1;else ok:=0;i:=i+1;
+        fi;
+    od;
     RETURN(seed[2]);
 end:
 #
@@ -338,17 +344,20 @@ projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_pr
 end:
 #projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3]);
 # Projected cone and projected vertex (expressed in the lattice basis)
-# Input: W is a Cone in Z^d and Cspace is a subset of [1,..,d] of cardinal k;
-#  Output: A "Cone" in Z^k;
+# Input: W is a Cone in Z^d and Cspace is a subset of [1,..,d] of
+#        cardinality k; ProjLattice = projectedlattice(W,Cspace);
+# Output: A "Cone" in Z^k;
 
 # Be careful: our input must have integral coordinates.
 # The ouput then will have integral coordinates.
 #
 #
-# Here W is the cone and we are projecting W over lin( Cspace) and expressing it in term of the basis H_1,H_2,...,H_k of projectedlattice(W,Cspace).
+# Here W is the cone and we are projecting W over lin(Cspace) and
+# expressing it in term of the basis H_1,H_2,...,H_k of
+# projectedlattice(W,Cspace).
 #  Example: projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3])→[[1,0],[0,1]]
-projectedconeinbasislattice:=proc(W,Cspace) local P,M,output,i,F;
-    P:=projectedlattice(W,Cspace);
+projectedconeinbasislattice:=proc(W,Cspace,ProjLattice) local P,M,output,i,F;
+    P:=ProjLattice;
     M:=transpose(matrix([seq(P[i],i=1..nops(P))]));
     output:=[];
     for i from 1 to nops(Cspace) do
@@ -360,9 +369,10 @@ end:
 
 #projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3]);
 #
-# #Input; W a Cone in Z^d;
-# Cspace a subset of [1,2,..d] of cardinal k;
-# s a vector in R^d with rational coordinates (or symbolic coordinates);
+# #Input: W a Cone in Z^d;
+#         Cspace a subset of [1,2,..d] of cardinal k;
+#         ProjLattice := projectedlattice(W,Cspace);
+#         s a vector in R^d with rational coordinates (or symbolic coordinates);
 # #Ouput: a vector in R^k with rational coordinates (or symbolic coordinates);
 
 # Math: Here W is the cone and we are projecting V over lin( Cspace)  using  V:=lin(Cspace) oplus
@@ -373,8 +383,8 @@ end:
 #
 # Example: projectedvertexinbasislattice([[1,0,0],[0,2,1],[0,1,1]],[1,3],[s1,s2,s3]) ->[s1, 2*s3-s2];;
 #
-projectedvertexinbasislattice:=proc(W,Cspace,s) local m,P,M,output,i,F;
-    P:=projectedlattice(W,Cspace);
+projectedvertexinbasislattice:=proc(W,Cspace,ProjLattice,s) local m,P,M,output,i,F;
+    P:=ProjLattice;
     if Cspace=[] then RETURN([]);fi;
     M:=Transpose(Matrix([seq(P[i],i=1..nops(P))]));
     F:=convert(LinearSolve(M,Vector(projectedvector(W,Cspace,s))),list);
@@ -582,7 +592,10 @@ end:
 functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi);
 #
 #
-# Input: a Cone W;  Cspace a subset of [1..d] of cardinal k; xi a letter:
+# Input: a Cone W;
+#        Cspace a subset of [1..d] of cardinality k;
+#        xi a letter;
+#        ProjLattice := projectedlattice(W,Cspace);
 # Ouput: a list of  k linear forms in variables xi[1],...xi[d].
 #
 #
@@ -592,8 +605,8 @@ functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi);
 #
 # Example: changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],xi)->[xi[1], (1/9)*xi[2]+(2/9)*xi[3]];;
 
-changeofcoordinates:=proc(W,Cspace,xi) local H,newxi,i,d;
-    H:=projectedlattice(W,Cspace);
+changeofcoordinates:=proc(W,Cspace,ProjLattice,xi) local H,newxi,i,d;
+    H:=ProjLattice;
     d:=nops(W[1]);
     newxi:=[];
     for i from 1 to nops(H) do
@@ -601,7 +614,8 @@ changeofcoordinates:=proc(W,Cspace,xi) local H,newxi,i,d;
     od;
     newxi;
 end:
-changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],xi);
+#changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],...,xi);
+
 # THE FUNCTION (S^Ispace) for a cone. Here we sum  the integrals of e^{xi,x}
 #  on slices of the cone
 # parallel to  L generated by w_i with i in Ispace.
@@ -622,16 +636,18 @@ changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],xi);
 # Here we take out a function of s, ceil
 # EXAMPLE: S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi)->  -TODD(ceil(s2), (1/2)*xi[1]+xi[2])*EXP((s1-(1/2)*s2)*xi[1])/(((1/2)*xi[1]+xi[2])*xi[1]);
 S_Ispace_Coneformulaa:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_prime_Cspace,M,newxi,dimL,g,testrank,newP,
-    s_Cspace_in_lattice_coord,news;
+    s_Cspace_in_lattice_coord,news,
+    ProjLattice;
     Cspace:=ComplementList(ISpace,nops(W));
-    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);
+    ProjLattice := projectedlattice(W,Cspace);
+    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,ProjLattice,s);
     function_on_ISpace:=functionIa(s,W,ISpace,xi);
 #from here express in terms of the basis lattice for projected cone.
-    W_projected:=projectedconeinbasislattice(W,Cspace):
+    W_projected:=projectedconeinbasislattice(W,Cspace,ProjLattice):
     if W_projected=[] then
         out1:=function_on_ISpace[1]/function_on_ISpace[2];
     else
-        newxi:=changeofcoordinates(W,Cspace,xi);
+        newxi:=changeofcoordinates(W,Cspace,ProjLattice,xi);
         uni_cones:=cone_dec(W_projected);
         out1:=0;
         for j from 1 to nops(uni_cones) do
@@ -663,16 +679,18 @@ S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi);
 # ##EXAMPLE: S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi)-> -EXP(s1*xi[1]+s2*xi[2])*TODD({-s2}, (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1]);
 #
 S_Ispace_Coneformulab:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,
-    s_Cspace_in_lattice_coord,news;
+    s_Cspace_in_lattice_coord,news,
+    ProjLattice;
     Cspace:=ComplementList(ISpace,nops(W));
-    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);
+    ProjLattice := projectedlattice(W,Cspace);
+    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,ProjLattice,s);
     function_on_ISpace:=functionIb(s,W,ISpace,xi);
 #from here express in terms of the basis lattice for projected cone.
-    W_projected:=projectedconeinbasislattice(W,Cspace):
+    W_projected:=projectedconeinbasislattice(W,Cspace,ProjLattice):
     if W_projected=[] then
         out1:=function_on_ISpace[1]/function_on_ISpace[2];
     else
-        newxi:=changeofcoordinates(W,Cspace,xi);
+        newxi:=changeofcoordinates(W,Cspace,ProjLattice,xi);
         uni_cones:=cone_dec(W_projected);
         out1:=0;
         for j from 1 to nops(uni_cones) do
@@ -704,12 +722,13 @@ S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi);
 #
 
 linindenom:=proc(W,Cspace) local YY,i,ISpace,g,WW,newx,d,a,z,cc,
-    WW_projected,uni_cones,t,cleanYY,r;
+    WW_projected,uni_cones,t,cleanYY,r,ProjLattice;
     d:=nops(W);
     YY:={};
-    WW_projected:=projectedconeinbasislattice(W,Cspace):
+    ProjLattice := projectedlattice(W,Cspace);
+    WW_projected:=projectedconeinbasislattice(W,Cspace,ProjLattice):
 ###print(WW_projected);
-    newx:=changeofcoordinates(W,Cspace,x);
+    newx:=changeofcoordinates(W,Cspace,ProjLattice,x);
     uni_cones:=cone_dec(WW_projected);
     for z from 1 to nops(uni_cones) do
         cc:=uni_cones[z][3];
@@ -838,17 +857,19 @@ cone_by_cone_approxi_simplex_formulab([[0,0],[1,0],[0,1]], 1,xi);
 # EXAMPLE ARE GIVEN AFTER THE PROCEDURE:
 
 dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
-    s_Cspace_in_lattice_coord,news;
+    s_Cspace_in_lattice_coord,news,
+    ProjLattice;
     Cspace:=ComplementList(ISpace,nops(W));
+    ProjLattice := projectedlattice(W,Cspace);
     dilateds:=[seq(n*s[i],i=1..nops(W))];
-    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);# I keep n outside;
+    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,ProjLattice,s);# I keep n outside;
     function_on_ISpace:=functionIb(dilateds,W,ISpace,xi);
 #from here express in terms of the basis lattice for projected cone.
-    W_projected:=projectedconeinbasislattice(W,Cspace):
+    W_projected:=projectedconeinbasislattice(W,Cspace,ProjLattice):
     if W_projected=[] then
         out1:=function_on_ISpace[1]/function_on_ISpace[2];
     else
-        newxi:=changeofcoordinates(W,Cspace,xi);
+        newxi:=changeofcoordinates(W,Cspace,ProjLattice,xi);
         uni_cones:=cone_dec(W_projected);
         out1:=0;
         for j from 1 to nops(uni_cones) do
@@ -942,7 +963,7 @@ end:
 # Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
 # The ouput is  a periodic function of n;
 # Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
-# Here we employ a random deformation vector, so if the procedure might return: error; diviasion by zero. RERUN:
+# Here we employ a random deformation vector, so if the procedure might return: error: division by zero. RERUN:
 #
 #
 TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
@@ -1028,17 +1049,19 @@ end:
 #
 
 dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
-    s_Cspace_in_lattice_coord,news;
+    s_Cspace_in_lattice_coord,news,
+    ProjLattice;
     Cspace:=ComplementList(ISpace,nops(W));
+    ProjLattice := projectedlattice(W,Cspace);
     dilateds:=[seq(n*s[i],i=1..nops(W))];
-    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,s);# I keep n outside;
+    s_Cspace_in_lattice_coord:=projectedvertexinbasislattice(W,Cspace,ProjLattice,s);# I keep n outside;
     function_on_ISpace:=functionIb(dilateds,W,ISpace,xi);
 #from here express in terms of the basis lattice for projected cone.
-    W_projected:=projectedconeinbasislattice(W,Cspace):
+    W_projected:=projectedconeinbasislattice(W,Cspace,ProjLattice):
     if W_projected=[] then
         out1:=function_on_ISpace[1]/function_on_ISpace[2];
     else
-        newxi:=changeofcoordinates(W,Cspace,xi);
+        newxi:=changeofcoordinates(W,Cspace,ProjLattice,xi);
         uni_cones:=cone_dec(W_projected);
         out1:=0;
         for j from 1 to nops(uni_cones) do
