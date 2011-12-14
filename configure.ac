@@ -38,7 +38,7 @@ AC_CHECK_FUNCS([pow sqrt])
 
 AC_CHECK_HEADERS([sstream])
 
-maple_script_dir=${datadir}/latte
+maple_script_dir=${datadir}/${PACKAGE_NAME}
 AC_DEFINE_DIR([MAPLE_SCRIPT_DIR], [maple_script_dir], [The directory where LattE's Maple scripts are installed.])
 
 LB_MISC
