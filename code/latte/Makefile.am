@@ -367,12 +367,13 @@ endif #HAVE_DATABASE
 
 noinst_LIBRARIES += liblatteintegration.a
 
-liblatteintegration_a_SOURCES = 		\
+liblatteintegration_a_SOURCES =			\
 	integration/PolyRep.cpp			\
 	integration/residue.cpp			\
-	timing.cpp			\
+	timing.cpp				\
 	integration/newIntegration.cpp		\
-	integration/PolyTrie.cpp
+	integration/PolyTrie.cpp		\
+	top-ehrhart/top-ehrhart.cpp
 
 noinst_HEADERS +=				\
 	integration/multiply.h			\
@@ -387,6 +388,7 @@ noinst_HEADERS +=				\
 	integration/blockReps.h			\
 	integration/residue.h	
 
+dist_pkgdata_DATA += top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
 
 if HAVE_PROGRAMMER_HELPER
 
