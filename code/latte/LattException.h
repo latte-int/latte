@@ -15,10 +15,9 @@
 
 using namespace std;
 
-/// FIXME: Don't include the semicolon. Such macros should always be
-/// usable in the same way as ordinary statements. --mkoeppe
-#define THROW_LATTE( type ) throw LattException( (type), __FILE__, __LINE__, "" );
-#define THROW_LATTE_MSG( type, msg ) throw LattException( (type), __FILE__, __LINE__, (msg) );
+
+#define THROW_LATTE( type ) throw LattException( (type), __FILE__, __LINE__, "" )
+#define THROW_LATTE_MSG( type, msg ) throw LattException( (type), __FILE__, __LINE__, (msg) )
 
 class LattException : public exception
 {

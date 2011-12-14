@@ -8,7 +8,7 @@ Valuation::ValuationContainer Valuation::computeTopEhrhart(Polyhedron *poly,
 	if ( intInput.integrandType != IntegrationInput::inputVolume
 	     && intInput.integrandType != IntegrationInput::nothing)
 	{
-		THROW_LATTE_MSG(LattException::bug_Unknown, "integrand type not supported.")
+		THROW_LATTE_MSG(LattException::bug_Unknown, "integrand type not supported.");
 	}
 	if (poly->dualized) {
 	  dualizeCones(poly->cones, poly->numOfVars, &myParameters);

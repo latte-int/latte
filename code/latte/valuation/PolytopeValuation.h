@@ -46,7 +46,6 @@ public:
 		integratePolynomialAsLinearFormTriangulation, 	//decompose polynomial to LF, use triangulation.
 		integratePolynomialAsLinearFormCone,			//decompose polynomial to LF, use cone method.
 		integratePolynomialAsPLFTriangulation,			//decompose polynomial as product of LF (PLF).
-		integratePolynomialStandardSimplex,				//transform domain to the std. simplex.
 		integrateLinearFormTriangulation,				//integrate linear forms using triangulation
 		integrateLinearFormCone,						//integrate linear forms using cone method
 		integrateProductLinearFormsTriangulation,		//integrate product of linear forms using triangulation.
@@ -78,7 +77,6 @@ private:
 	ZZ findDilationFactorVertexRays() const;
 	RationalNTL findIntegralUsingTriangulation(linFormSum &forms) const; //computes the integral over every simplex
 	RationalNTL findIntegralUsingLawrence(linFormSum &forms) const;      //computes the integral over every simple cone.
-	RationalNTL findIntegralPolynomialStdSimplex(const monomialSum& polynomial); //transform the domain to std. simplex.
 	RationalNTL findIntegralPolynomialToLinearForms(const monomialSum& polynomial, const ValuationAlgorithm integrationType); //main driver for integrating polynomial via decomposing into FL.
 	RationalNTL findIntegralPolynomialToPLF(const monomialSum& polynomial); //main driver to integrating polynomial by writing it as a product of linear forms.
 	RationalNTL findIntegralProductsUsingTriangulation(linFormSum &forms) const;

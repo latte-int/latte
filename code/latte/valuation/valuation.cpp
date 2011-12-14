@@ -91,7 +91,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	}
 	else
 	{
-		THROW_LATTE_MSG(LattException::bug_Unknown, "integrand type not supported.")
+		THROW_LATTE_MSG(LattException::bug_Unknown, "integrand type not supported.");
 	}
 }
 Valuation::ValuationContainer Valuation::computeIntegralPolynomial(Polyhedron *poly,
@@ -101,7 +101,6 @@ Valuation::ValuationContainer Valuation::computeIntegralPolynomial(Polyhedron *p
 	ValuationData tiangulate_timer_and_result;
 	ValuationData lawrence_timer_and_result;
 	ValuationData plf_time_and_result;
-	ValuationData stdSimplex_time_and_result;
 	RationalNTL ans1, ans2, ans3, ans4;
 	Polyhedron *polyCopy;//if doing more than 1 method, make a deep copy of the origional polytopel.
 
@@ -194,42 +193,13 @@ Valuation::ValuationContainer Valuation::computeIntegralPolynomial(Polyhedron *p
 			delete polyCopy;
 	}//polynomial to PLF.
 
-	if ( intInput.integratePolynomialStandardSimplex || intInput.all)
-	{
-		cerr << "Going to run the polynomial using the std. simplex method" << endl;
 
-		if(intInput.all)
-			polyCopy = new Polyhedron(*poly);
-		else
-			polyCopy = poly;
-
-		monomialSum originalPolynomial;// polynomial without the updated coefficients.
-		PolytopeValuation polytopeValuation(polyCopy, myParameters);
-
-		loadMonomials(originalPolynomial, intInput.integrand); //get the polynomial from the string.
-		stdSimplex_time_and_result.timer.start();
-		ans4 = polytopeValuation.findIntegral(originalPolynomial,
-				 PolytopeValuation::integratePolynomialStandardSimplex);
-		stdSimplex_time_and_result.timer.stop();
-
-		stdSimplex_time_and_result.valuationType
-					= PolytopeValuation::integratePolynomialAsPLFTriangulation;
-		stdSimplex_time_and_result.answer = ans4;
-		answer.add(stdSimplex_time_and_result);
-
-		destroyMonomials(originalPolynomial);
-
-		if(intInput.all)
-			delete polyCopy;
-	}//polynomial to PLF.
-
-	if (intInput.all && (ans1 != ans2 || ans1 != ans3 || ans1 != ans3) )
+	if (intInput.all && (ans1 != ans2 || ans1 != ans3 ) )
 	{
 		cerr << "Valuation.cpp: the methods are different.\n"
 				<< "triangulateion    : " << ans1 << "\n"
 				<< "cone-decomposition: " << ans2 << "\n"
 				<< "plf               : " << ans3 << "\n"
-				<< "std simplex       : " << ans4
 				<< endl;
 		THROW_LATTE(LattException::bug_Unknown);
 	}//if error.
