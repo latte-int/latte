@@ -46,7 +46,8 @@ public:
 		fe_Parse,						//parse error
 
 		//integration errors.
-		ie_badIntegrandFormat,			//something's wrong with the integrand.
+		ie_BadIntegrandFormat,			//something's wrong with the integrand.
+		ie_UnexpectedIntegrationOption,	//maybe wrong algorithm used?
 
 		//unknown
 		bug_Unknown,					//somthing really bad happened.

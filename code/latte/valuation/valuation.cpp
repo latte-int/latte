@@ -100,7 +100,9 @@ Valuation::ValuationContainer Valuation::computeIntegralPolynomial(Polyhedron *p
 	ValuationContainer answer;
 	ValuationData tiangulate_timer_and_result;
 	ValuationData lawrence_timer_and_result;
-	RationalNTL ans1, ans2;
+	ValuationData plf_time_and_result;
+	ValuationData stdSimplex_time_and_result;
+	RationalNTL ans1, ans2, ans3, ans4;
 	Polyhedron *polyCopy;//if doing more than 1 method, make a deep copy of the origional polytopel.
 
 	assert(intInput.integrandType == IntegrationInput::inputPolynomial);
@@ -163,12 +165,73 @@ Valuation::ValuationContainer Valuation::computeIntegralPolynomial(Polyhedron *p
 			delete polyCopy;
 	}
 
-	if (intInput.all && ans1 != ans2)
+	if ( intInput.integratePolynomialAsPLFTriangulation || intInput.all)
 	{
-		cerr << "Valuation.cpp: the two methods are different.\n"
-				<< "triangulateion: " << ans1 << "\nlawrence       " << ans2
+		cerr << "Going to run the polynomial to PLF method" << endl;
+
+		if(intInput.all)
+			polyCopy = new Polyhedron(*poly);
+		else
+			polyCopy = poly;
+
+		monomialSum originalPolynomial;// polynomial without the updated coefficients.
+		PolytopeValuation polytopeValuation(polyCopy, myParameters);
+
+		loadMonomials(originalPolynomial, intInput.integrand); //get the polynomial from the string.
+		plf_time_and_result.timer.start();
+		ans3 = polytopeValuation.findIntegral(originalPolynomial,
+				 PolytopeValuation::integratePolynomialAsPLFTriangulation);
+		plf_time_and_result.timer.stop();
+
+		plf_time_and_result.valuationType
+					= PolytopeValuation::integratePolynomialAsPLFTriangulation;
+		plf_time_and_result.answer = ans3;
+		answer.add(plf_time_and_result);
+
+		destroyMonomials(originalPolynomial);
+
+		if(intInput.all)
+			delete polyCopy;
+	}//polynomial to PLF.
+
+	if ( intInput.integratePolynomialStandardSimplex || intInput.all)
+	{
+		cerr << "Going to run the polynomial using the std. simplex method" << endl;
+
+		if(intInput.all)
+			polyCopy = new Polyhedron(*poly);
+		else
+			polyCopy = poly;
+
+		monomialSum originalPolynomial;// polynomial without the updated coefficients.
+		PolytopeValuation polytopeValuation(polyCopy, myParameters);
+
+		loadMonomials(originalPolynomial, intInput.integrand); //get the polynomial from the string.
+		stdSimplex_time_and_result.timer.start();
+		ans4 = polytopeValuation.findIntegral(originalPolynomial,
+				 PolytopeValuation::integratePolynomialStandardSimplex);
+		stdSimplex_time_and_result.timer.stop();
+
+		stdSimplex_time_and_result.valuationType
+					= PolytopeValuation::integratePolynomialAsPLFTriangulation;
+		stdSimplex_time_and_result.answer = ans4;
+		answer.add(stdSimplex_time_and_result);
+
+		destroyMonomials(originalPolynomial);
+
+		if(intInput.all)
+			delete polyCopy;
+	}//polynomial to PLF.
+
+	if (intInput.all && (ans1 != ans2 || ans1 != ans3 || ans1 != ans3) )
+	{
+		cerr << "Valuation.cpp: the methods are different.\n"
+				<< "triangulateion    : " << ans1 << "\n"
+				<< "cone-decomposition: " << ans2 << "\n"
+				<< "plf               : " << ans3 << "\n"
+				<< "std simplex       : " << ans4
 				<< endl;
-		exit(1);
+		THROW_LATTE(LattException::bug_Unknown);
 	}//if error.
 
 
@@ -509,6 +572,11 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			{
 				integrationInput.integratePolynomialAsLinearFormCone = true;
 				strcpy(read_polyhedron_data.dualApproach, "no");
+			}
+			else if ( strcmp(argv[i], "--valuation-alg=poly-plf-triangulation") == 0)
+			{
+				integrationInput.integratePolynomialAsPLFTriangulation = true;
+				strcpy(read_polyhedron_data.dualApproach, "yes");
 			}
 			else if ( strcmp(argv[i], "--valuation-alg=lf-triangulation") == 0)
 			{
@@ -1070,6 +1138,7 @@ Valuation::IntegrationInput::IntegrationInput()
 	volumeTriangulation = false;							//volume using triangulation
 	integratePolynomialAsLinearFormTriangulation = false; 	//decompose polynomial to LF, use triangulation.
 	integratePolynomialAsLinearFormCone = false;			//decompose polynomila to LF, use cone method.
+	integratePolynomialAsPLFTriangulation = false; 			//decompose polynomial to PLF
 	integrateLinearFormTriangulation = false;				//integrate linear forms using triangulation
 	integrateLinearFormCone = false;						//integrate linear forms using cone method
 	integrateProductLinearFormsTriangulation = false;		//integrate product of linear forms using triangulation.
@@ -1107,6 +1176,8 @@ void Valuation::ValuationContainer::printResults(ostream & out) const
 			out << "Integration of a polynomial as linear forms (using the cone method)" << endl;
 		else if ( answers[i].valuationType == PolytopeValuation::integratePolynomialAsLinearFormTriangulation)
 			out << "Integration of a polynomial as linear forms (using the triangulation method)" << endl;
+		else if ( answers[i].valuationType == PolytopeValuation::integratePolynomialAsPLFTriangulation)
+			out << "Integration of a polynomail as products of linear forms (using the triangulation method)" << endl;
 		else if (answers[i].valuationType == PolytopeValuation::entireValuation)
 		{
 			out

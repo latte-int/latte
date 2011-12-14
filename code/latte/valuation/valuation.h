@@ -121,7 +121,9 @@ public:
 	bool volumeCone;									//volume using the cone method.
 	bool volumeTriangulation;							//volume using triangulation
 	bool integratePolynomialAsLinearFormTriangulation; 	//decompose polynomial to LF, use triangulation.
-	bool integratePolynomialAsLinearFormCone;			//decompose polynomila to LF, use cone method.
+	bool integratePolynomialAsLinearFormCone;			//decompose polynomial to LF, use cone method.
+	bool integratePolynomialAsPLFTriangulation; 		//decompost polynomial to PLF, use triangulation.
+	bool integratePolynomialStandardSimplex;			//update the domain to be the std. simplex.
 	bool integrateLinearFormTriangulation;				//integrate linear forms using triangulation
 	bool integrateLinearFormCone;						//integrate linear forms using cone method
 	bool integrateProductLinearFormsTriangulation;		//integrate product of linear forms using triangulation.

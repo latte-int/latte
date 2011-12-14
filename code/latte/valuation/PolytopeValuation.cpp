@@ -398,86 +398,17 @@ ZZ PolytopeValuation::findDilationFactorVertexRays() const
 
 RationalNTL PolytopeValuation::findIntegral(const monomialSum& polynomial, const ValuationAlgorithm algorithm)
 {
-	linFormSum linearForms;
-	RationalNTL answer;
-	RationalNTL constantMonomial;
 
-
-	//find the dilation factor.
-	ZZ dilationFactor;
-
-	//cout << "Integrating " << polynomial.termCount << " monomials." << endl;
-	//dilate the polytope
-	if ( numOfVars != numOfVarsOneCone)
-	{
-		dilationFactor = findDilationFactorVertexRays();
-		cerr << "dilation factor = " << dilationFactor << endl;
-		dilatePolytopeVertexRays(RationalNTL(dilationFactor, to_ZZ(1)));
-	}//if we started with vertex-rays
+	if ( algorithm == integratePolynomialAsLinearFormCone || algorithm == integratePolynomialAsLinearFormTriangulation)
+		return findIntegralPolynomialToLinearForms(polynomial, algorithm);
+	else if ( algorithm == integratePolynomialAsPLFTriangulation)
+		return findIntegralPolynomialToPLF(polynomial);
+	else if ( algorithm == integratePolynomialStandardSimplex)
+		return findIntegralPolynomialStdSimplex(polynomial);
 	else
-	{
-		dilationFactor = findDilationFactorOneCone();
-		cerr << "dilation factor = " << dilationFactor << endl;
-		dilatePolytopeOneCone(dilationFactor);
-	}//we started with the lifted polytope.
+		THROW_LATTE(LattException::ie_UnexpectedIntegrationOption);
 
 
-	//the input polynomial have have a constant term, but the integration functions can only
-	//work with non-constant monomials. We need to remove any constant terms from the input polynomial.
-	//This will be done in dilatePolynomialToLinearForms
-
-
-	//dilate the polynomial..
-    //after this call, linearForms is filled in, and constantMonomial is the constant term in the input polynomial.
-	dilatePolynomialToLinearForms(linearForms, polynomial, dilationFactor, constantMonomial);
-
-	//Note the difference between lawrence and integration on how we compute the volume
-	//if dilatePolytopeVertexRays was used: 1) integrate 2) volume 3) jacobian term
-	//if dilatePolytopeOneCone    was used: 1) integrate 2) jacobian term 3)volume
-	//This is due to the fact that dilatePolytopeVertexRays permanently dilates the polytope.
-	//But dilatePolytopeOneCone records the dilation in the last slot, and so nothing is lost.
-	if ( algorithm == integratePolynomialAsLinearFormCone)
-	{
-		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
-		cerr << lengthListCone(triangulatedPoly) << " triangulations done.\n"
-			 << " starting to integrate " << linearForms.termCount << " linear forms.\n";
-		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
-
-		if ( constantMonomial != 0)
-			answer.add(findVolume(volumeCone)*constantMonomial);
-
-		answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
-	}// if computing the integral using the lawrence style method.
-	else if ( algorithm == integratePolynomialAsLinearFormTriangulation)
-	{
-		convertToOneCone(); //every vertex should be integer
-		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
-		cerr << " starting to integrate " << linearForms.termCount << " linear forms.\n";
-
-		answer.add(findIntegralUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
-
-		answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
-
-
-		if ( constantMonomial != 0)
-		{
-			RationalNTL volume;
-			volume = findVolume(volumeTriangulation)*constantMonomial;
-			if (numOfVars != numOfVarsOneCone)
-				volume.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
-			answer.add(volume);
-		}
-
-	}//if computing the integral by triangulating to simplex polytopes.
-	else
-	{
-		cerr << "Integration Type not known" << endl;
-		exit(1);
-	}//else error.
-
-
-	destroyLinForms(linearForms);
-	return answer;
 }
 
 /**
@@ -560,7 +491,7 @@ RationalNTL PolytopeValuation::findIntegral(const linFormSum& originalLinearForm
 	else
 	{
 		cerr << "Integration Type not known" << endl;
-		exit(1);
+		THROW_LATTE(LattException::ie_UnexpectedIntegrationOption);
 	}//else error.
 
 
@@ -617,7 +548,7 @@ RationalNTL PolytopeValuation::findIntegral(const linFormProductSum& originalLin
 		if ( linearForms.termCount > 0 && currentConstantMonomial != 0)
 		{
 			cout << "lf: " << printLinForms(originalLinearFormProducts[i]).c_str() << endl;
-			THROW_LATTE_MSG(LattException::ie_badIntegrandFormat, "product of linear forms contains a constant factor");
+			THROW_LATTE_MSG(LattException::ie_BadIntegrandFormat, "product of linear forms contains a constant factor");
 		}
 
 		if ( currentConstantMonomial != 0)
@@ -897,6 +828,330 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 	return ans;
 
 }//integratePolytopeLawrence()
+
+//transform the domain to std. simplex.
+RationalNTL PolytopeValuation::findIntegralPolynomialStdSimplex(const monomialSum& polynomial)
+{
+	RationalNTL answer;
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+
+	//cout << "Integrating " << polynomial.termCount << " monomials." << endl;
+	//dilate the polytope
+	if ( numOfVars != numOfVarsOneCone)
+	{
+		dilationFactor = findDilationFactorVertexRays();
+		cerr << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeVertexRays(RationalNTL(dilationFactor, to_ZZ(1)));
+	}//if we started with vertex-rays
+	else
+	{
+		dilationFactor = findDilationFactorOneCone();
+		cerr << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeOneCone(dilationFactor);
+	}//we started with the lifted polytope.
+
+	convertToOneCone(); //every vertex should be integer
+	triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+
+
+	cerr << " starting to integrate " << polynomial.termCount << " monomials.\n";
+
+	monomialSum everyPolynomial;
+	everyPolynomial.varCount = polynomial.varCount;
+	for (listCone * currentCone = triangulatedPoly; currentCone; currentCone
+				= currentCone->rest)
+	{
+		vec_ZZ v0;
+		v0.SetLength(numOfVarsOneCone-1);
+		listVector * rays = currentCone->rays;
+
+		for (int k = 0; k < numOfVarsOneCone -1; ++k)
+			v0[k] = rays->first[k];//save the first vertex;
+
+
+		int vertexCount = 0; //the current vertex number being processed.
+		mat_ZZ mInv;
+		mInv.SetDims(numOfVarsOneCone-1,numOfVarsOneCone-1);
+
+		for (rays = rays->rest; rays; rays = rays->rest, ++vertexCount)
+		{
+			for (int k = 0; k < numOfVarsOneCone -1; ++k)
+				mInv[k][vertexCount] = rays->first[k];//save the vertex.
+
+		}//vertices are in the column of mInv (except the first vertex vo).
+
+		ZZ detMInv = abs(determinant(mInv));
+
+		//the transformation is x = mInv *y + vo
+		BTrieIterator<RationalNTL, int>* polynomialIterator =
+					new BTrieIterator<RationalNTL, int> ();
+		polynomialIterator->setTrie(polynomial.myMonomials,	polynomial.varCount);
+		term<RationalNTL, int>* originalMonomial;
+
+		int *zero = new int[polynomial.varCount];
+
+		polynomialIterator->begin();
+		for (originalMonomial = polynomialIterator->nextTerm(); originalMonomial; originalMonomial
+				= polynomialIterator->nextTerm())
+		{
+			int totalDegree = 0;
+
+			for(int k = 0; k < polynomial.varCount; ++k)
+			{
+				totalDegree += originalMonomial->exps[k];
+				zero[k] = 0;
+			}
+
+			RationalNTL coef;
+			coef = originalMonomial->coef;
+			coef.div(power(dilationFactor, totalDegree * polynomial.varCount)); //dilation jocobian
+			coef.mult(detMInv); //transformation jocobian.
+
+			monomialSum currentProduct, temp, tempResult;
+			BTrieIterator<RationalNTL, int> it1, it2;
+
+			currentProduct.varCount = polynomial.varCount;
+
+			insertMonomial(RationalNTL(1,1), zero, currentProduct);
+
+
+
+
+			for(int k = 0; k < polynomial.varCount; ++k)
+			{
+				if ( originalMonomial->exps[k] == 0)
+					continue;
+
+				temp.varCount = polynomial.varCount;
+
+				//the transformation is x = mInv *y + vo
+				for(int l =0; l < polynomial.varCount; ++l)
+				{
+					zero[l] = 1;
+					insertMonomial(RationalNTL(mInv[k][l],1), zero, temp);
+					zero[l]=0;
+				}
+				insertMonomial(RationalNTL(v0[k],1), zero, temp);
+
+				//power(temp, temp, originalMonomial->exps[k], totalDegree);
+
+
+				it1.setTrie(temp.myMonomials, temp.varCount);
+				it2.setTrie(currentProduct.myMonomials, currentProduct.varCount);
+
+				multiply(&it1, &it2, tempResult);
+				destroyMonomials(temp);
+				destroyMonomials(currentProduct);
+				currentProduct = tempResult;
+			}
+
+			temp.varCount = polynomial.varCount;
+			insertMonomial(coef, zero, temp);
+
+			it1.setTrie(temp.myMonomials, temp.varCount);
+			it2.setTrie(currentProduct.myMonomials, currentProduct.varCount);
+			multiply(&it1, &it2, tempResult);
+			destroyMonomials(temp);
+			destroyMonomials(currentProduct);
+			currentProduct = tempResult;
+
+			//add currentProduct to ans;
+			//addMonomial(everyPolynomial, currentProduct);
+			//todo: fix this add function. this should not be inlined here.
+			//addMonomial(everyPolynomial, currentProduct); //add currentProduct to everyPolynomial
+			BTrieIterator<RationalNTL, int> itr;
+
+			itr.setTrie(currentProduct.myMonomials, currentProduct.varCount);
+
+			term<RationalNTL, int> *term;
+
+			itr.begin();
+			while (term = itr.nextTerm())
+			{
+				insertMonomial(term->coef, term->exps, currentProduct);
+			}
+			//addMonomial(everyPolynomial, currentProduct);
+
+		}
+
+
+
+		delete [] zero;
+	}//for every simplex.
+
+
+
+	//answer.add(integrateOverStdSimplex(everyPolynomial)); //finally, we are ready to do the integration!
+
+	//answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+
+	destroyMonomials(everyPolynomial);
+	return answer;
+}
+
+
+//main driver for integrating polynomial via decomposing into FL.
+RationalNTL PolytopeValuation::findIntegralPolynomialToLinearForms(const monomialSum& polynomial, const ValuationAlgorithm algorithm)
+{
+
+	linFormSum linearForms;
+	RationalNTL answer;
+	RationalNTL constantMonomial;
+
+	//find the dilation factor.
+	ZZ dilationFactor;
+
+	//cout << "Integrating " << polynomial.termCount << " monomials." << endl;
+	//dilate the polytope
+	if ( numOfVars != numOfVarsOneCone)
+	{
+		dilationFactor = findDilationFactorVertexRays();
+		cerr << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeVertexRays(RationalNTL(dilationFactor, to_ZZ(1)));
+	}//if we started with vertex-rays
+	else
+	{
+		dilationFactor = findDilationFactorOneCone();
+		cerr << "dilation factor = " << dilationFactor << endl;
+		dilatePolytopeOneCone(dilationFactor);
+	}//we started with the lifted polytope.
+
+
+	//the input polynomial have have a constant term, but the integration functions can only
+	//work with non-constant monomials. We need to remove any constant terms from the input polynomial.
+	//This will be done in dilatePolynomialToLinearForms
+
+
+	//dilate the polynomial..
+    //after this call, linearForms is filled in, and constantMonomial is the constant term in the input polynomial.
+	dilatePolynomialToLinearForms(linearForms, polynomial, dilationFactor, constantMonomial);
+
+	//Note the difference between lawrence and integration on how we compute the volume
+	//if dilatePolytopeVertexRays was used: 1) integrate 2) volume 3) jacobian term
+	//if dilatePolytopeOneCone    was used: 1) integrate 2) jacobian term 3)volume
+	//This is due to the fact that dilatePolytopeVertexRays permanently dilates the polytope.
+	//But dilatePolytopeOneCone records the dilation in the last slot, and so nothing is lost.
+	if ( algorithm == integratePolynomialAsLinearFormCone)
+	{
+		triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
+		cerr << lengthListCone(triangulatedPoly) << " triangulations done.\n"
+			 << " starting to integrate " << linearForms.termCount << " linear forms.\n";
+		answer.add(findIntegralUsingLawrence(linearForms)); //finally, we are ready to do the integration!
+
+		if ( constantMonomial != 0)
+			answer.add(findVolume(volumeCone)*constantMonomial);
+
+		answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+	}// if computing the integral using the lawrence style method.
+	else if ( algorithm == integratePolynomialAsLinearFormTriangulation)
+	{
+		convertToOneCone(); //every vertex should be integer
+		triangulatePolytopeCone(); //every tiangulated vertex is now in the form (1, a1, ..., an) such that ai \in Z.
+		cerr << " starting to integrate " << linearForms.termCount << " linear forms.\n";
+
+		answer.add(findIntegralUsingTriangulation(linearForms)); //finally, we are ready to do the integration!
+
+		answer.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+
+
+		if ( constantMonomial != 0)
+		{
+			RationalNTL volume;
+			volume = findVolume(volumeTriangulation)*constantMonomial;
+			if (numOfVars != numOfVarsOneCone)
+				volume.div(power(dilationFactor, polynomial.varCount)); //factor in the Jacobian term.
+			answer.add(volume);
+		}
+
+	}//if computing the integral by triangulating to simplex polytopes.
+	else
+	{
+		cerr << "Integration Type not known" << endl;
+		THROW_LATTE(LattException::ie_UnexpectedIntegrationOption);
+	}//else error.
+
+
+	destroyLinForms(linearForms);
+	return answer;
+}//findIntegralPolynomialToLinearForms
+
+
+//main driver to integrating polynomial by writing it as a product of linear forms.
+RationalNTL PolytopeValuation::findIntegralPolynomialToPLF(const monomialSum& polynomial)
+{
+	//goal: convert the polynomail to PLF (w/o dilation) then call the correct findIntegral function.
+	linFormProductSum plf;
+
+	FormProductLoadConsumer<RationalNTL>* consumer =
+			new FormProductLoadConsumer<RationalNTL> ();
+	consumer->setFormProductSum(plf);
+
+	consumer->setDimension(polynomial.varCount);
+
+
+
+	BTrieIterator<RationalNTL, int>* polynomialIterator =
+			new BTrieIterator<RationalNTL, int> ();
+	polynomialIterator->setTrie(polynomial.myMonomials,	polynomial.varCount);
+	polynomialIterator->begin();
+
+	term<RationalNTL, int>* oneMonomial;
+
+	//loop over the polynomial, and insert the plf
+	vec_ZZ lForm;
+	lForm.SetLength(polynomial.varCount);
+	for(int i = 0; i < lForm.length(); ++i)
+		lForm[i] = 0;
+
+	vec_ZZ onesVector;
+	onesVector.SetLength(polynomial.varCount);
+	for(int i = 0; i < onesVector.length(); ++i)
+		onesVector[i] = 1;
+
+
+	int numTermsAdded;
+	for (oneMonomial = polynomialIterator->nextTerm(); oneMonomial; oneMonomial
+			= polynomialIterator->nextTerm())
+	{
+		int productIndex = consumer->initializeNewProduct();
+		numTermsAdded = 0;
+
+		for(int i = 0; i < polynomial.varCount; ++i)
+		{
+
+			if (oneMonomial->exps[i] == 0)
+				continue;
+
+
+			lForm[i] = 1;
+
+			consumer->ConsumeLinForm(productIndex, oneMonomial->coef, oneMonomial->exps[i], lForm);
+			oneMonomial->coef = 1; //add a real coefficient the first time only.
+
+			++numTermsAdded;
+			lForm[i] = 0;
+		}
+
+		if (numTermsAdded == 0)
+		{
+			consumer->ConsumeLinForm(productIndex, oneMonomial->coef, 0, onesVector);
+		}//oneMonomial is a constant term.
+	}//for each monomial.
+
+	delete consumer;
+	delete polynomialIterator;
+
+	RationalNTL ans;
+	ans = findIntegral(plf, integrateProductLinearFormsTriangulation);
+
+	destroyLinFormProducts(plf);
+
+	return ans;
+}//findIntegralPolynomialToPLF
+
+
 
 
 /* computes the integral of a product of powers of linear forms over each simplex
