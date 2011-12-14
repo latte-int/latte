@@ -23,7 +23,7 @@ interface(quiet=true);
 #@parm: startingDim: starting dim. of the simplex.
 #@parm: numTests: how many simpleices you want to test at once
 #@parm: baseFileName: string. File names used for saving the time, average, and latte's facet equations and latte's volume answer. ex:"testingSL/testingSL_volume"
-table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
+table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName, test_procedure)
 	local currentDim, currentTestNumber, time_coeff, fileNameLog, fileNameTable, filePtrLog, filePtrTable;
 	local failFlag, totalTime;
 
@@ -48,17 +48,21 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		#if this 1 test takes more than 30min, we stop the function.
 
 		failFlag:= 1;
+        time_coeff := [0.0, ERROR];
 		while failFlag <> 0 do
 			try
 				#time_coeff:=test_top_ehrhart_v1(currentDim, fileBaseName||".debug");
-				 time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
+				#time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
+				#time_coeff:=test_top_ehrhart_v3(currentDim, fileBaseName||".debug");
+                time_coeff:=test_procedure(currentDim, fileBaseName||".debug");
+                print(time_coeff):
 
 				failFlag:=0; #no erros. break out of while loop.
 			catch:
 				printf("Something went wrong: %q\n",lastexception);
 				failFlag:=1; #try again.
 			end try;
-		end; #while the first test case did not fail.
+		od; #while the first test case did not fail.
 
 		#print to log.
 		fprintf(filePtrLog, "Dim %d:\t test %d out of %d:\t time %f\n", currentDim, currentTestNumber, numTests, time_coeff[1]);
@@ -85,7 +89,9 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 			while failFlag <> 0 do
 				try
 					#time_coeff:=test_top_ehrhart_v1(currentDim, fileBaseName||".debug");
-					 time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
+					#time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
+					#time_coeff:=test_top_ehrhart_v3(currentDim, fileBaseName||".debug");
+                    time_coeff:=test_procedure(currentDim, fileBaseName||".debug");
 					failFlag:=0; #no erros. break out of while loop.
 
 					#print to log.
@@ -102,7 +108,7 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 					printf("Something went wrong: %q\n",lastexception);
 					failFlag:=1; #try again.
 				end try;
-			end; #while the current test case did not fail.
+			od; #while the current test case did not fail.
 		od; #end for. for every test.
 
 		#now, we just did numTest many test cases. so find the average and print it.
@@ -114,7 +120,7 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 		fflush(filePtrTable);
 
 		currentDim:=currentDim + 1;
-	end; #while. Keep trying higher dim. simplex.
+	od; #while. Keep trying higher dim. simplex.
 
 	fclose(filePtrLog);
 	fclose(filePtrTable);
@@ -123,7 +129,7 @@ end:
 
 #Find the average time to compute the top 3 coeff. of many simplices and increasing dim.
 				#starting dim, number of tests, file base name.
-table_time_top_ehrhart(11, 50, "CUCARACHAS/tableTimeSLTopEhrhart");
+table_time_top_ehrhart(3, 50, "tableTimeSLTopEhrhart-3", test_top_ehrhart_v2);
 
 
 #test_top_ehrhart_compare_v1_v2(4, "compareV1V2");
@@ -135,44 +141,117 @@ table_time_top_ehrhart(11, 50, "CUCARACHAS/tableTimeSLTopEhrhart");
 
 
 quit;
-Profile(primitive_vector);
-Profile(short_vector);
-Profile(sign_entries_vector);
-Profile(good_vector);
-Profile(signed_decomp);
-Profile(good_cone_dec);
-Profile(more_decomposition_in_cones);
-Profile(cone_dec);
-Profile(projectedvector);
-Profile(projectedlattice);
-Profile(projectedconeinbasislattice);
-Profile(Toddzero);
-Profile(relativevolumeoffaceiotac);
-Profile(functionIzero);
-Profile(prod_Toddzero);
-Profile(functionSzero);
-Profile(coeff_minusdplusk_S);
-Profile(coeff_dminusk_Eh_with_reg);
-Profile(random_vector);
-Profile(coeff_dminusk_Eh);
+##resetprofile();
+profile(primitive_vector);
+profile(short_vector);
+profile(sign_entries_vector);
+profile(good_vector);
+profile(signed_decomp);
+profile(good_cone_dec);
+profile(more_decomposition_in_cones);
+profile(cone_dec);
+profile(projectedvector);
+profile(projectedlattice);
+profile(projectedconeinbasislattice);
+profile(Toddzero);
+profile(relativevolumeoffaceiotac);
+profile(functionIzero);
+profile(prod_Toddzero);
+profile(functionSzero);
+profile(coeff_minusdplusk_S);
+profile(coeff_dminusk_Eh_with_reg);
+profile(random_vector);
+profile(coeff_dminusk_Eh);
 
-Profile(changeofcoordinates);
-Profile(coeff_minusdplusk_iota_function_S);
+profile(changeofcoordinates);
+profile(coeff_minusdplusk_iota_function_S);
 
-PrintProfiles(primitive_vector);
-PrintProfiles(short_vector);
-PrintProfiles(sign_entries_vector);
-PrintProfiles(good_vector);
-PrintProfiles(signed_decomp);
-PrintProfiles(good_cone_dec);
-PrintProfiles(more_decomposition_in_cones);
-PrintProfiles(cone_dec);
-PrintProfiles(projectedvector);
-PrintProfiles(projectedlattice);
-PrintProfiles(projectedconeinbasislattice);
-PrintProfiles(projectedconeinbasislattice);
-PrintProfiles(Toddzero);
-PrintProfiles(relativevolumeoffaceiotac);
+profile(projectedvertexinbasislattice);
 
-PrintProfiles(changeofcoordinates);
-PrintProfiles(coeff_minusdplusk_iota_function_S);
+
+
+
+
+# All procedures in Conebyconeapproximations...:
+profile(insert);
+profile(ComplementList);
+profile(GeneralComplementList);
+profile(special_lincomb_v);
+profile(primitive_vector);
+profile(ortho_basis);
+profile(fracpart);
+profile(short_vector);
+profile(sign_entries_vector);
+profile(good_vector);
+profile(signed_decomp);
+profile(good_cone_dec);
+profile(more_decomposition_in_cones);
+profile(cone_dec);
+profile(projectedvector);
+profile(projectedvector_with_inverse);
+profile(projectedlattice);
+profile(projectedconeinbasislattice);
+profile(projectedvertexinbasislattice);
+profile(s_ISpace);
+profile(Todd);
+profile(ourceil);
+profile(fractionalpart);
+profile(fmod);
+profile(ourmod);
+profile(nfractionalpart);
+profile(ourmodreal);
+profile(nfractionalpartreal);
+profile(volume_ISpace);
+profile(functionIa);
+profile(functionIb);
+profile(prod_Todd);
+profile(functionS);
+profile(changeofcoordinates);
+profile(S_Ispace_Coneformulaa);
+profile(S_Ispace_Coneformulab);
+profile(linindenom);
+profile(approx_Cone_formulaa);
+profile(approx_Cone_formulab);
+profile(cone_by_cone_approxi_simplex_formulaa);
+profile(cone_by_cone_approxi_simplex_formulab);
+profile(dilatedS_Ispace_Cone);
+profile(dilated_approxi_cone);
+profile(ApproxEhrhartSimplexgeneric);
+profile(random_vector);
+profile(TopEhrhartweightedluckyell);
+profile(TopEhrhartweighted);
+profile(CompleteEhrhartweighted);
+profile(TopEhrhartweightedPoly);
+profile(printTopEhrhartweightedPoly);
+profile(printIncrementalEhrhartweightedPoly);
+profile(dilatedS_Ispace_Cone_real);
+profile(dilated_approxi_cone_real);
+profile(ApproxEhrhartSimplexgeneric_real);
+profile(random_vector);
+profile(TopEhrhartweightedluckyell_real);
+profile(TopEhrhartweighted_real);
+profile(CompleteEhrhartweighted_real);
+profile(TopEhrhartweightedPoly_real);
+profile(printTopEhrhartweightedPoly_real);
+profile(printIncrementalEhrhartweightedPoly_real);
+profile(random_rational_vector);
+profile(randomaffinecone);
+profile(random_rational_simplex);
+profile(checkapprox);
+
+
+#TopEhrhartweightedPoly(n, [[-9, 40, -73], [-37, -46, -7], [70, -85, 31], [59, 99, 68]], [seq(0,i=1..3)], 0, 2);
+#TopEhrhartweightedPoly(n, [[-9, 40, -73], [-37, -46, -7], [70, -85, 31], [59, 99, 68]], [seq(0,i=1..3)], 0, 2);
+#table_time_top_ehrhart(4, 3, "tableTimeSLTopEhrhart-v3-4", test_top_ehrhart_v3);
+
+Simplex := [[-49, -89, -14, -1], [77, -46, 26, 6], [44, 97, -85, 93],
+    [94, -7, -47, -72], [30, 32, 94, 19]];
+#TopEhrhartweightedPoly(n, Simplex, [seq(0,i=1..4)], 0, 2);
+#Topk_Eh(Simplex,2,t);
+Simplex6 := [[56, -47, 27, 95, 79, -30], [88, -16, 18, -13, 77, -86], [-52, -89, 67, 21, 64, 22], [-31, 71, 78, 81, -90, 64], [-37, -31, -33, 82, 17, -22], [48, 29, -19, 72, -79, -16], [45, -70, -41, -51, -91, -66]];
+TopEhrhartweightedPoly(n, Simplex6 , [seq(0,i=1..6)], 0, 2);
+#Topk_Eh(Simplex6,2,t);
+
+showprofile();
+resetprofile();
+

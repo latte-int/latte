@@ -11,7 +11,7 @@ create_random_simplex:=proc(simplexDim)
 	do
 		M:=randmatrix(simplexDim+1, simplexDim); #default is  rand(-99..99).
 		# if you want different matrices, try randmatrix(simplexDim+1, simplexDim, entries=rand(0..10))
-		
+
 		checkRankMatrix:=randmatrix(simplexDim, simplexDim);
 		for i from 1 to simplexDim do
 			for j from 1 to simplexDim do
@@ -20,14 +20,14 @@ create_random_simplex:=proc(simplexDim)
 		od;
 		#print("got here");
 		#print(checkRankMatrix, "=checkRandMatrix");
-		
+
 		#print(rank(checkRankMatrix), checkRankMatrix, simplexDim, rank(checkRankMatrix) = simplexDim);
 		if rank(checkRankMatrix) = simplexDim then:
 			break;
 		fi;
 	end do;
 	#print(M, "=M");
-	
+
 	return(convert(M, listlist));
 end:
 
@@ -49,14 +49,14 @@ end:
 #Output: Writes to file fileName the latte-style facet equations.
 write_facets_to_file:=proc(equations, fileName, simplexDim)
 	local i, j, filePtr, lcmDenom, M:
-	
+
 	filePtr:=fopen(fileName, WRITE, TEXT);
-	
+
 	#print(equations, "=equations");
 	#print(fileName, "=fileName");
-	
-	
-	
+
+
+
 	#sorry, I had to do a bunch of converting because I couldn't pull the elements in the origional structure.
 	M:=convert(equations, Matrix);
 	#print(M, "=M1");
@@ -66,12 +66,12 @@ write_facets_to_file:=proc(equations, fileName, simplexDim)
 	M:=matrix(simplexDim+1, simplexDim+1, M);
 	#print(M, "=M2");
 	#print(M[1], "=M2[1,1]");
-	
+
 	#write the latte file.
 	fprintf(filePtr,"%d %d\n", simplexDim+1, simplexDim+1);
 	for i from 1 to simplexDim+1 do:
 		lcmDenom:=1;
-		
+
 		for j from 1 to simplexDim+1 do:
 			lcmDenom:=lcm(lcmDenom, denom(M[i, j]));
 		od:
@@ -90,15 +90,15 @@ end:
 write_simplex_to_file:=proc(simplexList, fileName)
 	local filePtr, i:
 	filePtr:=fopen(fileName,WRITE,TEXT):
-	
-	for i from 1 to nops(simplexList) do:	
+
+	for i from 1 to nops(simplexList) do:
 		writeline(filePtr, convert(simplexList[i], string));
-	od;	
+	od;
 	close(filePtr);
 end:
 
 #Input:List of n points of a simplex and the last point.
-#Output: the Facet of the equation containing the n points with the sign such that the last point is in the halfspace. 
+#Output: the Facet of the equation containing the n points with the sign such that the last point is in the halfspace.
 #Description: Feeding the n points of a n-simplex and the 1 point that
 # is not in their facet it generates ONE equation of the simplex in LattE format
 #for those points.
@@ -128,10 +128,10 @@ end:
 write_simplex_to_file:=proc(simplexList, fileName)
 	local filePtr, i:
 	filePtr:=fopen(fileName,WRITE,TEXT):
-	
-	for i from 1 to nops(simplexList) do:	
+
+	for i from 1 to nops(simplexList) do:
 		writeline(filePtr, convert(simplexList[i], string));
-	od;	
+	od;
 	close(filePtr);
 end:
 
@@ -162,7 +162,7 @@ test_top_ehrhart_v1:=proc(mydim, myfilename)
 
 	version1:= test_top_ehrhart_given_simplex_v1(mysimplex);
 	return version1;
-	
+
 	#CheckSou(5);
 end:
 
@@ -180,9 +180,22 @@ test_top_ehrhart_v2:=proc(mydim, myfilename)
 	return version2;
 end:
 
+#Makes a random simplex, saves it to a file, and calles the new (version 1) TopEhrhart functions.
+test_top_ehrhart_v3:=proc(mydim, myfilename)
+	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version3:
+	randomize():
+	mysimplex:=create_random_simplex(mydim):
+	myfileName:=myfilename:
+	write_simplex_to_file(mysimplex,cat(myfileName,".simp")):
+	write_facets_to_file(simplex_to_hyperplanes(mysimplex),cat(myfileName,".latte"),mydim):
+
+	version3:= test_top_ehrhart_given_simplex_v3(mysimplex);
+	return version3;
+end:
 
 
-#Tests top-ehrhart functions 
+
+#Tests top-ehrhart functions
 #These are the orgigional functions we recieved before Oct 2010.
 test_top_ehrhart_given_simplex_v1:=proc(mysimplex)
 	local myi, myCC:=[], startTime, totalTime:
@@ -199,7 +212,7 @@ test_top_ehrhart_given_simplex_v1:=proc(mysimplex)
 	#CheckSou(5);
 end:
 
-#Tests top-ehrhart functions 
+#Tests top-ehrhart functions
 #These are the new functions we recieved on Oct 2010.
 test_top_ehrhart_given_simplex_v2:=proc(mysimplex)
 	local startTime, myCC, totalTime;
@@ -209,6 +222,18 @@ test_top_ehrhart_given_simplex_v2:=proc(mysimplex)
 	totalTime:= time() - startTime;
 	return([totalTime, myCC]);
 end:
+
+### This is for the "Conebyconeapproximations_08_11_2010" version
+test_top_ehrhart_given_simplex_v3:=proc(mysimplex)
+	local startTime, myCC, totalTime, dim;
+
+	startTime:=time();
+    dim := nops(mysimplex)-1;
+	myCC:=TopEhrhartweightedPoly(n, mysimplex, [seq(0,i=1..dim)], 0, 2);
+	totalTime:= time() - startTime;
+	return([totalTime, myCC]);
+end:
+
 
 
 print("testSLEhrhar.file ok");
