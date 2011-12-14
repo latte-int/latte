@@ -245,8 +245,9 @@ test_library_examples_LDADD = $(LDADD)
 test_library_examples_LDADD += liblatteintegration.a
 TESTS += test-library-examples
 
-if HAVE_PROGRAMMER_HELPER
-
+#hack...have_Programmer_extra was giving errors
+#if HAVE_PROGRAMMER_EXTRA
+if HAVE_DATABASE
  
 #we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
 bin_PROGRAMS += testBuildPolytope
@@ -296,7 +297,7 @@ test_volume_for_SL_SOURCES = valuation/test/testVolumeForSLDriver.cpp
 test_volume_for_SL_LDADD = $(LDADD)
 test_volume_for_SL_LDADD += liblatteintegration.a
 
-endif #end of  HAVE_PROGRAMMER_HELPER
+endif #end of  HAVE_PROGRAMMER_EXTRA
 
 
 
@@ -390,8 +391,8 @@ noinst_HEADERS +=				\
 
 dist_pkgdata_DATA += top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
 
-if HAVE_PROGRAMMER_HELPER
-
+#if HAVE_PROGRAMMER_EXTRA
+if HAVE_DATABASE
 bin_PROGRAMS += BlockIntegrate
 BlockIntegrate_SOURCES = integration/blockInt.cpp
 BlockIntegrate_LDADD = liblatteintegration.a liblatte.a
@@ -417,7 +418,7 @@ check_PROGRAMS += compare
 compare_SOURCES = integration/versusMode.cpp
 compare_LDADD = liblatteintegration.a liblatte.a
 
-endif #end of HAVE_PROGRAMMER_HELPER
+endif #end of HAVE_PROGRAMMER_EXTRA
 
 check_PROGRAMS += integrate_test
 integrate_test_SOURCES =    integration/integrateTest.cpp

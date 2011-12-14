@@ -50,6 +50,7 @@ public:
 		integrateLinearFormTriangulation,				//integrate linear forms using triangulation
 		integrateLinearFormCone,						//integrate linear forms using cone method
 		integrateProductLinearFormsTriangulation,		//integrate product of linear forms using triangulation.
+		topEhrhart,	// compute top coefficients of Ehrhart quasi-polynomial
 		entireValuation};
 private:
 
@@ -88,20 +89,7 @@ private:
 
 
 public:
-	typedef enum {DeterminantVolume, LawrenceVolume} VolumeType;
-	typedef enum {TriangulationIntegration, LawrenceIntegration} IntegrationType;
-	typedef enum {VertexRayCones, TriangulatedCones} ConeType;
-	enum ValuationAlgorithm {
-		volumeCone,									//volume using the cone method.
-		volumeTriangulation,							//volume using triangulation
-		integratePolynomialAsLinearFormTriangulation, 	//decompose polynomial to LF, use triangulation.
-		integratePolynomialAsLinearFormCone,			//decompose polynomila to LF, use cone method.
-		integrateLinearFormTriangulation,				//integrate linear forms using triangulation
-		integrateLinearFormCone,						//integrate linear forms using cone method
-		integrateProductLinearFormsTriangulation,		//integrate product of linear forms using triangulation.
-		entireValuation,
-		topEhrhart	// compute top coefficients of Ehrhart quasi-polynomial
-	};
+
 
 	PolytopeValuation(Polyhedron *p, BarvinokParameters &bp);
 	virtual ~PolytopeValuation();
