@@ -112,6 +112,8 @@ class IntegrationInput
 {
 public:
 	typedef enum {inputVolume, inputPolynomial, inputLinearForm, inputProductLinearForm, nothing} IntegrandType;
+	// FIXME: maybe rename inputVolume to inputUnweighted.  And what's
+	// the difference to `nothing'? --mkoeppe
 	IntegrandType integrandType;
 	string fileName;
 	string integrand;
@@ -123,8 +125,12 @@ public:
 	bool integrateLinearFormTriangulation;				//integrate linear forms using triangulation
 	bool integrateLinearFormCone;						//integrate linear forms using cone method
 	bool integrateProductLinearFormsTriangulation;		//integrate product of linear forms using triangulation.
+	bool topEhrhart;					//compute top Ehrhart coefficients
 	bool all;
 
+	int numEhrhartCoefficients;
+	bool realDilations;
+	
 	IntegrationInput();
 };
 
@@ -142,6 +148,10 @@ ValuationContainer computeIntegralLinearForm(Polyhedron *poly,
 ValuationContainer computeIntegralProductLinearForm(Polyhedron *poly,
 		BarvinokParameters &myParameters, const IntegrationInput & intInput);
 
+//Computes top weighted Ehrhart coefficients
+ ValuationContainer computeTopEhrhart(Polyhedron *poly,
+				      BarvinokParameters &myParameters,
+				      const IntegrationInput & intInput);
 
 ValuationContainer mainValuationDriver(const char *argv[], int argc);
 

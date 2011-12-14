@@ -265,6 +265,7 @@ code/latte/top-ehrhart/README -text
 code/latte/top-ehrhart/TopEhrhart_lib.mpl -text
 code/latte/top-ehrhart/testingTopEhrhart.mpl -text
 code/latte/top-ehrhart/testingTopEhrhart_lib.mpl -text
+code/latte/top-ehrhart/top-ehrhart.cpp -text
 code/latte/valuation/Driver.cpp -text
 code/latte/valuation/Perturbation.cpp -text
 code/latte/valuation/Perturbation.h -text

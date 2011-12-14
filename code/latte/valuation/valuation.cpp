@@ -347,6 +347,10 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	strcpy(printLawrence, "no");
 	integrationInput.integrandType = IntegrationInput::nothing;
 	integrationInput.all = true;
+	integrationInput.numEhrhartCoefficients = -1; // incremental mode
+	integrationInput.realDilations = false; // don't output
+						// formulas valid for
+						// real dilations also
 
 	approx = false;
 	ehrhart_polynomial = false;
@@ -456,16 +460,23 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		{
 			read_polyhedron_data.show_options(cerr);
 			cerr << "Options that control what to compute:" << endl
-					<< "  valuation types: --valuation=volume, or --valuation=integrate\n"
+			     		<< "  --valuation=volume                          Computes the volume\n"
+			     		<< "  --valuation=integrate                       Computes an integral\n"
+	       			     	<< "  --valuation=top-ehrhart                     Computes the top weighted Ehrhart coefficients\n"
 					<< "volume algorithms and options:\n"
 					<< "  --cone-decompose                            Computes the volume using the Lawrence formula and\n"
 					<< "                                              and prints the Lawrence rational function.\n"
 					<< "  --triangulate                               Computes the volume using the triangulation method.\n"
 					<< "  --all                                       Computes the volume using all the methods.\n"
-					<< "\n" << "integration options\n"
-					<< "  --monomials=<file>                           Looks at the first line of file for a polynomial\n"
+					<< "\n" << "integration and weighted summation options:\n"
+					<< "  --monomials=<file>                          Looks at the first line of file for a polynomial\n"
 					<< "                                              encoded in maple-syntax: [ [coef, [exponent vector]], ...]\n"
+			  /// FIXME: Add further options!
 					<< "                                              If cannot open file, the line is read from std in.\n"
+					<< "top Ehrhart options:\n"
+					<< "  --num-coefficients=K                        Number of highest Ehrhart coefficients to compute\n"
+					<< "                                              (default: compute all, incrementally)\n"
+					<< "  --real-dilations                            Output formulas valid for real dilations also\n"
 					<< "Example: " << argv[0]
 					<< " --valuation=volume --cone-decompose --print-cone-decompose-function file.latte\n"
 					<< "         (will print the volume found by the cone decomposition method along with the Lawrence rational function.)\n"
@@ -533,7 +544,21 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		{
 			cout << "TODO: add the old style volume optinos back." << endl;
 			exit(1);
-		}/* else if (strcmp(argv[i], "--lawrence") == 0 || strcmp(argv[i], "--cone-decompose") == 0)
+		}
+		else if (strcmp(argv[i], "--valuation=top-ehrhart") == 0) {
+		  strcpy(read_polyhedron_data.dualApproach, "yes");  // Want
+								     // vertices
+								     // of polytope
+		  integrationInput.all = false;
+		  integrationInput.topEhrhart = true;
+		}
+		else if (strncmp(argv[i], "--num-coefficients=", 19) == 0) {
+		  integrationInput.numEhrhartCoefficients = atoi(argv[i] + 19);
+		}
+		else if (strncmp(argv[i], "--real-dilations", 6) == 0) {
+		  integrationInput.realDilations = true;
+		}
+		/* else if (strcmp(argv[i], "--lawrence") == 0 || strcmp(argv[i], "--cone-decompose") == 0)
 		{
 			strcpy(valuationAlg, "lawrence");
 			strcpy(read_polyhedron_data.dualApproach, "no");
@@ -692,8 +717,11 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		//poly is updated.
 		polyhedronToCones(integrationInput, Poly, params);
 
+		if (integrationInput.topEhrhart) {
+		  valuationAnswers = computeTopEhrhart(Poly, *params, integrationInput);
+		}
 		//now the cones of poly are the tangent cones or the lifted cone of the vertices.
-		if (integrationInput.integrandType == IntegrationInput::inputVolume)
+		else if (integrationInput.integrandType == IntegrationInput::inputVolume)
 		{
 			valuationAnswers = computeVolume(Poly, *params, integrationInput,
 					printLawrence);
@@ -752,8 +780,12 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			}//user supplied polynomial in file.
 
 
-
-			valuationAnswers = computeIntegral(Poly, *params, integrationInput);
+			if (integrationInput.topEhrhart) {
+			  valuationAnswers = computeTopEhrhart(Poly, *params, integrationInput);
+			}
+			else {
+			  valuationAnswers = computeIntegral(Poly, *params, integrationInput);
+			}
 		} //else integration.
 		ValuationData totalValuationTimer;
 		totalValuationTimer.valuationType = PolytopeValuation::entireValuation;
@@ -934,6 +966,7 @@ void Valuation::polyhedronToCones(const IntegrationInput &intInput, Polyhedron *
 				dualizeCones(Poly->cones, Poly->numOfVars, params);
 				cerr << "done!) ";
 				cerr.flush();
+				Poly->dualized = false; // Adjust state
 			}
 		}//only need vertices
 

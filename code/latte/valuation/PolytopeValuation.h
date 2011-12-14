@@ -78,7 +78,9 @@ public:
 		integrateLinearFormTriangulation,				//integrate linear forms using triangulation
 		integrateLinearFormCone,						//integrate linear forms using cone method
 		integrateProductLinearFormsTriangulation,		//integrate product of linear forms using triangulation.
-		entireValuation};
+		entireValuation,
+		topEhrhart	// compute top coefficients of Ehrhart quasi-polynomial
+	};
 
 	PolytopeValuation(Polyhedron *p, BarvinokParameters &bp);
 	virtual ~PolytopeValuation();
