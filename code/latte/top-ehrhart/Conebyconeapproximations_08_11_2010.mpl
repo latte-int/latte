@@ -859,6 +859,7 @@ cone_by_cone_approxi_simplex_formulab([[0,0],[1,0],[0,1]], 1,xi);
 dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
     s_Cspace_in_lattice_coord,news,
     ProjLattice;
+    #printf("### dilatedS_Ispace_Cone: W = %a, ISpace = %a\n", W, ISpace);
     Cspace:=ComplementList(ISpace,nops(W));
     ProjLattice := projectedlattice(W,Cspace);
     dilateds:=[seq(n*s[i],i=1..nops(W))];
@@ -903,6 +904,7 @@ dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     output:=0;
     d:=nops(W);
     if order=d then
+        # Fast path; general code below handles this case just fine.
         output:=dilatedS_Ispace_Cone(n,s,W,[],xi);
     else
         for j from 0 to order do
@@ -923,8 +925,8 @@ end:
 # xi a list of variables. xi can be numeric but then there can be an error message;
 # Output a function f(n,N,xi);
 # This is the sum of the approximate  functions  over the tangent cones  for the dilated simplex nS; where we emphasize the dependance in n;
-# N is the same than n, but here the function of N are perodic;
-# I did that,  as we will need to pick  up a polynomial term in n, while N are then considered as constants;
+# N is the same as n, but here the functions of N are periodic;
+# I did that, as we will need to pick up a polynomial term in n, while N are then considered as constants;
 # EXAMPLE IS GIVEN  AFTER;
 
 #
@@ -954,7 +956,7 @@ end:
 #
 TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
     d:=nops(Simplex)-1;
-    order:=M+nops(Simplex)-m;
+    order:=M+d-m;
     xx:=[seq(t*ell[i],i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
     CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
@@ -968,7 +970,7 @@ end:
 #
 TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
-    order:=M+nops(Simplex)-m;
+    order:=M+d-m;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
@@ -993,7 +995,7 @@ end:
 TopEhrhartweightedPoly:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
     k := min(M+d, given_k);
-    order:=M+nops(Simplex)-k;
+    order:=M+d-k;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
@@ -1119,7 +1121,7 @@ end:
 #WARNING; THIS WORKS ONLY IF ell is generic;
 TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
     d:=nops(Simplex)-1;
-    order:=M+nops(Simplex)-m;
+    order:=M+d-m;
     xx:=[seq(t*ell[i],i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
     CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
@@ -1127,7 +1129,7 @@ TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
 end:
 TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
-    order:=M+nops(Simplex)-m;
+    order:=M+d-m;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
@@ -1145,7 +1147,7 @@ end:
 TopEhrhartweightedPoly_real:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
     k := min(M+d, given_k);
-    order:=M+nops(Simplex)-k;
+    order:=M+d-k;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
@@ -1181,7 +1183,7 @@ end:
 
 
 
-EXAMPLES:
+##EXAMPLES:
 #VERIFICATION FOR APPROXIMATION;
 random_rational_vector:=proc(N,d) local R;
     R:=rand(N);
