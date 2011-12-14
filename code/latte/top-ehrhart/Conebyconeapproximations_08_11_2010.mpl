@@ -895,12 +895,13 @@ end:
 # W a cone, order is an integer;
 # xi a list of variables.
 # Output a function f(n,xi);
-# This is the sulm of the approximate  function S^{Isplace}(ns+W)(xi), where we emphasize the dependance in n;
+# This is the sulm of the approximate  function S^{Ispace}(ns+W)(xi), where we emphasize the dependance in n;
 
 # EXAMPLE IS GIVEN  AFTER;
 
 #
 dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+    #printf("##### dilated_approxi_cone: order = %d\n", order);
     output:=0;
     d:=nops(W);
     if order=d then
@@ -995,7 +996,7 @@ end:
 TopEhrhartweightedPoly:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
     k := min(M+d, given_k);
-    order:=M+d-k;
+    order:=k;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
@@ -1147,7 +1148,7 @@ end:
 TopEhrhartweightedPoly_real:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
     k := min(M+d, given_k);
-    order:=M+d-k;
+    order:=k;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
     AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
