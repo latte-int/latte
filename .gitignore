@@ -282,7 +282,6 @@ code/test-suite/totalTime
 /config.sub
 /configure
 /depcomp
-distro/*.tar.gz
 distro/.built_*
 distro/.unpacked_*
 distro/Makefile
