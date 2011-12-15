@@ -301,8 +301,21 @@ code/test-suite/test-default.sh -text
 code/test-suite/test-homog.sh -text
 code/test-suite/test-irr-exp-maxdet1000-4ti2.sh -text
 code/test-suite/test-irr-exp-maxdet1000.sh -text
+distro/4ti2-1.4-prerelease-2009-11-13.tar.gz -text
 distro/cdd+-077a.patch -text svneol=unset#application/octet-stream
+distro/cdd+-077a.tar.gz -text
+distro/cddlib-094f.tar.gz -text
+distro/glpk-4.13.tar.gz -text
+distro/gmp-4.2.4.tar.gz -text
+distro/lidia-FF-2.2.1-pre1+svn-1069+lattepatches-0.1.tar.gz -text
+distro/lidia-FF-2.3.0.tar.gz -text
+distro/lidia-LA-2.2.1-pre1+svn-1069+lattepatches-0.1.tar.gz -text
+distro/lidia-LA-2.3.0.tar.gz -text
+distro/lidia-base-2.2.1-pre1+svn-1069+lattepatches-0.1.tar.gz -text
+distro/lidia-base-2.3.0.tar.gz -text
 distro/ntl-5.4-patch -text svneol=unset#application/octet-stream
+distro/ntl-5.4.2.tar.gz -text
+distro/ntl-5.5.2.tar.gz -text
 doc/amsabbrv.bst -text
 doc/bibliography.bib -text
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
