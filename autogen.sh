@@ -3,4 +3,5 @@
 aclocal -I m4 -I m4/gnulib
 autoheader
 autoconf
+libtoolize --force
 automake --add-missing

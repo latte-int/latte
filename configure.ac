@@ -3,6 +3,7 @@
 
 AC_PREREQ(2.59)
 AC_INIT(latte-int, 1.5+svn-2011-07-29)
+AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
 AM_MAINTAINER_MODE
@@ -11,7 +12,7 @@ AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
 AC_CONFIG_FILES([code/latte/integration/testMultiply.sh], [chmod +x code/latte/integration/testMultiply.sh])
 AC_CONFIG_FILES([code/latte/integration/testIntegration.sh], [chmod +x code/latte/integration/testIntegration.sh])
 AC_CONFIG_FILES([code/gnulib/Makefile])
-AC_PROG_RANLIB
+LT_INIT
 AC_PROG_CC
 AC_PROG_CXX
 
