@@ -302,6 +302,7 @@ code/test-suite/test-homog.sh -text
 code/test-suite/test-irr-exp-maxdet1000-4ti2.sh -text
 code/test-suite/test-irr-exp-maxdet1000.sh -text
 distro/4ti2-1.4.tar.gz -text
+distro/4ti2-1.5.tar.gz -text
 distro/cddlib-094f.tar.gz -text
 distro/glpk-4.13.tar.gz -text
 distro/gmp-4.2.4.tar.gz -text
