@@ -343,7 +343,6 @@ endif #HAVE_DATABASE
 liblatte_la_SOURCES +=				\
 	integration/PolyRep.cpp			\
 	integration/residue.cpp			\
-	timing.cpp				\
 	integration/newIntegration.cpp		\
 	integration/PolyTrie.cpp		\
 	top-ehrhart/top-ehrhart.cpp
