@@ -46,5 +46,3 @@ Configuration:
 
 * Make compile and run with compilers other than g++
 
-* Make the package relocatable (replacing compiled-in paths), 
-  so make a binary distribution as a tar-gz file more useful
