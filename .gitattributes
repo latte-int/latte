@@ -132,48 +132,6 @@ EXAMPLES/tests/implied-equation.latte -text
 EXAMPLES/tests/missing-newline-2.latte -text
 EXAMPLES/tests/missing-newline-3.latte -text
 EXAMPLES/tests/missing-newline.latte -text
-EXAMPLES/volumeIntegrationPaperComparison/Henrion/README.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/Henrion/bean.Arc10-08.latte.vrep -text
-EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/integrateAsFunction.mw -text
-EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/mapleBean.mpl -text
-EXAMPLES/volumeIntegrationPaperComparison/Henrion/maple/plotFuctionNorm.mw -text
-EXAMPLES/volumeIntegrationPaperComparison/Henrion/paper/appVolumeIntegrationBasicSemiAlgebraicSets.pdf -text
-EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/makeVotePolytope.mpl -text
-EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope3.hrep.latte -text
-EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope4.hrep.latte -text
-EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope5.hrep.latte -text
-EXAMPLES/volumeIntegrationPaperComparison/Lepelley/maple/votePolytope6.hrep.latte -text
-EXAMPLES/volumeIntegrationPaperComparison/Lepelley/paper/On[!!-~]Ehrhart[!!-~]polynomials[!!-~]and[!!-~]probability[!!-~]calculations.PDF -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/README.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/ch3.1 -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/ch3.2 -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/ch3.3 -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/markKorenblit/paper/Mark[!!-~]Korenblit1.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/README.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p1.latte.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p2.latte.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p3.latte.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p4.latte.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p5.latte.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p6.latte.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/p7.latte.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/VOLUME/ong/paper/OngVolumeExperiments.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/bueler/READEME.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/paper/bueler.pdf -text
-EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.tex -text
-EXAMPLES/volumeIntegrationPaperComparison/notStarted/Fausto[!!-~]Bernardini.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/notStarted/RATHOD.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/notStarted/README.txt -text
-EXAMPLES/volumeIntegrationPaperComparison/notStarted/alanGenz.pdf -text svneol=unset#unset
-EXAMPLES/volumeIntegrationPaperComparison/notStarted/zhiqiangXu.pdf -text
-EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/createScript.sqlite -text
-EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/createVolume.sql -text
-EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dbBackup/polynomialBackup.1.20.9pm.tar.gzip -text
-EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/fixDuals.sh -text
-EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/makeDatabase.sh -text
-EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/randomPolytoepDB.2.15.2011.tar.gzip -text
-EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/vinciCyclicPolytopes/vinciCyclicPolytopesDriver.pl -text
-EXAMPLES/volumeIntegrationPaperComparison/shaoweiLin/shaoweiLin.pdf -text
 code/gnulib/alloca_.h -text
 code/gnulib/setenv.h -text
 code/gnulib/stdbool_.h -text
