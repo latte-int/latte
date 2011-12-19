@@ -1,8 +1,10 @@
-This is LattE integrale, a new version of LattE that can compute volumes
-and integrate polynomials and powers of linear forms over polytopes.
+This is LattE integrale, the official new version of LattE.
 
-This release also includes LattE macchiato, an improved version of 
-LattE derived from the official Release 1.2.
+In addition to the traditional LattE function of counting lattice
+points in polytopes by variants of Barvinok's algorithm, LattE
+integrale can also compute volumes and integrate polynomial functions
+over polytopes.  It supersedes LattE macchiato, an improved version of 
+LattE.
 
 LattE requires the following programs and libraries: 
 

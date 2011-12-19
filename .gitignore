@@ -302,7 +302,14 @@ distro/m4/ltsugar.m4
 distro/m4/ltversion.m4
 distro/m4/lt~obsolete.m4
 distro/missing
-doc/manual.pdf
+doc/*.aux
+doc/*.bbl
+doc/*.blg
+doc/*.dvi
+doc/*.log
+doc/*.out
+doc/*.toc
+doc/auto
 doc/manual.ps
 /install-reloc
 /install-sh

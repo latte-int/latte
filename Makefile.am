@@ -4,7 +4,7 @@ SUBDIRS = code EXAMPLES
 
 docdir = $(pkgdatadir)/doc
 
-dist_doc_DATA = manual_v1.5.pdf NEWS README
+dist_doc_DATA = doc/manual.pdf NEWS README
 
 
 cvstag:
