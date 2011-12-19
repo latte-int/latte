@@ -284,6 +284,7 @@ code/test-suite/totalTime
 /depcomp
 distro/.built_*
 distro/.unpacked_*
+distro/ChangeLog.svn2cl
 distro/Makefile
 distro/Makefile.in
 distro/aclocal.m4
@@ -296,6 +297,7 @@ distro/configure
 distro/configure.lineno
 distro/dest
 distro/install-sh
+distro/ltmain.sh
 distro/m4/libtool.m4
 distro/m4/ltoptions.m4
 distro/m4/ltsugar.m4
