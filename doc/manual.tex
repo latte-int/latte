@@ -41,15 +41,16 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2ex plus 0.4ex minus 0.4ex}
 
-\title{A User's Guide for {\tt LattE integrale} \latteV \\ (Linux Release) 
+\title{A User's Guide for {\tt LattE integrale} \latteV 
 \footnote{Research supported by NSF grants DMS-0309694, NSF grants
 DMS-0073815, DMS-0914107 and DMS-0914873.
 Most of the students were supported by those
 grants and by summer fellowships provided through the UC Davis VIGRE grants
 DMS-0135345 and DMS-0636297. $\copyright$ 
-Department of Mathematics, University of California, Davis, 2011. This
-software is released under the GNU license agreement}
-\\ \includegraphics[width=0.25\textwidth]{latte-integrale.jpg}
+the authors, 2001--2011. This
+software is released under the GNU General Public License, version 2 or later.
+Image credit: Adapted from a photo by coffeefellow on Wikipedia, Creative Commons Attribution ShareAlike 2.5 License}
+\\[4ex] \includegraphics[width=0.25\textwidth]{latte-integrale.jpg}
 }%close title brace
 
 \author{Jes\'us A. De Loera \and
@@ -83,8 +84,9 @@ The name ``{\tt LattE}'' is an abbreviation for ``{\bf Latt}ice point
 convex polyhedra defined by linear equations and inequalities with 
 integer coefficients. The polyhedra can be of any (reasonably small) 
 dimension. In 2007, {\tt LattE macchiato} was released and contained many 
-algorithmic improvements. The newest edition, {\tt LattE integrale}, developed
-in 2010 can compute integrals of polynomials and volumes of rational polytopes. 
+algorithmic improvements, in particular primal variants of the algorithms. 
+The newest edition, {\tt LattE integrale}, developed
+since 2010, can also compute integrals of polynomials and volumes of rational polytopes. 
 All these algorithms run in polynomial
 time for fixed dimension. To
 learn more about the exact details of our implementation for lattice point enumeration, the interested reader can consult 
@@ -94,11 +96,11 @@ give a rather short description of the mathematical objects used by
 {\tt LattE}. Note that all our computations are done over the integers or the rationals {\emph exactly}.
 \latte cannot compute with floating-point numbers. 
 
-\subsubsection{Counting lattice points: Barvinok's Rational Functions}
+\subsubsection{Counting lattice points: Barvinok's Rational Generating Functions}
 
 Given a convex polyhedron $P = \{u\in\R^d:Au\leq b\}$, where $A$ and
 $b$ are integral, the fundamental object that we compute is a short 
-representation of the infinite power series:
+representation of the generating function:
 \[
 f(P;x) \quad = \sum_{\alpha\in P\cap\Z^d} x_1^{\alpha_1}
 x_2^{\alpha_2} \ldots x_d^{\alpha_d}.
@@ -151,9 +153,13 @@ Fore details of how the computations are done, see \cite{koeppe:irrational-barvi
 
 \subsubsection{Integration}
 
-\latteInt has two different integration algorithms for integrating a rational polynomial $p \in \R[x_1, \dots, x_d]$ over a $d$ dimensional rational polytope. The first one, called the triangulation method, triangulates the polytope into simplices and integrates over each simplex. The other method, called the cone decomposition method, integrates over each tangent cone of the polytope. In order to do this, each tangent cone is triangulated into simple cones. This is the main trade off between the two integration algorithms: you can do one (possibly) large triangulation, or (possibly) many small tangent cone triangulations. 
+\latteInt has two different integration algorithms for integrating a rational polynomial $p \in \Q[x_1, \dots, x_d]$ over a $d$-dimensional rational polytope. The first one, called the triangulation method, triangulates the polytope into simplices and integrates over each simplex. The other method, called the cone decomposition method, integrates over each tangent cone of the polytope. In order to do this, each tangent cone is triangulated into simple cones. This is the main trade off between the two integration algorithms: you can do one (possibly) large triangulation, or (possibly) many small tangent cone triangulations. 
 
-We decompose polynomials into finite sums of powers of linear forms because integrating powers of linear forms can be done in polynomial time \cite{howToIntegratePolynomialSimplex}. A decomposition of a polynomial as a sum of powers of linear forms is known as the polynomial Waring problem.
+We decompose polynomials into finite sums of powers of linear forms because
+integrating powers of linear forms can be done in polynomial time
+\cite{howToIntegratePolynomialSimplex}. The problem of decomposing a
+polynomial as a sum of powers of linear forms is known as the polynomial
+Waring problem. 
 
 See \cite{latte-integrale-paper} for a detailed explanation on why the next example gives the correct integral. 
 
@@ -196,7 +202,7 @@ The integral $\int_{x_1 = 0}^{x_1 = 1}\int_{x_2 = 0}^{x_2 = 1} x_1 +x_2  \d{x_1}
 \begin{description}
 	\item[count] counts lattice points, computes Ehrhart polynomials and Ehrhart series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
 	\item[integrate] integrates polynomials over polytopes.
-	\item[max/minimize] perform linear integer optimization.
+	\item[latte-minimize, latte-maximize] perform linear integer optimization.
 \end{description}
 
 The other executables in latte are drivers, converters, and other small utility function described in Section \ref{section:file-descriptions}.
@@ -289,10 +295,11 @@ linearity 1 3
 The last line states that among the $5$ inequalities one is to be
 considered an equality, the third one.
 
-In general, the linearity syntax is :
+In general, the linearity syntax is:
 \begin{verbatim}
-	linearity <number of equations> <row index of constraint, start counting from 1>
+	linearity <number of equations> <row indices of constraints...>
 \end{verbatim}
+The row indices start counting from 1.
 
 \subsubsection{Nonnegativity Constraints}
 For bigger examples it quickly becomes cumbersome to state all
@@ -314,14 +321,15 @@ The last line states that there are two nonnegativity constraints and
 that the first and second variables are required to be nonnegative. 
 {\bf NOTE} that the first line reads ``3 3'' and not ``5 3'' as above! 
 
-In general, the nonnegative syntax is :
+In general, the nonnegative syntax is:
 \begin{verbatim}
-	nonnegative <number of variables in list> <variable index, start counting from 1>
+	nonnegative <number of variables in list> <variable indices>
 \end{verbatim}
+The variable indices  start counting from 1.
 
 
 \subsubsection{Cost Vector}
-The functions maximize and minimize solve the integer linear programs
+The functions latte-maximize and latte-minimize solve the integer linear programs
 \[
 \max\{c^\intercal x: x\in P\cap\Z^d\}
 \]
@@ -410,7 +418,12 @@ For a complete description of \cdd file syntax, see the \cdd manual \cite{fukuda
 
 \subsection{Non-full dimensional polytopes}
 
-When the input polytope is not full dimensional, \latte projects that polytope such that it becomes full dimensional. This transformation preserves the lattice count and volume of the input polytope. The current \latteInt cannot integrate non-full dimensional polytopes.
+When the input polytope is not full dimensional, \latte projects that polytope
+such that it becomes full dimensional. This transformation preserves the
+lattice count and volume of the input polytope. 
+
+However, the integration and volume computation procedures do not handle the
+case of non--full dimensional polytopes.
 
 \subsection{\latte vs. \cdd file formats}
 There are a few key differences between \latte and \cdd file formats.
@@ -531,7 +544,7 @@ For unbounded polyhedra, one needs to combine
 	\end{verbatim} 
 \end{itemize}
 
-The following options relate to the Barvinok algorithm and where introduced by Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.
+The following options relate to the Barvinok algorithm and were introduced by Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.
 \begin{itemize}
 \item Triangulate and signed-decompose in the dual space (traditional method, default)
 	\begin{verbatim}
@@ -650,7 +663,7 @@ Let us view a few examples of the above options
 A common subproblem in counting lattice points and integration requires finding triangulations and tangent cones. Also, there are many different software tools available to do this. Instead of reinventing the wheel, \latte links with other software tools to compute these basic objects. In this section, we describe how you can control which software tool is used.
 
 \begin{itemize}
-\item The \fourtitwo program can be used instead of {\tt cddlib} and {\tt CDD+}
+\item The \fourtitwo program can be used instead of {\tt cddlib} 
   to compute the vertex cones of polytopes, triangulations, and duals of cones.
   In many cases, \fourtitwo is faster.
   
@@ -719,57 +732,6 @@ A common subproblem in counting lattice points and integration requires finding 
 
 
 \latte uses the GNU Autoconf and Automake tools. Please see the {\tt README} file in the \latte directory for detailed directions for installing \latte.
-
-\begin{comment}
-\textbf{Step 1: Create directory for {\tt LattE}}
-
-\begin{verbatim}
-     mkdir latte
-\end{verbatim}
-
-\textbf{Step 2: Download ``latte\_v1.1.tar.gz'' to directory ``latte''}
-
-\begin{verbatim}
-     Download ``latte_v1.1.tar.gz'' from
-\end{verbatim}
-
-\makebox[12 cm]{http://www.math.ucdavis.edu/$\sim$latte/downloads/}
- 
-(If you have never downloaded a file from the internet: A click with
-your right mouse button onto the file name on the webpage should do
-the trick. In any case, if you do not succeed, ask your system
-administrator, a friend, or send us an email.) 
-
-\textbf{Step 3: Change to directory for ``latte''}
-
-\begin{verbatim}
-     cd latte
-\end{verbatim}
-
-\textbf{Step 4: Unzip and untar the archive} 
-
-\begin{verbatim}
-     gunzip latte_v1.1.tar.gz
-     tar xvf latte_v1.1.tar
-\end{verbatim}
-
-\textbf{Step 5: Make ``install'' executable} 
-
-\begin{verbatim}
-     chmod 700 install
-\end{verbatim}
-
-\textbf{Step 6: Install {\tt LattE}} 
-
-\begin{verbatim}
-     ./install
-\end{verbatim}
-
-\end{comment}
-
-
-
-
 
 
 %\newpage
@@ -1190,8 +1152,9 @@ provided.
 \subsection{System Requirements}
 
 \subsubsection{Platform} 
-The binaries for \latte v1.1 as well as for {\tt cdd} (by
-K. Fukuda \cite{fukuda}) are for platforms that run Unix, that is, Mac and Linux.
+Recent versions of LattE has been successfully built on various Linux
+distributions, Mac OS X, and Solaris.
+
 
 \subsubsection{Memory Requirements} 
 The memory requirements are essentially problem dependent; however,
@@ -1213,51 +1176,6 @@ simplification feature to ``count'' will not be available.
 We have tested this connection with \maple 5.1, 8.0, and 14.0 and experienced
 no problem. Please let us know about any problem you experience with
 our connection to \maple.
-
-\subsection{File Descriptions} 
-\label{section:file-descriptions}
-The {\tt LattE} Linux release consists a single archive file,
-\textbf{latte\_v1.*.tar.gz}. The archive contains the following files:
-
-\begin{tabular}{|l|l|}
-\hline
-Name & Description\\
-\hline 
-%\hline
-& \\
-count & Main program executables\\
-ehrhart & \\
-latte-maximize & \\
-latte-minimize & \\
-integrate      & \\
-& \\
-
-simplify2.add & additional files used by {\tt LattE}\\
-redcheck & ($\leftarrow$ modified from {\tt cdd} library) \\
-install & \\
-& \\
-cdd & external {\tt cdd} software executable used by {\tt LattE},\\
-& original name in {\tt cdd}: cddr+\_gmp\\
-& \\
-\hline
-& \\
-EXAMPLES/ & Subdirectory containing sample input files\\
-& \\
-\hline
-& \\
-manual.pdf & User's guide \\
-%manual.pdf & \\
-& \\
-\hline 
-& \\
-code/ & {\tt LattE} source code (including {\tt NTL}, {\tt cdd} and {\tt cdd lib})\\
-& \\
-\hline 
-& \\
-gpl.txt & GNU General Public License agreement\\
-& \\
-\hline 
-\end{tabular}
 
 \subsection{License Agreement}
 
