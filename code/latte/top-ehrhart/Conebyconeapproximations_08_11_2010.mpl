@@ -910,6 +910,7 @@ dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     else
         for j from 0 to order do
             C:=choose(d,j);
+            #print("choose j, order, c", j, order, C);
             cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
             for a from 1 to nops(C) do
                 K:=C[a]; KK:=ComplementList(K,nops(W));
@@ -939,6 +940,8 @@ ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
         F:=F+dilated_approxi_cone(n,S[i],W,order,xi) ;
     od:
     F:=eval(subs({TODD=Todd,EXP=exp},F));
+    
+    return F;
 end:
 
 
@@ -978,7 +981,7 @@ TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,re
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=coeff(CCeps,n,m);
-    subs({N=n},CCn);
+    return subs({N=n},CCn);
 end:
 # Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
 # The ouput is  a polynomial with coefficients  periodic function of n;
@@ -993,7 +996,7 @@ CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
 end:
 # New functions: --Matthias
 # Compute the highest (k+1) terms.
-TopEhrhartweightedPoly:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
+TopEhrhartweightedPoly:=proc(n,nn,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
     k := min(M+d, given_k);
     order:=k;
@@ -1002,31 +1005,130 @@ TopEhrhartweightedPoly:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,
     AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
-    CCn:=add(coeff(CCeps,n,m) * N^m, m=M+d-k..M+d);
-    subs({N=n},CCn);
+    CCn:=add(coeff(CCeps,n,m) * nn^m, m=M+d-k..M+d);
+    return CCn;
 end:
+
+
+printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK) 
+	local coef, M, ell, ehrhartPoly, mapleLinForm;
+	
+	ehrhartPoly:=0;
+	
+	for mapleLinForm in linearForms do
+		coef:=mapleLinForm[1];
+		M   :=mapleLinForm[2][1];
+		ell :=mapleLinForm[2][2];
+	
+		
+		#print("cor=", coef);
+		#print("m=",M);
+		#print("ell=", ell);
+		if (topK >= 0) then
+			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2(n,nn,simpleCones,ell,M,d,useRealDilations, topK);
+		else
+			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2(n,nn,simpleCones,ell,M,d,useRealDilations, M+d);
+		fi;
+	end;
+	
+	return ehrhartPoly;
+end;
+
+
+#Computes the top weighted ehrhart polynomial's coefficients
+#input
+#	ell: the linear form
+#	M: the power of the linear form
+#	d: dimension of the polytope
+#	simpleCones: the polytope.
+#	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
+#return: the polynomial's coefficients in an array. ehrhartPoly2[m+1] is the coefficient of n^m
+printIncrementalEhrhartweightedPoly2:=proc(n,nn,simpleCones,ell,M,d, useRealDilations, topK) 
+ local order, newOrder, xi;
+ local partialF, partialSeries; 
+ local totalSeries, term;
+ local l, j, i, a, s, W, C, K,KK, reg, output;
+ local cone, rays;
+ local ehrhartPoly;
+ 
+ 
+ 	ehrhartPoly:=0;    
+    order:=min(M+d, topK);
+    #order:=M+d;
+    
+    reg:=random_vector(5000,d);
+    xi:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+      
+    
+	partialF:=Array([seq(0,ll=0..order+1)]);
+	partialSeries:=Array([seq(0,ll=0..order+1)]);	
+    
+    for j from 0 to order do
+    	C:=choose(d,j);
+    	output:=0;
+    	#cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
+    	
+    	#compute the valuation over each cone.
+    	for cone in simpleCones do
+
+    		s:=cone[1]; #vertex
+    		W:=[seq(primitive_vector(cone[2][j]), j=1..d)]; #rays of the cone.
+	    	for a from 1 to nops(C) do
+        		K:=C[a]; KK:=ComplementList(K,nops(W));
+        		
+        		if useRealDilations then
+        			output:=output + dilatedS_Ispace_Cone_real(n,s,W,KK,xi) ;
+        		else
+        			output:=output + dilatedS_Ispace_Cone(n,s,W,KK,xi) ;
+        		fi;
+
+        	od;
+        od;
+        partialF[j+1]:=eval(subs({TODD=Todd,EXP=exp},output));
+        
+        partialSeries[j+1]:=coeff(series(partialF[j+1],t=0,M+d+2),t,M);
+        partialSeries[j+1]:=coeff(series(partialSeries[j+1],epsilon=0,d+2),epsilon,0);
+    
+        totalSeries:=0;
+        for l from 0 to j do
+    		newOrder:=j;
+    		totalSeries:=totalSeries + (-1)^(newOrder-l)*binomial(d-l-1,d-newOrder-1)*partialSeries[l+1];
+    	od; #for l
+    	totalSeries:=coeff(totalSeries,n,M+d-j);
+    	term:= expand(subs({N=n},totalSeries));
+    	ehrhartPoly:=ehrhartPoly+term*nn^(M+d-j);
+    	printf("+ %a\n", term*nn^(M+d-j));
+
+    od;
+    printf("## Evaluation at n=1: %a\n", eval(subs(n=1, nn=1,MOD=modp, ehrhartPoly)));
+    return ehrhartPoly;
+end:
+
+
+
 #### LATTE INTERFACE FUNCTION:
-printTopEhrhartweightedPoly:=proc(n,Simplex,ell,M,k)
-    printf("%a\n", TopEhrhartweightedPoly(n,Simplex,ell,M,k));
-end:
+
 # Incrementally compute and print all terms 0f the weighted Ehrhart
 # polynomial.  User can interrupt when computation takes too long.
 #### LATTE INTERFACE FUNCTION:
-printIncrementalEhrhartweightedPoly:=proc(n,Simplex,ell,M) local d;
+printIncrementalEhrhartweightedPoly:=proc(n,nn, Simplex,ell,M) local d;
     local m, term, poly;
     d:=nops(Simplex)-1;
     m := M+d;
-    term := TopEhrhartweighted(n,Simplex,ell,M,m)*n^m;
+    term := TopEhrhartweighted(n,Simplex,ell,M,m)*nn^m;
     printf("%a\n", term);
     poly := term;
     for m from M+d-1 to 0 by -1 do
-        term := TopEhrhartweighted(n,Simplex,ell,M,m)*n^m;
+        term := TopEhrhartweighted(n,Simplex,ell,M,m)*nn^m;
         printf("+ %a\n", term);
         poly := poly + term;
     od;
     printf("## Evaluation at n=1: %a\n",
-           eval(subs(n=1,MOD=modp, poly)));
+           eval(subs(n=1,nn=1, MOD=modp, poly)));
+    return poly;
 end:
+
+
 
 ##################################################################
 ### CODE FOR REAL DILATIONS
@@ -1128,6 +1230,7 @@ TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
     CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
     subs({N=n},CC);
 end:
+
 TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
     order:=M+d-m;
@@ -1139,13 +1242,13 @@ TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,C
     CCn:=coeff(CCeps,n,m);
     subs({N=n},CCn);
 end:
-CompleteEhrhartweighted_real:=proc(n,Simplex,ell,M) local d;
+CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d;
     d:=nops(Simplex)-1;
-    add(TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m,m=0..M+d);
+    add(TopEhrhartweighted_real(n,Simplex,ell,M,mTopEhrhartweightedPoly_real)*nn^m,m=0..M+d);
 end:
 # New functions: --Matthias
 # Compute the highest (k+1) terms.
-TopEhrhartweightedPoly_real:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
+TopEhrhartweightedPoly_real:=proc(n,nn,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
     d:=nops(Simplex)-1;
     k := min(M+d, given_k);
     order:=k;
@@ -1154,31 +1257,37 @@ TopEhrhartweightedPoly_real:=proc(n,Simplex,ell,M,given_k) local k,d,order,xx,AA
     AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
-    CCn:=add(coeff(CCeps,n,m) * N^m, m=M+d-k..M+d);
-    subs({N=n},CCn);
+    CCn:=add(subs(N=n, coeff(CCeps,n,m)) * nn^m, m=M+d-k..M+d);
+    #subs({N=n},CCn);
+    
+    return CCn;
 end:
+
+
 #### LATTE INTERFACE FUNCTION:
-printTopEhrhartweightedPoly_real:=proc(n,Simplex,ell,M,k)
-    printf("%a\n", TopEhrhartweightedPoly_real(n,Simplex,ell,M,k));
+printTopEhrhartweightedPoly_real:=proc(n, nn, Simplex,ell,M,k)
+    printf("%a\n", TopEhrhartweightedPoly_real(n,nn,Simplex,ell,M,k));
 end:
 # Incrementally compute and print all terms 0f the weighted Ehrhart
 # polynomial.  User can interrupt when computation takes too long.
 #### LATTE INTERFACE FUNCTION:
-printIncrementalEhrhartweightedPoly_real:=proc(n,Simplex,ell,M) local d;
+printIncrementalEhrhartweightedPoly_real:=proc(n,nn,Simplex,ell,M) local d;
     local m, term, poly;
     d:=nops(Simplex)-1;
     m := M+d;
-    term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m;
+    term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*nn^m;
     printf("%a\n", term);
     poly := term;
     for m from M+d-1 to 0 by -1 do
-        term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m;
+        term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*nn^m;
         printf("+ %a\n", term);
         poly := poly + term;
     od;
     printf("## Evaluation at n=1: %a\n",
-           eval(subs(n=1,MOD=modp, poly)));
+           eval(subs(n=1, nn=1, MOD=modp, poly)));
+	return poly;           
 end:
+
 
 ######################################################################""""
 
@@ -1249,5 +1358,63 @@ end:
 #A3:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab([1/2,1/3,1/4],Coneindex2,3,xi)));
 
 
+#####################################################################
+### Debugging functions for the latte interface functions.
+#####################################################################
 
 
+# input:
+#	a: any rational number
+#	n: base
+#	return the number between [0,n) that is equal to  a mod n
+latteMod:=proc(a, n)
+	local r, x;
+	ASSERT(n > 0);
+	x:=a;
+	while ( x >= n or x < 0) do
+		x:= x - floor(x/n)*n;
+	end;
+	return x;
+end;
+
+
+#input:
+#	simpleCones is a list of d+1 vertex-ray cones in the form
+#		[[[vertex],[[ray1], ..., [rayn]]], ...]
+#		We assume the cones are simple, that is, we have the tangent-cones of a simplex.
+#	d: integer, dimension.
+#
+# return a list of just the d+1 vertices.
+tangentConesToSimplex:=proc(simpleCones, d)
+local Simplex, cone;
+
+	Simplex:=[];
+	for cone in simpleCones do
+		Simplex:=[op(Simplex), cone[1]];
+	end;
+
+	ASSERT(nops(Simplex) = d+1); #make sure we have a simplex.
+		
+	return Simplex;
+end;
+
+
+#input
+#	Simplex: list of d+1 verticies
+#return maple-list of the tangent-cones.
+SimplexToTangentCones:=proc(Simplex)
+	local simpleCones;
+	local cone, rays, d, i;
+	
+	simpleCones:=[];
+	cone:=[];
+	d:=nops(Simplex)-1;
+	
+	for i from 1 to d+1 do
+		rays:= [seq(primitive_vector(Simplex[j]-Simplex[i]), j=1..(i-1)), seq(primitive_vector(Simplex[j]-Simplex[i]), j=(i+1)..d+1)] ;
+		cone:=[Simplex[i], rays ];
+		simpleCones:=[op(simpleCones), cone];
+	end;
+	
+	return simpleCones;
+end;
