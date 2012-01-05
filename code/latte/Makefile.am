@@ -345,7 +345,7 @@ liblatte_la_SOURCES +=				\
 	integration/residue.cpp			\
 	integration/newIntegration.cpp		\
 	integration/PolyTrie.cpp		\
-	top-ehrhart/top-ehrhart.cpp
+	top-ehrhart/TopEhrhart.cpp
 
 noinst_HEADERS +=				\
 	integration/multiply.h			\
@@ -358,7 +358,8 @@ noinst_HEADERS +=				\
 	integration/burstTrie.h			\
 	integration/burstTrie.hpp		\
 	integration/blockReps.h			\
-	integration/residue.h	
+	integration/residue.h			\
+	top-ehrhart/TopEhrhart.cpp
 
 dist_pkgdata_DATA += top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
 

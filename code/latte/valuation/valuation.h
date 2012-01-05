@@ -24,6 +24,7 @@
 
 #include "valuation/PolytopeValuation.h"
 #include "valuation/RecursivePolytopeValuation.h"
+#include "top-ehrhart/TopEhrhart.h"
 
 #include "CheckEmpty.h"
 #include "Polyhedron.h"
@@ -111,29 +112,57 @@ public:
 class IntegrationInput
 {
 public:
+	//These bool's
+
 	typedef enum {inputVolume, inputPolynomial, inputLinearForm, inputProductLinearForm, nothing} IntegrandType;
 	// FIXME: maybe rename inputVolume to inputUnweighted.  And what's
 	// the difference to `nothing'? --mkoeppe
+	// We could rename inputVolume. If it is set, it means the user typed "./exe --valuation=volume file.latte"
+	// If nothing is set, then the user typed "./exe file.latte" (didn't give a valuation command).
+	// Also, these enum's are prefixed with "input" because if a user gives a polynomial, we
+	// do not know (yet) if they want to decompose to linear forms or think of the polynomial
+	// as a product of linear forms--Brandon
 	IntegrandType integrandType;
 	string fileName;
 	string integrand;
 
+	//volume algorithms
 	bool volumeCone;									//volume using the cone method.
 	bool volumeTriangulation;							//volume using triangulation
+
+	//integration algorithms.
+	bool integratePolynomial;
 	bool integratePolynomialAsLinearFormTriangulation; 	//decompose polynomial to LF, use triangulation.
 	bool integratePolynomialAsLinearFormCone;			//decompose polynomial to LF, use cone method.
+
 	bool integratePolynomialAsPLFTriangulation; 		//decompost polynomial to PLF, use triangulation.
-	bool integratePolynomialStandardSimplex;			//update the domain to be the std. simplex.
+
 	bool integrateLinearFormTriangulation;				//integrate linear forms using triangulation
 	bool integrateLinearFormCone;						//integrate linear forms using cone method
-	bool integrateProductLinearFormsTriangulation;		//integrate product of linear forms using triangulation.
-	bool topEhrhart;					//compute top Ehrhart coefficients
-	bool all;
 
+	bool integrateProductLinearFormsTriangulation;		//integrate product of linear forms using triangulation.
+
+	//Ehrhart algorithms.
+	bool topEhrhart;					//compute top Ehrhart coefficients using cone method only.
 	int numEhrhartCoefficients;
 	bool realDilations;
+
 	
 	IntegrationInput();
+	void processUserInput();	//set the above integration/volume algorithmic booleans.
+
+	//Command line options. These are used by processUserInput()
+	//  to set up which algorithms will be used.
+	bool valuationVolume;		//--valuation=volume
+	bool valuationIntegrate;	//etc
+	bool valuationEhrhart;
+
+	bool useTangentCones;		//--cone-decompose
+	bool useTriangulation;		//--triangulate
+
+	bool polynomialAsPLF;		//--polynomial-as-plf
+
+
 };
 
 ValuationContainer computeVolume(Polyhedron * poly,
@@ -149,11 +178,9 @@ ValuationContainer computeIntegralLinearForm(Polyhedron *poly,
 		BarvinokParameters &myParameters, const IntegrationInput & intInput);
 ValuationContainer computeIntegralProductLinearForm(Polyhedron *poly,
 		BarvinokParameters &myParameters, const IntegrationInput & intInput);
+void 			   computeTopEhrhart(Polyhedron *poly,
+		BarvinokParameters &myParameters, const IntegrationInput & intInput); //Computes top weighted Ehrhart coefficients
 
-//Computes top weighted Ehrhart coefficients
- ValuationContainer computeTopEhrhart(Polyhedron *poly,
-				      BarvinokParameters &myParameters,
-				      const IntegrationInput & intInput);
 
 ValuationContainer mainValuationDriver(const char *argv[], int argc);
 
