@@ -1190,7 +1190,7 @@ dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     output:=0;
     d:=nops(W);
     if order=d then
-        output:=dilatedS_Ispace_Cone(n,s,W,[],xi);
+        output:=dilatedS_Ispace_Cone_real(n,s,W,[],xi);
     else
         for j from 0 to order do
             C:=choose(d,j);
