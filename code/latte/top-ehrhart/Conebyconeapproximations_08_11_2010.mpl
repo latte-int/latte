@@ -1095,12 +1095,13 @@ printIncrementalEhrhartweightedPoly2:=proc(n,nn,simpleCones,ell,M,d, useRealDila
     		totalSeries:=totalSeries + (-1)^(newOrder-l)*binomial(d-l-1,d-newOrder-1)*partialSeries[l+1];
     	od; #for l
     	totalSeries:=coeff(totalSeries,n,M+d-j);
-    	term:= expand(subs({N=n},totalSeries));
+    	#we need to mult. my M! because we are computing w/the weight 1/M!* ell^M
+    	term:= expand(subs({N=n},totalSeries)*factorial(M));
     	ehrhartPoly:=ehrhartPoly+term*nn^(M+d-j);
     	printf("+ %a\n", term*nn^(M+d-j));
 
     od;
-    printf("## Evaluation at n=1: %a\n", eval(subs(n=1, nn=1,MOD=modp, ehrhartPoly)));
+    #printf("## Evaluation at n=1: %a\n", eval(subs(n=1, nn=1,MOD=modp, ehrhartPoly)));
     return ehrhartPoly;
 end:
 

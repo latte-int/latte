@@ -151,7 +151,9 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", false, -1):" << endl;
 	}//integer dilations.
 
-	maple << "printf(\"The Ehrhart polynomial=%a\", epoly);\n" << endl;
+	maple << "\n\n";
+	maple << "printf(\"The Ehrhart polynomial=%a\\n\", epoly);\n" << endl;
+	maple << "printf(\"Evaluation at 1 is %a\\n\", subs({N=1,n=1, MOD=latteMod},epoly));\n" << endl;
 	maple.close();
 
 	system_with_error_check(MAPLE_PATH + string(" compute-top-ehrhart.mpl"));
