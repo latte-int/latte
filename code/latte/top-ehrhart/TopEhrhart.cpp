@@ -152,8 +152,8 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 	}//integer dilations.
 
 	maple << "\n\n";
-	maple << "printf(\"The Ehrhart polynomial=%a\\n\", epoly);\n" << endl;
-	maple << "printf(\"Evaluation at 1 is %a\\n\", subs({N=1,n=1, MOD=latteMod},epoly));\n" << endl;
+	maple << "printf(\"The Ehrhart polynomial=%a\\n\", expand(epoly));\n" << endl;
+	maple << "printf(\"Evaluation at 1 is %a\\n\", eval(subs({N=1,n=1, MOD=latteMod},epoly)));\n" << endl;
 	maple.close();
 
 	system_with_error_check(MAPLE_PATH + string(" compute-top-ehrhart.mpl"));
