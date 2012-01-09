@@ -530,7 +530,6 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			     << "  --valuation=volume                          Computes the volume\n"
 			     << "  --valuation=integrate                       Computes an integral\n"
 	       		 << "  --valuation=top-ehrhart                     Computes the top weighted Ehrhart coefficients\n"
-	       		 << "  --valuation=top-real-ehrhart                Computes the real top weighted Ehrhart coefficients\n"
 					<< "volume and integration and options:\n"
 					<< "  --cone-decompose                            Computes the valuation using tangent cones\n"
 					<< "  --triangulate                               Computes the valuation over a triangulation.\n"
@@ -539,14 +538,14 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 					<< "integration and weighted summation options:\n"
 					<< "  --monomials=<file>                          Looks at the first line of file for a polynomial\n"
 					<< "                                              encoded in maple-syntax: [ [coef, [exponent vector]], ...]\n"
-					<< "  --linear-forms=<file>                       Looks at the first line of file for a sum of powers of linear forms"
+					<< "  --linear-forms=<file>                       Looks at the first line of file for a sum of powers of linear forms\n"
 					<< "                                              encoded in maple-syntax: [ [coef, [power, [linear form]]], ...]\n"
 					<< "  --product-linear-forms=<file>               Looks at the first line of file for a product of linear forms\n"
 					<< "                                              in maple-syntax: [ [], ...] \n"
 			  /// FIXME: Add further options!
 					<< "                                              If cannot open file, the line is read from std in.\n"
 					<< "top Ehrhart options:\n"
-					<< "  --num-coefficients=K                        Number of highest Ehrhart coefficients to compute\n"
+					<< "  --num-coefficients=K                        Number of highest Ehrhart coefficients +1 to compute\n"
 					<< "                                              (default: compute all, incrementally)\n"
 					<< "  --real-dilations                            Output formulas valid for real dilations also\n"
 					<< "Example: " << argv[0]
@@ -555,6 +554,10 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 					<< "Example: " << argv[0]
 					<< " --valuation=integrate --monomials=poly.txt file.latte\n"
 					<< "         (will compute the integral of the polynomial in poly.txt over the polytope in file.latte.)\n"
+					<< "Example: " << argv[0]
+					<< " --valuation=top-ehrhart --num-coefficients=3 --real-dilations --monomials=poly.txt file.latte\n"
+					<< "         (will compute the top 4 Ehrhart coefficients with a polynomial weight in poly.txt over the polytope in file.latte.)\n"
+
 					<< endl;
 			exit(0);
 		} else if ( strncmp(argv[i], "--valuation=", 11) == 0)
