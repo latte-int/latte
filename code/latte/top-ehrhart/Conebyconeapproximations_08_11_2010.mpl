@@ -1009,21 +1009,26 @@ TopEhrhartweightedPoly:=proc(n,nn,Simplex,ell,M,given_k) local k,d,order,xx,AA,C
     return CCn;
 end:
 
-
+#Computes the top weighted ehrhart polynomial's coefficients
+#input
+#	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
+#	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
+#	simpleCones: the polytope.
+#	linearForms: list of powers of linear forms
+#	d: dimension of the polytope
+#	useRealDilations: ture=the polynomial can be evaluaded at rational dilations.
+#	topK: find the top topK+1 coefficients.
 printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK) 
 	local coef, M, ell, ehrhartPoly, mapleLinForm;
 	
 	ehrhartPoly:=0;
 	
+	#loop over every linear form and collect the polynomial.
 	for mapleLinForm in linearForms do
 		coef:=mapleLinForm[1];
 		M   :=mapleLinForm[2][1];
 		ell :=mapleLinForm[2][2];
-	
-		
-		#print("cor=", coef);
-		#print("m=",M);
-		#print("ell=", ell);
+
 		if (topK >= 0) then
 			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2(n,nn,simpleCones,ell,M,d,useRealDilations, topK);
 		else
@@ -1035,13 +1040,15 @@ printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealD
 end;
 
 
-#Computes the top weighted ehrhart polynomial's coefficients
+#Computes the top weighted ehrhart polynomial's coefficients with a power of a linear form weight
 #input
 #	ell: the linear form
 #	M: the power of the linear form
 #	d: dimension of the polytope
 #	simpleCones: the polytope.
 #	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
+#	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
+#	topK: compute the top topK+1 coefficients.
 #return: the polynomial's coefficients in an array. ehrhartPoly2[m+1] is the coefficient of n^m
 printIncrementalEhrhartweightedPoly2:=proc(n,nn,simpleCones,ell,M,d, useRealDilations, topK) 
  local order, newOrder, xi;
