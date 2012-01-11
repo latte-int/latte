@@ -461,7 +461,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			flags |= LOAD;
 		} else if (strncmp(argv[i], "--exponential", 5) == 0)
 			params->substitution = BarvinokParameters::ExponentialSubstitution;
-		else if (strncmp(argv[i], "--polynomial", 6) == 0)
+		else if (strcmp(argv[i], "--polynomial") == 0)
 			params->substitution = BarvinokParameters::PolynomialSubstitution;
 		else if (strncmp(argv[i], "--maxdet=", 9) == 0)
 			params->max_determinant = atoi(argv[i] + 9);
@@ -588,8 +588,6 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		else if ( strcmp(argv[i], "--polynomial-as-plf") == 0)
 		{
 			integrationInput.polynomialAsPLF = true;
-			cout << "got here" << endl;
-			exit(1);
 		}
 /*
 //		 else if (strcmp(argv[i], "--all") == 0)
@@ -601,7 +599,8 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			strcpy(printLawrence, "yes");
 		else if ( strcmp(argv[i], "--stokes") == 0)
 			useStokes = true;
-//		else if (strncmp(argv[i], "--monomials=", 12) == 0)
+//
+*/		else if (strncmp(argv[i], "--monomials=", 12) == 0)
 		{
 			integrationInput.integrandType = IntegrationInput::inputPolynomial;
 			integrationInput.fileName = (argv[i] + 12);
@@ -613,7 +612,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		{
 			integrationInput.integrandType = IntegrationInput::inputProductLinearForm;
 			integrationInput.fileName = (argv[i] + 23);
-		}*/ else if (read_polyhedron_data.parse_option(argv[i]))
+		} else if (read_polyhedron_data.parse_option(argv[i]))
 		{
 
 		} else
