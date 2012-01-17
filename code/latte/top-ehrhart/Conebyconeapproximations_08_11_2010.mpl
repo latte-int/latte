@@ -1018,7 +1018,7 @@ end:
 #	d: dimension of the polytope
 #	useRealDilations: ture=the polynomial can be evaluaded at rational dilations.
 #	topK: find the top topK+1 coefficients.
-printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK) 
+printIncrementalEhrhartPolynomial_old:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK) 
 	local coef, M, ell, ehrhartPoly, mapleLinForm;
 	
 	ehrhartPoly:=0;
@@ -1030,13 +1030,141 @@ printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealD
 		ell :=mapleLinForm[2][2];
 
 		if (topK >= 0) then
-			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2(n,nn,simpleCones,ell,M,d,useRealDilations, topK);
+			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2_old(n,nn,simpleCones,ell,M,d,useRealDilations, topK);
 		else
-			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2(n,nn,simpleCones,ell,M,d,useRealDilations, M+d);
+			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2_old(n,nn,simpleCones,ell,M,d,useRealDilations, M+d);
 		fi;
 	end;
 	
 	return ehrhartPoly;
+end;
+
+
+printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK, fileName) 
+ local order, newOrder, xi;
+ local partialF, partialSeries; 
+ local totalSeries, term;
+ local l, j, i, a, s, W, C, K,KK, reg, output;
+ local cone, rays;
+ local ehrhartPoly;
+ local fPtr; #file pointer.
+ 
+ 	
+ 	#notes to self
+    #coef:=linearForms[iLF][1];
+	#M   :=linearForms[iLF][2][1];
+	#ell :=linearForms[iLF][2][2];
+	
+	#set up the integrand/residue direction.    
+    numLinearForms:=nops(linearForms);
+    M:=linearForms[1][2][1];
+    xi:=Array(1..numLinearForms);
+    for iLF from 1 to numLinearForms do
+    	#construct a different residue direction for each linear form.
+    	
+    	reg:=random_vector(5000,d);
+    	ell :=linearForms[iLF][2][2];
+    	xi[iLF]:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];    	
+    	
+    	#make sure all the linear forms have the same degree.
+    	#TODO: what sould be the output if there are different degrees and the topK are asked for?
+    	ASSERT( M = linearForms[iLF][2][1]);
+    od;
+
+    #set up the output file if needed
+    if fileName <> -1 then
+    	fPtr:=fopen(fileName, WRITE, TEXT);
+    	fprintf(fPtr, "epoly:= ");
+    fi;
+    
+    ehrhartPoly:=0;
+
+	#set the order. Larger order means we are computing more top coefficients.
+	#order=0 means find the top coefficient only 
+	#order=1 means find the top two coefficients
+	#...
+	#order=M+d menas find the top M+d+1 coefficients (the entire polynomial)
+ 	if topK >= 0 then 
+    	order:=min(M+d, topK);
+    else
+    	order:=M+d;
+    fi;
+    
+    #these are just placeholders for the dilatedS_Ispace_Cone_real() output.
+	partialF:=0; #Array([seq(0,ll=0..order+1)]);
+	partialSeries:=Array([seq(0,ll=0..order+1)]);	
+    
+	#j gives the coefficient of nn^(M+d-j)
+    for j from 0 to order do
+    	C:=choose(d,j);
+    	output:=0; #output is the "short rational" functions for this order (over every cone and every integrand/ell) 
+    	#cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
+    	
+    	#compute the integrand/valuation over each cone
+    	for cone in simpleCones do
+
+    		s:=cone[1]; #vertex
+    		W:=[seq(primitive_vector(cone[2][j]), j=1..d)]; #rays of the cone.
+	    	for a from 1 to nops(C) do
+        		K:=C[a]; 
+        		KK:=ComplementList(K,nops(W));
+        		
+        		#loop over every ell/xi
+        		
+        		#notes to self
+        		#coef:=linearForms[iLF][1];
+        		#M   :=linearForms[iLF][2][1];
+        		#ell :=linearForms[iLF][2][2];
+				for iLF from 1 to numLinearForms do
+				
+					#note, we could multiply coef by M! here, but lets do that at the end.
+					coef:=linearForms[iLF][1];
+					
+        			if useRealDilations then
+        				output:=output + coef*dilatedS_Ispace_Cone_real(n,s,W,KK,xi[iLF]) ;
+        				else
+        				output:=output + coef*dilatedS_Ispace_Cone(n,s,W,KK,xi[iLF]) ;
+        			fi;
+        		od; #for every linear form.
+
+        	od;
+        od; #for every cone.
+        
+        #partialF is now the sum of rational functions for every cone and for every linear form
+        partialF:=eval(subs({TODD=Todd,EXP=exp},output));
+
+		#find the series expansion of partialF.        
+        partialSeries[j+1]:=coeff(series(partialF,t=0,M+d+2),t,M);
+        partialSeries[j+1]:=coeff(series(partialSeries[j+1],epsilon=0,d+2),epsilon,0);
+    
+        #to find the ehrhart coeff of nn^(M+d-j), we have to take a linear combination of the last j terms in partialSeries 
+        totalSeries:=0;
+        for l from 0 to j do
+    		newOrder:=j;
+    		totalSeries:=totalSeries + (-1)^(newOrder-l)*binomial(d-l-1,d-newOrder-1)*partialSeries[l+1];
+    	od; #for l
+    	totalSeries:=coeff(totalSeries,n,M+d-j);
+    	#we need to mult. my M! because we are computing w/the weight 1/M!* ell^M
+    	term:= expand(subs({N=n},totalSeries)*factorial(M));
+    	ehrhartPoly:=ehrhartPoly+term*nn^(M+d-j);
+    	printf("+ %a\n", term*nn^(M+d-j));
+
+    	#also print to output file if needed
+    	if fileName <> -1 then
+    		fprintf(fPtr, "\\ \n+ %a", term*nn^(M+d-j));
+    	fi;
+    	
+    od; #for j. For every coefficient.
+
+   	#close the file if needed.
+  	if fileName <> -1 then
+  		fprintf(fPtr, ";\n");
+    	fclose(fPtr);
+   	fi;
+
+    
+	#finaly, we are done!    
+    return ehrhartPoly;
 end;
 
 
@@ -1050,7 +1178,7 @@ end;
 #	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
 #	topK: compute the top topK+1 coefficients.
 #return: the polynomial's coefficients in an array. ehrhartPoly2[m+1] is the coefficient of n^m
-printIncrementalEhrhartweightedPoly2:=proc(n,nn,simpleCones,ell,M,d, useRealDilations, topK) 
+printIncrementalEhrhartweightedPoly2_old:=proc(n,nn,simpleCones,ell,M,d, useRealDilations, topK) 
  local order, newOrder, xi;
  local partialF, partialSeries; 
  local totalSeries, term;
@@ -1083,6 +1211,7 @@ printIncrementalEhrhartweightedPoly2:=proc(n,nn,simpleCones,ell,M,d, useRealDila
 	    	for a from 1 to nops(C) do
         		K:=C[a]; KK:=ComplementList(K,nops(W));
         		
+        		#put the loop here: loop over every ell/xi
         		if useRealDilations then
         			output:=output + dilatedS_Ispace_Cone_real(n,s,W,KK,xi) ;
         		else
