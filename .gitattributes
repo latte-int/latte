@@ -223,7 +223,6 @@ code/latte/top-ehrhart/README -text
 code/latte/top-ehrhart/TopEhrhart.cpp -text
 code/latte/top-ehrhart/TopEhrhart.h -text
 code/latte/top-ehrhart/TopEhrhart_lib.mpl -text
-code/latte/top-ehrhart/compute-top-ehrhart-stdsimplex.mpl -text
 code/latte/top-ehrhart/testingTopEhrhart.mpl -text
 code/latte/top-ehrhart/testingTopEhrhart_lib.mpl -text
 code/latte/valuation/Driver.cpp -text
