@@ -1040,133 +1040,6 @@ printIncrementalEhrhartPolynomial_old:=proc(n,nn,simpleCones,linearForms, d,useR
 end;
 
 
-printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK, fileName) 
- local order, newOrder, xi;
- local partialF, partialSeries; 
- local totalSeries, term;
- local l, j, i, a, s, W, C, K,KK, reg, output;
- local cone, rays;
- local ehrhartPoly;
- local fPtr; #file pointer.
- 
- 	
- 	#notes to self
-    #coef:=linearForms[iLF][1];
-	#M   :=linearForms[iLF][2][1];
-	#ell :=linearForms[iLF][2][2];
-	
-	#set up the integrand/residue direction.    
-    numLinearForms:=nops(linearForms);
-    M:=linearForms[1][2][1];
-    xi:=Array(1..numLinearForms);
-    for iLF from 1 to numLinearForms do
-    	#construct a different residue direction for each linear form.
-    	
-    	reg:=random_vector(5000,d);
-    	ell :=linearForms[iLF][2][2];
-    	xi[iLF]:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];    	
-    	
-    	#make sure all the linear forms have the same degree.
-    	#TODO: what sould be the output if there are different degrees and the topK are asked for?
-    	ASSERT( M = linearForms[iLF][2][1]);
-    od;
-
-    #set up the output file if needed
-    if fileName <> -1 then
-    	fPtr:=fopen(fileName, WRITE, TEXT);
-    	fprintf(fPtr, "epoly:= ");
-    fi;
-    
-    ehrhartPoly:=0;
-
-	#set the order. Larger order means we are computing more top coefficients.
-	#order=0 means find the top coefficient only 
-	#order=1 means find the top two coefficients
-	#...
-	#order=M+d menas find the top M+d+1 coefficients (the entire polynomial)
- 	if topK >= 0 then 
-    	order:=min(M+d, topK);
-    else
-    	order:=M+d;
-    fi;
-    
-    #these are just placeholders for the dilatedS_Ispace_Cone_real() output.
-	partialF:=0; #Array([seq(0,ll=0..order+1)]);
-	partialSeries:=Array([seq(0,ll=0..order+1)]);	
-    
-	#j gives the coefficient of nn^(M+d-j)
-    for j from 0 to order do
-    	C:=choose(d,j);
-    	output:=0; #output is the "short rational" functions for this order (over every cone and every integrand/ell) 
-    	#cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
-    	
-    	#compute the integrand/valuation over each cone
-    	for cone in simpleCones do
-
-    		s:=cone[1]; #vertex
-    		W:=[seq(primitive_vector(cone[2][j]), j=1..d)]; #rays of the cone.
-	    	for a from 1 to nops(C) do
-        		K:=C[a]; 
-        		KK:=ComplementList(K,nops(W));
-        		
-        		#loop over every ell/xi
-        		
-        		#notes to self
-        		#coef:=linearForms[iLF][1];
-        		#M   :=linearForms[iLF][2][1];
-        		#ell :=linearForms[iLF][2][2];
-				for iLF from 1 to numLinearForms do
-				
-					#note, we could multiply coef by M! here, but lets do that at the end.
-					coef:=linearForms[iLF][1];
-					
-        			if useRealDilations then
-        				output:=output + coef*dilatedS_Ispace_Cone_real(n,s,W,KK,xi[iLF]) ;
-        				else
-        				output:=output + coef*dilatedS_Ispace_Cone(n,s,W,KK,xi[iLF]) ;
-        			fi;
-        		od; #for every linear form.
-
-        	od;
-        od; #for every cone.
-        
-        #partialF is now the sum of rational functions for every cone and for every linear form
-        partialF:=eval(subs({TODD=Todd,EXP=exp},output));
-
-		#find the series expansion of partialF.        
-        partialSeries[j+1]:=coeff(series(partialF,t=0,M+d+2),t,M);
-        partialSeries[j+1]:=coeff(series(partialSeries[j+1],epsilon=0,d+2),epsilon,0);
-    
-        #to find the ehrhart coeff of nn^(M+d-j), we have to take a linear combination of the last j terms in partialSeries 
-        totalSeries:=0;
-        for l from 0 to j do
-    		newOrder:=j;
-    		totalSeries:=totalSeries + (-1)^(newOrder-l)*binomial(d-l-1,d-newOrder-1)*partialSeries[l+1];
-    	od; #for l
-    	totalSeries:=coeff(totalSeries,n,M+d-j);
-    	#we need to mult. my M! because we are computing w/the weight 1/M!* ell^M
-    	term:= expand(subs({N=n},totalSeries)*factorial(M));
-    	ehrhartPoly:=ehrhartPoly+term*nn^(M+d-j);
-    	printf("+ %a\n", term*nn^(M+d-j));
-
-    	#also print to output file if needed
-    	if fileName <> -1 then
-    		fprintf(fPtr, "\\ \n+ %a", term*nn^(M+d-j));
-    	fi;
-    	
-    od; #for j. For every coefficient.
-
-   	#close the file if needed.
-  	if fileName <> -1 then
-  		fprintf(fPtr, ";\n");
-    	fclose(fPtr);
-   	fi;
-
-    
-	#finaly, we are done!    
-    return ehrhartPoly;
-end;
-
 
 #Computes the top weighted ehrhart polynomial's coefficients with a power of a linear form weight
 #input
@@ -1240,6 +1113,171 @@ printIncrementalEhrhartweightedPoly2_old:=proc(n,nn,simpleCones,ell,M,d, useReal
     #printf("## Evaluation at n=1: %a\n", eval(subs(n=1, nn=1,MOD=modp, ehrhartPoly)));
     return ehrhartPoly;
 end:
+
+
+#### LATTE INTERFACE FUNCTION:
+#Computes the top weighted ehrhart polynomial's coefficients
+#input
+#	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
+#	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
+#	simpleCones: the polytope.
+#	linearForms: list of powers of linear forms
+#	d: dimension of the polytope
+#	useRealDilations: ture=the polynomial can be evaluaded at rational dilations.
+#	topK: find the top topK coefficients (note this function does not compute the top topk+1)
+#	filename: if -1, the polynomial is not saved to a file. Else, the polynomial is saved to fileName.
+printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d, useRealDilations, topK, fileName) 
+ local xi, numLinearForms, M, iLF, ell, minDegree, currentDegree, coef_current, M_current, currentDifference;
+ local partialF, partialSeries, totalCoeffSum; 
+ local term;
+ local l, j, i, a, s, W, C, K, KK, reg, output;
+ local cone, rays;
+ local ehrhartPoly;
+ local fPtr; #file pointer.
+ local new_n;
+ 
+ 	new_n := `tools/gensym`('myn');
+ 	
+ 	#notes to self. iLF is "Index of Linear Form"
+    #coef:=linearForms[iLF][1];
+	#M   :=linearForms[iLF][2][1];
+	#ell :=linearForms[iLF][2][2];
+	
+	#set up the integrand/residue direction.    
+    numLinearForms:=nops(linearForms);
+    M:=linearForms[1][2][1];
+    xi:=Array(1..numLinearForms);
+    for iLF from 1 to numLinearForms do
+    	#construct a different residue direction for each linear form.
+    	
+    	reg:=random_vector(5000,d);
+    	ell :=linearForms[iLF][2][2];
+    	xi[iLF]:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];    	
+    	
+    	#find the largest degree of all the linear forms.
+    	M:=max(M, linearForms[iLF][2][1]);
+    od;
+
+    #set up the output file if needed
+    if fileName <> -1 then
+    	fPtr:=fopen(fileName, WRITE, TEXT);
+    	fprintf(fPtr, "epoly:= ");
+    fi;
+    
+    ehrhartPoly:=0;
+
+    #topK should be a natural number or -1.
+    ASSERT(topK = -1 or topK > 0);
+    
+ 	if topK > 0 then 
+    	minDegree:=M+d-(topK-1);
+    else
+    	minDegree:=0;
+    fi;
+    
+    #these are just placeholders for the dilatedS_Ispace_Cone_real() output.
+	partialF:=0; 
+	partialSeries:=Array(1..numLinearForms, 1..(M+d+1), 0); #holds the partial taylor series of the rational functions.
+		#Note: The index of array's start at ONE in maple.
+		#the rows corresponds to the linear forms. Columns corresponds to the  difference between the current power and the current degree
+		#example: partialSeries[1][2+1] is the rational functions when we are summing over choose(d,2)
+
+		
+    
+	
+	#for every degree of the ehrhart polynomial we are going to compute
+	for currentDegree from M+d to minDegree by -1 do
+	
+		#for every linear form.
+		for iLF from 1 to numLinearForms do
+		    coef_current:=linearForms[iLF][1];
+		    M_current   :=linearForms[iLF][2][1];
+		    
+			#does this linear form add a coefficient of currentDegree to the polynomial?
+			if currentDegree > M_current + d then
+				next; #skip this linear form.
+			fi;
+		
+			#figure out how far the currentDegree is from M_current + d
+			currentDifference:=M_current + d - currentDegree; 
+			
+			C:=choose(d, currentDifference);
+			
+			output:=0; #output is the "short rational" functions for this order
+			
+			
+			#compute the integrand/valuation over each cone
+			for cone in simpleCones do
+			
+    			s:=cone[1]; #vertex
+    			W:=[seq(primitive_vector(cone[2][j]), j=1..d)]; #rays of the cone.
+    			for a from 1 to nops(C) do
+        			K:=C[a]; 
+        			KK:=ComplementList(K,nops(W));
+        		
+        			
+        			if useRealDilations then
+        				output:=output + coef_current*factorial(M_current)*dilatedS_Ispace_Cone_real(new_n,s,W,KK,xi[iLF]) ;
+        			else
+        				output:=output + coef_current*factorial(M_current)*dilatedS_Ispace_Cone(new_n,s,W,KK,xi[iLF]) ;
+        			fi;
+        		
+        		od; 
+			od; #for every simple cone
+			
+			#partialF is now the sum of rational functions for every cone and the current linear form.
+			partialF:=eval(subs({TODD=Todd,EXP=exp},output));
+			
+			#find the series expansion of partialF.        
+			partialSeries[iLF, currentDifference+1]:=coeff(series(partialF,t=0,M_current+d+2),t,M_current);			
+			partialSeries[iLF, currentDifference+1]:=coeff(series(partialSeries[iLF, currentDifference+1],epsilon=0,d+2),epsilon,0);
+
+			
+        od; #for every linear form
+        
+        #we are ready to find the coefficient of currentDegree
+        
+        totalCoeffSum:=0;
+		for iLF from 1 to numLinearForms do
+		    M_current   :=linearForms[iLF][2][1];
+		    
+			#does this linear form add a coefficient of currentDegree to the polynomial?
+			if currentDegree > M_current + d then
+				next; #skip this linear form.
+			fi;
+			
+			#figure out how far the currentDegree is from M_current + d
+			currentDifference:=M_current + d - currentDegree; 
+		
+			for l from 0 to currentDifference do
+				
+	    		totalCoeffSum:=totalCoeffSum + (-1)^(currentDifference-l)*binomial(d-l-1,d-currentDifference-1)*coeff(partialSeries[iLF, l+1], new_n, currentDegree);
+    		od; #for l
+    	
+		od; #for every linear form.
+        term:= subs({new_n=n},totalCoeffSum);
+    	term:= subs({N=n},totalCoeffSum);
+    	ehrhartPoly:=ehrhartPoly+term*nn^(currentDegree);
+    	printf("+ %a\n", term*nn^(currentDegree));
+
+    	#also print to output file if needed
+    	if fileName <> -1 then
+    		fprintf(fPtr, "\\ \n+ %a", term*nn^(currentDegree));
+    	fi;
+	od; #for every degree of the polynomial.
+	
+	
+   	#close the file if needed.
+  	if fileName <> -1 then
+  		fprintf(fPtr, ";\n");
+    	fclose(fPtr);
+   	fi;
+
+    
+	#finaly, we are done!    
+    return ehrhartPoly;
+end;
+
 
 
 

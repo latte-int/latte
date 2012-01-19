@@ -7,14 +7,17 @@
 
 #include "TopEhrhart.h"
 
-TopEhrhart::TopEhrhart(Polyhedron * polyhedron, BarvinokParameters & para, int numTopCoeff, bool real) :
-	poly(polyhedron), parameters(para), numTopCoefficients(numTopCoeff), realDilations(real)
+TopEhrhart::TopEhrhart(Polyhedron * polyhedron, BarvinokParameters & para, int numTopCoeff, bool real, string saveTopEhrhartPoly ) :
+	poly(polyhedron), parameters(para), numTopCoefficients(numTopCoeff), realDilations(real), saveTopEhrhartPolynomial(saveTopEhrhartPoly)
 {
 	assert(poly != NULL);
 	assert(poly->cones != NULL);
 	assert(poly->cones->rays != NULL);
 	assert(poly->homogenized == false);
 	assert(poly->dualized == false);
+
+	if (numTopCoefficients != -1 && numTopCoefficients <= 0)
+		THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, "unexpedted numTopCoefficients given");
 }
 
 TopEhrhart::~TopEhrhart()
@@ -22,6 +25,11 @@ TopEhrhart::~TopEhrhart()
 	// TODO Auto-generated destructor stub
 }
 
+/**
+ * Calls a maple script to compute the weighted Ehrhart polynomial.
+ * @parm polynomial: weight each integer by a polynomial.
+ * The polynomial is decomposed to linear forms.
+ */
 void TopEhrhart::computeTopEhrhartPolynomial(const monomialSum & polynomial)
 {
 	linFormSum linearForms;
@@ -42,17 +50,19 @@ void TopEhrhart::computeTopEhrhartPolynomial(const monomialSum & polynomial)
 	delete polynomialItr;
 }
 
-
+/**
+ * Calls a maple script to compute the weighted Ehrhart polynomial.
+ * @parm linForm: weight each integer by sum of powers of linear forms.
+ */
 void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 {
-	//check the polytope is simple.
 
 	ofstream maple("compute-top-ehrhart.mpl");
 
 	maple << "read(\"" << relocated_pathname(MAPLE_SCRIPT_DIR) << "/"
 			<< "Conebyconeapproximations_08_11_2010.mpl" << "\"):\n\n";
 
-	maple << "\n seed:=randomize();" << endl;
+	maple << "\n seed:=randomize():" << endl;
 
 	//print the polytope's vertex-rays in maple format out.
 	maple << "\n simpleCones := [";
@@ -74,9 +84,12 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 		maple << "], ";
 		//done adding the vertex.
 
+		//check the polytope is simple.
+		assert(lengthListVector(cone->rays) == poly->numOfVars);
+
+
 		//start of ray list
 		maple << "[";
-		assert(lengthListVector(cone->rays) == poly->numOfVars);
 		for(listVector * ray = cone->rays; ray; ray = ray->rest)
 		{
 			maple << "\n\t[";
@@ -98,7 +111,7 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 		if (cone->rest)
 			maple << ",";
 	}//for each vertex.
-	maple << "]; #end of the vertex-cones" << endl;
+	maple << "]: #end of the vertex-cones" << endl;
 
 	//Ok, now print the linear form list.
 	//I inlined the printLinForms(linForm) function here because
@@ -130,7 +143,7 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 		if (temp)
 			maple << ", \n\t";
 	}
-	maple << "];\n\n";
+	maple << "]: #end of the linear forms. \n\n";
 	delete it;
 
 	//end of printing the linear form list.
@@ -139,22 +152,49 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 	if(realDilations)
 	{
 		if (numTopCoefficients >= 0)
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", true, "<< numTopCoefficients << "):" << endl;
+			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", true, "<< numTopCoefficients << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):" << endl;
 		else
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", true, -1):" << endl;
+			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", true, -1, \"" << saveTopEhrhartPolynomial.c_str() << "\"):" << endl;
 	}
 	else
 	{
 		if (numTopCoefficients >= 0)
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", false, "<< numTopCoefficients << "):" << endl;
+			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", false, "<< numTopCoefficients << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):" << endl;
 		else
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", false, -1):" << endl;
+			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", false, -1, \"" << saveTopEhrhartPolynomial.c_str() <<"\"):" << endl;
 	}//integer dilations.
 
 	maple << "\n\n";
-	maple << "printf(\"The Ehrhart polynomial=%a\\n\", expand(epoly));\n" << endl;
+	maple << "printf(\"\\n\\n\\nThe Ehrhart polynomial=%a\\n\", epoly);\n" << endl;
 	maple << "printf(\"Evaluation at 1 is %a\\n\", eval(subs({N=1,n=1, MOD=latteMod},epoly)));\n" << endl;
 	maple.close();
 
-	system_with_error_check(MAPLE_PATH + string(" compute-top-ehrhart.mpl"));
+	system_with_error_check(MAPLE_PATH + string(" -q compute-top-ehrhart.mpl"));
 }
+
+/**
+ * Calls a maple script to compute the unweighted Ehrhart polynomial.
+ */
+void TopEhrhart::computeTopEhrhartPolynomial()
+{
+	//insert the linear form (0,0,0,0...)^0 = 1
+	linFormSum forms;
+	FormLoadConsumer<RationalNTL> *consumer =
+			new FormLoadConsumer<RationalNTL> ();
+	consumer->setFormSum(forms);
+
+	consumer->setDimension(poly->numOfVars);
+	vec_ZZ coefs;
+	coefs.SetLength(poly->numOfVars);
+	for (int i = 0; i < poly->numOfVars; ++i)
+		coefs[i]=0;
+
+	RationalNTL coefficient;
+	coefficient = 1;
+
+	consumer->ConsumeLinForm(coefficient, 0, coefs);
+	delete consumer;
+
+	computeTopEhrhartPolynomial(forms);
+}
+

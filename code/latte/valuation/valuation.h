@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <cassert>
 #include <vector>
 #include <string.h>
@@ -146,6 +147,8 @@ public:
 	bool topEhrhart;					//compute top Ehrhart coefficients using cone method only.
 	int numEhrhartCoefficients;
 	bool realDilations;
+	string saveTopEhrhartPolynomial;
+	bool unweightedCounting;
 
 	
 	IntegrationInput();

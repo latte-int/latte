@@ -41,12 +41,14 @@ private:
 	Polyhedron * poly;				//The polyhedron, vertexRayCones or PolytopeAsOneCone points to the polyhedron's cones.
 	int numTopCoefficients;
 	bool realDilations;
+	string saveTopEhrhartPolynomial;
 public:
-	TopEhrhart(Polyhedron * polyhedron, BarvinokParameters & para, int numTopCoeff, bool real);
+	TopEhrhart(Polyhedron * polyhedron, BarvinokParameters & para, int numTopCoeff, bool real, string savePolynomial = "-1");
 
 
-	void computeTopEhrhartPolynomial(const monomialSum & polynomial);
-	void computeTopEhrhartPolynomial(const linFormSum  & linForm);
+	void computeTopEhrhartPolynomial(const monomialSum & polynomial); //the weight function is a polynomial
+	void computeTopEhrhartPolynomial(const linFormSum  & linForm);    //the weight function is a linear form sum
+	void computeTopEhrhartPolynomial();								  //the weight function is 1 (no weight)
 	virtual ~TopEhrhart();
 };
 

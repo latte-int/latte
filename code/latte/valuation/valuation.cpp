@@ -333,7 +333,7 @@ void Valuation::computeTopEhrhart(Polyhedron *poly,
 
 	if (intInput.integrandType == IntegrationInput::inputPolynomial)
 	{
-		TopEhrhart topEhrhart(poly, myParameters, intInput.numEhrhartCoefficients, intInput.realDilations);
+		TopEhrhart topEhrhart(poly, myParameters, intInput.numEhrhartCoefficients, intInput.realDilations, intInput.saveTopEhrhartPolynomial);
 
 		monomialSum originalPolynomial;// polynomial without the updated coefficients.
 		loadMonomials(originalPolynomial, intInput.integrand); //get the polynomial from the string.
@@ -345,7 +345,7 @@ void Valuation::computeTopEhrhart(Polyhedron *poly,
 	{
 		linFormSum originalLinearForm;// polynomial without the updated coefficients.
 
-		TopEhrhart topEhrhart(poly, myParameters, intInput.numEhrhartCoefficients, intInput.realDilations);
+		TopEhrhart topEhrhart(poly, myParameters, intInput.numEhrhartCoefficients, intInput.realDilations,  intInput.saveTopEhrhartPolynomial);
 
 		loadLinForms(originalLinearForm, intInput.integrand); //get the polynomial from the string.
 
@@ -353,9 +353,13 @@ void Valuation::computeTopEhrhart(Polyhedron *poly,
 
 		destroyLinForms(originalLinearForm);
 	}//the weight is a power of a linear form.
+	else if (intInput.unweightedCounting == true)
+	{
+		TopEhrhart topEhrhart(poly, myParameters, intInput.numEhrhartCoefficients, intInput.realDilations, intInput.saveTopEhrhartPolynomial);
+		topEhrhart.computeTopEhrhartPolynomial();
+	}
 	else
 	{
-		cerr << "Ehrhart weight is missing. To count without a weight, enter a linear form to the 0th power" << endl;
 		THROW_LATTE_MSG(LattException::bug_NotImplementedHere, "integrand type not supported");
 	}
 
@@ -390,6 +394,9 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	bool useStokes = false;
 	double sampling_factor = 1.0;
 	long int num_samples = -1;
+
+	//options used by top ehrhart
+	bool interactiveLatte = false; //only in the case of top ehrhart do we look at this value.
 
 	ReadPolyhedronData read_polyhedron_data;
 	//ReadPolyhedronDataRecursive read_polyhedron_data;
@@ -527,39 +534,44 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		{
 			read_polyhedron_data.show_options(cerr);
 			cerr << "Options that control what to compute:" << endl
-			     << "  --valuation=volume                          Computes the volume\n"
-			     << "  --valuation=integrate                       Computes an integral\n"
-	       		 << "  --valuation=top-ehrhart                     Computes the top weighted Ehrhart coefficients\n"
+			     << "  --valuation=volume                       Computes the volume\n"
+			     << "  --valuation=integrate                    Computes an integral\n"
+	       		 << "  --valuation=top-ehrhart                  Computes the top weighted Ehrhart coefficients\n"
 					<< "volume and integration and options:\n"
-					<< "  --cone-decompose                            Computes the valuation using tangent cones\n"
-					<< "  --triangulate                               Computes the valuation over a triangulation.\n"
-					<< "  --all                                       Computes the using all the two methods above.\n"
+					<< "  --cone-decompose                         Computes the valuation using tangent cones\n"
+					<< "  --triangulate                            Computes the valuation over a triangulation.\n"
+					<< "  --all                                    Computes the using all the two methods above.\n"
 					<< "\n"
 					<< "integration and weighted summation options:\n"
-					<< "  --monomials=<file>                          Looks at the first line of file for a polynomial\n"
-					<< "                                              encoded in maple-syntax: [ [coef, [exponent vector]], ...]\n"
-					<< "  --linear-forms=<file>                       Looks at the first line of file for a sum of powers of linear forms\n"
-					<< "                                              encoded in maple-syntax: [ [coef, [power, [linear form]]], ...]\n"
-					<< "  --product-linear-forms=<file>               Looks at the first line of file for a product of linear forms\n"
-					<< "                                              in maple-syntax: [ [], ...] \n"
-			  /// FIXME: Add further options!
-					<< "                                              If cannot open file, the line is read from std in.\n"
+					<< "  --monomials=FILE                         Looks at the first line of file for a polynomial\n"
+					<< "                                           encoded in maple-syntax: [ [coef, [exponent vector]], ...]\n"
+					<< "  --linear-forms=FILE                      Looks at the first line of file for a sum of powers of linear forms\n"
+					<< "                                           encoded in maple-syntax: [ [coef, [power, [linear form]]], ...]\n"
+					<< "  --product-linear-forms=FILE              Looks at the first line of file for a product of linear forms\n"
+					<< "                                           in maple-syntax: [ [coef, [[power, [linear form]],\n"
+					<< "                                           [power, [linear form]], ...]],  ...] \n"
+					/// FIXME: Add further options!
+					<< "                                           If cannot open file, the line is read from std in.\n"
 					<< "top Ehrhart options:\n"
-					<< "  --num-coefficients=K                        Number of highest Ehrhart coefficients +1 to compute\n"
-					<< "                                              (default: compute all, incrementally)\n"
-					<< "  --real-dilations                            Output formulas valid for real dilations also\n"
+					<< "  --num-coefficients=K                     Number of highest Ehrhart coefficients to compute\n"
+					<< "                                           (default: compute all, incrementally)\n"
+					<< "  --real-dilations                         Output formulas valid for real dilations also\n"
+					<< "  --top-ehrhart-save=FILE                  Writes the Ehrhart polynomial to the file.\n"
+					<< "  --top-ehrhart-unweighted                 The weight function is assumed to be 1 (default)\n"
+					<< "  --interactive-mode                       Print the screen asking for an integrand type,\n"
+					<< "                                           Only polynomials and linear forms are valid.\n"
 					<< "Example: " << argv[0]
-					<< " --valuation=volume --cone-decompose --print-cone-decompose-function file.latte\n"
-					<< "         (will print the volume found by the cone decomposition method along with the Lawrence rational function.)\n"
+					<< " --valuation=volume --cone-decompose file.latte\n"
+					<< "         (will compute the volume using the cone-decomposition method over the polytope in file.latte.)\n"
 					<< "Example: " << argv[0]
 					<< " --valuation=integrate --monomials=poly.txt file.latte\n"
 					<< "         (will compute the integral of the polynomial in poly.txt over the polytope in file.latte.)\n"
 					<< "Example: " << argv[0]
-					<< " --valuation=top-ehrhart --num-coefficients=3 --real-dilations --monomials=poly.txt file.latte\n"
+					<< " --valuation=top-ehrhart --num-coefficients=4 --real-dilations --monomials=poly.txt file.latte\n"
 					<< "         (will compute the top 4 Ehrhart coefficients with a polynomial weight in poly.txt over the polytope in file.latte.)\n"
 
 					<< endl;
-			exit(0);
+			exit(1);
 		} else if ( strncmp(argv[i], "--valuation=", 11) == 0)
 		{
 			if ( strcmp(argv[i], "--valuation=volume") == 0)
@@ -567,12 +579,28 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			else if ( strcmp(argv[i], "--valuation=integrate") == 0)
 				integrationInput.valuationIntegrate = true;
 			else if ( strcmp(argv[i], "--valuation=top-ehrhart") == 0)
+			{
 				integrationInput.valuationEhrhart = true;
+				integrationInput.unweightedCounting = true;
+			}
 			else
 				; //nothing.
 		}
+		else if (strcmp(argv[i], "--top-ehrhart-unweighted")==0)
+		{
+			integrationInput.unweightedCounting = true;
+			interactiveLatte = false;
+		}
+		else if (strcmp(argv[i], "--interactive-mode") == 0)
+		{
+			interactiveLatte = true; //note, when in
+		}
 		else if (strncmp(argv[i], "--num-coefficients=", 19) == 0) {
 			integrationInput.numEhrhartCoefficients = atoi(argv[i] + 19);
+		}
+		else if (strncmp(argv[i], "--top-ehrhart-save=", 19) == 0)
+		{
+			integrationInput.saveTopEhrhartPolynomial = (argv[i] + 19);
 		}
 		else if (strncmp(argv[i], "--real-dilations", 6) == 0) {
 			integrationInput.realDilations = true;
@@ -788,13 +816,17 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 
 			integrationInput.integrand = "";
 
-			//get the integrand form the file or the user.
+			//get the integrand from the file or the user.
 			if (inFile.is_open())
 			{
 				cerr << "Reading " << (integrationInput.integrandType == IntegrationInput::inputPolynomial ? "polynomial" : "linear forms" ) << " from file " << integrationInput.fileName.c_str() << endl;
 				getline(inStream, integrationInput.integrand, '\n');
 				inFile.close();
-			} else
+			} else if (integrationInput.unweightedCounting == true && interactiveLatte == false)
+			{
+				; //don't ask the user for the integrand.
+			}
+			else
 			{
 				cout << "\nEnter an integrand type: \n"
 					 << "1) p (for a polynomial)\n"
@@ -822,6 +854,8 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 					exit(1);
 				}
 
+				integrationInput.unweightedCounting == false;
+
 				integrationInput.processUserInput();
 				//char integrandLine[150];
 				getline(inStream, integrationInput.integrand, '\n');
@@ -841,6 +875,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		params->total_time.stop();
 		totalValuationTimer.timer = params->total_time;
 		valuationAnswers.add(totalValuationTimer);
+		cout << "waht the heck: " << params->total_time;
 
 		freeListVector(read_polyhedron_data.templistVec);
 		freeListVector(read_polyhedron_data.matrix);
@@ -848,6 +883,8 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	}
 	else
 	{ //use strokes
+		//NOTE:: THIS RECURSIVE METHOD IS NOT DONE.
+		//THIS SHOULD NOT WORK.
 
 		ReadPolyhedronDataRecursive rpdr(read_polyhedron_data);
 		rpdr.readHrepMatrixFromFile(read_polyhedron_data.filename, params);
@@ -1139,6 +1176,7 @@ Valuation::IntegrationInput::IntegrationInput()
 	topEhrhart = false;					//compute top Ehrhart coefficients using cone method only.
 	numEhrhartCoefficients = -1; // incremental mode
 	realDilations = false; //formula is only valid for integer dilations, not rational/real ones.
+	saveTopEhrhartPolynomial = "-1"; //default is to not save the polynomial.
 
 
 	//Command line options. These are used by processUserInput()
