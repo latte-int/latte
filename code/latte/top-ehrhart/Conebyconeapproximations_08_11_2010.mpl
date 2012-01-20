@@ -889,60 +889,7 @@ dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Csp
 end:
 
 
-#dilatedS_Ispace_Cone(n,[1/2,1/2],[[1,0],[1,2]],[1],xi); #Ouput;-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
 
-# Input: n a variable,  s a numeric vector in Q^d,
-# W a cone, order is an integer;
-# xi a list of variables.
-# Output a function f(n,xi);
-# This is the sulm of the approximate  function S^{Ispace}(ns+W)(xi), where we emphasize the dependance in n;
-
-# EXAMPLE IS GIVEN  AFTER;
-
-#
-dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
-    #printf("##### dilated_approxi_cone: order = %d\n", order);
-    output:=0;
-    d:=nops(W);
-    if order=d then
-        # Fast path; general code below handles this case just fine.
-        output:=dilatedS_Ispace_Cone(n,s,W,[],xi);
-    else
-        for j from 0 to order do
-            C:=choose(d,j);
-            #print("choose j, order, c", j, order, C);
-            cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
-            for a from 1 to nops(C) do
-                K:=C[a]; KK:=ComplementList(K,nops(W));
-                output:=output+cc[j]*dilatedS_Ispace_Cone(n,s,W,KK,xi) ;
-            od;
-        od:
-    fi;
-    output;
-end:
-
-#dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi); # Ouput:-2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
-# Input: n a variable,  Simplex  a numeric rational simplex ; given by a list of  rational  vectors in Q^d
-# order is an integer;
-# xi a list of variables. xi can be numeric but then there can be an error message;
-# Output a function f(n,N,xi);
-# This is the sum of the approximate  functions  over the tangent cones  for the dilated simplex nS; where we emphasize the dependance in n;
-# N is the same as n, but here the functions of N are periodic;
-# I did that, as we will need to pick up a polynomial term in n, while N are then considered as constants;
-# EXAMPLE IS GIVEN  AFTER;
-
-#
-ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
-    F:=0;  S:=Simplex;
-    d:=nops(S)-1;
-    for i from 1 to nops(S) do
-        W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-        F:=F+dilated_approxi_cone(n,S[i],W,order,xi) ;
-    od:
-    F:=eval(subs({TODD=Todd,EXP=exp},F));
-    
-    return F;
-end:
 
 
 
@@ -952,48 +899,7 @@ random_vector:=proc(N,d) local R;
     [seq(R()+1,i=1..d)]:
 end:
 
-#WARNING; THIS WORKS ONLY IF ell is generic;
-# Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
-# The ouput is  a periodic function of n;
-# Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
-# Here I did not employ a deformation vector, so the procedure might return: error; diviasion by zero.
-#
-TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
-    d:=nops(Simplex)-1;
-    order:=M+d-m;
-    xx:=[seq(t*ell[i],i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
-    CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
-    subs({N=n},CC);
-end:
-# Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
-# The ouput is  a periodic function of n;
-# Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
-# Here we employ a random deformation vector, so if the procedure might return: error: division by zero. RERUN:
-#
-#
-TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
-    d:=nops(Simplex)-1;
-    order:=M+d-m;
-    reg:=random_vector(5000,d);
-    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
-    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
-    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
-    CCn:=coeff(CCeps,n,m);
-    return subs({N=n},CCn);
-end:
-# Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
-# The ouput is  a polynomial with coefficients  periodic function of n;
-# Math: the output is Ehrhart polynomial E(n S, ell^M)
-# Here we employ a random deformation vector, so if the procedure might return: error; diviasion by zero. RERUN:
-#
-#
-#
-CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
-    d:=nops(Simplex)-1;
-    add(TopEhrhartweighted(n,Simplex,ell,M,m)*n^m,m=0..M+d);
-end:
+
 
 
 #### LATTE INTERFACE FUNCTION:
@@ -1348,34 +1254,6 @@ dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_o
 end:
 
 
-#dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi);
-dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
-    output:=0;
-    d:=nops(W);
-    if order=d then
-        output:=dilatedS_Ispace_Cone_real(n,s,W,[],xi);
-    else
-        for j from 0 to order do
-            C:=choose(d,j);
-            cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
-            for a from 1 to nops(C) do
-                K:=C[a]; KK:=ComplementList(K,nops(W));
-                output:=output+cc[j]*dilatedS_Ispace_Cone_real(n,s,W,KK,xi) ;
-            od;
-        od:
-    fi;
-    output;
-end:
-
-ApproxEhrhartSimplexgeneric_real:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
-    F:=0;  S:=Simplex;
-    d:=nops(S)-1;
-    for i from 1 to nops(S) do
-        W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-        F:=F+dilated_approxi_cone_real(n,S[i],W,order,xi) ;
-    od:
-    F:=eval(subs({TODD=Todd,EXP=exp},F));
-end:
 
 
 
@@ -1384,31 +1262,7 @@ random_vector:=proc(N,d) local R;
     [seq(R()+1,i=1..d)]:
 end:
 
-#WARNING; THIS WORKS ONLY IF ell is generic;
-TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
-    d:=nops(Simplex)-1;
-    order:=M+d-m;
-    xx:=[seq(t*ell[i],i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
-    CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
-    subs({N=n},CC);
-end:
 
-TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
-    d:=nops(Simplex)-1;
-    order:=M+d-m;
-    reg:=random_vector(5000,d);
-    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
-    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
-    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
-    CCn:=coeff(CCeps,n,m);
-    subs({N=n},CCn);
-end:
-CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d;
-    d:=nops(Simplex)-1;
-    add(TopEhrhartweighted_real(n,Simplex,ell,M,mTopEhrhartweightedPoly_real)*nn^m,m=0..M+d);
-end:
 
 ######################################################################""""
 
@@ -1479,9 +1333,10 @@ end:
 #A3:=eval(subs({TODD=Todd,EXP=exp},approx_Cone_formulab([1/2,1/3,1/4],Coneindex2,3,xi)));
 
 
+
 #####################################################################
-### Debugging functions for the latte interface functions.
-#####################################################################
+### LATTE INTERFACE HELPER FUNCTIONS:
+####################################################################
 
 #### LATTE INTERFACE FUNCTION:
 # input:
@@ -1541,3 +1396,169 @@ SimplexToTangentCones:=proc(Simplex)
 	
 	return simpleCones;
 end;
+
+
+#####################################################################
+### Functions I want to delete
+#####################################################################
+
+#dilatedS_Ispace_Cone(n,[1/2,1/2],[[1,0],[1,2]],[1],xi); #Ouput;-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
+
+# Input: n a variable,  s a numeric vector in Q^d,
+# W a cone, order is an integer;
+# xi a list of variables.
+# Output a function f(n,xi);
+# This is the sulm of the approximate  function S^{Ispace}(ns+W)(xi), where we emphasize the dependance in n;
+
+# EXAMPLE IS GIVEN  AFTER;
+
+#
+dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+    #printf("##### dilated_approxi_cone: order = %d\n", order);
+    output:=0;
+    d:=nops(W);
+    if order=d then
+        # Fast path; general code below handles this case just fine.
+        output:=dilatedS_Ispace_Cone(n,s,W,[],xi);
+    else
+        for j from 0 to order do
+            C:=choose(d,j);
+            #print("choose j, order, c", j, order, C);
+            cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
+            for a from 1 to nops(C) do
+                K:=C[a]; KK:=ComplementList(K,nops(W));
+                output:=output+cc[j]*dilatedS_Ispace_Cone(n,s,W,KK,xi) ;
+            od;
+        od:
+    fi;
+    output;
+end:
+
+#dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi); # Ouput:-2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
+# Input: n a variable,  Simplex  a numeric rational simplex ; given by a list of  rational  vectors in Q^d
+# order is an integer;
+# xi a list of variables. xi can be numeric but then there can be an error message;
+# Output a function f(n,N,xi);
+# This is the sum of the approximate  functions  over the tangent cones  for the dilated simplex nS; where we emphasize the dependance in n;
+# N is the same as n, but here the functions of N are periodic;
+# I did that, as we will need to pick up a polynomial term in n, while N are then considered as constants;
+# EXAMPLE IS GIVEN  AFTER;
+
+#
+ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
+    F:=0;  S:=Simplex;
+    d:=nops(S)-1;
+    for i from 1 to nops(S) do
+        W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
+        F:=F+dilated_approxi_cone(n,S[i],W,order,xi) ;
+    od:
+    F:=eval(subs({TODD=Todd,EXP=exp},F));
+    
+    return F;
+end:
+
+#WARNING; THIS WORKS ONLY IF ell is generic;
+# Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
+# The ouput is  a periodic function of n;
+# Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
+# Here I did not employ a deformation vector, so the procedure might return: error; diviasion by zero.
+#
+TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
+    d:=nops(Simplex)-1;
+    order:=M+d-m;
+    xx:=[seq(t*ell[i],i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+    CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
+    subs({N=n},CC);
+end:
+# Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
+# The ouput is  a periodic function of n;
+# Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
+# Here we employ a random deformation vector, so if the procedure might return: error: division by zero. RERUN:
+#
+#
+TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
+    d:=nops(Simplex)-1;
+    order:=M+d-m;
+    reg:=random_vector(5000,d);
+    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
+    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+    CCn:=coeff(CCeps,n,m);
+    return subs({N=n},CCn);
+end:
+# Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
+# The ouput is  a polynomial with coefficients  periodic function of n;
+# Math: the output is Ehrhart polynomial E(n S, ell^M)
+# Here we employ a random deformation vector, so if the procedure might return: error; diviasion by zero. RERUN:
+#
+#
+#
+CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
+    d:=nops(Simplex)-1;
+    add(TopEhrhartweighted(n,Simplex,ell,M,m)*n^m,m=0..M+d);
+end:
+
+#####################################################################
+### real Functions I want to delete
+#####################################################################
+
+
+#dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi);
+dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+    output:=0;
+    d:=nops(W);
+    if order=d then
+        output:=dilatedS_Ispace_Cone_real(n,s,W,[],xi);
+    else
+        for j from 0 to order do
+            C:=choose(d,j);
+            cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
+            for a from 1 to nops(C) do
+                K:=C[a]; KK:=ComplementList(K,nops(W));
+                output:=output+cc[j]*dilatedS_Ispace_Cone_real(n,s,W,KK,xi) ;
+            od;
+        od:
+    fi;
+    output;
+end:
+
+ApproxEhrhartSimplexgeneric_real:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
+    F:=0;  S:=Simplex;
+    d:=nops(S)-1;
+    for i from 1 to nops(S) do
+        W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
+        F:=F+dilated_approxi_cone_real(n,S[i],W,order,xi) ;
+    od:
+    F:=eval(subs({TODD=Todd,EXP=exp},F));
+end:
+
+
+#WARNING; THIS WORKS ONLY IF ell is generic;
+TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
+    d:=nops(Simplex)-1;
+    order:=M+d-m;
+    xx:=[seq(t*ell[i],i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+    CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
+    subs({N=n},CC);
+end:
+
+TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
+    d:=nops(Simplex)-1;
+    order:=M+d-m;
+    reg:=random_vector(5000,d);
+    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
+    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+    CCn:=coeff(CCeps,n,m);
+    subs({N=n},CCn);
+end:
+CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d;
+    d:=nops(Simplex)-1;
+    add(TopEhrhartweighted_real(n,Simplex,ell,M,mTopEhrhartweightedPoly_real)*nn^m,m=0..M+d);
+end:
+
+
