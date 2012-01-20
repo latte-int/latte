@@ -994,32 +994,30 @@ CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
     d:=nops(Simplex)-1;
     add(TopEhrhartweighted(n,Simplex,ell,M,m)*n^m,m=0..M+d);
 end:
-# New functions: --Matthias
-# Compute the highest (k+1) terms.
-TopEhrhartweightedPoly:=proc(n,nn,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
-    d:=nops(Simplex)-1;
-    k := min(M+d, given_k);
-    order:=k;
-    reg:=random_vector(5000,d);
-    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
-    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
-    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
-    CCn:=add(coeff(CCeps,n,m) * nn^m, m=M+d-k..M+d);
-    return CCn;
-end:
 
-#Computes the top weighted ehrhart polynomial's coefficients
+
+#### LATTE INTERFACE FUNCTION:
+##Used by latte to find just the top k coefficients of the ehrhart polynomial.
+##Because we do this by finding the polynomial per linear form, we do not print
+##  out the coefficients incrementally, and hence do not have to store 
+##  partial results which gives this function a smaller memory footprint than 
+##  the printIncrementalEhrhartPolynomial function.
+##But this function could find the entire ehrhart polynomial if asked to.
 #input
 #	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
-#	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
+#	nn: symbolic variable. The coefficients are graded by nn. example (3mod(n,2)^3 + 2)*nn^3
 #	simpleCones: the polytope.
 #	linearForms: list of powers of linear forms
 #	d: dimension of the polytope
 #	useRealDilations: ture=the polynomial can be evaluaded at rational dilations.
-#	topK: find the top topK+1 coefficients.
-printIncrementalEhrhartPolynomial_old:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK) 
+#	topK: find the top topK coefficients (not the topK +1) or all of them if topk=-1
+#	filename: if -1, the polynomial is not saved to a file. Else, the polynomial is saved to fileName.
+findEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK, fileName) 
 	local coef, M, ell, ehrhartPoly, mapleLinForm;
+	local fPtr;
+	
+
+	ASSERT(topK > 0 or topK = -1);
 	
 	ehrhartPoly:=0;
 	
@@ -1029,19 +1027,26 @@ printIncrementalEhrhartPolynomial_old:=proc(n,nn,simpleCones,linearForms, d,useR
 		M   :=mapleLinForm[2][1];
 		ell :=mapleLinForm[2][2];
 
-		if (topK >= 0) then
-			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2_old(n,nn,simpleCones,ell,M,d,useRealDilations, topK);
+		if (topK > 0) then
+			ehrhartPoly:= ehrhartPoly + coef*findEhrhartPolynomial_linearForm(n,nn,simpleCones,ell,M,d,useRealDilations, topK-1);
 		else
-			ehrhartPoly:= ehrhartPoly + coef*printIncrementalEhrhartweightedPoly2_old(n,nn,simpleCones,ell,M,d,useRealDilations, M+d);
+			ehrhartPoly:= ehrhartPoly + coef*findEhrhartPolynomial_linearForm(n,nn,simpleCones,ell,M,d,useRealDilations, M+d);
 		fi;
 	end;
+	
+	if fileName <> -1 then
+		fPtr:=fopen(fileName, WRITE, TEXT);
+    	fprintf(fPtr, "epoly:= %a;\\n", ehrhartPoly);
+		fprintf(fPtr, "\n");
+    	fclose(fPtr);
+	fi;
 	
 	return ehrhartPoly;
 end;
 
 
 
-#Computes the top weighted ehrhart polynomial's coefficients with a power of a linear form weight
+#Computes the top weighted ehrhart polynomial's coefficients with one power of a linear form weight
 #input
 #	ell: the linear form
 #	M: the power of the linear form
@@ -1050,24 +1055,25 @@ end;
 #	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
 #	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
 #	topK: compute the top topK+1 coefficients.
-#return: the polynomial's coefficients in an array. ehrhartPoly2[m+1] is the coefficient of n^m
-printIncrementalEhrhartweightedPoly2_old:=proc(n,nn,simpleCones,ell,M,d, useRealDilations, topK) 
+#return: the polynomial
+findEhrhartPolynomial_linearForm:=proc(n,nn,simpleCones,ell,M,d, useRealDilations, topK) 
  local order, newOrder, xi;
  local partialF, partialSeries; 
  local totalSeries, term;
  local l, j, i, a, s, W, C, K,KK, reg, output;
  local cone, rays;
  local ehrhartPoly;
+ local new_n;
  
- 
+  	new_n := `tools/gensym`('myn');
+  	
  	ehrhartPoly:=0;    
     order:=min(M+d, topK);
     #order:=M+d;
     
     reg:=random_vector(5000,d);
     xi:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-      
-    
+          
 	partialF:=Array([seq(0,ll=0..order+1)]);
 	partialSeries:=Array([seq(0,ll=0..order+1)]);	
     
@@ -1086,9 +1092,9 @@ printIncrementalEhrhartweightedPoly2_old:=proc(n,nn,simpleCones,ell,M,d, useReal
         		
         		#put the loop here: loop over every ell/xi
         		if useRealDilations then
-        			output:=output + dilatedS_Ispace_Cone_real(n,s,W,KK,xi) ;
+        			output:=output + dilatedS_Ispace_Cone_real(new_n,s,W,KK,xi) ;
         		else
-        			output:=output + dilatedS_Ispace_Cone(n,s,W,KK,xi) ;
+        			output:=output + dilatedS_Ispace_Cone(new_n,s,W,KK,xi) ;
         		fi;
 
         	od;
@@ -1103,20 +1109,25 @@ printIncrementalEhrhartweightedPoly2_old:=proc(n,nn,simpleCones,ell,M,d, useReal
     		newOrder:=j;
     		totalSeries:=totalSeries + (-1)^(newOrder-l)*binomial(d-l-1,d-newOrder-1)*partialSeries[l+1];
     	od; #for l
-    	totalSeries:=coeff(totalSeries,n,M+d-j);
+    	totalSeries:=coeff(totalSeries,new_n,M+d-j);
+    	
     	#we need to mult. my M! because we are computing w/the weight 1/M!* ell^M
-    	term:= expand(subs({N=n},totalSeries)*factorial(M));
-    	ehrhartPoly:=ehrhartPoly+term*nn^(M+d-j);
-    	printf("+ %a\n", term*nn^(M+d-j));
-
+    	term:= subs({new_n=n, N=n},totalSeries)*factorial(M);
+    	ehrhartPoly:=ehrhartPoly+term*nn^(M+d-j);    	
     od;
-    #printf("## Evaluation at n=1: %a\n", eval(subs(n=1, nn=1,MOD=modp, ehrhartPoly)));
+
     return ehrhartPoly;
 end:
 
 
 #### LATTE INTERFACE FUNCTION:
-#Computes the top weighted ehrhart polynomial's coefficients
+##Used by latte to print ALL of the coefficients of the ehrhart polynomial coefficients incrementally
+##But this function could compute just the top k ehrhart polynomial incrementally.
+##If the user wants the top k, latte calls the function findEhrhartPolynomial_saveMemory
+##  instead because it computes the polynomial per linear form, and hence has a small 
+##  memory footprint because printIncrementalEhrhartPolynomial finds the 
+##  current coefficient of all the linear forms at once.
+
 #input
 #	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
 #	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
@@ -1177,7 +1188,8 @@ printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d, useReal
     
     #these are just placeholders for the dilatedS_Ispace_Cone_real() output.
 	partialF:=0; 
-	partialSeries:=Array(1..numLinearForms, 1..(M+d+1), 0); #holds the partial taylor series of the rational functions.
+	partialSeries:=Array(1..numLinearForms, 1..(M+d+1), 0); 
+	#holds the partial taylor series of the rational functions.
 		#Note: The index of array's start at ONE in maple.
 		#the rows corresponds to the linear forms. Columns corresponds to the  difference between the current power and the current degree
 		#example: partialSeries[1][2+1] is the rational functions when we are summing over choose(d,2)
@@ -1278,30 +1290,6 @@ printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d, useReal
     return ehrhartPoly;
 end;
 
-
-
-
-#### LATTE INTERFACE FUNCTION:
-
-# Incrementally compute and print all terms 0f the weighted Ehrhart
-# polynomial.  User can interrupt when computation takes too long.
-#### LATTE INTERFACE FUNCTION:
-printIncrementalEhrhartweightedPoly:=proc(n,nn, Simplex,ell,M) local d;
-    local m, term, poly;
-    d:=nops(Simplex)-1;
-    m := M+d;
-    term := TopEhrhartweighted(n,Simplex,ell,M,m)*nn^m;
-    printf("%a\n", term);
-    poly := term;
-    for m from M+d-1 to 0 by -1 do
-        term := TopEhrhartweighted(n,Simplex,ell,M,m)*nn^m;
-        printf("+ %a\n", term);
-        poly := poly + term;
-    od;
-    printf("## Evaluation at n=1: %a\n",
-           eval(subs(n=1,nn=1, MOD=modp, poly)));
-    return poly;
-end:
 
 
 
@@ -1421,48 +1409,6 @@ CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d;
     d:=nops(Simplex)-1;
     add(TopEhrhartweighted_real(n,Simplex,ell,M,mTopEhrhartweightedPoly_real)*nn^m,m=0..M+d);
 end:
-# New functions: --Matthias
-# Compute the highest (k+1) terms.
-TopEhrhartweightedPoly_real:=proc(n,nn,Simplex,ell,M,given_k) local k,d,order,xx,AA,CCt,CCeps,CCn,reg;
-    d:=nops(Simplex)-1;
-    k := min(M+d, given_k);
-    order:=k;
-    reg:=random_vector(5000,d);
-    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
-    CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
-    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
-    CCn:=add(subs(N=n, coeff(CCeps,n,m)) * nn^m, m=M+d-k..M+d);
-    #subs({N=n},CCn);
-    
-    return CCn;
-end:
-
-
-#### LATTE INTERFACE FUNCTION:
-printTopEhrhartweightedPoly_real:=proc(n, nn, Simplex,ell,M,k)
-    printf("%a\n", TopEhrhartweightedPoly_real(n,nn,Simplex,ell,M,k));
-end:
-# Incrementally compute and print all terms 0f the weighted Ehrhart
-# polynomial.  User can interrupt when computation takes too long.
-#### LATTE INTERFACE FUNCTION:
-printIncrementalEhrhartweightedPoly_real:=proc(n,nn,Simplex,ell,M) local d;
-    local m, term, poly;
-    d:=nops(Simplex)-1;
-    m := M+d;
-    term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*nn^m;
-    printf("%a\n", term);
-    poly := term;
-    for m from M+d-1 to 0 by -1 do
-        term := TopEhrhartweighted_real(n,Simplex,ell,M,m)*nn^m;
-        printf("+ %a\n", term);
-        poly := poly + term;
-    od;
-    printf("## Evaluation at n=1: %a\n",
-           eval(subs(n=1, nn=1, MOD=modp, poly)));
-	return poly;           
-end:
-
 
 ######################################################################""""
 
@@ -1537,7 +1483,7 @@ end:
 ### Debugging functions for the latte interface functions.
 #####################################################################
 
-
+#### LATTE INTERFACE FUNCTION:
 # input:
 #	a: any rational number
 #	n: base
@@ -1553,6 +1499,7 @@ latteMod:=proc(a, n)
 end;
 
 
+#### LATTE INTERFACE FUNCTION:
 #input:
 #	simpleCones is a list of d+1 vertex-ray cones in the form
 #		[[[vertex],[[ray1], ..., [rayn]]], ...]
@@ -1574,6 +1521,7 @@ local Simplex, cone;
 end;
 
 
+#### LATTE INTERFACE FUNCTION:
 #input
 #	Simplex: list of d+1 verticies
 #return maple-list of the tangent-cones.

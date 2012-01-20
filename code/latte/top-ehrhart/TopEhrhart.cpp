@@ -148,25 +148,38 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 
 	//end of printing the linear form list.
 
-	//now print the function we are going to call.
-	if(realDilations)
-	{
-		if (numTopCoefficients >= 0)
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", true, "<< numTopCoefficients << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):" << endl;
-		else
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", true, -1, \"" << saveTopEhrhartPolynomial.c_str() << "\"):" << endl;
-	}
-	else
-	{
-		if (numTopCoefficients >= 0)
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", false, "<< numTopCoefficients << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):" << endl;
-		else
-			maple << "epoly:=printIncrementalEhrhartPolynomial(n,N,simpleCones,linearForms," << poly->numOfVars << ", false, -1, \"" << saveTopEhrhartPolynomial.c_str() <<"\"):" << endl;
-	}//integer dilations.
+	//print the timer
+	maple << "printf(\"Starting to compute the Ehrhart polynomial\\n\");" << endl;
+	maple << "t1:=time():" << endl;
 
+	//now print the function we are going to call.
+	stringstream functionCall;
+
+	functionCall << "epoly:=";
+	if ( numTopCoefficients >=0)
+		functionCall << "findEhrhartPolynomial(n, N, simpleCones, linearForms," << poly->numOfVars;
+	else
+		functionCall << "printIncrementalEhrhartPolynomial(n, N, simpleCones, linearForms," << poly->numOfVars;
+
+	if (realDilations)
+		functionCall << ", true";
+	else
+		functionCall << ", false";
+
+	if ( numTopCoefficients >=0)
+		functionCall << ", " << numTopCoefficients;
+	else
+		functionCall << ", -1";
+
+
+	functionCall << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):";
+	maple << functionCall.str().c_str() << endl;
+
+	maple << "t2:=time()-t1:" << endl;
 	maple << "\n\n";
 	maple << "printf(\"\\n\\n\\nThe Ehrhart polynomial=%a\\n\", epoly);\n" << endl;
 	maple << "printf(\"Evaluation at 1 is %a\\n\", eval(subs({N=1,n=1, MOD=latteMod},epoly)));\n" << endl;
+	maple << "printf(\"Total Maple time %a\\n\", t2);\n" << endl;
 	maple.close();
 
 	system_with_error_check(MAPLE_PATH + string(" -q compute-top-ehrhart.mpl"));

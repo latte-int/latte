@@ -875,7 +875,6 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		params->total_time.stop();
 		totalValuationTimer.timer = params->total_time;
 		valuationAnswers.add(totalValuationTimer);
-		cout << "waht the heck: " << params->total_time;
 
 		freeListVector(read_polyhedron_data.templistVec);
 		freeListVector(read_polyhedron_data.matrix);
