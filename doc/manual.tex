@@ -24,7 +24,7 @@
 \newcommand{\latte}{{\tt LattE}\xspace}
 \newcommand{\latteInt}{{\tt LattE integrale}\xspace}
 \newcommand{\latteMac}{{\tt LattE macchiato}\xspace}
-\newcommand{\latteV}{v1.5}
+\newcommand{\latteV}{v1.6}
 \newcommand{\vinci}{{\tt Vinci}\xspace}
 \newcommand{\maple}{{\tt Maple}\xspace}
 \newcommand{\cdd}{{\tt CDD}\xspace}
@@ -41,29 +41,32 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2ex plus 0.4ex minus 0.4ex}
 
-\title{A User's Guide for {\tt LattE integrale} \latteV 
+\title{A User's Guide for {\tt LattE integrale} \latteV \\ (Linux Release) 
 \footnote{Research supported by NSF grants DMS-0309694, NSF grants
 DMS-0073815, DMS-0914107 and DMS-0914873.
 Most of the students were supported by those
 grants and by summer fellowships provided through the UC Davis VIGRE grants
 DMS-0135345 and DMS-0636297. $\copyright$ 
-the authors, 2001--2011. This
-software is released under the GNU General Public License, version 2 or later.
-Image credit: Adapted from a photo by coffeefellow on Wikipedia, Creative Commons Attribution ShareAlike 2.5 License}
-\\[4ex] \includegraphics[width=0.25\textwidth]{latte-integrale.jpg}
+Department of Mathematics, University of California, Davis, 2011. This
+software is released under the GNU license agreement}
+\\ \includegraphics[width=0.25\textwidth]{latte-integrale.jpg}
 }%close title brace
 
-\author{Jes\'us A. De Loera \and
+\author{
+Maria Baldoni \and
+Nicole Berline \and 
+Jes\'us A. De Loera \and
 Brandon Dutra \and
 Matthias K\"oppe \and 
 Stanislav Moreinis \and
 Gregory Pinto \and
+Michele Vergne \and
 Jianqiu Wu \and
 }
  
 
  
- \date{July 2011}
+ \date{January 2012}
 
 \begin{document}
 
@@ -84,9 +87,9 @@ The name ``{\tt LattE}'' is an abbreviation for ``{\bf Latt}ice point
 convex polyhedra defined by linear equations and inequalities with 
 integer coefficients. The polyhedra can be of any (reasonably small) 
 dimension. In 2007, {\tt LattE macchiato} was released and contained many 
-algorithmic improvements, in particular primal variants of the algorithms. 
-The newest edition, {\tt LattE integrale}, developed
-since 2010, can also compute integrals of polynomials and volumes of rational polytopes. 
+algorithmic improvements, in particular primal variants of the algorithms.. The newest edition, \latteInt, developed
+in 2010 can compute integrals of polynomials and volumes of rational polytopes. 
+\latteInt was extended in 2012 with a \maple interface for computing weighted Ehrhart polynomials. 
 All these algorithms run in polynomial
 time for fixed dimension. To
 learn more about the exact details of our implementation for lattice point enumeration, the interested reader can consult 
@@ -96,11 +99,11 @@ give a rather short description of the mathematical objects used by
 {\tt LattE}. Note that all our computations are done over the integers or the rationals {\emph exactly}.
 \latte cannot compute with floating-point numbers. 
 
-\subsubsection{Counting lattice points: Barvinok's Rational Generating Functions}
+\subsubsection{Counting lattice points: Barvinok's Rational Functions}
 
 Given a convex polyhedron $P = \{u\in\R^d:Au\leq b\}$, where $A$ and
 $b$ are integral, the fundamental object that we compute is a short 
-representation of the generating function:
+representation of the infinite power series:
 \[
 f(P;x) \quad = \sum_{\alpha\in P\cap\Z^d} x_1^{\alpha_1}
 x_2^{\alpha_2} \ldots x_d^{\alpha_d}.
@@ -153,13 +156,9 @@ Fore details of how the computations are done, see \cite{koeppe:irrational-barvi
 
 \subsubsection{Integration}
 
-\latteInt has two different integration algorithms for integrating a rational polynomial $p \in \Q[x_1, \dots, x_d]$ over a $d$-dimensional rational polytope. The first one, called the triangulation method, triangulates the polytope into simplices and integrates over each simplex. The other method, called the cone decomposition method, integrates over each tangent cone of the polytope. In order to do this, each tangent cone is triangulated into simple cones. This is the main trade off between the two integration algorithms: you can do one (possibly) large triangulation, or (possibly) many small tangent cone triangulations. 
+\latteInt has two different integration algorithms for integrating a rational polynomial $p \in \R[x_1, \dots, x_d]$ over a $d$ dimensional rational polytope. The first one, called the triangulation method, triangulates the polytope into simplices and integrates over each simplex. The other method, called the cone decomposition method, integrates over each tangent cone of the polytope. In order to do this, each tangent cone is triangulated into simple cones. This is the main trade off between the two integration algorithms: you can do one (possibly) large triangulation, or (possibly) many small tangent cone triangulations. 
 
-We decompose polynomials into finite sums of powers of linear forms because
-integrating powers of linear forms can be done in polynomial time
-\cite{howToIntegratePolynomialSimplex}. The problem of decomposing a
-polynomial as a sum of powers of linear forms is known as the polynomial
-Waring problem. 
+We decompose polynomials into finite sums of powers of linear forms because integrating powers of linear forms can be done in polynomial time \cite{howToIntegratePolynomialSimplex}. A decomposition of a polynomial as a sum of powers of linear forms is known as the polynomial Waring problem.
 
 See \cite{latte-integrale-paper} for a detailed explanation on why the next example gives the correct integral. 
 
@@ -193,6 +192,9 @@ Vertex $s_4 = (0,1):$
 
 The integral $\int_{x_1 = 0}^{x_1 = 1}\int_{x_2 = 0}^{x_2 = 1} x_1 +x_2  \d{x_1}\d{x_2} = 0 + 4/3 -1/6 - 1/6 = 1$ as it should be.
 
+\subsubsection{Weighted Ehrhart Polynomials}
+
+\latteInt can also compute the weighted Ehrhart polynomials where the weight function is a polynomial or a sum of powers of linear forms. However, the polytope must be a simplicial polytope and \maple must be installed on your computer.
 
 
 
@@ -201,8 +203,8 @@ The integral $\int_{x_1 = 0}^{x_1 = 1}\int_{x_2 = 0}^{x_2 = 1} x_1 +x_2  \d{x_1}
 \latte contains three key executables:
 \begin{description}
 	\item[count] counts lattice points, computes Ehrhart polynomials and Ehrhart series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
-	\item[integrate] integrates polynomials over polytopes.
-	\item[latte-minimize, latte-maximize] perform linear integer optimization.
+	\item[integrate] integrates polynomials, powers of linear forms, and products of powers of linear forms over polytopes. Integrate can also computed weighted Ehrhart polynomials.
+	\item[max/minimize] perform linear integer optimization.
 \end{description}
 
 The other executables in latte are drivers, converters, and other small utility function described in Section \ref{section:file-descriptions}.
@@ -295,11 +297,10 @@ linearity 1 3
 The last line states that among the $5$ inequalities one is to be
 considered an equality, the third one.
 
-In general, the linearity syntax is:
+In general, the linearity syntax is :
 \begin{verbatim}
-	linearity <number of equations> <row indices of constraints...>
+	linearity <number of equations> <row index of constraint, start counting from 1>
 \end{verbatim}
-The row indices start counting from 1.
 
 \subsubsection{Nonnegativity Constraints}
 For bigger examples it quickly becomes cumbersome to state all
@@ -321,15 +322,14 @@ The last line states that there are two nonnegativity constraints and
 that the first and second variables are required to be nonnegative. 
 {\bf NOTE} that the first line reads ``3 3'' and not ``5 3'' as above! 
 
-In general, the nonnegative syntax is:
+In general, the nonnegative syntax is :
 \begin{verbatim}
-	nonnegative <number of variables in list> <variable indices>
+	nonnegative <number of variables in list> <variable index, start counting from 1>
 \end{verbatim}
-The variable indices  start counting from 1.
 
 
 \subsubsection{Cost Vector}
-The functions latte-maximize and latte-minimize solve the integer linear programs
+The functions maximize and minimize solve the integer linear programs
 \[
 \max\{c^\intercal x: x\in P\cap\Z^d\}
 \]
@@ -418,12 +418,7 @@ For a complete description of \cdd file syntax, see the \cdd manual \cite{fukuda
 
 \subsection{Non-full dimensional polytopes}
 
-When the input polytope is not full dimensional, \latte projects that polytope
-such that it becomes full dimensional. This transformation preserves the
-lattice count and volume of the input polytope. 
-
-However, the integration and volume computation procedures do not handle the
-case of non--full dimensional polytopes.
+When the input polytope is not full dimensional, \latte projects that polytope such that it becomes full dimensional. This transformation preserves the lattice count and volume of the input polytope. The current \latteInt cannot integrate non-full dimensional polytopes.
 
 \subsection{\latte vs. \cdd file formats}
 There are a few key differences between \latte and \cdd file formats.
@@ -465,6 +460,21 @@ There are a few key differences between \latte and \cdd file formats.
 
 The reason this is useful is because any polynomial can be written as a sum of powers of linear forms, see \cite{howToIntegratePolynomialSimplex}.
 
+
+\subsection{Products of linear forms}
+
+\latteInt can integrate a product of linear forms over a simplex or a triangulation of a polytope.
+
+The input format for a sum of products of linear forms is
+    \begin{quote}
+      \texttt{[ [{\itshape coefficient}, [[{\itshape power$_1$}, [{\itshape coefficient-vector$_1$}]],[{\itshape power$_2$}, [{\itshape coefficient-vector$_2$}]], ...]],  ...]}.
+    \end{quote}
+
+For example, the integrand \[(1x_1 +2x_2)^3(4x_1 + 5x_2)^6 +7(8x_1 +9x_2)^{10}(11x_1 + 12x_2)^{13}(14x_1 +15x_2)^{16}\]
+
+is written as
+
+\texttt{[[1, [ [3, [1, 2]], [6, [4, 5]] ]], [7, [ [10, [8, 9]], [13, [11, 12]], [16, [14, 15]] ]] ]}
 
 \end{itemize}
 
@@ -544,7 +554,7 @@ For unbounded polyhedra, one needs to combine
 	\end{verbatim} 
 \end{itemize}
 
-The following options relate to the Barvinok algorithm and were introduced by Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.
+The following options relate to the Barvinok algorithm and where introduced by Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.
 \begin{itemize}
 \item Triangulate and signed-decompose in the dual space (traditional method, default)
 	\begin{verbatim}
@@ -613,6 +623,8 @@ Like {\tt count}, {\tt integrate} has a help menu. To view the menu, run
 
 There are two different integration (and volume) algorithms. The triangulation method triangulates the entire polytope and integrates over each simplex. In the cone decomposition method we integrate over each cone, possibly triangulating it first. Unlike other integration software, \latte integrates polynomials and powers of linear forms in exact arithmetic.
 
+{\tt integrate} is also able to compute weighted Ehrhart polynomials, see the next subsection.
+
 \begin{itemize}
 \item Integrates using the cone-decomposition method.
 	\begin{verbatim}
@@ -627,15 +639,18 @@ There are two different integration (and volume) algorithms. The triangulation m
      --valuation=integrate
      --valuation=volume
 	\end{verbatim} 	
-\item Prints the cone-decomposition rational function for volumes
-	\begin{verbatim}
-     --valuation=volume --cone-decompose --print-cone-decompose-function
-	\end{verbatim} 	
-\item Sets the file that contains the polynomial or powers of linear forms. If this option is not set, and the valuation is integration, the polynomial or powers of linear forms will be read from stdin.
+%\item Prints the cone-decomposition rational function for volumes
+%	\begin{verbatim}
+%     --valuation=volume --cone-decompose --print-cone-decompose-function
+%	\end{verbatim} 	
+\item Sets the file that contains the polynomial, powers of linear forms, or products of powers of linear forms. If this option is not set, and the valuation is integration, the integrand will be read from stdin.
 	\begin{verbatim}
      --monomials=FILE
      --linear-forms=FILE
+     --product-linear-forms=FILE
 	\end{verbatim} 	
+	
+	If the integrand is a polynomial or a power of a linear form, there are two integration and volume algorithms available: a polytope triangulation based method and a tangent cone based method. If the integrand is a product of powers of linear forms, there is only one algorithm available and it is a polytope triangulation based method.
 \end{itemize}
 
 \example
@@ -656,14 +671,76 @@ Let us view a few examples of the above options
 	./integrate --valuation=volume --all --vrep fileName.vrep.latte	
 	\end{verbatim} 	
 \end{itemize}
-           
+
+
+\subsubsection{How to use {\tt integrate} for computing weighted Ehrhart polynomials}           
+
+\latteInt can (currently) only compute weighted Ehrhart polynomials if the polytope is simple and if the user has \maple.
+
+\begin{itemize}
+\item Sets what you want to compute: weighted ehrhart polynomials. 
+	\begin{verbatim}
+     --valuation=top-ehrhart
+	\end{verbatim} 	
+\item Sets the weight function from a file.
+	\begin{verbatim}
+    --monomials=FILE
+    --linear-forms=FILE
+	\end{verbatim} 	
+\item Sets the weight function to 1 (unweighted). This is the default. 
+	\begin{verbatim}
+     --top-ehrhart-unweighted
+	\end{verbatim} 
+\item Only compute the top K coefficients. The polynomial's coefficients are not computed incrementally. Use this option if you know in advance you can wait for the software to finish or have low memory requirements. When this option is missing, the entire polynomial's coefficients are computed incrementally which takes more memory but you may manually stop the computation at any time.
+	\begin{verbatim}
+     --num-coefficients=K
+	\end{verbatim}
+\item Save the polynomial to a file. If ``--num-coefficients=K'' is used, the file write is done after the polynomial is computed. If  ``--num-coefficients=K'' is missing, the polynomial's coefficients are saved as they are computed.
+	\begin{verbatim}
+     --top-ehrhart-save=FILE
+	\end{verbatim}		
+\item Compute the weighted Ehrhart polynomial that is valid for non-integer dilations.
+	\begin{verbatim}
+     --real-dilations
+	\end{verbatim}		
+\item Sets interactive mode if you want to manually type a polynomial or a sum of linear forms. You cannot compute a weighted Ehrhart polynomial where the weight is a product of linear forms.
+	\begin{verbatim}
+     --interactive-mode
+	\end{verbatim}		
+\end{itemize}
+
+\example
+Let us view a few examples of the above options.
+
+\begin{itemize}
+\item Compute the unweighted Ehrhart polynomial that is valid for real dilations.
+	\begin{verbatim}
+	./integrate --valuation=top-ehrhart --real-dilations  
+		 fileName.hrep.latte
+	\end{verbatim} 	
+\item Compute weighted Ehrhart polynomial where the weight is a polynomial.
+	\begin{verbatim}
+	./integrate --valuation=top-ehrhart --monomials=FILE 
+		 fileName.hrep.latte
+	\end{verbatim} 	
+\item Find only the two largest degree terms of the linear form weighted Ehrhart polynomial
+	\begin{verbatim}
+	./integrate --valuation=top-ehrhart --linear-forms=FILE 
+		 --num-coefficients=2 fileName.hrep.latte				
+	\end{verbatim} 	
+\item Manually enter a weight function and save the polynomial to a file
+	\begin{verbatim}
+	./integrate --valuation=top-ehrhart --interactive-mode 
+		 --top-ehrhart-save=FILE fileName.hrep.latte
+	\end{verbatim} 	
+\end{itemize}
 
 \subsection{Options common to both {\tt count} and {\tt integrate}}
 
 A common subproblem in counting lattice points and integration requires finding triangulations and tangent cones. Also, there are many different software tools available to do this. Instead of reinventing the wheel, \latte links with other software tools to compute these basic objects. In this section, we describe how you can control which software tool is used.
 
 \begin{itemize}
-\item The \fourtitwo program can be used instead of {\tt cddlib} 
+\item The \fourtitwo program can be used instead of {\tt cddlib} and {\tt CDD+}
   to compute the vertex cones of polytopes, triangulations, and duals of cones.
   In many cases, \fourtitwo is faster.
   
@@ -732,6 +809,57 @@ A common subproblem in counting lattice points and integration requires finding 
 
 
 \latte uses the GNU Autoconf and Automake tools. Please see the {\tt README} file in the \latte directory for detailed directions for installing \latte.
+
+\begin{comment}
+\textbf{Step 1: Create directory for {\tt LattE}}
+
+\begin{verbatim}
+     mkdir latte
+\end{verbatim}
+
+\textbf{Step 2: Download ``latte\_v1.1.tar.gz'' to directory ``latte''}
+
+\begin{verbatim}
+     Download ``latte_v1.1.tar.gz'' from
+\end{verbatim}
+
+\makebox[12 cm]{http://www.math.ucdavis.edu/$\sim$latte/downloads/}
+ 
+(If you have never downloaded a file from the internet: A click with
+your right mouse button onto the file name on the webpage should do
+the trick. In any case, if you do not succeed, ask your system
+administrator, a friend, or send us an email.) 
+
+\textbf{Step 3: Change to directory for ``latte''}
+
+\begin{verbatim}
+     cd latte
+\end{verbatim}
+
+\textbf{Step 4: Unzip and untar the archive} 
+
+\begin{verbatim}
+     gunzip latte_v1.1.tar.gz
+     tar xvf latte_v1.1.tar
+\end{verbatim}
+
+\textbf{Step 5: Make ``install'' executable} 
+
+\begin{verbatim}
+     chmod 700 install
+\end{verbatim}
+
+\textbf{Step 6: Install {\tt LattE}} 
+
+\begin{verbatim}
+     ./install
+\end{verbatim}
+
+\end{comment}
+
+
+
+
 
 
 %\newpage
@@ -1090,6 +1218,53 @@ We see the exact answer is
 This answer displays the power of using exact rational arithmetic!	
 
 
+
+\subsection{Computing the Weighted Ehrhart Polynomial}
+
+Again, \latteInt can (currently) only compute weighted Ehrhart polynomial functions if the polytope is simple and the user has \maple.
+
+Consider a simple cube with vertices
+\begin{verbatim}
+4 3
+1 0 0
+1 1 0
+1 0 1
+1 1 1
+\end{verbatim}
+
+
+Lets first compute the unweighted Ehrhart polynomial 
+	\begin{verbatim}
+	./integrate --valuation=top-ehrhart --vrep cube.vrep.latte 
+	\end{verbatim}
+
+and we get the answer $N^2 + 2N + 1$. 
+
+Next, compute the Ehrhart polynomial with weight $x_1^2x_2^4$ where we enter the polynomial from stdin:
+	\begin{verbatim}
+	./integrate --valuation=top-ehrhart --interactive-mode --vrep cube.vrep.latte 
+	\end{verbatim}
+and then type
+	\begin{verbatim}
+	p
+	[[1,[2,4]]]
+	\end{verbatim}
+	
+The answer is $1/15*N^8+4/15*N^7+71/180*N^6+1/4*N^5+2/45*N^4-1/60*N^3-1/180*N^2$.
+
+Finally, repeat the above commands, but find the polynomial that is correct if $N$ is a rational dilation and save the answer to a file called ``bigAnswer''. That is, add ``--real-dilations --top-ehrhart-save=bigAnswer'' to the command line and use the same polynomial. 
+
+Open the file ``bigAnswer.'' To evaluate the polynomial at a point $a \in \R$, first open the file ``compute-top-ehrhart.mpl'' that was made by \latteInt and copy the same load path ``compute-top-ehrhart.mpl'' uses into ``bigAnswer''. Make your ``bigAnswer'' file look something like this (your file path might be different):
+
+	\begin{verbatim}
+	read("/home/latte/dest/share/latte-int/Conebyconeapproximations_08_11_2010.mpl"):
+	
+	epoly:= ``something big'';
+	
+	eval(subs({N=a,n=a, MOD=latteMod},epoly);
+	\end{verbatim}
+Note that you had to set both $n$ and $N$ to the point $a \in \R$ and the ``latteMod'' function is defined in the \maple script. If you then run this \maple file with the point $a=2.5$ you will get $85.00000031$.
+
 \subsection{Example of Optimization with \latte}
 
 Next, let us solve the problem ``cuww1'' \cite{cuww,latte3}. Its
@@ -1152,9 +1327,8 @@ provided.
 \subsection{System Requirements}
 
 \subsubsection{Platform} 
-Recent versions of LattE has been successfully built on various Linux
-distributions, Mac OS X, and Solaris.
-
+The binaries for \latte v1.1 as well as for {\tt cdd} (by
+K. Fukuda \cite{fukuda}) are for platforms that run Unix, that is, Mac and Linux.
 
 \subsubsection{Memory Requirements} 
 The memory requirements are essentially problem dependent; however,
@@ -1176,6 +1350,51 @@ simplification feature to ``count'' will not be available.
 We have tested this connection with \maple 5.1, 8.0, and 14.0 and experienced
 no problem. Please let us know about any problem you experience with
 our connection to \maple.
+
+\subsection{File Descriptions} 
+\label{section:file-descriptions}
+The {\tt LattE} Linux release consists a single archive file,
+\textbf{latte\_v1.*.tar.gz}. The archive contains the following files:
+
+\begin{tabular}{|l|l|}
+\hline
+Name & Description\\
+\hline 
+%\hline
+& \\
+count & Main program executables\\
+ehrhart & \\
+latte-maximize & \\
+latte-minimize & \\
+integrate      & \\
+& \\
+
+simplify2.add & additional files used by {\tt LattE}\\
+redcheck & ($\leftarrow$ modified from {\tt cdd} library) \\
+install & \\
+& \\
+cdd & external {\tt cdd} software executable used by {\tt LattE},\\
+& original name in {\tt cdd}: cddr+\_gmp\\
+& \\
+\hline
+& \\
+EXAMPLES/ & Subdirectory containing sample input files\\
+& \\
+\hline
+& \\
+manual.pdf & User's guide \\
+%manual.pdf & \\
+& \\
+\hline 
+& \\
+code/ & {\tt LattE} source code (including {\tt NTL}, {\tt cdd} and {\tt cdd lib})\\
+& \\
+\hline 
+& \\
+gpl.txt & GNU General Public License agreement\\
+& \\
+\hline 
+\end{tabular}
 
 \subsection{License Agreement}
 
