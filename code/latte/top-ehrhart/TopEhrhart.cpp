@@ -32,6 +32,8 @@ TopEhrhart::~TopEhrhart()
  */
 void TopEhrhart::computeTopEhrhartPolynomial(const monomialSum & polynomial)
 {
+	assert(polynomial.varCount == poly->numOfVars);
+
 	linFormSum linearForms;
 
 	//make an iterator for the transformed polynomial and decompose it into linear forms.
@@ -56,6 +58,7 @@ void TopEhrhart::computeTopEhrhartPolynomial(const monomialSum & polynomial)
  */
 void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 {
+	assert(linForm.varCount == poly->numOfVars);
 
 	ofstream maple("compute-top-ehrhart.mpl");
 
