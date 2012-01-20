@@ -1017,7 +1017,7 @@ findEhrhartPolynomial_linearForm:=proc(n,nn,simpleCones,ell,M,d, useRealDilation
     	od; #for l
     	totalSeries:=coeff(totalSeries,new_n,M+d-j);
     	
-    	#we need to mult. my M! because we are computing w/the weight 1/M!* ell^M
+    	#we need to mult. by M! because we are computing w/the weight 1/M!* ell^M
     	term:= subs({new_n=n, N=n},totalSeries)*factorial(M);
     	ehrhartPoly:=ehrhartPoly+term*nn^(M+d-j);    	
     od;
@@ -1029,7 +1029,7 @@ end:
 #### LATTE INTERFACE FUNCTION:
 ##Used by latte to print ALL of the coefficients of the ehrhart polynomial coefficients incrementally
 ##But this function could compute just the top k ehrhart polynomial incrementally.
-##If the user wants the top k, latte calls the function findEhrhartPolynomial_saveMemory
+##If the user wants the top k, latte calls the function findEhrhartPolynomial
 ##  instead because it computes the polynomial per linear form, and hence has a small 
 ##  memory footprint because printIncrementalEhrhartPolynomial finds the 
 ##  current coefficient of all the linear forms at once.
