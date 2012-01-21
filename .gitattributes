@@ -273,6 +273,7 @@ distro/cddlib/INSTALL -text
 distro/cddlib/Makefile.am -text
 distro/cddlib/NEWS -text
 distro/cddlib/README -text
+distro/cddlib/autogen.sh -text
 distro/cddlib/configure.ac -text
 distro/cddlib/doc/cddlibman.pdf -text
 distro/cddlib/doc/cddlibman.ps -text
@@ -407,11 +408,6 @@ distro/cddlib/lib-src/random.c -text
 distro/cddlib/lib-src/random.h -text
 distro/cddlib/lib-src/setoper.c -text
 distro/cddlib/lib-src/setoper.h -text
-distro/cddlib/m4/libtool.m4 -text
-distro/cddlib/m4/ltoptions.m4 -text
-distro/cddlib/m4/ltsugar.m4 -text
-distro/cddlib/m4/ltversion.m4 -text
-distro/cddlib/m4/lt~obsolete.m4 -text
 distro/cddlib/src-gmp/Makefile.am -text
 distro/cddlib/src-gmp/adjacency.c -text
 distro/cddlib/src-gmp/allfaces.c -text
