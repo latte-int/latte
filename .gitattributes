@@ -264,7 +264,6 @@ distro/.svn2cl-authors -text
 distro/4ti2-1.4.tar.gz -text
 distro/4ti2-1.5.1.tar.gz -text
 distro/cddlib-094f.tar.gz -text
-distro/cddlib-shared-library.patch -text
 distro/cddlib/AUTHORS -text
 distro/cddlib/COPYING -text
 distro/cddlib/ChangeLog -text
