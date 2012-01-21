@@ -263,6 +263,7 @@ code/test-suite/test-irr-exp-maxdet1000.sh -text
 distro/.svn2cl-authors -text
 distro/4ti2-1.4.tar.gz -text
 distro/4ti2-1.5.1.tar.gz -text
+distro/cddlib-0.94f+sage-patches-p8+latte-build-patch.tar.gz -text
 distro/cddlib-094f.tar.gz -text
 distro/cddlib/AUTHORS -text
 distro/cddlib/COPYING -text
