@@ -273,7 +273,7 @@ distro/cddlib/INSTALL -text
 distro/cddlib/Makefile.am -text
 distro/cddlib/NEWS -text
 distro/cddlib/README -text
-distro/cddlib/configure.in -text
+distro/cddlib/configure.ac -text
 distro/cddlib/doc/cddlibman.pdf -text
 distro/cddlib/doc/cddlibman.ps -text
 distro/cddlib/doc/cddlibman.tex -text
@@ -389,6 +389,8 @@ distro/cddlib/lib-src-gmp/cddproj.c -text
 distro/cddlib/lib-src-gmp/cddproj_f.c -text
 distro/cddlib/lib-src-gmp/cddtypes.h -text
 distro/cddlib/lib-src-gmp/cddtypes_f.h -text
+distro/cddlib/lib-src-gmp/random.c -text
+distro/cddlib/lib-src-gmp/random.h -text
 distro/cddlib/lib-src-gmp/setoper.c -text
 distro/cddlib/lib-src-gmp/setoper.h -text
 distro/cddlib/lib-src/Makefile.am -text
@@ -401,11 +403,19 @@ distro/cddlib/lib-src/cddmp.c -text
 distro/cddlib/lib-src/cddmp.h -text
 distro/cddlib/lib-src/cddproj.c -text
 distro/cddlib/lib-src/cddtypes.h -text
+distro/cddlib/lib-src/random.c -text
+distro/cddlib/lib-src/random.h -text
 distro/cddlib/lib-src/setoper.c -text
 distro/cddlib/lib-src/setoper.h -text
+distro/cddlib/m4/libtool.m4 -text
+distro/cddlib/m4/ltoptions.m4 -text
+distro/cddlib/m4/ltsugar.m4 -text
+distro/cddlib/m4/ltversion.m4 -text
+distro/cddlib/m4/lt~obsolete.m4 -text
 distro/cddlib/src-gmp/Makefile.am -text
 distro/cddlib/src-gmp/adjacency.c -text
 distro/cddlib/src-gmp/allfaces.c -text
+distro/cddlib/src-gmp/cdd_both_reps.c -text
 distro/cddlib/src-gmp/fourier.c -text
 distro/cddlib/src-gmp/lcdd.c -text
 distro/cddlib/src-gmp/projection.c -text
@@ -441,6 +451,7 @@ distro/cddlib/src/Makefile.am -text
 distro/cddlib/src/Makefile.in -text
 distro/cddlib/src/adjacency.c -text
 distro/cddlib/src/allfaces.c -text
+distro/cddlib/src/cdd_both_reps.c -text
 distro/cddlib/src/fourier.c -text
 distro/cddlib/src/lcdd.c -text
 distro/cddlib/src/minkowski.c -text
