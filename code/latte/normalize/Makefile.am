@@ -7,7 +7,7 @@ lib_LTLIBRARIES =
 
 if HAVE_FORTYTWO_LIB
 lib_LTLIBRARIES += libnormalize.la
-libnormalize_a_SOURCES = ReductionTest.cpp normalize.cpp
+libnormalize_la_SOURCES = ReductionTest.cpp normalize.cpp
 noinst_HEADERS += ReductionTest.h
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = 
