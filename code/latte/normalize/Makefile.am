@@ -3,14 +3,15 @@ AUTOMAKE_OPTIONS = subdir-objects
 bin_PROGRAMS =
 noinst_LIBRARIES =
 noinst_HEADERS =
+lib_LTLIBRARIES =
 
 if HAVE_FORTYTWO_LIB
-noinst_LIBRARIES += libnormalize.a
+lib_LTLIBRARIES += libnormalize.la
 libnormalize_a_SOURCES = ReductionTest.cpp normalize.cpp
 noinst_HEADERS += ReductionTest.h
 AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = 
-LDADD = libnormalize.a ../liblatte.a
+LDADD = libnormalize.la ../liblatte.la
 
 # For Gnulib relocatable-prog
 AM_CPPFLAGS += -DINSTALLDIR=\"$(bindir)\"
@@ -20,7 +21,7 @@ endif
 LDADD += ../../gnulib/libgnu.a
 
 if HAVE_CPLEX
-libnormalize_a_SOURCES += ReductionTestWithCPLEX.cpp 
+libnormalize_la_SOURCES += ReductionTestWithCPLEX.cpp 
 noinst_HEADERS += ReductionTestWithCPLEX.h
 endif
 
