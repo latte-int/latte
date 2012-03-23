@@ -99,18 +99,18 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		float theTotalTime;
 		for( int i = 0; i < vc.answers.size(); ++i)
 		{
-			if ( vc.answers[i].valuationType == Valuation::ValuationData::volumeLawrence
+			if ( vc.answers[i].valuationType == PolytopeValuation::volumeCone
 					&& alg == 1)
 			{
 				theComputedIntegral = vc.answers[i].answer;
 			}
-			else if (vc.answers[i].valuationType == Valuation::ValuationData::volumeTriangulation
+			else if (vc.answers[i].valuationType == PolytopeValuation::volumeTriangulation
 					&& alg == 2)
 			{
 				theComputedIntegral = vc.answers[i].answer;
 			}
 
-			if ( vc.answers[i].valuationType == Valuation::ValuationData::entireValuation)
+			if ( vc.answers[i].valuationType == PolytopeValuation::entireValuation)
 			{
 				theTotalTime = vc.answers[i].timer.get_seconds();
 			}

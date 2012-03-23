@@ -26,6 +26,8 @@ private:
 	vector<vector<string> > getUnusedPolynomials(int dim, int degree, int polytopeID);
 	vector<vector<string> > getUnusedPolytopes(int dim, int degree, int vertexCount, bool useDual);
 
+	void getStatistics(const vector<double> &data, double &avg, double &min, double &max, double &sd, int &totalFinished, int &totalExist, bool &manuallyLimited); //given an array of double's, computes the average, min, max, etc.
+
 public:
 	enum AlgorithemUsed {Lawrence, Triangulate};
 	IntegrationDB();
@@ -55,6 +57,7 @@ public:
 	ValuationDBStatistics getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual);
 	ValuationDBStatistics getStatisticsByFileDegree(const string & polymakeFile, int degree, bool useDual);
 	vector<double> getStatisticsAvgMinMaxCount(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual);
+	double getStdDeviation(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual); //gets the standard deviation (sqlite does not have this function build in).
 	vector<double> getStatisticsAvgMinMaxCount(AlgorithemUsed alg, const string &polymakeFile, int degree, bool useDual);
 
 	void insertEmptyIntegrationTest(const char* polynomialPath, int dim, int degree,

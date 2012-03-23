@@ -12,6 +12,7 @@
 #include <iostream>
 #include <ctime>
 #include "../valuation.h"
+#include "../PolytopeValuation.h"
 #include "../../sqlite/IntegrationDB.h"
 
 
@@ -62,7 +63,7 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		argv[index++] = "--redundancy-check=none";
 		argv[index++] =  "--valuation=integrate";
 		if (alg == 1) //if you cange this, allso need to chage the other alg get below.
-			argv[index++] = "--lawrence";
+			argv[index++] = "--cone-decompose";
 		else if (alg == 2)
 			argv[index++] = "--triangulate";
 		else
@@ -100,22 +101,21 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		float theTotalTime;
 		for( int i = 0; i < vc.answers.size(); ++i)
 		{
-			if ( vc.answers[i].valuationType == Valuation::ValuationData::integrateLawrence
+			if ( vc.answers[i].valuationType == PolytopeValuation::integratePolynomialAsLinearFormCone
 					&& alg == 1)
 			{
 				theComputedIntegral = vc.answers[i].answer;
 			}
-			else if (vc.answers[i].valuationType == Valuation::ValuationData::integrateTriangulation
+			else if (vc.answers[i].valuationType == PolytopeValuation::integratePolynomialAsLinearFormTriangulation
 					&& alg == 2)
 			{
 				theComputedIntegral = vc.answers[i].answer;
 			}
 
-			if ( vc.answers[i].valuationType == Valuation::ValuationData::entireValuation)
+			if ( vc.answers[i].valuationType == PolytopeValuation::entireValuation)
 			{
 				theTotalTime = vc.answers[i].timer.get_seconds();
 			}
-
 		}//find the integral and time
 
 		//print results to the log file
@@ -128,13 +128,14 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		//finally, save it.
 		IntegrationDB db;
 		db.open(dbFile);
+		//cout << "SAVING TO DB COMMENTED OUT FOR NOW" << endl; //remove this if you are serious about running the tests. (you check everthing is working well)
 		db.updateIntegrationTimeAndValue((alg == 1 ? IntegrationDB::Lawrence : IntegrationDB::Triangulate)
 							, theTotalTime, theComputedIntegral, value, rowid);
 		db.close();
 
 		if ( theTotalTime > 660 ) //660 sec= 10.5mins
 		{
-			cout << "Valuation took " << theTotalTime << " seconds, skipping the test of the test case" << endl;
+			cout << "Valuation took " << theTotalTime << " seconds, skipping the rest of the test case" << endl;
 			return;
 		}//if it took too long, don't do the rest.
 	}

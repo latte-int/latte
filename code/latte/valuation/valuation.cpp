@@ -796,6 +796,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		{
 			valuationAnswers = computeVolume(Poly, *params, integrationInput,
 					printLawrence);
+
 		} else //integration
 		{
 			//read the integrand from the file or from std in.
@@ -1180,7 +1181,7 @@ Valuation::IntegrationInput::IntegrationInput()
 
 	//Command line options. These are used by processUserInput()
 	//  to set up which algorithms will be used.
-	valuationVolume;			//--valuation=volume
+	valuationVolume =false;			//--valuation=volume
 	valuationIntegrate= false;	//etc
 	valuationEhrhart= false;
 	useTangentCones= false;		//--cone-decompose

@@ -33,14 +33,13 @@ public:
 
 	bool canVolumeTestFinish(AlgorithemUsed alg, int dim, int vertex, bool useDual, int timeLimit);
 
-	bool getLimit(AlgorithemUsed alg, int dim, int vertexCount, bool useDual);
-	int getNumberVolumeTest(int dim, int vertexCount, bool useDual);
+
 	vector<vector<string> > getRowsToFindVolume(int dim, int vertex, bool useDual, int limit);
 	vector<vector<string> > getRowsToFindVolumeGivenSpecficFile(const char *polymakeFile, bool useDual);
 
 	vector<vector<ValuationDBStatistics> > getStatistics(bool useDual);//main printing function.
 	ValuationDBStatistics getStatisticsByDimAndPointCount(int dim, int additionalPoints, bool useDual);
-	vector<double> getStatisticsAvgMinMaxCount(AlgorithemUsed alg, int dim, int vertexCount, bool useDual);
+	void getStatistics(const vector<double> &data, double &avg, double &min, double &max, double &sd, int &totalFinished, int &totalExist, bool &manuallyLimited);
 
 	void updateVolumeTimeAndValue(AlgorithemUsed alg, double time, RationalNTL theComputedIntegral, string previousValue, string rowid);
 	int volumeTestsCompleted(AlgorithemUsed alg, int dim, int vertex, bool useDual);

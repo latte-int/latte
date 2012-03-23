@@ -20,144 +20,24 @@
 
 
 using namespace std;
-void printLatexTableIntegration(char * dbFile, int dim)
-{
-
-	vector<vector<ValuationDBStatistics> > results, resultsDual;
-	string fasterStyle, slowerStyle, sameStyle;
-	string timeT, timeL;
-
-	fasterStyle = " \\timeFaster";
-	slowerStyle = " \\timeSlower";
-	sameStyle   = " \\timeBothZero";
-
-	IntegrationDB db;
-	db.open(dbFile);
-	resultsDual = db.getStatisticsByDim(dim, true);
-	results     = db.getStatisticsByDim(dim, false);
-	db.close();
-	assert(results.size() == resultsDual.size());
-
-	cout << fixed;
-
-	for(int i = 0; i < (int) results.size(); ++i)
-	{
-		for(int j = 0; j < (int) results[i].size(); ++j)
-		{
-			if ( results[i][j].totalFinishedLawrenceTestCases < 50)
-				results[i][j].avgLawrenceTime = 0;
-			if ( results[i][j].totalFinishedTriangulationTestCases < 50 )
-				results[i][j].avgTriangulationTime = 0;
-		}
-		for(int j = 0; j < (int) resultsDual[i].size(); ++j)
-		{
-			if ( resultsDual[i][j].totalFinishedLawrenceTestCases < 50)
-				resultsDual[i][j].avgLawrenceTime = 0;
-			if ( resultsDual[i][j].totalFinishedTriangulationTestCases < 50 )
-				resultsDual[i][j].avgTriangulationTime = 0;
-		}
-	}//for i. clear any incomplete test cases.
-
-
-	cout << "\\begin{table}\n";
-	cout << "\\caption{Triangulation vs Lawrence Integration on Random Polytopes in Dimension " << dim << "}\n";
-	cout << "\\label{tabel:lawrence-random-integration-dim" << dim <<  "}\n";
-	cout << "\\begin{tabular}{l";
-	for(int i = 0; i < results.size(); ++i)
-		cout << 'r';
-	cout << "}\n";
-	cout << "\\toprule \n";
-	//print 1st header row.
-	cout << "& \\multicolumn{" << results.size() << "}{c}{Vertex Count}\\\\ \n";
-	cout << " \\cmidrule(c){2-" << results.size() + 1 << "} \n";
-
-	for (int i = 0; i < (int) results.size(); ++i)
-		cout << " & \\multicolumn{2}{c}{" << results[i][0].vertexCount << "} ";
-	cout << " \\\\ \n";
-	for (int i = 0; i < (int) results.size(); ++i)
-		cout << "\\cmidrule(r){" << 2*i+1+1 << "-" << 2*i+2+1<< "}";
-	cout << "\n";
-
-	//print 2nd header row.
-	cout << "Degree";
-	for(int i = 0; i < (int) results[0].size(); ++i)
-			cout << " & Law. & Tri. ";
-	cout << "\\\\ \n";
-
-	//print other rows.
-	for(int i = 0; i < (int) results[0].size(); ++i)
-	{
-		//print 1st col.
-		cout << results[0][i].degree;
-
-		for(int j = 0; j < (int) results.size(); ++j)
-		{
-			if (results[j][i].avgLawrenceTime < results[j][i].avgTriangulationTime)
-			{
-				timeL = fasterStyle;
-				timeT = slowerStyle;
-			}
-			else if (results[j][i].avgLawrenceTime > results[j][i].avgTriangulationTime)
-			{
-				timeL = slowerStyle;
-				timeT = fasterStyle;
-			}
-			else
-			{
-				timeL = sameStyle;
-				timeT = sameStyle;
-			}//if tie.
-
-			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << results[j][i].avgLawrenceTime << "}"
-				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << results[j][i].avgTriangulationTime << "}";
-		}
-		cout << "\\\\ \n";
-
-		//dual rows.
-		for(int j = 0; j < (int) resultsDual.size(); ++j)
-		{
-			if (resultsDual[j][i].avgLawrenceTime < resultsDual[j][i].avgTriangulationTime)
-			{
-				timeL = fasterStyle;
-				timeT = slowerStyle;
-			}
-			else if (resultsDual[j][i].avgLawrenceTime > resultsDual[j][i].avgTriangulationTime)
-			{
-				timeL = slowerStyle;
-				timeT = fasterStyle;
-			}
-			else
-			{
-				timeL = sameStyle;
-				timeT = sameStyle;
-			}//if tie.
-
-			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[j][i].avgLawrenceTime << "}"
-				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[j][i].avgTriangulationTime << "}";
-		}
-		cout << "\\\\ \n";
-		cout << "\\hline \n";
-	}//for each row.
-
-	cout << "\\bottomrule \n";
-	cout << "\\end{tabular} \n";
-	cout << "\\end{table} \n";
-}//printLatexIntegrationTable()
-
 
 void printLatexTable_core(const vector<vector<ValuationDBStatistics> > & results,
 		const vector<vector<ValuationDBStatistics> >  &resultsDual,
 		const string &fasterStyle,
 		const string &slowerStyle,
 		const string &sameStyle,
-		const string &zeroStyle)
+		const string &zeroStyle,
+		bool volume)
 {
 	string timeT, timeL;
 
 	for(int i = 0; i < (int) results.size(); ++i)
 	{
 		//print 1st col.
-		cout << results[i][0].vertexCount;
+		if (!volume)
+			cout << results[i][0].vertexCount;
+		else
+			cout << results[i][0].dim;
 
 		for(int j = 0; j < (int) results[i].size(); ++j)
 		{
@@ -195,8 +75,10 @@ void printLatexTable_core(const vector<vector<ValuationDBStatistics> > & results
 				timeT = sameStyle;
 			}//tie.
 
-			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgLawrenceTime << "}"
-				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgTriangulationTime << "}";
+			//cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgLawrenceTime << "}"
+			//	 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgTriangulationTime << "}";
+			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].stdDeviationLawrence << "}"
+				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].stdDeviationTriangulation << "}";
 		}
 		cout << "\\\\ \n";
 
@@ -237,15 +119,24 @@ void printLatexTable_core(const vector<vector<ValuationDBStatistics> > & results
 				timeT = sameStyle;
 			}//tie.
 
-			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgLawrenceTime << "}"
-				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgTriangulationTime << "}";
+			//cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgLawrenceTime << "}"
+			//	 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgTriangulationTime << "}";
+			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].stdDeviationLawrence << "}"
+				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].stdDeviationTriangulation << "}";
+
 		}
+
 		cout << "\\\\ \n";
 		cout << "\\hline \n";
 	}//for each row.
 
 }//printLatexTable_core
 
+
+
+/**
+ * Will print out a latex table for the average integration times for the two methods.
+ */
 void printLatexTableIntegration_sideways(char * dbFile, int dim)
 {
 
@@ -307,12 +198,12 @@ void printLatexTableIntegration_sideways(char * dbFile, int dim)
 	//print 2nd header row.
 	cout << "Vert.";
 	for(int i = 0; i < (int) results[0].size(); ++i)
-			cout << " & Law. & Tri. ";
+			cout << " & Cone. & Tri. ";
 	cout << "\\\\ \n";
 	cout << "\\hline \n";
 	//print other rows.
 
-	printLatexTable_core(results, resultsDual, fasterStyle, slowerStyle, sameStyle, zeroStyle);
+	printLatexTable_core(results, resultsDual, fasterStyle, slowerStyle, sameStyle, zeroStyle, false);
 
 
 	cout << "\\bottomrule \n";
@@ -320,7 +211,9 @@ void printLatexTableIntegration_sideways(char * dbFile, int dim)
 	cout << "\\end{sidewaystable} \n";
 }//printLatexIntegrationTable()
 
-
+/**
+ * Prints out a html table that includes the avg time, min/max, and standard deviation.
+ */
 void printHTMLtableIntegration(char * dbFile, int dim)
 {
 
@@ -363,7 +256,7 @@ void printHTMLtableIntegration(char * dbFile, int dim)
 	//print 2nd header row.
 	cout << "\n<tr><td>x</td>";
 	for(int i = 0; i < (int) results[0].size(); ++i)
-			cout << "\n\t<td>Law.</td><td>Tri.</td>";
+			cout << "\n\t<td>Cone.</td><td>Tri.</td>";
 	cout << "\n</tr>" << endl;
 
 	//print other rows.
@@ -398,7 +291,10 @@ void printHTMLtableIntegration(char * dbFile, int dim)
 
 		cout << "\n<tr><!--min max row and manual stop MS-->";
 		for(int j = 0; j < (int) results[i].size(); ++j)
-			cout << "\n\t<td class=\"range\">[" << results[i][j].minLawrenceTime  << ", " << results[i][j].maxLawrenceTime << "]" << (results[i][j].manuallyLimitedLawrence ? "MS":"") << "</td><td class=\"range\">[" << results[i][j].minTriangulationTime << ", " << results[i][j].maxTriangulationTime << "]" << (results[i][j].manuallyLimitedTriangulation ? "MS":"") << "</td>";
+		{
+			cout << "\n\t<td class=\"range\">[" << results[i][j].minLawrenceTime  << ", " << results[i][j].maxLawrenceTime << "]" << (results[i][j].manuallyLimitedLawrence ? "MS":"") << "<br>SD:" << results[i][j].stdDeviationLawrence << "</td>"
+				     << "<td class=\"range\">[" << results[i][j].minTriangulationTime << ", " << results[i][j].maxTriangulationTime << "]" << (results[i][j].manuallyLimitedTriangulation ? "MS":"") << "<br>SD:" << results[i][j].stdDeviationTriangulation << "</td>";
+		}
 		cout << "\n</tr>";
 
 
@@ -433,7 +329,10 @@ void printHTMLtableIntegration(char * dbFile, int dim)
 
 		cout << "\n<tr><!--dual min max row-->";
 		for(int j = 0; j < (int) resultsDual[i].size(); ++j)
-			cout << "\n\t<td class=\"dualRange\">[" << resultsDual[i][j].minLawrenceTime  << ", " << resultsDual[i][j].maxLawrenceTime << "]" << (resultsDual[i][j].manuallyLimitedLawrence ? "MS":"") << "</td><td class=\"dualRange\">[" << resultsDual[i][j].minTriangulationTime << ", " << resultsDual[i][j].maxTriangulationTime << "]" << (resultsDual[i][j].manuallyLimitedTriangulation? "MS":"") << "</td>";
+		{
+			cout << "\n\t<td class=\"dualRange\">[" << resultsDual[i][j].minLawrenceTime  << ", " << resultsDual[i][j].maxLawrenceTime << "]" << (resultsDual[i][j].manuallyLimitedLawrence ? "MS":"") << "<br>SD:" << resultsDual[i][j].stdDeviationLawrence << "</td>"
+					<< "<td class=\"dualRange\">[" << resultsDual[i][j].minTriangulationTime << ", " << resultsDual[i][j].maxTriangulationTime << "]" << (resultsDual[i][j].manuallyLimitedTriangulation? "MS":"") << "<br>SD:" << resultsDual[i][j].stdDeviationTriangulation <<"</td>";
+		}
 		cout << "\n</tr>";
 
 
@@ -452,6 +351,10 @@ void printHTMLtableIntegration(char * dbFile, int dim)
 }//printHTMLtable()
 
 
+
+/**
+ * Prints out the volume table for the random polytopes.
+ */
 void printLatexTableVolume(const char *dbFile)
 {
 	cerr << "going to print latex volume table.\n";
@@ -490,16 +393,28 @@ void printLatexTableVolume(const char *dbFile)
 		for(int j = 0; j < (int) results[i].size(); ++j)
 		{
 			if ( results[i][j].totalFinishedLawrenceTestCases < 50)
+			{
 				results[i][j].avgLawrenceTime = 0;
+				results[i][j].stdDeviationLawrence = 0; //not needed, because \timeNotComputed{} latex style will not print this non-zero number.
+			}
 			if ( results[i][j].totalFinishedTriangulationTestCases < 50 )
+			{
 				results[i][j].avgTriangulationTime = 0;
+				results[i][j].stdDeviationTriangulation = 0;
+			}
 		}
 		for(int j = 0; j < (int) resultsDual[i].size(); ++j)
 		{
 			if ( resultsDual[i][j].totalFinishedLawrenceTestCases < 50)
+			{
 				resultsDual[i][j].avgLawrenceTime = 0;
+				resultsDual[i][j].stdDeviationLawrence = 0;
+			}
 			if ( resultsDual[i][j].totalFinishedTriangulationTestCases < 50 )
+			{
 				resultsDual[i][j].avgTriangulationTime = 0;
+				resultsDual[i][j].stdDeviationTriangulation = 0;
+			}
 		}
 	}//for i. clear any incomplete test cases.
 
@@ -525,12 +440,12 @@ void printLatexTableVolume(const char *dbFile)
 	//print 2nd header row.
 	cout << "Dim.";
 	for(int i = 0; i < (int) results[0].size(); ++i)
-			cout << " & Law. & Tri. ";
+			cout << " & Cone. & Tri. ";
 	cout << "\\\\ \n";
 	cout << "\\hline \n";
 	//print other rows.
 
-	printLatexTable_core(results, resultsDual, fasterStyle, slowerStyle, sameStyle, zeroStyle);
+	printLatexTable_core(results, resultsDual, fasterStyle, slowerStyle, sameStyle, zeroStyle, true);
 
 
 	cout << "\\bottomrule \n";
@@ -538,6 +453,9 @@ void printLatexTableVolume(const char *dbFile)
 	cout << "\\end{table} \n";
 }//printLatexTableVolume
 
+/**
+ * Prints the html volume table
+ */
 void printHTMLtableVolume(const char *dbFile)
 {
 	vector<vector<ValuationDBStatistics> > results, resultsDual;
@@ -591,7 +509,7 @@ void printHTMLtableVolume(const char *dbFile)
 	//print 2nd header row.
 	cout << "\n<tr><td>x</td>";
 	for(int i = 0; i < (int) results[0].size(); ++i)
-			cout << "\n\t<td>Law.</td><td>Tri.</td>";
+			cout << "\n\t<td>Cone.</td><td>Tri.</td>";
 	cout << "\n</tr>" << endl;
 
 	//print other rows.
@@ -681,90 +599,6 @@ void printHTMLtableVolume(const char *dbFile)
 
 
 
-void printMatlabTableVolume(const char * dbFile, const char * mFile)
-{
-	vector<vector<ValuationDBStatistics> > results, resultsDual;
-	string timeT, timeL;
-
-	VolumeDB db;
-	db.open(dbFile);
-	resultsDual = db.getStatistics(true);
-	results     = db.getStatistics(false);
-	db.close();
-
-	//check data.
-	assert(results.size() == resultsDual.size());
-	for(int i = 0; i < results.size(); ++i)
-	{
-		int dim = results[i][0].dim;
-
-		for(int k = 0; k < results[i].size(); ++k)
-		{
-			assert(results[i][k].dim == dim);
-			assert(results[i][k].vertexCount - dim == results[0][k].vertexCount - results[0][k].dim);
-		}
-	}
-
-	//open the file.
-	ofstream file(mFile);
-
-	//make dim vector
-	file << "dimArray = [";
-	for(int i = 0; i < (int) results.size(); ++i)
-		file << results[i][0].dim << ' ';
-	file << "]\n\n";
-
-	//make point vector
-	file << "pointArray = [";
-	for(int i = 0; i < (int) results[0].size(); ++i)
-		file << results[0][i].vertexCount - results[0][i].dim << ' ';
-	file << "]\n\n";
-
-	//make primal volume matrix lawrence.
-	file << "primalVolumeLawrence = [";
-	for(int i = 0; i < (int) results.size(); ++i)
-	{
-		for(int j = 0; j < (int) results[i].size(); ++j)
-			file << results[i][j].avgLawrenceTime << ' ';
-		file << ";\n";
-	}
-	file << "]\n\n";
-
-	//make primal volume matrix triang.
-	file << "primalVolumeTriangulation = [";
-	for(int i = 0; i < (int) results.size(); ++i)
-	{
-		for(int j = 0; j < (int) results[i].size(); ++j)
-			file << results[i][j].avgTriangulationTime << ' ';
-		file << ";\n";
-	}
-	file << "]\n\n";
-
-	//make dual volume matrix lawrence.
-	file << "dualVolumeLawrence = [";
-	for(int i = 0; i < (int) resultsDual.size(); ++i)
-	{
-		for(int j = 0; j < (int) resultsDual[i].size(); ++j)
-			file << resultsDual[i][j].avgLawrenceTime << ' ';
-		file << ";\n";
-	}
-	file << "]\n\n";
-
-	//make dual volume matrix triang.
-	file << "dualVolumeTriangulation = [";
-	for(int i = 0; i < (int) resultsDual.size(); ++i)
-	{
-		for(int j = 0; j < (int) resultsDual[i].size(); ++j)
-			file << resultsDual[i][j].avgTriangulationTime << ' ';
-		file << ";\n";
-	}
-	file << "]\n\n";
-
-	file.close();
-
-}//printMatlabTavleVolume.
-
-
 void printLatexTableIntegrationPerPolymakeFile(const char *dbFile)
 {
 
@@ -828,7 +662,7 @@ void printLatexTableIntegrationPerPolymakeFile(const char *dbFile)
 	//print 2nd header row.
 	cout << "Vert.";
 	for(int i = 0; i < (int) results[0].size(); ++i)
-			cout << " & Law. & Tri. ";
+			cout << " & Cone. & Tri. ";
 	cout << "\\\\ \n";
 	cout << "\\hline \n";
 	//print other rows.
@@ -873,8 +707,11 @@ void printLatexTableIntegrationPerPolymakeFile(const char *dbFile)
 				timeT = sameStyle;
 			}//tie.
 
-			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgLawrenceTime << "}"
-				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgTriangulationTime << "}";
+			//cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgLawrenceTime << "}"
+			//	 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].avgTriangulationTime << "}";
+			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].stdDeviationLawrence << "}"
+				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << results[i][j].stdDeviationTriangulation << "}";
+
 		}
 		cout << "\\\\ \n";
 
@@ -915,8 +752,11 @@ void printLatexTableIntegrationPerPolymakeFile(const char *dbFile)
 				timeT = sameStyle;
 			}//tie.
 
-			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgLawrenceTime << "}"
-				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgTriangulationTime << "}";
+			//cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgLawrenceTime << "}"
+			//	 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].avgTriangulationTime << "}";
+			cout << " & " << timeL.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].stdDeviationLawrence << "}"
+				 << " & " << timeT.c_str() << "{ " << setw(6) << setprecision(2) << resultsDual[i][j].stdDeviationTriangulation << "}";
+
 		}
 		cout << "\\\\ \n";
 		cout << "\\hline \n";
@@ -972,7 +812,7 @@ void printHTMLtableIntegrationPerPolymakeFile(const char *dbFile)
 	//print 2nd header row.
 	cout << "\n<tr><td>x</td>";
 	for(int i = 0; i < (int) results[0].size(); ++i)
-			cout << "\n\t<td>Law.</td><td>Tri.</td>";
+			cout << "\n\t<td>Cone.</td><td>Tri.</td>";
 	cout << "\n</tr>" << endl;
 
 	//print other rows.
@@ -1087,7 +927,9 @@ int main(int argc, char *argv[])
 	if ( strcmp(argv[2], "volume") == 0)
 	{
 		if ( 0 == strcmp(argv[3], "html"))
+		{
 			printHTMLtableVolume(argv[1]); //exe db volume
+		}
 		else if ( 0 == strcmp(argv[3], "latex"))
 			printLatexTableVolume(argv[1]); //exe db volume
 		else
@@ -1098,7 +940,9 @@ int main(int argc, char *argv[])
 		if ( argc == 5)
 		{
 			if ( 0 == strcmp(argv[3], "html"))
+			{
 				printHTMLtableIntegration(argv[1], atoi(argv[4])); //exe db integration html dim
+			}
 			else if ( 0 == strcmp(argv[3], "latex"))
 				printLatexTableIntegration_sideways(argv[1], atoi(argv[4])); //exe db integration latex dim
 		}

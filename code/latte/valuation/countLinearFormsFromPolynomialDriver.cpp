@@ -4,7 +4,7 @@
  *  Created on: March 27, 2010
  *      Author: Brandon Dutra and Gregory Pinto
  *
- *  Given a list of polynomial files, counts the number of linear forms in the decomposition.
+ *  Given a list of monomial files, creates a file containing the number of linear forms from that file.
  */
 
 #include <cstdlib>
@@ -27,19 +27,15 @@ using namespace std;
 int main(int argc, char * argv[])
 
 {
-	RR sumCount, avg, sumMeanDifference, standardDeviation;
-	vector<RR> allCounts;
-	sumCount = 0;
-	avg = 0;
-
-	
-	
 	if ( argc == 1)
 	{
 		cout << "usage: " << argv[0] << " polynomial files" << endl;
 		exit(1);
 	}
 	
+	ofstream file;
+	file.open((string(argv[0]) + ".log").c_str(), ios::app);
+
 	for(int i = 1; i < argc; ++i)	
 	{
 		//read the polynomial from the file.
@@ -55,6 +51,7 @@ int main(int argc, char * argv[])
 		monomialSum originalPolynomial;
 		loadMonomials(originalPolynomial, polynomialLine);
 		
+
 		//convert to linear form
 		linFormSum linearForms;
 		BTrieIterator<RationalNTL, int>* polynomialIterator =
@@ -67,36 +64,30 @@ int main(int argc, char * argv[])
 	
 		polynomialIterator->setTrie(originalPolynomial.myMonomials,
 			originalPolynomial.varCount);
+
+		//find the degree of the monomial.
+		int degree;
+		term<RationalNTL, int>* temp;
+		polynomialIterator->begin();
+		temp = polynomialIterator->nextTerm();
+		degree = 0;
+		for(int k = 0; k < originalPolynomial.varCount; ++k)
+			degree += temp->exps[k];
+		temp = polynomialIterator->nextTerm();
+		assert(temp == NULL);
+
+
 		decompose(polynomialIterator, linearForms);
 
 		destroyMonomials(originalPolynomial);
 
-
-		//finally, count the terms.
-		sumCount += linearForms.termCount;
-		allCounts.push_back(to_RR(linearForms.termCount));
-
+		file << linearForms.varCount << " " << degree << " " << linearForms.termCount << " " << argv[i] << "\n";
 		//delete the linear form.
 		destroyLinForms(linearForms);
 	}//for each file.
+	file.close();
 
-	assert(argc -1 == allCounts.size());
-
-	//find the std. deviation
-	avg = to_RR(sumCount)/(argc-1);
-	sumMeanDifference = 0;
-	for (int i = 0; i < allCounts.size(); ++i)
-	{
-		sumMeanDifference += (allCounts[i] - avg)*(allCounts[i] - avg);
-	}
-	sumMeanDifference /= allCounts.size();
-	standardDeviation = sqrt(sumMeanDifference);
-
-
-	cout << "Number polynomials " << argc -1
-		<< "\nAvg count " << avg
-		<< "\nStandard Deviation " << standardDeviation << endl;
-
+	cout << "Results printed to file " << argv[0] << ".log" << endl;
 	return 0;
 }
 

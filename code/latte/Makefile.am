@@ -240,21 +240,21 @@ TESTS += test-library-examples
 
 #hack...have_Programmer_extra was giving errors
 #if HAVE_PROGRAMMER_EXTRA
-if HAVE_DATABASE
+#if HAVE_DATABASE
  
 #we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
 ## bin_PROGRAMS += testBuildPolytope
 ## testBuildPolytope_SOURCES = valuation/test/testBuildPolytopes.cpp
 ## testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
 
+ 
 
-#counts the number of linear forms in a polynomial.
 bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
 ehrhart3_SOURCES += interpolation/PolynomialInterpolation.cpp
 
 
-#counts the number of linear forms in a polynomial.
+#counts the number of linear forms in a polynomisal.
 bin_PROGRAMS += count-linear-forms-from-polynomial
 count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolynomialDriver.cpp
 
@@ -286,11 +286,11 @@ count_linear_forms_from_polynomial_SOURCES = valuation/countLinearFormsFromPolyn
 check_PROGRAMS += test-volume-for-SL
 test_volume_for_SL_SOURCES = valuation/test/testVolumeForSLDriver.cpp
 
-endif #end of  HAVE_PROGRAMMER_EXTRA
+#endif #end of  HAVE_PROGRAMMER_EXTRA
 
 
 
-if HAVE_DATABASE
+#if HAVE_DATABASE
 
 #This is used to make many polytopes for the new research paper.
 bin_PROGRAMS += build-database-polytopes
@@ -335,7 +335,7 @@ print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
 print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
 print_database_time_table_LDFLAGS = -lsqlite3
 
-endif #HAVE_DATABASE
+#endif #HAVE_DATABASE
 
 
 ################ INTEGRATION ####################

@@ -587,6 +587,77 @@ vector<vector<ValuationDBStatistics> >  IntegrationDB::getStatisticsByDim(int di
 	return ans;
 }//getResultsByDim
 
+//given an array of double's, computes the average, min, max, etc.
+//lawrenceData is the only input parameter, the rest are output parameters.
+void IntegrationDB::getStatistics(const vector<double> &data, double &avg, double &min, double &max, double &sd, int &totalFinished, int &totalExist, bool &manuallyLimited)
+{
+	//set initial values.
+	avg = 0.0;
+	sd  = 0.0;
+	totalFinished = 0;
+	totalExist = 0;
+	manuallyLimited = false;
+
+
+	//set the initial min/max to a non-neg number.
+	bool foundNonNeg = false;
+	for(int i = 0; i < data.size() && !foundNonNeg ; ++i)
+	{
+		if (data[i] >= 0)
+		{
+			min = data[i];
+			max = data[i];
+			foundNonNeg = true;
+		}
+	}
+	if ( foundNonNeg == false)
+	{
+		//so every number is -1 or -2. That is, not one integration test finished.
+		max = 0;
+		min = 0;
+		//the next for loop will not change min to -1 or -2.
+	}
+
+	totalExist = (int) data.size();
+
+	//we can compute everything but the standard deviation in one pass of the array.
+	for(int i = 0; i < data.size(); ++i)
+	{
+		if (data[i] <= -2)
+			manuallyLimited = true;
+		if (data[i] < 0)
+			continue;
+
+		//so data[i] >= 0
+
+		++totalFinished;
+
+		if (min > data[i])
+			min = data[i];
+		if ( max < data[i])
+			max = data[i];
+
+		avg += data[i];
+	}//for i
+
+	if (totalFinished != 0)
+	{
+		avg /= totalFinished; //otherwise, avg is still zero.
+
+		//now find the standard deviation.
+
+		for(int i = 0; i < data.size(); ++i)
+		{
+			if (data[i] < 0)
+				continue;
+			sd += pow(data[i] - avg, 2);
+		}//for i
+
+		sd /= totalFinished;
+		sd = sqrt(sd);
+	}//if totalFinished != 0
+
+}//getStatistics
 
 vector<vector<ValuationDBStatistics> > IntegrationDB::getStatisticsByFile(const vector<vector<string> > &polymakeFile, bool useDual)
 {
@@ -628,7 +699,8 @@ vector<vector<ValuationDBStatistics> > IntegrationDB::getStatisticsByFile(const 
 ValuationDBStatistics IntegrationDB::getStatisticsByDimVertexDegree(int dim, int vertexCount, int degree, bool useDual)
 {
 	ValuationDBStatistics vdbs;
-	vector<double> avgMinMaxCountLawrence, avgMinMaxCountTriangulate;
+	vector<double> lawrenceData, triangulateData;
+	string sqlLawrence, sqlTriang;
 
 	//save how this function was called.
 	vdbs.dim = dim;
@@ -636,6 +708,76 @@ ValuationDBStatistics IntegrationDB::getStatisticsByDimVertexDegree(int dim, int
 	vdbs.degree = degree;
 	vdbs.useDual = useDual;
 
+	//build the sql statements.
+	for(int i = 0; i < 2; ++i)
+	{
+		stringstream sql;
+		string strAlg;
+
+		if ( i == 0)
+			strAlg = "timeLawrence";
+		else
+			strAlg  = "timeTriangulate";
+
+		if (useDual == true)
+		{
+			sql << "select i." << strAlg
+				<< " from integrate as i"
+				<< " join polytope as dualP on dualP.rowid = i.polytopeID"
+				<< " join polytope as orgP on orgP.rowid = dualP.dual"
+				<< " join polynomial as p on p.rowid = i.polynomialID"
+				<< " where dualP.dual is not null " //and with orgp
+				<< " and orgP.dim = " << dim
+				<< " and orgP.vertexCount = " << vertexCount
+				<< " and p.degree = " << degree;
+		}//if dual
+		else
+		{
+			sql << "select i." << strAlg
+				<< " from integrate as i"
+				<< " join polynomial as p on p.rowid = i.polynomialID"
+				<< " join polytope as t on t.rowid = i.polytopeID"
+				<< " where t.dual is null"
+				<< " and t.dim = " << dim
+				<< " and t.vertexCount = " << vertexCount
+				<< " and p.degree = " << degree;
+		}//regular
+
+		if ( i == 0)
+			sqlLawrence = sql.str();
+		else
+			sqlTriang  = sql.str();
+	}//for i.
+
+	//get the time data only. (note that a time in never stored as NULL. So zero times really mean "super fast"
+	lawrenceData    = queryAsFloatArray(sqlLawrence.c_str());
+	triangulateData = queryAsFloatArray(sqlTriang.c_str());
+
+
+	double avg, min, max, sd;
+	int totalExist, totalFinished;
+	bool manuallyLimited;
+
+	getStatistics(lawrenceData, avg, min, max, sd, totalFinished, totalExist, manuallyLimited);
+	vdbs.avgLawrenceTime = avg;
+	vdbs.minLawrenceTime = min;
+	vdbs.maxLawrenceTime = max;
+	vdbs.stdDeviationLawrence = sd;
+	vdbs.totalFinishedLawrenceTestCases = totalFinished;
+	vdbs.totalTestCases = totalExist;
+	vdbs.manuallyLimitedLawrence = manuallyLimited;
+
+
+	getStatistics(triangulateData, avg, min, max, sd, totalFinished, totalExist, manuallyLimited);
+	vdbs.avgTriangulationTime = avg;
+	vdbs.minTriangulationTime = min;
+	vdbs.maxTriangulationTime = max;
+	vdbs.stdDeviationTriangulation = sd;
+	vdbs.totalFinishedTriangulationTestCases = totalFinished;
+	assert(vdbs.totalTestCases == totalExist);
+	vdbs.manuallyLimitedTriangulation = manuallyLimited;
+
+	/*
 	//get avg, min, man, and number finished
 	avgMinMaxCountLawrence    = getStatisticsAvgMinMaxCount(Lawrence, dim, vertexCount, degree, useDual);
 	avgMinMaxCountTriangulate = getStatisticsAvgMinMaxCount(Triangulate, dim, vertexCount, degree, useDual);
@@ -652,11 +794,14 @@ ValuationDBStatistics IntegrationDB::getStatisticsByDimVertexDegree(int dim, int
 	vdbs.totalFinishedTriangulationTestCases = avgMinMaxCountTriangulate[3];
 	vdbs.totalFinishedLawrenceTestCases      = avgMinMaxCountLawrence[3];
 
+	vdbs.stdDeviationLawrence = getStdDeviation(Lawrence, dim, vertexCount, degree, useDual);
+	vdbs.stdDeviationTriangulation = getStdDeviation(Triangulate, dim, vertexCount, degree, useDual);
+
 	vdbs.totalTestCases = getNumberIntegrationTest(dim, vertexCount, degree, useDual);
 
 	vdbs.manuallyLimitedLawrence = getLimit(Lawrence, dim, vertexCount, degree, useDual);
 	vdbs.manuallyLimitedTriangulation = getLimit(Triangulate, dim, vertexCount, degree, useDual);
-
+*/
 	return vdbs;
 }//getStatisticsByDimVertexDegree
 
@@ -746,6 +891,74 @@ vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, in
 
 	return ans;
 }//	getStatisticsAvgMinMaxCount
+
+//finds the standard deviation (note that sqlite does not have a build in std deviation function :(  )
+double IntegrationDB::getStdDeviation(AlgorithemUsed alg, int dim, int vertexCount, int degree, bool useDual)
+{
+	vector<vector<string> > strAns;
+	stringstream sql;
+	string strAlg;
+	double sd = 0.0;
+	double avg = 0.0;
+	vector<double> numbers;
+
+
+	strAlg = (alg == Lawrence ? "timeLawrence" : "timeTriangulate");
+
+	if (useDual == true)
+	{
+		sql << "select i." << strAlg
+			<< " from integrate as i"
+			<< " join polytope as dualP on dualP.rowid = i.polytopeID"
+			<< " join polytope as orgP on orgP.rowid = dualP.dual"
+			<< " join polynomial as p on p.rowid = i.polynomialID"
+			<< " where dualP.dual is not null " //and with orgp
+			<< " and orgP.dim = " << dim
+			<< " and orgP.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " >= 0 ";
+	}//if dual
+	else
+	{
+
+		sql << "select i." << strAlg
+			<< " from integrate as i"
+			<< " join polynomial as p on p.rowid = i.polynomialID"
+			<< " join polytope as t on t.rowid = i.polytopeID"
+			<< " where t.dual is null"
+			<< " and t.dim = " << dim
+			<< " and t.vertexCount = " << vertexCount
+			<< " and p.degree = " << degree
+			<< " and i." << strAlg << " >= 0 ";
+	}//regular
+
+	//get the data and save it
+	strAns = query(sql.str().c_str());
+	cerr << "got here "<< strAlg.c_str() << " " << strAns.size() << endl;
+	if (strAns.size() <= 1)
+		return 0.0;
+
+	//ok, find the standard deviation manually.
+	numbers.resize(strAns.size());
+
+	assert(strAns.size() > 0); //we are going to divide by this number.
+
+	for(int i = 0; i < strAlg.size(); ++i)
+	{
+		numbers[i] = atof(strAns[i][0].c_str());
+		avg += numbers[i];
+	}
+	avg /= numbers.size();
+
+	for(int i = 0; i < numbers.size(); ++i)
+		sd = sd + (numbers[i] - avg)*(numbers[i] - avg);
+	sd /= numbers.size();
+	cerr << "sd^2=" << sd << endl;
+	sd = sqrt(sd);
+
+	return sd;
+}
+
 
 vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, const string &polymakeFile, int degree, bool useDual)
 {
@@ -1210,6 +1423,9 @@ void IntegrationDB::updateIntegrationTimeAndValue(AlgorithemUsed alg, double tim
 	}
 	sql << " , flagValue = '" << -1 << "', flagType = '" << LAWRECE_INTEGRATE_VERSION << "'";
 	sql << " where rowid = " << rowid << endl;
+
+	//cout << "QUERY:: " << sql.str().c_str() << endl;
+
 	query(sql.str().c_str());
 
 }//updateIntegrationTimeAndValue

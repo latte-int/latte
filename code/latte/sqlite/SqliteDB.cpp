@@ -166,4 +166,29 @@ double SqliteDB::queryAsFloat(const char* q)
 
 
 
+/**
+ * For queries that return 1 column of numerical data.
+ */
+vector<double> SqliteDB::queryAsFloatArray(const char *q)
+{
+	vector<vector<string> > result = query(q);
+	vector<double> ans;
+
+	ans.resize(result.size());
+
+	for(int i = 0; i < result.size(); ++i)
+	{
+		if ( result[i].size() != 1)
+			throw SqliteDBexception("queryAsFloatArray::Query contains more than 1 column");
+
+		if( result[i][0].compare("NULL") == 0)
+			ans[i] = 0.0;
+		else
+			ans[i] = atof(result[i][0].c_str());
+	}//for i.
+
+	return ans;
+}//queryAsFloatArray
+
+
 

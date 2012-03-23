@@ -79,76 +79,9 @@ bool VolumeDB::canVolumeTestFinish(AlgorithemUsed alg, int dim, int vertex, bool
 	return true;
 }
 
-bool VolumeDB::getLimit(AlgorithemUsed alg, int dim, int vertexCount, bool useDual)
-{
-	stringstream sql;
-	string strAlg;
-
-	if (alg == Lawrence)
-		strAlg = "timeLawrence";
-	else
-		strAlg = "timeTriangulate";
 
 
-	if (useDual == true)
-	{
-		sql << "select count(i." << strAlg << ")"
-			<< " from volume as i"
-			<< " join polytope as dualP on dualP.rowid = i.polytopeID"
-			<< " join polytope as orgP on orgP.rowid = dualP.dual"
-			<< " where dualP.dual is not null " //and with orgp
-			<< " and orgP.dim = " << dim
-			<< " and orgP.vertexCount = " << vertexCount
-			<< " and i." << strAlg << " = -2 ";
-	}//if dual
-	else
-	{
 
-		sql << "select count(i." << strAlg << ") "
-			<< " from volume as i"
-			<< " join polytope as t on t.rowid = i.polytopeID"
-			<< " where t.dual is null"
-			<< " and t.dim = " << dim
-			<< " and t.vertexCount = " << vertexCount
-			<< " and i." << strAlg << " = -2 ";
-	}//regular
-
-	bool ans = (queryAsInteger(sql.str().c_str()) > 0);
-
-	//if (dim == 10)
-	//	cerr << "vertexCount=" << vertexCount << endl;
-	if (ans)
-	{
-		cerr << "HEY, I found a -2 in " << dim << ", " << vertexCount << ", " << strAlg.c_str() << endl;
-	//	exit(1);
-	}
-
-	return ans;
-
-
-}
-
-int VolumeDB::getNumberVolumeTest(int dim, int vertexCount, bool useDual)
-{
-	stringstream sql;
-	if (useDual == true)
-	{
-		sql << "select count(*) from volume as v"
-			<< " join polytope as dualP on v.polytopeID = dualP.rowid"
-			<< " join polytope as orgP on orgP.rowid = dualP.dual"
-			<< " where orgP.vertexCount = " << vertexCount
-			<< " and orgP.dim = " << dim;
-	}
-	else
-	{
-		sql << "select count(*) from volume as v"
-			<< " join polytope as t on v.polytopeID = t.rowid"
-			<< " where t.vertexCount = " << vertexCount
-			<< " and t.dim = " << dim
-			<< " and t.dual is null";
-	}
-	return queryAsInteger(sql.str().c_str());
-}//getNumberVolumeTest
 
 vector<vector<string> > VolumeDB::getRowsToFindVolume(int dim, int vertex, bool useDual, int limit)
 {
@@ -250,6 +183,91 @@ vector<vector<ValuationDBStatistics> > VolumeDB::getStatistics(bool useDual)
 
 ValuationDBStatistics VolumeDB::getStatisticsByDimAndPointCount(int dim, int additionalPoints, bool useDual)
 {
+	int vertexCount = dim + 1 + additionalPoints;
+
+	ValuationDBStatistics vdbs;
+	vector<double> lawrenceData, triangulateData;
+	string sqlLawrence, sqlTriang;
+
+
+
+	//save how this function was called.
+	vdbs.dim = dim;
+	vdbs.vertexCount = vertexCount;\
+	vdbs.degree = 0;
+	vdbs.useDual = useDual;
+
+	//build the sql statements.
+	for(int i = 0; i < 2; ++i)
+	{
+		stringstream sql;
+		string strAlg;
+
+		if ( i == 0)
+			strAlg = "timeLawrence";
+		else
+			strAlg  = "timeTriangulate";
+
+		if (useDual == true)
+		{
+			sql << "select v." << strAlg
+				<< " from volume as v"
+				<< " join polytope as dualP on v.polytopeID = dualP.rowid"
+				<< " join polytope as orgP on orgP.rowid = dualP.dual"
+				<< " where dualP.dual is not null"
+				<< " and orgP.dim = " << dim
+				<< " and orgP.vertexCount = " << vertexCount
+				<< " ;";
+		}//if dual
+		else
+		{
+			sql << "select v." << strAlg
+				<< " from volume as v"
+				<< " join polytope as t on v.polytopeID = t.rowid"
+				<< " where t.dual is null"
+				<< " and t.dim = " << dim
+				<< " and t.vertexCount = " << vertexCount
+				<< " ;";
+		}//regular
+
+		if ( i == 0)
+			sqlLawrence = sql.str();
+		else
+			sqlTriang  = sql.str();
+	}//for i.
+
+	//get the time data only. (note that a time in never stored as NULL. So zero times really mean "super fast"
+	lawrenceData    = queryAsFloatArray(sqlLawrence.c_str());
+	triangulateData = queryAsFloatArray(sqlTriang.c_str());
+
+
+	double avg, min, max, sd;
+	int totalExist, totalFinished;
+	bool manuallyLimited;
+
+
+
+	getStatistics(lawrenceData, avg, min, max, sd, totalFinished, totalExist, manuallyLimited);
+	vdbs.avgLawrenceTime = avg;
+	vdbs.minLawrenceTime = min;
+	vdbs.maxLawrenceTime = max;
+	vdbs.stdDeviationLawrence = sd;
+	vdbs.totalFinishedLawrenceTestCases = totalFinished;
+	vdbs.totalTestCases = totalExist;
+	vdbs.manuallyLimitedLawrence = manuallyLimited;
+
+
+	getStatistics(triangulateData, avg, min, max, sd, totalFinished, totalExist, manuallyLimited);
+	vdbs.avgTriangulationTime = avg;
+	vdbs.minTriangulationTime = min;
+	vdbs.maxTriangulationTime = max;
+	vdbs.stdDeviationTriangulation = sd;
+	vdbs.totalFinishedTriangulationTestCases = totalFinished;
+	assert(vdbs.totalTestCases == totalExist);
+	vdbs.manuallyLimitedTriangulation = manuallyLimited;
+
+	return vdbs;
+	/*
 	ValuationDBStatistics vdbs;
 	vector<double> avgMinMaxCountLawrence, avgMinMaxCountTriangulate;
 	int vertexCount = dim + 1 + additionalPoints;
@@ -282,50 +300,78 @@ ValuationDBStatistics VolumeDB::getStatisticsByDimAndPointCount(int dim, int add
 	vdbs.manuallyLimitedTriangulation = getLimit(Triangulate, dim, vertexCount, useDual);
 
 	return vdbs;
+	*/
 }//ValuationDBStatistics getStatisticsByDimAndPointCount(int dim, int additionalPoints, bool useDual);
 
-vector<double> VolumeDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, int dim, int vertexCount, bool useDual)
+void VolumeDB::getStatistics(const vector<double> &data, double &avg, double &min, double &max, double &sd, int &totalFinished, int &totalExist, bool &manuallyLimited)
 {
-	vector<double> ans;
-	vector<vector<string> > strAns;
-	stringstream sql;
-	string strAlg;
+	//set initial values.
+	avg = 0.0;
+	sd  = 0.0;
+	totalFinished = 0;
+	totalExist = 0;
+	manuallyLimited = false;
 
-	strAlg = (alg == Lawrence ? "timeLawrence" : "timeTriangulate");
 
-	if (useDual == true)
+	//set the initial min/max to a non-neg number.
+	bool foundNonNeg = false;
+	for(int i = 0; i < data.size() && !foundNonNeg ; ++i)
 	{
-		sql << "select avg(v." << strAlg << "), min(v." << strAlg << "), max(v." << strAlg << "), count(*) "
-			<< " from volume as v"
-			<< " join polytope as dualP on v.polytopeID = dualP.rowid"
-			<< " join polytope as orgP on orgP.rowid = dualP.dual"
-			<< " where dualP.dual is not null"
-			<< " and orgP.dim = " << dim
-			<< " and orgP.vertexCount = " << vertexCount
-			<< " and v." << strAlg << " >= 0 ";
-	}//if dual
-	else
+		if (data[i] >= 0)
+		{
+			min = data[i];
+			max = data[i];
+			foundNonNeg = true;
+		}
+	}
+	if ( foundNonNeg == false)
 	{
-		sql << "select avg(v." << strAlg << "), min(v." << strAlg << "), max(v." << strAlg << "), count(*) "
-			<< " from volume as v"
-			<< " join polytope as t on v.polytopeID = t.rowid"
-			<< " where t.dual is null"
-			<< " and t.dim = " << dim
-			<< " and t.vertexCount = " << vertexCount
-			<< " and v." << strAlg << " >= 0 ";
+		//so every number is -1 or -2. That is, not one integration test finished.
+		max = 0;
+		min = 0;
+		//the next for loop will not change min to -1 or -2.
+	}
 
-	}//regular
+	totalExist = (int) data.size();
 
-	//get the data and save it
-	strAns = query(sql.str().c_str());
+	//we can compute everything but the standard deviation in one pass of the array.
+	for(int i = 0; i < data.size(); ++i)
+	{
+		if (data[i] <= -2)
+			manuallyLimited = true;
+		if (data[i] < 0)
+			continue;
 
-	ans.push_back(atof(strAns[0][0].c_str())); //avg
-	ans.push_back(atof(strAns[0][1].c_str())); //min
-	ans.push_back(atof(strAns[0][2].c_str())); //max
-	ans.push_back(atof(strAns[0][3].c_str())); //count
+		//so data[i] >= 0
 
-	return ans;
-}//getStatisticsAvgMinMaxCount
+		++totalFinished;
+
+		if (min > data[i])
+			min = data[i];
+		if ( max < data[i])
+			max = data[i];
+
+		avg += data[i];
+	}//for i
+
+	if (totalFinished != 0)
+	{
+		avg /= totalFinished; //otherwise, avg is still zero.
+
+		//now find the standard deviation.
+
+		for(int i = 0; i < data.size(); ++i)
+		{
+			if (data[i] < 0)
+				continue;
+			sd += pow(data[i] - avg, 2);
+		}//for i
+
+		sd /= totalFinished;
+		sd = sqrt(sd);
+	}//if totalFinished != 0
+
+}//getStatistics
 
 void VolumeDB::updateVolumeTimeAndValue(AlgorithemUsed alg, double time, RationalNTL theComputedVolume, string previousValueStr, string rowid)
 {

@@ -26,6 +26,9 @@ struct ValuationDBStatistics
 	double maxTriangulationTime;
 	double maxLawrenceTime;
 
+	double stdDeviationTriangulation;
+	double stdDeviationLawrence;
+
 	int totalFinishedTriangulationTestCases;
 	int totalFinishedLawrenceTestCases;
 
