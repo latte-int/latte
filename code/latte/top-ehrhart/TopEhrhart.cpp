@@ -65,6 +65,9 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 	maple << "read(\"" << relocated_pathname(MAPLE_SCRIPT_DIR) << "/"
 			<< "Conebyconeapproximations_08_11_2010.mpl" << "\"):\n\n";
 
+	//maple << "read(\"Conebyconeapproximations_08_11_2010.mpl\"):\n\n";
+
+
 	maple << "\n seed:=randomize():" << endl;
 
 	//print the polytope's vertex-rays in maple format out.
@@ -175,7 +178,10 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 		functionCall << ", -1";
 
 
-	functionCall << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):";
+	if (saveTopEhrhartPolynomial == "-1")
+		functionCall << ", " << -1 << "):";
+	else
+		functionCall << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):";
 	maple << functionCall.str().c_str() << endl;
 
 	maple << "t2:=time()-t1:" << endl;
