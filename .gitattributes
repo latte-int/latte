@@ -248,6 +248,12 @@ code/latte/top-ehrhart/TopEhrhart.h -text
 code/latte/top-ehrhart/TopEhrhart_lib.mpl -text
 code/latte/top-ehrhart/testingTopEhrhart.mpl -text
 code/latte/top-ehrhart/testingTopEhrhart_lib.mpl -text
+code/latte/top-knapsack/Driver.cpp -text
+code/latte/top-knapsack/PeriodicFunction.cpp -text
+code/latte/top-knapsack/PeriodicFunction.h -text
+code/latte/top-knapsack/TopKnapsack.cpp -text
+code/latte/top-knapsack/TopKnapsack.h -text
+code/latte/top-knapsack/class.cpp -text
 code/latte/valuation/Driver.cpp -text
 code/latte/valuation/Perturbation.cpp -text
 code/latte/valuation/Perturbation.h -text
