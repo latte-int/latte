@@ -1,5 +1,5 @@
-# setenv.m4 serial 22
-dnl Copyright (C) 2001-2004, 2006-2011 Free Software Foundation, Inc.
+# setenv.m4 serial 26
+dnl Copyright (C) 2001-2004, 2006-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -7,6 +7,7 @@ dnl with or without modifications, as long as this notice is preserved.
 AC_DEFUN([gl_FUNC_SETENV],
 [
   AC_REQUIRE([gl_FUNC_SETENV_SEPARATE])
+  AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
   if test $ac_cv_func_setenv = no; then
     HAVE_SETENV=0
   else
@@ -33,13 +34,19 @@ AC_DEFUN([gl_FUNC_SETENV],
        return result;
       ]])],
       [gl_cv_func_setenv_works=yes], [gl_cv_func_setenv_works=no],
-      [gl_cv_func_setenv_works="guessing no"])])
-    if test "$gl_cv_func_setenv_works" != yes; then
-      REPLACE_SETENV=1
-    fi
-  fi
-  if test $HAVE_SETENV$REPLACE_SETENV != 10; then
-    AC_LIBOBJ([setenv])
+      [case "$host_os" in
+                 # Guess yes on glibc systems.
+         *-gnu*) gl_cv_func_setenv_works="guessing yes" ;;
+                 # If we don't know, assume the worst.
+         *)      gl_cv_func_setenv_works="guessing no" ;;
+       esac
+      ])])
+    case "$gl_cv_func_setenv_works" in
+      *yes) ;;
+      *)
+        REPLACE_SETENV=1
+        ;;
+    esac
   fi
 ])
 
@@ -59,15 +66,16 @@ AC_DEFUN([gl_FUNC_SETENV_SEPARATE],
 AC_DEFUN([gl_FUNC_UNSETENV],
 [
   AC_REQUIRE([gl_STDLIB_H_DEFAULTS])
+  AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
   AC_CHECK_DECLS_ONCE([unsetenv])
   if test $ac_cv_have_decl_unsetenv = no; then
     HAVE_DECL_UNSETENV=0
   fi
   AC_CHECK_FUNCS([unsetenv])
   if test $ac_cv_func_unsetenv = no; then
-    AC_LIBOBJ([unsetenv])
-    gl_PREREQ_UNSETENV
+    HAVE_UNSETENV=0
   else
+    HAVE_UNSETENV=1
     dnl Some BSDs return void, failing to do error checking.
     AC_CACHE_CHECK([for unsetenv() return type], [gt_cv_func_unsetenv_ret],
       [AC_COMPILE_IFELSE(
@@ -80,11 +88,7 @@ extern
 #ifdef __cplusplus
 "C"
 #endif
-#if defined(__STDC__) || defined(__cplusplus)
 int unsetenv (const char *name);
-#else
-int unsetenv();
-#endif
             ]],
             [[]])],
          [gt_cv_func_unsetenv_ret='int'],
@@ -93,7 +97,6 @@ int unsetenv();
       AC_DEFINE([VOID_UNSETENV], [1], [Define to 1 if unsetenv returns void
        instead of int.])
       REPLACE_UNSETENV=1
-      AC_LIBOBJ([unsetenv])
     fi
 
     dnl Solaris 10 unsetenv does not remove all copies of a name.
@@ -123,11 +126,19 @@ int unsetenv();
        if (getenv ("a")) return 6;
       ]])],
       [gl_cv_func_unsetenv_works=yes], [gl_cv_func_unsetenv_works=no],
-      [gl_cv_func_unsetenv_works="guessing no"])])
-    if test "$gl_cv_func_unsetenv_works" != yes; then
-      REPLACE_UNSETENV=1
-      AC_LIBOBJ([unsetenv])
-    fi
+      [case "$host_os" in
+                 # Guess yes on glibc systems.
+         *-gnu*) gl_cv_func_unsetenv_works="guessing yes" ;;
+                 # If we don't know, assume the worst.
+         *)      gl_cv_func_unsetenv_works="guessing no" ;;
+       esac
+      ])])
+    case "$gl_cv_func_unsetenv_works" in
+      *yes) ;;
+      *)
+        REPLACE_UNSETENV=1
+        ;;
+    esac
   fi
 ])
 

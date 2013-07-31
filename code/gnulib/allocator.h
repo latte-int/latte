@@ -1,6 +1,6 @@
 /* Memory allocators such as malloc+free.
 
-   Copyright (C) 2011 Free Software Foundation, Inc.
+   Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,10 +45,11 @@ struct allocator
   /* Call FREE to free memory, like 'free'.  */
   void (*free) (void *);
 
-  /* If nonnull, call DIE if MALLOC or REALLOC fails.  DIE should not
-     return.  DIE can be used by code that detects memory overflow
-     while calculating sizes to be passed to MALLOC or REALLOC.  */
-  void (*die) (void);
+  /* If nonnull, call DIE (SIZE) if MALLOC (SIZE) or REALLOC (...,
+     SIZE) fails.  DIE should not return.  SIZE should equal SIZE_MAX
+     if size_t overflow was detected while calculating sizes to be
+     passed to MALLOC or REALLOC.  */
+  void (*die) (size_t);
 };
 
 /* An allocator using the stdlib functions and a null DIE function.  */

@@ -1,6 +1,6 @@
 /* A more-standard <time.h>.
 
-   Copyright (C) 2007-2011 Free Software Foundation, Inc.
+   Copyright (C) 2007-2013 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,8 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software Foundation,
-   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
+   along with this program; if not, see <http://www.gnu.org/licenses/>.  */
 
 #if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
@@ -28,13 +27,13 @@
    without adding our own declarations.  */
 #if (defined __need_time_t || defined __need_clock_t \
      || defined __need_timespec \
-     || defined _GL_TIME_H)
+     || defined _@GUARD_PREFIX@_TIME_H)
 
 # @INCLUDE_NEXT@ @NEXT_TIME_H@
 
 #else
 
-# define _GL_TIME_H
+# define _@GUARD_PREFIX@_TIME_H
 
 # @INCLUDE_NEXT@ @NEXT_TIME_H@
 

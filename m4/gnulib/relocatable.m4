@@ -1,5 +1,5 @@
-# relocatable.m4 serial 16
-dnl Copyright (C) 2003, 2005-2007, 2009-2011 Free Software Foundation, Inc.
+# relocatable.m4 serial 18
+dnl Copyright (C) 2003, 2005-2007, 2009-2013 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -14,9 +14,6 @@ AC_DEFUN([gl_RELOCATABLE],
 [
   AC_REQUIRE([gl_RELOCATABLE_BODY])
   gl_RELOCATABLE_LIBRARY
-  if test $RELOCATABLE = yes; then
-    AC_LIBOBJ([progreloc])
-  fi
   : ${RELOCATABLE_CONFIG_H_DIR='$(top_builddir)'}
   RELOCATABLE_SRC_DIR="\$(top_srcdir)/$gl_source_base"
   RELOCATABLE_BUILD_DIR="\$(top_builddir)/$gl_source_base"
@@ -44,7 +41,7 @@ AC_DEFUN([gl_RELOCATABLE_BODY],
     AC_CHECK_FUNCS([_NSGetExecutablePath])
     case "$host_os" in
       mingw*) is_noop=yes ;;
-      linux*) use_elf_origin_trick=yes ;;
+      linux* | kfreebsd*) use_elf_origin_trick=yes ;;
     esac
     if test $is_noop = yes; then
       RELOCATABLE_LDFLAGS=:

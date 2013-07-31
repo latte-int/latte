@@ -1,6 +1,6 @@
 /* Read symbolic links into a buffer without size limitation, relative to fd.
 
-   Copyright (C) 2001, 2003-2004, 2007, 2009-2011 Free Software Foundation,
+   Copyright (C) 2001, 2003-2004, 2007, 2009-2013 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -24,7 +24,6 @@
 
 #include <errno.h>
 #include <limits.h>
-#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -38,20 +37,6 @@
 #endif
 
 #include "allocator.h"
-
-/* Get the symbolic link value of FILENAME and put it into BUFFER, with
-   size BUFFER_SIZE.  This function acts like readlink  but has
-   readlinkat's signature.  */
-ssize_t
-careadlinkatcwd (int fd, char const *filename, char *buffer,
-                 size_t buffer_size)
-{
-  /* FD must be AT_FDCWD here, otherwise the caller is using this
-     function in contexts for which it was not meant for.  */
-  if (fd != AT_FDCWD)
-    abort ();
-  return readlink (filename, buffer, buffer_size);
-}
 
 /* Assuming the current directory is FD, get the symbolic link value
    of FILENAME as a null-terminated string and put it into a buffer.
@@ -133,6 +118,7 @@ careadlinkat (int fd, char const *filename,
           if (buf == stack_buf)
             {
               char *b = (char *) alloc->allocate (link_size);
+              buf_size = link_size;
               if (! b)
                 break;
               memcpy (b, buf, link_size);
@@ -156,6 +142,11 @@ careadlinkat (int fd, char const *filename,
         buf_size *= 2;
       else if (buf_size < buf_size_max)
         buf_size = buf_size_max;
+      else if (buf_size_max < SIZE_MAX)
+        {
+          errno = ENAMETOOLONG;
+          return NULL;
+        }
       else
         break;
       buf = (char *) alloc->allocate (buf_size);
@@ -163,7 +154,7 @@ careadlinkat (int fd, char const *filename,
   while (buf);
 
   if (alloc->die)
-    alloc->die ();
+    alloc->die (buf_size);
   errno = ENOMEM;
   return NULL;
 }

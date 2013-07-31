@@ -1,5 +1,5 @@
 /* Relocating wrapper program.
-   Copyright (C) 2003, 2005-2007, 2009-2011 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005-2007, 2009-2013 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -22,14 +22,13 @@
         -> areadlink
            -> careadlinkat
              -> allocator
-             -> readlink
+           -> readlink
         -> canonicalize-lgpl
            -> malloca
            -> readlink
     -> relocatable
     -> setenv
        -> malloca
-    -> strerror
     -> c-ctype
 
    Macros that need to be set while compiling this file:

@@ -1,6 +1,6 @@
 /* intprops.h -- properties of integer types
 
-   Copyright (C) 2001-2005, 2009-2011 Free Software Foundation, Inc.
+   Copyright (C) 2001-2005, 2009-2013 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -22,14 +22,13 @@
 
 #include <limits.h>
 
-/* Return a integer value, converted to the same type as the integer
-   expression E after integer type promotion.  V is the unconverted value.
-   E should not have side effects.  */
-#define _GL_INT_CONVERT(e, v) ((e) - (e) + (v))
+/* Return an integer value, converted to the same type as the integer
+   expression E after integer type promotion.  V is the unconverted value.  */
+#define _GL_INT_CONVERT(e, v) (0 * (e) + (v))
 
 /* Act like _GL_INT_CONVERT (E, -V) but work around a bug in IRIX 6.5 cc; see
    <http://lists.gnu.org/archive/html/bug-gnulib/2011-05/msg00406.html>.  */
-#define _GL_INT_NEGATE_CONVERT(e, v) ((e) - (e) - (v))
+#define _GL_INT_NEGATE_CONVERT(e, v) (0 * (e) - (v))
 
 /* The extra casts in the following macros work around compiler bugs,
    e.g., in Cray C 5.0.3.0.  */
@@ -53,7 +52,7 @@
 #define TYPE_SIGNED(t) (! ((t) 0 < (t) -1))
 
 /* Return 1 if the integer expression E, after integer promotion, has
-   a signed type.  E should not have side effects.  */
+   a signed type.  */
 #define _GL_INT_SIGNED(e) (_GL_INT_NEGATE_CONVERT (e, 1) < 0)
 
 
@@ -90,7 +89,7 @@
 
 /* Return 1 if the __typeof__ keyword works.  This could be done by
    'configure', but for now it's easier to do it by hand.  */
-#if 2 <= __GNUC__ || 0x5110 <= __SUNPRO_C
+#if 2 <= __GNUC__ || defined __IBM__TYPEOF__ || 0x5110 <= __SUNPRO_C
 # define _GL_HAVE___TYPEOF__ 1
 #else
 # define _GL_HAVE___TYPEOF__ 0
@@ -311,13 +310,10 @@
 /* Return 1 if the expression A <op> B would overflow,
    where OP_RESULT_OVERFLOW (A, B, MIN, MAX) does the actual test,
    assuming MIN and MAX are the minimum and maximum for the result type.
-
-   This macro assumes that A | B is a valid integer if both A and B are,
-   which is true of all known practical hosts.  If this is a problem
-   for you, please let us know how to fix it for your host.  */
+   Arguments should be free of side effects.  */
 #define _GL_BINARY_OP_OVERFLOW(a, b, op_result_overflow)        \
   op_result_overflow (a, b,                                     \
-                      _GL_INT_MINIMUM ((a) | (b)),              \
-                      _GL_INT_MAXIMUM ((a) | (b)))
+                      _GL_INT_MINIMUM (0 * (b) + (a)),          \
+                      _GL_INT_MAXIMUM (0 * (b) + (a)))
 
 #endif /* _GL_INTPROPS_H */
