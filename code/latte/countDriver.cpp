@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
 {
 
 	CountAnswerContainer ans;
-	cout << "going to call main" << endl;
+	//cout << "going to call main" << endl;
 	try {
 		ans = mainCountDriver(argc,  argv);
 	} catch ( LattException & e)
