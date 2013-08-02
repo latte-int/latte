@@ -216,8 +216,8 @@ void GraphMaker::makeKneserGraph(const int setSize, const int subSetSize)
 //		cout << endl;
 //	}//print points out.
 
-	for(int i = 0; i < points.size(); ++i)
-		for(int k = i + 1; k < points.size(); ++k)
+	for(size_t i = 0; i < points.size(); ++i)
+		for(size_t k = i + 1; k < points.size(); ++k)
 		{
 			match = false;
 			for(int curElement = 0; curElement < setSize && ! match; ++curElement)

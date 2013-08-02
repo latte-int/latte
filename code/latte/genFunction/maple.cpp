@@ -152,4 +152,5 @@ int GeneratingFunctionWritingConeConsumer::ConsumeCone(listCone *cone)
     first_term = false;
   }
   freeCone(cone);
+  return 1; // means "success, please continue"
 }

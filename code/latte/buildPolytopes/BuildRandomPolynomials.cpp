@@ -43,7 +43,7 @@ string makeRandomMonomial(const int dim, int totalDegree)
 
 	//now make a string monomial.
 	poly << "[1,[";
-	for(int j = 0; j < powers.size(); ++j)
+	for(size_t j = 0; j < powers.size(); ++j)
 	{
 		poly << powers[j];
 		if (j != powers.size()-1)

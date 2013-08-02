@@ -1105,6 +1105,7 @@ int CDDstylereadLatteProblem(const char *fileName, listVector **equations,
     indexEquations=createVector(numOfEquations);
     if(f == 0)
     for (i=0; i<numOfEquations; i++) in >> indexEquations[i]; */
+    numOfEquations = 0;
     cerr << "\nEquation indices: ";
     printVectorToFile(cerr,indexEquations,numOfEquations);
 

@@ -13,7 +13,7 @@ NTL_CLIENT
 //this function deletes space from a given string
 void delSpace(string &line)
 {
-	for (int i = 0; i < line.length(); i++)
+	for (size_t i = 0; i < line.length(); i++)
 	{
 		while ((i < line.length()) && (line.at(i) == 32))
 		{

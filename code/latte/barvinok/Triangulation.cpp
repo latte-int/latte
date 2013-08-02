@@ -182,7 +182,7 @@ void readCDDicdFileRudy(int & face2, vec_ZZ & numOfPoints, mat_ZZ & Result) {
 // NEW TRIANGULATION FUNCTION TO REUSE PREVIOUSLY CALCULATED RESULTS
 
 /* ----------------------------------------------------------------- */
-int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, char* a, list< int >& List, char *File_Name, int Cone_Index, unsigned int Flags) 
+int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, const char* a, list< int >& List, const char *File_Name, int Cone_Index, unsigned int Flags) 
 {
 //	cerr << "Triangulation_Load_Save: Cone_Index: " << Cone_Index << "  Flags: " << Flags << endl;
   vec_ZZ neg; 

@@ -1053,6 +1053,8 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 		} //End of for loop going from 0 to "order"			
 	
 		} //End of if statement for OUTPUT_CONE == 0
+		else
+			T_Node_Negative_One = NULL;
 		
 		
 		if ( OUTPUT_CONE == 1)

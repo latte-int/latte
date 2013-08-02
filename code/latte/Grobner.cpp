@@ -641,7 +641,7 @@ ZZ SolveGrobner(const char * filename, char * nonneg, char * dualApproach,
  strcat(outFile, ".gro");
  ofstream out(outFile);
  int CheckFeas = 0;
- char* File = "Gro.latte";
+ const char* File = "Gro.latte";
  unsigned int flags = 0;
  int nn = 0, n = numOfVars;
  if(IsZero(W) == 0) nn = numOfVars;

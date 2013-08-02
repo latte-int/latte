@@ -69,7 +69,7 @@ rationalVector::rationalVector(const vector<RationalNTL> & rational)
 	enumerator.SetLength(rational.size());
 	denominator.SetLength(rational.size());
 
-	for(int i = 0; i < rational.size(); ++i)
+	for(size_t i = 0; i < rational.size(); ++i)
 	{
 		enumerator[i] = rational[i].getNumerator();
 		denominator[i] = rational[i].getDenominator();
@@ -170,7 +170,7 @@ RationalNTL::RationalNTL(const string &num, const string &denom)
 
 RationalNTL::RationalNTL(const string &number)
 {
-	for (int i = 0; i < number.length(); ++i)
+	for (size_t i = 0; i < number.length(); ++i)
 		if (number[i] == '/')
 		{
 			numerator = to_ZZ(number.substr(0, i).c_str());
@@ -559,6 +559,7 @@ vec_RationalNTL::vec_RationalNTL(const vec_RationalNTL& a)
 vec_RationalNTL& vec_RationalNTL::operator=(const vec_RationalNTL& a)
 {
 	vec = a.vec;
+	return *this;
 }
 
 vec_RationalNTL::~vec_RationalNTL()

@@ -28,7 +28,7 @@
 
 using namespace std;
 
-int Triangulation_Load_Save(const mat_ZZ &, const int &, const int &, char*, list< int >&, char *File_Name, int Cone_Index, unsigned int Flags);
+int Triangulation_Load_Save(const mat_ZZ &, const int &, const int &, const char*, list< int >&, const char *File_Name, int Cone_Index, unsigned int Flags);
 
 
 #endif

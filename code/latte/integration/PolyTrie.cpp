@@ -38,7 +38,7 @@ void parseMonomials(MonomialConsumer<RationalNTL>* consumer, const string &line)
 	int *exponents = new int[varCount];
 	RationalNTL coefficient;
 
-	for (int i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
+	for (size_t i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
 	{
 		if (line[i] == '[')
 		{
@@ -190,7 +190,7 @@ void parseLinForms(FormSumConsumer<RationalNTL>* consumer, const string& line)
 	int degree;
 	RationalNTL coefficient;
 
-	for (int i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
+	for (size_t i = 1; i < line.length() - 1; i++) //ignore outermost square brackets
 	{
 		if (line[i] == '[')
 		{

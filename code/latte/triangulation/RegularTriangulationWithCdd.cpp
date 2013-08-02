@@ -50,7 +50,7 @@ triangulate_cone_with_cdd(listCone *cone,
     exit(2);
   }
   int Face = 1, Faces = 10000;
-  char* s1 = "latte_dec";
+  const char* s1 = "latte_dec";
   list< int > List;
   if(m != n){
     Face = Triangulation_Load_Save(Mat, m, n, s1, List, Parameters->File_Name, Parameters->Cone_Index, Parameters->Flags);

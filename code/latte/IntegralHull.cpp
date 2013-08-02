@@ -849,7 +849,7 @@ ZZ Calculate_Polytope_Width (listCone *cones,listVector *matrix,int numOfVars)
 
 listVector* IntegralHull(listCone* cones,listVector* matrix, int numOfVars)
 {
-	listVector* vertices, *hyperplanes, *newVertices;
+	listVector* vertices = NULL, *hyperplanes, *newVertices;
 	
 	if (IntegralHull_Flag == 1)
 	{

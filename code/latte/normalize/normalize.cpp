@@ -28,6 +28,7 @@
 #include <set>
 #include <list>
 #include <functional>
+#include <unistd.h>
 
 #include "print.h"
 #include "triangulation/triangulate.h"
@@ -315,7 +316,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
 	_4ti2_zsolve_::LinearSystem<int> *ls
 	  = facets_to_4ti2_zsolve_LinearSystem(t->facets, t->equalities, params.Number_of_Variables);
 	cout << *ls;
-	fprintf(stdout, "%d %d\n\n", homs.vectors() + free.vectors(), homs.variables());
+	fprintf(stdout, "%zu %zu\n\n", homs.vectors() + free.vectors(), homs.variables());
 	cout << homs;
 	cout << free;
 	abort();
@@ -323,7 +324,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     
       //fprintVectorArray(output, ctx->Homs, false);
       //fprintVectorArray(output, ctx->Frees, false);
-      int i;
+      size_t i;
       bool any_new = false;
       for (i = 0; i<homs.vectors(); i++) {
 	if (insert_hilbert_basis_element(homs[i])) any_new = true;

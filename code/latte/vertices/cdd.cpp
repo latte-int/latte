@@ -591,9 +591,6 @@ listCone* readCddExtFile(int &numOfVars)
 			y = 0;
 			ReadCDD(in, x, y);
 
-			leadingX, leadingY;
-
-
 			if (j > 0)
 			{
 				//the input in in the form (leadingX/leadingY, x/y, ...), we need (1, x/y * leadingY/leadingX, ...)

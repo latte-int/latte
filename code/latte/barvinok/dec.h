@@ -42,7 +42,7 @@ public:
 // Obsolete:
 listCone*
 decomposeCones(listCone *cones, int numOfVars, unsigned int Flags,
-	       char *File_Name, int max_determinant,
+	       const char *File_Name, int max_determinant,
 	       bool dualize,
 	       BarvinokParameters::DecompositionType decomposition,
 	       bool debug_triangulation = false);

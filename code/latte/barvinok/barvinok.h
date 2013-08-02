@@ -93,7 +93,7 @@ public:
   int max_determinant;
   // A file name that is used for constructing file names for
   // temporary and semi-temporary files.
-  char *File_Name;
+  const char *File_Name;
   // Ambient dimension.
   int Number_of_Variables;
   // Parameters that control the computation.

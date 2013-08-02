@@ -9,6 +9,7 @@
 #include <iostream>
 #include <cassert>
 #include <ctime>
+#include <unistd.h>
 
 using namespace std;
 
@@ -61,7 +62,7 @@ void BuildPolytope::centerPolytope()
 	//but here, it does not like it when the output and input files are the same.
 	//Hence the ".temp" file that is made and renamed.
 	system((string("center ") + getPolymakeFile() + ".temp " + getPolymakeFile()).c_str());
-	system((string("mv " + getPolymakeFile()+".temp " + getPolymakeFile())).c_str());
+	rename((string(getPolymakeFile()+".temp ")).c_str(), getPolymakeFile().c_str());
 	points.clear();
 	facets.clear();
 	dualFacets.clear();
@@ -76,12 +77,12 @@ void BuildPolytope::clearPoints()
 /**
  * Deletes the generated file if it has been created.
  */
-void BuildPolytope::deletePolymakeFile() { if (createdPolymakeFile) system((string("rm -f ") + getPolymakeFile()).c_str());}
-void BuildPolytope::deletePolymakeDualFile() { if ( createdPolymakeDualFile) system((string("rm -f ") + getPolymakeDualFile()).c_str());}
-void BuildPolytope::deleteLatteVRepFile(){ if (createdLatteVRepFile) system((string("rm -f ") + getLatteVRepFile()).c_str());}
-void BuildPolytope::deleteLatteVRepDualFile(){ if (createdLatteVRepDualFile) system((string("rm -f ") + getLatteVRepDualFile()).c_str());}
-void BuildPolytope::deleteLatteHRepFile(){ if (createdLatteHRepFile) system((string("rm -f ") + getLatteHRepFile()).c_str());}
-void BuildPolytope::deleteLatteHRepDualFile(){ if (createdLatteHRepDualFile) system((string("rm -f ") + getLatteHRepDualFile()).c_str());}
+void BuildPolytope::deletePolymakeFile() { if (createdPolymakeFile) unlink(getPolymakeFile().c_str());}
+void BuildPolytope::deletePolymakeDualFile() { if ( createdPolymakeDualFile) unlink(getPolymakeDualFile().c_str());}
+void BuildPolytope::deleteLatteVRepFile(){ if (createdLatteVRepFile) unlink(getLatteVRepFile().c_str());}
+void BuildPolytope::deleteLatteVRepDualFile(){ if (createdLatteVRepDualFile) unlink(getLatteVRepDualFile().c_str());}
+void BuildPolytope::deleteLatteHRepFile(){ if (createdLatteHRepFile) unlink(getLatteHRepFile().c_str());}
+void BuildPolytope::deleteLatteHRepDualFile(){ if (createdLatteHRepDualFile) unlink(getLatteHRepDualFile().c_str());}
 /**
  * Builds the polymake file containing the points information.
  * filename: fileBaseName.polymake.
@@ -128,7 +129,7 @@ void BuildPolytope::buildPolymakeDualFile()
 	file << "VERTICES" << endl;
 	for(int i = 0; i < (int) dualVertices.size(); ++i)
 	{
-		for(int k = 0; k < dualVertices[i].size(); ++k)
+		for(size_t k = 0; k < dualVertices[i].size(); ++k)
 			file << dualVertices[i][k] << " ";
 		file << endl;
 	}//for i.
@@ -504,11 +505,11 @@ int BuildPolytope::getVertexDualCount()
  */
 void BuildPolytope::homogenizeDualVertices()
 {
-	for(int i = 0; (int) i < dualVertices.size(); ++i)
+	for(size_t i = 0; i < dualVertices.size(); ++i)
 	{
 		assert(dualVertices[i][0] > 0);
 
-		for(int j = 1; j < (int) dualVertices[i].size(); ++j)
+		for(size_t j = 1; j < dualVertices[i].size(); ++j)
 			dualVertices[i][j] /= dualVertices[i][0];
 		dualVertices[i][0] = 1;
 	}//for i;
@@ -726,9 +727,9 @@ void BuildPolytope::makeIntegerList(vector<vector<mpq_class> > &list)
 	assert(currentLCM > 0);
 	
 	//loop over everything again and times by the lcm.
-	for (int i = 0; i < (int) list.size(); ++i)
+	for (size_t i = 0; i < list.size(); ++i)
 	{
-		for (int k = 0; k < list[i].size(); ++k)
+		for (size_t k = 0; k < list[i].size(); ++k)
 		{
 			list[i][k] = list[i][k]* mpz_class(currentLCM);
 		}//for k
