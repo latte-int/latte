@@ -26,7 +26,7 @@ AM_CPPFLAGS += -DINSTALLDIR=\"$(bindir)\"
 if RELOCATABLE_VIA_LD
 AM_LDFLAGS += `$(RELOCATABLE_LDFLAGS) $(bindir)`
 endif
-LDADD += ../gnulib/libgnu.a
+LDADD += ../gnulib/libgnu.la
 
 lib_LTLIBRARIES = liblatte.la
 liblatte_la_SOURCES =							\
@@ -290,7 +290,7 @@ test_volume_for_SL_SOURCES = valuation/test/testVolumeForSLDriver.cpp
 
 
 
-#if HAVE_DATABASE
+if HAVE_DATABASE
 
 #This is used to make many polytopes for the new research paper.
 bin_PROGRAMS += build-database-polytopes
@@ -335,7 +335,7 @@ print_database_time_table_SOURCES += sqlite/VolumeDB.cpp
 print_database_time_table_SOURCES += sqlite/SqliteDB.cpp
 print_database_time_table_LDFLAGS = -lsqlite3
 
-#endif #HAVE_DATABASE
+endif #HAVE_DATABASE
 
 
 ################ INTEGRATION ####################
@@ -359,7 +359,7 @@ noinst_HEADERS +=				\
 	integration/burstTrie.hpp		\
 	integration/blockReps.h			\
 	integration/residue.h			\
-	top-ehrhart/TopEhrhart.cpp
+	top-ehrhart/TopEhrhart.h
 
 dist_pkgdata_DATA += top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
 

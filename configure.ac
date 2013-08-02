@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(latte-int, 1.6)
+AC_INIT(latte-int, 1.6-prerelease-2013-08-02)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
@@ -12,6 +12,7 @@ AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
 AC_CONFIG_FILES([code/latte/integration/testMultiply.sh], [chmod +x code/latte/integration/testMultiply.sh])
 AC_CONFIG_FILES([code/latte/integration/testIntegration.sh], [chmod +x code/latte/integration/testIntegration.sh])
 AC_CONFIG_FILES([code/gnulib/Makefile])
+AC_USE_SYSTEM_EXTENSIONS
 LT_INIT
 AC_PROG_CC
 AC_PROG_CXX

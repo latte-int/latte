@@ -18,7 +18,7 @@ AM_CPPFLAGS += -DINSTALLDIR=\"$(bindir)\"
 if RELOCATABLE_VIA_LD
 AM_LDFLAGS += `$(RELOCATABLE_LDFLAGS) $(bindir)`
 endif
-LDADD += ../../gnulib/libgnu.a
+LDADD += ../../gnulib/libgnu.la
 
 if HAVE_CPLEX
 libnormalize_la_SOURCES += ReductionTestWithCPLEX.cpp 
