@@ -273,6 +273,7 @@ code/test-suite/results
 code/test-suite/set-max-cpu-time
 code/test-suite/test.pl
 code/test-suite/totalTime
+/compile
 /config.cache
 /config.guess
 /config.h.in
@@ -295,6 +296,7 @@ doc/manual.synctex.gz
 /install-reloc
 /install-sh
 /link-warning.h
+/ltmain.sh
 m4/gnulib/.deps
 m4/gnulib/.dirstamp
 m4/libtool.m4
@@ -308,3 +310,4 @@ m4/lt~obsolete.m4
 /numOfUnimodularCones
 /reloc-ldflags
 /stamp-h1
+/test-driver
