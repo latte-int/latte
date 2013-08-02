@@ -53,14 +53,14 @@ software is released under the GNU license agreement}
 }%close title brace
 
 \author{
-Maria Baldoni \and
+Velleda Baldoni \and
 Nicole Berline \and 
 Jes\'us A. De Loera \and
 Brandon Dutra \and
 Matthias K\"oppe \and 
 Stanislav Moreinis \and
 Gregory Pinto \and
-Michele Vergne \and
+Mich\`ele Vergne \and
 Jianqiu Wu \and
 }
  
@@ -87,17 +87,19 @@ The name ``{\tt LattE}'' is an abbreviation for ``{\bf Latt}ice point
 convex polyhedra defined by linear equations and inequalities with 
 integer coefficients. The polyhedra can be of any (reasonably small) 
 dimension. In 2007, {\tt LattE macchiato} was released and contained many 
-algorithmic improvements, in particular primal variants of the algorithms.. The newest edition, \latteInt, developed
+algorithmic improvements, in particular primal variants of the algorithms. The newest edition, \latteInt, developed
 in 2010 can compute integrals of polynomials and volumes of rational polytopes. 
-\latteInt was extended in 2012 with a \maple interface for computing weighted Ehrhart polynomials. 
 All these algorithms run in polynomial
-time for fixed dimension. To
+time for fixed dimension. 
+\latteInt was extended in 2012/2013 with a hybrid C++ and \maple
+implementation for computing the top coefficients of weighted Ehrhart polynomials. 
+To
 learn more about the exact details of our implementation for lattice point enumeration, the interested reader can consult 
 \cite{koeppe:irrational-barvinok, latte1} and the references listed therein. 
 For learning the algorithmic details of integration, see \cite{howToIntegratePolynomialSimplex, latte-integrale-paper}. Here we
 give a rather short description of the mathematical objects used by
 {\tt LattE}. Note that all our computations are done over the integers or the rationals {\emph exactly}.
-\latte cannot compute with floating-point numbers. 
+\latte does not accept floating-point numbers as input. 
 
 \subsubsection{Counting lattice points: Barvinok's Rational Functions}
 
@@ -554,7 +556,7 @@ For unbounded polyhedra, one needs to combine
 	\end{verbatim} 
 \end{itemize}
 
-The following options relate to the Barvinok algorithm and where introduced by Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.
+The following options relate to the Barvinok algorithm and were introduced by Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.
 \begin{itemize}
 \item Triangulate and signed-decompose in the dual space (traditional method, default)
 	\begin{verbatim}
@@ -1326,15 +1328,17 @@ provided.
 
 \subsection{System Requirements}
 
-\subsubsection{Platform} 
-The binaries for \latte v1.1 as well as for {\tt cdd} (by
-K. Fukuda \cite{fukuda}) are for platforms that run Unix, that is, Mac and Linux.
+\latte runs on Unix-like systems, including Mac OS and Linux.
 
-\subsubsection{Memory Requirements} 
-The memory requirements are essentially problem dependent; however,
-{\tt LattE count} runs in a ``memory saving mode'' whenever appropriate.
-In this mode {\tt count} rarely uses more than around 20 MB beyond the
-amount of memory needed to calculate triangulations. 
+%% \subsubsection{Platform} 
+%% The binaries for \latte v1.1 as well as for {\tt cdd} (by
+%% K. Fukuda \cite{fukuda}) are for platforms that run Unix, that is, Mac and Linux.
+
+%% \subsubsection{Memory Requirements} 
+%% The memory requirements are essentially problem dependent; however,
+%% {\tt LattE count} runs in a ``memory saving mode'' whenever appropriate.
+%% In this mode {\tt count} rarely uses more than around 20 MB beyond the
+%% amount of memory needed to calculate triangulations. 
 
 \subsection{Additional \maple Connection}
 The call
@@ -1351,50 +1355,50 @@ We have tested this connection with \maple 5.1, 8.0, and 14.0 and experienced
 no problem. Please let us know about any problem you experience with
 our connection to \maple.
 
-\subsection{File Descriptions} 
-\label{section:file-descriptions}
-The {\tt LattE} Linux release consists a single archive file,
-\textbf{latte\_v1.*.tar.gz}. The archive contains the following files:
+%% \subsection{File Descriptions} 
+%% \label{section:file-descriptions}
+%% The {\tt LattE} Linux release consists a single archive file,
+%% \textbf{latte\_v1.*.tar.gz}. The archive contains the following files:
 
-\begin{tabular}{|l|l|}
-\hline
-Name & Description\\
-\hline 
-%\hline
-& \\
-count & Main program executables\\
-ehrhart & \\
-latte-maximize & \\
-latte-minimize & \\
-integrate      & \\
-& \\
+%% \begin{tabular}{|l|l|}
+%% \hline
+%% Name & Description\\
+%% \hline 
+%% %\hline
+%% & \\
+%% count & Main program executables\\
+%% ehrhart & \\
+%% latte-maximize & \\
+%% latte-minimize & \\
+%% integrate      & \\
+%% & \\
 
-simplify2.add & additional files used by {\tt LattE}\\
-redcheck & ($\leftarrow$ modified from {\tt cdd} library) \\
-install & \\
-& \\
-cdd & external {\tt cdd} software executable used by {\tt LattE},\\
-& original name in {\tt cdd}: cddr+\_gmp\\
-& \\
-\hline
-& \\
-EXAMPLES/ & Subdirectory containing sample input files\\
-& \\
-\hline
-& \\
-manual.pdf & User's guide \\
-%manual.pdf & \\
-& \\
-\hline 
-& \\
-code/ & {\tt LattE} source code (including {\tt NTL}, {\tt cdd} and {\tt cdd lib})\\
-& \\
-\hline 
-& \\
-gpl.txt & GNU General Public License agreement\\
-& \\
-\hline 
-\end{tabular}
+%% simplify2.add & additional files used by {\tt LattE}\\
+%% redcheck & ($\leftarrow$ modified from {\tt cdd} library) \\
+%% install & \\
+%% & \\
+%% cdd & external {\tt cdd} software executable used by {\tt LattE},\\
+%% & original name in {\tt cdd}: cddr+\_gmp\\
+%% & \\
+%% \hline
+%% & \\
+%% EXAMPLES/ & Subdirectory containing sample input files\\
+%% & \\
+%% \hline
+%% & \\
+%% manual.pdf & User's guide \\
+%% %manual.pdf & \\
+%% & \\
+%% \hline 
+%% & \\
+%% code/ & {\tt LattE} source code (including {\tt NTL}, {\tt cdd} and {\tt cdd lib})\\
+%% & \\
+%% \hline 
+%% & \\
+%% gpl.txt & GNU General Public License agreement\\
+%% & \\
+%% \hline 
+%% \end{tabular}
 
 \subsection{License Agreement}
 
@@ -1430,26 +1434,33 @@ software package \latte is available at
 	
 \subsection{The {\tt LattE} Team}
 \begin{description}
-\item[Project directors]  Prof. Jes\'us A. De Loera and Prof. Matthias K\"oppe
-\item[Students currently working on the project] Brandon Dutra
-\item[Distinguished \latte Scientists, Collaborators and Advisors] \hfill \\
+\item[Project directors]~
+  \begin{itemize}
+  \item Prof.~Jes\'us A. De Loera (\latte v1.2, \latteInt v1.5--)
+  \item Prof.~Matthias K\"oppe (\latteMac, \latteInt v1.5--)
+  \end{itemize}
+\item[Students currently working on the project]~
+  \begin{itemize}
+  \item Brandon Dutra (\latteInt v1.5--)
+  \end{itemize}
+\item[Distinguished \latte scientists, collaborators and advisors]~
 	\begin{itemize} 
-		\item Dr. Raymond Hemmecke (\latte v1.2)
-		\item Prof. Ruriko Yoshida (\latte v1.2)
-		\item Dr. David Haws (\latte v1.2)
-		\item Dr. Peter Huggins (\latte v1.2)
-		\item Prof. Tyrrell McAllister
-		\item Prof. Velleda Baldoni
-		\item Prof. Nicole Berline
-		\item Prof. Michele Vergne
-		\item Prof. Alexander Barvinok
-		\item Prof. Bernd Sturmfels 
+		\item Prof.~Raymond Hemmecke (\latte v1.2)
+		\item Prof.~Ruriko Yoshida (\latte v1.2)
+		\item Dr.~David Haws (\latte v1.2)
+		\item Dr.~Peter Huggins (\latte v1.2)
+		\item Prof.~Tyrrell McAllister
+		\item Prof.~Velleda Baldoni (\latteInt v1.6)
+		\item Prof.~Nicole Berline (\latteInt v1.6)
+		\item Prof.~Michele Vergne (\latteInt v1.6)
+		\item Prof.~Alexander Barvinok
+		\item Prof.~Bernd Sturmfels 
 	\end{itemize}
-\item[Alumni of the project]	\hfill \\
+\item[Alumni of the project]~
 	\begin{itemize}
-		\item Gregory Pinto	(\latteInt)
-		\item Stanislav Moreinis (\latteInt)
-		\item Jianqiu Wu (\latteInt)
+		\item Gregory Pinto	(\latteInt v1.5)
+		\item Stanislav Moreinis (\latteInt v1.5)
+		\item Jianqiu Wu (\latteInt v1.5)
 		\item Jeremy Tauzer (\latte v1.2)
 		\item Jonathan Brooks (\latte v1.2)
 		\item Carol Shih (\latte v1.2)
