@@ -1,3 +1,8 @@
+Changes in release 1.6:
+
+ * New program for computing top Ehrhart coefficients (see manual). 
+
+
 Changes since release 1.4:
 
  * New program for computing volumes and integrating polynomials or powers of linear forms over polytopes.
