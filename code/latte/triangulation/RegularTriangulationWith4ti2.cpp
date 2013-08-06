@@ -245,7 +245,7 @@ void triangulate_cone_with_4ti2(listCone *cone, BarvinokParameters *Parameters,
 					&& !Parameters->nonsimplicial_subdivision)
 			{
 				cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
-						<< "in purported triangulation, triangulating it recursively."
+						<< "in polyhedral subdivision, triangulating it recursively."
 						<< endl;
 				/* In the refinement step, always fall back to using a
 				 random height vector. */
@@ -254,7 +254,7 @@ void triangulate_cone_with_4ti2(listCone *cone, BarvinokParameters *Parameters,
 			} else if (c_num_rays < true_dimension)
 			{
 				cerr
-						<< "Lower-dimensional cone in purported triangulation, should not happen."
+						<< "Lower-dimensional cone in polyhedral subdivision, should not happen."
 						<< endl;
 				abort();
 			} else
