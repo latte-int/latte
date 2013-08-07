@@ -530,7 +530,7 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 			}
 		}
 	}
-	cout << "got here" << endl;
+	//cout << "got here" << endl;
 	for (i = 0; i < lengthListVector(inequalities); i++) {
 		a = tmp->first;
 		b = createVector(newNumOfVars + 1);
