@@ -108,8 +108,8 @@ fi
 AC_CACHE_SAVE
 
 # We need Maple to simplify some rational functions. 
-AC_PATH_PROG(MAPLEBIN, maple)
-AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != x )
+AC_PATH_PROG(MAPLEBIN, maple, maple)
+AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != xmaple )
 AC_DEFINE_UNQUOTED(MAPLE_PATH, "${MAPLEBIN}", [The path to the Maple program.])
 
 # TOPCOM for triangulations (optional)
