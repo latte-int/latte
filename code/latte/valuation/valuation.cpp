@@ -275,7 +275,7 @@ Valuation::ValuationContainer Valuation::computeIntegralLinearForm(Polyhedron *p
 	if (intInput.integrateLinearFormTriangulation && intInput.integrateLinearFormCone && ans1 != ans2)
 	{
 		cerr << "computeIntegralLinearForm(): the two methods are different.\n"
-				<< "triangulateion: " << ans1 << "\nlawrence       " << ans2
+				<< "triangulation: " << ans1 << "\nlawrence       " << ans2
 				<< endl;
 		THROW_LATTE(LattException::bug_Unknown);
 	}//if error.
@@ -432,7 +432,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	//params->decomposition = BarvinokParameters::DualDecomposition;
 	params->decomposition
 			= BarvinokParameters::IrrationalAllPrimalDecomposition;
-	params->triangulation = BarvinokParameters::RegularTriangulationWithCdd;
+	// params->triangulation = BarvinokParameters::RegularTriangulationWithCdd;
 	params->max_determinant = 1;
 
 	for (i = 1; i < argc; i++)
@@ -882,7 +882,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		delete Poly;
 	}
 	else
-	{ //use strokes
+	{ //use Stokes
 		//NOTE:: THIS RECURSIVE METHOD IS NOT DONE.
 		//THIS SHOULD NOT WORK.
 
