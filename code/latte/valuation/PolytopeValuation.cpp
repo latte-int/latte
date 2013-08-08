@@ -28,7 +28,7 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 
 	if (p->unbounded)
 	{
-		cout << "Ops, cannot compute valuation for unbounded polyhedron."
+		cout << "Cannot compute valuation for unbounded polyhedron."
 				<< endl;
 		exit(1);
 	}//check the polytope is bounded.
@@ -1017,7 +1017,8 @@ RationalNTL PolytopeValuation::findIntegralPolynomialToPLF(const monomialSum& po
  *
  * Note that we cannot divide by zero.
  *
- * See the paper: "How to Integrate a Polynomial over a Simplex" by  V. BALDONI, N. BERLINE, J. A. DE LOERA, M. VERGNE.
+ * See the paper: "How to Integrate a Polynomial over a Simplex" by
+ * V. BALDONI, N. BERLINE, J. A. DE LOERA, M. KOEPPE, M. VERGNE.
  */
 RationalNTL PolytopeValuation::findIntegralProductsUsingTriangulation(linFormSum &forms) const
 {
@@ -1120,7 +1121,7 @@ RationalNTL PolytopeValuation::findVolume(ValuationAlgorithm algorithm)
  * The volume of an n-simplex in n-dimensional space with vertices (v0, ..., vn) is the abs. value of
  * {1\over n!}\det \begin{pmatrix} v_1-v_0 & v_2-v_0& \dots & v_{n-1}-v_0 & v_n-v_0 \end{pmatrix}
  *
- * However, using facts about how the determinat does not change when adding a multiple of a col. to another col,
+ * However, using facts about how the determinant does not change when adding a multiple of a col. to another col,
  * and det(A) = 1/a * det ( times one col of A by a), we can get away with doing this subtraction,
  * and we do not have to project the vertices back down ( i.e. remove the leading one/element).
  *
