@@ -108,7 +108,7 @@ triangulate_cone_with_cddlib(listCone *cone,
 	  int c_num_rays = set_card(incidence->set[i]);
 	  if (c_num_rays > cone_dimension && !Parameters->nonsimplicial_subdivision) {
 	    cerr << "Found non-simplicial cone (" << c_num_rays << "rays) "
-		 << "in purported triangulation, triangulating it recursively." << endl;
+		 << "in polyhedral subdivision, triangulating it recursively." << endl;
 	    /* In the refinement step, always fall back to using a
 	       random height vector. */
 	    triangulate_cone_with_cddlib(c, Parameters,
@@ -117,7 +117,7 @@ triangulate_cone_with_cddlib(listCone *cone,
 	    freeCone(c);
 	  }
 	  else if (c_num_rays < cone_dimension) {
-	    cerr << "Lower-dimensional cone in purported triangulation, should not happen."
+	    cerr << "Lower-dimensional cone in polyhedral subdivision, should not happen."
 		 << endl;
 	    abort();
 	  }
