@@ -1,5 +1,5 @@
 #!/bin/sh
-if [ x@MAPLEBIN@ = x ]; then
+if [ x@MAPLEBIN@ = xmaple ]; then
   echo "Skipping multiplication test (needs Maple, which is not installed)"
   exit 0
 fi
