@@ -6,6 +6,7 @@
  */
 
 #include "TopEhrhart.h"
+#include "dual.h"
 
 TopEhrhart::TopEhrhart(Polyhedron * polyhedron, BarvinokParameters & para, int numTopCoeff, bool real, string saveTopEhrhartPoly ) :
 	poly(polyhedron), parameters(para), numTopCoefficients(numTopCoeff), realDilations(real), saveTopEhrhartPolynomial(saveTopEhrhartPoly)
@@ -17,7 +18,7 @@ TopEhrhart::TopEhrhart(Polyhedron * polyhedron, BarvinokParameters & para, int n
 	assert(poly->dualized == false);
 
 	if (numTopCoefficients != -1 && numTopCoefficients <= 0)
-		THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, "unexpedted numTopCoefficients given");
+		THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, "unexpected numTopCoefficients given");
 }
 
 TopEhrhart::~TopEhrhart()
@@ -67,16 +68,41 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 
 	//maple << "read(\"Conebyconeapproximations_08_11_2010.mpl\"):\n\n";
 
+	assert(!poly->dualized);
 
 	maple << "\n seed:=randomize():" << endl;
 
 	//print the polytope's vertex-rays in maple format out.
 	maple << "\n simpleCones := [";
-	for ( listCone *cone = poly->cones; cone; cone = cone->rest)
+	for (listCone *vcone = poly->cones; vcone; vcone = vcone->rest)
 	{
-		// add [[vertex], [[ray1], [ray2], ..., [ray d]] ]
+	  listCone *simplicial_cones;
+	  bool dualized;
+	  
+	  //// FIXME: We really want to use a ConeConsumer here.
+	  if (lengthListVector(vcone->rays) != poly->numOfVars) {
+	    // Triangulate vertex cones in the dual, so discarding
+	    // lower-dimensional cones is OK.
+	    dualizeCone(vcone, poly->numOfVars, &parameters);
+	    simplicial_cones = triangulateCone(vcone, poly->numOfVars, &parameters);
+	    dualized = true;
+	    dualizeCone(vcone, poly->numOfVars, &parameters); // just swaps
+	  }
+	  else {
+	    simplicial_cones = copyCone(vcone);
+	    dualized = false;
+	  }
 
-		//add the vertex
+	  for (listCone *cone = simplicial_cones; cone; cone = cone->rest) {
+
+	    // add [[vertex], [[ray1], [ray2], ..., [ray d]] ]
+
+	    if (dualized) {
+	      // dualize back
+	      dualizeCone(cone, poly->numOfVars, &parameters);
+	    }
+	    
+	    //add the vertex
 		maple << "\n[";
 		vec_ZZ num = cone->vertex->vertex->numerators();
 		vec_ZZ den = cone->vertex->vertex->denominators();
@@ -116,7 +142,11 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 		maple << "]";
 		if (cone->rest)
 			maple << ",";
-	}//for each vertex.
+	  }// for each simplicial cone
+	  freeListCone(simplicial_cones);
+	  if (vcone->rest)
+	    maple << ",";
+	}//for each vertex cone.
 	maple << "]: #end of the vertex-cones" << endl;
 
 	//Ok, now print the linear form list.
