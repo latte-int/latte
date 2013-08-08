@@ -10,7 +10,6 @@ LattE requires the following programs and libraries:
 
   * GMP, compiled with --enable-cxx
   * NTL, version 5.4 or newer
-  * CDD+ 0.77 or newer
   * cddlib
   * (optional) LRS
   * (optional) LiDIA
@@ -60,7 +59,7 @@ at the directory $HOME/latte.
    make
    make install
 
-3. Install Komei Fukuda's packages CDD+ and cddlib
+3. Install Komei Fukuda's package cddlib
 
    Obtain then from http://www.ifor.math.ethz.ch/~fukuda/cdd_home
 

@@ -41,15 +41,14 @@
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{2ex plus 0.4ex minus 0.4ex}
 
-\title{A User's Guide for {\tt LattE integrale} \latteV \\ (Linux Release) 
-\footnote{Research supported by NSF grants DMS-0309694, NSF grants
-DMS-0073815, DMS-0914107 and DMS-0914873.
+\title{A User's Guide for\\ {\tt LattE integrale} \latteV 
+\footnote{Research supported by NSF grants DMS-0309694, 
+DMS-0073815, DMS-0914107, and DMS-0914873.
 Most of the students were supported by those
 grants and by summer fellowships provided through the UC Davis VIGRE grants
-DMS-0135345 and DMS-0636297. $\copyright$ 
-Department of Mathematics, University of California, Davis, 2011. This
-software is released under the GNU license agreement}
-\\ \includegraphics[width=0.25\textwidth]{latte-integrale.jpg}
+DMS-0135345 and DMS-0636297. This
+software is released under the GNU General Public License.  Image credit: Wikipedia.}
+\\[4ex] \includegraphics[width=0.25\textwidth]{latte-integrale.jpg}
 }%close title brace
 
 \author{
@@ -66,7 +65,7 @@ Jianqiu Wu \and
  
 
  
- \date{January 2012}
+ \date{August 2013}
 
 \begin{document}
 
@@ -88,11 +87,12 @@ convex polyhedra defined by linear equations and inequalities with
 integer coefficients. The polyhedra can be of any (reasonably small) 
 dimension. In 2007, {\tt LattE macchiato} was released and contained many 
 algorithmic improvements, in particular primal variants of the algorithms. The newest edition, \latteInt, developed
-in 2010 can compute integrals of polynomials and volumes of rational polytopes. 
+in 2010, can compute integrals of polynomials and volumes of rational polytopes. 
 All these algorithms run in polynomial
 time for fixed dimension. 
 \latteInt was extended in 2012/2013 with a hybrid C++ and \maple
-implementation for computing the top coefficients of weighted Ehrhart polynomials. 
+implementation for computing the top coefficients of weighted Ehrhart
+quasipolynomials, using the algorithm of~\cite{so-called-paper-1}. 
 To
 learn more about the exact details of our implementation for lattice point enumeration, the interested reader can consult 
 \cite{koeppe:irrational-barvinok, latte1} and the references listed therein. 
@@ -118,10 +118,10 @@ the good news is that it admits short representations.
 $V_1=(0,0)$, $V_2=(5,0)$, $V_3=(4,2)$, and $V_4=(0,2)$, see Figure \ref{fig:quadrangle}.
 
 \begin{figure}[thb]
-	\centering
-	\includegraphics[width=0.7\textwidth]{examplebrion.jpg}
-	\caption{Quadrangle with vertices $V_1=(0,0)$, $V_2=(5,0)$, $V_3=(4,2)$, and $V_4=(0,2)$.}
-	\label{fig:quadrangle}
+        \centering
+        \includegraphics[width=0.7\textwidth]{examplebrion.jpg}
+        \caption{Quadrangle with vertices $V_1=(0,0)$, $V_2=(5,0)$, $V_3=(4,2)$, and $V_4=(0,2)$.}
+        \label{fig:quadrangle}
 \end{figure}
 
 {\small
@@ -160,13 +160,17 @@ Fore details of how the computations are done, see \cite{koeppe:irrational-barvi
 
 \latteInt has two different integration algorithms for integrating a rational polynomial $p \in \R[x_1, \dots, x_d]$ over a $d$ dimensional rational polytope. The first one, called the triangulation method, triangulates the polytope into simplices and integrates over each simplex. The other method, called the cone decomposition method, integrates over each tangent cone of the polytope. In order to do this, each tangent cone is triangulated into simple cones. This is the main trade off between the two integration algorithms: you can do one (possibly) large triangulation, or (possibly) many small tangent cone triangulations. 
 
-We decompose polynomials into finite sums of powers of linear forms because integrating powers of linear forms can be done in polynomial time \cite{howToIntegratePolynomialSimplex}. A decomposition of a polynomial as a sum of powers of linear forms is known as the polynomial Waring problem.
+We decompose polynomials into finite sums of powers of linear forms because
+integrating powers of linear forms can be done in polynomial time
+\cite{howToIntegratePolynomialSimplex}. Finding a decomposition of a
+polynomial as a sum of powers of linear forms is known as the polynomial
+Waring problem. 
 
 See \cite{latte-integrale-paper} for a detailed explanation on why the next example gives the correct integral. 
 
 As an example, let us integrate the polynomial $x_1+x_2$ over the unit square with vertices $(0,0), (1,0), (0,1)$ and $(1,1)$. The polynomial is already a power of a linear form so let $\ell = (1,1)$. To integrate $\int (x_1+x_2)^M dx$ over the square, we need to compute
 \begin{displaymath}
-	\frac{M!}{(M+d)!} |\det(u_1, \dots, u_d)| \frac{(\langle \ell, s \rangle)^{M+d}}{\prod_{i=1}^d  \langle -\ell, u_i \rangle}
+        \frac{M!}{(M+d)!} |\det(u_1, \dots, u_d)| \frac{(\langle \ell, s \rangle)^{M+d}}{\prod_{i=1}^d  \langle -\ell, u_i \rangle}
 \end{displaymath}
 at each vertex $s$ where the $u_i$ are the rays from the tangent cone at $s$, and $d$ is the dimension of the polytope.
 
@@ -179,7 +183,7 @@ Vertex $s_2 = (1,1)$:
 \end{displaymath}
 
 Vertex $s_3 = (1,0)$: 
-	
+        
 \begin{displaymath}
  \frac{M!}{(M+d)!} |\det(u_1, \dots, u_d)| \frac{(1)^{1+2}}{(1)(-1)} = \frac{1!}{(1+2)!} \times 1 \times -1 = -1/6
 \end{displaymath}
@@ -196,20 +200,20 @@ The integral $\int_{x_1 = 0}^{x_1 = 1}\int_{x_2 = 0}^{x_2 = 1} x_1 +x_2  \d{x_1}
 
 \subsubsection{Weighted Ehrhart Polynomials}
 
-\latteInt can also compute the weighted Ehrhart polynomials where the weight function is a polynomial or a sum of powers of linear forms. However, the polytope must be a simplicial polytope and \maple must be installed on your computer.
+\latteInt can also compute the weighted Ehrhart quasipolynomials where the weight function is a polynomial or a sum of powers of linear forms. However, the polytope must be a simplicial polytope and \maple must be installed on your computer.
 
 
 
-\subsection{What can {\tt LattE} compute?}
+\subsection{Which programs of {\tt LattE} compute what?}
 
 \latte contains three key executables:
 \begin{description}
-	\item[count] counts lattice points, computes Ehrhart polynomials and Ehrhart series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
-	\item[integrate] integrates polynomials, powers of linear forms, and products of powers of linear forms over polytopes. Integrate can also computed weighted Ehrhart polynomials.
-	\item[max/minimize] perform linear integer optimization.
+        \item[count] counts lattice points, computes Ehrhart polynomials and Ehrhart series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
+        \item[integrate] integrates polynomials, powers of linear forms, and products of powers of linear forms over polytopes. Integrate can also computed weighted Ehrhart quasipolynomials.
+        \item[max/minimize] perform linear integer optimization.
 \end{description}
 
-The other executables in latte are drivers, converters, and other small utility function described in Section \ref{section:file-descriptions}.
+The other executables in latte are drivers, converters, and other small utility functions.
 
 %***********************************************************************************
 %***********************************************************************************
@@ -221,10 +225,10 @@ The other executables in latte are drivers, converters, and other small utility 
 
 A polytope can be defined from a list of vertices (a v-representation) or a list of hyperplane inequalities (h-representation) and so \latte can start from either representation in different formats. Here are four common file formats:
 \begin{enumerate}
-	\item \latte style vertex file
-	\item \latte style hyperplane file
-	\item \cdd style vertex file
-	\item \cdd style hyperplane file
+        \item \latte style vertex file
+        \item \latte style hyperplane file
+        \item \cdd style vertex file
+        \item \cdd style hyperplane file
 \end{enumerate}
 
 Users of {\tt Polymake} will notice that {\tt Polymake}'s facets and vertices are printed in a format that is easily converted to a \latte style h- or v-representation.
@@ -301,7 +305,7 @@ considered an equality, the third one.
 
 In general, the linearity syntax is :
 \begin{verbatim}
-	linearity <number of equations> <row index of constraint, start counting from 1>
+        linearity <number of equations> <row index of constraint, start counting from 1>
 \end{verbatim}
 
 \subsubsection{Nonnegativity Constraints}
@@ -326,7 +330,7 @@ that the first and second variables are required to be nonnegative.
 
 In general, the nonnegative syntax is :
 \begin{verbatim}
-	nonnegative <number of variables in list> <variable index, start counting from 1>
+        nonnegative <number of variables in list> <variable index, start counting from 1>
 \end{verbatim}
 
 
@@ -384,10 +388,10 @@ that we call maximize, this whole data encodes the integer program
 Let $v_1, \dots, v_k$ be the vertices of a polytope $P \subseteq \R^n$, then the \latte v-representation file format is:
 
 \begin{align*}
-	k &\: (n+1)\\
-	1 &\: v_1\\
-	\vdots & \\
-	1 &\: v_k
+        k &\: (n+1)\\
+        1 &\: v_1\\
+        \vdots & \\
+        1 &\: v_k
 \end{align*}
 
 
@@ -420,22 +424,28 @@ For a complete description of \cdd file syntax, see the \cdd manual \cite{fukuda
 
 \subsection{Non-full dimensional polytopes}
 
-When the input polytope is not full dimensional, \latte projects that polytope such that it becomes full dimensional. This transformation preserves the lattice count and volume of the input polytope. The current \latteInt cannot integrate non-full dimensional polytopes.
+When the input polytope is not full dimensional, \latte projects that polytope
+such that it becomes full dimensional. This transformation preserves the
+lattice point count of the input polytope. 
+
+Note, however, that the integration routines do not currently support non-full
+dimensional polytopes.
 
 \subsection{\latte vs. \cdd file formats}
 There are a few key differences between \latte and \cdd file formats.
 
 \begin{enumerate}
-	\item \cdd used the file extension *.ine for h-representation files, and *.ext for v-representation files. However, \latte makes no assumption on the file extensions of files. We recommend *.vrep.latte and *.hrep.latte for \latte style files, but you are free to name your files anything.
-	\item \cdd also requires ``H-representation'' or ``V-representation'' keywords in the file. Forgetting about the ``linearity'' and ``nonnegative'' keywords, there is no difference between a \latte v- and h-representation file.
-%	\item Currently, not all commands work starting from a \cdd v-representation file. --it looks ok now.
+        \item \cdd used the file extension *.ine for h-representation files, and *.ext for v-representation files. However, \latte makes no assumption on the file extensions of files. We recommend *.vrep.latte and *.hrep.latte for \latte style files, but you are free to name your files anything.
+        \item \cdd also requires ``H-representation'' or ``V-representation'' keywords in the file. Forgetting about the ``linearity'' and ``nonnegative'' keywords, there is no difference between a \latte v- and h-representation file.
+%       \item Currently, not all commands work starting from a \cdd v-representation file. --it looks ok now.
 \end{enumerate}
 
 
 \subsection{Polynomials and linear forms}
 \label{input-file:polynomial-and-linear-form}
 
-\latteInt can also integrate polynomials and in particular sums of powers of linear forms. Powers of linear forms are the fundamental structure used to integrate. Next, we describe the syntax of polynomials and linear forms
+\latteInt can also integrate polynomials and in particular sums of powers of
+linear forms over polytopes. Powers of linear forms are the fundamental structure used to integrate. Next, we describe the syntax of polynomials and linear forms
 
 \begin{itemize}
 \item A polynomial is represented as a list of its monomials in the form
@@ -458,8 +468,8 @@ There are a few key differences between \latte and \cdd file formats.
     \end{quote}
     For example, $3(2x_0 + 4x_1 + 6x_2)^{10} + 7(3x_1 + 5x_2)^{12}$ is input
     as \texttt{[[3,[10,[2,4,6]]], [7,[12,[0,3,5]]]]}. 
-
-
+  \end{itemize}
+  
 The reason this is useful is because any polynomial can be written as a sum of powers of linear forms, see \cite{howToIntegratePolynomialSimplex}.
 
 
@@ -478,7 +488,7 @@ is written as
 
 \texttt{[[1, [ [3, [1, 2]], [6, [4, 5]] ]], [7, [ [10, [8, 9]], [13, [11, 12]], [16, [14, 15]] ]] ]}
 
-\end{itemize}
+%\end{itemize}
 
 %*****************************************************************
 %*****************************************************************
@@ -488,12 +498,23 @@ is written as
 
 \section{Running {\tt LattE}}\label{Running LattE}
 
+The executables of \latteInt are installed in the ``bin/'' subdirectory of the
+installation tree.  The standard distribution of \latteInt sets the installation tree to be the
+``dest/'' subdirectory of the source tree. 
+Thus, to invoke the {\tt count} executable, you would type
+\begin{verbatim}
+        dest/bin/count
+\end{verbatim}
+
+
+
+
 \subsection{How to use {\tt count}}
 
 {\tt count} has a nice help menu, to view it, run
 
 \begin{verbatim}
-	./count --help
+        count --help
 \end{verbatim}
 
 
@@ -501,115 +522,115 @@ The following options control what {\tt count} computes.
 
 \begin{itemize}
 \item Count the number of lattice points in polytope $P$, where $P$  is given in a file named ``fileName.hrep.latte'' in different file formats.
-	\begin{verbatim}
-     ./count fileName.hrep.latte
-     ./count --vrep fileName.vrep.latte
-     ./count --cdd fileName.ine
-	\end{verbatim} 
+        \begin{verbatim}
+     count fileName.hrep.latte
+     count --vrep fileName.vrep.latte
+     count --cdd fileName.ine
+        \end{verbatim} 
 
 \item Count the number of lattice points in $nP$, the dilation of $P$ by the integer factor $n$.
-	\begin{verbatim}
-     ./count --dilation=n fileName.hrep.latte
-	\end{verbatim} 
-\begin{comment}	
+        \begin{verbatim}
+     count --dilation=n fileName.hrep.latte
+        \end{verbatim} 
+\begin{comment} 
 \item Count the number of lattice points in the interior of the  polytope $P$, where $P$ is given in ``fileName''.
-	\begin{verbatim}
-     ./count --interior fileName.hrep.latte
-	\end{verbatim} 
-\end{comment}	
+        \begin{verbatim}
+     count --interior fileName.hrep.latte
+        \end{verbatim} 
+\end{comment}   
 \item Use the homogenized Barvinok algorithm \cite{latte3} to count  the number of lattice points in the polytope $P$. Use if number of vertices of $P$ is big compared to the number of constraints. 
-	\begin{verbatim}
-     ./count --homog fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --homog fileName.hrep.latte
+        \end{verbatim} 
 \item Compute the number of lattice points (default)
-	\begin{verbatim}
-     ./count --count-lattice-points  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --count-lattice-points  fileName.hrep.latte
+        \end{verbatim} 
 \item Compute the multivariate generating function of the set of lattice points of the polyhedron
-	\begin{verbatim}
-     ./count --multivariate-generating-function  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --multivariate-generating-function  
+         fileName.hrep.latte
+        \end{verbatim} 
 For unbounded polyhedra, one needs to combine
-  this with {\tt --compute-vertex-cones=4ti2}, as other methods in \latte currently refuse to handle unbounded polyhedra. For example, 
-	\begin{verbatim}
-  	count --compute-vertex-cones=4ti2 --multivariate-generating-function fileName
-	\end{verbatim}
+  this with the option {\tt --compute-vertex-cones=4ti2} (now the default when
+  4ti2 is available), as other methods in \latte currently refuse to handle
+  unbounded polyhedra. For example,  
+        \begin{verbatim}
+     count --compute-vertex-cones=4ti2 
+           --multivariate-generating-function fileName.hrep.latte
+        \end{verbatim}
   writes the multivariate generating function (in Maple notation) to ``fileName.rat.''
-	
-	
-	
-\item Compute the Ehrhart polynomial of an \emph{integral} polytope
-	\begin{verbatim}
-     ./count --ehrhart-polynomial  fileName.hrep.latte
-	\end{verbatim} 
+\item Compute the Ehrhart polynomial of a lattice polytope
+        \begin{verbatim}
+     count --ehrhart-polynomial  fileName.hrep.latte
+        \end{verbatim} 
+  \emph{Note:}  For the computation of weighted Ehrhart quasipolynomials of rational
+  polytopes, or their top coefficients, see section~\ref{s:top-ehrhart} below. 
 \item Compute the unsimplified Ehrhart series as a univariate rational function
-	\begin{verbatim}
-     ./count --ehrhart-series  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --ehrhart-series  fileName.hrep.latte
+        \end{verbatim} 
 \item Compute the simplified Ehrhart series as a univariate rational function (needs \maple).
-	\begin{verbatim}
-     ./count --simplified-ehrhart-series  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --simplified-ehrhart-series  fileName.hrep.latte
+        \end{verbatim} 
 \item Compute the first N terms of the Ehrhart series
-	\begin{verbatim}
-     ./count --ehrhart-taylor=N  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --ehrhart-taylor=N  fileName.hrep.latte
+        \end{verbatim} 
 \end{itemize}
 
-The following options relate to the Barvinok algorithm and were introduced by Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.
+The following options relate to the Barvinok algorithm and were introduced by
+Matthias K\"oppe in \latteMac, see \cite{koeppe:irrational-barvinok}.  Not all modes of operation
+support all options.
 \begin{itemize}
 \item Triangulate and signed-decompose in the dual space (traditional method, default)
-	\begin{verbatim}
-     ./count --dual  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --dual  fileName.hrep.latte
+        \end{verbatim} 
 \item Triangulate in the dual space, signed-decompose in the primal space using irrationalization
-	\begin{verbatim}
-     ./count --irrational-primal  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --irrational-primal  fileName.hrep.latte
+        \end{verbatim} 
 \item Triangulate and signed-decompose in the primal space  using irrationalization
-	\begin{verbatim}
-     ./count --irrational-all-primal  fileName.hrep.latte
-	\end{verbatim} 
-	This gives a new method for computing Ehrhart polynomials of integral polytopes 
-   in the primal space
-	\begin{verbatim}
-     ./count --all-primal --ehrhart-polynomial fileName.hrep.latte
-	\end{verbatim} 
-   
-\item  Decompose cones down to an index (determinant) of N instead down to unimodular cones (which have an index of 1).
-	\begin{verbatim}
-     ./count --maxdet=N  fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --irrational-all-primal  fileName.hrep.latte
+        \end{verbatim} 
+\item  Decompose cones down to an index (determinant) of N instead down to
+  unimodular cones (which have an index of 1).  
+        \begin{verbatim}
+     count --maxdet=N  fileName.hrep.latte
+        \end{verbatim} 
 \item Do not signed-decompose simplicial cones
-	\begin{verbatim}
-     ./count --no-decomposition   fileName.hrep.latte
-	\end{verbatim} 
+        \begin{verbatim}
+     count --no-decomposition   fileName.hrep.latte
+        \end{verbatim} 
 \item Use polynomial substitution for specialization (traditional method, default)
-	\begin{verbatim}
-     ./count --polynomial  fileName.hrep.latte
-	\end{verbatim} 	
+        \begin{verbatim}
+     count --polynomial  fileName.hrep.latte
+        \end{verbatim}  
 \item Use exponential substitution for specialization (recommended for maxdet larger than 1)
-	\begin{verbatim}
-     ./count --exponential   fileName.hrep.latte
-	\end{verbatim} 	
-			
+        \begin{verbatim}
+     count --exponential   fileName.hrep.latte
+        \end{verbatim}  
+                        
 \end{itemize}
 
 
 \textbf{REMARK}  The functionality of the \latte v1.2 {\tt ehrhart} command has been merged into {\tt count}:
 
 \begin{verbatim} 
-	count --ehrhart-series FILENAME
-	
-	      (replaces: ehrhart FILENAME)
+        count --ehrhart-series FILENAME
+        
+              (replaces: ehrhart FILENAME)
 
-	count --simplified-ehrhart-series FILENAME
+        count --simplified-ehrhart-series FILENAME
 
-	      (replaces: ehrhart simplify FILENAME)
+              (replaces: ehrhart simplify FILENAME)
 
-	count --ehrhart-taylor=N FILENAME
+        count --ehrhart-taylor=N FILENAME
 
-	      (replaces: ehrhart N FILENAME)
+              (replaces: ehrhart N FILENAME)
 \end{verbatim}
 
 The {\tt ehrhart} program is still available, but it does not accept
@@ -620,39 +641,39 @@ The {\tt ehrhart} program is still available, but it does not accept
 Like {\tt count}, {\tt integrate} has a help menu. To view the menu, run
 
 \begin{verbatim}
-	./integrate --help
-\end{verbatim}	
+        integrate --help
+\end{verbatim}  
 
 There are two different integration (and volume) algorithms. The triangulation method triangulates the entire polytope and integrates over each simplex. In the cone decomposition method we integrate over each cone, possibly triangulating it first. Unlike other integration software, \latte integrates polynomials and powers of linear forms in exact arithmetic.
 
-{\tt integrate} is also able to compute weighted Ehrhart polynomials, see the next subsection.
+{\tt integrate} is also able to compute weighted Ehrhart quasi-polynomials, see the next subsection.
 
 \begin{itemize}
 \item Integrates using the cone-decomposition method.
-	\begin{verbatim}
+        \begin{verbatim}
      --cone-decompose
-	\end{verbatim} 	
+        \end{verbatim}  
 \item Integrates using the triangulation method.
-	\begin{verbatim}
+        \begin{verbatim}
      --triangulate
-	\end{verbatim} 	
+        \end{verbatim}  
 \item Sets what you want to compute: a volume or an integral.
-	\begin{verbatim}
+        \begin{verbatim}
      --valuation=integrate
      --valuation=volume
-	\end{verbatim} 	
+        \end{verbatim}  
 %\item Prints the cone-decomposition rational function for volumes
-%	\begin{verbatim}
+%       \begin{verbatim}
 %     --valuation=volume --cone-decompose --print-cone-decompose-function
-%	\end{verbatim} 	
+%       \end{verbatim}  
 \item Sets the file that contains the polynomial, powers of linear forms, or products of powers of linear forms. If this option is not set, and the valuation is integration, the integrand will be read from stdin.
-	\begin{verbatim}
+        \begin{verbatim}
      --monomials=FILE
      --linear-forms=FILE
      --product-linear-forms=FILE
-	\end{verbatim} 	
-	
-	If the integrand is a polynomial or a power of a linear form, there are two integration and volume algorithms available: a polytope triangulation based method and a tangent cone based method. If the integrand is a product of powers of linear forms, there is only one algorithm available and it is a polytope triangulation based method.
+        \end{verbatim}  
+        
+        If the integrand is a polynomial or a power of a linear form, there are two integration and volume algorithms available: a polytope triangulation based method and a tangent cone based method. If the integrand is a product of powers of linear forms, there is only one algorithm available and it is a polytope triangulation based method.
 \end{itemize}
 
 \example
@@ -660,81 +681,108 @@ Let us view a few examples of the above options
 
 \begin{itemize}
 \item Integrates a polynomial in file ``FILE'' using the triangulation method. 
-	\begin{verbatim}
-	./integrate --valuation=integral --triangulate --monomials=FILE fileName.hrep.latte
-	\end{verbatim} 	
+        \begin{verbatim}
+     integrate --valuation=integral --triangulate 
+       --monomials=FILE fileName.hrep.latte
+        \end{verbatim}  
 \item Find a volume using the cone decomposition method from a \latte v-representation file.
-	\begin{verbatim}
-	./integrate --valuation=volume --cone-decompose --vrep fileName.vrep.latte
-	\end{verbatim} 	
-\item If an integration method is not given, \latteInt computes the integral with \emph{both} methods. This cal also be done by the {\tt --all} option. The next two commands do the same thing: find a volume using both methods from a \latte v-representation file.
-	\begin{verbatim}
-	./integrate --valuation=volume --vrep fileName.vrep.latte
-	./integrate --valuation=volume --all --vrep fileName.vrep.latte	
-	\end{verbatim} 	
+        \begin{verbatim}
+     integrate --valuation=volume --cone-decompose 
+       --vrep fileName.vrep.latte
+        \end{verbatim}  
+\item If an integration method is not given, \latteInt computes the integral with \emph{both} methods. This can also be done by the {\tt --all} option. The next two commands do the same thing: find a volume using both methods from a \latte v-representation file.
+        \begin{verbatim}
+     integrate --valuation=volume --vrep fileName.vrep.latte
+
+     integrate --valuation=volume --all 
+       --vrep fileName.vrep.latte 
+        \end{verbatim}  
 \end{itemize}
 
 
-\subsubsection{How to use {\tt integrate} for computing weighted Ehrhart polynomials}           
+\subsubsection{How to use {\tt integrate} for computing weighted Ehrhart quasi\-polynomials}           
+\label{s:top-ehrhart}
 
-\latteInt can (currently) only compute weighted Ehrhart polynomials if the polytope is simple and if the user has \maple.
+This option currently requires \maple.
+For non-lattice polytopes, the coefficients of the Ehrhart quasipolynomials
+are computed as step functions. 
+The triangulation of vertex cones is performed in the dual space; command line
+options to do otherwise are ignored.
+
+By default, \latteInt\ computes the coefficients incrementally, starting from
+the highest coefficient, which is the easiest to compute.  
+You can interrupt the computation at any time if you
+don't need any further coefficients. 
+If you know in advance, how many coefficients from the top you need, use  the
+option \texttt{--num-coefficients=K}. 
+
+%% if the polytope is simple and 
+
 
 \begin{itemize}
-\item Sets what you want to compute: weighted ehrhart polynomials. 
-	\begin{verbatim}
+\item Sets what you want to compute: weighted Ehrhart quasipolynomials. 
+        \begin{verbatim}
      --valuation=top-ehrhart
-	\end{verbatim} 	
+        \end{verbatim}  
 \item Sets the weight function from a file.
-	\begin{verbatim}
+        \begin{verbatim}
     --monomials=FILE
     --linear-forms=FILE
-	\end{verbatim} 	
+        \end{verbatim}  
 \item Sets the weight function to 1 (unweighted). This is the default. 
-	\begin{verbatim}
+        \begin{verbatim}
      --top-ehrhart-unweighted
-	\end{verbatim} 
-\item Only compute the top K coefficients. The polynomial's coefficients are not computed incrementally. Use this option if you know in advance you can wait for the software to finish or have low memory requirements. When this option is missing, the entire polynomial's coefficients are computed incrementally which takes more memory but you may manually stop the computation at any time.
-	\begin{verbatim}
+        \end{verbatim} 
+\item Only compute the top K coefficients. The quasipolynomial's coefficients are not computed incrementally. Use this option if you know in advance you can wait for the software to finish or have low memory requirements. When this option is missing, the entire quasipolynomial's coefficients are computed incrementally which takes more memory but you may manually stop the computation at any time.
+        \begin{verbatim}
      --num-coefficients=K
-	\end{verbatim}
-\item Save the polynomial to a file. If ``--num-coefficients=K'' is used, the file write is done after the polynomial is computed. If  ``--num-coefficients=K'' is missing, the polynomial's coefficients are saved as they are computed.
-	\begin{verbatim}
+        \end{verbatim}
+\item Save the quasipolynomial to a file. If ``--num-coefficients=K'' is
+  used, the file write is done after the quasipolynomial is computed. If
+  ``--num-coefficients=K'' is missing, the quasipolynomial's coefficients
+  are saved as they are computed. 
+        \begin{verbatim}
      --top-ehrhart-save=FILE
-	\end{verbatim}		
-\item Compute the weighted Ehrhart polynomial that is valid for non-integer dilations.
-	\begin{verbatim}
+        \end{verbatim}          
+\item Compute the weighted Ehrhart polynomial that is valid for non-integer
+  dilations, rather than integer dilations only. 
+  The formulas for the
+  coefficients will usually be more complicated.  Even for lattice polytopes,
+  one obtains Ehrhart quasipolynomials rather than Ehrhart polynomials.
+        \begin{verbatim}
      --real-dilations
-	\end{verbatim}		
-\item Sets interactive mode if you want to manually type a polynomial or a sum of linear forms. You cannot compute a weighted Ehrhart polynomial where the weight is a product of linear forms.
-	\begin{verbatim}
+        \end{verbatim}          
+\item Sets interactive mode if you want to manually type a polynomial or a sum of linear forms. You cannot compute a weighted Ehrhart quasipolynomial where the weight is a product of linear forms.
+        \begin{verbatim}
      --interactive-mode
-	\end{verbatim}		
+        \end{verbatim}          
 \end{itemize}
 
 \example
 Let us view a few examples of the above options.
 
 \begin{itemize}
-\item Compute the unweighted Ehrhart polynomial that is valid for real dilations.
-	\begin{verbatim}
-	./integrate --valuation=top-ehrhart --real-dilations  
-		 fileName.hrep.latte
-	\end{verbatim} 	
-\item Compute weighted Ehrhart polynomial where the weight is a polynomial.
-	\begin{verbatim}
-	./integrate --valuation=top-ehrhart --monomials=FILE 
-		 fileName.hrep.latte
-	\end{verbatim} 	
-\item Find only the two largest degree terms of the linear form weighted Ehrhart polynomial
-	\begin{verbatim}
-	./integrate --valuation=top-ehrhart --linear-forms=FILE 
-		 --num-coefficients=2 fileName.hrep.latte				
-	\end{verbatim} 	
-\item Manually enter a weight function and save the polynomial to a file
-	\begin{verbatim}
-	./integrate --valuation=top-ehrhart --interactive-mode 
-		 --top-ehrhart-save=FILE fileName.hrep.latte
-	\end{verbatim} 	
+\item Compute the unweighted Ehrhart quasipolynomial that is valid for real
+  dilations, rather than integer dilations only. 
+\begin{verbatim}
+        integrate --valuation=top-ehrhart --real-dilations  
+                 fileName.hrep.latte
+        \end{verbatim}  
+\item Compute weighted Ehrhart quasipolynomial where the weight is a polynomial.
+        \begin{verbatim}
+        integrate --valuation=top-ehrhart --monomials=FILE 
+                 fileName.hrep.latte
+        \end{verbatim}  
+\item Find only the two largest degree terms of the linear form weighted Ehrhart quasipolynomial
+        \begin{verbatim}
+        integrate --valuation=top-ehrhart --linear-forms=FILE 
+                 --num-coefficients=2 fileName.hrep.latte                               
+        \end{verbatim}  
+\item Manually enter a weight function and save the Ehrhart quasipolynomial to a file
+        \begin{verbatim}
+        integrate --valuation=top-ehrhart --interactive-mode 
+                 --top-ehrhart-save=FILE fileName.hrep.latte
+        \end{verbatim}  
 \end{itemize}
 
 \subsection{Options common to both {\tt count} and {\tt integrate}}
@@ -742,36 +790,37 @@ Let us view a few examples of the above options.
 A common subproblem in counting lattice points and integration requires finding triangulations and tangent cones. Also, there are many different software tools available to do this. Instead of reinventing the wheel, \latte links with other software tools to compute these basic objects. In this section, we describe how you can control which software tool is used.
 
 \begin{itemize}
-\item The \fourtitwo program can be used instead of {\tt cddlib} and {\tt CDD+}
+\item The \fourtitwo program can be used instead of {\tt cddlib} %and {\tt CDD+}
   to compute the vertex cones of polytopes, triangulations, and duals of cones.
-  In many cases, \fourtitwo is faster.
+  In many cases, \fourtitwo is faster, which is why it is now the default when
+  it is available.
   
   \begin{verbatim}
-	--compute-vertex-cones={cdd,4ti2}
-	--triangulation={cddlib,4ti2}
-	--dualization={cdd,4ti2}
+        --compute-vertex-cones={cdd,4ti2}
+        --triangulation={cddlib,4ti2}
+        --dualization={cdd,4ti2}
   \end{verbatim}
 
 \item By default, \latte assumes the h-representation may contain redundant hyperplanes and tries to find and remove them. You can control how much more \latte should spend checking the input h-representation with the following option.
 
-	\begin{verbatim}
-	--redundancy-check={none,cddlib,full-cddlib}.
-	\end{verbatim}
+        \begin{verbatim}
+        --redundancy-check={none,cddlib,full-cddlib}.
+        \end{verbatim}
 
-	\begin{itemize}
-  	\item ``full-cddlib'' (the default) uses cddlib to compute an irredundant
+        \begin{itemize}
+        \item ``full-cddlib'' (the default) uses cddlib to compute an irredundant
     system of linear equations and inequalities describing the
     polyhedron.  This corresponds to the traditional \latte behavior;
     it can be expensive.
 
-	\item ``cddlib'' (used to be the default in the 1.2+mk-0.9.x series) uses
+        \item ``cddlib'' (used to be the default in the 1.2+mk-0.9.x series) uses
     cddlib to compute some implicit linearities only; it often fails
     but is faster than full-cddlib.
 
-	\item ``none'' does nothing, the input description of the polytope should
+        \item ``none'' does nothing, the input description of the polytope should
     be irredundant.
-		
-	\end{itemize}
+                
+        \end{itemize}
 
 \end{itemize}
 
@@ -810,59 +859,7 @@ A common subproblem in counting lattice points and integration requires finding 
 
 
 
-\latte uses the GNU Autoconf and Automake tools. Please see the {\tt README} file in the \latte directory for detailed directions for installing \latte.
-
-\begin{comment}
-\textbf{Step 1: Create directory for {\tt LattE}}
-
-\begin{verbatim}
-     mkdir latte
-\end{verbatim}
-
-\textbf{Step 2: Download ``latte\_v1.1.tar.gz'' to directory ``latte''}
-
-\begin{verbatim}
-     Download ``latte_v1.1.tar.gz'' from
-\end{verbatim}
-
-\makebox[12 cm]{http://www.math.ucdavis.edu/$\sim$latte/downloads/}
- 
-(If you have never downloaded a file from the internet: A click with
-your right mouse button onto the file name on the webpage should do
-the trick. In any case, if you do not succeed, ask your system
-administrator, a friend, or send us an email.) 
-
-\textbf{Step 3: Change to directory for ``latte''}
-
-\begin{verbatim}
-     cd latte
-\end{verbatim}
-
-\textbf{Step 4: Unzip and untar the archive} 
-
-\begin{verbatim}
-     gunzip latte_v1.1.tar.gz
-     tar xvf latte_v1.1.tar
-\end{verbatim}
-
-\textbf{Step 5: Make ``install'' executable} 
-
-\begin{verbatim}
-     chmod 700 install
-\end{verbatim}
-
-\textbf{Step 6: Install {\tt LattE}} 
-
-\begin{verbatim}
-     ./install
-\end{verbatim}
-
-\end{comment}
-
-
-
-
-
+\latte uses the GNU Autoconf, Automake, Libtool tools. Please see the {\tt README} file in the \latte directory for detailed directions for installing \latte.
 
 %\newpage
 
@@ -898,7 +895,7 @@ nonnegative 16 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16
 \end{verbatim}
 Now we simply invoke the counting function of {\tt LattE} by typing:
 \begin{verbatim}
-    ./count EXAMPLES/magic4x4
+    count EXAMPLES/magic4x4
 \end{verbatim}
 
 The last couple of lines that {\tt LattE} prints to the screen
@@ -921,7 +918,7 @@ to create a new file. Instead, we use the option ``dilation'' to indicate
 that we want to count the number of lattice points of a dilation of
 the given polytope:
 \begin{verbatim}
-    ./count --dilation=12 EXAMPLES/magic4x4
+    count --dilation=12 EXAMPLES/magic4x4
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -952,7 +949,7 @@ $4\times 4$ squares that have the magic constant $s$.
 For this, simply type (note that {\tt LattE} invokes {\tt Maple} to
 simplify intermediate expressions):
 \begin{verbatim}
-    ./count --simplified-ehrhart-series EXAMPLES/magic4x4
+    count --simplified-ehrhart-series EXAMPLES/magic4x4
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen looks
 as follows:
@@ -990,7 +987,7 @@ $t$ and due to long integer coefficients that appear.
 However, even if we cannot compute the full Ehrhart series, we can at
 least try and find the first couple of terms of it. 
 \begin{verbatim}
-    ./count --ehrhart-taylor=15 EXAMPLES/magic4x4
+    count --ehrhart-taylor=15 EXAMPLES/magic4x4
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -1054,7 +1051,7 @@ $24$-cell. Its description is given in the file ``EXAMPLES/24\_cell'':
 \end{verbatim}
 Now we invoke the counting function of {\tt LattE} by typing:
 \begin{verbatim}
-    ./count EXAMPLES/24_cell
+    count EXAMPLES/24_cell
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -1070,7 +1067,7 @@ Time: 0.429686 sec
 Therefore, there are exactly $33$ lattice points in the $24$-cell. We
 get the same result by using the homogenized Barvinok algorithm:
 \begin{verbatim}
-    ./count --homog EXAMPLES/24_cell
+    count --homog EXAMPLES/24_cell
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -1087,7 +1084,7 @@ Time: 0.957031 sec
 But how many of these $33$ points lie in the interior of the
 $24$-cell?
 \begin{verbatim}
-    ./count --interior EXAMPLES/24_cell
+    count --interior EXAMPLES/24_cell
 \end{verbatim}
 The last couple of lines that {\tt LattE} prints to the screen
 look as follows:
@@ -1111,15 +1108,15 @@ Let us integrate the polynomial $w^2x^2y^4z^8 -3/8x^2$ and the power of a linear
  
 
 Create a file named ``even.polynomial'' that has on its first line the polynomial. See Section \ref{input-file:polynomial-and-linear-form} for a review of the syntax.
-	
-	\begin{verbatim}
-	[[1,[2,2,4,8]], [-3/8,[0,2,0,0]]]
-	\end{verbatim}
+        
+        \begin{verbatim}
+        [[1,[2,2,4,8]], [-3/8,[0,2,0,0]]]
+        \end{verbatim}
 
 After running the integration command using the triangulation method
-	\begin{verbatim}
-	./integrate --valuation=integrate --triangulate --monomials=even.polynomial 24_cell
-	\end{verbatim}
+        \begin{verbatim}
+        integrate --valuation=integrate --triangulate --monomials=even.polynomial 24_cell
+        \end{verbatim}
 
 
 we see that the two monomials where decomposed into 406 powers of linear forms and the answer is
@@ -1140,36 +1137,36 @@ Computational time (algorithms + processing + program control)
 
 Now create a new file named ``power10.linearforms'' that has in its first line the power of a linear form:
 
-	\begin{verbatim}
-	[[3,[10,[1,2,4,6]]]]
-	\end{verbatim}
-	
-Then integrate this power of a linear form over the 24\_cell using the cone decomposition method with the following command:	
-	\begin{verbatim}
-	./integrate --cone-decompose --linear-forms=power10.linearforms  24_cell
-	\end{verbatim}
-	
+        \begin{verbatim}
+        [[3,[10,[1,2,4,6]]]]
+        \end{verbatim}
+        
+Then integrate this power of a linear form over the 24\_cell using the cone decomposition method with the following command:    
+        \begin{verbatim}
+        integrate --cone-decompose --linear-forms=power10.linearforms  24_cell
+        \end{verbatim}
+        
 We see the answer is computed very quickly.
-	
-\begin{verbatim}	
+        
+\begin{verbatim}        
 Integration (using the cone decomposition method)
      Answer: 59555515086/77
      Decimal: 773448247.87012987012987012987013
      Time: 0.02 sec
 Computational time (algorithms + processing + program control)
      Total time: 0.07 sec
-\end{verbatim}	
-	
+\end{verbatim}  
+        
 \begin{figure}[thb]
-	\centering
-	\includegraphics[width=0.3\textwidth]{truncatedCube.jpg}
+        \centering
+        \includegraphics[width=0.3\textwidth]{truncatedCube.jpg}
 \caption{The truncated cube.}
-	\label{fig:truncated-cube}
-\end{figure}	
-	
-For the next example, consider the truncated cube in Figure \ref{fig:truncated-cube}	
+        \label{fig:truncated-cube}
+\end{figure}    
+        
+For the next example, consider the truncated cube in Figure \ref{fig:truncated-cube}    
 
-	
+        
 The vertices are
 \begin{verbatim}
 24 4
@@ -1201,31 +1198,37 @@ The vertices are
 
 This time, let us enter the polynomial $x^{40}y^{40}z^{40}$ from stdin, which
 will be decomposed into $68,920$ powers of linear forms. Run
-	
-	\begin{verbatim}
-	./integrate --cone-decompose --triangulation=4ti2 --vrep truncatedCube.vrep.latte 
-	\end{verbatim}
+        
+        \begin{verbatim}
+        integrate --cone-decompose --triangulation=4ti2 
+                  --vrep truncatedCube.vrep.latte 
+        \end{verbatim}
 
 and type
-	\begin{verbatim}
-	p [[1,[40,40,40]]]
-	\end{verbatim}
-
-
+        \begin{verbatim}
+        p [[1,[40,40,40]]]
+        \end{verbatim}
 We see the exact answer is 
+{  \tiny
 \begin{displaymath}
 \frac{93991283632941965714919247928639002510318209692293688827363993265109276641003769553256}{2795239135836124463932439643671211584534957465679791608181565}
 \end{displaymath}
-	
-This answer displays the power of using exact rational arithmetic!	
+}
+        
+This answer displays the power of using exact rational arithmetic!      
 
 
 
 \subsection{Computing the Weighted Ehrhart Polynomial}
 
-Again, \latteInt can (currently) only compute weighted Ehrhart polynomial functions if the polytope is simple and the user has \maple.
+Again, \latteInt can (currently) only compute weighted Ehrhart polynomial
+functions 
+if 
+%% the polytope is simple and 
+the user has \maple.
 
-Consider a simple cube with vertices
+Consider the standard 0/1 square, which we represent in v-representation format as the
+file ``square.vrep.latte'':
 \begin{verbatim}
 4 3
 1 0 0
@@ -1233,38 +1236,49 @@ Consider a simple cube with vertices
 1 0 1
 1 1 1
 \end{verbatim}
-
-
-Lets first compute the unweighted Ehrhart polynomial 
-	\begin{verbatim}
-	./integrate --valuation=top-ehrhart --vrep cube.vrep.latte 
-	\end{verbatim}
-
+Let's first compute the unweighted Ehrhart polynomial of the square:
+        \begin{verbatim}
+        integrate --valuation=top-ehrhart --vrep square.vrep.latte 
+        \end{verbatim}
 and we get the answer $N^2 + 2N + 1$. 
 
-Next, compute the Ehrhart polynomial with weight $x_1^2x_2^4$ where we enter the polynomial from stdin:
-	\begin{verbatim}
-	./integrate --valuation=top-ehrhart --interactive-mode --vrep cube.vrep.latte 
-	\end{verbatim}
+\emph{Note:} For the case of the unweighted Ehrhart polynomial of a lattice polytope,
+when all coefficients are to be computed, it is faster to use \texttt{count
+  --ehrhart-polynomial} instead.  The benefit of \texttt{integrate
+  --valuation=top-ehrhart} lies in the greater generality (polynomial weights,
+rational polytopes) and the ability to compute the top few coefficients, when
+the computation of the full Ehrhart polynomial is computationally intractable
+\cite{so-called-paper-1}. 
+
+
+Next, compute the Ehrhart polynomial with weight $x_1^2x_2^4$ where we enter
+the polynomial on the terminal:
+        \begin{verbatim}
+        integrate --valuation=top-ehrhart --interactive-mode 
+            --vrep square.vrep.latte 
+        \end{verbatim}
 and then type
-	\begin{verbatim}
-	p
-	[[1,[2,4]]]
-	\end{verbatim}
-	
+        \begin{verbatim}
+        p
+        [[1,[2,4]]]
+        \end{verbatim}
 The answer is $1/15*N^8+4/15*N^7+71/180*N^6+1/4*N^5+2/45*N^4-1/60*N^3-1/180*N^2$.
 
-Finally, repeat the above commands, but find the polynomial that is correct if $N$ is a rational dilation and save the answer to a file called ``bigAnswer''. That is, add ``--real-dilations --top-ehrhart-save=bigAnswer'' to the command line and use the same polynomial. 
+Finally, repeat the above commands, but find the polynomial that is correct if
+$N$ is any real dilation factor and save the answer to a file called
+``bigAnswer''. That is, add \texttt{--real-dilations
+  --top-ehrhart-save=bigAnswer} to the command line and use the same
+polynomial.  
 
 Open the file ``bigAnswer.'' To evaluate the polynomial at a point $a \in \R$, first open the file ``compute-top-ehrhart.mpl'' that was made by \latteInt and copy the same load path ``compute-top-ehrhart.mpl'' uses into ``bigAnswer''. Make your ``bigAnswer'' file look something like this (your file path might be different):
 
-	\begin{verbatim}
-	read("/home/latte/dest/share/latte-int/Conebyconeapproximations_08_11_2010.mpl"):
-	
-	epoly:= ``something big'';
-	
-	eval(subs({N=a,n=a, MOD=latteMod},epoly);
-	\end{verbatim}
+        \begin{verbatim}
+        read("/home/latte/dest/share/latte-int/Conebyconeapproximations_08_11_2010.mpl"):
+        
+        epoly:= ``something big'';
+        
+        eval(subs({N=a,n=a, MOD=latteMod},epoly);
+        \end{verbatim}
 Note that you had to set both $n$ and $N$ to the point $a \in \R$ and the ``latteMod'' function is defined in the \maple script. If you then run this \maple file with the point $a=2.5$ you will get $85.00000031$.
 
 \subsection{Example of Optimization with \latte}
@@ -1295,7 +1309,7 @@ look as follows:
 Finished computing a rational function. 
 Time: 0.158203 sec.
 
-There is one optimal solution. 		
+There is one optimal solution.          
 
 No digging.
 An optimal solution for [213 -1928 -11111 -2345 9123] is: [7334 0 0 0 0].
@@ -1323,12 +1337,12 @@ The number of optimal solutions: 1
 Time: 0.042968
 \end{verbatim}
 Note that we get the same optimal value, but no optimal solution is
-provided.	
+provided.       
 \section{Release Information}
 
 \subsection{System Requirements}
 
-\latte runs on Unix-like systems, including Mac OS and Linux.
+\latte runs on Unix-like systems, including Mac OS X and GNU/Linux.
 
 %% \subsubsection{Platform} 
 %% The binaries for \latte v1.1 as well as for {\tt cdd} (by
@@ -1343,7 +1357,7 @@ provided.
 \subsection{Additional \maple Connection}
 The call
 \begin{verbatim}
-./count --simplified-ehrhart-series  fileName
+count --simplified-ehrhart-series  fileName
 \end{verbatim}
 requires \maple for simplifications of expressions. It should be
 sufficient to have a copy of \maple installed on your machine,
@@ -1426,12 +1440,15 @@ Although {\tt LattE} is free software, your acknowledgment
 is requested.  If {\tt LattE} is useful in your research or
 applications please acknowledge it by referencing this manual as
 
-De Loera, J.A., Dutra, B., K\"oppe, M., Moreinis, S.,
-Pinto, G., Wu, J.\\ 
-{\em A User's Guide for {\tt LattE integrale} \latteV}, 2011, 
-software package \latte is available at 
-{\tt http://www.math.ucdavis.edu/$\sim$latte/}
-	
+\begin{quote}
+  V.~Baldoni, N.~Berline, J.A.~De Loera, B.~Dutra, M.~K\"oppe, S.~Moreinis,
+  G.~Pinto, M.~Vergne, J.~Wu,
+  \\
+  {\em A User's Guide for {\tt LattE integrale} \latteV}, 2013, software
+  package \latte is available at {\tt
+    http://www.math.ucdavis.edu/$\sim$latte/}
+\end{quote}
+
 \subsection{The {\tt LattE} Team}
 \begin{description}
 \item[Project directors]~
@@ -1444,35 +1461,35 @@ software package \latte is available at
   \item Brandon Dutra (\latteInt v1.5--)
   \end{itemize}
 \item[Distinguished \latte scientists, collaborators and advisors]~
-	\begin{itemize} 
-		\item Prof.~Raymond Hemmecke (\latte v1.2)
-		\item Prof.~Ruriko Yoshida (\latte v1.2)
-		\item Dr.~David Haws (\latte v1.2)
-		\item Dr.~Peter Huggins (\latte v1.2)
-		\item Prof.~Tyrrell McAllister
-		\item Prof.~Velleda Baldoni (\latteInt v1.6)
-		\item Prof.~Nicole Berline (\latteInt v1.6)
-		\item Prof.~Michele Vergne (\latteInt v1.6)
-		\item Prof.~Alexander Barvinok
-		\item Prof.~Bernd Sturmfels 
-	\end{itemize}
+        \begin{itemize} 
+                \item Prof.~Raymond Hemmecke (\latte v1.2)
+                \item Prof.~Ruriko Yoshida (\latte v1.2)
+                \item Dr.~David Haws (\latte v1.2)
+                \item Dr.~Peter Huggins (\latte v1.2)
+                \item Prof.~Tyrrell McAllister
+                \item Prof.~Velleda Baldoni (\latteInt v1.6)
+                \item Prof.~Nicole Berline (\latteInt v1.6)
+                \item Prof.~Michele Vergne (\latteInt v1.6)
+                \item Prof.~Alexander Barvinok
+                \item Prof.~Bernd Sturmfels 
+        \end{itemize}
 \item[Alumni of the project]~
-	\begin{itemize}
-		\item Gregory Pinto	(\latteInt v1.5)
-		\item Stanislav Moreinis (\latteInt v1.5)
-		\item Jianqiu Wu (\latteInt v1.5)
-		\item Jeremy Tauzer (\latte v1.2)
-		\item Jonathan Brooks (\latte v1.2)
-		\item Carol Shih (\latte v1.2)
-		\item Esteban Pauli (\latte v1.2)
-		\item Mike Zhang	(\latte v1.2)
-	\end{itemize}
+        \begin{itemize}
+                \item Gregory Pinto     (\latteInt v1.5)
+                \item Stanislav Moreinis (\latteInt v1.5)
+                \item Jianqiu Wu (\latteInt v1.5)
+                \item Jeremy Tauzer (\latte v1.2)
+                \item Jonathan Brooks (\latte v1.2)
+                \item Carol Shih (\latte v1.2)
+                \item Esteban Pauli (\latte v1.2)
+                \item Mike Zhang        (\latte v1.2)
+        \end{itemize}
 \end{description}
 
 \subsection{Acknowledgments}
 
 \par {\tt LattE} currently uses many wonderful pieces of software.
-First is {\tt cdd} \cite{fukuda}, developed by Komei Fukuda, whose webpage can be
+First is {\tt cddlib} \cite{fukuda}, developed by Komei Fukuda, whose webpage can be
 found at:
 
 \makebox[12 cm]{http://www.cs.mcgill.ca/$\sim$fukuda/}
@@ -1481,7 +1498,7 @@ Next, \latte uses \fourtitwo \cite{4ti2} whose webpage can be found at:
 
 \makebox[12 cm]{http://www.4ti2.de}
 
-{\tt cdd} and \fourtitwo is used for finding vertices of polytopes and the
+{\tt cddlib} and \fourtitwo is used for finding vertices of polytopes and the
 triangulation of cones.
 
 In addition, {\tt LattE} currently uses NTL, a
@@ -1491,7 +1508,12 @@ integers, and floating point numbers.  NTL can be found at:
 
 \makebox[12cm]{http://shoup.net/ntl/}
 
-We are truly grateful to Velleda Baldoni, Alexander Barvinok, Nicole Berline, Komei Fukuda, Tyrrell McAllister, Dmitrii Pasechnik, Michele Vergne, and Bernd Sturmfels for several suggestions and
+In addition, {\tt LattE} optionally uses the LiDIA library, 
+developed at TU Darmstadt.
+
+We are truly grateful to Velleda Baldoni, Alexander Barvinok, Nicole Berline,
+Komei Fukuda, Tyrrell McAllister, Dmitrii Pasechnik, Bernd Sturmfels, and
+Mich\`ele Vergne for several suggestions and 
 useful conversations that improved our software.  We thank the National
 Science Foundation for support to this project via NSF grants DMS-0309694, 
 DMS-0073815, DMS-0914107 and DMS-0914873. Most of the students were supported by those
@@ -1540,7 +1562,7 @@ polytopes}, university lecture series, vol. 8, AMS, Providence RI,
 1996.
 \bibitem{stanley}{Stanley, R.P.} {\em Enumerative Combinatorics}, 
 Volume I, Cambridge, 1997.
-\end{thebibliography}	
+\end{thebibliography}   
 
 \end{comment}
 
