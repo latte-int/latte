@@ -1,10 +1,10 @@
 ACLOCAL_AMFLAGS = -I m4 -I m4/gnulib
 
-SUBDIRS = code EXAMPLES
+SUBDIRS = code EXAMPLES doc
 
 docdir = $(pkgdatadir)/doc
 
-dist_doc_DATA = doc/manual.pdf NEWS README
+dist_doc_DATA = NEWS README
 
 
 cvstag:
