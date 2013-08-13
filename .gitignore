@@ -290,6 +290,7 @@ doc/*.dvi
 doc/*.log
 doc/*.out
 doc/*.toc
+doc/Makefile.in
 doc/auto
 doc/manual.ps
 doc/manual.synctex.gz
