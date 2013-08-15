@@ -156,7 +156,7 @@ void BuildPolytope::buildLatteHRepFile()
 	ofstream file;
 
 	file.open(getLatteHRepFile().c_str());
-
+
 	file << facets.size() << " " << ambientDim + 1 << endl;
 	for (int i = 0; i < (int) facets.size(); ++i)
 	{
@@ -174,7 +174,7 @@ void BuildPolytope::buildLatteHRepFile()
 		}//for the affine hull equations.
 		file << endl;
 	}//if there are affine hulls!
-	file.close();}
+	file.close();}
 
 /**
  * Makes a latte dual h-rep file.
@@ -225,7 +225,7 @@ void BuildPolytope::buildLatteVRepFile()
 	ofstream file;
 
 	file.open(getLatteVRepFile().c_str());
-
+
 	file << points.size() << " " << ambientDim + 1 << endl;
 	for (int i = 0; i < (int) points.size(); ++i)
 	{
