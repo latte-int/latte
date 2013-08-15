@@ -336,7 +336,6 @@ m4/gnulib/sys_types_h.m4 -text
 m4/gnulib/time_h.m4 -text
 m4/gnulib/warn-on-use.m4 -text
 m4/gnulib/wchar_t.m4 -text
-/manual_v1.6.pdf -text svneol=unset#unset
 /reloc-ldflags -text
 snippet/_Noreturn.h -text
 snippet/arg-nonnull.h -text
