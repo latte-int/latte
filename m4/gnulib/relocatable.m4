@@ -40,7 +40,9 @@ AC_DEFUN([gl_RELOCATABLE_BODY],
     AC_CHECK_HEADERS([mach-o/dyld.h])
     AC_CHECK_FUNCS([_NSGetExecutablePath])
     case "$host_os" in
-      mingw*) is_noop=yes ;;
+      dnl On Cygwin, the shared libraries (DLLs) are installed next to the binaries, 
+      dnl and Windows seems to find them there.  So no action necessary. --mkoeppe, 2013-08-14
+      mingw* | cygwin*) is_noop=yes ;;
       linux* | kfreebsd*) use_elf_origin_trick=yes ;;
     esac
     if test $is_noop = yes; then
