@@ -882,7 +882,7 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
 
 	cerr << "Computing vertices and edges with cdd...";
 	cerr.flush();
-	system_with_error_check(relocated_pathname(CDD_PATH)
+	system_with_error_check(shell_quote(relocated_pathname(CDD_PATH))
 			+ " latte_cdd.ine > latte_cdd.out");
 	cerr << "done." << endl;
 
@@ -925,7 +925,7 @@ listCone* computeVertexCones(const char* fileName, const dd_MatrixPtr M)
 
 	cerr << "Computing vertices and edges with cdd...";
 	cerr.flush();
-	system_with_error_check(relocated_pathname(CDD_PATH)
+	system_with_error_check(shell_quote(relocated_pathname(CDD_PATH))
 			+ " latte_cdd.ine > latte_cdd.out");
 	cerr << "done." << endl;
 
@@ -953,14 +953,14 @@ listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix,
 	createLrsIneFile(matrix, numOfVars + 1);
 
 	cerr << "Computing vertices with lrs...";
-	system_with_error_check(LRS_PATH " latte_lrs.ine > latte_lrs.ext");
+	system_with_error_check(shell_quote(LRS_PATH) + " latte_lrs.ine > latte_lrs.ext");
 	cerr << "done.\n\n";
 
 	createLrsIneFileToPostAnalysys(matrix, numOfVars + 1);
 	createLrsExtFileToPostAnalysys(matrix, numOfVars + 1);
 
 	cerr << "Computing edges with cdd...";
-	system_with_error_check(relocated_pathname(CDD_PATH)
+	system_with_error_check(shell_quote(relocated_pathname(CDD_PATH))
 			+ " latte_cdd.ine > latte_cdd.out");
 	cerr << "done.\n\n";
 
@@ -1138,7 +1138,7 @@ listCone *computeVertexConesFromExtFile(int &numOfVars)
 
 #if 0
 	cerr << "Computing vertices and edges with cdd...";
-	system_with_error_check(relocated_pathname(COMPUTEADJACENCY_PATH) + " latte_cdd.ext > latte_cdd.jnk 2>&1");
+	system_with_error_check(shell_quote(relocated_pathname(COMPUTEADJACENCY_PATH)) + " latte_cdd.ext > latte_cdd.jnk 2>&1");
 	cerr << "done.\n\n";
 #else
 	cerr << "Computing vertices and edges with cddlib...";
@@ -1222,7 +1222,7 @@ rationalVector* LP(listVector* matrix, vec_ZZ& cost, int numOfVars,
 		cerr << "Computing LP... ";
 		cerr.flush();
 	}
-	system_with_error_check(relocated_pathname(CDD_PATH) + " LP.ine > LP.out");
+	system_with_error_check(shell_quote(relocated_pathname(CDD_PATH)) + " LP.ine > LP.out");
 	if (verbose)
 	{
 		cerr << "done.";

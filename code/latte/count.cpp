@@ -68,10 +68,10 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 
 	if (argc < 2)
 	{
-		cerr << "usage: " << argv[0] << " [OPTIONS...] " << "INPUTFILE" << endl;
-		cerr << "Type `" << argv[0] << " --help' \n"
-				<< "for a list of options and input specifications." << endl;
-		THROW_LATTE(LattException::ue_BadCommandLineOptionCount);
+	  cerr << "usage: " << shell_quote(argv[0]) << " [OPTIONS...] " << "INPUTFILE" << endl;
+	  cerr << "Type `" << shell_quote(argv[0]) << " --help' \n"
+	       << "for a list of options and input specifications." << endl;
+	  THROW_LATTE(LattException::ue_BadCommandLineOptionCount);
 	}
 
 	//setbuf(stdout,0);
@@ -79,7 +79,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 	cerr << "Invocation: ";
 	for (i = 0; i < argc; i++)
 	{
-		cerr << argv[i] << " ";
+	  cerr << shell_quote(argv[i]) << " ";
 	}
 	cerr << endl;
 

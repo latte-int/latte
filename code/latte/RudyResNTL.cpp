@@ -1063,7 +1063,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 			Simplify_Term.close ();
 
-			system_with_error_check(MAPLE_PATH " < " + relocated_pathname(MAPLE_SCRIPT_DIR) + "/simplify3.add >out.simplify");
+			system_with_error_check(shell_quote(MAPLE_PATH) + " < " + shell_quote(relocated_pathname(MAPLE_SCRIPT_DIR)) + "/simplify3.add >out.simplify");
 		
 			cerr << "%";	
 		}
@@ -1076,7 +1076,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			{
 				Cones_File_Count = 0;
 
-				system_with_error_check(MAPLE_PATH " < " + relocated_pathname(MAPLE_SCRIPT_DIR) + "/simplify4.add >out.simplify");
+				system_with_error_check(shell_quote(MAPLE_PATH) + " < " + shell_quote(relocated_pathname(MAPLE_SCRIPT_DIR)) + "/simplify4.add >out.simplify");
 
 			}	
 			
@@ -1118,7 +1118,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 				
 				Rational_Function_S_T.close ();	
 
-				system_with_error_check(MAPLE_PATH " < " + relocated_pathname(MAPLE_SCRIPT_DIR) + "/simplify2.add >out.simplify");
+				system_with_error_check(shell_quote(MAPLE_PATH) + " < " + shell_quote(relocated_pathname(MAPLE_SCRIPT_DIR)) + "/simplify2.add >out.simplify");
 			}
 
 		//Now we have all the N_k's up to N_(order)
@@ -1164,7 +1164,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			
 			Simplify_Term.close ();
 
-			system_with_error_check(MAPLE_PATH " < " + relocated_pathname(MAPLE_SCRIPT_DIR) + "/simplify.add >out.simplify");
+			system_with_error_check(shell_quote(MAPLE_PATH) + " < " + shell_quote(relocated_pathname(MAPLE_SCRIPT_DIR)) + "/simplify.add >out.simplify");
 			
 		}
 		

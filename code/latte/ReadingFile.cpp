@@ -146,7 +146,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
   }
  
   int * NewIndex = NULL;
-  system_with_error_check(relocated_pathname(REDCHECK_PATH) + " Check_red > Check_red.out 2>&1");
+  system_with_error_check(shell_quote(relocated_pathname(REDCHECK_PATH)) + " Check_red > Check_red.out 2>&1");
   int numOfEqu2 = 0, numOfConsts2;
   ifstream in2("Check_red.out");
   if(!in2){

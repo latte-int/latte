@@ -62,7 +62,7 @@ void BuildPolytope::centerPolytope()
 	//I do not know why, but in the terminal I can type center f.polymake f.polymake,
 	//but here, it does not like it when the output and input files are the same.
 	//Hence the ".temp" file that is made and renamed.
-	system_with_error_check((string("center ") + getPolymakeFile() + ".temp " + getPolymakeFile()).c_str());
+	system_with_error_check(string("center ") + shell_quote(getPolymakeFile()) + ".temp " + shell_quote(getPolymakeFile()));
 	rename((string(getPolymakeFile()+".temp ")).c_str(), getPolymakeFile().c_str());
 	points.clear();
 	facets.clear();
@@ -306,7 +306,7 @@ void BuildPolytope::findFacets()
 	
 	//ask polymake for the 
 
-	system_with_error_check((string("polymake ") + getPolymakeFile() + " DIM AMBIENT_DIM FACETS AFFINE_HULL > /dev/null ").c_str());
+	system_with_error_check((string("polymake ") + shell_quote(getPolymakeFile()) + " DIM AMBIENT_DIM FACETS AFFINE_HULL > /dev/null ").c_str());
 
 	//next, read the polymake file.
 
@@ -411,7 +411,7 @@ void BuildPolytope::findVertices()
 	buildPolymakeFile();
 	
 	//ask polymake for the 
-	system_with_error_check((string("polymake ") + getPolymakeFile() + " DIM AMBIENT_DIM VERTICES > /dev/null ").c_str());
+	system_with_error_check((string("polymake ") + shell_quote(getPolymakeFile()) + " DIM AMBIENT_DIM VERTICES > /dev/null ").c_str());
 
 
 	//next, read the polymake file.
@@ -521,7 +521,7 @@ bool BuildPolytope::isCentered()
 	buildPolymakeFile();
 
 	//ask polymake
-	system_with_error_check((string("polymake ") + getPolymakeFile() + " CENTERED > /dev/null ").c_str());
+	system_with_error_check((string("polymake ") + shell_quote(getPolymakeFile()) + " CENTERED > /dev/null ").c_str());
 
 	//next, read the polymake file.
 	ifstream file;
@@ -588,7 +588,7 @@ bool BuildPolytope::isSimplicial()
 	buildPolymakeFile();
 
 	//ask polymake
-	system_with_error_check((string("polymake ") + getPolymakeFile() + " SIMPLICIAL > /dev/null ").c_str());
+	system_with_error_check(string("polymake ") + shell_quote(getPolymakeFile()) + " SIMPLICIAL > /dev/null ");
 
 
 	//next, read the polymake file.
@@ -611,8 +611,8 @@ bool BuildPolytope::isSimple()
 	buildPolymakeFile();
 
 	//ask polymake
-	system_with_error_check((string("polymake ") + getPolymakeFile() + " DIM > /dev/null ").c_str());
-	system_with_error_check((string("polymake ") + getPolymakeFile() + " SIMPLE > /dev/null ").c_str());
+	system_with_error_check(string("polymake ") + shell_quote(getPolymakeFile()) + " DIM > /dev/null ");
+	system_with_error_check(string("polymake ") + shell_quote(getPolymakeFile()) + " SIMPLE > /dev/null ");
 
 
 	//next, read the polymake file.

@@ -31,6 +31,9 @@
 void system_with_error_check(const char *command);
 void system_with_error_check(const string &command);
 
+// Quote argument for the shell.
+string shell_quote(const string &argument);
+
 // Functions for storing intermediate data in a secure temporary
 // directory.  (More importantly, different runs of LattE are isolated
 // from each other.)  The  function `temporary_directory_name' returns

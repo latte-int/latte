@@ -221,7 +221,7 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 	maple << "printf(\"Total Maple time %a\\n\", t2);\n" << endl;
 	maple.close();
 
-	system_with_error_check(MAPLE_PATH + string(" -q compute-top-ehrhart.mpl"));
+	system_with_error_check(shell_quote(MAPLE_PATH) + string(" -q compute-top-ehrhart.mpl"));
 }
 
 /**

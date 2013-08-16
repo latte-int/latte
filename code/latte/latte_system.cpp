@@ -47,6 +47,26 @@ void system_with_error_check(const string &command)
   system_with_error_check(command.c_str());
 }
 
+string shell_quote(const string &argument)
+{
+  // Quote unless all characters in ARGUMENT are from a very
+  // conservative character set.  We don't use the <ctype> functions
+  // because they are locale-dependent.
+  std::size_t found = argument.find_first_not_of("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-+/.");
+  if (found!=string::npos) {
+    string result;
+    result.push_back('\'');
+    for (string::const_iterator i = argument.begin(); i!=argument.end(); ++i) {
+      if (*i == '\'') 
+	result.push_back('\\');
+      result.push_back(*i);
+    }
+    result.push_back('\'');
+    return result;
+  }
+  else
+    return argument;
+}
 
 static bool created_temp_dir = false;
 static string temp_dir;

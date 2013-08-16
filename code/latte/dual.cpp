@@ -103,7 +103,7 @@ static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
   out.close();
 
   /*      printf("Computing facets with cdd..."); */
-  system_with_error_check(relocated_pathname(CDD_PATH) + " latte_cdd.ine > latte_cdd.out");
+  system_with_error_check(shell_quote(relocated_pathname(CDD_PATH)) + " latte_cdd.ine > latte_cdd.out");
   /*      printf("done.\n"); */
 
   strcpy(cddInFileName,"latte_cdd.ext");

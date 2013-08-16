@@ -151,7 +151,7 @@ void CheckEmpty(const char * Filename){
      existence of the output file.
   */
   system_with_error_check("rm -f Check_emp.lps");
-  system_with_error_check(relocated_pathname(CDD_PATH) + " Check_emp.lp > Check_emp.out");
+  system_with_error_check(shell_quote(relocated_pathname(CDD_PATH)) + " Check_emp.lp > Check_emp.out");
 
   int FLAG = 0;
 

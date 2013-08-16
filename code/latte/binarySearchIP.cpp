@@ -115,7 +115,7 @@ rationalVector* LP2(listVector* matrix, listVector* ineq, vec_ZZ& cost, int numO
   rationalVector* Opt_vector;
    createCddIneLPFile2(matrix, ineq, numOfVars+1, cost);
    cerr << "Computing LP...";
-   system_with_error_check(relocated_pathname(CDD_PATH) + " LP.ine > LP.out");
+   system_with_error_check(shell_quote(relocated_pathname(CDD_PATH)) + " LP.ine > LP.out");
   cerr << "done.\n\n";
   Opt_vector = ReadLpsFile2(numOfVars);
   //  cerr << Opt_vector->numerators() << " " << Opt_vector -> denominator << endl;
