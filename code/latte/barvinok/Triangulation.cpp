@@ -188,7 +188,6 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
   vec_ZZ neg; 
  	int	File_Present = 1;	 
 	char		File_Path [256];
-	char		System_Command[256];
 	char		*Integer_String = NULL;
 	char 		*Integer_String_Original = NULL;  
 	
@@ -223,7 +222,7 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 			//file not present
 			File_Present = 0;
 
-			cerr << "Triangulation_Load_Save: File not present.  Calculation triangulation." << endl;
+			cerr << "Triangulation_Load_Save: File not present.  Calculating triangulation." << endl;
   			writeCDDextFileRudy(m,n,Mat);
   			system_with_error_check(shell_quote(relocated_pathname(CDD_PATH)) + " tri.ext > tri.out");
   			system_with_error_check("rm -f tri.out");
@@ -231,9 +230,9 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 		else
 		{
 			//unzip file, rename [File_name][Cone_Index] to tri.ext
-			strcpy (System_Command, "tar -zxf ");
-			strcat (System_Command, File_Path );
-
+			string System_Command("tar -zxf ");
+			System_Command += shell_quote(File_Path);
+			
 			cerr << "Triangulation_Load_Save: File present.  Unziping using command: " << System_Command << endl;
 	
 			system_with_error_check (System_Command);
@@ -288,9 +287,9 @@ int Triangulation_Load_Save (const mat_ZZ & Mat, const int & m, const int & n, c
 	{
 		//save files to triangulation/[File_Name][Cone_Index].tar.gz 	
 
-		strcpy (System_Command, "tar -zcf ");
-		strcat (System_Command, File_Path);
-		strcat (System_Command, " tri.ine tri.icd");
+		string System_Command("tar -zcf ");
+		System_Command += shell_quote(File_Path);
+		System_Command += " tri.ine tri.icd";
 
 		cerr << "Triangulation_Load_Save: Save mode.  Creating archive of tri.ine tri.icd with command: " << System_Command << endl;
 
