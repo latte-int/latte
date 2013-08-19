@@ -274,7 +274,7 @@ handle_cone(listCone *t, int t_count, int t_total, int level)
     // FIXME: Lame.
     optind = 1;			// getopt should parse from the beginning.
     int argc = 3;
-    char *argv[3] = {"embedded_zsolve", "-q", "normalize_aux"};
+    char *argv[3] = {(char*) "embedded_zsolve", (char*) "-q", (char*) "normalize_aux"};
     _4ti2_zsolve_::Options options(argc, argv);
     _4ti2_zsolve_::DefaultController<int> * controller
       = new NormalizController<int>(&std::cout, NULL, options,
