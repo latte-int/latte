@@ -39,6 +39,15 @@ extern "C" {
 #include "util/vector.h"
 }
 
+#include <climits>
+#include <string>
+
+#include "config.h"
+#include "gnulib/progname.h"
+#include "latte/latte_system.h"
+
+using namespace std;
+
 // Silly interface to hilbert-from-rays
 int normalize_commandline(char *command);
 
@@ -165,13 +174,11 @@ listVector* extractSimplicialCones(listVector *simplicialCones,
 /* ----------------------------------------------------------------- */
 void runHilbert_From_Rays(char *inFileName, char *outFileName, char *hilbert_from_rays, 
 		 char *raysFileName, int rayToBePulled, int trivial) {
-  char command[1000];
+  char command[10000];
   int retval;
 
-/*    strcpy(command,"/home/mkoeppe/w/latte/build-gcc411-64/dest/bin/"); */
-
   if (hilbert_from_rays[0])
-    strcpy(command,hilbert_from_rays);
+    strcpy(command, shell_quote(hilbert_from_rays).c_str());
   else
     strcpy(command, "dummy");
   
@@ -179,12 +186,12 @@ void runHilbert_From_Rays(char *inFileName, char *outFileName, char *hilbert_fro
   strcat(command," --triangulation-pull-rays=");
   sprintf(command,"%s%d",command,rayToBePulled);
   strcat(command," --subcones=");
-  strcat(command,inFileName);
+  strcat(command, shell_quote(inFileName).c_str());
   strcat(command," --output-subcones=");
-  strcat(command,outFileName);
+  strcat(command, shell_quote(outFileName).c_str());
   if (trivial==1) {
     strcat(command," --output-trivial-subcones=");
-    strcat(command,outFileName);
+    strcat(command, shell_quote(outFileName).c_str());
     strcat(command,".trivial");
   }
   strcat(command," ");
@@ -212,13 +219,13 @@ void checkCones(char *simplicialConesFileName,char *checkFileName,
 		char* raysFileName, char *hilbert_from_rays) {
   int numOfVars;
   listVector *HB, *tmp;
-  char hilFileName[127],command[1000];
+  char hilFileName[PATH_MAX],command[10000];
   int retval;
 
   printf("Checking simplicial cones.\n");
 
   if (hilbert_from_rays[0])
-    strcpy(command,hilbert_from_rays);
+    strcpy(command, shell_quote(hilbert_from_rays).c_str());
   else
     strcpy(command, "dummy");
 
@@ -226,12 +233,12 @@ void checkCones(char *simplicialConesFileName,char *checkFileName,
   strcat(command," --no-triang-file --reduction=cplex");
   strcat(command," --max-determinant-for-enumeration=10000");
   strcat(command," --reduction-rays-file=");
-  strcat(command,raysFileName);
+  strcat(command, shell_quote(raysFileName).c_str());
   strcat(command,".check");
   strcat(command," --subcones=");
-  strcat(command,simplicialConesFileName);
+  strcat(command, shell_quote(simplicialConesFileName).c_str());
   strcat(command," ");
-  strcat(command,raysFileName);
+  strcat(command, shell_quote(raysFileName).c_str());
 
   printf("%s\n",command);
   callsToHilbert_From_Rays++;
@@ -366,8 +373,8 @@ listVector* pullOneRay(char* simplicialConesFileName, char* mainConesInFileName,
             int rayToBePulled, int numOfVars, int dimension) {
   int maxNorm,threshold,localRayToBePulled;
   listVector *simplicialCones, *smallCones, *mainOrbits;
-  char mainConesInFileNameNumbered[127], mainConesOutFileNameNumbered[127],
-    smallConesInFileName[127],smallConesOutFileName[127],trivialSmallConesOutFileName[127];
+  char mainConesInFileNameNumbered[PATH_MAX], mainConesOutFileNameNumbered[PATH_MAX],
+    smallConesInFileName[PATH_MAX],smallConesOutFileName[PATH_MAX],trivialSmallConesOutFileName[PATH_MAX];
   
   if (mainCones==0) return (mainCones);
 
@@ -465,12 +472,14 @@ int main(int argc, char *argv[]) {
   vector v;
   listVector *mainCones, *symmGroup, *smallCones, *trivialSmallCones, 
     *simplicialCones, *tmp;
-  char raysFileName[127],symFileName[127],mainConesInFileName[127],
-    mainConesInFileNameNumbered[127],mainConesOutFileName[127],
-    mainConesOutFileNameNumbered[127],smallConesInFileName[127],
-    smallConesOutFileName[127],trivialSmallConesOutFileName[127],
-    simplicialConesFileName[127],reductionRaysFileName[127],
-    action[127],hilbert_from_rays[127];
+  char raysFileName[PATH_MAX],symFileName[PATH_MAX],mainConesInFileName[PATH_MAX],
+    mainConesInFileNameNumbered[PATH_MAX],mainConesOutFileName[PATH_MAX],
+    mainConesOutFileNameNumbered[PATH_MAX],smallConesInFileName[PATH_MAX],
+    smallConesOutFileName[PATH_MAX],trivialSmallConesOutFileName[PATH_MAX],
+    simplicialConesFileName[PATH_MAX],reductionRaysFileName[PATH_MAX],
+    action[PATH_MAX],hilbert_from_rays[PATH_MAX];
+
+  set_program_name(argv[0]);
 
   if (argc < 2) {
     usage();
