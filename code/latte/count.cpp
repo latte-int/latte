@@ -494,7 +494,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 			listCone *cone;
 			for (cone = Poly->cones; cone != NULL; cone = cone->rest)
 				barvinokDecomposition_Single(cone, write_params);
-			cerr << "Multivariate generating function written to "<< rat_filename.c_str() << endl;
+			cerr << "Multivariate generating function written to `"<< rat_filename.c_str() << "'" << endl;
 			countAnswerContainer.multivariateGenFunctionFileName = rat_filename;
 			break;
 		}
@@ -712,24 +712,16 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 
 	if (read_polyhedron_data.rationalCone[0] == 'y')
 	{
-		cerr << endl << "Rational function written to " << argv[argc - 1]
-				<< ".rat" << endl << endl;
-		strcpy(command, "mv ");
-		strcat(command, "simplify.sum ");
-		strcat(command, argv[argc - 1]);
-		strcat(command, ".rat");
-		system_with_error_check(command);
+		string new_name = string(argv[argc - 1]) + ".rat";
+		cerr << endl << "Rational function written to `" << new_name << "'" << endl << endl;
+		rename_with_error_check("simplify.sum", new_name);
 	}
 
 	if (printfile[0] == 'y')
 	{
-		cerr << endl << "Rational function written to " << argv[argc - 1]
-				<< ".rat" << endl << endl;
-		strcpy(command, "mv ");
-		strcat(command, "func.rat ");
-		strcat(command, argv[argc - 1]);
-		strcat(command, ".rat");
-		system_with_error_check(command);
+		string new_name = string(argv[argc - 1]) + ".rat";
+		cerr << endl << "Rational function written to `" << new_name << "'" << endl << endl;
+		rename_with_error_check("func.rat", new_name);
 	}
 	if ((removeFiles[0] == 'y')
 			&& (read_polyhedron_data.dualApproach[0] == 'n'))

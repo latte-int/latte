@@ -34,6 +34,10 @@ void system_with_error_check(const string &command);
 // Quote argument for the shell.
 string shell_quote(const string &argument);
 
+// The rename(2) system call with error checking and C++ strings as arguments.
+void
+rename_with_error_check(const string &old_name, const string &new_name);
+
 // Functions for storing intermediate data in a secure temporary
 // directory.  (More importantly, different runs of LattE are isolated
 // from each other.)  The  function `temporary_directory_name' returns

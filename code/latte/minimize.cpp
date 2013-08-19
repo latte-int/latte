@@ -589,19 +589,13 @@ if(Memory_Save[0] == 'n')
  }
 
  if(rationalCone[0] == 'y') {
-   strcpy(command, "mv ");
-   strcat(command, "simplify.sum ");
-   strcat(command, argv[argc - 1]);
-   strcat(command, ".rat");
-   system_with_error_check(command);
+   string new_name = string(argv[argc - 1]) + ".rat";
+   rename_with_error_check("simplify.sum", new_name);
  }
 
  if(printfile[0] == 'y'){
-   strcpy(command, "mv ");
-   strcat(command, "func.rat ");
-   strcat(command, argv[argc - 1]);
-   strcat(command, ".rat");
-   system_with_error_check(command);
+   string new_name = string(argv[argc - 1]) + ".rat";
+   rename_with_error_check("func.rat", new_name);
  }
  if(removeFiles[0] == 'y'){
    

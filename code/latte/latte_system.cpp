@@ -36,7 +36,7 @@ void system_with_error_check(const char *command)
 {
   int status = system(command);
   if (status != 0) {
-    cerr << "Command '" << command << "' returned with exit status "
+    cerr << "Command `" << command << "' returned with exit status "
 	 << status << "." << endl;
     exit(1);
   }
@@ -66,6 +66,16 @@ string shell_quote(const string &argument)
   }
   else
     return argument;
+}
+
+void
+rename_with_error_check(const string &old_name, const string &new_name)
+{
+  int status = rename(old_name.c_str(), new_name.c_str());
+  if (status != 0) {
+    cerr << "Renaming file `" << old_name << "' to `" << new_name << "' failed, errno: " << errno << "." << endl;
+    exit(1);
+  }
 }
 
 static bool created_temp_dir = false;
