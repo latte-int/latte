@@ -27,4 +27,6 @@
 
 std::string relocated_pathname(const char *pathname);
 
+std::string relocated_pathname(const std::string &pathname);
+
 #endif

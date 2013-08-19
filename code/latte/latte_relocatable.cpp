@@ -34,3 +34,9 @@ std::string relocated_pathname(const char *pathname)
   return result;
 }
 
+std::string relocated_pathname(const std::string &pathname)
+{
+  return relocated_pathname(pathname.c_str());
+}
+
+  
