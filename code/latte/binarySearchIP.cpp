@@ -165,7 +165,7 @@ ZZ OptimalCheckEqu(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, 
 
   //system_with_error_check("rm numOfLatticePoints");
   createLatteFileEqu(matrix, ineq, numOfVars + 1, rhs, lhs);
-  system_with_error_check("./count latte_BS > latte_BS.out");
+  system_with_error_check(shell_quote(relocated_pathname(string(INSTALLPREFIX) + "/bin/count")) + " latte_BS > latte_BS.out");
 
   ifstream in("numOfLatticePoints");
   in >> NumOfLatticePoints;
@@ -218,9 +218,9 @@ ZZ OptimalCheck(listVector* matrix, listVector* ineq, int numOfVars, ZZ rhs, vec
   //system_with_error_check("rm -f numOfLatticePoints");
   createLatteFile(matrix, ineq, numOfVars + 1, rhs, lhs);
   if(lengthListVector(matrix) != 0)
-  system_with_error_check("time ./count latte_BS > latte_BS.out");
+    system_with_error_check("time " + shell_quote(relocated_pathname(string(INSTALLPREFIX) + "/bin/count")) + " latte_BS > latte_BS.out");
   else
-  system_with_error_check("time ./count latte_BS > latte_BS.out");
+    system_with_error_check("time " + shell_quote(relocated_pathname(string(INSTALLPREFIX) + "/bin/count")) + " latte_BS > latte_BS.out");
 
   ifstream in("numOfLatticePoints");
   in >> NumOfLatticePoints;
