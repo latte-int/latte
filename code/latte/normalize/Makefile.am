@@ -9,7 +9,8 @@ if HAVE_FORTYTWO_LIB
 lib_LTLIBRARIES += libnormalize.la
 libnormalize_la_SOURCES = ReductionTest.cpp normalize.cpp
 noinst_HEADERS += ReductionTest.h
-AM_CPPFLAGS = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(top_srcdir)/code
+#AM_CPPFLAGS = -I$(srcdir)/..
 AM_LDFLAGS = 
 LDADD = libnormalize.la ../liblatte.la
 
