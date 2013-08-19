@@ -68,7 +68,7 @@ show_standard_dualization_option(ostream &stream)
 
 static void dualizeCone_with_cdd(listCone *tmp, int numOfVars)
 {
-  char cddInFileName[127];
+  char cddInFileName[PATH_MAX];
   string tmpString;
   int i,j,tmpInt,len,numOfVertices;
   ZZ x,y;

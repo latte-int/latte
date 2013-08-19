@@ -54,7 +54,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 	int i;
 	unsigned int flags = 0, print_flag = 0, output_cone = 0;
 	char printfile[127], Save_Tri[127], Load_Tri[127], Print[127],
-			removeFiles[127], command[PATH_MAX];
+		removeFiles[127];
 	bool approx;
 	bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
 	bool triangulation_specified = false;

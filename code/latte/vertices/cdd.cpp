@@ -873,7 +873,7 @@ listCone* readCddEadFileFromVrep(listCone* cones, int numOfVars)
 listCone* computeVertexCones(const char* fileName, listVector* matrix,
 		int numOfVars)
 {
-	char cddOutFileName[PATH_MAX], command[PATH_MAX];
+	char cddOutFileName[PATH_MAX], command[10000];
 	listCone *cones;
 
 	/* Compute vertices and edges with cdd. */
@@ -916,7 +916,7 @@ listCone* computeVertexCones(const char* fileName, listVector* matrix,
 /* ----------------------------------------------------------------- */
 listCone* computeVertexCones(const char* fileName, const dd_MatrixPtr M)
 {
-	char cddOutFileName[PATH_MAX], command[PATH_MAX];
+	char cddOutFileName[PATH_MAX], command[10000];
 	listCone *cones;
 
 	/* Compute vertices and edges with cdd. */
@@ -945,7 +945,7 @@ listCone* computeVertexConesViaLrs(const char* fileName, listVector* matrix,
 		int numOfVars)
 {
 
-	char cddOutFileName[PATH_MAX], command[PATH_MAX];
+	char cddOutFileName[PATH_MAX], command[10000];
 	listCone *cones;
 
 	/* Compute vertices with lrs. */

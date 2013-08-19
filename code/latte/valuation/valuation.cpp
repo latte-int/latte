@@ -386,7 +386,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	int i;
 	unsigned int flags = 0, print_flag = 0, output_cone = 0;
 	char printfile[127], Save_Tri[127], Load_Tri[127], Print[127],
-			removeFiles[127], command[127];
+			removeFiles[127];
 	char printLawrence[127];
 	bool approx;
 	bool ehrhart_polynomial, ehrhart_series, ehrhart_taylor;
@@ -962,28 +962,28 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			&& (read_polyhedron_data.dualApproach[0] == 'n'))
 	{
 
-		strcpy(command, "rm -f ");
-		strcat(command, fileName);
-		strcat(command, ".ext");
-		system_with_error_check(command);
+		// strcpy(command, "rm -f ");
+		// strcat(command, fileName);
+		// strcat(command, ".ext");
+		// system_with_error_check(command);
 
-		strcpy(command, "rm -f ");
-		strcat(command, fileName);
-		strcat(command, ".cdd");
-		system_with_error_check(command);
+		// strcpy(command, "rm -f ");
+		// strcat(command, fileName);
+		// strcat(command, ".cdd");
+		// system_with_error_check(command);
 
-		if (read_polyhedron_data.Memory_Save[0] == 'n')
-		{
-			strcpy(command, "rm -f ");
-			strcat(command, fileName);
-			strcat(command, ".maple");
-			system_with_error_check(command);
-		}
+		// if (read_polyhedron_data.Memory_Save[0] == 'n')
+		// {
+		// 	strcpy(command, "rm -f ");
+		// 	strcat(command, fileName);
+		// 	strcat(command, ".maple");
+		// 	system_with_error_check(command);
+		// }
 
-		strcpy(command, "rm -f ");
-		strcat(command, fileName);
-		strcat(command, ".ead");
-		system_with_error_check(command);
+		// strcpy(command, "rm -f ");
+		// strcat(command, fileName);
+		// strcat(command, ".ead");
+		// system_with_error_check(command);
 
 	}
 

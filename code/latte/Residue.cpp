@@ -42,7 +42,6 @@ ZZ
 Residue(listCone* cones, int numOfVars)
 {
   int numOfTerms;
-//  char outFileName[127];
   listVector *tmp;
   listCone *C, * cones1;
   int dim, noGsPerC,noCones; //noGsPerC is number of generators per cone
@@ -584,7 +583,6 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 		    ZZ *Total_Lattice_Points, ZZ *Ten_Power) 
 {
 
-//  char outFileName[127];
   listCone *C, * cones1;
   int dim, noGsPerC,noCones; //noGsPerC is number of generators per cone
   clock_t t,sc=0,sc2=0;
