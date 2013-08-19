@@ -727,28 +727,28 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 			&& (read_polyhedron_data.dualApproach[0] == 'n'))
 	{
 
-		strcpy(command, "rm -f ");
-		strcat(command, fileName);
-		strcat(command, ".ext");
-		system_with_error_check(command);
+		// strcpy(command, "rm -f ");
+		// strcat(command, fileName);
+		// strcat(command, ".ext");
+		// system_with_error_check(command);
 
-		strcpy(command, "rm -f ");
-		strcat(command, fileName);
-		strcat(command, ".cdd");
-		system_with_error_check(command);
+		// strcpy(command, "rm -f ");
+		// strcat(command, fileName);
+		// strcat(command, ".cdd");
+		// system_with_error_check(command);
 
 		if (read_polyhedron_data.Memory_Save[0] == 'n')
 		{
-			strcpy(command, "rm -f ");
-			strcat(command, fileName);
-			strcat(command, ".maple");
-			system_with_error_check(command);
+			// strcpy(command, "rm -f ");
+			// strcat(command, fileName);
+			// strcat(command, ".maple");
+			// system_with_error_check(command);
 		}
 
-		strcpy(command, "rm -f ");
-		strcat(command, fileName);
-		strcat(command, ".ead");
-		system_with_error_check(command);
+		// strcpy(command, "rm -f ");
+		// strcat(command, fileName);
+		// strcat(command, ".ead");
+		// system_with_error_check(command);
 
 	}
 

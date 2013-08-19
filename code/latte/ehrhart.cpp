@@ -548,26 +548,26 @@ int main(int argc, char *argv[]) {
 	cerr <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cerr << "Computation done." << endl;
 	cerr <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ext");
-        system_with_error_check(command);
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // strcat(command,".ext");
+        // system_with_error_check(command);
 
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".cdd");
-        system_with_error_check(command);
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // strcat(command,".cdd");
+        // system_with_error_check(command);
 
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ead");
-        system_with_error_check(command);
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // strcat(command,".ead");
+        // system_with_error_check(command);
 
-	if(cddstyle[0] == 'n'){
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        system_with_error_check(command);
-	}
+	// if(cddstyle[0] == 'n'){
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // system_with_error_check(command);
+	// }
 
 	exit(0);
       }
@@ -590,26 +590,26 @@ int main(int argc, char *argv[]) {
 	cerr <<"The gap is: "<< abs(tmp_RR - LP_OPT) << endl;
 	cerr << "Computation done." << endl;
 	cerr <<"Time: " << GetTime() << " sec." << endl;
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ext");
-        system_with_error_check(command);
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // strcat(command,".ext");
+        // system_with_error_check(command);
 
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".cdd");
-        system_with_error_check(command);
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // strcat(command,".cdd");
+        // system_with_error_check(command);
 
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        strcat(command,".ead");
-        system_with_error_check(command);
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // strcat(command,".ead");
+        // system_with_error_check(command);
 
-	if(cddstyle[0] == 'n'){
-        strcpy(command,"rm -f ");
-        strcat(command,fileName);
-        system_with_error_check(command);
-	}
+	// if(cddstyle[0] == 'n'){
+        // strcpy(command,"rm -f ");
+        // strcat(command,fileName);
+        // system_with_error_check(command);
+	// }
 
 	exit(0);
    }
@@ -707,36 +707,36 @@ if(Memory_Save[0] == 'n')
  }
  if(removeFiles[0] == 'y'){
    
-  strcpy(command,"rm -f ");
-  strcat(command,fileName);
-  strcat(command,".ext");
-  system_with_error_check(command);
+  // strcpy(command,"rm -f ");
+  // strcat(command,fileName);
+  // strcat(command,".ext");
+  // system_with_error_check(command);
   
-  strcpy(command,"rm -f ");
-  strcat(command,fileName);
-  strcat(command,".cdd");
-  system_with_error_check(command); 
+  // strcpy(command,"rm -f ");
+  // strcat(command,fileName);
+  // strcat(command,".cdd");
+  // system_with_error_check(command); 
   
-  if(Memory_Save[0] == 'n'){
-    strcpy(command,"rm -f ");
-    strcat(command,fileName);
-    strcat(command,".maple");
-    system_with_error_check(command); 
-  }
+  // if(Memory_Save[0] == 'n'){
+  //   strcpy(command,"rm -f ");
+  //   strcat(command,fileName);
+  //   strcat(command,".maple");
+  //   system_with_error_check(command); 
+  // }
 
-  if(cddstyle[0] == 'n'){
-  strcpy(command,"rm -f ");
-  strcat(command,fileName);
-  strcat(command,".ead");
-  system_with_error_check(command); 
-  }
+  // if(cddstyle[0] == 'n'){
+  // strcpy(command,"rm -f ");
+  // strcat(command,fileName);
+  // strcat(command,".ead");
+  // system_with_error_check(command); 
+  // }
  }
   }
 
   if(cddstyle[0] == 'n'){
-    strcpy(command,"rm -f ");
-    strcat(command,fileName);
-    system_with_error_check(command);
+    // strcpy(command,"rm -f ");
+    // strcat(command,fileName);
+    // system_with_error_check(command);
   }
 
  cerr << "Computation done. " << endl;
