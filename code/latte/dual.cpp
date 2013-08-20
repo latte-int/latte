@@ -20,6 +20,7 @@
 */
 
 #include <cassert>
+#include <climits>
 #include "config.h"
 #include "cone.h"
 #include "print.h"
