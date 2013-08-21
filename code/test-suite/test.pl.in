@@ -231,7 +231,18 @@ $MAXRUNTIME = 720;
 
 chop($LATTEDIR = `cd \`dirname $0\`; cd ../..; pwd`);
 $PARAMETERS = $ARGV[0];
-$COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; ./count $PARAMETERS";
+
+if ($ENV{SET_ULIMIT}) {
+    # Enforce CPU limits using `ulimit'.  Useful for manual testing
+    # and creating benchmark tables.  Not portable: Does not work on
+    # Cygwin.  Also introduces non-deterministic fails, which is why
+    # we don't use it by default in `make check'. --mkoeppe
+    $COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; ./count $PARAMETERS";
+}
+else {
+    # Robust, portable; but some examples might take very long.
+    $COMMAND = "./count $PARAMETERS";
+}    
 
 #$EXAMPLESDIR = "$LATTEDIR/EXAMPLES";
 $EXAMPLESDIR = "@abs_top_srcdir@/EXAMPLES";
