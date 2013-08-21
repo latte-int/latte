@@ -31,6 +31,7 @@
 
 /* If ERRNUM maps to an errno value defined by gnulib, return a string
    describing the error.  Otherwise return NULL.  */
+#ifndef strerror_override_switch
 const char *
 strerror_override (int errnum)
 {
@@ -300,3 +301,4 @@ strerror_override (int errnum)
       return NULL;
     }
 }
+#endif

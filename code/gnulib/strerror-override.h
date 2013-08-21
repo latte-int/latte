@@ -51,6 +51,7 @@
 extern const char *strerror_override (int errnum);
 # else
 #  define strerror_override(ignored) NULL
+#  define strerror_override_switch
 # endif
 
 #endif /* _GL_STRERROR_OVERRIDE_H */

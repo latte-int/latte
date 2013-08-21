@@ -148,13 +148,15 @@ fi
 # Compile wrapper.
 #
 # CHANGE: We added source files lstat, stat here to get it compile on
-# Mac OS X.  But this is all very brittle; for example on Cygwin,
-# strerror-override.c does not compile (it is excluded when compiling
-# libgnu.a, but here it is included conditionally.)  May be better to
-# link against the built gnulib, but this is tricky because of
-# possible libtool.  So we are leaving it like this for now, and on
+# Mac OS X.  But this is all very brittle; for example on Cygwin and
+# Solaris, strerror-override.c does not compile (it is excluded when
+# compiling libgnu.a, but here it is included conditionally.)  May be
+# better to link against the built gnulib, but this is tricky because
+# of possible libtool.  So we are leaving it like this for now, and on
 # Cygwin disable compilation of wrappers, because everything seems to
-# work fine without them?! --mkoeppe, 2013-08-14.
+# work fine without them?!  To also get it to work on Solaris, used
+# patch from Dima Pasechnik to make strerror-override.c compile.
+# --mkoeppe, 2013-08-20.
 func_verbose $compile_command \
              -I"$builddir" -I"$srcdir" -I"$config_h_dir" \
              -DHAVE_CONFIG_H -DIN_RELOCWRAPPER -DNO_XMALLOC \
