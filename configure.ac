@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(latte-int, 1.6-prerelease-2013-08-19)
+AC_INIT(latte-int, 1.6-prerelease-2013-08-20)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE(gnu)
