@@ -29,6 +29,10 @@ endif
 LDADD += ../gnulib/libgnu.la
 
 lib_LTLIBRARIES = liblatte.la
+# The following line is necessary for the Mac OS X enable-shared build.
+# Otherwise, get "dyld: lazy symbol binding failed: Symbol not found: _set_program_name_and_installdir"
+# when running the binary.  --mkoeppe
+liblatte_la_LIBADD = ../gnulib/libgnu.la
 liblatte_la_SOURCES =							\
 	barvinok/dec.cpp barvinok/barvinok.cpp  barvinok/Cone.cpp	\
 	count.cpp \
