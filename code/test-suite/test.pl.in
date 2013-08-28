@@ -2,6 +2,12 @@
 
 ## usage: ./test.pl "COUNT-PARAMS" ["PROBLEMS..."]
 
+## Environment variables:
+##  SET_ULIMIT  -- Set if we should use "ulimit" to stop computations that take too long.
+##  USE_INSTALLED_BINARY -- Set if we should use the installed binary instead of the $builddir binary.
+##  COPY_BINARY -- Set if we should make a local copy of the binary, so that long-running 
+#                  tests are not disturbed by recompiles.  Does not work with --enable-shared.
+
 use File::Basename;
 use File::Path;
 
@@ -232,17 +238,7 @@ $MAXRUNTIME = 720;
 chop($LATTEDIR = `cd \`dirname $0\`; cd ../..; pwd`);
 $PARAMETERS = $ARGV[0];
 
-if ($ENV{SET_ULIMIT}) {
-    # Enforce CPU limits using `ulimit'.  Useful for manual testing
-    # and creating benchmark tables.  Not portable: Does not work on
-    # Cygwin.  Also introduces non-deterministic fails, which is why
-    # we don't use it by default in `make check'. --mkoeppe
-    $COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; ./count $PARAMETERS";
-}
-else {
-    # Robust, portable; but some examples might take very long.
-    $COMMAND = "./count $PARAMETERS";
-}    
+
 
 #$EXAMPLESDIR = "$LATTEDIR/EXAMPLES";
 $EXAMPLESDIR = "@abs_top_srcdir@/EXAMPLES";
@@ -255,8 +251,32 @@ print "Logging to '$LOGDIR/log'\n";
 
 mkpath($LOGDIR) or die;
 chdir($LOGDIR) or die;
-# We hard-link the executable here and execute it from here, so long-running tests are not disturbed by recompiles.
-system("ln $LATTEDIR/code/latte/count .");
+
+if ($ENV{USE_INSTALLED_BINARY}) {
+    $COUNT = "@prefix@/bin/count";
+}
+else {
+    $COUNT = "$LATTEDIR/code/latte/count";
+}
+
+if ($ENV{COPY_BINARY}) {
+    # We hard-link the executable here and execute it from here, so long-running tests are not disturbed by recompiles.
+    system("ln $COUNT .");
+    $COUNT = "./count";
+}
+
+$COMMAND = "$COUNT $PARAMETERS";
+
+if ($ENV{SET_ULIMIT}) {
+    # Enforce CPU limits using `ulimit'.  Useful for manual testing
+    # and creating benchmark tables.  Not portable: Does not work on
+    # Cygwin.  Also introduces non-deterministic fails, which is why
+    # we don't use it by default in `make check'. --mkoeppe
+    $COMMAND = "ulimit -t $MAXRUNTIME; ulimit -c 0; $COMMAND";
+}
+else {
+    # Robust, portable; but some examples might take very long.
+}    
 
 open SUMMARY, ">summary" or die;
 print SUMMARY "Running with time limit ", $MAXRUNTIME, "\n";
