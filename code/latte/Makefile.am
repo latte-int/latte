@@ -242,16 +242,23 @@ check_PROGRAMS += test-library-examples
 test_library_examples_SOURCES = valuation/testLibraryExamples.cpp
 TESTS += test-library-examples
 
+### test-library-examples bleeds lots of temporary files and result files into the current directory.
+### Delete them.
+DISTCLEANFILES = 								\
+	4ti2_triangulation_output Check_emp.lp Check_emp.lps Check_emp.out 	\
+	latte_stats lifted_cone_for_4ti2_triangulation numOfLatticePoints 	\
+	numOfUnimodularCones test-library-examples.hrep totalTime
+
 #hack...have_Programmer_extra was giving errors
 #if HAVE_PROGRAMMER_EXTRA
 #if HAVE_DATABASE
- 
+
 #we should delete this, it only makes sure the BuidPolytope base class works.~Brandon
 ## bin_PROGRAMS += testBuildPolytope
 ## testBuildPolytope_SOURCES = valuation/test/testBuildPolytopes.cpp
 ## testBuildPolytope_SOURCES += buildPolytopes/BuildPolytope.cpp
 
- 
+
 
 bin_PROGRAMS += ehrhart3
 ehrhart3_SOURCES = ehrhart3.cpp
