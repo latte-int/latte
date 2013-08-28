@@ -46,3 +46,7 @@ Configuration:
 
 * Make compile and run with compilers other than g++
 
+* All programs should understand --help and --version. 
+  Then add std-options to AM_INIT_AUTOMAKE, so that this is checked 
+  at `make installcheck'.
+
