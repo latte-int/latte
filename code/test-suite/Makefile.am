@@ -32,3 +32,6 @@ EXTRA_DIST = $(TESTS)
 clean-local:
 	-rm -rf results
 
+installcheck-local:
+	$(TESTS_ENVIRONMENT) USE_INSTALLED_BINARY=t $(srcdir)/test-default.sh
+	$(TESTS_ENVIRONMENT) USE_INSTALLED_BINARY=t $(srcdir)/test-cdd.sh
