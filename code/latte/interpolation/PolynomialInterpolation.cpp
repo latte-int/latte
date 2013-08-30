@@ -113,7 +113,7 @@ void PolynomialInterpolation::GE()
 
         //find row with non-zero base
         int currentRow = perfectRow;
-        while( currentRow < rowSize && matrix[currentRow, currentColumn] == 0)
+        while( currentRow < rowSize && matrix[currentRow][currentColumn] == 0)
         {
             currentRow = currentRow + 1;
         }
