@@ -65,7 +65,7 @@ Jianqiu Wu \and
  
 
  
- \date{August 2013}
+ \date{September 2013}
 
 \begin{document}
 
@@ -855,11 +855,15 @@ A common subproblem in counting lattice points and integration requires finding 
 
 {\tt LattE} is downloadable from the following website:
 
-\makebox[12 cm]{http://www.math.ucdavis.edu/$\sim$latte/}
+\makebox[12 cm]{\url{http://www.math.ucdavis.edu/~latte/}}
 
 
+\latte uses the GNU Autoconf, Automake, Libtool tools. % Please see the {\tt
+                                % README} file in the \latte directory for
+                                % detailed directions for installing \latte.
+The following README file provides detailed instructions.
 
-\latte uses the GNU Autoconf, Automake, Libtool tools. Please see the {\tt README} file in the \latte directory for detailed directions for installing \latte.
+{\small\verbatiminput{../README}}
 
 %\newpage
 
@@ -1521,55 +1525,18 @@ grants and by summer fellowships provided through the UC Davis VIGRE grants
 DMS-0135345 and DMS-0636297.
 
 
-%\newpage
+\clearpage
 
-\bibliographystyle{amsabbrv}
+\providecommand\ISBN{ISBN }
+\bibliographystyle{amsabbrvurl}
 \bibliography{bibliography}
 
-\begin{comment}
-\begin{thebibliography}{99}
-\bibitem{4ti2}{4ti2 team}{\em \: 4ti2---A software package for algebraic, geometric and 
-combinatorial problems on linear spaces}. Available at \url{www.4ti2.de}.
-\bibitem{howToIntegratePolynomialSimplex} {V. Baldoni, N. Berline, J. A. De 
-Loera, M. K{\"o}ppe, and M. Vergne} {\em How to integrate a polynomial over a
-simplex}, Mathematics of Computation 80 (2011), no. 273, 297–325.
-\bibitem{BarviPom} {Barvinok, A.I. and Pommersheim, J.} {\em An
-algorithmic theory of lattice points in polyhedra}, in: {\sl New
-Perspectives in Algebraic Combinatorics} (Berkeley, CA, 1996-1997),
-91-147, Math. Sci. Res.  Inst. Publ. 38, Cambridge Univ. Press,
-Cambridge, 1999.
-\bibitem{cuww}{Cornu\'ejols, G., Urbaniak, R., Weismantel, R., Wolsey, L.A.} 
-{\em Decomposition of integer programs and of generating sets.}  
-R. E. Burkard, G. J. Woeginger, eds., {\em Algorithms}--ESA 97. 
-Lecture Notes in Computer Science 1284, Springer-Verlag, 92--103, 1997. 
-\bibitem{latte1}{De Loera, J.A., Hemmecke, R., Tauzer, J., and Yoshida, R.}
-{\em Effective lattice point counting in rational convex polytopes},
-Journal of Symbolic Computation, Volume 38, Issue 4, Symbolic Computation in Algebra and Geometry, October 2004, Pages 1273-1302, ISSN 0747-7171, DOI: 10.1016/j.jsc.2003.04.003.
-\bibitem{latte2}{De Loera, J.A., Haws, D., Hemmecke, R., Huggins, P.,
-Sturmfels, B., and Yoshida, R.} {\em Short rational functions for
-toric algebra and applications}, e-print, Available via 
-\url{http://front.math.ucdavis.edu/math.CO/0307350}, 2003.
-\bibitem{latte3}{De Loera, J.A., Haws, D., Hemmecke, R., Huggins, P.,
-and Yoshida, R.} {\em Three kinds of integer programming algorithms based on
-  {B}arvinok's rational functions}, manuscript, 2003.
-\bibitem{fukuda} {Fukuda, K.} {\tt cdd} and {\tt cdd+}, {\em The {\tt cdd}
-and {\tt cdd} plus}, available via
-\url{http://www.cs.mcgill.ca/~fukuda/soft/cdd_home/cdd.html}.
-\bibitem{shoup} {Shoup, V.} {\em {\tt NTL}, A library for doing Number
-Theory}, available via \url{http://shoup.net/ntl/}. 
-\bibitem{sturmfels} {Sturmfels, B.} {\em Gr\"obner bases and convex
-polytopes}, university lecture series, vol. 8, AMS, Providence RI,
-1996.
-\bibitem{stanley}{Stanley, R.P.} {\em Enumerative Combinatorics}, 
-Volume I, Cambridge, 1997.
-\end{thebibliography}   
+\input{deloera-hemmecke-koeppe-book.tex}
 
-\end{comment}
+\clearpage
 
-%\newpage
-
-
-
+\appendix
+\footnotesize
 %****************************************************************************
 %****************************************************************************
 %****************************************************************************
@@ -1929,7 +1896,8 @@ possibility of such damages.}
 \end{center}
 
 
-\pagebreak[2]
+%\pagebreak[2]
+\clearpage
 
 \section*{Appendix: How to Apply These Terms to Your New Programs}
 

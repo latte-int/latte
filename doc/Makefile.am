@@ -2,7 +2,7 @@ docdir = $(pkgdatadir)/doc
 
 doc_DATA = manual.pdf
 
-EXTRA_DIST = 					\
+EXTRA_DIST =					\
 	amsabbrv.bst				\
 	bibliography.bib			\
 	examplebrion.eps			\
@@ -13,4 +13,8 @@ EXTRA_DIST = 					\
 	manual.pdf				\
 	relocatable.texi			\
 	secrets.tex				\
-	truncatedCube.jpg
+	truncatedCube.jpg			\
+	amsabbrvurl.bst				\
+	deloera-hemmecke-koeppe-book.tex	\
+	deloera-hemmecke-koeppe-cover.jpg
+

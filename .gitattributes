@@ -300,7 +300,10 @@ code/test-suite/test-irr-exp-maxdet1000-4ti2.sh -text
 code/test-suite/test-irr-exp-maxdet1000.sh -text
 doc/Makefile.am -text
 doc/amsabbrv.bst -text
+doc/amsabbrvurl.bst -text
 doc/bibliography.bib -text
+doc/deloera-hemmecke-koeppe-book.tex -text
+doc/deloera-hemmecke-koeppe-cover.jpg -text
 doc/examplebrion.eps -text svneol=unset#application/octet-stream
 doc/examplebrion.jpg -text
 doc/homogenizedTriangle.jpg -text
