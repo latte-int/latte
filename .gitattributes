@@ -1,4 +1,5 @@
 * text=auto !eol
+/.svn2cl-authors -text
 EXAMPLES/aimPresentation/aimLatteExamples.tex -text
 EXAMPLES/aimPresentation/examples/easy/birkhoff-4.latte -text
 EXAMPLES/aimPresentation/examples/easy/birkhoff-4.latte.polynomial -text
