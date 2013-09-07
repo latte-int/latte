@@ -22,7 +22,7 @@ code distribution called
    "latte-integrale"
 
 that includes all of these libraries and will build them automatically. 
-You can get it at the same place where you got LattE macchiato,
+You can get it at the same place where you got LattE integrale,
 
     http://www.math.ucdavis.edu/~latte/
 
@@ -82,7 +82,7 @@ N. Build and install LattE
    make
    make install
 
-Now the LattE executables (count, ehrhart, minimize, maximize, ...)
+Now the LattE executables (count, integrate, latte-minimize, latte-maximize, ...)
 should be available in $HOME/latte/bin.
 
 
