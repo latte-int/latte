@@ -1,6 +1,10 @@
 	To update this ChangeLog, use `make update-changelog' and then
 	copy (and edit) entries from ChangeLog.svn2cl
 
+2013-09-07  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
+
+	Version 1.6
+
 2013-09-05 21:07  Matthias Koeppe <mkoeppe@math.ucdavis.edu>
 
 	* .svn2cl-authors, Makefile.am: New maintainer target
