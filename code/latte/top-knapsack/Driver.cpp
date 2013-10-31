@@ -9,82 +9,134 @@
 #include <ctime>
 #include <climits>
 
+#include "cone.h"
+#include "preprocess.h"
+#include "barvinok/barvinok.h"
+#include "barvinok/dec.h"
+#include "integration/multiply.h"
+#include "PeriodicFunction.h"
+#include "print.h"
+#include "dual.h"
+#include "timing.h"
+#include <sstream>
+#include <getopt.h>
 using namespace std;
 
-int main(int argc, char *argv[])
-{
-if(1){
-	ifstream file;
-	file.open(argv[1]);
-	int n;
-	file >> n;
-	vec_ZZ alpha;
-	alpha.SetLength(n);
+int main(int argc, char *argv[]) {
+	if (1) {
 
-	for(int i =0; i < n; ++i)
-		file >> alpha[i];
+		cout << "Invocation: ";
+		for(int i = 0; i < argc; ++i)
+			cout << argv[i] << " ";
+		cout << endl;
 
-	cout << "you said" << endl;
-	for(int i = 0; i < n ; ++i)
-		cout << alpha[i] << ", ";
-	cout << endl;
+		string inFile, outFile;
+		int k = -1;
 
-	TopKnapsack tk;
-	tk.set(alpha);
-	tk.coeff_NminusK(2);
-}
-else{
-	monomialSum t1, t2, ans;
-	t1.varCount = 2;
-	t2.varCount = 2;
-	ans.varCount=2;
+		//process each option.
+		while (1)
+		{
+			static struct option long_options[] =
+			{
+			{ "out",	  			  required_argument, 0, 'o' },
+			{ "k",  				  required_argument, 0, 'k' },
+			{ "help",				  no_argument,       0, 'h' },
+			{ "file",				  required_argument, 0, 'f' },
+			{ 0, 0, 0, 0 } };
+			/* getopt_long stores the option index here. */
 
-	vector<int> xpow, ypow, coef;
+			int option_index = 0;
+			int c;
 
-	int n = 5;
-	for(int i = 0; i < n; ++i)
-	{
-		xpow.push_back(i);
-		ypow.push_back(-i);
-		coef.push_back(i*2);
+			//single-character=short option-name. x: means x takes a required argument, x:: means x takes an optional argument.
+			c = getopt_long(argc, argv, "o:k:hf:", long_options, &option_index);
+
+			if (c == -1)
+				break;
+
+			switch (c)
+			{
+				case 0:
+					// If this option set a flag, do nothing
+					break;
+				case 'o':
+					outFile = optarg;
+					break;
+				case 'k':
+					k = atoi(optarg);
+					break;
+				case 'h':
+					cout << "TODO: print help menu" << endl;
+					break;
+				case 'f':
+					inFile = optarg;
+					break;
+				default:
+					cout << "main: Unknown case" << endl; //todo: throw exception in my fancy class.
+					exit(1);
+			}
+		}//while.
+
+		if (inFile.length() == 0 || k < 0)
+		{
+			cout << "Input error: run " << argv[0] << " -h for help" << endl;
+			exit(1);
+		}
+
+		ifstream file;
+		file.open(inFile.c_str());
+		int n;
+		file >> n;
+		vec_ZZ alpha;
+		alpha.SetLength(n);
+
+		for (int i = 0; i < n; ++i)
+			file >> alpha[i];
+
+		Timer time("Total");
+		time.start();
+		TopKnapsack tk;
+		tk.set(alpha);
+		tk.coeff_NminusK(k);
+		time.stop();
+
+		if ( outFile.length())
+		{
+			ofstream f(outFile.c_str());
+			tk.printAnswer(f);
+			f << "#Total Time: " << time.get_seconds() << endl;
+			f.close();
+		}
+		else
+		{
+			tk.printAnswer(cout);
+			cout << "Total Time: " << time.get_seconds() << endl;
+		}
+
 	}
-
-	srand(time(0));
-	for(int last = n; last > 0; --last)
+	else if (0)
 	{
-		int index = rand()%last;
+		TopKnapsack tk;
 
-		swap(xpow[index], xpow[last-1]);
-		swap(ypow[index], ypow[last-1]);
-		swap(coef[index], coef[last-1]);
+		GeneralMonomialSum<PeriodicFunction, int> a;
+		vector<ZZ> ea, ee;
+		ea.push_back(to_ZZ(1)); ee.push_back(to_ZZ(2));
+		ea.push_back(to_ZZ(2)); ee.push_back(to_ZZ(0));
+		ea.push_back(to_ZZ(3)); ee.push_back(to_ZZ(4));
+		ea.push_back(to_ZZ(4)); ee.push_back(to_ZZ(5));
+
+		cout << "got here" << endl;
+		vec_ZZ junk;
+		junk.SetLength(ea.size());
+
+
+		tk.set(junk);
+		tk.order = 4;
+		ZZ bottom;
+		tk.expandPeriodicPart(bottom, a, 1, ea, ee);
+
+		cout << "anser is sign/bottom*" << a.printMonomials().c_str() << endl;
+
 	}
-
-	for(int i = 0; i < n; ++i)
-	{
-		int e[2];
-		e[0] = xpow[i];
-		e[1] = ypow[i];
-		insertMonomial(RationalNTL(coef[i], 1), e, t1);
-		insertMonomial(RationalNTL(coef[i], 1), e, t2);
-	}
-
-	BTrieIterator<RationalNTL, int>* it = new BTrieIterator<RationalNTL, int>();
-	BTrieIterator<RationalNTL, int>* it2 = new BTrieIterator<RationalNTL, int>();
-
-	it->setTrie(t1.myMonomials, t1.varCount);
-	it2->setTrie(t2.myMonomials, t2.varCount);
-	int low[2], high[2];
-	low[0] = low[1] = INT_MIN;
-	high[0] = high[1] = INT_MAX;
-	multiply<RationalNTL>(it, it2, ans, low, high);
-
-	cout  << printMonomials(ans) << endl;
-
-	destroyMonomials(t1);
-	destroyMonomials(t2);
-	destroyMonomials(ans);
-	delete it;
-	delete it2;
-}
 }
 //main()

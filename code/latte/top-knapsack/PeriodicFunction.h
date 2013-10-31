@@ -32,7 +32,7 @@ class PeriodicFunction;
 class PeriodicFunctionNode
 {
 private:
-	bool isLeaf;      //if true, data has no meaning and is zero.
+	bool isLeaf;      //if false, data has no meaning and is zero.
 	bool isNumber;    //if true, data should be thought of as just a fraction.
 					  //else, data represents the function {a/b*T}
 	RationalNTL data;
@@ -64,19 +64,25 @@ private:
 
 public:
 	PeriodicFunction();
+	PeriodicFunction(const RationalNTL & d, bool type);
+	PeriodicFunction(const PeriodicFunction & p);
 	~PeriodicFunction();
 
-	void add(PeriodicFunctionNode * p); //p is deleted.
-	void addProduct(const RationalNTL &coeff, const RationalNTL & function);
+	void add(const PeriodicFunction & p);
+	void subtract(const PeriodicFunction & p);
 	void pow(int p);
 	void div(const ZZ & d);
 	void times(const RationalNTL & d);
+	void times(const PeriodicFunction& p);
 	void setToConstant(int c);
+	void setToConstant(const RationalNTL & c);
 	//void clear();
 
 	PeriodicFunction & operator=(const PeriodicFunction & p);
+	PeriodicFunction & operator=(const int c);
 	bool operator==(const int) const;
-	PeriodicFunction & operator+=(const PeriodicFunction &p);
+	void operator+=(const PeriodicFunction &p);
+	void operator*=(const PeriodicFunction & d);
 
 	void print() const;
 	friend ostream& operator<<(ostream& out, const PeriodicFunction & pf);

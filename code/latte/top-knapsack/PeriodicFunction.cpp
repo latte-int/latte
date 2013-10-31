@@ -61,17 +61,23 @@ PeriodicFunctionNode::PeriodicFunctionNode(const RationalNTL & d, bool isN):
 }
 
 
+PeriodicFunction::PeriodicFunction(const PeriodicFunction & p)
+{
+	if ( p.head)
+		head = new PeriodicFunctionNode(*(p.head));
+	else
+		head = NULL;
+}
+
+PeriodicFunction::PeriodicFunction(const RationalNTL & d, bool type)
+{
+	head = new PeriodicFunctionNode(d, type);
+}
+
 PeriodicFunction::PeriodicFunction(): head(NULL)
 {}
 
-/*
- * Removes ownership of any memory.
 
-void PeriodicFunction::clear()
-{
-	head = NULL;
-}
- */
 
 void PeriodicFunction::setToConstant(int c)
 {
@@ -80,45 +86,42 @@ void PeriodicFunction::setToConstant(int c)
 	head = new PeriodicFunctionNode(RationalNTL(c,1), true);
 }
 
-/*
- * This object becomes the owner of the memory in p, and p is "cleared"
- */
-void PeriodicFunction::add( PeriodicFunctionNode * p)
+
+void PeriodicFunction::setToConstant(const RationalNTL & c)
 {
-	if ( head ==  NULL)
-	{
-		head = p;
-	}
-	else
-	{
-		PeriodicFunctionNode * temp = new PeriodicFunctionNode(PeriodicFunctionNode::plus, head, p);
-		head = temp;
-	}
+	if (head)
+		delete head;
+	head = new PeriodicFunctionNode(c, true);
 }
 
 
-void PeriodicFunction::addProduct(const RationalNTL &coeff, const RationalNTL & function)
+void PeriodicFunction::add(const PeriodicFunction &p)
 {
-	//check if we can add these numbers.
-	if(coeff.getNumerator() == 0 || function.getDenominator() == 1)
-		return ; //coefficient or periodic function is zero so skip it.
-
-	//temp is a plus note with two leaf children: one a number, the other a function
-	PeriodicFunctionNode *temp;
-	temp = new PeriodicFunctionNode(PeriodicFunctionNode::times,
-			new PeriodicFunctionNode(coeff, true),
-			new PeriodicFunctionNode(function, false));
-
-	//if there is a head, we have to make a new plus node.
-	if (head == NULL)
-		head = temp;
-	else
+	if ( p.head == NULL)
+		return;
+	else if (head == NULL)
 	{
-		head = new PeriodicFunctionNode(PeriodicFunctionNode::plus, head, temp);
+		*this = p;
 	}
-
+	else if ( head->isNumber && p.head->isNumber)
+		head->data += p.head->data;
+	else
+		head = new PeriodicFunctionNode(PeriodicFunctionNode::plus, head, new PeriodicFunctionNode(*(p.head)) );
 }
 
+void PeriodicFunction::subtract(const PeriodicFunction & p)
+{
+	if ( p.head == NULL)
+		return;
+	else if (head == NULL)
+	{
+		*this = p;
+	}
+	else if ( head->isNumber && p.head->isNumber)
+		head->data -= p.head->data;
+	else
+		head = new PeriodicFunctionNode(PeriodicFunctionNode::minus, head, new PeriodicFunctionNode(*(p.head)) );
+}
 PeriodicFunction & PeriodicFunction::operator=(const PeriodicFunction & p)
 {
 	if( this == &(p))
@@ -136,20 +139,31 @@ PeriodicFunction & PeriodicFunction::operator=(const PeriodicFunction & p)
 	return *this;
 }
 
+PeriodicFunction & PeriodicFunction::operator=(const int c)
+{
+
+	if(head)
+		delete head;
+
+	head = new PeriodicFunctionNode(RationalNTL(c,1), true);
+
+	return *this;
+}
+
 void PeriodicFunction::pow(int p)
 {
 
 	if ( p == 0)
 	{
 		setToConstant(1); //num^0 = 1, 0^0=1
-		return;
 	}
-	if ( !head)
+	else if ( !head)
 		return; //0^p =0 for p!= 0
-	if ( p == 1)
+	else if ( p == 1)
 		return;
-
-
+	else if ( head->isNumber)
+		head->data.power(p);
+	else
 	head = new PeriodicFunctionNode(PeriodicFunctionNode::power,
 			head,  new PeriodicFunctionNode(RationalNTL(p,1), true));
 }
@@ -160,7 +174,10 @@ void PeriodicFunction::div(const ZZ & d)
 		return; //don't waste time dividing by 1.
 	if ( !head)
 		return; //0/d  = 0....not checking of d=0.
-	head = new PeriodicFunctionNode(PeriodicFunctionNode::divide,
+	if (head->isNumber)
+		head->data.div(d);
+	else
+		head = new PeriodicFunctionNode(PeriodicFunctionNode::divide,
 			head, new PeriodicFunctionNode(RationalNTL(d,1), true));
 }
 
@@ -168,7 +185,7 @@ void PeriodicFunction::times(const RationalNTL & d)
 {
 	if (!head)
 		return; //0*d=0
-	if (head->isLeaf && head->isNumber)
+	if (head->isNumber)
 		head->data *= d;
 	else
 	{
@@ -176,6 +193,24 @@ void PeriodicFunction::times(const RationalNTL & d)
 				head, new PeriodicFunctionNode(d, true));
 	}
 
+}
+
+void PeriodicFunction::times(const PeriodicFunction& p)
+{
+	if(!head)
+		return; //0*p=0
+	if(head->isLeaf && head->isNumber && p.head->isLeaf && p.head->isNumber)
+		head->data *= p.head->data;
+	else
+	{
+		head = new PeriodicFunctionNode(PeriodicFunctionNode::times,
+				head, new PeriodicFunctionNode(*(p.head)));
+	}
+}
+
+void PeriodicFunction::operator*=(const PeriodicFunction & d)
+{
+	times(d);
 }
 
 bool PeriodicFunction::operator==(const int x) const
@@ -187,23 +222,9 @@ bool PeriodicFunction::operator==(const int x) const
 	return (head->isLeaf && head->isNumber && head->data == x);
 }
 
-PeriodicFunction & PeriodicFunction::operator+=(const PeriodicFunction &p)
+void PeriodicFunction::operator+=(const PeriodicFunction &p)
 {
-	if(p.head == NULL)
-		return *this; //if adding the zero function
-
-	PeriodicFunctionNode * copy = new PeriodicFunctionNode(*(p.head));
-
-	if(head == NULL)
-	{
-		head = copy;
-		return *this;
-	}//if this was the zero function.
-
-	PeriodicFunctionNode * temp = new PeriodicFunctionNode(PeriodicFunctionNode::plus, head, copy);
-
-	head = temp;
-	return *this;
+	add(p);
 }
 
 void PeriodicFunction::print() const
@@ -249,13 +270,12 @@ ostream& operator<<(ostream& out, const PeriodicFunction & pf)
 
 ostream& operator<<(ostream& out, const PeriodicFunctionNode & pfn)
 {
-
 	if(pfn.isLeaf)
 	{
 		if(pfn.isNumber)
 			out << "(" << pfn.data << ")";
 		else
-			out << "( FF(" << pfn.data << ", T) )";
+			out << "( Frac( T * (" << pfn.data << ") ) )";
 	}
 	else
 	{
