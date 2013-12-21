@@ -12,9 +12,13 @@
 #include "integration/multiply.h"
 #include "print.h"
 #include "dual.h"
+#include "timing.h"
 #include <typeinfo>
 #include <climits>
 #include <algorithm>
+
+
+
 
 MobiusPair::MobiusPair():gcd(to_ZZ(0)), mu(to_ZZ(0)), mobiusValid(false){}
 MobiusPair::MobiusPair(const ZZ& g, const ZZ& m): gcd(g), mu(m), mobiusValid(false) {}
@@ -86,6 +90,12 @@ void MobiusSeriesList::computeMobius()
 	unweightedSeries.resize(list.size());
 	for(int i = 0; i < (int)unweightedSeries.size(); ++i)
 		unweightedSeries[i] = NULL;
+}
+
+MobiusSeriesList::~MobiusSeriesList()
+{
+	for(int i = 0; i < (int)unweightedSeries.size(); ++i)
+		delete unweightedSeries[i];
 }
 
 // **************************************************************************************************
@@ -167,22 +177,40 @@ void TopKnapsack::set(const vec_ZZ& list)
 	//	cout << "bernoulli[" << i << "]=" << bernoulli[i] << endl;
 }
 
+// compute t^N+t^{N-1}+....+t^{N-k}
+void TopKnapsack::coeff_topK(int k)
+{
+	topKTerms = true;
+	coeff(k);
+}
 
-
+//to do: clean at start of run in case user calls this twice or do this in the set() method...?
 void TopKnapsack::coeff_NminusK(int k)
+{
+	topKTerms = false;
+	coeff(k);
+}
+
+void TopKnapsack::coeff(int k)
 {
 
 	assert(0 <= k && k<= N);
 	order = k;
+	cout << "order=" << order << endl;
 	coeffsNminusk.resize(k+1);
 
 
+	Timer tgcd("Time for gcds");
+	tgcd.start();
 	for(int i = 0; i <= k; ++i)
 		everyGCD(N+1-i);
-
 	gcds.computeMobius();
+	tgcd.stop();
+	cout << tgcd << endl;
+
 	//cout << "mu found" << endl;
 	//gcds.print();
+
 
 	for(int i = 0; i < (int)gcds.list.size(); ++i)
 		if (gcds.list[i].mu != 0)
@@ -212,7 +240,7 @@ void TopKnapsack::packageAnswer()
 
 				PeriodicFunction p(oneTerm->coef);
 				int deg = oneTerm->exps[1]; // deg = -N-1 +i for some 0<=i<=k (=order)
-				deg += N+1; //= i
+				//deg += N+1; //= i
 				int h = N-deg; //h= N-i
 
 				ZZ hFactorial;
@@ -234,6 +262,7 @@ void TopKnapsack::packageAnswer()
 				p.times(factor);
 				coeffsNminusk[deg].add(p);
 			}
+			delete itr;
 		}
 
 }
@@ -242,22 +271,25 @@ void TopKnapsack::packageAnswer()
 void TopKnapsack::printAnswer(ostream & out)
 {
 
-	out << "coeff" << N << "minus" << order << ":= " << coeffsNminusk[order] << ";\n";
-	/*
-	for(int i = 0; i < (int) coeffsNminusk.size(); ++i)
+	if ( topKTerms == false)
+		out << "coeff" << N << "minus" << order << ":= " << coeffsNminusk[order] << ";\n";
+	else
 	{
-		out << "coeff" << N << "minus" << i << ":= " << coeffsNminusk[i] << ";\n";
-	}
 
-	out << "\ntopKPolynomial:=" ;
-	for(int i = 0; i < (int) coeffsNminusk.size(); ++i)
-	{
-		if ( i > 0)
-			out << " + ";
-		out << "(coeff" << N << "minus" << i << ")*T^(" <<N-i << ")";
+		for(int i = 0; i < (int) coeffsNminusk.size(); ++i)
+		{
+			out << "coeff" << N << "minus" << i << ":= " << coeffsNminusk[i] << ";\n";
+		}
+
+		out << "\ntopKPolynomial:=" ;
+		for(int i = 0; i < (int) coeffsNminusk.size(); ++i)
+		{
+			if ( i > 0)
+				out << " + ";
+			out << "(coeff" << N << "minus" << i << ")*T^(" <<N-i << ")";
+		}
+		out << ";" << endl;
 	}
-	out << ";" << endl;
-	*/
 }
 
 void TopKnapsack::E(int fIndex)
@@ -322,10 +354,16 @@ void TopKnapsack::E(int fIndex)
 	//	cout << tVertex[i] << ", " ;
 	//cout << endl;
 
+	//static Timer ttri("Finding uni cones so far");
+	//ttri.start();
 	listCone* uniCones = findUnimodularCones(invLatticeBasisScaled); //todp: move the latice scaling to this function
+	//ttri.stop();
+	//cout << ttri << endl;
 
 	bool finishedResidue = false;
 
+	//static Timer tresidu("residue so far time: ");
+	//tresidu.start();
 	while ( !finishedResidue)
 	{
 		try
@@ -339,6 +377,10 @@ void TopKnapsack::E(int fIndex)
 			gcds.unweightedSeries[fIndex]->varCount = 2;
 		}
 	}//while.
+	//tresidu.stop();
+	//cout  << tresidu << endl;
+	
+	freeListCone(uniCones);
 
 }
 
@@ -645,12 +687,18 @@ void TopKnapsack::findResidue(GeneralMonomialSum<PeriodicFunction, int> & fSerie
 
 	for(const listCone * oneCone = u; oneCone; oneCone = oneCone->rest)
 	{
+		static long int abcd = 1;
+		abcd++;
+		//if ( 414 != abcd)
+		//	continue;
+
 		//cout << "#####################################################" << endl;
 		//printCone((listCone *) oneCone, I);
 
 		//compute all the inner produces in 1/(1-exp(<(alpha  + beta e)*x, Bg>))
 		i=0;
 		int numPoles = 0;
+
 		for(const listVector * g = oneCone->rays; g; g = g->rest)
 		{
 			vec_ZZ Bg;
@@ -743,16 +791,20 @@ void TopKnapsack::findResidue(GeneralMonomialSum<PeriodicFunction, int> & fSerie
 		//}
 
 
+
+
 		GeneralMonomialSum<PeriodicFunction, int> exExpansion;
 		expandExponentialPart(exExpansion, numPoles, fractionalPartCoeffa, fractionalPartCoeffe, fractionalPart);
 
+		minE[0] = 0;
+		minE[1] = 0;
 
 		maxE[0] = numPoles;
 		maxE[1] = order;
 
-		//cout << "fnDiv.vc" << fnDivAlphaExpansion.varCount << endl;
-		//cout << "fDiv.vc" << fDivAlphaExpansion.varCount << endl;
-		//cout << "exo.vc" << exExpansion.varCount << endl;
+		//cout << "fnDivAlphaExpansion " << fnDivAlphaExpansion.printMonomials().c_str() << endl;
+		//cout << "fDivAlphaExpansion  " << fDivAlphaExpansion.printMonomials().c_str() << endl;
+		//cout << "exExpansion         " << exExpansion.printMonomials().c_str() << endl;
 
 		fnDivAlphaExpansion.multiply(fDivAlphaExpansion, minE, maxE);
 		fnDivAlphaExpansion.multiply(exExpansion, minE, maxE);
@@ -761,7 +813,7 @@ void TopKnapsack::findResidue(GeneralMonomialSum<PeriodicFunction, int> & fSerie
 
 
 
-		//cout << "fnDivAlphaExpansion " << fnDivAlphaExpansion.printMonomials().c_str() << endl;
+		//cout << "fnDivAlphaExpansion after...." << fnDivAlphaExpansion.printMonomials().c_str() << endl;
 		//cout << "fDivAlphaExpansion  " << fDivAlphaExpansion.printMonomials().c_str() << endl;
 		//cout << "exExpansion         " << exExpansion.printMonomials().c_str() << endl;
 
@@ -776,29 +828,41 @@ void TopKnapsack::findResidue(GeneralMonomialSum<PeriodicFunction, int> & fSerie
 
 		scale *= oneCone->coefficient;
 
+
 		PeriodicFunction scaleTerm;
 		scaleTerm.setToConstant(scale);
-		GeneralMonomialSum<PeriodicFunction, int> finalProduct;
-		finalProduct.varCount = 2;
-		maxE[0] = -1* numPoles;
-		maxE[1] = -1*(N+1);
-		finalProduct.insertMonomial(scaleTerm, maxE);
-
-
+		GeneralMonomialSum<PeriodicFunction, int> finalProductScale;
+		finalProductScale.varCount = 2;
+		//maxE[0] = -1* numPoles;
+		//maxE[1] = -1*(N+1);
 		maxE[0] = 0;
-		minE[0] = 0;
-		maxE[1] = -1*N -1 + order;
-		minE[1] = -1*N -1 + order;
-		//minE[1] = -1*N -1;
-		//maxE[0] = maxE[1] = INT_MAX;
-		//minE[0] = minE[1] = INT_MIN;
-
-		fnDivAlphaExpansion.multiply(finalProduct, minE, maxE);
+		maxE[1] = 0;
+		finalProductScale.insertMonomial(scaleTerm, maxE);
 
 
 
-		//cout << "#####" << endl;
-		//cout << "final series for the cone" << fnDivAlphaExpansion.printMonomials().c_str() << endl;
+		//maxE[0] = 0;
+		//minE[0] = 0;
+
+		//maxE[1] = -1*N -1 + order;
+		//if ( topKTerms)
+		//	minE[1] = -1*N -1;
+		//else
+		//	minE[1] = -1*N -1 + order;
+
+		maxE[0] = numPoles;
+		minE[0] = numPoles;
+
+		maxE[1] = order;
+		if ( topKTerms)
+			minE[1] = 0;
+		else
+			minE[1] = order;
+
+		//cout << "before.....full cone expansion" << fnDivAlphaExpansion.printMonomials().c_str() << endl;
+		fnDivAlphaExpansion.multiply(finalProductScale, minE, maxE);
+		//cout << "after.....full cone expansion" << fnDivAlphaExpansion.printMonomials().c_str() << endl;
+
 
 		fSeries.add(fnDivAlphaExpansion);
 
@@ -864,7 +928,9 @@ void TopKnapsack::expandNonperiodicPart(GeneralMonomialSum<PeriodicFunction, int
 		//cout << "a " << a.printMonomials().c_str() << endl;
 		a.multiply(oneExpansion, min, max);
 		//cout << "after multiply" << endl;
+		//cout << "a " << a.printMonomials().c_str() << endl;
 	}//for j
+	//cout << "\n\n\n" << endl;
 }
 
 /*
@@ -924,6 +990,8 @@ void TopKnapsack::expandPeriodicPart(ZZ & bottomCoeffPeriodicPart, GeneralMonomi
 			mFract *= (m+1);
 		}//for m.
 
+		oneExpansion.check();
+		a.check();
 		a.multiply(oneExpansion, minE, maxE);
 	}//for i
 
@@ -966,10 +1034,12 @@ void TopKnapsack::expandPeriodicPart(ZZ & bottomCoeffPeriodicPart, GeneralMonomi
 				p.setToConstant(bcoeff);
 				oneExpansion.insertMonomial(p, exponents);
 			}
-
+			oneExpansion.check();
 			a.multiply(oneExpansion, minE, maxE);
 		}//expa !=0 and expe != 0. Then 1/ax = 1/x * (1/ (expa + expe*e) = sum_{m=0}^{inf} (-1)^m (expe*e)^m * expa^{-1-m}
 	}
+
+	a.check();
 
 	assert( powerX == (int)expa.size() && powerE == numPoles);
 
@@ -1001,11 +1071,18 @@ void TopKnapsack::expandExponentialPart(GeneralMonomialSum<PeriodicFunction, int
 	{
 		if ( f[i] == 0)
 			continue;
-		PeriodicFunction temp1(f[i], false), temp2(f[i], false);
-		temp1.times(RationalNTL(a[i],1));
-		temp2.times(RationalNTL(e[i],1));
-		pa.add(temp1);
-		pe.add(temp2);
+		if ( a[i] != 0)
+		{
+			PeriodicFunction temp1(f[i], false);
+			temp1.times(RationalNTL(a[i],1));
+			pa.add(temp1);
+		}
+		if ( e[i] != 0)
+		{
+			PeriodicFunction temp2(f[i], false);
+			temp2.times(RationalNTL(e[i],1));
+			pe.add(temp2);
+		}
 	}
 
 
@@ -1063,6 +1140,9 @@ void TopKnapsack::expandF1Case(GeneralMonomialSum<PeriodicFunction, int> & expan
 
 
 	expandNonperiodicPart(expansion, alphaCopy);
+	
+	//cout << "f=1 series::" << expansion.printMonomials().c_str() << endl;
+	
 	ZZ bottomCoeffNonperiodicPart;
 	bottomCoeffNonperiodicPart = 1;
 	for(int i = 0; i < (int)alphaCopy.size();++i)
@@ -1076,7 +1156,8 @@ void TopKnapsack::expandF1Case(GeneralMonomialSum<PeriodicFunction, int> & expan
 
 	int exponent[2];
 	exponent[0] = 0;
-	exponent[1] = -1*(N+1);
+	//exponent[1] = -1*(N+1);
+	exponent[1] = 0;
 	GeneralMonomialSum<PeriodicFunction, int> scaleTerm;
 	scaleTerm.varCount = 2;
 	scaleTerm.insertMonomial(p, exponent);
@@ -1084,8 +1165,22 @@ void TopKnapsack::expandF1Case(GeneralMonomialSum<PeriodicFunction, int> & expan
 	int maxE[2], minE[2];
 	maxE[0] = 0;
 	minE[0] = 0;
-	maxE[1] = -1*N -1 + order;
-	minE[1] = -1*N -1 + order;
+
+	//maxE[1] = -1*N -1 + order;
+	//if ( topKTerms )
+	//	minE[1] = -1*N -1;
+	//else
+	//	minE[1] = -1*N -1 + order;
+
+	//cout << "f=1 series w/o scale" << expansion.printMonomials().c_str() << endl;
+
+	maxE[1] =  order;
+	if ( topKTerms )
+		minE[1] = 0;
+	else
+		minE[1] =  order;
+
+
 	expansion.multiply(scaleTerm, minE, maxE);
 
 

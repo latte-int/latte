@@ -48,6 +48,7 @@ class MobiusSeriesList: public MobiusList
 public:
 	vector<GeneralMonomialSum<PeriodicFunction, int> *> unweightedSeries; //[i] is a series corresponding to list[i]. Still needs to by build by list[i].mu and -1^i/i!
 	void computeMobius();
+	~MobiusSeriesList();
 };
 
 class BernoulliFirstKind
@@ -68,6 +69,7 @@ public:
 	int N;
 	int order; //k as in N-k
 	int largestSubsetComputed;
+	bool topKTerms;
 	MobiusSeriesList gcds;
 	BernoulliFirstKind bernoulli;
 	vector<PeriodicFunction> coeffsNminusk;
@@ -110,7 +112,10 @@ public:
 
 	void set(const vec_ZZ& list);
 
+
 	void coeff_NminusK(int k);
+	void coeff_topK(int k);
+	void coeff(int k);
 
 	static void printMatrix(const mat_ZZ &A);//for debugging.
 

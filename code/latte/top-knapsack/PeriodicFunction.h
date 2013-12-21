@@ -10,9 +10,11 @@
 
 #include "latte_ntl.h"
 #include "rational.h"
-
+#include <tr1/memory>
+#include <tr1/shared_ptr.h>
 
 class PeriodicFunction;
+class PeriodicFunctionNode;
 
 /**
  * A class to hold a function of periodic functions {x}:=x-floor(x).
@@ -29,38 +31,44 @@ class PeriodicFunction;
  *
  *
  */
+
+typedef tr1::shared_ptr<PeriodicFunctionNode> PeriodicFunctionNodePtr;
 class PeriodicFunctionNode
 {
 private:
-	bool isLeaf;      //if false, data has no meaning and is zero.
+	//bool isLeaf;      //if false, data has no meaning and is zero.
 	bool isNumber;    //if true, data should be thought of as just a fraction.
 					  //else, data represents the function {a/b*T}
 	RationalNTL data;
 	enum Operation { plus, minus, times, divide, power};
 	Operation opt;    //this is only defined if isLeaf is false.
 
-	PeriodicFunctionNode *left, *right;
+	PeriodicFunctionNodePtr left, right;
 
 	friend class PeriodicFunction;
 
-public:
+
 	PeriodicFunctionNode();
-	~PeriodicFunctionNode();
-	PeriodicFunctionNode(Operation operation, PeriodicFunctionNode * l, PeriodicFunctionNode * r);
+	
+	PeriodicFunctionNode(Operation operation, PeriodicFunctionNodePtr  l, PeriodicFunctionNodePtr  r);
 
 	PeriodicFunctionNode(const PeriodicFunctionNode& p);
 	PeriodicFunctionNode(const RationalNTL & d, bool isN);
 
+	bool isLeaf() const;
+
 	void print(int i) const; //for debugging.
 	friend ostream& operator<<(ostream& out, const PeriodicFunctionNode & pfn);
 	//~PeriodicFunctionNode();
+public:
+~PeriodicFunctionNode();
 };
 
 
 class PeriodicFunction
 {
 private:
-	PeriodicFunctionNode * head;
+	PeriodicFunctionNodePtr  head;
 
 public:
 	PeriodicFunction();

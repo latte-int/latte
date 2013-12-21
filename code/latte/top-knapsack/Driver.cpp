@@ -9,6 +9,7 @@
 #include <ctime>
 #include <climits>
 
+#include "rational.h"
 #include "cone.h"
 #include "preprocess.h"
 #include "barvinok/barvinok.h"
@@ -22,7 +23,40 @@
 #include <getopt.h>
 using namespace std;
 
+
+
+
 int main(int argc, char *argv[]) {
+
+	//ZZ aa(NTL::INIT_VAL,   "533765551555708028075229384988162533893304992101320918011350006754330831749448685737984256335377984983889916831716778019758878193530263849346252117733839462400");
+	//ZZ aa(NTL::INIT_VAL,   "4520293857002398570928708520349769486720967028972394570923857023895709283562385793465120893570294630160562306032857023896209857857203462304985702349860234950");
+	//ZZ aa(NTL::INIT_VAL, "4609533765551555708028075229384988162533893304992101320918011350006754330831749448685737984256335377984983889916831716778019758878193530263849346252117733839462400");
+	//ZZ bb(NTL::INIT_VAL, "-14587749093744857173029509001388066559542146001301398349519941981826976622712267583318429498029400");
+	//cout << "aa:=" << aa << ";\nbb:=" << bb << ";" << endl;
+
+	//GCD(abs(aa),abs(bb));
+	//cout << "g:=" << myGCD(aa,bb) << ";" << endl;
+	//cout << "YES!!!" << endl;
+
+	//cout << "hi" << endl;
+	//mpz_class aaa("4609533765551555708028075229384988162533893304992101320918011350006754330831749448685737984256335377984983889916831716778019758878193530263849346252117733839462400",10);
+	//mpz_class aaa = convert_ZZ_to_mpz(aa);
+	//cout << "world" << endl;
+	//mpz_class bbb("-14587749093744857173029509001388066559542146001301398349519941981826976622712267583318429498029400",10);
+	//mpz_class bbb = convert_ZZ_to_mpz(bb);
+	//cout << "aaa:=" << flush << aaa << flush << ";\nbbb:=" << bbb << ";" << endl;
+	//mpz_class thegcd;
+	//mpz_gcd(thegcd.get_mpz_t(), aaa.get_mpz_t(),bbb.get_mpz_t());
+	//cout << "YES!" << endl;
+
+	//mpz_t at, bt;
+	//mpz_init(at);
+	//mpz_init(bt);
+	//cout << "hi" << endl;
+	//mpz_set_str(at, "4609533765551555708028075229384988162533893304992101320918011350006754330831749448685737984256335377984983889916831716778019758878193530263849346252117733839462400", 10);
+	//cout << "world" << endl;
+	//mpz_set_str(bt, "-14587749093744857173029509001388066559542146001301398349519941981826976622712267583318429498029400", 10);
+	//cout << "b = " << flush; mpz_out_str(stdout, 10, bt); cout << "\na = " << flush; mpz_out_str(stdout,10,at); cout << endl;
 	if (1) {
 
 		cout << "Invocation: ";
@@ -32,6 +66,7 @@ int main(int argc, char *argv[]) {
 
 		string inFile, outFile;
 		int k = -1;
+		int allk = -1;
 
 		//process each option.
 		while (1)
@@ -40,6 +75,7 @@ int main(int argc, char *argv[]) {
 			{
 			{ "out",	  			  required_argument, 0, 'o' },
 			{ "k",  				  required_argument, 0, 'k' },
+			{ "allk",				  required_argument, 0, 0x100 },
 			{ "help",				  no_argument,       0, 'h' },
 			{ "file",				  required_argument, 0, 'f' },
 			{ 0, 0, 0, 0 } };
@@ -65,6 +101,9 @@ int main(int argc, char *argv[]) {
 				case 'k':
 					k = atoi(optarg);
 					break;
+				case 0x100:
+					allk = atoi(optarg);
+					break;
 				case 'h':
 					cout << "TODO: print help menu" << endl;
 					break;
@@ -77,10 +116,10 @@ int main(int argc, char *argv[]) {
 			}
 		}//while.
 
-		if (inFile.length() == 0 || k < 0)
+		if (inFile.length() == 0 || (k < 0 && allk < 0))
 		{
 			cout << "Input error: run " << argv[0] << " -h for help" << endl;
-			exit(1);
+			THROW_LATTE( LattException::ue_BadCommandLineOption);
 		}
 
 		ifstream file;
@@ -97,14 +136,18 @@ int main(int argc, char *argv[]) {
 		time.start();
 		TopKnapsack tk;
 		tk.set(alpha);
-		tk.coeff_NminusK(k);
+		if ( k > -1)
+			tk.coeff_NminusK(k);
+		else
+			tk.coeff_topK(allk);
 		time.stop();
 
+		cout << "Printing answer..." << endl;
 		if ( outFile.length())
 		{
 			ofstream f(outFile.c_str());
 			tk.printAnswer(f);
-			f << "#Total Time: " << time.get_seconds() << endl;
+			f << "\n\n\n#Total Time: " << time.get_seconds() << endl;
 			f.close();
 		}
 		else
@@ -121,22 +164,22 @@ int main(int argc, char *argv[]) {
 		GeneralMonomialSum<PeriodicFunction, int> a;
 		vector<ZZ> ea, ee;
 		ea.push_back(to_ZZ(1)); ee.push_back(to_ZZ(2));
-		ea.push_back(to_ZZ(2)); ee.push_back(to_ZZ(0));
+		ea.push_back(to_ZZ(2)); ee.push_back(to_ZZ(1));
 		ea.push_back(to_ZZ(3)); ee.push_back(to_ZZ(4));
 		ea.push_back(to_ZZ(4)); ee.push_back(to_ZZ(5));
 
-		cout << "got here" << endl;
-		vec_ZZ junk;
-		junk.SetLength(ea.size());
-
-
-		tk.set(junk);
-		tk.order = 4;
-		ZZ bottom;
-		tk.expandPeriodicPart(bottom, a, 1, ea, ee);
-
-		cout << "anser is sign/bottom*" << a.printMonomials().c_str() << endl;
-
+		PeriodicFunction pf;
+		pf.setToConstant(20);
+		for(int j = 0; j < ea.size(); ++j)
+		{
+			pf.add(PeriodicFunction(RationalNTL(ea[j], ee[j]), false));
+		}
+		pf.pow(34);
+		PeriodicFunction pf2(pf);
+		pf2.times(pf);
+		
+		cout << pf2 << endl;
+		
 	}
 }
 //main()
