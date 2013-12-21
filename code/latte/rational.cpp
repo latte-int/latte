@@ -154,6 +154,12 @@ RationalNTL::RationalNTL(const ZZ &num, const int denom) :
 	canonicalize();
 }
 
+RationalNTL::RationalNTL(const int num, const ZZ& denom):denominator(denom)
+{
+	numerator = num;
+	canonicalize();
+}
+
 RationalNTL::RationalNTL(const int num, const int denom)
 {
 	numerator = num;
@@ -188,17 +194,24 @@ RationalNTL::RationalNTL(const string &number)
  */
 void RationalNTL::canonicalize()
 {
+
 	if (denominator < 0)
 	{
 		denominator *= -1;
 		numerator *= -1;
 	}//make denominator positive.
 
-	ZZ gcd = GCD(numerator, denominator);
+	ZZ gcd = myGCD(numerator, denominator); //GCD(numerator, denominator);
+
 	if (gcd != 1)
 	{
+		//cout << numerator << "/" <<  denominator << endl;
+		//cout << "n:" << numerator/gcd << endl;
 		numerator /= gcd;
+		//cout << "*" << flush;
+		//cout << "d:" << denominator/gcd << flush;
 		denominator /= gcd;
+		//cout << " saved." << endl;
 	}//if can divide.
 
 }//canonicalize
@@ -209,6 +222,7 @@ RationalNTL & RationalNTL::add(const ZZ &num, const ZZ& denom)
 
 	numerator = numerator * denom + num * denominator;
 	denominator *= denom;
+	assert(denom != 0);
 	canonicalize();
 	return *this;
 }//add
@@ -304,19 +318,13 @@ RationalNTL & RationalNTL::mult(const ZZ rhs)
  */
 RationalNTL & RationalNTL::power(const long e)
 {
-
-	//void power(ZZ& x, const ZZ& a, long e); // x = a^e (e >= 0)
-	//cout << "RationalNTL::power e= " << e << endl;
-
 	if (e > 0)
 	{
-		//cout << e << "> 0" << endl;
 		numerator = NTL::power(numerator, e);
 		denominator = NTL::power(denominator, e);
 	}// return (a/b) ^ e
 	else if (e < 0)
 	{
-		//cout << e << "< 0" << endl;
 		assert(numerator != 0);
 		ZZ oldNum;
 		oldNum = numerator;
@@ -325,13 +333,10 @@ RationalNTL & RationalNTL::power(const long e)
 	} // return (b/a)^|e|, where |.| is abs. value.
 	else if (e == 0)
 	{
-		//cout << e << "== 0" << endl;
-		assert( numerator != 0);
 		numerator = 1;
 		denominator = 1;
 	} // return (a/b)^0
 
-	//cout << "now, this=" << *this << endl;
 	canonicalize();
 
 	return *this;
@@ -462,6 +467,45 @@ ostream& operator <<(ostream &out, const RationalNTL & rationalNTL)
 	if (rationalNTL.denominator != 1)
 		out << "/" << rationalNTL.denominator;
 	return out;
+}
+
+//hack. to delete.
+ZZ RationalNTL::myGCD(ZZ a, ZZ b) const
+{
+
+	a = a*sign(a);
+	b = b*sign(b);
+	long int numTimes2;
+	numTimes2 = 0;
+
+	if ( b == 1 || a == b) return b;
+
+	while(true)
+	{
+		if (IsZero(a)) return b*power2_ZZ(numTimes2);
+		if (IsZero(b)) return a*power2_ZZ(numTimes2);
+
+		if ( a % 2 == 0)
+		{
+			if ( b % 2 == 0)
+			{
+				++numTimes2;
+				a /= 2;
+				b /= 2;
+			}
+			else
+				a /= 2;
+		}
+		else if ( b % 2 == 0)
+			b /= 2;
+		else
+		{
+			if ( a < b)
+				b = (b - a)/2;
+			else
+				a = (a - b)/2;
+		}
+	}
 }
 
 /**]

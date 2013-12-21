@@ -176,6 +176,7 @@ public:
 	RationalNTL(); //initialize to 0
 	RationalNTL(const ZZ &num, const ZZ& denom);
 	RationalNTL(const ZZ &num, const int denom);
+	RationalNTL(const int num, const ZZ& denom);
 	RationalNTL(const int num, const int denom);
 	RationalNTL(const string &num, const string &denom);
 	RationalNTL(const string &number);
@@ -220,6 +221,7 @@ public:
 	RR to_RR() const; // converts the fraction to a float.
 	string str() const; //converts the fraction to a string.
 	void changeSign(); //times by -1. does not try to reduce the fraction.
+	ZZ myGCD(ZZ a, ZZ b) const; //hack. to delete
 
 	// I/O
 	friend ostream& operator <<(ostream &out, const RationalNTL & rationalNTL);
