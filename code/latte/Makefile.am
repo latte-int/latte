@@ -88,7 +88,9 @@ noinst_HEADERS =							\
 	triangulation/RegularTriangulationWithCdd.h			\
 	ReadPolyhedron.h						\
 	ProjectUp.h							\
-	ReadSubcones.h
+	ReadSubcones.h \
+	integration/GeneralMonomialSum.h 
+
 
 if HAVE_TOPCOM_LIB
 liblatte_la_SOURCES += triangulation/TriangulationWithTOPCOM.cpp
@@ -212,6 +214,12 @@ liblatte_la_SOURCES  += buildPolytopes/BuildRandomPolytope.cpp
 liblatte_la_SOURCES  += buildPolytopes/GraphMaker.cpp
 liblatte_la_SOURCES  += buildPolytopes/BuildRandomPolynomials.cpp
 
+#top knapsack headers and sources. 
+noinst_HEADERS += top-knapsack/PeriodicFunction.h
+noinst_HEADERS += top-knapsack/TopKnapsack.h
+liblatte_la_SOURCES += top-knapsack/TopKnapsack.cpp
+liblatte_la_SOURCES += top-knapsack/PeriodicFunction.cpp
+
 #interpolation. to delete this.
 noinst_HEADERS += interpolation/PolynomialInterpolation.h
 
@@ -220,6 +228,11 @@ noinst_HEADERS += interpolation/PolynomialInterpolation.h
 #main program to find volumes and integrals of polytopes.
 bin_PROGRAMS += integrate
 integrate_SOURCES = valuation/Driver.cpp
+
+#main program to find the top k terms of the Ehrhart polynomial for knapsacks
+bin_PROGRAMS += topKnapsack
+topKnapsack_SOURCES = top-knapsack/Driver.cpp
+topKnapsack_LDADD = $(LDADD)
 
 #convert a cdd H-rep to latte H-rep (by clearing the fractions)
 bin_PROGRAMS += ConvertCDDineToLatte
@@ -356,7 +369,7 @@ liblatte_la_SOURCES +=				\
 	integration/residue.cpp			\
 	integration/newIntegration.cpp		\
 	integration/PolyTrie.cpp		\
-	top-ehrhart/TopEhrhart.cpp
+	top-ehrhart/TopEhrhart.cpp		
 
 noinst_HEADERS +=				\
 	integration/multiply.h			\
