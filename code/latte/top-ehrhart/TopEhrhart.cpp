@@ -63,10 +63,13 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 
 	ofstream maple("compute-top-ehrhart.mpl");
 
+	//cout << "TopEhrhart::computeTopEhrhartPolynomial:: fix script location" << endl;
 	maple << "read(\"" << relocated_pathname(MAPLE_SCRIPT_DIR) << "/"
 			<< "Conebyconeapproximations_08_11_2010.mpl" << "\"):\n\n";
-
 	//maple << "read(\"Conebyconeapproximations_08_11_2010.mpl\"):\n\n";
+
+	//maple << "\nREAD_EXPERIMENTS:=false;\n";
+	//maple << "read(\"knapsackLib2.mpl\"):\n\n";
 
 	assert(!poly->dualized);
 
@@ -189,6 +192,12 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 	maple << "t1:=time():" << endl;
 
 	//now print the function we are going to call.
+	
+	//TEMP FUNCTIONS FOR KNAPSACK PAPER
+	//maple << "timeOneCoefficientConeByCone(n,N, simpleCones, linearForms, " << poly->numOfVars << ", false, " << numTopCoefficients << ", \"" << saveTopEhrhartPolynomial.c_str() << "\"):\n";
+	//TEMP FUNCTIONS FOR KNAPSACK PAPER
+	
+	///* //TO BUT BACK IN
 	stringstream functionCall;
 
 	functionCall << "epoly:=";
@@ -219,6 +228,7 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 	maple << "printf(\"\\n\\n\\nThe Ehrhart polynomial=%a\\n\", epoly);\n" << endl;
 	maple << "printf(\"Evaluation at 1 is %a\\n\", eval(subs({N=1,n=1, MOD=latteMod},epoly)));\n" << endl;
 	maple << "printf(\"Total Maple time %a\\n\", t2);\n" << endl;
+	//*/
 	maple.close();
 
 	system_with_error_check(shell_quote(MAPLE_PATH) + string(" -q compute-top-ehrhart.mpl"));
@@ -249,4 +259,6 @@ void TopEhrhart::computeTopEhrhartPolynomial()
 
 	computeTopEhrhartPolynomial(forms);
 }
+
+
 

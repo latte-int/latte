@@ -52,4 +52,5 @@ public:
 	virtual ~TopEhrhart();
 };
 
-#endif /* TOPEHRHART_H_ */
+
+#endif
