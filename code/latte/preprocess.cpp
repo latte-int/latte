@@ -40,6 +40,38 @@ vec_ZZ transpose(vec_ZZ mat, int numOfVars, int numOfRows) {
 /* ----------------------------------------------------------------- */
 /* Code originally from TiGERS. This is an adapted version from MLP. */
 
+/* Brandon: this is what I think  ihermite is doing.
+ * S: n by m matrix in  row-major order
+ * U: n by n matrix in row-major order
+ * rhs: m-vector.
+ * m: number of cols of S
+ * n: number of rows of S
+ *
+ * Given Ax=b, solves, UAx= Hx=Ub where S=A before the function call, and S=H after
+ *   but I am not sure when rhs chanes.
+ * Example:
+ * Before
+ * S=
+ * 0, 1, 2, 3, 4,
+   2, 3, 4, 5, 6,
+   4, 5, 6, 7, 8,
+   6, 7, 8, 9, 10,
+ *
+ * rhs = [1 2 3 4]^T
+ *
+ * After:
+ * S=
+ * 2, 3, 4, 5, 6,
+   0, 1, 2, 3, 4,
+   0, 0, 0, 0, 0,
+   0, 0, 0, 0, 0,  (note how we could do another row op to eliminate the 3 in row 1)
+ *
+ * U=
+ * 0, 1, 2, 1,
+   1, 0, -3, -2,
+   0, 0, 0, 1,
+   0, 0, 1, 0,
+ */
 int ihermite(vec_ZZ *S, vec_ZZ *U, vec_ZZ* rhs, int m, int n) {
 	int i, j, k, done, sign, c, mc, mn, crk;
 	ZZ mv, t;
