@@ -20,6 +20,7 @@ NTL_CLIENT
 
 template <class T, class S> class BurstTrie;
 
+
 struct monomialSum
 {
 	int termCount, varCount;
