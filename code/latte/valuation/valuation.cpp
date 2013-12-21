@@ -1170,7 +1170,6 @@ Valuation::IntegrationInput::IntegrationInput()
 	realDilations = false; //formula is only valid for integer dilations, not rational/real ones.
 	saveTopEhrhartPolynomial = "-1"; //default is to not save the polynomial.
 
-
 	//Command line options. These are used by processUserInput()
 	//  to set up which algorithms will be used.
 	valuationVolume =false;			//--valuation=volume

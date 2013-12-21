@@ -149,7 +149,6 @@ public:
 	bool realDilations;
 	string saveTopEhrhartPolynomial;
 	bool unweightedCounting;
-
 	
 	IntegrationInput();
 	void processUserInput();	//set the above integration/volume algorithmic booleans.
@@ -157,8 +156,8 @@ public:
 	//Command line options. These are used by processUserInput()
 	//  to set up which algorithms will be used.
 	bool valuationVolume;		//--valuation=volume
-	bool valuationIntegrate;	//etc
-	bool valuationEhrhart;
+	bool valuationIntegrate;	//--valuation=integrate
+	bool valuationEhrhart;		//--valuation=top-ehrhart
 
 	bool useTangentCones;		//--cone-decompose
 	bool useTriangulation;		//--triangulate
