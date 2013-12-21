@@ -230,9 +230,9 @@ bin_PROGRAMS += integrate
 integrate_SOURCES = valuation/Driver.cpp
 
 #main program to find the top k terms of the Ehrhart polynomial for knapsacks
-bin_PROGRAMS += topKnapsack
-topKnapsack_SOURCES = top-knapsack/Driver.cpp
-topKnapsack_LDADD = $(LDADD)
+bin_PROGRAMS += top-ehrhart-knapsack
+top_ehrhart_knapsack_SOURCES = top-knapsack/Driver.cpp
+top_ehrhart_knapsack_LDADD = $(LDADD)
 
 #convert a cdd H-rep to latte H-rep (by clearing the fractions)
 bin_PROGRAMS += ConvertCDDineToLatte
