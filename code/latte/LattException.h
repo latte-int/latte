@@ -46,7 +46,10 @@ public:
 
 		//integration errors (ie)
 		ie_BadIntegrandFormat,			//something's wrong with the integrand.
-		ie_UnexpectedIntegrationOption,	//maybe wrong algorithm used?
+		ie_UnexpectedIntegrationOption,	//maybe wrong algorithm used
+
+		//division errors
+		de_divisionByZero, 				//divided by zero...perturbation is not
 
 		//unknown (bug)
 		bug_Unknown,					//something really bad happened.
