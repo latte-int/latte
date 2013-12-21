@@ -824,6 +824,31 @@ ValuationDBStatistics IntegrationDB::getStatisticsByFileDegree(const string & po
 	avgMinMaxCountLawrence    = getStatisticsAvgMinMaxCount(Lawrence, polymakeFile, degree, useDual);
 	avgMinMaxCountTriangulate = getStatisticsAvgMinMaxCount(Triangulate, polymakeFile, degree, useDual);
 
+
+//	ans.push_back(avg); //avg 0
+//	ans.push_back(min); //min 1
+//	ans.push_back(max); //max 2
+//	ans.push_back(sd) ;//sd 3
+//	ans.push_back(totalFinished); //totalexist 4
+//	ans.push_back(totalExist);//5 
+//	ans.push_back(manuallyLimited);//6
+
+	vdbs.avgTriangulationTime = avgMinMaxCountTriangulate[0];
+	vdbs.minTriangulationTime = avgMinMaxCountTriangulate[1];
+	vdbs.maxTriangulationTime = avgMinMaxCountTriangulate[2];
+	vdbs.stdDeviationTriangulation = avgMinMaxCountTriangulate[3];
+	vdbs.totalFinishedTriangulationTestCases = avgMinMaxCountTriangulate[4];
+	vdbs.totalTestCases = avgMinMaxCountTriangulate[5];
+	vdbs.manuallyLimitedTriangulation = avgMinMaxCountTriangulate[6];
+
+	vdbs.avgLawrenceTime      = avgMinMaxCountLawrence[0];
+	vdbs.minLawrenceTime      = avgMinMaxCountLawrence[1];
+	vdbs.maxLawrenceTime      = avgMinMaxCountLawrence[2];
+	vdbs.stdDeviationLawrence = avgMinMaxCountLawrence[3];	
+	vdbs.totalFinishedLawrenceTestCases      = avgMinMaxCountLawrence[4];
+	vdbs.manuallyLimitedLawrence = avgMinMaxCountLawrence[6];
+//back here
+/*
 	vdbs.avgTriangulationTime = avgMinMaxCountTriangulate[0];
 	vdbs.avgLawrenceTime      = avgMinMaxCountLawrence[0];
 
@@ -840,7 +865,7 @@ ValuationDBStatistics IntegrationDB::getStatisticsByFileDegree(const string & po
 
 	vdbs.manuallyLimitedLawrence = getLimitByFile(Lawrence, polymakeFile, degree, useDual);
 	vdbs.manuallyLimitedTriangulation = getLimitByFile(Triangulate, polymakeFile, degree, useDual);
-
+*/
 	return vdbs;
 }///getStatisticsByFileDegree
 
@@ -962,8 +987,9 @@ double IntegrationDB::getStdDeviation(AlgorithemUsed alg, int dim, int vertexCou
 
 vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, const string &polymakeFile, int degree, bool useDual)
 {
+
 	vector<double> ans;
-	vector<vector<string> > strAns;
+	vector<double > strAns;
 	stringstream sql;
 	string strAlg;
 
@@ -971,7 +997,7 @@ vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, co
 
 	if (useDual == true)
 	{
-		sql << "select avg(i." << strAlg << "), min(i." << strAlg << "), max(i." << strAlg << "), count(*) "
+		sql << "select i." << strAlg 
 			<< " from polynomial as p, polytope as dualP, polytope as orgP, integrate as i "
 			<< " where i.polynomialID = p.rowid and i.polytopeID = dualP.rowid " //join with p, i, dualP
 			<< " and dualP.dual is not null and dualP.dual = orgP.rowid" //and with orgp
@@ -982,7 +1008,7 @@ vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, co
 	else
 	{
 
-		sql << "select avg(i." << strAlg << "), min(i." << strAlg << "), max(i." << strAlg << "), count(*) "
+		sql << "select i." << strAlg 
 			<< " from polynomial as p, polytope as t, integrate as i "
 			<< " where i.polynomialID = p.rowid and i.polytopeID = t.rowid " //join with p, i, dualP
 			<< " and t.dual is null"
@@ -992,12 +1018,23 @@ vector<double> IntegrationDB::getStatisticsAvgMinMaxCount(AlgorithemUsed alg, co
 	}//regular
 
 	//get the data and save it
-	strAns = query(sql.str().c_str());
+	strAns = queryAsFloatArray(sql.str().c_str());
 
-	ans.push_back(atof(strAns[0][0].c_str())); //avg
-	ans.push_back(atof(strAns[0][1].c_str())); //min
-	ans.push_back(atof(strAns[0][2].c_str())); //max
-	ans.push_back(atof(strAns[0][3].c_str())); //count
+	double avg, min, max, sd;
+	int totalExist, totalFinished;
+	bool manuallyLimited;
+
+	getStatistics(strAns, avg, min, max, sd, totalFinished, totalExist, manuallyLimited);
+	
+	
+	
+	ans.push_back(avg); //avg
+	ans.push_back(min); //min
+	ans.push_back(max); //max
+	ans.push_back(sd) ;//sd
+	ans.push_back(totalFinished); //totalexist
+	ans.push_back(totalExist);
+	ans.push_back(manuallyLimited);
 
 	return ans;
 }//getStatisticsAvgMinMaxCount
