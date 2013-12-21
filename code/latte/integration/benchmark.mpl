@@ -455,7 +455,15 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     od:
     close(inputFile):
     
+    #start of brandon's hack
+    newfptr := fopen("BRANDONstats", APPEND, TEXT);
+    fprintf(newfptr, "%d %d ", dimension, myDegree);    
+    fclose(newfptr);
+    #end of brandon's hack.
+    
+    
     #run the integrate program
+    print("going to run dim", dimension, " deg ", myDegree);
     print(StringTools[Join](["./integrate_test -b", filename, "-t 600 integration/input.tmp integration/output.tmp"], " ")):
     system(StringTools[Join](["./integrate_test -b", filename, "-t 600 integration/input.tmp integration/output.tmp"], " ")):
     
@@ -468,6 +476,7 @@ test_integration:=proc(polyCount, bigConstant, numTerms, dimension, myDegree, de
     end if:
     close(outputFile):
   end if:
+  return curTerm;
 end:
 
 draw_table6:=proc()
@@ -550,7 +559,7 @@ writeline(benchmarks, "   n  |       2        10        20         50       100 
 writeline(benchmarks, "_______________________________________________________________________________________"):
 fprintf(benchmarks, "%4.4s  |", "10"):
 close(benchmarks):
-for myDim from 10 to 1000 do
+for myDim from 400 to 1000 do
   timedOut:= 0:
   for myDegree from 2 to 1000 do
     #samplesize, bigConstant, numTerms, dimension, myDegree, decomposing
