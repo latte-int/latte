@@ -1,6 +1,12 @@
 	To update this ChangeLog, use `make update-changelog' and then
 	copy (and edit) entries from ChangeLog.svn2cl
 
+2013-12-23 Brandon Dutra <bedutra@ucdavis.edu>
+
+	configure.ac: Bump version number to 1.7
+	Added the top-ehrhart-knapsack code
+	Updated the manual
+
 2013-09-07  Matthias Koeppe  <mkoeppe@math.ucdavis.edu>
 
 	Version 1.6
