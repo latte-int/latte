@@ -24,7 +24,7 @@
 \newcommand{\latte}{{\tt LattE}\xspace}
 \newcommand{\latteInt}{{\tt LattE integrale}\xspace}
 \newcommand{\latteMac}{{\tt LattE macchiato}\xspace}
-\newcommand{\latteV}{v1.6}
+\newcommand{\latteV}{v1.7}
 \newcommand{\vinci}{{\tt Vinci}\xspace}
 \newcommand{\maple}{{\tt Maple}\xspace}
 \newcommand{\cdd}{{\tt CDD}\xspace}
@@ -156,6 +156,7 @@ Optimization, and Number Theory.
 
 Fore details of how the computations are done, see \cite{koeppe:irrational-barvinok, latte1} .
 
+
 \subsubsection{Integration}
 
 \latteInt has two different integration algorithms for integrating a rational polynomial $p \in \R[x_1, \dots, x_d]$ over a $d$ dimensional rational polytope. The first one, called the triangulation method, triangulates the polytope into simplices and integrates over each simplex. The other method, called the cone decomposition method, integrates over each tangent cone of the polytope. In order to do this, each tangent cone is triangulated into simple cones. This is the main trade off between the two integration algorithms: you can do one (possibly) large triangulation, or (possibly) many small tangent cone triangulations. 
@@ -210,6 +211,7 @@ The integral $\int_{x_1 = 0}^{x_1 = 1}\int_{x_2 = 0}^{x_2 = 1} x_1 +x_2  \d{x_1}
 \begin{description}
         \item[count] counts lattice points, computes Ehrhart polynomials and Ehrhart series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
         \item[integrate] integrates polynomials, powers of linear forms, and products of powers of linear forms over polytopes. Integrate can also computed weighted Ehrhart quasipolynomials.
+        \item[top-ehrhart-knapsack] Computes the Ehrhart quasipolynomials for knapsack-type polytopes.
         \item[max/minimize] perform linear integer optimization.
 \end{description}
 
@@ -823,6 +825,60 @@ A common subproblem in counting lattice points and integration requires finding 
         \end{itemize}
 
 \end{itemize}
+
+
+\subsection{How to use {\tt top-ehrhart-knapsack}}
+
+
+ To view the help menu, run
+
+\begin{verbatim}
+        top-ehrhart-knapsack --help
+\end{verbatim}  
+
+A knapsack is a polytope in the form $\{x \in \R^d \mid \alpha_1 x_1 + \cdots + \alpha_d x_d = t; x_i \geq 0\},$ which we identify by the coefficients $\boldsymbol{\alpha}= [\alpha_1, \dots, \alpha_d].$   {\tt top-ehrhart-knapsack} can compute the largest $k$ degree terms in the Ehrhart quasi-polynomial $E(\boldsymbol{\alpha}, t)$ as a function of $t$.  We assume the greatest common divisor of the $\alpha_i$ is one, because if $g$ is the greatest common divisor of the $\alpha_i$ and $g\neq 1$, then $E(\boldsymbol{\alpha}/g, t) = E(\boldsymbol{\alpha}, gt) $. There are only a few command line parameters:
+
+\begin{description}
+\item[--file, -f FILENAME] FILENAME contains the knapsack file in a special format (see below). Required parameter.
+\item[--out, -o FILENAME2] Saves the result to a file. This is an optional parameter, but is is recommended to always save the result to a file as the output can be large. 
+\item[-k $n$] Computes the $n^{th}$ term of the Ehrhart polynomial. This or ``--all-k" is required.
+\item[--all-k $n$] Computes the largest $n^{th}$ terms of the Ehrhart polynomial.  
+\end{description}
+
+{\tt top-ehrhart-knapsack} uses a special file format to input the knapsack coefficients. For a the knapsack $\boldsymbol{\alpha}$, the input file contains one line: the number of coefficients in the knapsack followed by each coefficient separated by spaces.
+
+The two main computation options are best illustrated with an example. Consider the knapsack $\boldsymbol{\alpha}:=[1,2,3,4,5]$. Notice that the greatest common divisor  is one.  Save this knapsack in a file called knap1.txt:
+\begin{verse}
+5 1 2 3 4 5
+\end{verse}
+
+To compute the $2^{nd}$ coefficient of the Ehrhart polynomial,  use the command
+\begin{verbatim}
+top-ehrhart-knapsack --file knap1.txt -k 2 --out results.mpl
+\end{verbatim}
+which gives the result
+\begin{verbatim}
+coeff4minus1:= (1/96);
+\end{verbatim}
+and hence the 2nd term is $t^2/96$.
+
+Next, we can compute the largest $5$ terms (because the dimension of this knapsack is $4$, this means we are computing the full Ehrhart polynomial), with the command
+\begin{verbatim}
+top-ehrhart-knapsack --file knap1.txt --all-k 5 --out results.mpl
+\end{verbatim}
+which gives the result
+\begin{verbatim}
+coeff4minus0:= (1/2880);
+coeff4minus1:= ((((((-1/48) + ((((((((1)*(( Frac( T * (1/3) ) )*(3))) + <and so on>;
+coeff4minus2:= <another large expression>;
+coeff4minus3:= <another large expression>;
+coeff4minus4:= <another large expression>;
+
+topKPolynomial:=(coeff4minus0)*T^(4) + (coeff4minus1)*T^(3) 
+ + (coeff4minus2)*T^(2) + (coeff4minus3)*T^(1) + (coeff4minus4)*T^(0);
+\end{verbatim}
+  
+Notice that the expressions for each coefficient might be very long. It is recommended that you always save the results in an output file, and use a computer algebra system to simplify the expressions. Also note that the output can be parsed by \maple. In fact, using \maple to simplify the expressions, ``coeff4minus1" is $1/96$. Finally, the Frac($x$) function represents the fractional part of $x$ and is equal to $x - \lfloor x \rfloor \in [0,1)$, where $\lfloor x \rfloor$ is  the largest integer smaller or equal to $x$.
 
 
 \subsection{Optimization}
