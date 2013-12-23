@@ -14,9 +14,14 @@
 using namespace std;
 
 /**
+ * A class to deal with polynomials without having to manually make BTrieIterator iterators.
+ */
+
+
+/**
  * Assumptions
  * 		S ? I don't know, we only use int for S.
- * 		T: needs to support ==(int), =, <<, *=(RationalNTL)
+ * 		T: needs to support ==(int), =, <<, *=.
  */
 template <class T, class S>
 class GeneralMonomialSum

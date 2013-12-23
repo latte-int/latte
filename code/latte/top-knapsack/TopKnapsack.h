@@ -17,40 +17,61 @@
 #include "PeriodicFunction.h"
 #include <vector>
 
+
+/**
+ * This class computes the top k terms of the Ehrhart polynomial for knapsack polytopes.
+ * This program implements the algorithms in "Coefficients of the Denumerant" by Velleda Baldoni, Nicole Berline, Jes\'us A. De Loera, Brandon E. Dutra, Matthias K\"oppe, and Mich\`ele Vergne
+ */
+
 using namespace std;
 
 class TopKnapsack;
 
+/**
+ * Holds a gcd value and it mu(f) value.
+ */
 class MobiusPair{
 public:
 	ZZ gcd;
 	ZZ mu;
-	bool mobiusValid;
+	bool mobiusValid; //!< if true, then the mu value for this gcd has already been computed.
 
 	MobiusPair();
 	MobiusPair(const ZZ& g, const ZZ& m);
 };
 
+/**
+ * Holds all the gcd values with their mu values. Base class
+ */
 class MobiusList {
 private:
 	void computeMobius(int i);
 public:
 	vector<MobiusPair> list;
 	MobiusList();
+	virtual ~MobiusList();
+
 	void insertGCD(const ZZ& v);
 	void computeMobius();
 	void print() const;
 };
 
-
+/**
+ * Holds the unweighted polynomial series for each gcd value.
+ * Derived class.
+ */
 class MobiusSeriesList: public MobiusList
 {
 public:
-	vector<GeneralMonomialSum<PeriodicFunction, int> *> unweightedSeries; //[i] is a series corresponding to list[i]. Still needs to by build by list[i].mu and -1^i/i!
+	vector<GeneralMonomialSum<PeriodicFunction, int> *> unweightedSeries; //!< [i] is a polynomial series corresponding to gcd list[i].
 	void computeMobius();
-	~MobiusSeriesList();
+	virtual ~MobiusSeriesList();
 };
 
+/**
+ * See http://en.wikipedia.org/wiki/Bernoulli_number
+ * Used for doing the series expansion.
+ */
 class BernoulliFirstKind
 {
 private:
@@ -62,23 +83,41 @@ public:
 
 
 
-
+/**
+ * Main class to compute the top Ehrhart polynomial for knapsacks.
+ *
+ * Example usage:
+ * 		TopKnapsack tk;
+ * 		tk.set(alpha);
+ * 		tk.coeff_NminusK(k); //find the coeff of t^{N-k}
+ * 		or ..
+ * 		tk.coeff_topK(k); // find the coeff of t^N, t^{N-1}, ..., t^{N-k}
+ * 		ofstream f(outFile.c_str());
+ * 		tk.printAnswer(f); //best to save to file....answers are BIG
+ *
+ * 	Todo:
+ * 		--find the gcd's faster
+ * 		--can this class be used twice? like tk.coeff_topK(k); tk.coeff_topK(k+1);
+ */
 class TopKnapsack {
-public:
-	vec_ZZ alpha;
+private:
+	vec_ZZ alpha;								//!< list of coefficients [a_1, a_1, ...., a_{N+1}]
 	int N;
-	int order; //k as in N-k
-	int largestSubsetComputed;
-	bool topKTerms;
-	MobiusSeriesList gcds;
-	BernoulliFirstKind bernoulli;
-	vector<PeriodicFunction> coeffsNminusk;
+	int order; 									//!< the k, as in N-k
+	int largestSubsetComputed; //to delete ?
+	bool topKTerms;								//!< if false, we are only computing coeff of t^{N-k}, else we are also computing the higher coefficients.
+	MobiusSeriesList gcds;						//!< unscaled series expansions with gcd mu values. If topKTerms=true, gcds.unweightedSeries[i] contains terms that contribute to t^N, ..., t^{N-k} for the ith gcd only. Else, it just has terms that contribute to t^{N-k}
+	BernoulliFirstKind bernoulli;				//!< store the bernoulli numbers so we do not have to always recompute.
+	vector<PeriodicFunction> coeffsNminusk;		//!< Output vector. [i] = coeff of t^{N-i}.
 
+
+
+	void coeff(int k); //!< start of computation
 
 	void everyGCD(int k);
 
 
-	void E(const int fIndex);
+	void E(const int fIndex); //!< computes the series expansion of F(\alpha, gcd[f-index], T)
 	void findLatticeBasis(mat_ZZ & latticeBasis, const vector<ZZ> & fnDivAlpha, const ZZ & f) const;
 	void findLatticeBasisInv(mat_ZZ & invLatticeBasisScaled, ZZ & invLatticeBasisD, mat_ZZ & invLatticeBasis,const mat_ZZ & latticeBasis) const;
 	void findVertex(vec_ZZ & tVertex, const ZZ &f, const vector<ZZ> &fnDivAlpha) const;
@@ -93,32 +132,26 @@ public:
 
 	void expandF1Case(GeneralMonomialSum<PeriodicFunction, int> & expansion);
 
-	void packageAnswer();
-	void printAnswer(ostream & out);
-/*
-	void expandOneTerm(monomialSum & oneExpansion, const ZZ & expx, const ZZ & expe);
-	void expandOneNonPerturbedTerm(monomialSum & oneExpansion, const ZZ & a);
-	void expandPeriodicExponential(GeneralMonomialSum<PeriodicFunction, int> & pxeProduct,
-			const mat_ZZ &B, const mat_ZZ & invB,
-			const ZZ & invBd, const listCone * oneCone,
-			const vec_ZZ & s, const vec_ZZ & alpha, const vec_ZZ & beta);
-
-	void expandPerturbationTerms(GeneralMonomialSum<PeriodicFunction, int> & ans,
-			const GeneralMonomialSum<PeriodicFunction, int> & p1, const monomialSum & p2);
-*/
-	static ZZ binomial(int n, int k);
-	TopKnapsack();
-	~TopKnapsack();
-
-	void set(const vec_ZZ& list);
+	void packageAnswer(); //!< computes the final coefficients and saves them in the coeffsNminusk vector.
 
 
-	void coeff_NminusK(int k);
-	void coeff_topK(int k);
-	void coeff(int k);
+
+
+
 
 	static void printMatrix(const mat_ZZ &A);//for debugging.
 
+public:
+	TopKnapsack();
+	~TopKnapsack();
+	static ZZ binomial(int n, int k);
+
+
+	void set(const vec_ZZ& list);
+
+	void coeff_NminusK(int k);
+		void coeff_topK(int k);
+		void printAnswer(ostream & out);
 };
 
 

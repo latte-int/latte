@@ -29,7 +29,11 @@ MobiusPair::MobiusPair(const ZZ& g, const ZZ& m): gcd(g), mu(m), mobiusValid(fal
 
 
 MobiusList::MobiusList() {}
+MobiusList::~MobiusList() {}
 
+/**
+ * @param v is inserted at the end of the list if it is not already there.
+ */
 void MobiusList::insertGCD(const ZZ& v )
 {
 	bool found = false;
@@ -43,6 +47,10 @@ void MobiusList::insertGCD(const ZZ& v )
 	if( !found )
 		list.push_back(MobiusPair(v, to_ZZ(0)));
 }
+
+/**
+ * Sets things up to compute the mu values. Throws an exception if the gcd of the entire list is not 1.
+ */
 void MobiusList::computeMobius()
 {
 	int indexOne =-1;
@@ -59,6 +67,12 @@ void MobiusList::computeMobius()
 	computeMobius(indexOne);
 }
 
+
+/**
+ * Recursively computes the mu values.
+ * Formula: mu(f) = 1 - \sum_{j: f divides j} mu(j).
+ * @param i, index of the current mu value that will be computed. On first call, this index value must be the gcd=1 case.
+ */
 void MobiusList::computeMobius(int i)
 {
 	if( list[i].mobiusValid == true)
@@ -77,13 +91,18 @@ void MobiusList::computeMobius(int i)
 	list[i].mobiusValid = true;
 }
 
+/**
+ * Used for debugging.
+ */
 void MobiusList::print() const
 {
 	for(int i = 0; i < (int) list.size(); ++i)
 		cout << list[i].mu << ", gcd=" << list[i].gcd << ", isv=" << list[i].mobiusValid << endl;
 }
 
-
+/**
+ * Computes the mu values and initializes the unweightedSeries vector.
+ */
 void MobiusSeriesList::computeMobius()
 {
 	MobiusList::computeMobius();
@@ -95,16 +114,18 @@ void MobiusSeriesList::computeMobius()
 MobiusSeriesList::~MobiusSeriesList()
 {
 	for(int i = 0; i < (int)unweightedSeries.size(); ++i)
-		delete unweightedSeries[i];
+		if (unweightedSeries[i])
+			delete unweightedSeries[i];
 }
 
 // **************************************************************************************************
 // **************************************************************************************************
+
 /*
  * Bernoulli of the 2nd kind:
  * Computes B[0], B[1], .... B[k] where
  * t/(1-exp(-t)) = \sum_{m=0}^infinity B[m] (-t)^m/m!
- * See https://en.wikipedia.org/wiki/Bernoulli_number#Generating_function
+ * See https://en.wikipedia.org/wiki/Bernoulli_number
  *
  * Formula:
  * B[0]= 1;
@@ -112,6 +133,8 @@ MobiusSeriesList::~MobiusSeriesList()
  * See https://en.wikipedia.org/wiki/Bernoulli_number#Explicit_definition
  *
  * Then note that Bernoulli of the fist kind is equal to the second kind only b[1] = -1/2, instead of 1/2
+ *
+ * @param k starting with B[0], computes up to B[k], where the B's are the Bernoulli of the 1st kind:
  */
 void BernoulliFirstKind::setBernoulli(int k)
 {
@@ -124,7 +147,6 @@ void BernoulliFirstKind::setBernoulli(int k)
 	{
 
 		//TODO: replace the choose function with pascal's triangle type computation to save time.
-		//cout << "starting B" << m << endl;
 		B[m] = 0;
 		if (m > 1 && (m % 2) == 1)
 		{
@@ -133,9 +155,7 @@ void BernoulliFirstKind::setBernoulli(int k)
 		for( j = 0; j < m; ++j)
 		{
 			B[m] += B[j]*RationalNTL(TopKnapsack::binomial(m,j), to_ZZ(m-j+1));;
-			//cout << " + " << B[j] << "* " << TopKnapsack::binomial(m,j) << "*1/" << m-j+1 << " ";
 		}
-		//cout << "\nbefore change" << B[m] << endl;
 		B[m].changeSign();
 		B[m] += RationalNTL(1,1);
 	}
@@ -158,39 +178,49 @@ const RationalNTL& BernoulliFirstKind::operator[](int i) const
 // **************************************************************************************************
 // **************************************************************************************************
 // **************************************************************************************************
+
 TopKnapsack::TopKnapsack() {
 	// TODO Auto-generated constructor stub
-
 }
 
 TopKnapsack::~TopKnapsack() {
 	// TODO Auto-generated destructor stub
 }
 
+/**
+ * Sets the knapsack list and computes the bernoulli numbers.
+ * @param list the knapsack list
+ */
 void TopKnapsack::set(const vec_ZZ& list)
 {
 	alpha = list;
 	N = alpha.length()-1;
 	bernoulli.setBernoulli(alpha.length());
-
-	//for(int i = 0; i <= N; ++i)
-	//	cout << "bernoulli[" << i << "]=" << bernoulli[i] << endl;
 }
 
-// compute t^N+t^{N-1}+....+t^{N-k}
+
+/**
+ * @param k will compute the coefficients of t^N, t^{N-1}, ..., t^{N-k}
+ */
 void TopKnapsack::coeff_topK(int k)
 {
 	topKTerms = true;
 	coeff(k);
 }
 
-//to do: clean at start of run in case user calls this twice or do this in the set() method...?
+/**
+ * @param k will compute the coefficient of t^{N-k}
+ */
 void TopKnapsack::coeff_NminusK(int k)
 {
 	topKTerms = false;
 	coeff(k);
 }
 
+/**
+ * Start of main computation.
+ * Computes the gcd, the mu values, does the residues and residues the polynomial.
+ */
 void TopKnapsack::coeff(int k)
 {
 
@@ -222,15 +252,23 @@ void TopKnapsack::coeff(int k)
 
 }
 
+/**
+ * 1) Looks at every term in the series computed so far,
+ * 2) figure how for which t^{N-i}-coefficient this term contributes to,
+ * 3) compute the final residue value,
+ * 4) Factor in f and mu(f)
+ */
 void TopKnapsack::packageAnswer()
 {
 	for(int i = 0; i < (int)gcds.list.size(); ++i)
 		if (gcds.list[i].mu != 0)
 		{
+			//series might contain terms that contribute to t^N, .., t^{N-k} or just t^{N-k}
 			GeneralMonomialSum<PeriodicFunction, int> *series = gcds.unweightedSeries[i];
 			if ( series->termCount == 0)
 				continue;
 
+			//loop over every term in the series
 			BTrieIterator<PeriodicFunction, int> * itr = new BTrieIterator<PeriodicFunction, int>();
 			itr->setTrie(series->myMonomials, series->varCount);
 			itr->begin();
@@ -239,8 +277,10 @@ void TopKnapsack::packageAnswer()
 			{
 
 				PeriodicFunction p(oneTerm->coef);
-				int deg = oneTerm->exps[1]; // deg = -N-1 +i for some 0<=i<=k (=order)
-				//deg += N+1; //= i
+				int deg = oneTerm->exps[1]; // deg = i for some 0<=i<=k (=order)
+				//recall that 1/(x^{N+1}}* gcds.unweightedSeries gives you the real series expansion.
+				//and so deg = -N -1 +i in the true series expansion.
+				//This this term would be obtained when we computed the residue of ((-x)^{N-i}/(N-i)! * real series expansion)
 				int h = N-deg; //h= N-i
 
 				ZZ hFactorial;
@@ -248,39 +288,42 @@ void TopKnapsack::packageAnswer()
 				for(int i = 2; i <= h; ++i)
 					hFactorial *= i;
 
-				//cout << "hFactorial" << hFactorial << endl;
 				RationalNTL factor;
 				if ( h % 2 == 0)
 					factor = -1;
 				else
 					factor = 1;
+
 				factor *= gcds.list[i].mu;
 				factor *= gcds.list[i].gcd;
 				factor.div(hFactorial);
 
-				//cout << "h=" << h << "FACTOR=" << factor << endl;
+
 				p.times(factor);
-				coeffsNminusk[deg].add(p);
+				coeffsNminusk[deg].add(p); //update coeff of t^{N-deg}
 			}
 			delete itr;
 		}
 
 }
 
-//mostly for debugging
+/**
+ * Prints the answer in a maple-friendly way.
+ */
 void TopKnapsack::printAnswer(ostream & out)
 {
 
 	if ( topKTerms == false)
-		out << "coeff" << N << "minus" << order << ":= " << coeffsNminusk[order] << ";\n";
+		out << "coeff" << N << "minus" << order << ":= " << coeffsNminusk[order] << ";\n"; //save the answer in a maple var
 	else
 	{
-
+		//print each coeff. computed in its own variable.
 		for(int i = 0; i < (int) coeffsNminusk.size(); ++i)
 		{
 			out << "coeff" << N << "minus" << i << ":= " << coeffsNminusk[i] << ";\n";
 		}
 
+		//sum the polynomial
 		out << "\ntopKPolynomial:=" ;
 		for(int i = 0; i < (int) coeffsNminusk.size(); ++i)
 		{
@@ -292,12 +335,14 @@ void TopKnapsack::printAnswer(ostream & out)
 	}
 }
 
+/**
+ * Going to compute the expansion of F(\alpha, f, T)(x).
+ */
 void TopKnapsack::E(int fIndex)
 {
 	ZZ f = gcds.list[fIndex].gcd;
 
 	assert(gcds.unweightedSeries[fIndex] == NULL);
-
 	gcds.unweightedSeries[fIndex] = new GeneralMonomialSum<PeriodicFunction, int>;
 	gcds.unweightedSeries[fIndex]->varCount = 2;
 
@@ -307,7 +352,7 @@ void TopKnapsack::E(int fIndex)
 		expandF1Case(*(gcds.unweightedSeries[fIndex]));
 		return;
 	}
-	//cout << "f=" << f << endl;
+
 
 	vector<ZZ> fDivAlpha, fnDivAlpha; //f (not) divides alpha
 	for(int i = 0; i < alpha.length(); ++i)
@@ -318,13 +363,6 @@ void TopKnapsack::E(int fIndex)
 			fnDivAlpha.push_back(alpha[i]);
 	}
 
-	//cout << "fDivAlpha" << endl;
-	//for(int i =0;i < fDivAlpha.size(); ++i)
-	//	cout << fDivAlpha[i] << ", ";
-	//cout << "\nfnDivAlph" << endl;
-	//for(int i = 0; i < fnDivAlpha.size(); ++i)
-	//	cout << fnDivAlpha[i] << ", " ;
-	//cout << endl;
 
 	mat_ZZ latticeBasis;
 	latticeBasis.SetDims(fnDivAlpha.size(), fnDivAlpha.size());
@@ -483,7 +521,7 @@ exit(1);
 	//cout << "before " << s << endl;
 	int r = ihermite(&s, &u, &rhs, m,n);
 
-	//U is in row-major order. take the transpose and save taht in latticeBasis
+	//U is in row-major order. take the transpose and save that in latticeBasis
 	for(int i = 0; i < n; ++i)
 		for(int j = 0; j < n; ++j)
 			latticeBasis[i][j] = u[j*n+i];
@@ -519,7 +557,7 @@ exit(1);
 
 
 	ZZ newf;
-	divide(newf, f, GCD(f,s[0])); //newf = f/gcd(f, u[0][0])
+	divide(newf, f, GCD(f,s[0])); //newf = f/gcd(f, u[0][0]);
 	for(int i = 0; i < n; ++i)
 		latticeBasis[i][0] *= newf;
 
@@ -1130,10 +1168,19 @@ void TopKnapsack::expandExponentialPart(GeneralMonomialSum<PeriodicFunction, int
 }
 
 
+/**
+ * Computes the expansion of
+ *
+ *               x^{N+1}
+ *    -------------------------
+ *    prod (1 - exp(alpha_i x))
+ *
+ * @param expansion, an output parameter, assumed to be initialized to zero, else its value will be lost.
+ */
 void TopKnapsack::expandF1Case(GeneralMonomialSum<PeriodicFunction, int> & expansion)
 {
+	//we need a vector type to reuse the function expandNonperiodicPart()
 	vector<ZZ> alphaCopy;
-
 	alphaCopy.resize(alpha.length());
 	for(int i = 0; i < (int) alpha.length(); ++i)
 		alphaCopy[i] = alpha[i];
@@ -1141,49 +1188,38 @@ void TopKnapsack::expandF1Case(GeneralMonomialSum<PeriodicFunction, int> & expan
 
 	expandNonperiodicPart(expansion, alphaCopy);
 	
-	//cout << "f=1 series::" << expansion.printMonomials().c_str() << endl;
-	
+	//compute the denominator of the expansion
 	ZZ bottomCoeffNonperiodicPart;
 	bottomCoeffNonperiodicPart = 1;
 	for(int i = 0; i < (int)alphaCopy.size();++i)
 		bottomCoeffNonperiodicPart *= alphaCopy[i];
-
 
 	if( (N+1) % 2 == 1)
 		bottomCoeffNonperiodicPart *= -1;
 	PeriodicFunction p;
 	p.setToConstant(RationalNTL(1, bottomCoeffNonperiodicPart));
 
+	//insert the fraction part first
 	int exponent[2];
-	exponent[0] = 0;
-	//exponent[1] = -1*(N+1);
-	exponent[1] = 0;
+	exponent[0] = 0; //no epsilon term
+	exponent[1] = 0; //insert as a constant
 	GeneralMonomialSum<PeriodicFunction, int> scaleTerm;
 	scaleTerm.varCount = 2;
 	scaleTerm.insertMonomial(p, exponent);
 
 	int maxE[2], minE[2];
-	maxE[0] = 0;
+	maxE[0] = 0; //no epsilon term
 	minE[0] = 0;
 
-	//maxE[1] = -1*N -1 + order;
-	//if ( topKTerms )
-	//	minE[1] = -1*N -1;
-	//else
-	//	minE[1] = -1*N -1 + order;
-
-	//cout << "f=1 series w/o scale" << expansion.printMonomials().c_str() << endl;
 
 	maxE[1] =  order;
 	if ( topKTerms )
 		minE[1] = 0;
 	else
-		minE[1] =  order;
+		minE[1] =  order; //ignore the other terms.
 
-
+	//scale the answer
 	expansion.multiply(scaleTerm, minE, maxE);
-
-
 }
 
 /*
@@ -1539,8 +1575,9 @@ ZZ TopKnapsack::binomial(int n, int k)
 }
 
 /**
- * @parm k: integer 1 <= k <= alphaSize
+ * @parm k: integer 1 <= k <= alphaSize = N+1
  * Computes every k-subset of alpha and computes the gcd of these sublists.
+ * Assumes the gcd of the entire list is one.
  */
 void TopKnapsack::everyGCD(int k)
 {
@@ -1553,7 +1590,7 @@ void TopKnapsack::everyGCD(int k)
 	//sublist is going to be a list of index values to add to the output list.
 	//sublist starts off as [k,k-1, ..., 2, 1].
 	//We keep adding values to sublist[1] and if sublist[i] > (n - i) we add 1 to the next element
-	//Hence the last element added is [n, n-1, n-2, n-3, ..., n-k+1]
+	//Hence the last element checked is [n, n-1, n-2, n-3, ..., n-k+1]
 	int* sublist = new int[k];
 	int i;
 	ZZ newGCD;
@@ -1565,34 +1602,30 @@ void TopKnapsack::everyGCD(int k)
 	counter = 1;
 	while (counter <= limit)
 	{
-
+		//find the gcd of the current subset index by sublist.
 		newGCD = alpha[sublist[0]-1];
 		for(i = 1; i < k; ++i)
 			newGCD = GCD(newGCD, alpha[sublist[i]-1]);
 		gcds.insertGCD(newGCD);
-		/*
-		cout << "("<< counter << "/" << limit << ") List:";
-		for(i = 0; i < k; ++i)
-			cout << sublist[i] << ", ";
-		cout << " gcd=" << newGCD << endl;
-		*/
 
 		if (limit == counter)
 			break;
 
 		sublist[0] += 1;
-
+		//ex: if N+1=10 and sublist = [11,9,2,1]
 		i=0;
 		while (sublist[i] > (N+1  - i) )
 		{
 			sublist[i+1] += 1;
 			++i;
 		}
+		//ex then sublist = [11,10,3,1], i = 2 (0-based)
 		while (i > 0)
 		{
 			sublist[i-1] = sublist[i]+1;
 			--i;
 		}
+		//ex then sublist = [5,4,3,1]
 		counter += 1;
 
 	}//while

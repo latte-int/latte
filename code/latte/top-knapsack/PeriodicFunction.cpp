@@ -9,20 +9,28 @@
 
 
 
+/**
+ * Set the shared pointer to null.
+ */
 PeriodicFunction::~PeriodicFunction()
 {
 	head.reset();	
 }
 
+/**
+ * Set the shared pointer to null.
+ */
 PeriodicFunctionNode::~PeriodicFunctionNode()
 {
 	left.reset();
 	right.reset();
 }
 
+/**
+ * Set to constant function 0.
+ */
 PeriodicFunctionNode::PeriodicFunctionNode(): isNumber(true)//, left(nullptr), right(nullptr)
 {
-
 }
 
 PeriodicFunctionNode::PeriodicFunctionNode(Operation operation, PeriodicFunctionNodePtr l, PeriodicFunctionNodePtr r):
@@ -31,29 +39,18 @@ PeriodicFunctionNode::PeriodicFunctionNode(Operation operation, PeriodicFunction
 }
 
 /**
- * Recursivly call the copy constructor to make a deep copy of this tree.
+ * Copy class values, but make a pointer copy of the left and right subtrees.
  */
 PeriodicFunctionNode::PeriodicFunctionNode(const PeriodicFunctionNode& p):
 		isNumber(p.isNumber), data(p.data), opt(p.opt)
 {
-	//if (p.left)
-	//	left = new PeriodicFunctionNode(*(p.left));
-	//else
-	//	left = NULL;
-
-	//if(p.right)
-	//	right = new PeriodicFunctionNode(*(p.right));
-	//else
-	//	right = NULL;
-
 	left = p.left;
 	right = p.right;
 }
 
 PeriodicFunctionNode::PeriodicFunctionNode(const RationalNTL & d, bool isN):
-		isNumber(isN), data(d) //, left(nullptr), right(nullptr)
+		isNumber(isN), data(d)
 {
-
 }
 
 bool PeriodicFunctionNode::isLeaf() const
@@ -61,10 +58,11 @@ bool PeriodicFunctionNode::isLeaf() const
 	return (left == NULL && right == NULL);
 }
 
-
+/**
+ * Make a pointer copy.
+ */
 PeriodicFunction::PeriodicFunction(const PeriodicFunction & p)
 {
-	//head = new PeriodicFunctionNode(*(p.head));
 	head = p.head;
 }
 
@@ -73,6 +71,9 @@ PeriodicFunction::PeriodicFunction(const RationalNTL & d, bool isN)
 	head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(d, isN));
 }
 
+/**
+ * Set to the constant function 0
+ */
 PeriodicFunction::PeriodicFunction()
 {
 	head = PeriodicFunctionNodePtr(new PeriodicFunctionNode( RationalNTL(0,1), true));
@@ -82,71 +83,24 @@ PeriodicFunction::PeriodicFunction()
 
 void PeriodicFunction::setToConstant(int c)
 {
-	//if (head)
-	//	delete head; //this should always be true.
 	head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(RationalNTL(c,1), true));
 }
 
 
 void PeriodicFunction::setToConstant(const RationalNTL & c)
 {
-	//if (head)
-	//	delete head;
 	head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(c, true));
 }
 
 
+/**
+ * If this and p are constant functions, simply add the numbers, else update the tree.
+ */
 void PeriodicFunction::add(const PeriodicFunction &p)
 {
-
-	//static int help = 1;
-	//help++;
 	if (head->isLeaf() && head->isNumber && (p.head)->isLeaf() && (p.head)->isNumber )
 	{
-		/*
-		RationalNTL temp, temp2;
-		temp = head->data;
-		temp2 = (p.head)->data;
-		if (help == 2658412)
-		{
-			ZZ a,b,c,d;
-			cout << "h" << help << endl;
-			a = temp.getNumerator();
-			b = temp.getDenominator();
-
-			c = temp2.getNumerator();
-			d = temp2.getDenominator();
-
-
-			cout << "temp: " << temp << endl;
-			cout << "      " << a << "/" << b << endl;
-			cout << "temp2: " << temp2 << endl;
-			cout << "       " << c << "/" << d << endl;
-
-			//a/b + c/d = ad/bd + cb/db
-			ZZ num, denom, gcd;
-			num = a*d + c*b;
-			denom = b*d;
-
-			cout << "num=" << num << endl;
-			cout << "denom=" << denom << endl;
-			cout << "going to find gcd...." << endl;
-			gcd = GCD(num, denom);
-			cout << "what?" << endl;
-			cout << "gcd = " << gcd << endl;
-			num /= gcd;
-			denom /= gcd;
-			RationalNTL ans(num, denom);
-			cout << "ans = " << ans << endl;
-			cout << "going to add it in temp" << endl;
-			temp = temp + temp2;
-			cout << "end of if block" << endl;
-		}
-		else
-			temp = temp + temp2;
-		*/
 		head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(head->data + (p.head)->data,true));
-		//head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(temp,true));
 	}
 	else
 	{
@@ -154,6 +108,9 @@ void PeriodicFunction::add(const PeriodicFunction &p)
 	}
 }
 
+/**
+ * If this and p are constant functions, simply add the numbers, else update the tree.
+ */
 void PeriodicFunction::subtract(const PeriodicFunction & p)
 {
 	if (head->isLeaf() && head->isNumber && (p.head)->isLeaf() && (p.head)->isNumber )
@@ -165,13 +122,15 @@ void PeriodicFunction::subtract(const PeriodicFunction & p)
 		head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(PeriodicFunctionNode::minus, head, p.head) );
 	}
 }
+
+/**
+ * Make a pointer copy.
+ */
 PeriodicFunction & PeriodicFunction::operator=(const PeriodicFunction & p)
 {
 	if( this == &(p))
 		return *this;
 
-	//if(head)
-	//	delete head;
 	head = p.head;
 
 	return *this;
@@ -183,6 +142,10 @@ PeriodicFunction & PeriodicFunction::operator=(const int c)
 	return *this;
 }
 
+/**
+ * Anything to the zero power is 1, even 0^0.
+ * If this is a number, the perform the power.
+ */
 void PeriodicFunction::pow(int p)
 {
 
@@ -196,6 +159,9 @@ void PeriodicFunction::pow(int p)
 		head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(PeriodicFunctionNode::power, head,  PeriodicFunctionNodePtr(new PeriodicFunctionNode(RationalNTL(p,1), true))));
 }
 
+/**
+ * @param d is assumed to be non-zero.
+ */
 void PeriodicFunction::div(const ZZ & d)
 {
 	if(d == 1)
@@ -206,6 +172,9 @@ void PeriodicFunction::div(const ZZ & d)
 		head = PeriodicFunctionNodePtr(new PeriodicFunctionNode(PeriodicFunctionNode::divide, head, PeriodicFunctionNodePtr(new PeriodicFunctionNode(RationalNTL(d,1), true))));
 }
 
+/**
+ * @param d we are not checking of d is zero or one.
+ */
 void PeriodicFunction::times(const RationalNTL & d)
 {
 	if (head->isNumber && head->isLeaf())
@@ -234,6 +203,9 @@ void PeriodicFunction::operator*=(const PeriodicFunction & d)
 	times(d);
 }
 
+/**
+ * @return true if this is a constant function equal to x.
+ */
 bool PeriodicFunction::operator==(const int x) const
 {
 	return (head->isLeaf() && head->isNumber && head->data == x);
@@ -244,6 +216,9 @@ void PeriodicFunction::operator+=(const PeriodicFunction &p)
 	add(p);
 }
 
+/**
+ * Mostly used for debugging.
+ */
 void PeriodicFunction::print() const
 {
 	if(head)
@@ -275,6 +250,10 @@ void PeriodicFunctionNode::print(int i) const
 			right->print(i+1);
 	}
 }
+
+/**
+ * The main print function
+ */
 ostream& operator<<(ostream& out, const PeriodicFunction & pf)
 {
 	if (pf.head)

@@ -17,58 +17,61 @@ class PeriodicFunction;
 class PeriodicFunctionNode;
 
 /**
- * A class to hold a function of periodic functions {x}:=x-floor(x).
- *
- * We make a binary tree of nodes and operators that connect them. This is best said with a graphic
- *
- *
- *                                                root: non-leaf, operation +
- *               left: non-leaf, operation power                           right: non-leaf: operation times
- *     (left: leaf. function {a/b * T}  right: leaf. num 10)          (left: leaf function {c/d*T}     right: leaf number 20
- *
- * This example tree holds the expression ({a/b*T}^10) + ({c/d*T}*20)
- *
- *
- *
+ * PeriodicFunction.h: Classes to store periodic functions in the form {x}:=x-floor(x).
+ * We do not evaluate expressions like {4/5 T}^10 + 4{4/5 T}^10 to 5{4/5 T}^10.
+ * Instead, everything is saved in an operator tree using shared pointers.
  */
 
+
+/**
+ * Internal node for the PeriodicFunction binary tree.
+ * Shared pointers are used to save memory and construction time.
+ */
 typedef tr1::shared_ptr<PeriodicFunctionNode> PeriodicFunctionNodePtr;
 class PeriodicFunctionNode
 {
 private:
-	//bool isLeaf;      //if false, data has no meaning and is zero.
-	bool isNumber;    //if true, data should be thought of as just a fraction.
-					  //else, data represents the function {a/b*T}
-	RationalNTL data;
-	enum Operation { plus, minus, times, divide, power};
-	Operation opt;    //this is only defined if isLeaf is false.
 
-	PeriodicFunctionNodePtr left, right;
+	bool isNumber;    //!< if true, data should be thought of as just a fraction, else data represents the function {a/b*T}
+	RationalNTL data; //!< a fraction or argument to a periodice function
+	enum Operation { plus, minus, times, divide, power}; //!< set of poperators that this node can be.
+	Operation opt;    //!< operator for this node. this is only defined if isLeaf() is false.
 
-	friend class PeriodicFunction;
+	PeriodicFunctionNodePtr left, right; //!< If not a leaf, this this node is an binary operator (+,-,*,/,^) and the left and right children are some expressions.
+
+	friend class PeriodicFunction; //!< only the PeriodicFunction class should use this node class.
 
 
 	PeriodicFunctionNode();
-	
 	PeriodicFunctionNode(Operation operation, PeriodicFunctionNodePtr  l, PeriodicFunctionNodePtr  r);
-
 	PeriodicFunctionNode(const PeriodicFunctionNode& p);
 	PeriodicFunctionNode(const RationalNTL & d, bool isN);
 
-	bool isLeaf() const;
+	bool isLeaf() const; //!< true if this node is a leaf in the tree, representing a number or function.
 
-	void print(int i) const; //for debugging.
+	void print(int i) const; //!< for debugging.
 	friend ostream& operator<<(ostream& out, const PeriodicFunctionNode & pfn);
-	//~PeriodicFunctionNode();
 public:
 ~PeriodicFunctionNode();
 };
 
-
+/**
+ * PeriodicFunction is a class to hold an expression of periodic functions in the form {x}:=x-floor(x).
+ *
+ *
+ * We make a binary tree of nodes and operators that connect them. This is best said with a graphic
+ *
+ *
+ *                                             root(head): non-leaf, operation +
+ *               left: non-leaf, operation power                           right: non-leaf: operation times
+ *     (left: leaf. function {a/b * T},  right: leaf. num 10)          (left: leaf function {c/d*T},     right: leaf number 20
+ *
+ * This example tree holds the expression ({a/b*T}^10) + ({c/d*T}*20)
+ */
 class PeriodicFunction
 {
 private:
-	PeriodicFunctionNodePtr  head;
+	PeriodicFunctionNodePtr  head; //!< pointer to the root of the tree.
 
 public:
 	PeriodicFunction();
@@ -84,7 +87,7 @@ public:
 	void times(const PeriodicFunction& p);
 	void setToConstant(int c);
 	void setToConstant(const RationalNTL & c);
-	//void clear();
+
 
 	PeriodicFunction & operator=(const PeriodicFunction & p);
 	PeriodicFunction & operator=(const int c);
