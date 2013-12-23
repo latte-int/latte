@@ -24,7 +24,23 @@
 using namespace std;
 
 
+void printHelpMenu()
+{
+	cout << 
+	"Required parameters:\n"
+	"  --file, -f FILENAME.{knap}               Input knapsack file.\n"
+    "Options that control what to compute:\n"
+    "  -k INT                                   Computes the INT-th coefficient: T^{N-INT+1}\n"
+    "  --all-k INT                              Computes the top INT many coefficients: T^N, ..., T^{N-INT+1}\n"
+    "Other options:\n"
+    "  --help, -h                               Prints this help message\n"
+    "  --out, -o FILENAME                       Saves the Ehrhart polynomial to a file.\n"   
+    "\nExamples:\n"
+    "  ./top-ehrhart-knapsack -o results.mpl -k 1 -f partition.knap;\n"
+    "  (Will compute the top coefficient of the knapsack given in partition.knap and save the answer to a text file called results.mpl. \n"
+    << endl;
 
+}
 
 int main(int argc, char *argv[]) {
 
@@ -76,7 +92,7 @@ int main(int argc, char *argv[]) {
 			{
 			{ "out",	  			  required_argument, 0, 'o' },
 			{ "k",  				  required_argument, 0, 'k' },
-			{ "allk",				  required_argument, 0, 0x100 },
+			{ "all-k",				  required_argument, 0, 0x100 },
 			{ "help",				  no_argument,       0, 'h' },
 			{ "file",				  required_argument, 0, 'f' },
 			{ 0, 0, 0, 0 } };
@@ -100,13 +116,14 @@ int main(int argc, char *argv[]) {
 					outFile = optarg;
 					break;
 				case 'k':
-					k = atoi(optarg);
+					k = atoi(optarg)-1;
 					break;
 				case 0x100:
-					allk = atoi(optarg);
+					allk = atoi(optarg)-1;
 					break;
 				case 'h':
-					cout << "TODO: print help menu" << endl;
+					printHelpMenu();
+					exit(0);
 					break;
 				case 'f':
 					inFile = optarg;
