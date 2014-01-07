@@ -71,6 +71,8 @@ vec_ZZ transpose(vec_ZZ mat, int numOfVars, int numOfRows) {
    1, 0, -3, -2,
    0, 0, 0, 1,
    0, 0, 1, 0,
+
+ * Note U^T * old s = new s.
  */
 int ihermite(vec_ZZ *S, vec_ZZ *U, vec_ZZ* rhs, int m, int n) {
 	int i, j, k, done, sign, c, mc, mn, crk;
