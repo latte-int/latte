@@ -63,7 +63,7 @@ public:
 class MobiusSeriesList: public MobiusList
 {
 public:
-	vector<GeneralMonomialSum<PeriodicFunction, int> *> unweightedSeries; //!< [i] is a polynomial series corresponding to gcd list[i].
+	vector<GeneralMonomialSum<PeriodicFunction, int> *> unweightedSeries; //!< [i] is a polynomial series in (epsilon, x) corresponding to gcd list[i].
 	void computeMobius();
 	virtual ~MobiusSeriesList();
 };
@@ -89,6 +89,7 @@ public:
  * Example usage:
  * 		TopKnapsack tk;
  * 		tk.set(alpha);
+ * 		tk.seed(seed);
  * 		tk.coeff_NminusK(k); //find the coeff of t^{N-k}
  * 		or ..
  * 		tk.coeff_topK(k); // find the coeff of t^N, t^{N-1}, ..., t^{N-k}
@@ -104,7 +105,7 @@ private:
 	vec_ZZ alpha;								//!< list of coefficients [a_1, a_1, ...., a_{N+1}]
 	int N;
 	int order; 									//!< the k, as in N-k
-	int largestSubsetComputed; //to delete ?
+	//int largestSubsetComputed; //to delete ?
 	bool topKTerms;								//!< if false, we are only computing coeff of t^{N-k}, else we are also computing the higher coefficients.
 	MobiusSeriesList gcds;						//!< unscaled series expansions with gcd mu values. If topKTerms=true, gcds.unweightedSeries[i] contains terms that contribute to t^N, ..., t^{N-k} for the ith gcd only. Else, it just has terms that contribute to t^{N-k}
 	BernoulliFirstKind bernoulli;				//!< store the bernoulli numbers so we do not have to always recompute.
@@ -147,11 +148,12 @@ public:
 	static ZZ binomial(int n, int k);
 
 
-	void set(const vec_ZZ& list);
+	void set(const vec_ZZ& list); //!< sets the knapsack's coefficient vector
+	void seed(int s); //!< set seed for rand()
 
-	void coeff_NminusK(int k);
-		void coeff_topK(int k);
-		void printAnswer(ostream & out);
+	void coeff_NminusK(int k); //!< computes the coeff of t^{N-k}
+	void coeff_topK(int k); //!< computes the coeff of t^{N}, t^{N-1}, ..., t^{N-k}
+	void printAnswer(ostream & out); //!< prints the answer in a Maple friendly way becuase a computer algebra system should be used to simplify the expressions.
 };
 
 

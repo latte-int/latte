@@ -33,6 +33,7 @@ void printHelpMenu()
     "  -k INT                                   Computes the INT-th coefficient: T^{N-INT+1}\n"
     "  --all-k INT                              Computes the top INT many coefficients: T^N, ..., T^{N-INT+1}\n"
     "Other options:\n"
+	"  --random INT                             Seeds srand with INT or time(0) if INT = -1\n"
     "  --help, -h                               Prints this help message\n"
     "  --out, -o FILENAME                       Saves the Ehrhart polynomial to a file.\n"   
     "\nExamples:\n"
@@ -84,6 +85,7 @@ int main(int argc, char *argv[]) {
 		string inFile, outFile;
 		int k = -1;
 		int allk = -1;
+		int seed = 654354;
 
 		//process each option.
 		while (1)
@@ -92,9 +94,10 @@ int main(int argc, char *argv[]) {
 			{
 			{ "out",	  			  required_argument, 0, 'o' },
 			{ "k",  				  required_argument, 0, 'k' },
-			{ "all-k",				  required_argument, 0, 0x100 },
+			{ "all-k",				  required_argument, 0, 0x100 }, //hex value larger than 1 byte/char
 			{ "help",				  no_argument,       0, 'h' },
 			{ "file",				  required_argument, 0, 'f' },
+			{ "random",				  required_argument, 0, 'r' },
 			{ 0, 0, 0, 0 } };
 			/* getopt_long stores the option index here. */
 
@@ -102,7 +105,7 @@ int main(int argc, char *argv[]) {
 			int c;
 
 			//single-character=short option-name. x: means x takes a required argument, x:: means x takes an optional argument.
-			c = getopt_long(argc, argv, "o:k:hf:", long_options, &option_index);
+			c = getopt_long(argc, argv, "o:k:hf:r:", long_options, &option_index);
 
 			if (c == -1)
 				break;
@@ -127,6 +130,9 @@ int main(int argc, char *argv[]) {
 					break;
 				case 'f':
 					inFile = optarg;
+					break;
+				case 'r':
+					seed = atoi(optarg);
 					break;
 				default:
 					cout << "main: Unknown case" << endl; //todo: throw exception in my fancy class.
@@ -154,6 +160,7 @@ int main(int argc, char *argv[]) {
 		time.start();
 		TopKnapsack tk;
 		tk.set(alpha);
+		tk.seed(seed);
 		if ( k > -1)
 			tk.coeff_NminusK(k);
 		else
