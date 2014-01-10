@@ -317,7 +317,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	for (int i = 0;i <= DEGREE; i++)
 		Cone_Taylor_Parameters->Result[i] = 0;
 		
-	if(Residue_Parameters->Flags & PRINT	== 1)
+	if((Residue_Parameters->Flags & PRINT))
 		 {
 		   // system_with_error_check("rm func.rat");
 	 		 //cerr << "Outputing rational functions to file" << endl;
@@ -839,7 +839,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 			
 		}
 		
-		if(Residue_Parameters->Flags & PRINT == 1)
+		if ((Residue_Parameters->Flags & PRINT))
 		{
 			Rational_Function_Output_File << "x := ";
 			Final_Cone_Expression->Print_Rational_Functions_to_File( Rational_Function_Output_File );
@@ -874,7 +874,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	
 	//Output the rational functions to file
 
-	if(Residue_Parameters->Flags & PRINT == 1)
+	if (Residue_Parameters->Flags & PRINT)
 	{
 			 
 		Rational_Function_Output_File.close ();	 

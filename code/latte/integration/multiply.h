@@ -45,9 +45,9 @@ void multiply(PolyIterator<T, int>* it, PolyIterator<T, int>* it2, monomialSum& 
 	it2->begin();
 	
 	int i;
-	while (firstTerm = it->nextTerm())
+	while ((firstTerm = it->nextTerm()) != 0)
 	{
-		while (secondTerm = it2->nextTerm())
+	        while ((secondTerm = it2->nextTerm()) != 0)
 		{
 			for (i = 0; i < result.varCount; i++)
 			{
@@ -81,9 +81,9 @@ void multiply(PolyIterator<T, int>* it, PolyIterator<T, int>* it2, monomialSum& 
 	it2->begin();
 
 	int i;
-	while (firstTerm = it->nextTerm())
+	while ((firstTerm = it->nextTerm()) != 0)
 	{
-		while (secondTerm = it2->nextTerm())
+	        while ((secondTerm = it2->nextTerm()) != 0)
 		{
 			for (i = 0; i < result.varCount; i++)
 			{

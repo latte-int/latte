@@ -341,11 +341,12 @@ void Vector_Heap::Restore_Down (Heap_Node *Temp_Heap_Node)
 	else if ( *(Temp_Heap_Node->Right->Total_Sum) <= *(Temp_Heap_Node->Total_Sum))
 		Swap_Right	= 0;
 	
-	if (Swap_Left == 1 && Swap_Right == 1)
+	if (Swap_Left == 1 && Swap_Right == 1) {
 		if ( *(Temp_Heap_Node->Left->Total_Sum) > *(Temp_Heap_Node->Right->Total_Sum) ) //swap left and parent
 			Swap_Right = 0;
 		else
 			Swap_Left = 0;
+	}
 		
 	if (Swap_Left == 1)
 	{
@@ -1257,11 +1258,12 @@ void ConeInfo_Heap::Restore_Down (ConeInfo_Heap_Node *Temp_ConeInfo_Heap_Node)
 	else if ( *(Temp_ConeInfo_Heap_Node->Right->ConeInfo_Pointer->Get_Current_Highest_Term () ) <= *(Temp_ConeInfo_Heap_Node->ConeInfo_Pointer->Get_Current_Highest_Term () ))
 		Swap_Right	= 0;
 	
-	if (Swap_Left == 1 && Swap_Right == 1)
+	if (Swap_Left == 1 && Swap_Right == 1) {
 		if ( *(Temp_ConeInfo_Heap_Node->Left->ConeInfo_Pointer->Get_Current_Highest_Term () ) > *(Temp_ConeInfo_Heap_Node->Right->ConeInfo_Pointer->Get_Current_Highest_Term () ) ) //swap left and parent
 			Swap_Right = 0;
 		else
 			Swap_Left = 0;
+	}
 		
 	if (Swap_Left == 1)
 	{

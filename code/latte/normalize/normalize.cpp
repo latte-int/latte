@@ -842,7 +842,7 @@ int normalize_commandline(char *command)
   int argc;
   char **argv = (char**) malloc(sizeof(char *) * 100);
   argv[0] = strtok(command, " ");
-  for (argc = 1; argv[argc] = strtok(NULL, " "); argc++);
+  for (argc = 1; (argv[argc] = strtok(NULL, " ")) != NULL; argc++);
   int retval = normalize_main(argc, argv);  
   free(argv);
   return retval;

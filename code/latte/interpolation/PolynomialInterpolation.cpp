@@ -270,5 +270,6 @@ PolynomialInterpolation & PolynomialInterpolation::operator=(const PolynomialInt
 			matrix[row][col] = rhs.matrix[row][col];
 		}
 	}//for row
+	return *this;
 }//operator=
 	

@@ -252,7 +252,7 @@ void integrateLinFormSum(ZZ& numerator, ZZ& denominator,
 	denominator = 0;
 	it->begin();
 	term<RationalNTL, ZZ>* temp;
-	while (temp = it->nextTerm())
+	while ((temp = it->nextTerm()) != 0)
 	{
 		coe = temp->coef;
 		m = temp->degree; //obtain coefficient, power
@@ -334,7 +334,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 	it->begin();
 	term<RationalNTL, ZZ>* temp;
 	int i = 0;
-	while (temp = it->nextTerm())
+	while ((temp = it->nextTerm()) != 0)
 	{
 		M[i] = temp->degree; //save the power
 		++i;
@@ -387,7 +387,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 	{
 		it->begin();
 		int j = 0;
-		while (temp = it->nextTerm())
+		while ((temp = it->nextTerm()) != 0)
 		{
 			tVector[j] = 0;
 			for (int len = 0; len < temp->length; ++len)
@@ -478,7 +478,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 	finalPoly->begin();
 	term<RationalNTL, int>* storedTerm;
 	bool found;
-	while (storedTerm = finalPoly->nextTerm())
+	while ((storedTerm = finalPoly->nextTerm()) != 0)
 	{
 		found = true;
 		for(int i = 0; i < productCount; ++i)

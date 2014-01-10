@@ -786,7 +786,7 @@ RationalNTL PolytopeValuation::findIntegralUsingLawrence(linFormSum &forms) cons
 	//cout << "lpc got past construction" << endl;
 
 
-	while (temp = linearFormIterator->nextTerm())
+	while ((temp = linearFormIterator->nextTerm()) != 0)
 	{
 
 		//get the linear form's power and terms.

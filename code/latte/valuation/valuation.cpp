@@ -855,7 +855,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 					exit(1);
 				}
 
-				integrationInput.unweightedCounting == false;
+				integrationInput.unweightedCounting = false;
 
 				integrationInput.processUserInput();
 				//char integrandLine[150];

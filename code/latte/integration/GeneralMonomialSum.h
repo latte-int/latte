@@ -100,9 +100,9 @@ void GeneralMonomialSum<T, S>::multiply(const GeneralMonomialSum<T, S>& gms, con
 
 	int i;
 	termCount = 0;
-	while (firstTerm = it1->nextTerm())
+	while ((firstTerm = it1->nextTerm()) != 0)
 	{
-		while (secondTerm = it2->nextTerm())
+	        while ((secondTerm = it2->nextTerm()) != 0)
 		{
 			for (i = 0; i < varCount; i++)
 			{
@@ -328,7 +328,7 @@ string GeneralMonomialSum<T, S>::printMonomials(const int *min, const int * max)
 		it->setTrie(myMonomials, varCount);
 		it->begin();
 		int i = 0;
-		while(temp = it->nextTerm())
+		while ((temp = it->nextTerm()) != 0)
 		{
 			for(i = 0; i < varCount; ++i)
 				if (temp->exps[i] < min[i] || max[i] < temp->exps[i])

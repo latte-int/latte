@@ -238,7 +238,7 @@ void computeResidue(int d, int M, const vec_ZZ &innerProDiff, const ZZ &p,
 	}
 	it->begin();
 	term<RationalNTL, int>* storedTerm;
-	while (storedTerm = it->nextTerm())
+	while ((storedTerm = it->nextTerm()) != 0)
 	{
 		if (storedTerm->exps[0] == counter[0])
 		{
@@ -407,7 +407,7 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 	it->setTrie(products.myMonomials, products.varCount);
 	it->begin();
 	term<RationalNTL, int>* storedTerm;
-	while (storedTerm = it->nextTerm())
+	while ((storedTerm = it->nextTerm()) != 0)
 	{
 		if (storedTerm->exps[0] == truncateDegree)
 		{
