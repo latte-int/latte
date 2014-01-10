@@ -77,7 +77,7 @@ Residue(listCone* cones, int numOfVars)
   long int p, n;
   int E[noCones];  // E is the vector of epsilons, each 1 or -1
   long int totalNoGs=noGsPerC*noCones; //total no. of generators,ie,rowdim of B
-  list<Integer> A[noCones];  // A is the numerator vectors
+  vector<list<Integer> > A(noCones);  // A is the numerator vectors
   // long int B[totalNoGs][dim];  // B is the denominator vectors
   //  cerr<<"tNG: "<<totalNoGs<<endl;
 
@@ -188,8 +188,8 @@ Residue(listCone* cones, int numOfVars)
   //VARS:
   //Integer k;
   Integer tmp_lambda;
-  Integer lambda[dim];
-  Integer dlambda[dim]; // dlambda tracks change in 2 successive test-lambdas
+  vector<Integer> lambda(dim);
+  vector<Integer> dlambda(dim); // dlambda tracks change in 2 successive test-lambdas
   //for(i=0;i<dim;i++) lambda[i]=0;  // lambda starts at 0
   vector<Integer> dotProducts(totalNoGs); // ith entry tracks lambda dot row i of B
   //  dotProducts and dlambda used to try to improve calculational efficiency
@@ -329,7 +329,8 @@ Residue(listCone* cones, int numOfVars)
 
   *****************************************************************************/
   //  cerr<<"Getting numerator...";
-  Integer translation, numExps[noCones], kk;
+  Integer translation, kk;
+  vector<Integer> numExps(noCones);
   int tmp_k = k;
   kk = tmp_k;
   // Get dot product and add negative denominator exponents for each cone.
@@ -411,7 +412,8 @@ Residue(listCone* cones, int numOfVars)
   //VARS
   long int tenPow=10;  // To be used in getting extra digits of precision
   for(i=noCones;i>0;i/=10) tenPow*=10; // We will necessarily get enough precision.
-  ZZ tempSum,temp,temp2,temp3,tempVec[1+noGsPerC];
+  ZZ tempSum,temp,temp2,temp3;
+  vector<ZZ> tempVec(1+noGsPerC);
   //for(i=0;i<=noGsPerC;i++) mpz_init(tempVec[i]);
   /*mpz_init(temp);
   mpz_init(temp2);
@@ -426,8 +428,8 @@ Residue(listCone* cones, int numOfVars)
    constant term at each time and add it to a variable.  So, it's never
    really used double array anyway.  It was wasting memory....
   ***************************************************************************/
-  ZZ N[1+noGsPerC];
-  ZZ D[1+noGsPerC];
+  vector<ZZ> N(1+noGsPerC);
+  vector<ZZ> D(1+noGsPerC);
 
   ZZ noLatticePts, nn;
   //mpz_init(noLatticePts);
@@ -699,7 +701,8 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
 
   *****************************************************************************/
   //  cerr<<"Getting numerator...";
-  Integer translation, numExps[noCones], kk;
+  Integer translation, kk;
+  vector<Integer> numExps(noCones);
   int tmp_k = k;
   kk = tmp_k;
   // Get dot product and add negative denominator exponents for each cone.
@@ -783,7 +786,8 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
   //VARS
   //long int tenPow=10;  // To be used in getting extra digits of precision
   //for(i=noCones;i>0;i/=10) tenPow*=10; // We will necessarily get enough precision.
-  ZZ tempSum,temp,temp2,temp3,tempVec[1+noGsPerC];
+  ZZ tempSum,temp,temp2,temp3;
+  vector<ZZ> tempVec(1+noGsPerC);
   //for(i=0;i<=noGsPerC;i++) mpz_init(tempVec[i]);
   /*mpz_init(temp);
   mpz_init(temp2);
@@ -798,8 +802,8 @@ Residue_Single_Cone(listCone* cones, int numOfVars,
    constant term at each time and add it to a variable.  So, it's never
    really used double array anyway.  It was wasting memory....
   ***************************************************************************/
-  ZZ N[1+noGsPerC];
-  ZZ D[1+noGsPerC];
+  vector<ZZ> N(1+noGsPerC);
+  vector<ZZ> D(1+noGsPerC);
 
   ZZ noLatticePts, nn;
   

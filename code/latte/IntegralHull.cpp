@@ -735,7 +735,7 @@ listVector* Push_Vector(listVector* head, listVector* tail, int numOfVars){
   len2 = lengthListVector(tail);
   List = createListVector(createVector(numOfVars));
   endList = List;
-  vec_ZZ ArrayVec[len1];
+  vector<vec_ZZ> ArrayVec(len1);
   int flag = 0;
 
   for(int i = 0; i < (len1); i++) ArrayVec[i].SetLength(numOfVars); 

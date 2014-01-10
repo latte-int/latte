@@ -187,7 +187,8 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
 
   in3 >> numOfConsts2 >> numOfDims >> tmpString;
 
-   ZZ newEnt[numOfConsts2][numOfDims];
+  mat_ZZ newEnt;
+  newEnt.SetDims(numOfConsts2, numOfDims);
     for(int i = 0; i < numOfConsts2; i++)
       for(int j = 0; j < numOfDims; j++){
 	in3 >> newEnt[i][j]; }
