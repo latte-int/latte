@@ -8,14 +8,14 @@
 
 #include "NTL_to_LiDIA.h"
 #include "lidia-include.h"
+#include "latte_ntl.h"
 
 using namespace LiDIA;
 using namespace std;
 
 
-NTL_CLIENT
-
-NTL_io_matrix_decl(ZZ,vec_ZZ,vec_vec_ZZ,mat_ZZ)
+/// NTL_CLIENT
+/// NTL_io_matrix_decl(ZZ,vec_ZZ,vec_vec_ZZ,mat_ZZ)
 
 int main(int argc, char *argv[])
 {
