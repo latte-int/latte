@@ -179,8 +179,8 @@ const RationalNTL& BernoulliFirstKind::operator[](int i) const
 // **************************************************************************************************
 // **************************************************************************************************
 
-TopKnapsack::TopKnapsack() {
-	// TODO Auto-generated constructor stub
+TopKnapsack::TopKnapsack():computeGCDbySubsets(false) {
+	
 }
 
 TopKnapsack::~TopKnapsack() {
@@ -196,6 +196,15 @@ void TopKnapsack::set(const vec_ZZ& list)
 	alpha = list;
 	N = alpha.length()-1;
 	bernoulli.setBernoulli(alpha.length());
+}
+
+/**
+ * Sets how to compute the gcds.
+ * @param t: if true, uses the every-subsets method, else uses the complete method.
+ */
+void TopKnapsack::useSubsetsForGCD(bool t)
+{
+	computeGCDbySubsets = t;
 }
 
 /**
@@ -242,14 +251,13 @@ void TopKnapsack::coeff(int k)
 
 	Timer tgcd("Time for gcds");
 	tgcd.start();
-	for(int i = 0; i <= k; ++i)
-		everyGCD(N+1-i);
+	findGCDs(k);
 	gcds.computeMobius();
 	tgcd.stop();
 	cout << tgcd << endl;
 
-	//cout << "mu found" << endl;
-	//gcds.print();
+	cout << "mu found" << endl;
+	gcds.print();
 
 
 	for(int i = 0; i < (int)gcds.list.size(); ++i)
@@ -345,6 +353,14 @@ void TopKnapsack::printAnswer(ostream & out)
 		}
 		out << ";" << endl;
 	}
+}
+
+/**
+ * @param k: gets the coeff of t^{N-k}. Assumes coeff_NminusK or coeff_topK was already called
+ */
+PeriodicFunction TopKnapsack::getCoeffNminusK(int k)
+{
+	return coeffsNminusk[k];
 }
 
 /**
@@ -968,9 +984,7 @@ void TopKnapsack::expandNonperiodicPart(GeneralMonomialSum<PeriodicFunction, int
 * The expansion will be equal to a/bottomCoeffPeriodicPart * 1/x^expa.size() * 1/e^numPoles
 *
 * Note: 1/(1-exp(ax)) = -1/(ax) \sum_{m=0}^inf B_m (ax)^m/m!
-* We compute -1/(ax) \sum_{m=0}^{k} B_m (ax)^m/m!
-*          = \sum_{m=0}^{k} -1 B_m (ax)^{m-1}/m!
-*          = -1B_0 (1/ax) - B_1/1! - B_2 (ax)^1/2! - ... - B_k (ax)^{k-1}/k!
+*
 * @param bottomCoeffPeriodicPart. output parameter. scaling term.
 * @param a. output parameter. the polynomial expansion with missing scaling term.
 * @param numPoles is the number of zeros in expa
@@ -1219,339 +1233,8 @@ void TopKnapsack::expandF1Case(GeneralMonomialSum<PeriodicFunction, int> & expan
 	expansion.multiply(scaleTerm, minE, maxE);
 }
 
-/*
- * choose(-n,k) = choose(n+k-1,k)*(-1)^k
- *
- * 1/(1-exp(ax +bxe)) = -1/(ax+bxe) \sum_{m=0} B_m (ax+bxe)^m/m!
- *      = -1/(ax+bxe)(B0 + B1 (ax+bxe) + B2(ax+bxe)^2/2! + B3(ax+bxe)^3/3! + b4(ax+bxe)^4/4! +...)
- *      = -1( B0/(ax+bxe) + B1 + B2(ax+bxe)^1/2! + B3(ax+bxe)^2/3! + B4(ax+bxe)^3/4!+...)
- * If a,b!= 0
- *      = -1( (sum_{p=0}  B0(bxe)^p(ax)^{-1-p}choose(-1,p))  + B1 + B2(ax+bxe)^1/2! + B3(ax+bxe)^2/3! + B4(ax+bxe)^3/4!+...)
- *      = -1( (sum_{p=0}  B0(bxe)^p(ax)^{-1-p}(-1)^p)  + B1 + B2(ax+bxe)^1/2! + B3(ax+bxe)^2/3! + B4(ax+bxe)^3/4!+...)
- *      expand to order
- */
-/*
-void TopKnapsack::expandOneTerm(monomialSum & oneExpansion, const ZZ & a, const ZZ & b)
-{
-	//[0] = power of x, [1]=power of e
-	int monomialExp[2] = {0,0};
 
 
-	RationalNTL temp;
-	ZZ apow, bpow;
-	//first insert (sum_{p=0}^{numPoles}  -B0(bxe)^p(ax)^{-1-p}(-1)^p)
-	if( a == 0)
-	{
-		monomialExp[1] = monomialExp[0] = -1;
-		insertMonomial(RationalNTL(to_ZZ(-1), b), monomialExp, oneExpansion);
-	}//-1B0/(ax+bxe) = -B0/(0+bxe)
-	else if ( b == 0 )
-	{
-		monomialExp[0]=-1;
-		monomialExp[1] = 0;
-		insertMonomial(RationalNTL(to_ZZ(-1),a), monomialExp, oneExpansion);
-	}//-1B0/(ax+bxe) = -B0/(ax+0)
-	else
-	{
-		monomialExp[0] = -1;
-		apow = a;
-		bpow = 1;
-		for(int p = 0; p <= order; ++p)
-		{
-			temp = bpow;
-			temp.div(apow);
-			if( p %2 == 0)
-				temp.changeSign();
-			monomialExp[1] = p;
-
-			insertMonomial(temp, monomialExp, oneExpansion);
-			apow *= a;
-			bpow *= b;
-		}
-	}//-1( B0/(ax+bxe) = sum_{p=0}  -B0(bxe)^p(ax)^{-1-p}(-1)^p) =sum_{p=0} -B0(b^p)(e^p)/(x*a^{p+1})(-1)^p)
-
-	//next: -1( + B1 + B2(ax+bxe)^1/2! + B3(ax+bxe)^2/3! + B4(ax+bxe)^3/4!+...)
-	monomialExp[0] = monomialExp[1] = 0;
-	temp = bernoulli[1];
-	temp.changeSign();
-	insertMonomial(temp, monomialExp, oneExpansion);
-
-	//next: -(B2(ax+bxe)^1/2! + B3(ax+bxe)^2/3! + B4(ax+bxe)^3/4!+...)
-	ZZ fract;
-	fract = 1;
-	bpow = 1;
-	for(int p = 1; p <= order; ++p)
-	{
-		fract*= (p+1);
-		bpow *= b;
-		ZZ bpowTemp = bpow; //bpowTemp = b^p
-		apow = 1;
-		monomialExp[0] = p;
-		if ( a == 0)
-		{
-			temp = bernoulli[p+1];
-			temp.div(fract);
-			temp.changeSign();
-			temp.mult(bpowTemp);
-			monomialExp[1] = p;
-			insertMonomial(temp, monomialExp, oneExpansion);
-		}
-		else if ( b == 0)
-		{
-			temp = bernoulli[p+1];
-			temp.div(fract);
-			temp.changeSign();
-			temp.mult(power(a,p));
-			monomialExp[1] = 0;
-			insertMonomial(temp, monomialExp, oneExpansion);
-		}
-		else
-		{
-			for(int pow = 0; pow <= p; ++pow)
-			{
-				//-B[p+1](ax+bxe)^p/(p+1)! = -B[p+1]/(p+1)! ( sum (ax)^pow(bxe)^{p-pow} (p choose pow))
-				monomialExp[1] = p-pow;
-				temp = bernoulli[p+1];
-				temp.div(fract);
-				temp.changeSign();
-				temp.mult(apow*bpowTemp);
-				temp.mult(binomial(p,pow));
-
-				insertMonomial(temp, monomialExp, oneExpansion);
-
-				apow *= a;
-				bpowTemp /= b;
-
-			}//for pow
-		}//else
-
-	}//for p.
-
-}
-*/
-/**
- * Expand 1/(1-exp(ax)) up to order 'order'
- * 1/(1-exp(ax)) = -1/(ax) \sum_{m=0} B_m (ax)^m/m!
- *               = \sum_{m=0} -B_m (ax)^{m-1}/m!
- */
-/*
-void TopKnapsack::expandOneNonPerturbedTerm(monomialSum & oneExpansion, const ZZ & a)
-{
-	int monomialExp = -1;
-	insertMonomial(RationalNTL(to_ZZ(-1), a), &monomialExp, oneExpansion);
-
-	ZZ fractorial;
-	fractorial = 1;
-	RationalNTL temp;
-	RationalNTL c;
-	c = 1;
-	for(int m = 1; m <= order; ++m)
-	{
-
-		monomialExp = m-1; //power
-		temp = c*bernoulli[m]; //a^{m-1}*B[m]
-		fractorial*=to_ZZ(m); // m!
-		temp.div(fractorial);
-		temp.changeSign(); //temp = -B[m](a)^{m-1}/m!
-		insertMonomial(temp, &monomialExp, oneExpansion);
-		c *= a;
-	}
-}
-*/
-/**
- * @parm xProduct, output after we take the coefficient of e=0.
- * @parm xeProduct, current product of polynomials in x and e
- * @parm B, columns are the basis for the lattice
- * @parm invB B^{-1}
- * @parm current cone. It is assumed its facets and rays are computed.
- */
-/*
-void TopKnapsack::expandPeriodicExponential(GeneralMonomialSum<PeriodicFunction, int> & pxeProduct,
-		const mat_ZZ &B, const mat_ZZ & invB, const ZZ & invBd,
-		const listCone * oneCone, const vec_ZZ & s, const vec_ZZ & alpha, const vec_ZZ & beta)
-{
-	//convert the rays to a matrix.
-	int I = alpha.length();
-	mat_ZZ raysT;
-	raysT.SetDims(I, I);
-	int counter= 0;
-	for(listVector * ray = oneCone->rays; ray; ray = ray->rest)
-	{
-		raysT[counter] = ray->first ;
-		counter++;
-	}
-
-	mat_ZZ BT; //B^T
-	BT.SetDims(B.NumRows(), B.NumCols());
-	transpose(BT, B);
-	//x<av, B[cones]{s}> = <[cones]^TB^Ta, {s}>, likewise for e.
-	vec_ZZ av, bv;
-	av.SetLength(I);
-	bv.SetLength(I);
-	av = raysT * (BT*alpha);
-	bv = raysT * (BT*beta);
-
-	//now we compute {s} for  < av x + bv xe, {s}>.
-	//{s} =  fractionpart( [cones]^-1 * invB s)
-	//cones^-1 has already been computed...
-	// it is in the facet information of listCone in the form -[cones]^-T
-	// however, thoese facets have been scaled.
-	// need to unscale them...requires more book keeping or conversion to a rational matrix.
-	// todo: do this, for now just recompute the inverse.
-	mat_ZZ raysI;
-	ZZ d;
-	raysI.SetDims(raysT.NumRows(), raysT.NumCols());
-	//BT is no longer needed, so I will reuse it.
-	transpose(BT, raysT);
-	inv(d, raysI, BT); // (raysI/d)* rays = I
-	vec_ZZ fractionalS  = raysI*(invB*s);
-
-
-	//ok, finally have enough data to make a and b.
-	//a = <av, {fractionalS/d}>, likewise for b.
-	PeriodicFunction a, b;
-	RationalNTL f;
-	for(int i = 0; i < I; ++i)
-	{
-		f = fractionalS[i];
-		f.div(d*invBd);
-		f.changeSign();
-		//a.addProduct(RationalNTL(av[i],1), f); //adds the term av[i]*{f}
-		//b.addProduct(RationalNTL(bv[i],1), f);
-		//cout << "inserted xc" << av[i] << " f=" << f << endl;
-		//cout << "inserted ec" << bv[i] << " f=" << f << endl;
-	}
-
-	cout << "av=" << av << endl;
-	cout << "bv=" << bv << endl;
-	cout << "fs=" << fractionalS << endl;
-	cout << "d" << d << endl;
-	cout << "invb" << invBd << endl;
-
-
-	//cout << "coeff of x is" << endl;
-	//cout << a << endl;
-	//cout << "coeff of e is" << endl;
-	//cout << b << endl;
-	//cout << "end." << endl;
-
-	//insert the expansion of exp(ax+bxe)
-	// = sum_{m=0}^order (ax+bxe)^m/m!
-	pxeProduct.varCount = 2;
-
-
-	PeriodicFunction ftemp, ftemp2; //temp function.
-	RationalNTL ctemp; //temp coefficient.
-	ZZ fract;
-	int monomialExp[2] = {0,0};
-	fract = 1;
-
-
-	ftemp.setToConstant(1);
-	pxeProduct.insertMonomial(ftemp, monomialExp);//insert 1.
-
-	cout << "coing to insert exp(ax+bxe)\n where a=" << a << "\n and b=" << b << endl;
-	//sum_{p=0}^order (ax+bxe)^p/p!
-	//= sum_{p=0}^order (1/p!) sum (ax)^pow(bxe)^{p-pow}(p choose pow)
-	for(int p = 1; p <= order; ++p)
-	{
-		fract*= p;
-		monomialExp[0] = p;
-		if ( a == 0)
-		{
-			ftemp = b;
-			ftemp.pow(p);
-			ftemp.div(fract);
-			monomialExp[1] = p;
-			pxeProduct.insertMonomial(ftemp, monomialExp);
-			cout << "inserted " << ftemp << endl;
-		}
-		else if ( b == 0)
-		{
-			ftemp = a;
-			ftemp.pow(p);
-			ftemp.div(fract);
-			monomialExp[1] = 0;
-			pxeProduct.insertMonomial(ftemp, monomialExp);
-			cout << "inserted " << ftemp << endl;
-		}
-		else
-		{ //(1/p!) sum (ax)^pow(bxe)^{p-pow}(p choose pow)
-			for(int pow = 0; pow <= p; ++pow)
-			{
-
-				monomialExp[1] = p-pow;
-				ftemp = a;
-				ftemp.pow(p);
-				ftemp2  = b;
-				ftemp2.pow(p-pow);
-				ftemp.times(ftemp2);
-				ftemp.times(RationalNTL(binomial(p,pow), fract));//ftemp = (p choose pow)/p! a^pow b^{p-pow}
-
-				pxeProduct.insertMonomial(ftemp, monomialExp);
-				cout << "inserted " << ftemp << endl;
-			}//for pow
-		}//else
-
-	}//for p.
-
-}
-*/
-/*
-
-void TopKnapsack::expandPerturbationTerms(GeneralMonomialSum<PeriodicFunction, int> & ans,
-		const GeneralMonomialSum<PeriodicFunction, int> & p1, const monomialSum & p2)
-{
-	BTrieIterator<PeriodicFunction, int>* it1 = new BTrieIterator<PeriodicFunction, int>();
-	BTrieIterator<RationalNTL, int>* it2 = new BTrieIterator<RationalNTL, int>();
-
-		it1->setTrie(p1.myMonomials, p1.varCount);
-		it2->setTrie(p2.myMonomials, p2.varCount);
-		int low[2], high[2];
-		low[0] = INT_MIN;
-		low[1] = 0;
-		high[0] = order;
-		high[1] = 0;
-
-
-		ans.myMonomials = new BurstTrie<PeriodicFunction, int>();
-		ans.varCount = 1;
-		int power[1];
-
-		term<PeriodicFunction, int> *periodicTerm;
-		term<RationalNTL, int> *rationalTerm;
-
-		it1->begin();
-		it2->begin();
-
-		int i;
-		while (periodicTerm = it1->nextTerm())
-		{
-			while (rationalTerm = it2->nextTerm())
-			{
-				//[0] = power of x, [1]=power of e
-				int xPower = periodicTerm->exps[0] + rationalTerm->exps[0];
-				int ePower = periodicTerm->exps[1] + rationalTerm->exps[1];
-
-				if ( ePower != 0)
-					continue;
-				if (xPower > order)
-					continue;
-
-				power[0] = xPower;
-				PeriodicFunction temp;
-				temp = periodicTerm->coef;
-				temp.times(rationalTerm->coef);
-
-				ans.myMonomials->insertTerm(temp, power, 0, ans.varCount, -1);
-
-			}
-			it2->begin();
-		}
-
-}
-
-*/
 
 //This is a static function
 ZZ TopKnapsack::binomial(int n, int k)
@@ -1572,11 +1255,81 @@ ZZ TopKnapsack::binomial(int n, int k)
 }
 
 /**
+ * Finds all the gcds for computing the coeff of t^{N-k}
+ */
+void TopKnapsack::findGCDs(int k)
+{
+	cout << "computing gcd using a " << (computeGCDbySubsets ? "" : "non-") << "polynomial time algorithm" << endl;
+	if ( computeGCDbySubsets )
+		for(int i = 0; i <= k; ++i)
+			everyGCDFromSubsets(N+1-i);
+	else
+		everyGCDFromEntireList(k);
+}
+
+/**
+ * Finds all gcds from subsets of size N+1-k or larger
+ * Algorithm: find the gcd of every subset by dynamic programming.
+ */
+void TopKnapsack::everyGCDFromEntireList(int k)
+{
+	vector<ZZ> output; //list of gcds from every subset.
+	for(int i= 0; i < alpha.length(); ++i)
+	{
+		//at the end of this i-loop, output will contain every gcd from subsets of {alpha[0], ..., alpha[i]}
+		//add gcd(alpha[i], any element of output) to output
+		for(int j = 0; j < output.size(); ++j)
+		{
+			ZZ g;
+			g = GCD(output[j], alpha[i]);
+			if ( ! binary_search(output.begin(), output.end(), g))
+			{
+				output.push_back(g);
+				for(int i = ((int) output.size()) -2; i>= 0 && output[i] > output[i+1]; --i)
+				{
+					ZZ t = output[i+1];
+					output[i+1] = output[i];
+					output[i] = t;
+				}
+					
+			}//insert new gcd into sorted order
+		
+		}//for j
+
+		//insert alaph[i] into the output list in sorded order if it is not already in the list.
+		if ( ! binary_search(output.begin(), output.end(), alpha[i]))
+		{
+			output.push_back(alpha[i]);
+			for(int i = ((int) output.size()) -2; i>= 0 && output[i] > output[i+1]; --i)
+			{
+				ZZ t = output[i+1];
+				output[i+1] = output[i];
+				output[i] = t;
+			}		
+		}//if
+	}
+	
+	//output now contains the gcd from every subset of the alpha vector.
+	//We only care about terms that divide N+1-k many.
+	for (int i = 0; i < (int) output.size(); ++i)
+	{
+		int numDiv = 0;
+		for(int j = 0; j < alpha.length(); ++j)
+			if ( alpha[j] % output[i] == 0)
+				++numDiv;
+		if(numDiv >= N+1-k)
+			gcds.insertGCD(output[i]);	
+	}
+	
+	
+}
+
+/**
  * @parm k: integer 1 <= k <= alphaSize = N+1
  * Computes every k-subset of alpha and computes the gcd of these sublists.
  * Assumes the gcd of the entire list is one.
  */
-void TopKnapsack::everyGCD(int k)
+void TopKnapsack::everyGCDFromSubsets(int k)
 {
 	if (k == N+1)
 	{

@@ -90,6 +90,7 @@ public:
  * 		TopKnapsack tk;
  * 		tk.set(alpha);
  * 		tk.seed(seed);
+ * 		tk.useSubsetsForGCD(false);
  * 		tk.coeff_NminusK(k); //find the coeff of t^{N-k}
  * 		or ..
  * 		tk.coeff_topK(k); // find the coeff of t^N, t^{N-1}, ..., t^{N-k}
@@ -97,7 +98,6 @@ public:
  * 		tk.printAnswer(f); //best to save to file....answers are BIG
  *
  * 	Todo:
- * 		--find the gcd's faster
  * 		--can this class be used twice? like tk.coeff_topK(k); tk.coeff_topK(k+1);
  */
 class TopKnapsack {
@@ -107,6 +107,7 @@ private:
 	int order; 									//!< the k, as in N-k
 	//int largestSubsetComputed; //to delete ?
 	bool topKTerms;								//!< if false, we are only computing coeff of t^{N-k}, else we are also computing the higher coefficients.
+	bool computeGCDbySubsets; //!< if true, uses a polynomial-time alg. to find the gcds of subsets of size larger than N-k.
 	MobiusSeriesList gcds;						//!< unscaled series expansions with gcd mu values. If topKTerms=true, gcds.unweightedSeries[i] contains terms that contribute to t^N, ..., t^{N-k} for the ith gcd only. Else, it just has terms that contribute to t^{N-k}
 	BernoulliFirstKind bernoulli;				//!< store the bernoulli numbers so we do not have to always recompute.
 	vector<PeriodicFunction> coeffsNminusk;		//!< Output vector. [i] = coeff of t^{N-i}.
@@ -115,7 +116,10 @@ private:
 
 	void coeff(int k); //!< start of computation
 
-	void everyGCD(int k);
+	void findGCDs(int k);
+	void everyGCDFromSubsets(int k);
+	void everyGCDFromEntireList(int k);
+	
 
 
 	void E(const int fIndex); //!< computes the series expansion of F(\alpha, gcd[f-index], T)
@@ -149,11 +153,13 @@ public:
 
 
 	void set(const vec_ZZ& list); //!< sets the knapsack's coefficient vector
+	void useSubsetsForGCD(bool t); //!< sets how to compute the gcds.
 	void seed(int s); //!< set seed for rand()
 
 	void coeff_NminusK(int k); //!< computes the coeff of t^{N-k}
 	void coeff_topK(int k); //!< computes the coeff of t^{N}, t^{N-1}, ..., t^{N-k}
 	void printAnswer(ostream & out); //!< prints the answer in a Maple friendly way becuase a computer algebra system should be used to simplify the expressions.
+	PeriodicFunction getCoeffNminusK(int k); //!< gets the coeff of t^{N-k}. Assumes coeff_NminusK or coeff_topK was already called
 };
 
 

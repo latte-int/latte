@@ -33,7 +33,8 @@ void printHelpMenu()
     "  -k INT                                   Computes the INT-th coefficient: T^{N-INT+1}\n"
     "  --all-k INT                              Computes the top INT many coefficients: T^N, ..., T^{N-INT+1}\n"
     "Other options:\n"
-	"  --random INT                             Seeds srand with INT or time(0) if INT = -1\n"
+    "  --random INT                             Seeds srand with INT or time(0) if INT = -1\n"
+    "  --gcd-polynomial [0|1]                   If 1, uses a polynomial time algorithm in k for finding poles.\n"
     "  --help, -h                               Prints this help message\n"
     "  --out, -o FILENAME                       Saves the Ehrhart polynomial to a file.\n"   
     "\nExamples:\n"
@@ -55,6 +56,7 @@ int main(int argc, char *argv[]) {
 	int k = -1;
 	int allk = -1;
 	int seed = 654354;
+	bool gcdPolynomial = true;
 
 	//process each option.
 	while (1)
@@ -67,6 +69,7 @@ int main(int argc, char *argv[]) {
 		{ "help",				  no_argument,       0, 'h' },
 		{ "file",				  required_argument, 0, 'f' },
 		{ "random",				  required_argument, 0, 'r' },
+		{ "gcd-polynomial",           required_argument, 0, 0x101},
 		{ 0, 0, 0, 0 } };
 		/* getopt_long stores the option index here. */
 
@@ -103,6 +106,9 @@ int main(int argc, char *argv[]) {
 			case 'r':
 				seed = atoi(optarg);
 				break;
+			case 0x101:
+				gcdPolynomial = atoi(optarg);
+				break;
 			default:
 				cout << "main: Unknown case" << endl; //todo: throw exception in my fancy class.
 				exit(1);
@@ -129,6 +135,7 @@ int main(int argc, char *argv[]) {
 	time.start();
 	TopKnapsack tk;
 	tk.set(alpha);
+	tk.useSubsetsForGCD(gcdPolynomial);
 	tk.seed(seed);
 	if ( k > -1)
 		tk.coeff_NminusK(k);
@@ -141,7 +148,7 @@ int main(int argc, char *argv[]) {
 	{
 		ofstream f(outFile.c_str());
 		tk.printAnswer(f);
-		f << "\n\n\n#Total Time: " << time.get_seconds() << endl;
+		f << "#Total Time: " << time.get_seconds() << endl;
 		f.close();
 	}
 	else
