@@ -19,6 +19,7 @@
 #include "print.h"
 #include "dual.h"
 #include "timing.h"
+#include "config.h"
 #include <sstream>
 #include <getopt.h>
 using namespace std;
@@ -45,7 +46,6 @@ void printHelpMenu()
 }
 
 int main(int argc, char *argv[]) {
-
 
 	cout << "Invocation: ";
 	for(int i = 0; i < argc; ++i)

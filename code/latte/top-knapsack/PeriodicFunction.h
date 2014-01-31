@@ -10,8 +10,12 @@
 
 #include "latte_ntl.h"
 #include "rational.h"
-#include <tr1/memory>
-#include <tr1/shared_ptr.h>
+#include "config.h"
+
+
+
+
+
 
 class PeriodicFunction;
 class PeriodicFunctionNode;
@@ -22,12 +26,26 @@ class PeriodicFunctionNode;
  * Instead, everything is saved in an operator tree using shared pointers.
  */
 
+#undef HAVE_STD_SHARED_PTR
+#undef HAVE_STD_TR1_SHARED_PTR
+
+#if defined(HAVE_STD_SHARED_PTR)
+#include <memory>
+typedef std::shared_ptr<PeriodicFunctionNode> PeriodicFunctionNodePtr;
+#elif defined(HAVE_STD_TR1_SHARED_PTR)
+#include <tr1/memory>
+typedef std::tr1::shared_ptr<PeriodicFunctionNode> PeriodicFunctionNodePtr;
+#endif
+
+
+
+
 
 /**
  * Internal node for the PeriodicFunction binary tree.
  * Shared pointers are used to save memory and construction time.
  */
-typedef tr1::shared_ptr<PeriodicFunctionNode> PeriodicFunctionNodePtr;
+
 class PeriodicFunctionNode
 {
 private:
@@ -37,13 +55,20 @@ private:
 	enum Operation { plus, minus, times, divide, power}; //!< set of poperators that this node can be.
 	Operation opt;    //!< operator for this node. this is only defined if isLeaf() is false.
 
+#if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_STD_TR1_SHARED_PTR)
 	PeriodicFunctionNodePtr left, right; //!< If not a leaf, this this node is an binary operator (+,-,*,/,^) and the left and right children are some expressions.
-
+#else
+	PeriodicFunctionNode *left, *right;
+#endif
 	friend class PeriodicFunction; //!< only the PeriodicFunction class should use this node class.
 
 
 	PeriodicFunctionNode();
+#if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_STD_TR1_SHARED_PTR)
 	PeriodicFunctionNode(Operation operation, PeriodicFunctionNodePtr  l, PeriodicFunctionNodePtr  r);
+#else
+	PeriodicFunctionNode(Operation operation, PeriodicFunctionNode * l, PeriodicFunctionNode * r);
+#endif
 	PeriodicFunctionNode(const PeriodicFunctionNode& p);
 	PeriodicFunctionNode(const RationalNTL & d, bool isN);
 
@@ -71,8 +96,11 @@ public:
 class PeriodicFunction
 {
 private:
+#if defined(HAVE_STD_SHARED_PTR) || defined(HAVE_STD_TR1_SHARED_PTR)
 	PeriodicFunctionNodePtr  head; //!< pointer to the root of the tree.
-
+#else
+	PeriodicFunctionNode * head;
+#endif
 public:
 	PeriodicFunction();
 	PeriodicFunction(const RationalNTL & d, bool type);
