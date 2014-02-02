@@ -26,8 +26,7 @@ class PeriodicFunctionNode;
  * Instead, everything is saved in an operator tree using shared pointers.
  */
 
-#undef HAVE_STD_SHARED_PTR
-#undef HAVE_STD_TR1_SHARED_PTR
+
 
 #if defined(HAVE_STD_SHARED_PTR)
 #include <memory>
