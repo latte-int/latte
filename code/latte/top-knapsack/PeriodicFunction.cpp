@@ -55,7 +55,7 @@ PeriodicFunctionNode::PeriodicFunctionNode(const RationalNTL & d, bool isN):
 
 bool PeriodicFunctionNode::isLeaf() const
 {
-	return (left == NULL && right == NULL);
+	return !(left || right);
 }
 
 /**
