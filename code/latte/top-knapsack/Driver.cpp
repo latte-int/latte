@@ -35,7 +35,7 @@ void printHelpMenu()
     "  --all-k INT                              Computes the top INT many coefficients: T^N, ..., T^{N-INT+1}\n"
     "Other options:\n"
     "  --random INT                             Seeds srand with INT or time(0) if INT = -1\n"
-    "  --gcd-polynomial [0|1]                   If 1, uses a polynomial time algorithm in k for finding poles.\n"
+    "  --gcd-polynomial [0|1]                   If 1, uses a polynomial time algorithm in k for finding poles. Default is 1.\n"
     "  --help, -h                               Prints this help message\n"
     "  --out, -o FILENAME                       Saves the Ehrhart polynomial to a file.\n"   
     "\nExamples:\n"
