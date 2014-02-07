@@ -24,7 +24,7 @@
 \newcommand{\latte}{{\tt LattE}\xspace}
 \newcommand{\latteInt}{{\tt LattE integrale}\xspace}
 \newcommand{\latteMac}{{\tt LattE macchiato}\xspace}
-\newcommand{\latteV}{v1.7}
+\newcommand{\latteV}{v1.7.1}
 \newcommand{\vinci}{{\tt Vinci}\xspace}
 \newcommand{\maple}{{\tt Maple}\xspace}
 \newcommand{\cdd}{{\tt CDD}\xspace}
@@ -203,6 +203,11 @@ The integral $\int_{x_1 = 0}^{x_1 = 1}\int_{x_2 = 0}^{x_2 = 1} x_1 +x_2  \d{x_1}
 
 \latteInt can also compute the weighted Ehrhart quasipolynomials where the weight function is a polynomial or a sum of powers of linear forms. However, the polytope must be a simplicial polytope and \maple must be installed on your computer.
 
+
+\subsubsection{Ehrhart Polynomials of Knapsack polytopes}
+
+\latteInt can compute the Ehrhart quasipolynomials as function of $t$ of polytopes in the form \[ \{x\in \R^n_{\geq 0} \mid \alpha_1 x_1 + \cdots + \alpha_n x_n = t\}.\]
+These polytopes are also related to Sylvester's denumerant.
 
 
 \subsection{Which programs of {\tt LattE} compute what?}
@@ -843,6 +848,7 @@ A knapsack is a polytope in the form $\{x \in \R^d \mid \alpha_1 x_1 + \cdots + 
 \item[--out, -o FILENAME2] Saves the result to a file. This is an optional parameter, but is is recommended to always save the result to a file as the output can be large. 
 \item[-k $n$] Computes the $n^{th}$ term of the Ehrhart polynomial. This or ``--all-k" is required.
 \item[--all-k $n$] Computes the largest $n^{th}$ terms of the Ehrhart polynomial.  
+\item[--gcd-polynomial $(0\mid 1)$] If 1, uses a polynomial time algorithm to find the coefficients of the Ehrhart quasi-polynomial. The default is 1. See note below.
 \end{description}
 
 {\tt top-ehrhart-knapsack} uses a special file format to input the knapsack coefficients. For a the knapsack $\boldsymbol{\alpha}$, the input file contains one line: the number of coefficients in the knapsack followed by each coefficient separated by spaces.
@@ -879,6 +885,8 @@ topKPolynomial:=(coeff4minus0)*T^(4) + (coeff4minus1)*T^(3)
 \end{verbatim}
   
 Notice that the expressions for each coefficient might be very long. It is recommended that you always save the results in an output file, and use a computer algebra system to simplify the expressions. Also note that the output can be parsed by \maple. In fact, using \maple to simplify the expressions, ``coeff4minus1" is $1/96$. Finally, the Frac($x$) function represents the fractional part of $x$ and is equal to $x - \lfloor x \rfloor \in [0,1)$, where $\lfloor x \rfloor$ is  the largest integer smaller or equal to $x$.
+
+The option {\tt --gcd-polynomial } controls how poles are computed, which is given by the greatest common divisor of subsets of $\{\alpha_1 , \dots, \alpha_d\}$. For example, the options {\tt --gcd-polynomial 1 -k 5} will require finding all $\binom{d}{5}+\binom{d}{4}+\cdots+\binom{d}{1}$ subsets of size at most $5$ and comput the greatest common divisor of each one. However,~{\tt --gcd-polynomial 0 -k 5} will use a dynamic programming technique to compute the greatest common divisor of every subset of $\{\alpha_1 , \dots, \alpha_d\}$. If the number of unique greatest common divisors from subsets is much smaller than $2^d$, and $d$ is large, {\tt --gcd-polynomial 0} should be much faster. 
 
 
 \subsection{Optimization}
