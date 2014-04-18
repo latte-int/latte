@@ -1345,7 +1345,7 @@ Open the file ``bigAnswer.'' To evaluate the polynomial at a point $a \in \R$, f
         
         epoly:= ``something big'';
         
-        eval(subs({N=a,n=a, MOD=latteMod},epoly);
+        eval(subs({N=a,n=a, MOD=latteMod},epoly));
         \end{verbatim}
 Note that you had to set both $n$ and $N$ to the point $a \in \R$ and the ``latteMod'' function is defined in the \maple script. If you then run this \maple file with the point $a=2.5$ you will get $85.00000031$.
 
