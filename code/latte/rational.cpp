@@ -586,6 +586,19 @@ ZZ RationalNTL::readNumber(istream &in)
 	return to_ZZ(s.str().c_str());
 }//readNumber
 
+
+/* ----------------------------------------------------------------- */
+
+RationalNTL convert_mpq_to_RationalNTL(const mpq_class &q)
+{
+	return RationalNTL(convert_mpz_to_ZZ(q.get_num()), convert_mpz_to_ZZ(q.get_den()));
+}
+mpq_class convert_RationalNTL_to_mpq(const RationalNTL &q)
+{
+	return mpq_class(convert_ZZ_to_mpz(q.getNumerator()), convert_ZZ_to_mpz(q.getDenominator()));
+}
+
+
 /* ----------------------------------------------------------------- */
 
 

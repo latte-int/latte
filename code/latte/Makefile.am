@@ -234,6 +234,14 @@ bin_PROGRAMS += top-ehrhart-knapsack
 top_ehrhart_knapsack_SOURCES = top-knapsack/Driver.cpp
 top_ehrhart_knapsack_LDADD = $(LDADD)
 
+
+#main program to find optimization over box domains. 
+bin_PROGRAMS += boxOpt
+boxOpt_SOURCES = nonlinearOptimization/nonlinearOptimizationDriver.cpp
+boxOpt_SOURCES += nonlinearOptimization/WeightedExponentialSubs.cpp
+boxOpt_SOURCES += nonlinearOptimization/BoxOptimization.cpp
+boxOpt_LDADD = $(LDADD)
+
 #convert a cdd H-rep to latte H-rep (by clearing the fractions)
 bin_PROGRAMS += ConvertCDDineToLatte
 ConvertCDDineToLatte_SOURCES = convertCDD_ine_to_latte.cpp

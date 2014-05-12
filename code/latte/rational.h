@@ -25,6 +25,8 @@
 #define RATIONAL__H
 
 #include "latte_ntl.h"
+#include "latte_gmp.h"
+
 
 #include <fstream>
 #include <cstdlib>
@@ -241,6 +243,9 @@ public:
 	RationalNTL & operator=(const RationalNTL & rhs);
 
 };
+
+RationalNTL convert_mpq_to_RationalNTL(const mpq_class &q);
+mpq_class convert_RationalNTL_to_mpq(const RationalNTL &q);
 
 //this class follows the vec_T interface for NTL datatypes, but not all the functions have been implemented.
 class vec_RationalNTL

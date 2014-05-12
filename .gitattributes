@@ -228,6 +228,13 @@ code/latte/integration/versusMode.cpp -text
 code/latte/interpolation/PolynomialInterpolation.cpp -text
 code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
+code/latte/nonlinearOptimization/BoxOptimization.cpp -text
+code/latte/nonlinearOptimization/BoxOptimization.h -text
+code/latte/nonlinearOptimization/WeightedExponentialSubs.cpp -text
+code/latte/nonlinearOptimization/WeightedExponentialSubs.h -text
+code/latte/nonlinearOptimization/nonlinearOptimizationDriver.cpp -text
+code/latte/nonlinearOptimization/testBox.mpl -text
+code/latte/nonlinearOptimization/weightedCountingBox.mpl -text
 code/latte/polyintegration.tex -text
 code/latte/sqlite/IntegrationDB.cpp -text
 code/latte/sqlite/IntegrationDB.h -text

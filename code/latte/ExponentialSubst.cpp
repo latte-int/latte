@@ -55,10 +55,27 @@ sum_of_scalar_powers(const vec_ZZ &generic_vector,
 
 mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
+				 const listCone *cone, int numOfVars)
+  throw(NotGenericException)
+{
+  mpz_class prod_ray_scalar_products;
+  return computeExponentialResidueWeights(generic_vector,
+					  prod_ray_scalar_products,
+					  cone,
+					  numOfVars);
+}
+
+mpq_vector
+computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 mpz_class &prod_ray_scalar_products,
 				 const listCone *cone, int numOfVars)
   throw(NotGenericException)
 {
+
+  vec_ZZ linForm;
+  linForm = generic_vector;
+ return computeExponentialResidueWeights(generic_vector, cone, numOfVars, linForm, 0);
+ /*
   // Compute dimension; can be smaller than numOfVars
   int dimension = 0;
   listVector *ray;
@@ -90,19 +107,54 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
     weights[k] = td / k_factorial;
   }
   return weights;
+  */
 }
 
-mpq_vector
-computeExponentialResidueWeights(const vec_ZZ &generic_vector,
-				 const listCone *cone, int numOfVars)
+
+/*
+ * todo: if linForm is orthogonal to some ray, and M > 0, we should use the generic_vector to try to perturbe the linear form.
+ */
+mpq_vector computeExponentialResidueWeights(const vec_ZZ &generic_vector, const listCone *cone, int numOfVars, const vec_ZZ &linForm, int M)
   throw(NotGenericException)
 {
+  // Compute dimension; can be smaller than numOfVars
+  int dimension = 0;
+  listVector *ray;
+  for (ray = cone->rays; ray != NULL; ray = ray->rest)
+    dimension++;
+  vector<mpz_class> ray_scalar_products(dimension);
   mpz_class prod_ray_scalar_products;
-  return computeExponentialResidueWeights(generic_vector,
-					  prod_ray_scalar_products,
-					  cone,
-					  numOfVars);
+  prod_ray_scalar_products = 1;
+  {
+    int k;
+    for (k = 0, ray = cone->rays; ray != NULL; k++, ray = ray->rest) {
+      ZZ inner;
+      InnerProduct(inner, linForm, ray->first);
+      ray_scalar_products[k] = convert_ZZ_to_mpz(inner);
+      if (ray_scalar_products[k] == 0) {
+	static NotGenericException not_generic;
+	throw not_generic;
+      }
+      prod_ray_scalar_products *= ray_scalar_products[k];
+    }
+  }
+  int k;
+  mpz_class k_factorial;
+  mpq_vector weights((dimension + M) + 1);
+  mpq_vector todds = evaluate_todd(ray_scalar_products, dimension + M);
+  //cout << "evalute todd is ok..." << endl;
+  //for(k=0; k < todds.size(); ++k)
+//	  cout << todds[k] << "*t^" << k << " ";
+ // cout << endl;
+  for (k = 0, k_factorial = 1; k<=(dimension + M); k++, k_factorial *= k) {
+    mpq_class td = todds[(dimension + M) - k];
+    td /= prod_ray_scalar_products;
+    weights[k] = td / k_factorial;
+  }
+  return weights;
 }
+
+
 
 vec_ZZ
 compute_sums_of_scalar_powers(listCone *cone,
@@ -110,10 +162,19 @@ compute_sums_of_scalar_powers(listCone *cone,
 			      const vec_ZZ &generic_vector,
 			      BarvinokParameters *params)
 {
+	return compute_sums_of_scalar_powers(cone, numOfVars, generic_vector, params, numOfVars);
+}
+
+vec_ZZ
+compute_sums_of_scalar_powers(listCone *cone,
+			      int numOfVars,
+			      const vec_ZZ &generic_vector,
+			      BarvinokParameters *params, int order)
+{
   computeLatticePointsScalarProducts(cone, numOfVars, generic_vector, params);
   vec_ZZ sum;
   int dimension = numOfVars;
-  sum.SetLength(dimension + 1);
+  sum.SetLength(order + 1);
   int i;
   int num_points = cone->lattice_points_scalar_products.length();
   for (i = 0; i<num_points; i++) {
@@ -121,13 +182,14 @@ compute_sums_of_scalar_powers(listCone *cone,
     Integer scalar_power;
     scalar_power = 1;
     int k;
-    for (k = 0; k<=dimension; k++) {
+    for (k = 0; k<=order; k++) {
       sum[k] += scalar_power;
       scalar_power *= inner;
     }
   }
   return sum;
 }
+
 
 mpz_vector
 compute_sums_of_scalar_powers_mpz(listCone *cone,
@@ -175,6 +237,59 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
 //        << cone->coefficient << " * " << result << endl;
   return cone->coefficient * result;
 }
+
+mpq_class computeExponentialResidue_Single(const vec_ZZ &generic_vector, listCone *cone, int numOfVars,	 BarvinokParameters *params, const vec_ZZ & linForm, int M)
+{
+	//cout << "sers: gv " << generic_vector << endl;
+	//cout << "sers: numofvars " << numOfVars << endl;
+	//cout << "sers: linFomr" << linForm << endl;
+	//cout << "sers: M " << M << endl;
+  mpq_vector weights = computeExponentialResidueWeights(generic_vector, cone, numOfVars, linForm,M);
+
+  //cout << "the weights are " << endl;
+  //for(int i = 0; i < weights.size(); ++i)
+//	  cout << weights[i] << ", " ;
+  //cout << endl;
+
+  int dimension =  weights.size() - M - 1;
+  int k;
+  mpq_class result = 0;
+
+  // Equivalent, but faster code:
+  computeLatticePointsScalarProducts(cone, numOfVars, linForm, params);
+  //cout << "say..." << endl;
+  vec_ZZ sum = compute_sums_of_scalar_powers(cone, numOfVars, linForm, params, numOfVars + M);
+  //cout << "what..." << endl;
+  for (k = 0; k<=(dimension+M); k++)
+	result +=  convert_ZZ_to_mpz(sum[k]) * weights[k];
+  return cone->coefficient * result;
+
+ /*
+  mpq_vector weights
+    = computeExponentialResidueWeights(generic_vector, cone, numOfVars);
+  int dimension = weights.size() - 1;
+  int k;
+  mpq_class result = 0;
+#if 1
+  // Equivalent, but faster code:
+  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector, params);
+  mpz_vector sum = compute_sums_of_scalar_powers_mpz(cone, numOfVars, generic_vector, params);
+  for (k = 0; k<=dimension; k++)
+    result += sum[k] * weights[k];
+#else
+  computePointsInParallelepiped(cone, numOfVars);
+  for (k = 0; k<=dimension; k++) {
+    Integer sum = sum_of_scalar_powers(generic_vector,
+				       cone->latticePoints, k);
+    result += convert_ZZ_to_mpz(sum) * weights[k];
+  }
+#endif
+//   cerr << "Cone contributes: "
+//        << cone->coefficient << " * " << result << endl;
+  return cone->coefficient * result;
+*/
+}
+
 
 Integer
 computeExponentialResidue(listCone *cones, int numOfVars, BarvinokParameters *params)

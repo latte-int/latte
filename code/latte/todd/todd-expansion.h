@@ -57,4 +57,8 @@ taylor_product(const vector<mpq_vector> &taylors);
 mpq_vector
 evaluate_todd(const mpz_vector &x);
 
+/* Likewise, but compute the Taylor series up to t=order */
+mpq_vector
+evaluate_todd(const mpz_vector &x, int order);
+
 #endif

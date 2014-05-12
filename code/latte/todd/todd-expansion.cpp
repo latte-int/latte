@@ -101,6 +101,8 @@ taylor_product(const vector<mpq_vector> &taylors)
 mpq_vector
 evaluate_todd(const mpz_vector &x)
 {
+  return evaluate_todd(x, x.size());
+  /*
   int dimension = x.size();
   // Compute Taylor series for t/(1-exp(t))
   mpq_vector factor = taylor_for_todd(dimension);
@@ -121,5 +123,26 @@ evaluate_todd(const mpz_vector &x)
   }
   // Compute their product
   return taylor_product(factors);
+  */
 }
 
+mpq_vector
+evaluate_todd(const mpz_vector &x, int order)
+{
+  int dimension = x.size();
+  // Compute Taylor series for t/(1-exp(t))
+  mpq_vector factor = taylor_for_todd(order);
+  // Substitute t -> x_i * t
+  vector<mpq_vector> factors(dimension);
+  int i;
+  for (i = 0; i<dimension; i++) {
+	factors[i] = mpq_vector(factor.size());
+	mpq_vector::const_iterator source;
+	mpq_vector::iterator dest;
+	mpz_class coefficient = 1;
+	for (source = factor.begin(),  dest = factors[i].begin(),  coefficient = 1;	 source != factor.end(); ++source, ++dest, coefficient *= x[i])
+	  (*dest) = coefficient * (*source);
+  }
+  // Compute their product
+  return taylor_product(factors);
+}

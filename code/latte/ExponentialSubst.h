@@ -55,6 +55,12 @@ public:
    Also return the prod_ray_scalar_products, which might
    be useful for scaling purposes.
 */
+
+mpq_vector /* FIXME: This version can probably go away */
+computeExponentialResidueWeights(const vec_ZZ &generic_vector,
+				 const listCone *cone, int numOfVars)
+  throw(NotGenericException);
+
 mpq_vector /* FIXME: This version can probably go away */
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 mpz_class &prod_ray_scalar_products,
@@ -62,9 +68,8 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
   throw(NotGenericException);
 
 mpq_vector
-computeExponentialResidueWeights(const vec_ZZ &generic_vector,
-				 const listCone *cone, int numOfVars)
-  throw(NotGenericException);
+computeExponentialResidueWeights(const vec_ZZ &generic_vector, const listCone *cone, int numOfVars, const vec_ZZ &linForm, int M)
+throw(NotGenericException);
 
 ZZ
 scalar_power(const vec_ZZ &generic_vector,
@@ -77,6 +82,15 @@ compute_sums_of_scalar_powers(listCone *cone,
 			      int numOfVars,
 			      const vec_ZZ &generic_vector,
 			      BarvinokParameters *params);
+
+/* likewise, but for k=0,...,order*/
+vec_ZZ
+compute_sums_of_scalar_powers(listCone *cone,
+			      int numOfVars,
+			      const vec_ZZ &generic_vector,
+			      BarvinokParameters *params, int order);
+
+/* likewise for k=0,...,d but returns mpz_vector */
 mpz_vector
 compute_sums_of_scalar_powers_mpz(listCone *cone,
 				  int numOfVars,
@@ -93,6 +107,11 @@ compute_sums_of_scalar_powers_mpz(listCone *cone,
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &lambda,
 				 listCone *cone, int numOfVars, BarvinokParameters *params);
+
+/* likewise, but for a weighted counting by <linForm, x>^M
+ * Fixme: generic_vector is not being used, we are not processing the case if linFrom is orthogonal to some vertex-ray */
+mpq_class
+computeExponentialResidue_Single(const vec_ZZ &generic_vector, listCone *cone, int numOfVars, BarvinokParameters *params, const vec_ZZ & linForm, int M);
 
 /* Likewise, but for the whole list of CONES, summing up the
    results. */
