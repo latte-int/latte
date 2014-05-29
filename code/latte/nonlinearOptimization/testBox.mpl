@@ -71,7 +71,7 @@ testRandomForm:=proc(dim)
 
 
 	
-	system("../boxOpt --boxFile=boxTesting.box --linFile=boxTesting.linForms");
+	system("../boxOpt --count --boxFile=boxTesting.box --linear-forms=boxTesting.linForms");
 	#system("./boxOpt boxTesting.hrep --linFile=boxTesting.linForms");
 	print("Just called latte");
 	cans:=weightedBoxCount(l, u, c, linForm, M):
@@ -82,8 +82,17 @@ end;
 
 
 
+testPolynomial:=proc()
 
+	np:=getPolynomial("poly2.poly");
+	print(np);
+	ans:=weightedPolynomialLP([4, 10], [5, 13], np, 5);
+	
+	evalf(ans);
+
+end;
 
 
 #weightedBoxCount([4, 10], [5, 13], 1, [1,2], 10);
-testRandomForm(5);
+#testRandomForm(5);
+testPolynomial();

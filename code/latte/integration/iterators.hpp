@@ -15,7 +15,11 @@ public:
 		assert(myDim > 0);
 		myTrie = trie;
 		dimension = myDim;
+		if ( triePath)
+			delete [] triePath;
 		triePath = new trieElem*[dimension];
+		if (curTerm.exps)
+			delete [] curTerm.exps;
 		curTerm.exps = new S[dimension];
 		curTerm.length = dimension;
 	}

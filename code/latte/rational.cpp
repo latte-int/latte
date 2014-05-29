@@ -589,6 +589,17 @@ ZZ RationalNTL::readNumber(istream &in)
 
 /* ----------------------------------------------------------------- */
 
+RR to_RR(const RationalNTL & r)
+{
+	return r.to_RR();
+}
+
+// returns sign of a (-1, 0, +1)
+long sign(const RationalNTL& a)
+{
+	return sign(a.getNumerator());
+}
+
 RationalNTL convert_mpq_to_RationalNTL(const mpq_class &q)
 {
 	return RationalNTL(convert_mpz_to_ZZ(q.get_num()), convert_mpz_to_ZZ(q.get_den()));

@@ -32,6 +32,7 @@ struct monomialSum
 
 };
 
+
 //linear forms: sort on degree first, then the form coefficients
 struct linFormSum
 {

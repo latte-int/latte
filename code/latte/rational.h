@@ -244,6 +244,8 @@ public:
 
 };
 
+RR to_RR(const RationalNTL & r);
+long sign(const RationalNTL& a); // returns sign of a (-1, 0, +1)
 RationalNTL convert_mpq_to_RationalNTL(const mpq_class &q);
 mpq_class convert_RationalNTL_to_mpq(const RationalNTL &q);
 

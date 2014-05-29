@@ -13,6 +13,51 @@
 #include "barvinok/barvinok.h"
 #include "integration/burstTrie.h"
 #include "integration/PolyTrie.h"
+#include "integration/multiply.h"
+#include <map>
+#include <ostream>
+
+
+class PolynomialMap
+{
+public:
+	std::map<int, RationalNTL> terms;
+	PolynomialMap & operator+=(const PolynomialMap &rhs);
+	bool  operator==(const int rhs);
+	friend std::ostream & operator<<(std::ostream& os, const PolynomialMap & rhs);
+	RR eval(const RR & s) const;
+	void mult(const RationalNTL &rhs);
+	void print(ostream &out);
+};
+
+
+
+class BoxOptimization
+{
+public:
+	RR U;
+	RR L;
+	ZZ N;
+	monomialSum originalPolynomial; //d + 1 variables. (f + s)
+	monomialSum currentPolynomial; //(f + s)^currentPower
+	int currentPower;
+
+	vec_ZZ lowerBound, upperBound;
+
+	//BurstTrie<PolynomialMap, ZZ> *theTrie; //todo: constructor + if(theTrie) then delete old when calling new
+	PolynomialMap currentMap;
+	int currentMapPower;
+
+	BoxOptimization();
+	void setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly);
+	void setPower(int k);
+	void findRange(int itr);
+	void findNewUpperbound();
+	void findNewLowerbound();
+
+	RR maximumUpperbound();
+	RR maximumLowerBound();
+};
 
 
 class WeightedBoxProducer: public ConeProducer {
@@ -35,5 +80,10 @@ public:
  */
 mpq_class computeWeightedCountingBox(const vec_ZZ &lowerBound, const vec_ZZ &upperBound, const linFormSum &originalLinearForm);
 
+
+/**
+ * likewise, but for just one linear form.
+ */
+mpq_class computeWeightedCountingBox_singleForm(const vec_ZZ &lowerBound, const vec_ZZ &upperBound, const ZZ* linFormExps, const int degree, const RationalNTL & coef);
 
 #endif /* BOXOPTIMIZATION_H_ */
