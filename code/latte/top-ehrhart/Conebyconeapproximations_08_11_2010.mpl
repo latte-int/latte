@@ -1347,12 +1347,79 @@ latteMod:=proc(a, n)
 	local r, x;
 	ASSERT(n > 0);
 	x:=a;
-	while ( x >= n or x < 0) do
-		x:= x - floor(x/n)*n;
-	end;
+	#while ( x >= n or x < 0) do
+    ### I don't understand what the intention of this while loop
+    ### was.  It fails in the case that `a' is symbolic, such as
+    ### sqrt(2) with the error message "cannot determine if this
+    ### expression is true or false". 
+    ### On the other hand, `floor' works fine for symbolics, if `Digits'
+    ### is large enough. --mkoeppe
+	x:= x - floor(x/n)*n;
+	#end;
 	return x;
 end;
 
+#### LATTE INTERFACE FUNCTION:
+# input:
+#   lau: a triple [l, a, u], where a is symbolic and l, u are rational
+#        such that a is assumed to lie in the interval between l and u.
+#        (l does not have to be smaller than u.)
+#   n:   base (modulus), a positive rational number
+#   return an expression in a for the number between [0,n) that is
+#        equal to a mod n, without using "mod".  If no such expression
+#        can be given because [l, u] is too large, signal an error.
+latteIntervalMod:=proc(lau, n)
+	local r, l, a, u, lnfloor, unfloor;
+	ASSERT(n > 0, "modulus must be positive");
+    l, a, u := op(lau); 
+    if (u < l) then  # this easily happens by multiplying lau by a negative scalar.
+        u, l := l, u;
+    end if;
+    lnfloor := floor(l/n);
+    unfloor := floor(u/n);
+    if lnfloor <> unfloor then
+        error "The range [%1, %2] is too large to simplify MOD(%3, %4).  Provide more precision.", l, u, a, n;
+    end if;
+    return a - lnfloor*n;
+end;
+
+#### LATTE INTERFACE FUNCTION:
+# Return a rational interval l, u representing the range of numbers
+# represented by a Maple software floating point number.
+floatToInterval := proc(f)
+    local mantissa, exponent;
+    ASSERT(type(f, sfloat), cat("not a software float: ", f));
+    mantissa, exponent := op(f);
+    return (mantissa - 1/2 ) * 10^exponent, (mantissa + 1/2) * 10^exponent;
+end;
+
+#### LATTE INTERFACE FUNCTION:
+evaluateEhrhart:=proc(epoly, a)
+    local l, u, r;
+    if type(a, float) then
+        l, u := floatToInterval(a);
+        try
+             r := expand(eval(subs({N=n, n=[l, n, u], MOD=latteIntervalMod}, epoly)));
+             # The result is a polynomial in n, which has to be constant if
+             # epoly was the full Ehrhart quasi-polynomial.
+             if type(r, rational) then
+                 printf("# Exact answer (assuming that all provided digits of the floating-point dilation factor were correct):\n");
+                 return r;
+             else
+                 printf("# Given Ehrhart quasi-polynomial was not complete; evaluating using floating point.  Increase Digits if you want more precision.\n");
+                 #Digits := ilog10(1 + abs(op(1, a))) + 3;
+                 return evalf(subs({n=a}, r));
+             end if;
+        catch "The range [%1, %2] is too large to simplify MOD(%3, %4).  Provide more precision.":
+            printf("# The precision of the given floating point dilation factor is not large enough to allow exact computation.  Resorting to floating point evaluation.  Increase Digits if you want more precision in this evaluation.\n");
+            #Digits := ilog10(1 + abs(op(1, a))) + 3;
+            return eval(subs({N=a, n=a, MOD=latteMod}, epoly));
+        end;
+    else
+        # `expand' helps in case that a is a symbolic expression
+        return expand(eval(subs({N=a, n=a, MOD=latteMod}, epoly)));
+    end if;
+end;
 
 #### LATTE INTERFACE FUNCTION:
 #input:
