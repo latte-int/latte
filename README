@@ -14,15 +14,18 @@ LattE requires the following programs and libraries:
   * (optional) LRS
   * (optional) LiDIA
   * (optional) 4ti2
+  * (optional) Maple (non-free)
 
 If you do not have these libraries installed yet, follow the
 instructions below to install them.  However, we also package a source
 code distribution called
 
-   "latte-integrale"
+   "latte-integrale" 
 
-that includes all of these libraries and will build them automatically. 
-You can get it at the same place where you got LattE integrale,
+(also called LattE integrale "for tea, too") that includes all of
+these libraries (except, of course, Maple) and will build them
+automatically.  You can get it at the same place where you got this
+package,
 
     http://www.math.ucdavis.edu/~latte/
 
@@ -45,26 +48,29 @@ at the directory $HOME/latte.
    Download it from http://www.swox.com/gmp/
    Unpack it, then in the source directory do:
 
-   ./configure --prefix=$HOME/latte --enable-cxx
-   make
-   make install
+     ./configure --prefix=$HOME/latte --enable-cxx
+     make
+     make install
 
 2. Install Victor Shoup's Number Theoretic Library
 
    Obtain it from http://www.shoup.net/ntl/ 
    Unpack it, then in the source directory do:
    
-   cd src
-   ./configure PREFIX=$HOME/latte GMP_PREFIX=$HOME/latte NTL_GMP_LIP=on
-   make
-   make install
+      cd src
+      ./configure PREFIX=$HOME/latte GMP_PREFIX=$HOME/latte NTL_GMP_LIP=on
+      make
+      make install
 
 3. Install Komei Fukuda's package cddlib
 
    Obtain then from http://www.ifor.math.ethz.ch/~fukuda/cdd_home
 
 4. Put $HOME/latte/bin into your $PATH
-   and $HOME/latte/lib into your LD_LIBRARY_PATH.
+   and $HOME/latte/lib into your $LD_LIBRARY_PATH:
+
+      export PATH="$HOME/latte/bin:$PATH"
+      export LD_LIBRARY_PATH="$HOME/latte/lib:$LD_LIBRARY_PATH"
 
 5. Optionally, install the non-free library LiDIA.
 
@@ -74,13 +80,19 @@ at the directory $HOME/latte.
 
 6. Optionally, install 4ti2.
 
+7. Optionally, if you have Maple, make sure that the directory where
+   the command-line executable of Maple lives ("maple" or, on Windows,
+   "cmaple.exe") is in your $PATH:
+
+      export PATH="/path/to/maple/directory:$PATH"
+
 N. Build and install LattE
 
    From the source directory of LattE:
 
-   ./configure --prefix=$HOME/latte --with-default=$HOME/latte 
-   make
-   make install
+      ./configure --prefix=$HOME/latte --with-default=$HOME/latte 
+      make
+      make install
 
 Now the LattE executables (count, integrate, latte-minimize, latte-maximize, ...)
 should be available in $HOME/latte/bin.
