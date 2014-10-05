@@ -24,7 +24,7 @@
 \newcommand{\latte}{{\tt LattE}\xspace}
 \newcommand{\latteInt}{{\tt LattE integrale}\xspace}
 \newcommand{\latteMac}{{\tt LattE macchiato}\xspace}
-\newcommand{\latteV}{v1.7.1}
+\newcommand{\latteV}{v1.7.2}
 \newcommand{\vinci}{{\tt Vinci}\xspace}
 \newcommand{\maple}{{\tt Maple}\xspace}
 \newcommand{\cdd}{{\tt CDD}\xspace}
@@ -65,7 +65,7 @@ Jianqiu Wu \and
  
 
  
- \date{January 2014}
+ \date{October 2014}
 
 \begin{document}
 
@@ -85,17 +85,23 @@ The name ``{\tt LattE}'' is an abbreviation for ``{\bf Latt}ice point
 {\bf E}numeration.'' \latte was developed in 2001 to count lattice points contained in 
 convex polyhedra defined by linear equations and inequalities with 
 integer coefficients. The polyhedra can be of any (reasonably small) 
-dimension. In 2007, {\tt LattE macchiato} was released and contained many 
+dimension. 
+
+In 2007, {\tt LattE macchiato} was released and contained many 
 algorithmic improvements, in particular primal variants of the algorithms. The newest edition, \latteInt, developed
 in 2010, can compute integrals of polynomials and volumes of rational polytopes. 
 All these algorithms run in polynomial
-time for fixed dimension. 
+time for fixed dimension, or better.
+ 
 \latteInt was extended in 2012/2013 with a hybrid C++ and \maple
 implementation for computing the top coefficients of weighted Ehrhart
-quasipolynomials, using the algorithm of~\cite{so-called-paper-1}. 
+quasipolynomials, using the general algorithm of~\cite{so-called-paper-1}, 
+and the a C++ implementation of the algorithm specialized to knapsacks
+of~\cite{baldoni-et-al:denumerant-fpsac,baldoni-et-al:denumerant-full-paper}. 
+
 To
 learn more about the exact details of our implementation for lattice point enumeration, the interested reader can consult 
-\cite{koeppe:irrational-barvinok, latte1} and the references listed therein. 
+\cite{koeppe:irrational-barvinok, latte1, deloera-hemmecke-koeppe:book} and the references listed therein. 
 For learning the algorithmic details of integration, see \cite{howToIntegratePolynomialSimplex, latte-integrale-paper}. Here we
 give a rather short description of the mathematical objects used by
 {\tt LattE}. Note that all our computations are done over the integers or the rationals {\emph exactly}.
@@ -214,10 +220,10 @@ These polytopes are also related to Sylvester's denumerant.
 
 \latte contains three key executables:
 \begin{description}
-        \item[count] counts lattice points, computes Ehrhart polynomials and Ehrhart series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
-        \item[integrate] integrates polynomials, powers of linear forms, and products of powers of linear forms over polytopes. Integrate can also computed weighted Ehrhart quasipolynomials.
-        \item[top-ehrhart-knapsack] Computes the Ehrhart quasipolynomials for knapsack-type polytopes.
-        \item[max/minimize] perform linear integer optimization.
+        \item[\texttt{count}] counts lattice points, computes Ehrhart polynomials and Ehrhart series of polytopes. This executable has replaced {\tt ehrhart}, but {\tt ehrhart} is still included for backwards compatibility.
+        \item[\texttt{integrate}] integrates polynomials, powers of linear forms, and products of powers of linear forms over polytopes. Integrate can also computed weighted Ehrhart quasipolynomials.
+        \item[\texttt{top-ehrhart-knapsack}] Computes the Ehrhart quasipolynomials for knapsack-type polytopes.
+        \item[\texttt{latte-maximize}, \texttt{latte-minimize}] perform linear integer optimization.
 \end{description}
 
 The other executables in latte are drivers, converters, and other small utility functions.
@@ -312,8 +318,9 @@ considered an equality, the third one.
 
 In general, the linearity syntax is :
 \begin{verbatim}
-        linearity <number of equations> <row index of constraint, start counting from 1>
+        linearity <number of equations> <row indices...>
 \end{verbatim}
+The row indices start at 1.
 
 \subsubsection{Nonnegativity Constraints}
 For bigger examples it quickly becomes cumbersome to state all
@@ -337,8 +344,9 @@ that the first and second variables are required to be nonnegative.
 
 In general, the nonnegative syntax is :
 \begin{verbatim}
-        nonnegative <number of variables in list> <variable index, start counting from 1>
+        nonnegative <number of variables in list> <variable indices...>
 \end{verbatim}
+The variable indices start at 1.
 
 
 \subsubsection{Cost Vector}
@@ -429,13 +437,16 @@ end
 
 For a complete description of \cdd file syntax, see the \cdd manual \cite{fukuda}.
 
-\subsection{Non-full dimensional polytopes}
+\subsection{Non--full dimensional polytopes}
 
 When the input polytope is not full dimensional, \latte projects that polytope
 such that it becomes full dimensional. This transformation preserves the
 lattice point count of the input polytope. 
 
-Note, however, that the integration routines do not currently support non-full
+Note, however, that this is not supported when the input is given in LattE
+v-representation. 
+
+Also note that the integration routines do not currently support non--full
 dimensional polytopes.
 
 \subsection{\latte vs. \cdd file formats}
@@ -841,7 +852,14 @@ A common subproblem in counting lattice points and integration requires finding 
         top-ehrhart-knapsack --help
 \end{verbatim}  
 
-A knapsack is a polytope in the form $\{x \in \R^d \mid \alpha_1 x_1 + \cdots + \alpha_d x_d = t; x_i \geq 0\},$ which we identify by the coefficients $\boldsymbol{\alpha}= [\alpha_1, \dots, \alpha_d].$   {\tt top-ehrhart-knapsack} can compute the largest $k$ degree terms in the Ehrhart quasi-polynomial $E(\boldsymbol{\alpha}, t)$ as a function of $t$.  We assume the greatest common divisor of the $\alpha_i$ is one, because if $g$ is the greatest common divisor of the $\alpha_i$ and $g\neq 1$, then $E(\boldsymbol{\alpha}/g, t) = E(\boldsymbol{\alpha}, gt) $. There are only a few command line parameters:
+An (equality-constrained) knapsack is a polytope in the form $\{x \in \R^d \mid \alpha_1 x_1 + \cdots
++ \alpha_d x_d = t; x_i \geq 0\},$ which we identify by the coefficients
+$\boldsymbol{\alpha}= [\alpha_1, \dots, \alpha_d].$   {\tt
+  top-ehrhart-knapsack} can compute the largest $k$ degree terms in the
+Ehrhart quasi-polynomial $E(\boldsymbol{\alpha}, t)$ as a function of $t$,
+using the algorithm from
+\cite{baldoni-et-al:denumerant-fpsac,baldoni-et-al:denumerant-full-paper}. 
+We assume the greatest common divisor of the $\alpha_i$ is one, because if $g$ is the greatest common divisor of the $\alpha_i$ and $g\neq 1$, then $E(\boldsymbol{\alpha}/g, t) = E(\boldsymbol{\alpha}, gt) $. There are only a few command line parameters:
 
 \begin{description}
 \item[--file, -f FILENAME] FILENAME contains the knapsack file in a special format (see below). Required parameter.
@@ -858,7 +876,7 @@ The two main computation options are best illustrated with an example. Consider 
 5 1 2 3 4 5
 \end{verse}
 
-To compute the $2^{nd}$ coefficient of the Ehrhart polynomial,  use the command
+To compute the 2nd coefficient of the Ehrhart polynomial,  use the command
 \begin{verbatim}
 top-ehrhart-knapsack --file knap1.txt -k 2 --out results.mpl
 \end{verbatim}
@@ -886,7 +904,7 @@ topKPolynomial:=(coeff4minus0)*T^(4) + (coeff4minus1)*T^(3)
   
 Notice that the expressions for each coefficient might be very long. It is recommended that you always save the results in an output file, and use a computer algebra system to simplify the expressions. Also note that the output can be parsed by \maple. In fact, using \maple to simplify the expressions, ``coeff4minus1" is $1/96$. Finally, the Frac($x$) function represents the fractional part of $x$ and is equal to $x - \lfloor x \rfloor \in [0,1)$, where $\lfloor x \rfloor$ is  the largest integer smaller or equal to $x$.
 
-The option {\tt --gcd-polynomial } controls how poles are computed, which is given by the greatest common divisor of subsets of $\{\alpha_1 , \dots, \alpha_d\}$. For example, the options {\tt --gcd-polynomial 1 -k 5} will require finding all $\binom{d}{5}+\binom{d}{4}+\cdots+\binom{d}{1}$ subsets of size at most $5$ and comput the greatest common divisor of each one. However,~{\tt --gcd-polynomial 0 -k 5} will use a dynamic programming technique to compute the greatest common divisor of every subset of $\{\alpha_1 , \dots, \alpha_d\}$. If the number of unique greatest common divisors from subsets is much smaller than $2^d$, and $d$ is large, {\tt --gcd-polynomial 0} should be much faster. 
+The option {\tt --gcd-polynomial} controls how poles are computed, which is given by the greatest common divisor of subsets of $\{\alpha_1 , \dots, \alpha_d\}$. For example, the options {\tt --gcd-polynomial 1 -k 5} will require finding all $\binom{d}{5}+\binom{d}{4}+\cdots+\binom{d}{1}$ subsets of size at most $5$ and compute the greatest common divisor of each one. However,~{\tt --gcd-polynomial 0 -k 5} will use a dynamic programming technique to compute the greatest common divisor of every subset of $\{\alpha_1 , \dots, \alpha_d\}$. If the number of unique greatest common divisors from subsets is much smaller than $2^d$, and $d$ is large, {\tt --gcd-polynomial 0} should be much faster. 
 
 
 \subsection{Optimization}
@@ -1333,7 +1351,7 @@ and then type
 The answer is $1/15*N^8+4/15*N^7+71/180*N^6+1/4*N^5+2/45*N^4-1/60*N^3-1/180*N^2$.
 
 Finally, repeat the above commands, but find the polynomial that is correct if
-$N$ is any real dilation factor and save the answer to a file called
+$N$ is any rational or real dilation factor and save the answer to a file called
 ``bigAnswer''. That is, add \texttt{--real-dilations
   --top-ehrhart-save=bigAnswer} to the command line and use the same
 polynomial.  
@@ -1343,11 +1361,13 @@ Open the file ``bigAnswer.'' To evaluate the polynomial at a point $a \in \R$, f
         \begin{verbatim}
         read("/home/latte/dest/share/latte-int/Conebyconeapproximations_08_11_2010.mpl"):
         
-        epoly:= ``something big'';
+        epoly:= ...;  # from bigAnswer
+        a := 5/2;
+                # desired rational dilation factor
         
         eval(subs({N=a,n=a, MOD=latteMod},epoly));
         \end{verbatim}
-Note that you had to set both $n$ and $N$ to the point $a \in \R$ and the ``latteMod'' function is defined in the \maple script. If you then run this \maple file with the point $a=2.5$ you will get $85.00000031$.
+Note that you had to set both $n$ and $N$ to some dilation factor $a \in \R$ and the ``latteMod'' function is defined in the \maple script. If you then run this \maple file with the point $a=5/2$ you will get $85$.
 
 \subsection{Example of Optimization with \latte}
 
