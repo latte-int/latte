@@ -129,6 +129,7 @@ EXAMPLES/rv/rv_8_20.ext -text
 EXAMPLES/rv/rv_8_20.ine -text
 EXAMPLES/rv/rv_8_30.ext -text
 EXAMPLES/rv/rv_8_30.ine -text
+EXAMPLES/tests/char-spec-4-permclass-LPred-IP-4-RRRRRRRRRRR.lat.remIQ_36.lat -text
 EXAMPLES/tests/implied-equation.latte -text
 EXAMPLES/tests/missing-newline-2.latte -text
 EXAMPLES/tests/missing-newline-3.latte -text
