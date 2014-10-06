@@ -881,9 +881,11 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		freeListVector(read_polyhedron_data.matrix);
 		delete Poly;
 	}
+	/*
 	else
 	{ //use Stokes
 		//NOTE:: THIS RECURSIVE METHOD IS NOT DONE.
+		//this code is experimental/partly finished
 		//THIS SHOULD NOT WORK.
 
 		ReadPolyhedronDataRecursive rpdr(read_polyhedron_data);
@@ -941,7 +943,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		exit(1);
 
 	}//else. use strokes.
-
+	*/
 
 
 

@@ -10,6 +10,9 @@
 
 #include "PolytopeValuation.h"
 
+/**
+ * DO NOT USE THIS CLASS: it is experimental/partly finished
+ */
 class RecursivePolytopeValuation {
 public:
 	RecursivePolytopeValuation();

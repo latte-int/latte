@@ -110,7 +110,7 @@ public:
  * Class ReadPolyhedronDataRecursive's job is to set each facet inequalities to equality
  *   and compute the reduced polytope.
  *
- *  DO NOT USE THIS CLASS: it is only partly finished.
+ *  DO NOT USE THIS CLASS: it is experimental/partly finished.
  */
 class ReadPolyhedronDataRecursive: public ReadPolyhedronData
 {
