@@ -942,7 +942,7 @@ findEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, to
 	
 	if fileName <> -1 then
 		fPtr:=fopen(fileName, WRITE, TEXT);
-    	fprintf(fPtr, "epoly:= %a;\\n", ehrhartPoly);
+    	fprintf(fPtr, "epoly:= %a;", ehrhartPoly);
 		fprintf(fPtr, "\n");
     	fclose(fPtr);
 	fi;
