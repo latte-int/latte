@@ -205,15 +205,18 @@ Vertex $s_4 = (0,1):$
 
 The integral $\int_{x_1 = 0}^{x_1 = 1}\int_{x_2 = 0}^{x_2 = 1} x_1 +x_2  \d{x_1}\d{x_2} = 0 + 4/3 -1/6 - 1/6 = 1$ as it should be.
 
-\subsubsection{Weighted Ehrhart Polynomials}
+\subsubsection{Weighted Ehrhart Quasi-Polynomials}
 
-\latteInt can also compute the weighted Ehrhart quasipolynomials where the weight function is a polynomial or a sum of powers of linear forms. However, the polytope must be a simplicial polytope and \maple must be installed on your computer.
+\latteInt can also compute the weighted Ehrhart quasipolynomials where the
+weight function is a polynomial or a sum of powers of linear forms. See
+\cite{so-called-paper-1}. This
+functionality requires \maple.
 
 
-\subsubsection{Ehrhart Polynomials of Knapsack polytopes}
+\subsubsection{Ehrhart Quasi-Polynomials of Knapsack polytopes}
 
 \latteInt can compute the Ehrhart quasipolynomials as function of $t$ of polytopes in the form \[ \{x\in \R^n_{\geq 0} \mid \alpha_1 x_1 + \cdots + \alpha_n x_n = t\}.\]
-These polytopes are also related to Sylvester's denumerant.
+These polytopes are also related to Sylvester's denumerant.  See \cite{baldoni-et-al:denumerant-fpsac,baldoni-et-al:denumerant-full-paper}.
 
 
 \subsection{Which programs of {\tt LattE} compute what?}
@@ -245,6 +248,10 @@ A polytope can be defined from a list of vertices (a v-representation) or a list
 \end{enumerate}
 
 Users of {\tt Polymake} will notice that {\tt Polymake}'s facets and vertices are printed in a format that is easily converted to a \latte style h- or v-representation.
+
+\latte comes with a large library of example input files compiled from various
+sources.  In the source distribution, it can be found in the \path{EXAMPLES} subdirectory;
+after installation, it can be found in \path{dest/share/latte-int/examples}. 
 
 We now explore the file syntax of each.
 
@@ -436,6 +443,7 @@ end
 \end{verbatim}
 
 For a complete description of \cdd file syntax, see the \cdd manual \cite{fukuda}.
+Pass the command-line option \texttt{--cdd} to \latte if you use a \cdd input format.
 
 \subsection{Non--full dimensional polytopes}
 
@@ -453,8 +461,20 @@ dimensional polytopes.
 There are a few key differences between \latte and \cdd file formats.
 
 \begin{enumerate}
-        \item \cdd used the file extension *.ine for h-representation files, and *.ext for v-representation files. However, \latte makes no assumption on the file extensions of files. We recommend *.vrep.latte and *.hrep.latte for \latte style files, but you are free to name your files anything.
-        \item \cdd also requires ``H-representation'' or ``V-representation'' keywords in the file. Forgetting about the ``linearity'' and ``nonnegative'' keywords, there is no difference between a \latte v- and h-representation file.
+        \item \cdd uses the file extension \path{*.ine} for h-representation
+          files, and \path{*.ext} for v-representation files. However, \latte
+          makes no assumption on the file extensions of files. This manual has
+          recommended using \path{*.vrep.latte} and \path{*.hrep.latte} for
+          \latte style files, but you are free to name your files anything;
+          even our own example files do not follow this convention. 
+        \item \cdd also requires ``H-representation'' or ``V-representation''
+          keywords in the file.  Pass the command-line option
+          \texttt{--cdd} to \latte if you use either of the two \cdd formats. 
+        \item On the other hand, forgetting about the ``linearity'' and
+          ``nonnegative'' keywords, there is no syntactic difference between a
+          \latte v- and h-representation file.  Therefore, you need to provide
+          the command-line option \texttt{--vrep} whenever you input a \latte
+          v-representation file.
 %       \item Currently, not all commands work starting from a \cdd v-representation file. --it looks ok now.
 \end{enumerate}
 
@@ -718,12 +738,21 @@ Let us view a few examples of the above options
 \end{itemize}
 
 
-\subsubsection{How to use {\tt integrate} for computing weighted Ehrhart quasi\-polynomials}           
+\subsubsection{How to use {\tt integrate} for computing (highest coefficients
+  of) weighted Ehrhart quasi\-polynomials}           
 \label{s:top-ehrhart}
 
 This option currently requires \maple.
 For non-lattice polytopes, the coefficients of the Ehrhart quasipolynomials
-are computed as step functions. 
+are computed as step functions.  An amazing
+feature of this algorithm is that \textbf{we can compute a small number of highest
+coefficients of the Ehrhart quasipolynomial even for polytopes of rather high
+dimension}, for which the computation of the full quasipolynomial is
+completely out of reach.
+See \cite{so-called-paper-1} for the details, including a discussion of the
+complexity; this paper is based on the pioneering work in
+\cite{barvinok-2006-ehrhart-quasipolynomial}.   
+
 The triangulation of vertex cones is performed in the dual space; command line
 options to do otherwise are ignored.
 
@@ -731,8 +760,9 @@ By default, \latteInt\ computes the coefficients incrementally, starting from
 the highest coefficient, which is the easiest to compute.  
 You can interrupt the computation at any time if you
 don't need any further coefficients. 
-If you know in advance, how many coefficients from the top you need, use  the
-option \texttt{--num-coefficients=K}. 
+If you know in advance how many coefficients from the top you need, use  the
+option \texttt{--num-coefficients=K}.  This will be slightly faster than
+incremental computation. 
 
 %% if the polytope is simple and 
 
@@ -803,6 +833,242 @@ Let us view a few examples of the above options.
         \end{verbatim}  
 \end{itemize}
 
+\example
+A concrete example using a file from the library of examples that comes with
+the LattE distribution.  We count the lattice points in the 3-dimensional cube
+$[-1, 1]^3$, dilated by a \emph{real} dilation factor $N$. 
+\begin{verbatim}
+        integrate --valuation=top-ehrhart --cdd --real-dilations 
+                  --top-ehrhart-save=cube_3_real.txt 
+                  dest/share/latte-int/examples/cubes/cube_3.ext
+\end{verbatim}
+This creates a file \path{cube_3_real.txt} with the following content (the
+formulas are long; some parts have been elided here):
+\begin{verbatim}
+    epoly:= \ 
+    + 8*N^3\ 
+    + (12-24*MOD(n,1))*N^2\ 
+    + (6-12*MOD(n,1)+359/125245152*(-5521248*MOD(n,1)+2760624)*MOD(n,1)-[...])*N\ 
+    + 1-1700/431*MOD(n,1)+1652/431*MOD(n,1)^2-[...];
+\end{verbatim}
+As this example shows, the quasi-polynomial is expressed as a polynomial in
+$N$ (the dilation factor), whose coefficients are step-polynomials.  
+The polynomial degree in $N$ is 3 (the dimension of the polytope).  
+The step-polynomials are expressed using the fractional-part operation
+$\mathrm{MOD}(x, 1)$, using the variable~$n$ (again the dilation factor).
+(Having two different variables for the dilation factor makes it easier to
+manipulate this expression in computer algebra systems such as Maple.)
+
+This formula is valid for arbitrary real (not just rational) dilations.  See
+below for how to conviently evaluate it in \maple.
+
+\example
+For comparison, let's compute the same example without the
+\texttt{--real-dilations} parameter.  
+\begin{verbatim}
+        integrate --valuation=top-ehrhart --cdd 
+                  --top-ehrhart-save=cube_3_integer.txt 
+                  dest/share/latte-int/examples/cubes/cube_3.ext
+\end{verbatim}
+This creates a file \path{cube_3_integer.txt} with the following content:
+\begin{verbatim}
+    epoly:= \ 
+    + 8*N^3\ 
+    + 12*N^2\ 
+    + 6*N\ 
+    + 1;
+\end{verbatim}
+Since the input was a lattice polytope, this is an Ehrhart polynomial (all
+coefficients are constants).
+
+\example
+Another example.  This time we ask only for the highest 3 coefficients of the
+Ehrhart quasi-polynomial, valid for real dilations, of a
+6-dimensional simplex from the library, which is given in \latte vrep format. 
+\begin{verbatim}
+        integrate --redundancy-check=none --triangulation=4ti2 
+                  --valuation=top-ehrhart --num-coefficients=3 
+                  --top-ehrhart-save=random-simplex-real-top3.txt 
+                  --vrep --real-dilations
+                  dest/share/latte-int/examples/random-simplex/random-simplex-dim6-digits4-1.vrep
+\end{verbatim}
+This computation takes a while and creates a file
+\path{random-simplex-real-top3.txt}.  It is large, and we don't show it here.
+
+\example
+The same example, but we do not know in advance how many coefficients we want.  We do
+have a limited budget of time or patience.  So we ask for an incremental
+computation, starting at the top coefficients.  We can interrupt at any time
+by typing \textsc{control-C}.  
+\begin{verbatim}
+        integrate --redundancy-check=none --triangulation=4ti2 
+                  --valuation=top-ehrhart 
+                  --top-ehrhart-save=random-simplex-real-top3.txt 
+                  --vrep --real-dilations
+                  dest/share/latte-int/examples/random-simplex/random-simplex-dim6-digits4-1.vrep
+\end{verbatim}
+If interrupted after the term of $N^5$ is shown on the screen, the file 
+\path{random-simplex-real-incremental.txt} looks like this:
+\begin{verbatim}
+    epoly:= \ 
+    + 15181275198303665635391/360*N^6\ 
+    + (-1/120*MOD(-64173062910517600471035*n,1)-[...])*N^5
+\end{verbatim}
+To facilitate reading this file into \maple, let's add a semicolon at the end.
+\begin{verbatim}
+        echo ";" >> random-simplex-real-incremental.txt
+\end{verbatim}
+
+
+\subsubsection{Evaluating Ehrhart quasi-polynomials in \maple}
+
+LattE's \maple library has a helper function called \texttt{evaluateEhrhart}
+that is useful for evaluating quasi-polynomials in this form.  You can find it
+in file \path{dest/share/latte-int/Conebyconeapproximations_08_11_2010.mpl}. 
+Let's look at a sample \maple session.  We will refer to the files created in
+the previous section.  First load the code:
+
+\begin{verbatim}
+> read "dest/share/latte-int/Conebyconeapproximations_08_11_2010.mpl":
+\end{verbatim}
+Now read in one of the example Ehrhart quasi-polynomials.
+\begin{verbatim}
+> read "cube_3_real.txt";
+\end{verbatim}
+\maple displays the quasi-polynomial.  It is always assigned to variable
+\texttt{epoly}.  The output is long, but still fits on the screen
+(if your screen is big enough).  Let's evaluate it for a few integer and
+rational dilations:
+\begin{verbatim}
+> evaluateEhrhart(epoly, 0);
+                                      1
+
+> evaluateEhrhart(epoly, 1);
+                                     27
+
+> evaluateEhrhart(epoly, 3/2);
+                                     27
+
+> evaluateEhrhart(epoly, 2-1/1000000);
+                                     27
+
+> evaluateEhrhart(epoly, 2);          
+                                     125
+\end{verbatim}
+These are all exact answers.
+Now let's try real dilations.  \texttt{evaluateEhrhart} allows you to enter
+floating point numbers.  Remember, \maple represents all entered decimal
+fractions exactly, using floating point with basis 10.
+\texttt{evaluateEhrhart} interprets a given floating point number as an
+interval that represents that all given digits are correct, but the last given
+digit may be rounded:
+\begin{verbatim}
+> floatToInterval(2.0);
+                                   39  41
+                                   --, --
+                                   20  20
+> floatToInterval(2.00);
+                                  399  401
+                                  ---, ---
+                                  200  200
+\end{verbatim}
+If the dilation factor is given with enough precision, then by analyzing this
+interval, we can evaluate the quasi-polynomial \emph{exactly} (the answer will
+be an integer (or, in the weighted case, a rational number):
+\begin{verbatim}
+> evaluateEhrhart(epoly, 2.3);
+# Exact answer (assuming that all provided digits of the 
+# floating-point dilation factor were correct):
+                                     125
+\end{verbatim}
+However, if you try this for a dilation where there is a jump discontinuity in
+the quasi-polynomial, this method cannot work, and we return a simple floating
+point evaluation of the formula.  Use the result with caution.
+\begin{verbatim}
+> evaluateEhrhart(epoly, 2.0);
+# The precision of the given floating point dilation factor is 
+# not large enough to allow exact computation.  Resorting to 
+# floating point evaluation.  Increase Digits if you want more
+# precision in this evaluation.
+                                   125.000
+\end{verbatim}
+We can also evaluate at symbolic expressions.  However,
+\texttt{evaluateEhrhart} has to rely on the correctness of \maple's
+\texttt{floor} function for symbolic arguments.  Also, the system variable
+\texttt{Digits} needs to be set to a large enough value, or \maple will leave
+some \texttt{floor} expressions unevaluated.
+\begin{verbatim}
+> Digits := 4: evaluateEhrhart(epoly, 707*sqrt(2));
+                       1/2                  1/2 2                1/2 3
+      1 + 6 floor(707 2   ) + 12 floor(707 2   )  + 8 floor(707 2   )
+
+> Digits := 8: evaluateEhrhart(epoly, 707*sqrt(2));
+                                 7988005999
+\end{verbatim}
+Let's switch to another example.  The Ehrhart quasi-polynomial, valid for real
+dilations, has a complicated structure with many jump discontinuities.  Any
+evaluation at an integer or rational number will be exact.
+\begin{verbatim}
+> evaluateEhrhart(epoly, 1234/1000);
+
+                   167513276311474881671845822495473290521
+                   ---------------------------------------
+                             1125000000000000000
+\end{verbatim}
+If we try to give a floating point number, however, we need to give it with
+really high precision; but even then, we cannot evaluate it exactly because we
+only computed the top 3 coefficients of the quasi-polynomial.  So the best we
+can do is a floating-point approximation.
+\begin{verbatim}
+> read "random-simplex-real-incremental.txt":
+> evaluateEhrhart(epoly, 1.23);
+# The precision of the given floating point dilation factor is
+# not large enough to allow exact computation.  Resorting to 
+# floating point evaluation.  Increase Digits if you want more 
+# precision in this evaluation.
+                                            21
+                               0.14602810 10
+
+> evaluateEhrhart(epoly, 1.23456789098765);
+# The precision of the given floating point dilation factor is 
+# not large enough to allow exact computation. [...]
+                                            21
+                               0.14931232 10
+
+> evaluateEhrhart(epoly, 1.23456789098765345678976543456789);
+# Given Ehrhart quasi-polynomial was not complete; evaluating 
+# using floating point.  Increase Digits if you want more precision.
+                                            21
+                               0.14931233 10
+> Digits := 40: evaluateEhrhart(epoly, 1.23456789098765345678976543456789);   
+# Given Ehrhart quasi-polynomial was not complete; evaluating 
+# using floating point.  Increase Digits if you want more precision.
+                                                             21
+                0.1493123109910186285550465481092293593932 10
+\end{verbatim}
+Symbolic expressions work better in this case.  Again, the system variable
+\texttt{Digits} needs to be set to a large enough value, or \maple will leave
+some \texttt{floor} expressions unevaluated.
+\begin{verbatim}
+> Digits:=4: evaluateEhrhart(epoly, exp(1)); 
+ 15181275198303665635391       6
+------------------------ exp(1)
+           72
+
+                   5
+     + 1/120 exp(1)  floor(-64173062910517600471035 exp(1))
+
+                   5
+     + 1/120 exp(1)  floor(-32059652032188669736011 exp(1)) 
+
+     [...]
+
+> Digits:=40: evaluateEhrhart(epoly, exp(1));                
+   15181275198303665635391       6   20633492252192421384473       5
+  ------------------------ exp(1)  + ----------------------- exp(1)
+             72                                30
+\end{verbatim}
+
 \subsection{Options common to both {\tt count} and {\tt integrate}}
 
 A common subproblem in counting lattice points and integration requires finding triangulations and tangent cones. Also, there are many different software tools available to do this. Instead of reinventing the wheel, \latte links with other software tools to compute these basic objects. In this section, we describe how you can control which software tool is used.
@@ -871,7 +1137,7 @@ We assume the greatest common divisor of the $\alpha_i$ is one, because if $g$ i
 
 {\tt top-ehrhart-knapsack} uses a special file format to input the knapsack coefficients. For a the knapsack $\boldsymbol{\alpha}$, the input file contains one line: the number of coefficients in the knapsack followed by each coefficient separated by spaces.
 
-The two main computation options are best illustrated with an example. Consider the knapsack $\boldsymbol{\alpha}:=[1,2,3,4,5]$. Notice that the greatest common divisor  is one.  Save this knapsack in a file called knap1.txt:
+The two main computation options are best illustrated with an example. Consider the knapsack $\boldsymbol{\alpha}:=[1,2,3,4,5]$. Notice that the greatest common divisor  is one.  Save this knapsack in a file called \path{knap1.txt}:
 \begin{verse}
 5 1 2 3 4 5
 \end{verse}
