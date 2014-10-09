@@ -1,0 +1,172 @@
+++++++++++++++++++++++++++++
+MAPLE FILES FROM THE WEBSITE
+++++++++++++++++++++++++++++
+
+https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl same as knapsackwithdualdec.14.04.2012.mpl
+
++++++++++++++++++
+LINKS FROM PAPERS
++++++++++++++++++
+
+Computation of the Highest Coefficients of Weighted Ehrhart Quasi-polynomials of Rational Polyhedra
+LattE macchiato, version 1.2-mk-0.9.3  Available from URL
+http://www.math.ucdavis.edu/~mkoeppe/latte/
+
+Computation of the highest coefficients of weighted Ehrhart quasi-polynomials of rational polyhedra,
+Maple programs accompanying the manuscript
+http://www.math.ucdavis.edu/~latte/topweightedehrhart-maple/
+
+
+How to integrate a polynomial over a simplex,
+Maple programs accompanying the manuscript
+http://www.math.ucdavis.edu/~mkoeppe/art/pisa-integration-experiments/
+
+Software for Exact Integration of Polynomials over Polyhedra
+http://www.math.ucdavis.edu/~latte/theory/SoftwareExactIntegrationPolynomialsPolyhedraOnlineSupplement.pdf
+
+++++++++++++++++
+CORE MAPLE FILES
+++++++++++++++++
+
+knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl: top knapsack Maple code
+top-ehrhart/TopEhrhart_lib.mpl: the SL method for finding top Ehrhart coefficients
+top-ehrhart/Conebyconeapproximations_08_11_2010.mpl: Top (real) weighted Ehrhart coefficients of a simple polytope
+integration/integrationTestsLib.mpl: for integrating polynomials over a simplex
+
+++++++++++++++++++++++++++
+MAPLE FILES IN PISA-PAPERS
+++++++++++++++++++++++++++
+ 
+bedutra@logic:~/pisa-papers$ find  . -name "*.mpl"
+These folders have many one experiment based files
+./integration-programs/velleda-experiments-2008-05-18/* 
+./integration-programs/michele-2008-10-06/*
+./integration-programs/integration-experiments-float/*
+
+./knapsack/moreKnapsacks/knapsackLib2.mpl used for testing the top knapsack vs the SL maple codes
+./knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl: top knapsack maple code
+
+
++++++++++++++++++++++++++++++++++
+MAPLE FILES USED SOMEHOW IN LATTE
++++++++++++++++++++++++++++++++++
+
+bedutra@logic:~/latte/code/latte$ find  . -name "*.mpl"
+./burstmapletest.mpl
+./integration/multiplicity.mpl
+./integration/integrationTestsLib.mpl
+./integration/multiplyTest.mpl
+./integration/compareTimes.mpl
+./integration/decomposeTest.mpl
+./integration/createLinear.mpl
+./integration/benchmark.mpl
+./valuation/test/integrateHyperrectangle.mpl
+./valuation/test/valuationTestsLib.mpl
+./nonlinearOptimization/testBox.mpl
+./nonlinearOptimization/spoly.mpl
+./nonlinearOptimization/weightedCountingBox.mpl
+./top-ehrhart/testingTopEhrhart_lib.mpl
+./top-ehrhart/Conebyconeapproximations_08_11_2010_examples.mpl
+./top-ehrhart/TopEhrhart_lib.mpl
+./top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
+./top-ehrhart/testingTopEhrhart.mpl
+
+++++++++++++++++++++++++++
+HOW THE ABOVE LIST IS USED
+++++++++++++++++++++++++++
+
+Top (real) weighted Ehrhart coefficients of a simple polytope
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
+
+This is the only one used inside of Latte.
+The others in this list are for testing or for generating tables used in papers.
+
+
+
+Testing integrating polynomials or powers of linear forms over a simplex
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) TESTS += integration/testIntegration.sh
+2) |-- integration/decomposeTest.mpl
+3) |   |-- integration/integrationTestsLib.mpl
+4) |   |   |-- check_PROGRAMS += integrate_test
+5) |   |   |-- integration/createLinear.mpl
+
+(2) sets the degree/dimension to test
+(3) compares the maple integration algorithm (which is in (3)) with the c++ one (which is in (4))
+(5) contains the functions to generate random integrands
+
+Testing multiplying two polynomials
++++++++++++++++++++++++++++++++++++
+1) TESTS +=  integration/testMultiply.sh
+2) |-- integration/multiplyTest.mpl
+3) |   |-- check_PROGRAMS += multiply_test
+
+(2) multiplies two maple-style polynomials and compares it with the burst trie code in (3)
+
+Making a table of times for integrating over a simplex
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) integration/benchmark.sh 5 integration/table5.txt
+2) |-- integration/benchmark.mpl
+3) |   |-- integration/createLinear.mpl
+4) |   |-- check_PROGRAMS += integrate_test
+
+(2) has the job of drawing the average time tables for integrating over a simplex. A small modification is needed.
+(4) for running the integration over a simplex code.
+
+
+Making a table of times for integrating a special power of linear form
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) integration/multiplicity.mpl
+2) |-- integration/benchmark.mpl
+3) |   |-- integration/createLinear.mpl
+4) |   |-- check_PROGRAMS += integrate_test
+
+(1) does not seem to be complete. This table never made it into the paper.
+
+Compare times of old array-based and new burst trie structures
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) integration/compareTimes.mpl
+2) |-- check_PROGRAMS += compare
+
+Testing the burst trie code
++++++++++++++++++++++++++++
+burstmapletest.mpl
+
+not used.
+
+
+Testing integrating polynomials, powers of linear forms, and 
+products of powers of linear forms over a box domain.
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) valuation/test/integrateHyperrectangleTest.sh
+2) |-- valuation/test/integrateHyperrectangle.mpl 
+3) |   |-- valuation/test/valuationTestsLib.mpl
+4) |   |   |-- check_PROGRAMS += test-hyperrectangle-integration
+5) |   |   |-- integration/integrationTestsLib.mpl
+6) |   |   |   |--integration/createLinear.mpl
+
+
+
+(1) is a dummy script to call (2).
+(2) changes the degree/dimension of the integrand
+(3) does the integration on the maple side 
+(4) takes the answer from (3) and does the integration on the c++ side
+(5,6) are used because the functions to get the random integrand live there
+
+ 
+
+Average time to find top 3 Ehrhart coefficients of a simplex using SL code
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) top-ehrhart/testingTopEhrhart.mpl
+2) |-- top-ehrhart/testingTopEhrhart_lib.mpl
+3) |   |-- top-ehrhart/TopEhrhart_lib.mpl
+
+(1,2) are main testing drivers
+(3) is the SL method for finding top Ehrhart coefficients
+
+
+
+
+
+

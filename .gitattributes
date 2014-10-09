@@ -292,6 +292,7 @@ code/latte/valuation/test/valuationTestsLib.mpl -text
 code/latte/valuation/testLibraryExamples.cpp -text
 code/latte/valuation/valuation.cpp -text
 code/latte/valuation/valuation.h -text
+code/maple/README -text
 code/maple/m-knapsack.mpl -text
 code/test-suite/test-4ti2.sh -text
 code/test-suite/test-allprimal-exp-maxdet1000-4ti2.sh -text
