@@ -8,30 +8,67 @@ https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl same as kna
 LINKS FROM PAPERS
 +++++++++++++++++
 
-Computation of the Highest Coefficients of Weighted Ehrhart Quasi-polynomials of Rational Polyhedra
-LattE macchiato, version 1.2-mk-0.9.3  Available from URL
-http://www.math.ucdavis.edu/~mkoeppe/latte/
+PAPER: How to integrate a polynomial over a simplex,
+ Maple programs accompanying the manuscript
+ -- lists URL http://www.math.ucdavis.edu/~mkoeppe/art/pisa-integration-experiments/
 
-Computation of the highest coefficients of weighted Ehrhart quasi-polynomials of rational polyhedra,
-Maple programs accompanying the manuscript
-http://www.math.ucdavis.edu/~latte/topweightedehrhart-maple/
+    TODO: Add README to that directory that points to current state of the art 
+          (Maple and C++ implementations in LattE). 
 
+PAPER: Software for Exact Integration of Polynomials over Polyhedra (published in CGTA)
+ -- documents the input format (as in LattE manual).
+ -- only refers to LattE integrale by general latte URL
+ -- http://www.math.ucdavis.edu/~latte/theory/SoftwareExactIntegrationPolynomialsPolyhedraOnlineSupplement.pdf
+    is a PDF of figures and tables (no links).
 
-How to integrate a polynomial over a simplex,
-Maple programs accompanying the manuscript
-http://www.math.ucdavis.edu/~mkoeppe/art/pisa-integration-experiments/
+PAPER: Computation of the Highest Coefficients of Weighted Ehrhart Quasi-polynomials of Rational Polyhedra
+ -- lists LattE macchiato, version 1.2-mk-0.9.3, available from URL http://www.math.ucdavis.edu/~mkoeppe/latte/
+ -- lists Maple programs accompanying the manuscript:
+    http://www.math.ucdavis.edu/~latte/topweightedehrhart-maple/
+ -- this is a directory with a tar file: release-2010-11-05.tar
 
-Software for Exact Integration of Polynomials over Polyhedra
-http://www.math.ucdavis.edu/~latte/theory/SoftwareExactIntegrationPolynomialsPolyhedraOnlineSupplement.pdf
+    TODO: Check relation to code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
+
+    TODO: Add README to that directory that points to LattE (ideally to git subdirectory code/maple/)
+
+PAPER: Intermediate Sums on Polyhedra: Computation and Real Ehrhart Theory
+ -- mentions "our Maple program" but does not offer a link
+
+PAPER: Intermediate Sums on Polyhedra II: Bidegree and Poisson Formula
+ -- mentions "Maple implementation of such algorithms, which work with
+    a symbolic vertex s; the resulting formulas are naturally valid for
+    any real vector" but does not offer a link  
+
+PAPER: Three Ehrhart Polynomials (to be finished)
+
 
 ++++++++++++++++
 CORE MAPLE FILES
 ++++++++++++++++
 
-knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl: top knapsack Maple code
-top-ehrhart/TopEhrhart_lib.mpl: the SL method for finding top Ehrhart coefficients
-top-ehrhart/Conebyconeapproximations_08_11_2010.mpl: Top (real) weighted Ehrhart coefficients of a simple polytope
-integration/integrationTestsLib.mpl: for integrating polynomials over a simplex
+code/maple/m-knapsack.mpl: top knapsack Maple code
+
+ --- Same as $PISA_PAPERS/knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl
+
+ TODO: Double check it's exactly the same as https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl 
+
+code/latte/top-ehrhart/TopEhrhart_lib.mpl: the SL method for finding top Ehrhart coefficients
+
+ --- This is a cleaned up version of an earlier version of Conebyconeapproximations_08_11_2010.mpl
+
+ TODO:  Take some of the documentation from TopEhrhart_lib.mpl and add it to 
+ 	code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl.   Then DELETE.
+
+code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl: Top (real) weighted Ehrhart coefficients of a simple polytope
+
+ TODO:  After above, move to code/maple.  (Update Makefiles.)
+
+
+code/latte/integration/integrationTestsLib.mpl: for integrating polynomials over a simplex
+
+ TODO:  Find out what its relation to http://www.math.ucdavis.edu/~mkoeppe/art/pisa-integration-experiments/ is. 
+
+ TODO:  Move to code/maple
 
 ++++++++++++++++++++++++++
 MAPLE FILES IN PISA-PAPERS
@@ -47,9 +84,9 @@ These folders have many one experiment based files
 ./knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl: top knapsack maple code
 
 
-+++++++++++++++++++++++++++++++++
-MAPLE FILES USED SOMEHOW IN LATTE
-+++++++++++++++++++++++++++++++++
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+MAPLE FILES THAT APPEAR in THE LATTE SVN SOURCE TREE (not all are distributed)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 bedutra@logic:~/latte/code/latte$ find  . -name "*.mpl"
 ./burstmapletest.mpl
