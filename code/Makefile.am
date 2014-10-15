@@ -1,2 +1,2 @@
-SUBDIRS = gnulib latte test-suite 
+SUBDIRS = gnulib latte test-suite maple
 
