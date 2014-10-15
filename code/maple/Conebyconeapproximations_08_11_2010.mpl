@@ -72,20 +72,10 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 #
 # Programs on lists: addition on lists, complement of a list, sublist,etc...
 #
-# Input: K a subset of integers, L a list.The output takes the elements of the list L in the position of the list K
-#
-insert:=proc(K,L) local out;
-    out:=[seq(L[K[i]],i=1..nops(K))];
-end:
 #The output is the Complement  List, within the list [1,..,d]
 ComplementList:=proc(K,d);
     RETURN([seq (`if` (member(i,K)=false, i, op({})),i=1..d)]);
 end:
-#The output is the Complement  List, within the list [a[1],..,a[d]]
-GeneralComplementList:=proc(K,L)local d;d:=nops(L);
-    RETURN([seq (`if` (member(L[i],K)=false, L[i], op({})),i=1..d)]);
-end:
-#GeneralComplementList([2,3],[1,2,3,7]);
 special_lincomb_v:=proc(a,v,n) local out;
     ASSERT(nops(a)=nops(v)," the number of coefficients and vectors do not match");
     if v=[]   then out:=[seq(0,i=1..n)];else
@@ -117,10 +107,6 @@ ortho_basis:=proc(d) local i,v;
     od;
     [seq(v[j],j=1..d)];
 end:
-fracpart:=proc(x);
-    x-floor(x);
-end:
-#fracpart(1);
 
 #####################################
 # Computing Barvinok Signed decomposition into unimodular cones
@@ -434,11 +420,7 @@ fractionalpart:=proc(s) local our,T;
     fi;
     RETURN(our);
 end:
-fractionalpart(3/2);
-fmod:=proc(p,q,t) local u:
-    u:=modp(p,q);##print(u);
-    MOD(u*t,q);
-end:
+
 ourmod:=proc(p,q,t) local our,T;
     if q=1 or modp(p,q)=0 then our:=0;
     elif type(t,integer) then our:=modp(t*p,q);
@@ -664,8 +646,9 @@ S_Ispace_Coneformulaa:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspa
     out1;
 end:
 
+#S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi);
 
-S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi);
+
 # Input: s a vector in Q^d,  or a symbolic variable ; BUT THEN IT HAS TO BE ENTERED AS A LIST OF  d SYMBOLIC VARIABLES
 # s:=[s1,s2,...,sd]; W a cone in Z^d, Ispace a subset of [1,...,d]
 # xi a list of lenght d  of variable (or xi);
@@ -708,7 +691,8 @@ S_Ispace_Coneformulab:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspa
 end:
 
 
-S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi);
+#S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi);
+
 #
 # WE WILL NOT USE THE FOLLOWING  PROCEDURE, AS OUR CHOICE OF REGULAR VECTOR WILL BE DONE WITH A RANDOM PROCEDURE.
 # BUT WE SHOULD WHEN DETERMINING DETERMINISTICALLY A REGULAR VECTOR.
@@ -843,7 +827,7 @@ cone_by_cone_approxi_simplex_formulab:=proc(Simplex,order,xi) local F,W,i,st,d,S
     od:
     F:=eval(subs({TODD=Todd,EXP=exp},F));
 end:
-cone_by_cone_approxi_simplex_formulab([[0,0],[1,0],[0,1]], 1,xi);
+#cone_by_cone_approxi_simplex_formulab([[0,0],[1,0],[0,1]], 1,xi);
 
 # Approximate  functions  S^L  for a  dilated  cone ns+Cone; HERE n is an integer.
 # Input: n a variable,  s a numeric vector in Q^d,
@@ -948,7 +932,7 @@ findEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, to
 	fi;
 	
 	return ehrhartPoly;
-end;
+end:
 
 
 
@@ -1194,7 +1178,7 @@ printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d, useReal
     
 	#finaly, we are done!    
     return ehrhartPoly;
-end;
+end:
 
 
 
@@ -1340,9 +1324,9 @@ end:
 
 #### LATTE INTERFACE FUNCTION:
 # input:
-#	a: any rational number
-#	n: base
-#	return the number between [0,n) that is equal to  a mod n
+#	a: any rational number or symbolic expression.
+#	n: any rational number.
+#	return the number in the half-open interval [0,n) that is equal to  a mod n
 latteMod:=proc(a, n)
 	local r, x;
 	ASSERT(n > 0);
@@ -1357,7 +1341,7 @@ latteMod:=proc(a, n)
 	x:= x - floor(x/n)*n;
 	#end;
 	return x;
-end;
+end:
 
 #### LATTE INTERFACE FUNCTION:
 # input:
@@ -1381,7 +1365,7 @@ latteIntervalMod:=proc(lau, n)
         error "The range [%1, %2] is too large to simplify MOD(%3, %4).  Provide more precision.", l, u, a, n;
     end if;
     return a - lnfloor*n;
-end;
+end:
 
 #### LATTE INTERFACE FUNCTION:
 # Return a rational interval l, u representing the range of numbers
@@ -1391,7 +1375,7 @@ floatToInterval := proc(f)
     ASSERT(type(f, sfloat), cat("not a software float: ", f));
     mantissa, exponent := op(f);
     return (mantissa - 1/2 ) * 10^exponent, (mantissa + 1/2) * 10^exponent;
-end;
+end:
 
 #### LATTE INTERFACE FUNCTION:
 evaluateEhrhart:=proc(epoly, a)
@@ -1419,7 +1403,7 @@ evaluateEhrhart:=proc(epoly, a)
         # `expand' helps in case that a is a symbolic expression
         return expand(eval(subs({N=a, n=a, MOD=latteMod}, epoly)));
     end if;
-end;
+end:
 
 #### LATTE INTERFACE FUNCTION:
 #input:
@@ -1440,7 +1424,7 @@ local Simplex, cone;
 	ASSERT(nops(Simplex) = d+1); #make sure we have a simplex.
 		
 	return Simplex;
-end;
+end:
 
 
 #### LATTE INTERFACE FUNCTION:
@@ -1462,7 +1446,7 @@ SimplexToTangentCones:=proc(Simplex)
 	end;
 	
 	return simpleCones;
-end;
+end:
 
 
 #####################################################################
