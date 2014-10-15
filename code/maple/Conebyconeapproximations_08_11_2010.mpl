@@ -4,6 +4,7 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 # PEDAGOCICAL PROGRAM FOR COMPUTING EXAMPLES FOR ARTICLE:
 # HIGHEST EHRHART  COEFFICIENTS;
 # Version of November 10 -2010 : I have added the Ehrhart polynomial over the reals.
+#  .... with changes for LattE.
 #
 # I PUT SOME EXAMPLES AFTER THE PROCEDURE.
 #
@@ -12,28 +13,23 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 # HERE IS THE LIST OF WHAT THE PROGRAM DOES.
 #
 #
-# I
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
-#
 #
 # PROGRAM FOR  FORMULAE A and b for S^{L^I}(s+c) .
-# This function  is expressed in terms of the "black box functions" TODD and EXP.
-# TODD(s,x) representing the function e^(sx) x/(1-e^x); IF we want to evaluate S_C_k(x) at a regular element reg; the command eval and subs (TODD=Todd, EXP=exp) should be used.
+# This function  is expressed in terms of the "black box functions"
+# TODD, EXP, and either CEIL or MOD.
 #
-# The commands are  EITHER;
+# TODD(s,x) representing the function e^(sx) x/(1-e^x). 
+
+# IF we want to evaluate S_C_k(x) at a regular element reg; the command eval and
+# subs (TODD=Todd, EXP=exp, CEIL=ceil, MOD=latteMod) should be used.
+#
+# The commands are EITHER:
 # S_Ispace_Coneformulaa:=proc(vertex,cone, ISpace,xi);
+#  (which gives expressions using the CEIL function)
+# OR:
 # S_Ispace_Coneformulab:=proc(vertex,cone, ISpace,xi);
+#  (which gives expressions using the fractional part function MOD).
+#
 # Here  vertex should be entered  as a symbolic variable [s_1,s_2,s_3,....,s_d] ;
 #  cone is our cone  with generators v_i; I space is given by  a subset of [1,2,...,d];
 #
@@ -69,6 +65,12 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 #
 #
 #
+
+## FIXME:  Above examples regarding TopEhrhart are outdated; the
+# argument list has changed.  See
+# Conebyconeapproximations_08_11_2010_examples.mpl instead.
+
+
 #
 # Programs on lists: addition on lists, complement of a list, sublist,etc...
 #
@@ -83,6 +85,7 @@ special_lincomb_v:=proc(a,v,n) local out;
     fi;
     out;
 end:
+
 # Miscellanea
 #
 # Input: A :a vector with rational coordinates.
@@ -257,6 +260,7 @@ cone_dec:=proc(G) local seed, i,ok;
     od;
     RETURN(seed[2]);
 end:
+
 #
 # Projections:
 # Input: W is a list of vectors  of V , [v[1],..v[d]], of lenght d.
@@ -288,6 +292,7 @@ projectedvector_with_inverse:=proc(M_inverse, W,Cspace,b) local S,j,v,V;
     od:
     V:=[seq(v[j],j=1..nops(W))];
 end:
+
 # Projected lattice
 # # Input:  W=[v1,v2,.., vd];  a "Cone"  in  R^d;
 # BE CAREFUl: The vectors in W must have integral coordinates.
@@ -376,6 +381,7 @@ projectedvertexinbasislattice:=proc(W,Cspace,ProjLattice,s) local m,P,M,output,i
     F:=convert(LinearSolve(M,Vector(projectedvector(W,Cspace,s))),list);
     output:=F;
 end:
+
 # Input: s a vector in R^d with rational coordinates (or symbolic).
 # W a cone in Z^d;
 # Ispace a subset of [1,2,...,d];
@@ -392,6 +398,7 @@ s_ISpace:=proc(s,W,ISpace) local M,s_in_cone_coord,s_ISpace;
     special_lincomb_v(s_ISpace,[seq(W[ISpace[k]],k=1..nops(ISpace))],nops(W));
 end:
 #s_ISpace([s1,s2],[[1,0],[0,1]],[1]);
+
 # Basic functions
 #
 #
@@ -400,55 +407,117 @@ Todd:=proc(z,t);
     exp(z*t)*t/(1-exp(t));
 end:
 #Todd(z,t);
-# Input: a symbolic variable or a number; Output:This gives the formal ceil function or the ceil of a number.
-# EXAMPLE : ourceil(t)->ceil(t); ourceil(1/2)->1;
-ourceil:=proc(t) local u:
-    if type(t,rational) then
-        ceil(t);
-    else ceil(t);
-    fi;
-end:
 
-#ourceil(t);
-
-# Input: a symbolic variable or a number; Output:This gives the formal  fractionalpart of a function or the fractional part (betwwen 0 and 1) of a number.
-# EXAMPLE : fractionalpart(t)->{t};fractionalpart(3/2);->1/2
+# Input: a symbolic expression or a number; 
+# Output: This gives the formal ceil function, written CEIL(t), or the
+# ceil of a number.
 #
-fractionalpart:=proc(s) local our,T;
-    if  type(s,rational) then our:=s-floor(s);
-    else our:={s};
+# To evaluate after substituting a symbolic t by a number, substitute CEIL by ceil.
+#
+# Examples: see below.
+ourceil:=proc(t) local our:
+    our := ceil(t);
+    if type(our, numeric) then our;
+    else CEIL(t);
     fi;
-    RETURN(our);
 end:
+ASSERT(ourceil(1/2) = 1, "ourceil test #1");
+ASSERT(ourceil(-1/2) = 0, "ourceil test #2");
+ASSERT(ourceil(xyzzy) = CEIL(xyzzy), "ourceil test #3");
+ASSERT(ourceil(sqrt(2)) = 2, "ourceil test #4");
+ASSERT(eval(subs({CEIL=ceil, xyzzy=-1/2}, ourceil(xyzzy))) = 0, "ourceil test #4");
 
-ourmod:=proc(p,q,t) local our,T;
+# Input: a symbolic expression or a number; 
+# Output: This gives the formal fractional part of a function, written
+#         MOD(t, 1), or the fractional part in the half-open interval [0, 1) of a number.
+#
+# To evaluate after substituting a symbolic s by a number, substitute
+# MOD by latteMod.
+#
+# Examples: See below.
+fractionalpart:=proc(s) local our;
+    our := s - floor(s);
+    if type(our, numeric) then our;
+    else MOD(s, 1);
+    fi;
+end:
+ASSERT(fractionalpart(1/3) = 1/3, "fractionalpart test #1");
+ASSERT(fractionalpart(-1/3) = 2/3, "fractionalpart test #2");
+ASSERT(fractionalpart(xyzzy) = MOD(xyzzy, 1), "fractionalpart test #3");
+ASSERT(fractionalpart(sqrt(2)) = MOD(sqrt(2), 1), "fractionalpart test #4"); # Note that we do NOT replace it by sqrt(2) - 1; we want to keep MOD as the primitive expression for readibility.
+ASSERT(eval(subs({MOD=latteMod, xyzzy=-1/3}, fractionalpart(-1/3))) = 2/3, "fractionalpart test #5");
+
+## helper function for nfractionalpart.
+ourmod:=proc(p,q,t) local our;
     if q=1 or modp(p,q)=0 then our:=0;
     elif type(t,integer) then our:=modp(t*p,q);
     else our:=MOD(modp(p,q)*t,q);
     fi;
     RETURN(our);
 end:
-nfractionalpart:=proc(n,p,q) local our;
-    if  type(n,rational) then our:=fractionalpart(p*n/q)
-    else our:=1/q*ourmod(p,q,n);
-    fi;
-    our;
-end:
 
-ourmodreal:=proc(p,q,t) local our,T;
+# Input: n (INTEGER or symbolic expression which stands for an integer), integers p, q.
+# Output: A number or expression equivalent to fractional part of
+#         p*n/q.
+#
+#         ONLY VALID FOR INTEGERS n!
+#
+#         If the output is a symbolic expression, it is stylized in
+#         the same way of our papers "Computation of the Highest
+#         Coefficients..." and "Intermediate Sums On Polyhedra:
+#         Computation And Real Ehrhart Theory".  See examples below.
+#
+# To evaluate after substituting a symbolic n by a number, substitute
+# MOD by latteMod.
+#
+nfractionalpart:=proc(n,p,q)
+    if type(n, numeric) and not type(n, integer) then
+        error "nfractionalpart may only be called with first argument symbolic or integer";
+    fi;
+    1/q*ourmod(p,q,n);
+end:
+ASSERT(nfractionalpart(xyzzy, 13, 5) = 1/5 * MOD(3*xyzzy, 5), "nfractionalpart test #1");
+ASSERT(nfractionalpart(xyzzy, 10, 5) = 0, "nfractionalpart test #2");
+ASSERT(nfractionalpart(1,0,1) = 0, "nfractionalpart test #3");
+ASSERT(eval(subs({MOD=latteMod, xyzzy=2}, nfractionalpart(xyzzy, 13, 5))) = 1/5, "nfractionalpart test #4");
+
+
+## helper function for nfractionalpartreal.
+ourmodreal:=proc(p,q,t) local our;
     if type(t,integer) then our:=modp(t*p,q);fi;
     if t=0 or p=0 then our:=0;
     else our:=MOD(p*t,q);
     fi;
     our;
 end:
+
+# Input: n (number or symbolic expression), integers p, q.
+# Output: A number or expression equivalent to fractional part of
+#         p*n/q.
+#
+#         Valid for all real numbers n. 
+#
+#         If the output is a symbolic expression, it is stylized in
+#         the same way of our papers "Computation of the Highest
+#         Coefficients..." and "Intermediate Sums On Polyhedra:
+#         Computation And Real Ehrhart Theory".  See examples below.
+#
+# To evaluate after substituting a symbolic n by a number, substitute
+# MOD by latteMod.
+#
 nfractionalpartreal:=proc(n,p,q) local our;
     if  type(n,rational) then our:=fractionalpart(p*n/q)
     else our:=1/q*ourmodreal(p,q,n);
     fi;
     our;
 end:
-#nfractionalpartreal(1,0,1);
+ASSERT(nfractionalpartreal(xyzzy, 13, 5) = 1/5 * MOD(13*xyzzy, 5), "nfractionalpartreal test #1");
+ASSERT(nfractionalpartreal(sqrt(2), 1, 1) = MOD(sqrt(2), 1), "nfractionalpartreal test #2");
+ASSERT(nfractionalpartreal(xyzzy, 0, 17) = 0, "nfractionalpartreal test #3");
+ASSERT(nfractionalpartreal(sqrt(3), 0, 11) = 0, "nfractionalpartreal test #4");
+ASSERT(nfractionalpartreal(1,0,1) = 0, "nfractionalpartreal test #5");
+ASSERT(nfractionalpartreal(7/6, 3, 1) = 1/2, "nfractionalpartreal test #6");
+ASSERT(eval(subs({MOD=latteMod, xyzzy=2/13}, nfractionalpartreal(xyzzy, 13, 5))) = 2/5, "nfractionalpartreal test #7");
 
 # Relative volume
 #
@@ -456,7 +525,7 @@ end:
 # Input: W is a Cone in R^d and Cspace is a subset of [1,..,d] of cardinal k;
 # Ouput: a number;
 #
-# Math; the volume of the Box(v[i], i not in Cspace), with respect to the intersected lattice.
+# Math: the volume of the Box(v[i], i not in Cspace), with respect to the intersected lattice.
 # Example: volume_ISpace([[1,1],[0,1]],[1])->1;
 #
 volume_ISpace:=proc(W,ISpace) local P,M,H,MM,output;
@@ -470,6 +539,7 @@ volume_ISpace:=proc(W,ISpace) local P,M,H,MM,output;
     output;
 end:
 #volume_ISpace([[1,0],[0,1]],[1]);
+
 # Necessary  functions to compute S_L
 # Input: s a vector in R^d;  W a "Cone" in R^d; Ispace a subset of [1, 2,...,d];
 # xi a variable (for a list of  d symbolic variables):
@@ -536,7 +606,7 @@ end:
 #functionIb([0,s], [[1,0],[1,2]],[1,2],xi);
 
 # Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expressions (or just z,x), W a cone in R^d.
-# Output: a symbolic expression.
+# Output: a symbolic expression, using the formal function TODD. (substitute by Todd to evaluate).
 # Math: Our cone has generator w1,w2,...,wd.
 # We replace x by <x,w_i> and we compute  the product of Todd(z_i,<x,w_i>);
 # #Example: prod_Todd(z,[[1,0,0],[1,2,1]],x)-> TODD(z[1], x[1])*TODD(z[2], x[1]+2*x[2]+x[3]);
@@ -767,8 +837,8 @@ approx_Cone_formulaa:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
 end:
 #approx_Cone_formulaa([s,1/2], [[1,0],[1,2]],2,xi);
 #approx_Cone_formulaa([s1,s2], [[1,0],[1,2]],1,xi);
-#
-#
+
+
 # Input:  s a vector in Q^d,  or a symbolic variable (but has to be entered as a list of d symbolic variables,
 # W a cone, order  an integer;
 # xi a list of variables.
@@ -798,6 +868,9 @@ approx_Cone_formulab:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
 end:
 #approx_Cone_formulab([1/2,1/2], [[1,0],[1,2]],1,xi);
 #approx_Cone_formulab([s1,s2], [[1,0],[1,2]],1,xi);
+
+
+
 # ADDING THE CONES APPROXIMATIONS FOR A RATIONAL SIMPLEX;
 # Input: A SIMPLEX entered as a list of d+1 rational vectors in R^d; order is an integer, xi is a variable.
 # xi can also be entered as a numeric list of lenght d, but there can be then an error message (division by zero).
@@ -1479,7 +1552,9 @@ dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     output;
 end:
 
-#dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi); # Ouput:-2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
+#dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi); 
+# Ouput:-2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
+
 # Input: n a variable,  Simplex  a numeric rational simplex ; given by a list of  rational  vectors in Q^d
 # order is an integer;
 # xi a list of variables. xi can be numeric but then there can be an error message;
