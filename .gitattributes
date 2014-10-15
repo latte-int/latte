@@ -298,8 +298,6 @@ code/maple/Makefile.am -text
 code/maple/README -text
 code/maple/RealBarvinok-mars-exemples-2014-03-10.mpl -text
 code/maple/RealBarvinok-mars-exemples-2014-03-10.mw -text
-code/maple/cone-by-cone-real-2014-03-05.mpl -text
-code/maple/cone-by-cone-real-2014-03-05.mw -text
 code/maple/cone-by-cone-real-corrected-Nicole-2014-03-09.mpl -text
 code/maple/cone-by-cone-real-corrected-Nicole-2014-03-09.mw -text
 code/maple/cone-by-cone-real-corrected-michele-2014-03-05.mpl -text
