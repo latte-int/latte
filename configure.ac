@@ -2,12 +2,12 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(latte-int, 1.7.1)
+AC_INIT(latte-int, 1.7.2)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
 AM_INIT_AUTOMAKE([gnu])
 AM_MAINTAINER_MODE
-AC_CONFIG_FILES([Makefile EXAMPLES/Makefile doc/Makefile code/Makefile code/latte/Makefile code/latte/normalize/Makefile code/test-suite/Makefile code/lidia-include.h:code/lidia-include.hin])
+AC_CONFIG_FILES([Makefile EXAMPLES/Makefile doc/Makefile code/Makefile code/latte/Makefile code/latte/normalize/Makefile code/test-suite/Makefile code/maple/Makefile code/lidia-include.h:code/lidia-include.hin])
 AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
 AC_CONFIG_FILES([code/latte/integration/testMultiply.sh], [chmod +x code/latte/integration/testMultiply.sh])
 AC_CONFIG_FILES([code/latte/integration/testIntegration.sh], [chmod +x code/latte/integration/testIntegration.sh])
@@ -110,7 +110,7 @@ fi
 AC_CACHE_SAVE
 
 # We need Maple to simplify some rational functions. 
-AC_PATH_PROG(MAPLEBIN, maple, maple)
+AC_PATH_PROGS(MAPLEBIN, [cmaple.exe maple], maple)
 AM_CONDITIONAL(HAVE_MAPLE, test x$MAPLEBIN != xmaple )
 AC_DEFINE_UNQUOTED(MAPLE_PATH, "${MAPLEBIN}", [The path to the Maple program.])
 
