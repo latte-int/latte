@@ -251,9 +251,6 @@ code/latte/testingSLandTopEhrhart/TopEhrhart/TopEhrhart_lib.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhartBirkhoffSimplex.mpl -text
 code/latte/testingSLandTopEhrhart/TopEhrhart/testingTopEhrhart_lib.mpl -text
-code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl -text
-code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mw -text
-code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010_examples.mpl -text
 code/latte/top-ehrhart/README -text
 code/latte/top-ehrhart/TopEhrhart.cpp -text
 code/latte/top-ehrhart/TopEhrhart.h -text
@@ -292,6 +289,9 @@ code/latte/valuation/test/valuationTestsLib.mpl -text
 code/latte/valuation/testLibraryExamples.cpp -text
 code/latte/valuation/valuation.cpp -text
 code/latte/valuation/valuation.h -text
+code/maple/Conebyconeapproximations_08_11_2010.mpl -text
+code/maple/Conebyconeapproximations_08_11_2010.mw -text
+code/maple/Conebyconeapproximations_08_11_2010_examples.mpl -text
 code/maple/Isolatedpointdim2-2014-03-08.mpl -text
 code/maple/Isolatedpointdim2-2014-03-08.mw -text
 code/maple/Makefile.am -text

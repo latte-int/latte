@@ -74,7 +74,9 @@ code/latte/integration/integrationTestsLib.mpl: for integrating polynomials over
 NEW FILES FROM DROPBOX
 ++++++++++++++++++++++
 
- TODO:  Add to tree, compare the versions, clean up
+ DONE:  Add to tree
+
+ TODO:  compare the versions, clean up
 
 
 ++++++++++++++++++++++++++

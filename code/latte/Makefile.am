@@ -385,8 +385,6 @@ noinst_HEADERS +=				\
 	integration/residue.h			\
 	top-ehrhart/TopEhrhart.h
 
-dist_pkgdata_DATA += top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
-
 #if HAVE_PROGRAMMER_EXTRA
 if HAVE_DATABASE
 bin_PROGRAMS += BlockIntegrate
