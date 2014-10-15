@@ -533,7 +533,8 @@ local d,T,i,y,r,out;
     fi;
     out;
 end:
-functionIb([0,s], [[1,0],[1,2]],[1,2],xi);
+#functionIb([0,s], [[1,0],[1,2]],[1,2],xi);
+
 # Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expressions (or just z,x), W a cone in R^d.
 # Output: a symbolic expression.
 # Math: Our cone has generator w1,w2,...,wd.
@@ -551,7 +552,8 @@ prod_Todd:=proc(z,W,xi) local d,E,i,T,y;
     od;
     T;
 end:
-prod_Todd(z,[[1,0,0],[1,2,1]],xi);
+#prod_Todd(z,[[1,0,0],[1,2,1]],xi);
+
 #
 #
 # Input: z =[z1,...,zd], xi=[xi1,xi2,..,xid];  two lists of symbolic expression, or letters (z,xi); W a cone in R^d.
@@ -571,9 +573,8 @@ functionS:=proc(z,W,xi) local P,Q,y,i;
     od;
     [P,Q];
 end:
-functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi);
-#
-#
+#functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi);
+
 # Input: a Cone W;
 #        Cspace a subset of [1..d] of cardinality k;
 #        xi a letter;
@@ -1239,15 +1240,6 @@ end:
 
 
 
-
-
-random_vector:=proc(N,d) local R;
-    R:=rand(N);
-    [seq(R()+1,i=1..d)]:
-end:
-
-
-
 ######################################################################""""
 
 
@@ -1258,6 +1250,7 @@ random_rational_vector:=proc(N,d) local R;
     R:=rand(N);
     [seq(R()/(R()+1),i=1..d)]:
 end:
+
 randomaffinecone:=proc(N,d) local S,i,c;
     c:=[];
     for i from 1 to d do
@@ -1265,7 +1258,8 @@ randomaffinecone:=proc(N,d) local S,i,c;
     od;
     [random_rational_vector(10,d),c];
 end:
-randomaffinecone(10,4);
+#randomaffinecone(10,4);
+
 random_rational_simplex:=proc(N,d) local S,i,c;
     c:=[];
     for i from 1 to d+1 do
