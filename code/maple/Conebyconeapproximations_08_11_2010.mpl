@@ -446,12 +446,15 @@ if check_examples() then
 fi;
 
 #### LATTE INTERFACE FUNCTION:
+#
+# Function to be substituted for the formal MOD function to get results.
+#
 # input:
 #	a: any rational number or symbolic expression.
 #	n: any rational number.
 #	return the number in the half-open interval [0,n) that is equal to  a mod n
 latteMod:=proc(a, n)
-	local r, x;
+	local x;
 	ASSERT(n > 0);
 	x:=a;
 	#while ( x >= n or x < 0) do
@@ -465,6 +468,11 @@ latteMod:=proc(a, n)
 	#end;
 	return x;
 end:
+if check_examples() then
+    ASSERT(latteMod(1/3, 1) = 1/3, "latteMod test #1");
+    ASSERT(latteMod(-1/3, 1) = 2/3, "latteMod test #2");
+    ASSERT(latteMod(sqrt(2), 1) = sqrt(2) - 1, "latteMod test #3"); # Note the difference to what we output in fractionalpart and nfractionalpartreal!  
+fi;
 
 # Input: a symbolic expression or a number; 
 # Output: This gives the formal fractional part of a function, written
@@ -1501,6 +1509,10 @@ floatToInterval := proc(f)
     mantissa, exponent := op(f);
     return (mantissa - 1/2 ) * 10^exponent, (mantissa + 1/2) * 10^exponent;
 end:
+if check_examples() then
+    ASSERT([floatToInterval(2.0)] = [39/20, 41/20], "floatToInterval test #1");
+    ASSERT([floatToInterval(2.00)] = [399/200, 401/200], "floatToInterval test #2");
+fi;
 
 #### LATTE INTERFACE FUNCTION:
 evaluateEhrhart:=proc(epoly, a)
@@ -1529,6 +1541,25 @@ evaluateEhrhart:=proc(epoly, a)
         return expand(eval(subs({N=a, n=a, MOD=latteMod}, epoly)));
     end if;
 end:
+if check_examples() then
+    # example from cube_3 for real dilations; see LattE manual.
+    epoly := 8*N^3+(12-24*MOD(n,1))*N^2+(6-12*MOD(n,1)+359/125245152*(-5521248*MOD(n,1)+2760624)*MOD(n,1)-503/125245152*(-6102432*MOD(n,1)+3051216)*MOD(n,1)-289/62622576*(145728*MOD(n,1)-72864)*MOD(n,1)-359/125245152*(-2623400*MOD(n,1)+1311700)*MOD(n,1)+289/62622576*(-187200*MOD(n,1)+93600)*MOD(n,1)+5/434879*(393984*MOD(n,1)-196992)*MOD(n,1)+1081/125245152*(1120600*MOD(n,1)-560300)*MOD(n,1)-1081/125245152*(-2606688*MOD(n,1)+1303344)*MOD(n,1)+937/125245152*(-2358432*MOD(n,1)+1179216)*MOD(n,1)+503/125245152*(-2042216*MOD(n,1)+1021108)*MOD(n,1)-5/434879*(-435456*MOD(n,1)+217728)*MOD(n,1)-937/125245152*(872344*MOD(n,1)-436172)*MOD(n,1))*N+1-1700/431*MOD(n,1)+1652/431*MOD(n,1)^2-18/434879*(-2018*MOD(n,1)+1009)*MOD(n,1)^2-1/62064*(1728+10368*MOD(n,1)^2-10368*MOD(n,1))*MOD(n,1)+18/434879*(2018*MOD(n,1)-1009)*MOD(n,1)^2+1/62064*(185761/3+371522*MOD(n,1)^2-371522*MOD(n,1))*MOD(n,1)-431/144*(-1081/1009*MOD(n,1)+1081/2018)*MOD(n,1)^2+1/144*(-72/1009*(2018*MOD(n,1)-1009)*MOD(n,1)-1241209/6054-1023265/1009*MOD(n,1)^2+1095913/1009*MOD(n,1))*MOD(n,1)-431/144*(-937/1009*MOD(n,1)+937/2018)*MOD(n,1)^2+1/144*(72/1009*(-2018*MOD(n,1)+1009)*MOD(n,1)+805321/6054+1023265/1009*MOD(n,1)^2-950617/1009*MOD(n,1))*MOD(n,1)+431/2018*(-1081/72*MOD(n,1)+1081/144)*MOD(n,1)^2-1/2018*(-1009/72*(-144*MOD(n,1)+72)*MOD(n,1)+1241209/432+1023265/72*MOD(n,1)^2-1095913/72*MOD(n,1))*MOD(n,1)-431/2018*(937/72*MOD(n,1)-937/144)*MOD(n,1)^2+1/2018*(1009/72*(-144*MOD(n,1)+72)*MOD(n,1)+805321/432+1023265/72*MOD(n,1)^2-950617/72*MOD(n,1))*MOD(n,1)-36/1009*(-1440/431*MOD(n,1)+720/431)*MOD(n,1)^2+1/2018*(-1009/431*(862*MOD(n,1)-431)*MOD(n,1)-2508479/2586-1203842/431*MOD(n,1)^2+1638721/431*MOD(n,1))*MOD(n,1)+1/72*(-72/431*(862*MOD(n,1)-431)*MOD(n,1)-284041/2586-190945/431*MOD(n,1)^2+221977/431*MOD(n,1))*MOD(n,1)+36/1009*(578/431*MOD(n,1)-289/431)*MOD(n,1)^2-1/2018*(1009/431*(862*MOD(n,1)-431)*MOD(n,1)+100795/2586-1203842/431*MOD(n,1)^2+768963/431*MOD(n,1))*MOD(n,1):
+    ASSERT(evaluateEhrhart(epoly, 0) 
+           = 1,
+           "evaluateEhrhart test #1");
+    ASSERT(evaluateEhrhart(epoly, 1)
+           = 27,
+           "evaluateEhrhart test #2");
+    ASSERT(evaluateEhrhart(epoly, 3/2)
+           = 27,
+           "evaluateEhrhart test #3");
+    ASSERT(evaluateEhrhart(epoly, 2-1/1000000)
+           = 27, 
+           "evaluateEhrhart test #4");
+    ASSERT(evaluateEhrhart(epoly, 2)
+           = 125);
+    ## TODO: Add more examples; suppress output in the real case... --mkoeppe
+fi:
 
 #### LATTE INTERFACE FUNCTION:
 #input:
