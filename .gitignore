@@ -253,6 +253,7 @@ code/latte/vertices/.dirstamp
 code/latte/vertices/SunWS_cache
 code/latte/vertices/redcheck
 code/lidia-include.h
+code/maple/Makefile.in
 code/stamp-h.in
 code/stamp-h1
 code/test-suite/.deps

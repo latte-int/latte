@@ -1,0 +1,5 @@
+#!/bin/sh
+## Maple purports to support "exiting with nonzero exit code on error", via
+## command line option "-e 2", or "interface(errorbreak=2)", but it simply DOES NOT WORK.
+## So just grep for "error". --mkoeppe
+@MAPLEBIN@ -q $@ 2>&1 | tee 1>&2 | grep -v -q -i "error"

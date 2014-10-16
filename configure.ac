@@ -11,6 +11,7 @@ AC_CONFIG_FILES([Makefile EXAMPLES/Makefile doc/Makefile code/Makefile code/latt
 AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
 AC_CONFIG_FILES([code/latte/integration/testMultiply.sh], [chmod +x code/latte/integration/testMultiply.sh])
 AC_CONFIG_FILES([code/latte/integration/testIntegration.sh], [chmod +x code/latte/integration/testIntegration.sh])
+AC_CONFIG_FILES([code/maple/test-maple.sh], [chmod +x code/maple/test-maple.sh])
 AC_CONFIG_FILES([code/gnulib/Makefile])
 AC_USE_SYSTEM_EXTENSIONS
 LT_INIT
