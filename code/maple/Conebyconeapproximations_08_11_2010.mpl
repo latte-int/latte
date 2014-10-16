@@ -1,6 +1,11 @@
 with(linalg):with(LinearAlgebra):with(combinat):
 kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 
+## Define this variable to have the code check self-tests (some expensive)
+## (this is for "make check", not for production code; consider errorbreak (-e 2)).
+#
+# CHECK_EXAMPLES := true:
+
 # PEDAGOCICAL PROGRAM FOR COMPUTING EXAMPLES FOR ARTICLE:
 # HIGHEST EHRHART  COEFFICIENTS;
 # Version of November 10 -2010 : I have added the Ehrhart polynomial over the reals.
@@ -70,6 +75,10 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 # argument list has changed.  See
 # Conebyconeapproximations_08_11_2010_examples.mpl instead.
 
+# Find out whether we are to check examples.
+check_examples:=proc():
+    type(CHECK_EXAMPLES, boolean) and CHECK_EXAMPLES;
+end:
 
 #
 # Programs on lists: addition on lists, complement of a list, sublist,etc...
@@ -91,7 +100,7 @@ end:
 # Input: A :a vector with rational coordinates.
 # Output: A vector with integral coordinates:
 # Math: the primitive vector on the half line R^+A;
-# Example: #primitive_vector([0,-1/2])->[0,-1];
+# Example: #
 
 #
 primitive_vector:=proc(A) local d,n,g;
@@ -104,6 +113,11 @@ primitive_vector:=proc(A) local d,n,g;
         [seq(n*A[i],i=1..d)];
     fi;
 end:
+if check_examples() then
+    ASSERT(primitive_vector([0,-1/2]) = [0,-1], "primitive_vector test #1");
+fi;
+
+#
 ortho_basis:=proc(d) local i,v;
     for i from 1 to d do
         v[i]:=[seq(0,j=1..i-1),1,seq(0,j=i+1..d)]
@@ -273,7 +287,6 @@ end:
 # and lin(ISpace) of the vectors in the complement indices. We project a vector b on lin(Cspace)
 # Thus we write b=b_Cspace+b_ISpace;
 # Our output is b_Cspace;
-# Example: projectedvector([[1,0,0],[0,1,2],[0,1,0]],[3],[0,0,1])->[0,-1/2,0];
 projectedvector:=proc(W,Cspace,b) local M,S,j,v,V,m;
     M:=transpose(matrix([seq(W[i],i=1..nops(W))]));
     S:=linsolve(M,b);
@@ -283,6 +296,10 @@ projectedvector:=proc(W,Cspace,b) local M,S,j,v,V,m;
     od:
     V:=[seq(v[j],j=1..nops(W))];
 end:
+if check_examples() then
+    ASSERT(projectedvector([[1,0,0],[0,1,2],[0,1,0]],[3],[0,0,1]) = [0,-1/2,0], "projectedvector test #1");
+end;
+
 ## Same, with precomputed inverse (faster)
 projectedvector_with_inverse:=proc(M_inverse, W,Cspace,b) local S,j,v,V;
     S:=multiply(M_inverse,b);
@@ -308,13 +325,6 @@ end:
 # on lin[Cspace] which is a  subspace of dimension k  of a space of dim d.
 # output: (using ihermite) a basis of k elements (of lenght d) of the projected lattice  on lin(Cspace).
 # We will use over and over again this list H1,H2,..., Hk, so that we will work in Z^k  (embedded in R^d via H1,H2,..Hk).
-# EXAMPLE:
-#projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3])-># [[1, 3, 0], [0, 0, 1]];
-#
-#
-#
-#
-#
 #
 projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_projectedVectors;
     d:=nops(W);
@@ -333,7 +343,10 @@ projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_pr
     List:=[seq(1/m*convert(row(IS,j),list),j=1..k)];
     List;
 end:
-#projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3]);
+if check_examples() then
+    ASSERT(projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3]) = [[1, 3, 0], [0, 0, 1]], "projectedlattice test #1");
+fi;
+
 # Projected cone and projected vertex (expressed in the lattice basis)
 # Input: W is a Cone in Z^d and Cspace is a subset of [1,..,d] of
 #        cardinality k; ProjLattice = projectedlattice(W,Cspace);
@@ -346,7 +359,6 @@ end:
 # Here W is the cone and we are projecting W over lin(Cspace) and
 # expressing it in term of the basis H_1,H_2,...,H_k of
 # projectedlattice(W,Cspace).
-#  Example: projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3])→[[1,0],[0,1]]
 projectedconeinbasislattice:=proc(W,Cspace,ProjLattice) local P,M,output,i,F;
     P:=ProjLattice;
     M:=transpose(matrix([seq(P[i],i=1..nops(P))]));
@@ -357,9 +369,11 @@ projectedconeinbasislattice:=proc(W,Cspace,ProjLattice) local P,M,output,i,F;
     od;
     output;
 end:
+if check_examples() then
+    ASSERT(projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3], projectedlattice([[1,1,0],[0,1,0],[0,0,2]], [1,3])) = [[1,0],[0,1]]);
+fi;
 
-#projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3]);
-#
+
 # #Input: W a Cone in Z^d;
 #         Cspace a subset of [1,2,..d] of cardinal k;
 #         ProjLattice := projectedlattice(W,Cspace);
@@ -371,9 +385,6 @@ end:
 # with respect to the basis of the projected lattice. If the ouput is [a1,a2], this means that our
 # projected vertex is s_Cspace=a1*H1+a2*H2 where H1,H2 is the basis of the projected lattice computed before.
 #
-#
-# Example: projectedvertexinbasislattice([[1,0,0],[0,2,1],[0,1,1]],[1,3],[s1,s2,s3]) ->[s1, 2*s3-s2];;
-#
 projectedvertexinbasislattice:=proc(W,Cspace,ProjLattice,s) local m,P,M,output,i,F;
     P:=ProjLattice;
     if Cspace=[] then RETURN([]);fi;
@@ -381,6 +392,10 @@ projectedvertexinbasislattice:=proc(W,Cspace,ProjLattice,s) local m,P,M,output,i
     F:=convert(LinearSolve(M,Vector(projectedvector(W,Cspace,s))),list);
     output:=F;
 end:
+if check_examples() then
+    ASSERT(projectedvertexinbasislattice([[1,0,0],[0,2,1],[0,1,1]],[1,3],projectedlattice([[1,0,0],[0,2,1],[0,1,1]], [1,3]), [s1,s2,s3]) = [s1, 2*s3-s2], "projectedvertexinbasislattice test #1");
+fi;
+
 
 # Input: s a vector in R^d with rational coordinates (or symbolic).
 # W a cone in Z^d;
@@ -390,14 +405,15 @@ end:
 # Math: We decompose V in lin(CSpace) oplus lin (ISpace), (with CSpace spanned by the v|i] in the complementary indices of Ispace );
 #  and here we write s=s_Cspace+s_(ISpace): Here the output is
 # s_(ISpace);
-# Example: s_ISpace([s1,s2],[[1,0],[0,1]],[1])->[s1,0];
 s_ISpace:=proc(s,W,ISpace) local M,s_in_cone_coord,s_ISpace;
     M:=Matrix([seq(Vector([W[i]]),i=1..nops(W))]);
     s_in_cone_coord:=convert(LinearSolve(M,Vector(s)),list);
     s_ISpace:=[seq(s_in_cone_coord[ISpace[k]],k=1..nops(ISpace))];
     special_lincomb_v(s_ISpace,[seq(W[ISpace[k]],k=1..nops(ISpace))],nops(W));
 end:
-#s_ISpace([s1,s2],[[1,0],[0,1]],[1]);
+if check_examples() then
+    ASSERT(s_ISpace([s1,s2],[[1,0],[0,1]],[1]) = [s1,0], "s_ISpace test #1");
+fi;
 
 # Basic functions
 #
@@ -421,11 +437,13 @@ ourceil:=proc(t) local our:
     else CEIL(t);
     fi;
 end:
-ASSERT(ourceil(1/2) = 1, "ourceil test #1");
-ASSERT(ourceil(-1/2) = 0, "ourceil test #2");
-ASSERT(ourceil(xyzzy) = CEIL(xyzzy), "ourceil test #3");
-ASSERT(ourceil(sqrt(2)) = 2, "ourceil test #4");
-ASSERT(eval(subs({CEIL=ceil, xyzzy=-1/2}, ourceil(xyzzy))) = 0, "ourceil test #4");
+if check_examples() then
+    ASSERT(ourceil(1/2) = 1, "ourceil test #1");
+    ASSERT(ourceil(-1/2) = 0, "ourceil test #2");
+    ASSERT(ourceil(xyzzy) = CEIL(xyzzy), "ourceil test #3");
+    ASSERT(ourceil(sqrt(2)) = 2, "ourceil test #4");
+    ASSERT(eval(subs({CEIL=ceil, xyzzy=-1/2}, ourceil(xyzzy))) = 0, "ourceil test #4");
+fi;
 
 # Input: a symbolic expression or a number; 
 # Output: This gives the formal fractional part of a function, written
@@ -441,11 +459,13 @@ fractionalpart:=proc(s) local our;
     else MOD(s, 1);
     fi;
 end:
-ASSERT(fractionalpart(1/3) = 1/3, "fractionalpart test #1");
-ASSERT(fractionalpart(-1/3) = 2/3, "fractionalpart test #2");
-ASSERT(fractionalpart(xyzzy) = MOD(xyzzy, 1), "fractionalpart test #3");
-ASSERT(fractionalpart(sqrt(2)) = MOD(sqrt(2), 1), "fractionalpart test #4"); # Note that we do NOT replace it by sqrt(2) - 1; we want to keep MOD as the primitive expression for readibility.
-ASSERT(eval(subs({MOD=latteMod, xyzzy=-1/3}, fractionalpart(-1/3))) = 2/3, "fractionalpart test #5");
+if check_examples() then
+    ASSERT(fractionalpart(1/3) = 1/3, "fractionalpart test #1");
+    ASSERT(fractionalpart(-1/3) = 2/3, "fractionalpart test #2");
+    ASSERT(fractionalpart(xyzzy) = MOD(xyzzy, 1), "fractionalpart test #3");
+    ASSERT(fractionalpart(sqrt(2)) = MOD(sqrt(2), 1), "fractionalpart test #4"); # Note that we do NOT replace it by sqrt(2) - 1; we want to keep MOD as the primitive expression for readibility.
+    ASSERT(eval(subs({MOD=latteMod, xyzzy=-1/3}, fractionalpart(-1/3))) = 2/3, "fractionalpart test #5");
+fi;
 
 ## helper function for nfractionalpart.
 ourmod:=proc(p,q,t) local our;
@@ -476,11 +496,12 @@ nfractionalpart:=proc(n,p,q)
     fi;
     1/q*ourmod(p,q,n);
 end:
-ASSERT(nfractionalpart(xyzzy, 13, 5) = 1/5 * MOD(3*xyzzy, 5), "nfractionalpart test #1");
-ASSERT(nfractionalpart(xyzzy, 10, 5) = 0, "nfractionalpart test #2");
-ASSERT(nfractionalpart(1,0,1) = 0, "nfractionalpart test #3");
-ASSERT(eval(subs({MOD=latteMod, xyzzy=2}, nfractionalpart(xyzzy, 13, 5))) = 1/5, "nfractionalpart test #4");
-
+if check_examples() then
+    ASSERT(nfractionalpart(xyzzy, 13, 5) = 1/5 * MOD(3*xyzzy, 5), "nfractionalpart test #1");
+    ASSERT(nfractionalpart(xyzzy, 10, 5) = 0, "nfractionalpart test #2");
+    ASSERT(nfractionalpart(1,0,1) = 0, "nfractionalpart test #3");
+    ASSERT(eval(subs({MOD=latteMod, xyzzy=2}, nfractionalpart(xyzzy, 13, 5))) = 1/5, "nfractionalpart test #4");
+fi;
 
 ## helper function for nfractionalpartreal.
 ourmodreal:=proc(p,q,t) local our;
@@ -511,13 +532,15 @@ nfractionalpartreal:=proc(n,p,q) local our;
     fi;
     our;
 end:
-ASSERT(nfractionalpartreal(xyzzy, 13, 5) = 1/5 * MOD(13*xyzzy, 5), "nfractionalpartreal test #1");
-ASSERT(nfractionalpartreal(sqrt(2), 1, 1) = MOD(sqrt(2), 1), "nfractionalpartreal test #2");
-ASSERT(nfractionalpartreal(xyzzy, 0, 17) = 0, "nfractionalpartreal test #3");
-ASSERT(nfractionalpartreal(sqrt(3), 0, 11) = 0, "nfractionalpartreal test #4");
-ASSERT(nfractionalpartreal(1,0,1) = 0, "nfractionalpartreal test #5");
-ASSERT(nfractionalpartreal(7/6, 3, 1) = 1/2, "nfractionalpartreal test #6");
-ASSERT(eval(subs({MOD=latteMod, xyzzy=2/13}, nfractionalpartreal(xyzzy, 13, 5))) = 2/5, "nfractionalpartreal test #7");
+if check_examples() then
+    ASSERT(nfractionalpartreal(xyzzy, 13, 5) = 1/5 * MOD(13*xyzzy, 5), "nfractionalpartreal test #1");
+    ASSERT(nfractionalpartreal(sqrt(2), 1, 1) = MOD(sqrt(2), 1), "nfractionalpartreal test #2");
+    ASSERT(nfractionalpartreal(xyzzy, 0, 17) = 0, "nfractionalpartreal test #3");
+    ASSERT(nfractionalpartreal(sqrt(3), 0, 11) = 0, "nfractionalpartreal test #4");
+    ASSERT(nfractionalpartreal(1,0,1) = 0, "nfractionalpartreal test #5");
+    ASSERT(nfractionalpartreal(7/6, 3, 1) = 1/2, "nfractionalpartreal test #6");
+    ASSERT(eval(subs({MOD=latteMod, xyzzy=2/13}, nfractionalpartreal(xyzzy, 13, 5))) = 2/5, "nfractionalpartreal test #7");
+fi;
 
 # Relative volume
 #
@@ -526,7 +549,6 @@ ASSERT(eval(subs({MOD=latteMod, xyzzy=2/13}, nfractionalpartreal(xyzzy, 13, 5)))
 # Ouput: a number;
 #
 # Math: the volume of the Box(v[i], i not in Cspace), with respect to the intersected lattice.
-# Example: volume_ISpace([[1,1],[0,1]],[1])->1;
 #
 volume_ISpace:=proc(W,ISpace) local P,M,H,MM,output;
     if ISpace=[] then output:=1;
@@ -538,7 +560,9 @@ volume_ISpace:=proc(W,ISpace) local P,M,H,MM,output;
     fi;
     output;
 end:
-#volume_ISpace([[1,0],[0,1]],[1]);
+if check_examples() then
+    ASSERT(volume_ISpace([[1,0],[0,1]],[1]) = 1, "volume_ISpace test #1");
+fi;
 
 # Necessary  functions to compute S_L
 # Input: s a vector in R^d;  W a "Cone" in R^d; Ispace a subset of [1, 2,...,d];
@@ -549,7 +573,6 @@ end:
 # exp^(xi,x) ; the answer is given as [vol*exp (<q,xi>, product of linear forms]
 # Representing separately the numerator and the denominator.
 # Furthermore, we enter exp as a "black box" EXP(.); later on we might want to replace it.
-# #Example functionIa([0,s], [[1,0],[1,2]],[1,2],xi)-> [2*EXP(s*xi[2]), xi[1]*(xi[1]+2*xi[2])];
 #
 functionIa:=proc(s,W,ISpace,xi)
 local s_on_ISpace,d,T,i,y,r,out;
@@ -569,6 +592,10 @@ local s_on_ISpace,d,T,i,y,r,out;
     fi;
     out;
 end:
+if check_examples() then
+    ASSERT(functionIa([0,s], [[1,0],[1,2]],[1,2],xi) = [2*EXP(s*xi[2]), xi[1]*(xi[1]+2*xi[2])], "functionIa test #1");
+fi;
+
 # For formula b we do not enter theexponential inside.
 
 # Input: s a vector in R^d;  W a "Cone" in R^d; Ispace a subset of [1, 2,...,d];
@@ -579,13 +606,7 @@ end:
 # exp^(xi,x) ; the answer is given as [vol, product of linear forms]
 # Representing separately the numerator and the denominator.
 # Furthermore, we enter exp as a "black box" EXP(); later on we might want to replace it.
-# #Example functionIb([0,s], [[1,0],[1,2]],[1,2],xi)-> [2, xi[1]*(xi[1]+2*xi[2])];
 #
-#
-#
-#
-#
-
 functionIb:=proc(s,W,ISpace,xi)
 local d,T,i,y,r,out;
     d:=nops(W);
@@ -603,13 +624,14 @@ local d,T,i,y,r,out;
     fi;
     out;
 end:
-#functionIb([0,s], [[1,0],[1,2]],[1,2],xi);
+if check_examples() then
+    ASSERT(functionIb([0,s], [[1,0],[1,2]],[1,2],xi) = [2, xi[1]*(xi[1]+2*xi[2])], "functionIb test #1");
+fi;
 
 # Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expressions (or just z,x), W a cone in R^d.
 # Output: a symbolic expression, using the formal function TODD. (substitute by Todd to evaluate).
 # Math: Our cone has generator w1,w2,...,wd.
 # We replace x by <x,w_i> and we compute  the product of Todd(z_i,<x,w_i>);
-# #Example: prod_Todd(z,[[1,0,0],[1,2,1]],x)-> TODD(z[1], x[1])*TODD(z[2], x[1]+2*x[2]+x[3]);
 prod_Todd:=proc(z,W,xi) local d,E,i,T,y;
     d:=nops(W);
 #ASSERT(d = nops(z) and d = nops(xi),
@@ -622,16 +644,15 @@ prod_Todd:=proc(z,W,xi) local d,E,i,T,y;
     od;
     T;
 end:
-#prod_Todd(z,[[1,0,0],[1,2,1]],xi);
+if check_examples() then
+    ASSERT(prod_Todd(z,[[1,0,0],[1,2,1]],x) = TODD(z[1], x[1])*TODD(z[2], x[1]+2*x[2]+x[3]), "prod_Todd test #1");
+fi;
 
 #
 #
 # Input: z =[z1,...,zd], xi=[xi1,xi2,..,xid];  two lists of symbolic expression, or letters (z,xi); W a cone in R^d.
 # Output: a list of two symbolic expressions [P1,Q1].
 # Math: P1 is the   product of Todd(z_i,<xi,w_i>), while Q1 is  the product of the (<xi,wi>)
-# Example: functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi) ->[TODD(z[1],xi[1]) TODD(z[2],xi[1]+xi[2]+2 xi[3]) TODD(z[3],5 xi[2]+xi[3]),xi[1] (xi[1]+xi[2]+2 xi[3]) (5 xi[2]+xi[3])];
-# ;
-#
 #
 functionS:=proc(z,W,xi) local P,Q,y,i;
     P:=prod_Todd(z,W,xi);
@@ -643,7 +664,12 @@ functionS:=proc(z,W,xi) local P,Q,y,i;
     od;
     [P,Q];
 end:
-#functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi);
+if check_examples() then
+    ASSERT(functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi) 
+           = 
+           [TODD(z[1],xi[1]) * TODD(z[2],xi[1]+xi[2]+2*xi[3]) * TODD(z[3],5*xi[2]+xi[3]), xi[1] * (xi[1] + xi[2] + 2*xi[3]) * (5*xi[2]+xi[3])],
+           "functionS test #1");
+fi;
 
 # Input: a Cone W;
 #        Cspace a subset of [1..d] of cardinality k;
@@ -656,7 +682,6 @@ end:
 # We write R^d=lin(Cspace)+lin(ISpace). We computed a basis H1,H2...H_k of the projection of the lattice Z^d in lin(Cspace).
 # Thus the output is the list i <xi,H_i> where H_i are the basis vectors of the projected lattice.
 #
-# Example: changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],xi)->[xi[1], (1/9)*xi[2]+(2/9)*xi[3]];;
 
 changeofcoordinates:=proc(W,Cspace,ProjLattice,xi) local H,newxi,i,d;
     H:=ProjLattice;
@@ -667,14 +692,19 @@ changeofcoordinates:=proc(W,Cspace,ProjLattice,xi) local H,newxi,i,d;
     od;
     newxi;
 end:
-#changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2],...,xi);
+if check_examples() then
+    ASSERT(changeofcoordinates([[1,0,0],[1,1,2],[0,5,1]],[1,2], projectedlattice([[1,0,0],[1,1,2],[0,5,1]], [1,2]) ,xi)
+           =
+           [xi[1], (1/9)*xi[2]+(2/9)*xi[3]],
+           "changeofcoordinates test #1");
+fi;
 
 # THE FUNCTION (S^Ispace) for a cone. Here we sum  the integrals of e^{xi,x}
 #  on slices of the cone
 # parallel to  L generated by w_i with i in Ispace.
+#
 # WE GIVE THE TWO FORMULAE A) and B)
 # THESE ARE  THE MAIN  TECHNICAL PROCEDURES.
-#
 #
 #
 # Input: s a vector in Q^d,  or a symbolic variable ; BUT THEN IT HAS TO BE ENTERED AS A LIST OF  d SYMBOLIC VARIABLES
@@ -686,8 +716,9 @@ end:
 # The subspace $L$ where we integrate is the following face of W: L is the linear span of
 # <w[j]>, with j running of Ispace. (thus Ispace should be "big")
 #
-# Here we take out a function of s, ceil
-# EXAMPLE: S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi)->  -TODD(ceil(s2), (1/2)*xi[1]+xi[2])*EXP((s1-(1/2)*s2)*xi[1])/(((1/2)*xi[1]+xi[2])*xi[1]);
+# Here we take out a function of s, the ceiling, the formal version of
+# which is written CEIL.
+#
 S_Ispace_Coneformulaa:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_prime_Cspace,M,newxi,dimL,g,testrank,newP,
     s_Cspace_in_lattice_coord,news,
     ProjLattice;
@@ -716,9 +747,12 @@ S_Ispace_Coneformulaa:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspa
     fi;
     out1;
 end:
-
-#S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi);
-
+if check_examples() then
+    ASSERT(S_Ispace_Coneformulaa([s1,s2],[[1,0],[1,2]],[1],xi)
+           =
+           -TODD(CEIL(s2), (1/2)*xi[1]+xi[2])*EXP((s1-(1/2)*s2)*xi[1])/(((1/2)*xi[1]+xi[2])*xi[1]),
+           "S_Ispace_Coneformulaa test #1");
+fi;
 
 # Input: s a vector in Q^d,  or a symbolic variable ; BUT THEN IT HAS TO BE ENTERED AS A LIST OF  d SYMBOLIC VARIABLES
 # s:=[s1,s2,...,sd]; W a cone in Z^d, Ispace a subset of [1,...,d]
@@ -729,8 +763,8 @@ end:
 # The subspace $L$ where we integrate is the following face of W: L is the linear span of
 # <w[j]>, with j running of Ispace. (thus Ispace should be "big")
 #
-# Here we take out a function of s, fractionalpart
-# ##EXAMPLE: S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi)-> -EXP(s1*xi[1]+s2*xi[2])*TODD({-s2}, (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1]);
+# Here we take out a function of s, the fractional part, the formal
+# version of which is written as MOD( . , 1).
 #
 S_Ispace_Coneformulab:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,
     s_Cspace_in_lattice_coord,news,
@@ -760,9 +794,12 @@ S_Ispace_Coneformulab:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspa
     fi;
     EXP(add(s[i]*xi[i],i=1..nops(W)))*out1;
 end:
-
-
-#S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi);
+if check_examples() then
+    ASSERT(S_Ispace_Coneformulab([s1,s2],[[1,0],[1,2]],[1],xi)
+           = 
+           -EXP(s1*xi[1]+s2*xi[2])*TODD(MOD(-s2, 1), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1]),
+           "S_Ispace_Coneformulab test #1");
+fi;
 
 #
 # WE WILL NOT USE THE FOLLOWING  PROCEDURE, AS OUR CHOICE OF REGULAR VECTOR WILL BE DONE WITH A RANDOM PROCEDURE.
@@ -773,8 +810,6 @@ end:
 # Output: a list of linear forms.
 #  Math: this is  the forms in denominator of the   function S_Ispace_Cone(W,Cspace,x). In practice we will not use this procedure.
 # This is useful to determine a "deterministic regular vector", but we will plug a random regular vector;
-# EXAMPLE linindenom([[1,0],[1,2]],[1,2])->{x[1], x[2], x[1]+2*x[2]};
-#
 
 linindenom:=proc(W,Cspace) local YY,i,ISpace,g,WW,newx,d,a,z,cc,
     WW_projected,uni_cones,t,cleanYY,r,ProjLattice;
@@ -800,13 +835,13 @@ linindenom:=proc(W,Cspace) local YY,i,ISpace,g,WW,newx,d,a,z,cc,
     od;
     cleanYY;
 end:
+if check_examples() then
+    ASSERT(linindenom([[1,0],[1,2]],[1,2])
+           = {x[1], x[2], x[1]+2*x[2]},
+           "linindenom test #1");
+fi;
 
-
-#linindenom([[1,0],[1,2]],[1,2]);
 #  Approximation for a cone;
-#
-#
-#
 #
 # Input:  s a vector in Q^d,  or a symbolic variable (but has to be entered as a list of d symbolic variables,
 # W a cone, order  an integer;
@@ -835,8 +870,15 @@ approx_Cone_formulaa:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     fi;
     output;
 end:
-#approx_Cone_formulaa([s,1/2], [[1,0],[1,2]],2,xi);
-#approx_Cone_formulaa([s1,s2], [[1,0],[1,2]],1,xi);
+if check_examples() then
+    ASSERT(approx_Cone_formulaa([s,1/2], [[1,0],[1,2]],2,xi)
+           = 
+           TODD(1,xi[2])*TODD(CEIL(s),xi[1])/xi[2]/xi[1]-TODD(CEIL(s),xi[1]+2*xi[2])*TODD(CEIL(2*s-1/2),-xi[2])/(xi[1]+2*xi[2])/xi[2],  ## result has not been checked
+           "approx_Cone_formulaa test #1");
+    ASSERT(approx_Cone_formulaa([s1,s2], [[1,0],[1,2]],1,xi)
+           = -2*EXP(s1*xi[1]+s2*xi[2])/xi[1]/(xi[1]+2*xi[2])+2*TODD(CEIL(2*s1-s2),1/2*xi[1])/xi[1]*EXP(1/2*s2*xi[1]+s2*xi[2])/(-xi[1]-2*xi[2])-TODD(CEIL(s2),1/2*xi[1]+xi[2])/(1/2*xi[1]+xi[2])*EXP((s1-1/2*s2)*xi[1])/xi[1], ## result has not been checked
+           "approx_Cone_formulaa test #2");
+fi;           
 
 
 # Input:  s a vector in Q^d,  or a symbolic variable (but has to be entered as a list of d symbolic variables,
@@ -866,10 +908,16 @@ approx_Cone_formulab:=proc(s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     fi;
     output;
 end:
-#approx_Cone_formulab([1/2,1/2], [[1,0],[1,2]],1,xi);
-#approx_Cone_formulab([s1,s2], [[1,0],[1,2]],1,xi);
-
-
+if check_examples() then
+    ASSERT(approx_Cone_formulab([1/2,1/2], [[1,0],[1,2]],1,xi)
+           = 
+           -2*EXP(1/2*xi[1]+1/2*xi[2])/xi[1]/(xi[1]+2*xi[2])+2*EXP(1/2*xi[1]+1/2*xi[2])*TODD(1/2,1/2*xi[1])/xi[1]/(-xi[1]-2*xi[2])-EXP(1/2*xi[1]+1/2*xi[2])*TODD(1/2,1/2*xi[1]+xi[2])/(1/2*xi[1]+xi[2])/xi[1], ## result has not been checked
+           "approx_Cone_formulab test #1");
+    ASSERT(approx_Cone_formulab([s1,s2], [[1,0],[1,2]],1,xi)
+           = 
+           -2*EXP(s1*xi[1]+s2*xi[2])/xi[1]/(xi[1]+2*xi[2])+2*EXP(s1*xi[1]+s2*xi[2])*TODD(MOD(-2*s1+s2,1),1/2*xi[1])/xi[1]/(-xi[1]-2*xi[2])-EXP(s1*xi[1]+s2*xi[2])*TODD(MOD(-s2,1),1/2*xi[1]+xi[2])/(1/2*xi[1]+xi[2])/xi[1], ## result has not been checked
+            "approx_Cone_formulab test #2");
+fi;
 
 # ADDING THE CONES APPROXIMATIONS FOR A RATIONAL SIMPLEX;
 # Input: A SIMPLEX entered as a list of d+1 rational vectors in R^d; order is an integer, xi is a variable.
@@ -886,8 +934,7 @@ cone_by_cone_approxi_simplex_formulaa:=proc(Simplex,order,xi) local F,W,i,st,d,S
     d:=nops(S)-1;
     for i from 1 to nops(S) do
         W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-#print(datas,S[i],W,P,xi);
-
+        #print(datas,S[i],W,P,xi);
         F:=F+approx_Cone_formulaa(S[i],W,P,xi);
     od:
     F:=eval(subs({TODD=Todd,EXP=exp},F));
@@ -901,7 +948,11 @@ cone_by_cone_approxi_simplex_formulab:=proc(Simplex,order,xi) local F,W,i,st,d,S
     od:
     F:=eval(subs({TODD=Todd,EXP=exp},F));
 end:
-#cone_by_cone_approxi_simplex_formulab([[0,0],[1,0],[0,1]], 1,xi);
+if check_examples() then
+    ASSERT(cone_by_cone_approxi_simplex_formulab([[0,0],[1,0],[0,1]], 1,xi)
+           = -1/xi[2]/xi[1]-1/(1-exp(xi[1]))/xi[2]-1/(1-exp(xi[2]))/xi[1]+exp(xi[1])/xi[1]/(-xi[1]+xi[2])+exp(xi[1])/(1-exp(-xi[1]))/(xi[1]-xi[2])+exp(xi[1])/(1-exp(-xi[1]+xi[2]))/xi[1]+exp(xi[2])/xi[2]/(xi[1]-xi[2])+exp(xi[2])/(1-exp(-xi[2]))/(-xi[1]+xi[2])+exp(xi[2])/(1-exp(xi[1]-xi[2]))/xi[2], ## result has not been checked
+           "cone_by_cone_approxi_simplex_formulab test #1");
+fi;
 
 # Approximate  functions  S^L  for a  dilated  cone ns+Cone; HERE n is an integer.
 # Input: n a variable,  s a numeric vector in Q^d,
@@ -946,12 +997,14 @@ dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Csp
     EXP(add(n*s[i]*xi[i],i=1..nops(W)))*out1;
 end:
 
+if check_examples() then
+    ASSERT(dilatedS_Ispace_Cone(n,[1/2,1/2],[[1,0],[1,2]],[1],xi)
+           =
+           -EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1]),
+           "dilatedS_Ispace_Cone test #1");
+fi;
 
 
-
-
-
-#ApproxEhrhartSimplexgeneric(n,[[0,0],[1/2,0],[0,1/2]], 1,xi);
 random_vector:=proc(N,d) local R;
     R:=rand(N);
     [seq(R()+1,i=1..d)]:
@@ -1310,8 +1363,12 @@ dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_o
     fi;
     EXP(add(n*s[i]*xi[i],i=1..nops(W)))*out1;
 end:
-
-
+if check_examples() then
+    ASSERT(dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi)
+           =
+           -EXP(0)*TODD(0,1/2*xi[1]+xi[2])/(1/2*xi[1]+xi[2])/xi[1], ## result has not been checked
+           "dilatedS_Ispace_Cone_real test #1");
+fi;
 
 ######################################################################""""
 
@@ -1365,6 +1422,7 @@ random_rational_simplex:=proc(N,d) local S,i,c;
 # VERIFICATION OF THE PROPERTY OF APPROXIMATION; BY EVALUATING IN A RANDOM VECTOR;
 #SEEMS CORRECT;
 
+# TODO: add automatic tests. --mkoeppe
 
 checkapprox:=proc(s,Cone,k) local FFa,FFb,Fd,xx,xi;
     xi:=random_vector(100,nops(Cone));print(xi);
@@ -1520,8 +1578,6 @@ end:
 ### Functions I want to delete
 #####################################################################
 
-#dilatedS_Ispace_Cone(n,[1/2,1/2],[[1,0],[1,2]],[1],xi); #Ouput;-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
-
 # Input: n a variable,  s a numeric vector in Q^d,
 # W a cone, order is an integer;
 # xi a list of variables.
@@ -1551,9 +1607,11 @@ dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     fi;
     output;
 end:
-
-#dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi); 
-# Ouput:-2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1])
+if check_examples() then
+    ASSERT(dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi)
+           = -2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1]),
+           "dilated_approxi_cone test #1");
+fi;
 
 # Input: n a variable,  Simplex  a numeric rational simplex ; given by a list of  rational  vectors in Q^d
 # order is an integer;
@@ -1576,6 +1634,11 @@ ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
     
     return F;
 end:
+if check_examples() then
+    ASSERT(ApproxEhrhartSimplexgeneric(n,[[0,0],[1/2,0],[0,1/2]], 1,xi)
+           = -1/xi[2]/xi[1]-1/(1-exp(xi[1]))/xi[2]-1/(1-exp(xi[2]))/xi[1]+exp(1/2*n*xi[1])/xi[1]/(-xi[1]+xi[2])+exp(1/2*n*xi[1])*exp(-1/2*MOD(N,2)*xi[1])/(1-exp(-xi[1]))/(xi[1]-xi[2])+exp(1/2*n*xi[1])/(1-exp(-xi[1]+xi[2]))/xi[1]+exp(1/2*n*xi[2])/xi[2]/(xi[1]-xi[2])+exp(1/2*n*xi[2])*exp(-1/2*MOD(N,2)*xi[2])/(1-exp(-xi[2]))/(-xi[1]+xi[2])+exp(1/2*n*xi[2])/(1-exp(xi[1]-xi[2]))/xi[2], ## result has not been checked
+           "ApproxEhrhartSimplexgeneric test #1");
+fi;
 
 #WARNING; THIS WORKS ONLY IF ell is generic;
 # Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
@@ -1625,7 +1688,6 @@ end:
 #####################################################################
 
 
-#dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi);
 dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     output:=0;
     d:=nops(W);
