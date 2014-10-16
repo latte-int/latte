@@ -445,6 +445,27 @@ if check_examples() then
     ASSERT(eval(subs({CEIL=ceil, xyzzy=-1/2}, ourceil(xyzzy))) = 0, "ourceil test #4");
 fi;
 
+#### LATTE INTERFACE FUNCTION:
+# input:
+#	a: any rational number or symbolic expression.
+#	n: any rational number.
+#	return the number in the half-open interval [0,n) that is equal to  a mod n
+latteMod:=proc(a, n)
+	local r, x;
+	ASSERT(n > 0);
+	x:=a;
+	#while ( x >= n or x < 0) do
+    ### I don't understand what the intention of this while loop
+    ### was.  It fails in the case that `a' is symbolic, such as
+    ### sqrt(2) with the error message "cannot determine if this
+    ### expression is true or false". 
+    ### On the other hand, `floor' works fine for symbolics, if `Digits'
+    ### is large enough. --mkoeppe
+	x:= x - floor(x/n)*n;
+	#end;
+	return x;
+end:
+
 # Input: a symbolic expression or a number; 
 # Output: This gives the formal fractional part of a function, written
 #         MOD(t, 1), or the fractional part in the half-open interval [0, 1) of a number.
@@ -1446,27 +1467,6 @@ end:
 #####################################################################
 ### LATTE INTERFACE HELPER FUNCTIONS:
 ####################################################################
-
-#### LATTE INTERFACE FUNCTION:
-# input:
-#	a: any rational number or symbolic expression.
-#	n: any rational number.
-#	return the number in the half-open interval [0,n) that is equal to  a mod n
-latteMod:=proc(a, n)
-	local r, x;
-	ASSERT(n > 0);
-	x:=a;
-	#while ( x >= n or x < 0) do
-    ### I don't understand what the intention of this while loop
-    ### was.  It fails in the case that `a' is symbolic, such as
-    ### sqrt(2) with the error message "cannot determine if this
-    ### expression is true or false". 
-    ### On the other hand, `floor' works fine for symbolics, if `Digits'
-    ### is large enough. --mkoeppe
-	x:= x - floor(x/n)*n;
-	#end;
-	return x;
-end:
 
 #### LATTE INTERFACE FUNCTION:
 # input:
