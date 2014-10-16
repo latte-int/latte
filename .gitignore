@@ -299,6 +299,7 @@ doc/manual.synctex.gz
 /install-sh
 /link-warning.h
 /ltmain.sh
+m4/Makefile.in
 m4/gnulib/.deps
 m4/gnulib/.dirstamp
 m4/libtool.m4
