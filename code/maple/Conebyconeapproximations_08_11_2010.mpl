@@ -2,14 +2,19 @@ with(linalg):with(LinearAlgebra):with(combinat):
 kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 
 ## Define this variable to have the code check self-tests (some expensive)
-## (this is for "make check", not for production code; consider errorbreak (-e 2)).
+## (this is for "make check", not for production code).
 #
 # CHECK_EXAMPLES := true:
 
 # PEDAGOCICAL PROGRAM FOR COMPUTING EXAMPLES FOR ARTICLE:
 # HIGHEST EHRHART  COEFFICIENTS;
-# Version of November 10 -2010 : I have added the Ehrhart polynomial over the reals.
-#  .... with changes for LattE.
+#
+# Derived from the version of November 10 -2010, which added the Ehrhart quasi-polynomial over the reals.
+# ... with changes for LattE.
+# ... with automatic testing of examples.
+# ... includes test cases for "fractionalpart" correctness from
+#     cone-by-cone-real-corrected-Nicole-2014-03-09.mpl 
+#     and cone-by-cone-real-corrected-michele-2014-03-09.mpl
 #
 # I PUT SOME EXAMPLES AFTER THE PROCEDURE.
 #
@@ -1775,3 +1780,60 @@ CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d;
 end:
 
 
+################################################################
+# Another set of interface functions for computing the conebycone
+# Ehrhart quasipolynomial. 
+#
+# This comes from cone-by-cone-real-corrected-Nicole-2014-03-09.mpl
+#
+# TODO: What does this do what the other functions don't?
+
+cone_by_cone:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn;
+    d:=nops(Simplex)-1;CCn:=0;
+    #order:=M+nops(Simplex)-codim; 
+    reg:=random_vector(5000,d); 
+    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+    CCt:=coeff(series(AA,t=0,M+d+2),t,M); 
+    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+    CCn:=add(coeff(CCeps,n,m)*t^(m),m=0..M+d);
+    subs({N=n},CCn);
+end:
+
+cone_by_cone_real:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn,newCCn;
+    d:=nops(Simplex)-1;CCn:=0;
+    reg:=random_vector(5000,d); 
+    xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
+    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+    CCt:=coeff(series(AA,t=0,M+d+2),t,M); 
+    CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
+    CCn:=add(coeff(CCeps,n,m)*t^(m),m=0..M+d);
+    newCCn:=subs({N=n},CCn); newCCn:=subs(n=t,newCCn);
+    eval(subs(MOD=latteMod,newCCn));
+end:
+
+if check_examples() then
+    ### Tests from cone-by-cone-real-corrected-Nicole-2014-03-09.mpl
+    testfrac := [[2, 1, 4], [2, 8, 7], [4, 3, 2], [2, 8, 2]]:
+    testdim2 := [[1, 1], [1, 0], [0, 1]]:
+    testdim4 := [[6,9,5,1],[3,5,4,0],[7,4,9,1],[1,3,7,2],[8,9,1,7]]:
+    bonfrac := proc(x) latteMod(x, 1) end: # defined only! for testing.
+    ASSERT(cone_by_cone_real(testfrac,[1,5,7],0,0)
+           = 35/3*t^3, 
+           "cone_by_cone_real test #1");
+    ASSERT(cone_by_cone_real(testfrac,[1,5,7],0,1)
+           = -1/7350*bonfrac(-40*t)-35/48*bonfrac(-2*t)-1/7350*bonfrac(45*t)-5/2352*bonfrac(26*t)+1/2450*bonfrac(-40*t)^2-1/3675*bonfrac(-40*t)^3+35/16*bonfrac(-2*t)^2-35/24*bonfrac(-2*t)^3+1/2450*bonfrac(45*t)^2-1/3675*bonfrac(45*t)^3+5/784*bonfrac(26*t)^2-5/1176*bonfrac(26*t)^3+(-1/35*bonfrac(-40*t)+1/35*bonfrac(-40*t)^2-35/4*bonfrac(-2*t)+35/4*bonfrac(-2*t)^2+1/35*bonfrac(45*t)^2-1/35*bonfrac(45*t)-5/28*bonfrac(26*t)+5/28*bonfrac(26*t)^2+629/420)*t+(11-bonfrac(-40*t)-35/2*bonfrac(-2*t)-bonfrac(45*t)-5/2*bonfrac(26*t))*t^2+35/3*t^3,
+           "cone_by_cone_real test #2");
+    #conetestfrac2:=cone_by_cone_real(testfrac,[1,5,7],0,2):
+    #conetestfrac3:=cone_by_cone_real(testfrac,[1,5,7],0,3);
+    ASSERT(cone_by_cone_real(testdim2,[1,5],0,2)
+           = 1-(-bonfrac(t)+1/2)*bonfrac(t)-2*(-bonfrac(-t)+1/2)*bonfrac(t)-3/2*bonfrac(-t)-3/2*bonfrac(t)+bonfrac(t)^2+1/2*bonfrac(-t)^2+(-2*bonfrac(t)-bonfrac(-t)+3/2)*t+1/2*t^2,
+           "cone_by_cone_real test #3");
+    ### Tests from cone-by-cone-real-corrected-michele-2014-03-09.mpl
+    testfrac := [[1, 1, 1], [4, 2, 1], [1, 1, 2], [2, 2, 2]];
+    conetestfrac3:=cone_by_cone_real(testfrac,[1,5,7],0,3):
+    ASSERT([seq(eval(subs(t=i/24, conetestfrac3)),i=0..50)] 
+           = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 5, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 11, 5, 5],
+           "cone_by_cone_real test #4");
+    ### TODO: Tests from cone-by-cone-real-corrected-michele-2014-03-05.mpl
+end:
