@@ -1005,7 +1005,11 @@ some \texttt{floor} expressions unevaluated.
 > Digits := 8: evaluateEhrhart(epoly, 707*sqrt(2));
                                  7988005999
 \end{verbatim}
-Let's switch to another example.  The Ehrhart quasi-polynomial, valid for real
+Let's switch to another example.  
+\begin{verbatim}
+> read "random-simplex-real-incremental.txt":
+\end{verbatim}
+The Ehrhart quasi-polynomial, valid for real
 dilations, has a complicated structure with many jump discontinuities.  Any
 evaluation at an integer or rational number will be exact.
 \begin{verbatim}
@@ -1020,7 +1024,6 @@ really high precision; but even then, we cannot evaluate it exactly because we
 only computed the top 3 coefficients of the quasi-polynomial.  So the best we
 can do is a floating-point approximation.
 \begin{verbatim}
-> read "random-simplex-real-incremental.txt":
 > evaluateEhrhart(epoly, 1.23);
 # The precision of the given floating point dilation factor is
 # not large enough to allow exact computation.  Resorting to 
