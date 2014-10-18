@@ -1,9 +1,26 @@
 restart:with(linalg):with(LinearAlgebra):with(combinat):
 kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 
-# procedures principalesfullbarvinok(t,[[0,0],[0,1],[1,1]],2,[1,1],0);
+## Define this variable to have the code check self-tests (some expensive)
+## (this is for "make check", not for production code).
+#
+# CHECK_EXAMPLES := true:
+
+### PROGRAM ACCOMPANYING THE ARTICLE "THREE EHRHART POLYNOMIALS".
+
+# procedures principales:
+#
+# fullbarvinok(t,[[0,0],[0,1],[1,1]],2,[1,1],0);
 # FBbonfrac(t,[[0,0],[0,1],[1,1]],2,[1,1],0);
+#
 # SLsimplex(t,[[-1/3, 0, 0], [0, 1, 0], [0, 0, 1],[0, 0, 0]],[[1,1,1]],[x,y,z],0); 
+# SLbonfrac
+
+# Find out whether we are to check examples.
+check_examples:=proc():
+    type(CHECK_EXAMPLES, boolean) and CHECK_EXAMPLES;
+end:
+
 # Programs on lists: addition on lists, complement of a list, sublist,etc...
 # 
 # 
@@ -20,13 +37,14 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 
 # 
 # 
-special_lincomb_v:=proc(a,v,n) local out;
+special_lincomb_v:=proc(a,v,n) local out; #SHARED
 ASSERT(nops(a)=nops(v)," the number of coefficients and vectors do not match");
 if v=[]   then out:=[seq(0,i=1..n)];else
 out:=[seq(add(a[i]*v[i][j],i=1..nops(v)),j=1..nops(v[1]))];
 fi;out;
 end:
 special_lincomb_v([1],[[1,0]],2);
+
 # Input: a a list of lenght n, , v a list of n vectors, n an integer:
 # Output: a list of lenght n;
 # 
@@ -37,33 +55,34 @@ special_lincomb_v([1],[[1,0]],2);
 # but we restrict where the list v is not empty.
 # 
 # 
-lincomb_v:=proc(a,v)
+lincomb_v:=proc(a,v) #NEW
 ASSERT(nops(a)=nops(v) and nops(v)>=1," the number of coefficients and vectors do not match");
 
 [seq(add(a[i]*v[i][j],i=1..nops(v)),j=1..nops(v[1]))];
 
 end:
 #lincomb_v([],[],3);
+
 # Input: two integers N,d:
 # Output: a vector of lenght d:
-
+#
 # Math: the vector is randomly chosen with coordiantes between 1 and N:
 # 
 # 
 #  
-random_vector:=proc(N,d) local R;
+random_vector:=proc(N,d) local R; #SHARED
 R:=rand(N);
 [seq(R()+1,i=1..d)]:
 end:
 
 # Input: an integer N and sigma a list of vectors in R^d:
 # Output: a vector of lenght d:
-
+#
 # Math: the vector is  sum_i x_i sigma_i, where the x_i are randomly chosen with coordiantes between 1 and N:
 # Example:cone_random_vector(10,[[sigma[1],sigma[2]],[nu[1],nu[2]]])->`invalid character in short integer encoding 17 `;
 # 
 # 
-cone_random_vector:=proc(N,sigma) local R,d,randcoeff;
+cone_random_vector:=proc(N,sigma) local R,d,randcoeff; #NEW
 R:=rand(N);
 d:=nops(sigma[1]);
 randcoeff:=random_vector(N,nops(sigma));
@@ -74,18 +93,17 @@ end:
 # Input: K a subset of integers, L a list.The output takes the elements of the list L in the position of the list K
 # 
 # 
-insert:=proc(K,L) local out;
-out:=[seq(L[K[i]],i=1..nops(K))];
-end:
 #The output is the Complement  List, within the list [1,..,d]
-ComplementList:=proc(K,d);
+ComplementList:=proc(K,d); #SHARED
 RETURN([seq (`if` (member(i,K)=false, i, op({})),i=1..d)]);
 end:
+
 #The output is the Complement  List, within the list [a[1],..,a[d]]
-GeneralComplementList:=proc(K,L)local d;d:=nops(L);
+GeneralComplementList:=proc(K,L)local d;d:=nops(L); #NEW
 RETURN([seq (`if` (member(L[i],K)=false, L[i], op({})),i=1..d)]);
 end:
 #GeneralComplementList([2,3],[1,2,3,7]);
+
 # Miscellanea
 # 
 # Input: A :a vector with rational coordinates.
@@ -94,17 +112,19 @@ end:
 # Example: #primitive_vector([0,-1/2])->[0,-1];
 
 # 
-primitive_vector:=proc(A) local d,n,g;
+primitive_vector:=proc(A) local d,n,g; #SHARED
 d:=nops(A);
 n:=ilcm(seq(denom(A[i]),i=1..d));
 g:=igcd(seq(n*A[i],i=1..d));if g<>0 then
 [seq(n*A[i]/g,i=1..d)];else [seq(n*A[i],i=1..d)];fi;
 end:
-ortho_basis:=proc(d) local i,v;
+
+ortho_basis:=proc(d) local i,v; #SHARED
 for i from 1 to d do
 v[i]:=[seq(0,j=1..i-1),1,seq(0,j=i+1..d)]
 od;[seq(v[j],j=1..d)];
 end:
+
 #  Signed decomposition into unimodular cones
 # A "simplicial cone" is a list of  d linearly independent  vectors in Z^d, sometimes assumed primitive. 
 # 
@@ -112,7 +132,7 @@ end:
 # 
 # # Input:   A is a list of d linearly independent vectors.
 # # Output: sho is a vector of dimension d.
-short_vector:=proc(A) local n,base,i,sho;  
+short_vector:=proc(A) local n,base,i,sho;  #SHARED
 n:=nops(A);
 base:=IntegerRelations[LLL](A);
 sho:=base[1];
@@ -130,7 +150,7 @@ end:
 # #  Input : vector V of dimension d.
 # # Output:  L=[ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
 # #               according to the signs of the entries of the vector V.
-sign_entries_vector:=proc(V) local d,i,Lplus,Lminus,Lzero; 
+sign_entries_vector:=proc(V) local d,i,Lplus,Lminus,Lzero; #SHARED
        d:=nops(V); Lplus:=[]; Lminus:=[];Lzero:=[];
 
        for i from 1 to d do 
@@ -148,7 +168,7 @@ end:
 # #              V is a vector in Z^d. 
 # #               L=[ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
 # #               according to the signs of the entries of the vector V. in the basis G. 
-good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L;
+good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L; #SHARED
           n:=nops(G);  
           A:=Transpose(Matrix(G));      
           Ainverse:=MatrixInverse(A);
@@ -171,37 +191,37 @@ end:
 # #               detG is an integer,  
 # #               G  is a  list of  d linearly independant primitive  vectors in Z^d. 
 
-signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,kzero,i,j, C,M, detC, Csigned ; 
-Nonuni:=[]; Uni:=[];
-Lplus:=L[1]; Lminus:=L[2]; Lzero:=L[3];
- kplus:=nops(Lplus); kminus:=nops(Lminus); kzero:=nops(Lzero);
-if kplus>0 then
-    for i from 1 to kplus do
-        C:=[seq(G[Lplus[j]],j=1..i-1),seq(-G[Lplus[j]],j=i+1..kplus),v,seq(G[Lminus[j]],j=1..kminus),seq(G[Lzero[j]],j=1..kzero)];
+signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,kzero,i,j, C,M, detC, Csigned ; #SHARED
+    Nonuni:=[]; Uni:=[];
+    Lplus:=L[1]; Lminus:=L[2]; Lzero:=L[3];
+     kplus:=nops(Lplus); kminus:=nops(Lminus); kzero:=nops(Lzero);
+    if kplus>0 then
+        for i from 1 to kplus do
+            C:=[seq(G[Lplus[j]],j=1..i-1),seq(-G[Lplus[j]],j=i+1..kplus),v,seq(G[Lminus[j]],j=1..kminus),seq(G[Lzero[j]],j=1..kzero)];
 
-        detC := Determinant(Matrix(C));        
-        Csigned:=[eps*(-1)^(i+kplus),detC,C];       
- 
-       if abs(detC)>1 then
-          Nonuni:=[op(Nonuni),Csigned] else Uni:=[op(Uni),Csigned];
-        fi;
-   od;
- fi;
+            detC := Determinant(Matrix(C));        
+            Csigned:=[eps*(-1)^(i+kplus),detC,C];       
 
-if kminus>0 then
-   for i from 1 to kminus do
-         C:=[seq(G[Lplus[j]],j=1..kplus),-v,seq(-G[Lminus[j]],j=1..i-1),seq(G[Lminus[j]],j=i+1..kminus),seq(G[Lzero[j]],j=1..kzero)]; 
-        
-         detC := Determinant(Matrix(C));
-         Csigned:=[eps*(-1)^(i+1),detC,C];      
-       
-         if abs(detC)>1 then
-            Nonuni:=[op(Nonuni),Csigned] else Uni:=[op(Uni), Csigned];
-         fi;
-    od;
- end if;
- [Nonuni,Uni];
- end:
+           if abs(detC)>1 then
+              Nonuni:=[op(Nonuni),Csigned] else Uni:=[op(Uni),Csigned];
+            fi;
+       od;
+     fi;
+
+    if kminus>0 then
+       for i from 1 to kminus do
+             C:=[seq(G[Lplus[j]],j=1..kplus),-v,seq(-G[Lminus[j]],j=1..i-1),seq(G[Lminus[j]],j=i+1..kminus),seq(G[Lzero[j]],j=1..kzero)]; 
+
+             detC := Determinant(Matrix(C));
+             Csigned:=[eps*(-1)^(i+1),detC,C];      
+
+             if abs(detC)>1 then
+                Nonuni:=[op(Nonuni),Csigned] else Uni:=[op(Uni), Csigned];
+             fi;
+        od;
+     end if;
+     [Nonuni,Uni];
+     end:
 # 
 # 
 # # good_cone_dec(eps,G)
@@ -210,7 +230,7 @@ if kminus>0 then
 # #
 # #  Output:  two lists [Nonuni,Uni] as in procedure signed_decomp: 
 # #
-good_cone_dec:=proc(eps,G) local n,A,R,Output;
+good_cone_dec:=proc(eps,G) local n,A,R,Output; #SHARED
 n:=nops(G);  A:=Matrix([seq(G[i],i=1..n)]);   
    if abs(Determinant(A))=1 then  Output:=[[],[[eps,Determinant(A),G]]];
      else R:=good_vector(G);
@@ -223,7 +243,7 @@ end:
 # # Output: [Newnonuni,Newuni] as in procedure signed_decomp
 # 
 # 
-more_decomposition_in_cones:=proc(cones) local i,Newuni,Newnonuni,newcones:
+more_decomposition_in_cones:=proc(cones) local i,Newuni,Newnonuni,newcones: #SHARED
 Newnonuni:=[]; 
 Newuni:=cones[2];
    for i from 1 to nops(cones[1]) do
@@ -233,8 +253,8 @@ Newuni:=cones[2];
  od;
 [Newnonuni,Newuni];
 end:  
-          
-cone_dec([[1,2],[1,0]]);
+#cone_dec([[1,2],[1,0]]);
+
 # # cone_dec(G)
 # #
 # # Input:  G is a "simplicial cone"
@@ -243,7 +263,7 @@ cone_dec([[1,2],[1,0]]);
 # #               detG is an integer ( hopefully 1 or -1),  
 # #               G  is a  "simplicial cone", (hopefully unimodular)
 # #
-cone_dec:=proc(G) local seed, i,ok;
+cone_dec:=proc(G) local seed, i,ok; #SHARED
 if G=[] then RETURN([[1,1,[]]]);fi:
 seed:=good_cone_dec(1,G);
  ok:=0;
@@ -255,10 +275,11 @@ if seed[1]=[] then
 od;
     RETURN(seed[2]);
 end:
+
 # Input: A signed list of cones;
 # Output: a set of vectors;
 
-collectgene:=proc(signedcones) local i,j,gene,newgen1,newgen2,gene1,gene2,cc;
+collectgene:=proc(signedcones) local i,j,gene,newgen1,newgen2,gene1,gene2,cc; # NEW, UNUSED
 gene:={}; 
 for i from 1 to nops(signedcones) do 
 cc:=signedcones[i][2];
@@ -278,20 +299,21 @@ end:
 # 
 # 
 # 
-#  Input:  L a subspace: list of  s v ectors in R^d; The codimension 
+#  Input:  L a subspace: list of  s vectors in R^d; The codimension 
 # Output: a list  of
 #   k=d-s vectors   in R^d ;
 # Math: A basis  H_1,H_2,...,H_k of the space L^{perp};
 
-# Example:basis_L_perp([[1,1,1]])->[[-1, 0, 1], [-1, 1, 0]];
-
-
-
-basis_L_perp:=proc(L) local d,s,ML,VV;
-d:=nops(L[1]); s:=nops(L);
-ML:=Matrix(L): VV:=NullSpace(ML);
-[seq(convert(VV[i],list),i=1..d-s)];
+basis_L_perp:=proc(L) local d,s,ML,VV; #NEW
+    d:=nops(L[1]); s:=nops(L);
+    ML:=Matrix(L): VV:=NullSpace(ML);
+    [seq(convert(VV[i],list),i=1..d-s)];
 end:
+if check_examples() then
+    ASSERT(basis_L_perp([[1,1,1]])
+           = [[-1, 0, 1], [-1, 1, 0]],
+           "basis_L_perp test #1");
+fi:
 
 # Input: W a list of vectors in R^d;
 # L a list of vectors  in R^d of lenght s;
@@ -304,31 +326,32 @@ end:
 # 
 # 
 
-Oursmallmatrix:=proc(W,L) local s,d,HH,i,C,M,wbars,j,VV,cW;
-d:=nops(W[1]); s:=nops(L);
-C:=[];
-HH:=basis_L_perp(L);
-for i from 1 to d-s do 
-C:=[op(C),[seq(add(HH[i][k]*HH[j][k],k=1..d),j=1..(d-s))]];
-od;
-M:=Transpose(Matrix(C));
-wbars:=[];
-for j from 1 to nops(W) do
-VV:=Vector([seq(add(W[j][k]*HH[i][k],k=1..d),i=1..(d-s))]);
-cW:=convert(LinearSolve(M,VV),list); 
-wbars:=[op(wbars),cW];
-od;
-wbars;
+Oursmallmatrix:=proc(W,L) local s,d,HH,i,C,M,wbars,j,VV,cW; #NEW
+    d:=nops(W[1]); s:=nops(L);
+    C:=[];
+    HH:=basis_L_perp(L);
+    for i from 1 to d-s do 
+    C:=[op(C),[seq(add(HH[i][k]*HH[j][k],k=1..d),j=1..(d-s))]];
+    od;
+    M:=Transpose(Matrix(C));
+    wbars:=[];
+    for j from 1 to nops(W) do
+    VV:=Vector([seq(add(W[j][k]*HH[i][k],k=1..d),i=1..(d-s))]);
+    cW:=convert(LinearSolve(M,VV),list); 
+    wbars:=[op(wbars),cW];
+    od;
+    wbars;
 end:
+if check_examples() then
+    ASSERT(Oursmallmatrix([[1,0,0],[0,1,0],[0,0,1]],[[1,1,1]])
+           #= [[-1/3, -1/3], [2/3, -1/3], [-1/3, 2/3]],
+           = [[-1/3, -1/3], [-1/3, 2/3], [2/3, -1/3]],
+           "Oursmallmatrix test #1");
+    # compare with basis_L_perp([[1,1,1]]);
+fi:
 
-
-
- 
-Oursmallmatrix([[1,0,0],[0,1,0],[0,0,1]],[[1,1,1]]);basis_L_perp([[1,1,1]]);
-
-
-#  Input: a list of N vectors in R^k;
-# ouput; a list . Each element of the list is  [B,B_c,D,edges].
+# Input: a list of N vectors in R^k;
+# output; a list. Each element of the list is  [B,B_c,D,edges].
 # Here B is a subset of [1,...,N]; B_c is the complement subset in [1,...,N];
 # and D is a Matrix, edges is a list of vectors in R^k.
 # Maths; 
@@ -339,40 +362,36 @@ Oursmallmatrix([[1,0,0],[0,1,0],[0,0,1]],[[1,1,1]]);basis_L_perp([[1,1,1]]);
 # # This procedure should be done using reverse search.
 # 
 # 
-# AllDictionaries([[1,0],[1,0],[1,1]])-> `invalid character in short integer encoding 212 Ô`;;
-# 
-# 
-# 
-# 
-# 
-#  
 AllDictionaries:=proc(Listvectors) local LL, N,k,K,h,MM,Kc,bandc,Matrix2,Dict,edges,newbc;
-LL:=Listvectors;
-N:=nops(LL); 
-k:=nops(LL[1]);
-K:=choose(N,k); 
-bandc:=[];
-for h from 1 to nops(K) do
-MM:=Matrix([seq(LL[K[h][i]],i=1..k)]);
-if Rank(MM)=k then 
-Kc:=ComplementList(K[h],N); 
-Matrix2:=Transpose(Matrix([seq(LL[Kc[i]],i=1..nops(Kc))]));
-Dict:=MatrixMatrixMultiply(MatrixInverse(Transpose(MM)),Matrix2);
-edges:=[seq(convert(Column(Dict,u),list),u=1..N-k)];
-newbc:=[K[h],Kc,Dict,edges];
-bandc:=[op(bandc),newbc];
-else bandc:=bandc;
-fi;
-od;
-bandc;
+    LL:=Listvectors;
+    N:=nops(LL); 
+    k:=nops(LL[1]);
+    K:=choose(N,k); 
+    bandc:=[];
+    for h from 1 to nops(K) do
+        MM:=Matrix([seq(LL[K[h][i]],i=1..k)]);
+        if Rank(MM)=k then 
+            Kc:=ComplementList(K[h],N); 
+            Matrix2:=Transpose(Matrix([seq(LL[Kc[i]],i=1..nops(Kc))]));
+            Dict:=MatrixMatrixMultiply(MatrixInverse(Transpose(MM)),Matrix2);
+            edges:=[seq(convert(Column(Dict,u),list),u=1..N-k)];
+            newbc:=[K[h],Kc,Dict,edges];
+            bandc:=[op(bandc),newbc];
+        else bandc:=bandc;
+        fi;
+    od;
+    bandc;
 end:
+if check_examples() then
+    # two Matrix objects do not compare "=".  So instead of trying to
+    # use LinearAlgebra[Equal] for comparing them, we just compare
+    # their print representations.
+    ASSERT(sprintf("%a", AllDictionaries([[1,0],[1,0],[1,1]]))
+           = sprintf("%a", [[[1, 3], [2], Matrix(2, 1, [[1],[0]]), [[1, 0]]], 
+                            [[2, 3], [1], Matrix(2, 1, [[1],[0]]), [[1, 0]]]]),
+           "AllDictionaries test #1");
+fi;
 
-
-
-
-
-
-DDD:=AllDictionaries([[1,0],[0,1],[1,1]]);
 # Input:= a list of N vectors in R^k
 # Ouput:  a vector in R^k;
 # Math: we compute a  vector a which is not on any hyperplane generated by some of the vectors in the list.
@@ -380,37 +399,38 @@ DDD:=AllDictionaries([[1,0],[0,1],[1,1]]);
 # 
 # I did not do the choice of the "deterministic" regular vector.
 # Example: randomRegularpositivevector([[1,0],[0,1],[1,1]])->[5,10];
-randomRegularpositivevector:=proc(Listvectors) local LL,t,ok,w,K,f,MM,N,k,indexsigma,sigma;
-LL:=Listvectors;
-N:=nops(LL);
-k:=nops(LL[1]);
-indexsigma:=AllDictionaries(Listvectors)[1][1];
-sigma:=[seq(LL[indexsigma[i]],i=1..k)]; ###print("sigma",sigma); 
-K:=choose(N,k-1);
-t:=1; ok:=0;
- while t<=10 do 
- w:=cone_random_vector(10*t,sigma);
-f:=1; 
-while f<=nops(K) do
-MM:=Matrix([seq(LL[K[f][i]],i=1..k-1),w]);
-if Determinant(MM)<>0 
-then 
-f:=f+1;
-ok:=ok:
- ##print('ok,f',ok);
- else f:=nops(K)+1;
- ok:=ok+1;
- fi:od;
-if ok=0 then t:=11;
-else
-t:=t+1;ok:=0;
-fi;
-od:
-w;
+randomRegularpositivevector:=proc(Listvectors) local LL,t,ok,w,K,f,MM,N,k,indexsigma,sigma; #NEW
+    LL:=Listvectors;
+    N:=nops(LL);
+    k:=nops(LL[1]);
+    indexsigma:=AllDictionaries(Listvectors)[1][1];
+    sigma:=[seq(LL[indexsigma[i]],i=1..k)]; ###print("sigma",sigma); 
+    K:=choose(N,k-1);
+    t:=1; ok:=0;
+     while t<=10 do 
+     w:=cone_random_vector(10*t,sigma);
+    f:=1; 
+    while f<=nops(K) do
+    MM:=Matrix([seq(LL[K[f][i]],i=1..k-1),w]);
+    if Determinant(MM)<>0 
+    then 
+    f:=f+1;
+    ok:=ok:
+     ##print('ok,f',ok);
+     else f:=nops(K)+1;
+     ok:=ok+1;
+     fi:od;
+    if ok=0 then t:=11;
+    else
+    t:=t+1;ok:=0;
+    fi;
+    od:
+    w;
 end:
+if check_examples() then
+    randomRegularpositivevector([[0,0],[0,-1],[-1,-1]]): # only checks that it runs without error. output is nondeterministic.
+fi:
 
-
-randomRegularpositivevector([[0,0],[0,-1],[-1,-1]]);
 # 
 # 
 # 
@@ -422,50 +442,40 @@ randomRegularpositivevector([[0,0],[0,-1],[-1,-1]]);
 # Math; sigma, epsilon will lead to generators epsilon_i w_i (i in sigma), the complement of sigma will lead to the generators 
 # w_j-a_j^i w_i with j not in sigma. 
 # 
-# Example: coeff_cone_dec([[1,0],[0,1],[1,1]])->[op1,op2,op3]`invalid character in short integer encoding 212 Ô`;
-# 
-# 
-# 
-
-coeff_cone_dec:=proc(Listvectors) local N,k,w,out,LL,sigma,M1,cw,signswonsigma,edges,coeffs,i;
-LL:=Listvectors; 
-N:=nops(LL);
-k:=nops(LL[1]);
-coeffs:=[];
-w:=randomRegularpositivevector(LL); ##print("randvector",w);
-out:= AllDictionaries(LL);
-for i from 1 to nops(out) do
-sigma:=out[i][1]; ##print(sigma);
-M1:=Matrix([seq(LL[sigma[u]],u=1..nops(sigma))]);
-cw:=convert(LinearSolve(Transpose(M1),Vector(w)),list);
-signswonsigma:=[sigma, mul(sign(cw[j]),j=1..k),[seq(sign(cw[j]),j=1..k)]];
-coeffs:=[op(coeffs),[signswonsigma,[out[i][2],out[i][4]]]];
-od;
-coeffs;
+coeff_cone_dec:=proc(Listvectors) local N,k,w,out,LL,sigma,M1,cw,signswonsigma,edges,coeffs,i; #NEW
+    LL:=Listvectors; 
+    N:=nops(LL);
+    k:=nops(LL[1]);
+    coeffs:=[];
+    w:=randomRegularpositivevector(LL); ##print("randvector",w);
+    out:= AllDictionaries(LL);
+    for i from 1 to nops(out) do
+    sigma:=out[i][1]; ##print(sigma);
+    M1:=Matrix([seq(LL[sigma[u]],u=1..nops(sigma))]);
+    cw:=convert(LinearSolve(Transpose(M1),Vector(w)),list);
+    signswonsigma:=[sigma, mul(sign(cw[j]),j=1..k),[seq(sign(cw[j]),j=1..k)]];
+    coeffs:=[op(coeffs),[signswonsigma,[out[i][2],out[i][4]]]];
+    od;
+    coeffs;
 end:
+if check_examples() then
+    coeff_cone_dec([[1,0],[0,1],[1,1]]):  # output is nondeterministic.
+    ASSERT(op(1,coeff_cone_dec([[1,0],[0,1],[1,1]]))
+           = [[[1, 2], 1, [1, 1]], [[3], [[1, 1]]]], # this one SEEMS to be deterministic.
+           "coeff_cone_dec test #1");
+fi:
 
-
-
-op(1,coeff_cone_dec([[1,0],[0,1],[1,1]]));
 # FINALLY: 
 # 
 # Input: W a list of d vectors in R^d; L a list of vectors in R^d;
 # Output: a list of  signed cones in R^d
 # 
-# 
-#  ;
-# 
 # Math: W represents a cone, we express the characteristic function of C as a  signed sum of cones C_a
 # where the cones C_a have the following property:
 # If d=k+dim(L) these cones C_a  have d-k generators in L and k other generators in W. 
 #  Example: L_cone_dec([[1,0],[0,1]],[[1,1]])-> 202, "unexpected end of statement";;
-
 # 
-# 
-# 
-# 
-# 
-L_cone_dec:=proc(W,L) local d,LL,coeffs,conedec,i,generatorsonL,coe1,coe2,generatorssigma,u,a,vL,g,conesigma;
+L_cone_dec:=proc(W,L) local d,LL,coeffs,conedec,i,generatorsonL,coe1,coe2,generatorssigma,u,a,vL,g,conesigma; #NEW
 if L=[] 
 or nops(W)=Rank(Matrix(L)) then
 RETURN([[1,W]]);
@@ -489,11 +499,14 @@ conesigma:=[coe1[2],[op(generatorssigma),op(generatorsonL)]];
 conedec:=[op(conedec),conesigma];
 od;
 end:
-
-
-
+if check_examples() then
+    ASSERT(L_cone_dec([[1,0],[0,1]],[[1,1]])
+           = [[1, [[1, 0], [1, 1]]], [-1, [[0, -1], [1, 1]]]],
+           "L_cone_dec test #1");
+fi:
 
 # Projections:  
+### SHARED. Conebyconeapproximations has better notation "Cspace, Ispace" instead of II, II_c.
 
 # Input: W is a list of vectors  of V , [v[1],..v[d]], of lenght d. 
 # II =[i[1]..,i[s]], is a list of integers, b is a vector of lenght d.
@@ -504,7 +517,7 @@ end:
 # Thus we write b=b_II+b_II_c; 
 # Our output is b_II; 
 # Example: projectedvector([[1,0,0],[0,1,2],[0,1,0]],[3],[0,0,1])->[0,-1/2,0]; 
-projectedvector:=proc(W,II,b) local M,S,j,v,V,m; 
+projectedvector:=proc(W,II,b) local M,S,j,v,V,m; #SHARED
 M:=transpose(matrix([seq(W[i],i=1..nops(W))])); 
 S:=linsolve(M,b); 
 m:=det(M);
@@ -513,6 +526,7 @@ for j from 1 to nops(W) do
 od: 
 V:=[seq(v[j],j=1..nops(W))]; 
 end:
+
 # Projected lattice
 # # Input:  W=[v1,v2,.., vd];  a "Cone"  in  R^d;
 # BE CAREFUl: The vectors in W must hage integral coordinates.
@@ -529,14 +543,10 @@ end:
 # output: (using ihermite) a basis of k elements (of lenght d) of the projected lattice  on lin(II).
 # We will use over and over again this list H1,H2,..., Hk, so that we will work in Z^k  (embedded in R^d via H1,H2,..Hk).
 # EXAMPLE: 
-#projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3])-># [[0, 1/2, 0]];
+#projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3])-># [[0, 1/2, 0]];  ### <-- this is NOT the output. --mkoeppe
 # 
 # 
-# 
-# 
-# 
-# 
-projectedlattice:=proc(W,II) local m,B, d,k,i,r,S,IS,List;
+projectedlattice:=proc(W,II) local m,B, d,k,i,r,S,IS,List; # OLD - Conebyconeapproximations has faster version using projectedvector_with_inverse.
 d:=nops(W);
 B:=ortho_basis(d); 
 k:=nops(II);
@@ -559,7 +569,7 @@ end:
 # 
 # Here W is the cone and we are projecting W over lin( II) and expressing it in term of the standard projectedlattice(W,II). 
 #  Example: projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3])→[[1,0],[0,1]]
-projectedconeinbasislattice:=proc(W,II) local P,M,output,i,F; 
+projectedconeinbasislattice:=proc(W,II) local P,M,output,i,F; # SHARED
 P:=projectedlattice(W,II); ##print(P);
 M:=Transpose(Matrix([seq(P[i],i=1..nops(P))]));
 output:=[]; 
@@ -569,6 +579,7 @@ output:=[op(output),primitive_vector(F)];
  od;
 output;
 end:
+
 
 # 
 # #Input; W a Cone in Z^d;
@@ -584,12 +595,14 @@ end:
 # 
 # Example: projectedvertexinbasislattice([[1,0,0],[0,2,1],[0,1,1]],[1,3],[s1,s2,s3]) ->[s1, 2*s3-s2];; 
 # 
-projectedvertexinbasislattice:=proc(W,II,s) local m,P,M,output,i,F; P:=projectedlattice(W,II);##print(P);
+projectedvertexinbasislattice:=proc(W,II,s) local m,P,M,output,i,F;  # OLD
+P:=projectedlattice(W,II);##print(P);
 if II=[] then RETURN([]);fi;
 M:=Transpose(Matrix([seq(P[i],i=1..nops(P))])); 
 F:=convert(LinearSolve(M,Vector(projectedvector(W,II,s))),list); 
 output:=F;
 end:
+
 # Input: s a vector in R^d with rational coordinates (or symbolic).
 # W a cone in Z^d
 # Output:  a vector in R^d
@@ -597,22 +610,26 @@ end:
 # Math: We decompose V in lin(II) oplus lin (II_c), and here we write s=s_II+s_(II_c): Here the output is s_(II_c);
 # Example:s_IIc([s1,s2],[[1,0],[0,1]],[1])-> [0,s2];
 
-s_IIc:=proc(s,W,II) local DD,IIc,M,s_in_cone_coord,s_IIc;
-DD:=[seq(i,i=1..nops(W))];
-IIc:=GeneralComplementList(II,DD);
-M:=Matrix([seq(Vector([W[i]]),i=1..nops(W))]);
-
-s_in_cone_coord:=convert(LinearSolve(M,Vector(s)),list);
-
-s_IIc:=[seq(s_in_cone_coord[IIc[k]],k=1..nops(IIc))];
-special_lincomb_v(s_IIc,[seq(W[IIc[k]],k=1..nops(IIc))],nops(W));
+s_IIc:=proc(s,W,II) local DD,IIc,M,s_in_cone_coord,s_IIc; # NEW - note ConebyCone has the other function - s_Ispace
+    DD:=[seq(i,i=1..nops(W))];
+    IIc:=GeneralComplementList(II,DD);
+    M:=Matrix([seq(Vector([W[i]]),i=1..nops(W))]);
+    s_in_cone_coord:=convert(LinearSolve(M,Vector(s)),list);
+    s_IIc:=[seq(s_in_cone_coord[IIc[k]],k=1..nops(IIc))];
+    special_lincomb_v(s_IIc,[seq(W[IIc[k]],k=1..nops(IIc))],nops(W));
 end:
+if check_examples() then
+    ASSERT(s_IIc([s1,s2],[[1,0],[0,1]],[1]) 
+           = [0, s2],
+           "s_IIc test #1");
+fi:
+
 # Basic functions
 #  
 # 
 # 
 # Todd(z,x):  the function (e^(zx)*x/(1-exp(x))); 
-Todd:=proc(z,x);
+Todd:=proc(z,x); #SHARED
 exp(z*x)*x/(1-exp(x));
 end:
 # Relative volume
@@ -625,7 +642,7 @@ end:
 # Math; the volume of the Box(v[i], i not in II), with respect to the intersected lattice.
 # Example: relativevolumeoffaceIIc([[1,1],[0,1]],[1])->1;  
 # 
-relativevolumeoffaceIIc:=proc(W,II) local DD,IIc,P,M,H,MM,output;
+relativevolumeoffaceIIc:=proc(W,II) local DD,IIc,P,M,H,MM,output; # called volume_Ispace in Conebycone...
 DD:=[seq(i,i=1..nops(W))]; 
 IIc:=GeneralComplementList(II,DD);
 if IIc=[] then output:=1; 
@@ -638,6 +655,7 @@ fi;
  output;
 end:
 #relativevolumeoffaceIIc([[1,0],[0,1]],[1]); 
+
 # The 2 functions to compute S_L
 # Input: s a vector in R^d;  W a "Cone" in R^d; II a subset of [1, 2,...,d];
 # x a variable:
@@ -650,46 +668,52 @@ end:
 # Example functionI([1/2,1/2],[[1,0],[0,1]],[],x) `invalid character in short integer encoding 17 `;;
 # 
 # 
-functionI:=proc(s,W,II,x)
-local s_on_IIc,DD,IIc,d,T,i,y,r,out;
-d:=nops(W);
-DD:=[seq(i,i=1..d)]; 
-s_on_IIc:=s_IIc(s,W,II);
-if nops(II)=nops(W) 
-then out:=[1,1]; 
-else
-IIc:=GeneralComplementList(II,DD);
-r:=relativevolumeoffaceIIc(W,II);
-T:=1;
-for i from 1 to nops(IIc) do 
-y:=add(W[IIc[i]][j]*x[j],j=1..d);
-T:=T*y;
-od;
-T:=(-1)^(nops(IIc))*T;
-out:=[r*EXP(add(s_on_IIc[m]*x[m],m=1..d)),T];
-fi; 
-out;
+functionI:=proc(s,W,II,x) # called functionIb in Conebycone...
+    local s_on_IIc,DD,IIc,d,T,i,y,r,out;
+    d:=nops(W);
+    DD:=[seq(i,i=1..d)]; 
+    s_on_IIc:=s_IIc(s,W,II);
+    if nops(II)=nops(W) 
+    then out:=[1,1]; 
+    else
+    IIc:=GeneralComplementList(II,DD);
+    r:=relativevolumeoffaceIIc(W,II);
+    T:=1;
+    for i from 1 to nops(IIc) do 
+    y:=add(W[IIc[i]][j]*x[j],j=1..d);
+    T:=T*y;
+    od;
+    T:=(-1)^(nops(IIc))*T;
+    out:=[r*EXP(add(s_on_IIc[m]*x[m],m=1..d)),T];
+    fi; 
+    out;
 end: 
+
 # Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expressions, W a cone in R^d.
 # Output: a symbolic expression.
 # Math: Our cone has generator w1,w2,...,wd. 
 # We replace x by <x,w_i> and we compute  the product of Todd(z_i,<x,w_i>); 
 # Example: prod_Todd([z1,z2],[x1,x2],[[1,1],[1,0]])->`invalid character in short integer encoding 17 `;;
-
 # 
 # 
-prod_Todd:=proc(z,x,W) local d,E,i,T,y;
-d:=nops(W);
-ASSERT(d = nops(z) and d = nops(x),
-       "z, x, W need to be of the same length");
-T:=1;
-for i from 1 to d do 
-ASSERT(nops(W[i])=nops(x),"W[i], x need to be of the same length");
-y:=add(W[i][j]*x[j],j=1..nops(W[i]));
-T:=T*TODD(z[i],y);
-od;
-T;
+prod_Todd:=proc(z,x,W) local d,E,i,T,y; # CHANGED interface - x, W swapped; xi renamed x.
+    d:=nops(W);
+    ASSERT(d = nops(z) and d = nops(x),
+           "z, x, W need to be of the same length");
+    T:=1;
+    for i from 1 to d do 
+    ASSERT(nops(W[i])=nops(x),"W[i], x need to be of the same length");
+    y:=add(W[i][j]*x[j],j=1..nops(W[i]));
+    T:=T*TODD(z[i],y);
+    od;
+    T;
 end: 
+if check_examples() then
+    ASSERT(prod_Todd([z1,z2],[x1,x2],[[1,1],[1,0]])
+           = TODD(z1,x1+x2)*TODD(z2,x1),
+           "prod_Todd test #2");
+fi:
+
 # 
 # Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expression, W a cone in R^d.
 # Output: a list of two symbolic expressions [P1,Q1].
@@ -697,17 +721,23 @@ end:
 # Example: functionS([z[1],z[2],z[3]],[x[1],x[2],x[3]],[[1,1,0],[0,1,0],[0,0,1]]) ->
 # `invalid character in short integer encoding 209 Ñ`;
 # 
-functionS:=proc(z,x,W) local P,Q,y,i;
-P:=prod_Todd(z,x,W);
-Q:=1;
-for i from 1 to nops(W) do
-ASSERT(nops(W[i])=nops(x),"W[i], x need to be of the same length");
- y:=add(W[i][j]*x[j],j=1..nops(W[i]));
- Q:=Q*y;
-od;
-[P,Q];
-end: 
-changeofcoordinates([[1,0,0],[0,1,0],[1,2,3]],[1,2],[x1,x2,x3]);
+functionS:=proc(z,x,W) local P,Q,y,i; # CHANGED interface - x, W swapped; xi renamed x.
+    P:=prod_Todd(z,x,W);
+    Q:=1;
+    for i from 1 to nops(W) do
+        ASSERT(nops(W[i])=nops(x),"W[i], x need to be of the same length");
+        y:=add(W[i][j]*x[j],j=1..nops(W[i]));
+        Q:=Q*y;
+    od;
+    [P,Q];
+end:
+if check_examples() then
+    ASSERT(functionS([z[1],z[2],z[3]],[x[1],x[2],x[3]],[[1,1,0],[0,1,0],[0,0,1]])
+           = [TODD(z[1], x[1] + x[2])*TODD(z[2], x[2])*TODD(z[3], x[3]), (x[1] + x[2])*x[2]*x[3]],
+           "functionS test #2");
+fi:
+
+
 # 
 # 
 # Input: a Cone W;  II a subset of [1..d] of cardinal k; x a list [x1,x2,...,xd]:
@@ -721,136 +751,161 @@ changeofcoordinates([[1,0,0],[0,1,0],[1,2,3]],[1,2],[x1,x2,x3]);
 # 
 # 
 
-changeofcoordinates:=proc(W,II,x) local H,newx,i; 
-H:=projectedlattice(W,II);
-newx:=[];
-for i from 1 to nops(H) do 
-newx:=[op(newx),innerprod(x,H[i])];
-od; 
-newx;
+changeofcoordinates:=proc(W,II,x) local H,newx,i; # OLD - Conebycone has better version with ProjLattice
+    H:=projectedlattice(W,II);
+    newx:=[];
+    for i from 1 to nops(H) do 
+        newx:=[op(newx),innerprod(x,H[i])];
+    od; 
+    newx;
 end:
+### changeofcoordinates([[1,0,0],[0,1,0],[1,2,3]],[1,2],[x1,x2,x3]);
+
+
+
+
 # THE FUNCTION S_L for a cone.
 # Input: s,list,W a list of list,L a list of lists,x a list of variables.
 # Output:= a  function 
 # Math: the function SL
-# Example: function_SL([1/2,0,0],[[-1,0,1],[-1,2,0],[0,0,1]],[[-1,2,0]],[x1,x2,x3]):=(2*TODD(1, (1/2)*x1)*TODD(0, -x1+x3)/(x1*(-x1+x3))-2*TODD(0, x3)*TODD(-1, -(1/2)*x1)/(x3*x1))*EXP(0)/(x1-2*x2);
-function_SL:=proc(s,W,L,x) local DD,i,parallel_cones,uni_cones,function_on_II,function_on_IIc,WW_projected,WW,WWW,signuni,signL,j,II,IIc,out1,out2,s_in_cone_coord,s_II_in_cone_coord,s_prime_II,M,newx,dimL,g,testrank,newP,
-s_II_in_lattice_coord,news;
-DD:=[seq(i,i=1..nops(W))];
-#I added this
-if L=W then RETURN(functionI(s,W,[],x)[1]/functionI(s,W,[],x)[2]);fi;
-#up to here
-parallel_cones:=L_cone_dec(W,L);#print("parallel",parallel_cones);
-out2:=0;
-for i from 1 to nops(parallel_cones) do
-WW:=parallel_cones[i][2];
-signL:=parallel_cones[i][1];
-IIc:=[];
-II:=[];#print(Matrix(L));
-dimL:=Rank(Matrix(L));
-for g from 1 to nops(WW) do 
-testrank:=Rank(Matrix([op(L),WW[g]])); 
-if testrank=dimL 
-  then IIc:=[op(IIc),g];
- else II:=[op(II),g];
+function_SL:=proc(s,W,L,x)  #NEW
+    local DD,i,parallel_cones,uni_cones,function_on_II,function_on_IIc,WW_projected,WW,WWW,signuni,signL,j,II,IIc,out1,out2,s_in_cone_coord,s_II_in_cone_coord,s_prime_II,M,newx,dimL,g,testrank,newP,
+    s_II_in_lattice_coord,news;
+    DD:=[seq(i,i=1..nops(W))];
+    #I added this
+    if L=W then RETURN(functionI(s,W,[],x)[1]/functionI(s,W,[],x)[2]);fi;
+    #up to here
+    parallel_cones:=L_cone_dec(W,L);#print("parallel",parallel_cones);
+    out2:=0;
+    for i from 1 to nops(parallel_cones) do
+        WW:=parallel_cones[i][2];
+        signL:=parallel_cones[i][1];
+        IIc:=[];
+        II:=[];#print(Matrix(L));
+        dimL:=Rank(Matrix(L));
+        for g from 1 to nops(WW) do 
+            testrank:=Rank(Matrix([op(L),WW[g]])); 
+            if testrank=dimL 
+            then IIc:=[op(IIc),g]
+            else II:=[op(II),g];
+            fi:
+        od; 
+        ASSERT(nops(IIc)=dimL,"decompositioninL_parallel is wrong");
+        M:=Matrix([seq(Vector(WW[h]),h=1..nops(WW))]);
+        s_II_in_lattice_coord:=projectedvertexinbasislattice(WW,II,s);  
+        function_on_IIc:=functionI(s,WW,II,x);
+        #from here express in terms of the basis lattice for projected cone.
+
+        WW_projected:=projectedconeinbasislattice(WW,II):
+
+        if WW_projected=[] then 
+            out1:=1 
+        else
+            newx:=changeofcoordinates(WW,II,x);
+            uni_cones:=cone_dec(WW_projected):
+            out1:=0;
+            for j from 1 to nops(uni_cones) do 
+                WWW:=uni_cones[j][3];
+                signuni:=uni_cones[j][1];
+                ASSERT(abs(uni_cones[j][2])=1, "decomposition not unimodular");
+                newP:=MatrixInverse(Transpose(Matrix(WWW))):
+                news:=convert(Multiply(newP,Vector(s_II_in_lattice_coord)),list);
+                s_prime_II:=[seq(ceil(news[f]),f=1..nops(news))];
+                function_on_II:=functionS(s_prime_II,newx,WWW);
+                out1:=out1+
+                signuni*function_on_II[1]/function_on_II[2];
+            od:
+        fi;
+        out2:=out2+out1*function_on_IIc[1]/function_on_IIc[2]*signL;
+    od:
+    out2;
+end:
+if check_examples() then
+    ASSERT(function_SL([1/2,0,0],[[-1,0,1],[-1,2,0],[0,0,1]],[[-1,2,0]],[x1,x2,x3])
+           =
+           (2*TODD(1, (1/2)*x1)*TODD(0, -x1+x3)/(x1*(-x1+x3))-2*TODD(0, x3)*TODD(-1, -(1/2)*x1)/(x3*x1))*EXP(0)/(x1-2*x2),
+           "function_SL test #1");
+    ASSERT(function_SL([0,0,0],[[1,0,0],[0,2,1],[0,0,1]],[[1,1,1]],[x1,x2,x3])
+           =
+           TODD(0,x1)*TODD(0,2*x2+x3)/x1/(2*x2+x3)*EXP(0)/(-x1-x2-x3)
+           +TODD(0,-x1)*TODD(0,-x3)/x1/x3*EXP(0)/(-x1-x2-x3)
+           -(-TODD(0,x3)*TODD(0,x2)/x3/x2+TODD(0,2*x2+x3)*TODD(0,x2)/(2*x2+x3)/x2)*EXP(0)/(-x1-x2-x3),
+           "function_SL test #2");
 fi:
 
-od; 
-ASSERT(nops(IIc)=dimL,"decompositioninL_parallel is wrong");
-M:=Matrix([seq(Vector(WW[h]),h=1..nops(WW))]);
-s_II_in_lattice_coord:=projectedvertexinbasislattice(WW,II,s);  
-function_on_IIc:=functionI(s,WW,II,x);
-#from here express in terms of the basis lattice for projected cone.
 
-WW_projected:=projectedconeinbasislattice(WW,II):
-
-if WW_projected=[] then 
-out1:=1 else
-newx:=changeofcoordinates(WW,II,x);
-uni_cones:=cone_dec(WW_projected):
-out1:=0;
-for j from 1 to nops(uni_cones) do 
-WWW:=uni_cones[j][3];
-signuni:=uni_cones[j][1];
-ASSERT(abs(uni_cones[j][2])=1, "decomposition not unimodular");
-newP:=MatrixInverse(Transpose(Matrix(WWW))):
-news:=convert(Multiply(newP,Vector(s_II_in_lattice_coord)),list);
-s_prime_II:=[seq(ceil(news[f]),f=1..nops(news))];
-function_on_II:=functionS(s_prime_II,newx,WWW);
-out1:=out1+
-signuni*function_on_II[1]/function_on_II[2];
-od:
-fi;
-out2:=out2+out1*function_on_IIc[1]/function_on_IIc[2]*signL;
-od:
-out2;
-end:
-
-
-#function_SL([1/2,0,0],[[-1,0,1],[-1,2,0],[0,0,1]],[[-1,2,0]],[x1,x2,x3]);
 # Input: W a cone, L a linear space,x a variable.
 # Output: a list of linear forms.
 #  Math: this is  the forms in denominator of the big func.
 linindenom:=proc(W,L,x) local YY,i,
-parallel_cones,VDD,IIc,II,dimL,g,testrank,WW,newx,d,a,z,cc,
-WW_projected,uni_cones,t,cleanYY,r;
-VDD:=[seq(i,i=1..nops(W))];
-d:=nops(W);
-parallel_cones:=L_cone_dec(W,L);
- YY:={};
-for i from 1 to nops(parallel_cones) do
-WW:=parallel_cones[i][2];# We should know I, II
-IIc:=[];
-II:=[];
-dimL:=Rank(Matrix(L));
-for g from 1 to nops(WW) do 
-testrank:=Rank(Matrix([op(L),WW[g]])); 
-if testrank=dimL 
-  then IIc:=[op(IIc),g];
- else II:=[op(II),g];
-fi:
-od; 
-ASSERT(nops(IIc)=dimL,"decompositioninL_parallel is wrong");
-for a from 1 to nops(IIc) do
-YY:={op(YY),add(WW[IIc[a]][j]*x[j],j=1..d)};
-od;
- WW_projected:=projectedconeinbasislattice(WW,II):
-newx:=changeofcoordinates(WW,II,x); 
-##print("newx,WW_projected",newx,WW_projected);
-uni_cones:=cone_dec(WW_projected):
-##print("i,unicones,newx",i,uni_cones,newx,YY);
-for z from 1 to nops(uni_cones) do
-cc:=uni_cones[z][3]; 
-for t from 1 to nops(cc) do
-YY:={op(YY), add(cc[t][s]*newx[s],s=1..nops(newx))}
-od;
-od;
-od;
-##print(YY);
-cleanYY:={};
-for r from 1 to nops(YY) do
-if member(-YY[r],cleanYY)=false then
-cleanYY:={op(cleanYY),YY[r]}
-fi;
-od;
-cleanYY;
+    parallel_cones,VDD,IIc,II,dimL,g,testrank,WW,newx,d,a,z,cc,
+    WW_projected,uni_cones,t,cleanYY,r;
+    VDD:=[seq(i,i=1..nops(W))];
+    d:=nops(W);
+    parallel_cones:=L_cone_dec(W,L);
+    YY:={};
+    for i from 1 to nops(parallel_cones) do
+        WW:=parallel_cones[i][2];# We should know I, II
+        IIc:=[];
+        II:=[];
+        dimL:=Rank(Matrix(L));
+        for g from 1 to nops(WW) do 
+            testrank:=Rank(Matrix([op(L),WW[g]])); 
+            if testrank=dimL 
+            then IIc:=[op(IIc),g];
+            else II:=[op(II),g];
+            fi:
+        od; 
+        ASSERT(nops(IIc)=dimL,"decompositioninL_parallel is wrong");
+        for a from 1 to nops(IIc) do
+            YY:={op(YY),add(WW[IIc[a]][j]*x[j],j=1..d)};
+        od;
+        WW_projected:=projectedconeinbasislattice(WW,II):
+        newx:=changeofcoordinates(WW,II,x); 
+        ##print("newx,WW_projected",newx,WW_projected);
+        uni_cones:=cone_dec(WW_projected):
+        ##print("i,unicones,newx",i,uni_cones,newx,YY);
+        for z from 1 to nops(uni_cones) do
+            cc:=uni_cones[z][3]; 
+            for t from 1 to nops(cc) do
+                YY:={op(YY), add(cc[t][s]*newx[s],s=1..nops(newx))}
+            od;
+        od;
+    od;
+    ##print(YY);
+    cleanYY:={};
+    for r from 1 to nops(YY) do
+        if member(-YY[r],cleanYY)=false then
+            cleanYY:={op(cleanYY),YY[r]}
+        fi;
+    od;
+    cleanYY;
 end:
 
-
-#function_SL([0,0,0],[[1,0,0],[0,2,1],[0,0,1]],[[1,1,1]],[x1,x2,x3]);
 # The Valuation S_L for a simplex.
 # Input: S a list of a list, L a list of list, x a list of variables
 # Output: a function
 # Math: the function SL as  above computed for a simplex
-# Example function_SL_simplex([[0,0,0],[2,0,0],[0,2,0],[0,0,2]],[[1,0,0],[0,1,0]],[x1,x2,x3]):=TODD(0, x3)*EXP(0)/(x3*x1*x2)-TODD(0, -x1+x3)*EXP(2*x1)/((-x1+x3)*x1*(-x1+x2))-TODD(0, -x2+x3)*EXP(2*x2)/((-x2+x3)*x2*(x1-x2))-TODD(-2, -x3)*EXP(0)/(x3*x1*x2)-TODD(-2, x1-x3)*EXP(2*x1)/((x1-x3)*x1*(-x1+x2))-TODD(-2, x2-x3)*EXP(2*x2)/((x2-x3)*x2*(x1-x2));
 function_SL_simplex:=proc(S,L,x) local F,W,i;
-F:=0;
-for i from 1 to nops(S) do 
-W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-F:=F+function_SL(S[i],W,L,x);
-od:
-F:
+    F:=0;
+    for i from 1 to nops(S) do 
+        W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
+        F:=F+function_SL(S[i],W,L,x);
+    od:
+    F:
 end:
+if check_examples() then
+    ASSERT(function_SL_simplex([[0,0,0],[2,0,0],[0,2,0],[0,0,2]],[[1,0,0],[0,1,0]],[x1,x2,x3])
+           = 
+           TODD(0, x3)*EXP(0)/(x3*x1*x2)
+           -TODD(0, -x1+x3)*EXP(2*x1)/((-x1+x3)*x1*(-x1+x2))
+           -TODD(0, -x2+x3)*EXP(2*x2)/((-x2+x3)*x2*(x1-x2))
+           -TODD(-2, -x3)*EXP(0)/(x3*x1*x2)
+           -TODD(-2, x1-x3)*EXP(2*x1)/((x1-x3)*x1*(-x1+x2))
+           -TODD(-2, x2-x3)*EXP(2*x2)/((x2-x3)*x2*(x1-x2)),
+           "function_SL_simplex test #1");
+fi:
+
 # 
 #betedim1:=subs({TODD=Todd,EXP=exp},function_SL_simplex([[0],[1]],[],[x1]));
 #Sbete2:=[[0,0+2/10],[1,2/10],[0,2+2/10]]; 
@@ -861,6 +916,8 @@ end:
 check3:=subs({TODD=Todd,EXP=exp},function_SL_simplex([[0,0,0],[2,0,0],[0,2,0],[0,0,2]],[[1,0,0],[0,1,0]],[x1,x2,x3]));
 SERT:=subs({x1=t,x2=5*t,x3=17*t},check3);
 #series(SERT,t=0,20);
+
+
 # Regular vector
 
 # Input, t a variable, alpha= a list of lenght k of  linear forms l_i of  x1,x2,...,x_n,
@@ -902,6 +959,8 @@ alpha:=linindenom(W,L,xx); #print("alpha",alpha);
 denomWL([[1,-1,0],[0,2,1],[0,0,1]],[[1,1,1]]);
 
 Sbete2:=[[0,0],[1,0],[0,1]];
+
+
 # DEFORMATION OF FUNCTION S_L
 # 
 
@@ -922,6 +981,7 @@ ff;
 end:
 #series(SLell([1/2,1/2],[[1,0],[1,2]],[[1,1]], [1,-1]),delta=0,3);
 #function_SL([1/2,1/2],[[1,0],[0,1]],[[1,-1]], [x1,x2]);
+
 deftruncatedSL:=proc(s,W,L,ell,reg,M) local SS,cc;
 #SS:=subs({epsilon=0},SLell(s,W,L,ell,reg)); #print(SLell(s,W,L,ell));
 ##print("SS",SS);
@@ -930,8 +990,8 @@ cc:=convert(series(defSLell(s,W,L,ell,reg),delta=0,M+nops(W)+2),polynom);
 coeff(series(cc,epsilon=0,nops(W)+2),epsilon,0);
  
 end:
-
 deftruncatedSL([1/2,1/2],[[1,0],[1,2]],[[1,1]],[1,1],[3,7],4);
+
 # The function S_L for a simplex: we want to compute  function S_L for a simplex on the linear form ell.
 regularSL:=proc(S,L) local i,W,reg,xx,alpha;
 xx:=[seq(x[i],i=1..nops(S)-1)];
@@ -943,6 +1003,7 @@ od:
 
 reg:=regular(t,alpha,nops(S)-1);
 end:
+
 function_SL_simplex_ell:=proc(S,L,ell,M) local reg,F,W,i;
 F:=0;
 reg:=regularSL(S,L);
@@ -952,6 +1013,7 @@ F:=F+deftruncatedSL(S[i],W,L,ell,reg,M);
 od:
 coeff(F,delta,M):
 end:
+
 function_SL_simplex_ell(Sbete2,[[1,0]],[0,0],0);Sbete2;
 Sbetedilated:=proc(n,t) local ze, S,j,zej; ze:=[seq(0,i=1..n)];
 S:=[ze];
@@ -990,6 +1052,7 @@ Z:=proc(t) local our; if t=0 then our:=0; else our:=ourfrac(t);fi;end:
 Z(t);
 bonfrac:=proc(t); frac(t-floor(t));end: 
 bonfrac(-0.6);
+
 # We are dilating the cone by t and compute the function SL
 
 tfunction_SL:=proc(t,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_on_II,function_on_IIc,WW_projected,WW,WWW,signuni,signL,j,II,IIc,out1,out2,s_in_cone_coord,s_II_in_cone_coord,s_prime_II,M,newx,dimL,g,testrank,newP,
@@ -1050,6 +1113,7 @@ tfunction_SL(t,[1/2,1/4,1/7],[[1,0,0],[0,1,0],[0,0,1]],[[1,0,0]],[x1,x2,x3]);
 # Input: W a cone, L a linear space,x a variable.
 # Output: a list of linear forms.
 tfunction_SL(t,[1/2,1/2],[[0,1],[1,0]],[[1,0]],[x1,x2]);
+
 tSLell:=proc(t,s,W,L,ell,reg) local xx,defell,ff;
 #reg:=regularWL(W,L); #print("reg",reg);
 xx:=[seq(x[i],i=1..nops(W))];
@@ -1061,6 +1125,7 @@ ff;
 end:
 
 function_SL([1/2,1/2],[[1,0],[0,1]],[[1,-1]], [x1,x2]);
+
 ttruncatedSL:=proc(t,s,W,L,ell,reg,M) local SS,cc;
 cc:=convert(series(tSLell(t,s,W,L,ell,reg),delta=0,M+nops(W)+2),polynom);
 coeff(series(cc,epsilon=0,nops(W)+2),epsilon,0); 
@@ -1068,6 +1133,7 @@ end:
 
 
 simplify(ttruncatedSL(t,[1/2,1/2],[[1,0],[0,1]],[[1,0]],[1,1],[1,1],0));
+
 SLsimplex:=proc(t,S,L,ell,M) local F,W,i,reg;
 F:=0;
 reg:=regularSL(S,L);
@@ -1117,6 +1183,7 @@ fi;
 out;
 end:
 Q:=intermediate_step([1],3,1,5);intermediate_step([],3,1,5);intermediate_step([1,2,3,4],3,1,5);
+
 # Input:k,n,p, integers.  L a list of list of integers. meaning as above
 # Output: a list of lists each with one element more
 # Example: complete_inter_step([[1]],2,1,3)→[[1,1],[1,2]]
@@ -1130,6 +1197,7 @@ out;
 end:
 newL:=intermediate_step([1,2,2],3,2,7);intermediate_step([1,2,2,2],3,2,7);
 complete_inter_step([[1]],2,1,3);complete_inter_step([[1],[2]],2,1,3);complete_inter_step([[2],[2]],2,1,3);
+
 # Input: k,n,p integers # In the application n=d0+1 so is always greater or equal then 2
 # Output: a list of lists
 # Math: the partition with repetition of a number <=p via a list of k elements each >=n
@@ -1161,6 +1229,7 @@ one_possible_I([3],8);
 truncated_partition(4,3,9);
 [[4, 4, 4], [4, 4, 5], [4, 5, 5], [4, 4, 6], [5, 5, 5], [4, 5, 6], [4, 4, 7]];
 truncated_partition(3,2,7);
+
 # Now we need to recover the I=[I_1..I_m], with |I_1|=n_1..|I_m|=n_m starting from an element of truncated_partition
 # midstep : input L={[mixed,[{[A1],[],..[Ar]},s1...st],[set,setofindices]} output: a list of the same form L'={[mixed,{[A1],[],..[Ar+1]},s2...st],[set,newsetofindices]} example of input {[mixed, [{}, 2, 2, 2]],[set, [1, 2, 3, 4, 5, 6]]}
 midstep_possible_I:=proc(L) local newLset,Lsetspecial,QQ,Lmixed,start,Lset,C,i,j,out1,LLset;
@@ -1189,6 +1258,7 @@ od;
 #fi:
 out1;
 end:
+
 #given a list=[n_1,..,n_k], as in truncated, we construct all the [I_1,..I_m], I_i intersects I_j empty |I_j|=n_j.
 one_possible_I:=proc(TR,p)local out, Lset,i,j,Lmixed,initial:
 out:=[];
@@ -1208,6 +1278,7 @@ out:
 end:
 #midstep_possible_I({[mixed, [{}, 1, 2]],[set, [1, 2, 3, 4]]});
 #one_possible_I([1,2],7);
+
 # here we compute the Lspace associate to a list of vertices examples [1,2] corresponds to lin(s_1-s_2 )
 L_space:=proc(simplex,II) local s,i,out;
 out:=[];
@@ -1226,6 +1297,7 @@ complete_approximation(t,Sstandard(2),2,0,0);
 exp_trunc:=proc(x,k) ;
 add(1/n!*x^n,n=0..k-1);
 end:
+
 Bjiorner_rho:=proc(n,p)local out;
 if n=1 then out:=0; else
 out:=-n!*coeff(series(log(exp_trunc(x,p)),x=0,n+4),x,n);fi:
@@ -1259,6 +1331,7 @@ fi:
 if out=[] then out:=[1];fi;
 out;
 end:
+
 # Input:=k,n,p,integers
 # Output: a number
 # Math:= truncated muiltinomials as in formula....
@@ -1277,6 +1350,7 @@ out:=out+1/k*(-1)^(k-1)*(-k)^ex*multinomial(k, seq(multT[j],j=1..nops(multT)),k-
 od:
 out:
 end: 
+
 N_rho:=proc(n,p) local f;
 f:=floor(p/n):
 add((-1)^(k-1)*truncated_multinomial(k,n,p),k=1..f):
@@ -1288,6 +1362,7 @@ add((-1)^(k-1)*truncated_multinomial(k,n,p),k=1..f):
 end:
 N_rho(1,4);#it doesn't compute....N_rho(2,100)
 N_rho(2,2);N_rho(2,3);N_rho(2,4);
+
 #check the (-1) in front
 patchrho:=proc(n,L) local i,RHO;RHO:=1;
 for i from 1 to nops(L) do
@@ -1383,4 +1458,10 @@ L:=[seq(seq(k+n/12,n=0..11),k=0..1)];
 plot([M2,M1], t=1.3...2.9,color=[red,blue,green], axis[1]=[gridlines=[20, thickness=1, subticks=false]],axis[2]=[gridlines=[60, thickness=1, subticks=false]],thickness=2, adaptive=20,sample=L);
 eval(subs(t=5/2-0.1,M3));
 plot([M3], t=1.6...2.1,color=[black,red,blue,green], axis[1]=[gridlines=[10, thickness=1, subticks=true]],axis[2]=[gridlines=[60, thickness=1, subticks=false]],thickness=2, adaptive=10,sample=L);
+
+#Exemples - copied from RealBarvinok-avril-forMatthias-2014-10-16.mpl
+A:=[[1,1],[1,2],[2,2]];
+A2:=FBbonfrac(t,A,2,[9,2],0);
+AA1:=fullbarvinok(t,A,1,[9,2],0);
+C:=(1/2)*frac(2*t)^2+(1/2)*frac(-t)^2+1/4-(1/2)*frac(2*t)-(1/2)*frac(-t)+(3/2-frac(2*t)-frac(-t))*t+(1/2)*t^2;
 
