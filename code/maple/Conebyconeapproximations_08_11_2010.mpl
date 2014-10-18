@@ -92,6 +92,13 @@ end:
 ComplementList:=proc(K,d);
     RETURN([seq (`if` (member(i,K)=false, i, op({})),i=1..d)]);
 end:
+
+
+# Input: a a list of lenght m , v a list of m vectors  in R^n, n an integer:
+# Output: a list of length n; 
+# The program check also if  a and v have the same nimber of elements
+# Here we deal with the special case where v:=[] where we return the vector with coordinates 0;
+# Math: we compute the vector V:= sum_i a_i v[i];
 special_lincomb_v:=proc(a,v,n) local out;
     ASSERT(nops(a)=nops(v)," the number of coefficients and vectors do not match");
     if v=[]   then out:=[seq(0,i=1..n)];else
@@ -99,6 +106,14 @@ special_lincomb_v:=proc(a,v,n) local out;
     fi;
     out;
 end:
+if check_examples() then
+    ASSERT(special_lincomb_v([1,1],[[1,0],[0,1]],2)
+           = [1,1], 
+           "special_lincomb_v test #1");
+    ASSERT(special_lincomb_v([1],[[1,0]],2)
+           = [1, 0],
+           "special_lincomb_v test #2");
+fi:    
 
 # Miscellanea
 #
@@ -174,15 +189,14 @@ end:
 # #               L=[ Lplus,Lminus,Lzero] is a partition of [1..d] into three sublists,
 # #               according to the signs of the entries of the vector V. in the basis G.
 good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L;
-    n:=nops(G);
-    #A:=Transpose(Matrix(G));
-    Ainverse:=inverse(matrix(G));
-    B:=convert(Ainverse, listlist);
-    #B:=[seq(convert(Ainverse[i,1..n],list),i=1..n)];
-    sho:=short_vector(B);
-    V :=[seq(add(G[j][i]*sho[j],j=1..n),i=1..n)];
-    L:= sign_entries_vector(sho);
-    [V,L];
+          n:=nops(G);  
+          A:=Transpose(Matrix(G));      
+          Ainverse:=MatrixInverse(A);
+          B:=[seq(convert(Ainverse[1..n,i],list),i=1..n)]; 
+          sho:=short_vector(B); 
+          V :=[seq(add(G[j][i]*sho[j],j=1..n),i=1..n)];
+          L:= sign_entries_vector(sho);
+[V,L];
 end:
 
 # # signed_decomp(eps,G,v,L)
@@ -203,7 +217,7 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
         for i from 1 to kplus do
             C:=[seq(G[Lplus[j]],j=1..i-1),seq(-G[Lplus[j]],j=i+1..kplus),v,seq(G[Lminus[j]],j=1..kminus),seq(G[Lzero[j]],j=1..kzero)];
 
-            detC := det(matrix(C));
+            detC := Determinant(Matrix(C)); 
             Csigned:=[eps*(-1)^(i+kplus),detC,C];
 
             if abs(detC)>1 then
@@ -216,8 +230,8 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
         for i from 1 to kminus do
             C:=[seq(G[Lplus[j]],j=1..kplus),-v,seq(-G[Lminus[j]],j=1..i-1),seq(G[Lminus[j]],j=i+1..kminus),seq(G[Lzero[j]],j=1..kzero)];
 
-            detC := det(matrix(C));
-            Csigned:=[eps*(-1)^(i+1),detC,C];
+             detC := Determinant(Matrix(C));
+             Csigned:=[eps*(-1)^(i+1),detC,C];      
 
             if abs(detC)>1 then
                 Nonuni:=[op(Nonuni),Csigned] else Uni:=[op(Uni), Csigned];
@@ -230,18 +244,15 @@ end:
 # # good_cone_dec(eps,G)
 # #  Input: eps = 1 or -1
 # #             G  is a  simplicial cone
-# #  Output:  two lists [Nonuni,Uni] as in procedure signed_decomp:
-good_cone_dec:=proc(eps,G) local n,A,R,Output, det_A;
-#    printf("good_cone_dec: %A, %A", eps, G);
-    n:=nops(G);  A:=matrix([seq(G[i],i=1..n)]);
-    det_A:=det(A);
-    if abs(det_A)=1 then
-        Output:=[[],[[eps,det_A,G]]];
-    else R:=good_vector(G);
-        Output:=signed_decomp(eps,G,R[1],R[2]);
-    fi;
-    # print(Output);
-    # Output;
+# #
+# #  Output:  two lists [Nonuni,Uni] as in procedure signed_decomp: 
+# #
+good_cone_dec:=proc(eps,G) local n,A,R,Output;
+n:=nops(G);  A:=Matrix([seq(G[i],i=1..n)]);   
+   if abs(Determinant(A))=1 then  Output:=[[],[[eps,Determinant(A),G]]];
+     else R:=good_vector(G);
+          Output:=signed_decomp(eps,G,R[1],R[2]);
+   fi;
 end:
 
 # # more_decomposition_in_cones(cones)
@@ -279,6 +290,11 @@ cone_dec:=proc(G) local seed, i,ok;
     od;
     RETURN(seed[2]);
 end:
+if check_examples() then
+    ASSERT(cone_dec([[1,2],[1,0]])
+           = [[1, -1, [[0, 1], [1, 0]]], [1, -1, [[1, 2], [0, -1]]]],
+           "cone_dec test #1");
+fi:
 
 #
 # Projections:
@@ -335,15 +351,15 @@ projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_pr
     d:=nops(W);
     B:=ortho_basis(d);
     k:=nops(Cspace);
-    m:=abs(det(transpose(matrix([seq(W[i],i=1..nops(W))]))));
+    m:=abs(Determinant(Transpose(Matrix([seq(W[i],i=1..nops(W))]))));
 
-    M_inverse:=inverse(transpose(matrix([seq(W[i],i=1..nops(W))])));
+    M_inverse:=inverse(transpose(matrix([seq(W[i],i=1..nops(W))]))); #FIXME: Update to use LinearAlgebra
     for i from 1 to d do
 
         temp_projectedVectors:=m*projectedvector_with_inverse(M_inverse, W,Cspace,B[i]);
         r[i]:=[seq(temp_projectedVectors[j],j=1..nops(W))];
     od;
-    S:=matrix([seq(r[i],i=1..d)]);;
+    S:=Matrix([seq(r[i],i=1..d)]);;
     IS:=ihermite(S);
     List:=[seq(1/m*convert(row(IS,j),list),j=1..k)];
     List;
@@ -362,14 +378,14 @@ fi;
 #
 #
 # Here W is the cone and we are projecting W over lin(Cspace) and
-# expressing it in term of the basis H_1,H_2,...,H_k of
+# expressing it in terms of the basis H_1,H_2,...,H_k of
 # projectedlattice(W,Cspace).
 projectedconeinbasislattice:=proc(W,Cspace,ProjLattice) local P,M,output,i,F;
     P:=ProjLattice;
-    M:=transpose(matrix([seq(P[i],i=1..nops(P))]));
+    M:=Transpose(Matrix([seq(P[i],i=1..nops(P))]));
     output:=[];
     for i from 1 to nops(Cspace) do
-        F:=convert(linsolve(M,Vector(W[Cspace[i]])),list);
+        F:=convert(LinearSolve(M,Vector(W[Cspace[i]])),list);
         output:=[op(output),primitive_vector(F)];
     od;
     output;
@@ -642,7 +658,7 @@ fi;
 # Furthermore, we enter exp as a "black box" EXP(); later on we might want to replace it.
 #
 functionIb:=proc(s,W,ISpace,xi)
-local d,T,i,y,r,out;
+    local d,T,i,y,r,out;
     d:=nops(W);
     if nops(ISpace)=0
     then out:=[1,1];
@@ -668,18 +684,23 @@ fi;
 # We replace x by <x,w_i> and we compute  the product of Todd(z_i,<x,w_i>);
 prod_Todd:=proc(z,W,xi) local d,E,i,T,y;
     d:=nops(W);
-#ASSERT(d = nops(z) and d = nops(xi),
-#       "z, x, W need to be of the same length");
+    ASSERT((type(z, symbol) or d = nops(z)),
+           "z, W need to be of the same length");
     T:=1;
     for i from 1 to d do
-#ASSERT(nops(W[i])=nops(xi),"W[i], xi need to be of the same length");
+        ASSERT(type(xi, symbol) or nops(W[i])=nops(xi), "W[i], xi need to be of the same length");
         y:=add(W[i][j]*xi[j],j=1..nops(W[i]));
         T:=T*TODD(z[i],y);
     od;
     T;
 end:
 if check_examples() then
-    ASSERT(prod_Todd(z,[[1,0,0],[1,2,1]],x) = TODD(z[1], x[1])*TODD(z[2], x[1]+2*x[2]+x[3]), "prod_Todd test #1");
+    ASSERT(prod_Todd(z,[[1,0,0],[1,2,1]],x) 
+           = TODD(z[1], x[1])*TODD(z[2], x[1]+2*x[2]+x[3]), 
+           "prod_Todd test #1");
+    ASSERT(prod_Todd([z1,z2],[[1,1],[1,0]],[x1,x2])
+           = TODD(z1,x1+x2)*TODD(z2,x1),
+           "prod_Todd test #2");
 fi;
 
 #
@@ -692,7 +713,7 @@ functionS:=proc(z,W,xi) local P,Q,y,i;
     P:=prod_Todd(z,W,xi);
     Q:=1;
     for i from 1 to nops(W) do
-#ASSERT(nops(W[i])=nops(x),"W[i], x need to be of the same length");
+        ASSERT(type(xi, symbol) or nops(W[i])=nops(xi),"W[i], xi need to be of the same length");
         y:=add(W[i][j]*xi[j],j=1..nops(W[i]));
         Q:=Q*y;
     od;
@@ -1039,6 +1060,11 @@ if check_examples() then
 fi;
 
 
+# Input: two integers N,d:
+# Output: a vector of length d:
+#
+# Math: the vector is randomly chosen with coordiantes between 1 and N:
+# 
 random_vector:=proc(N,d) local R;
     R:=rand(N);
     [seq(R()+1,i=1..d)]:
