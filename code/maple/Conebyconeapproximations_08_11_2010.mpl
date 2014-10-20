@@ -1861,5 +1861,38 @@ if check_examples() then
     ASSERT([seq(eval(subs(t=i/24, conetestfrac3)),i=0..50)] 
            = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 5, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 11, 5, 5],
            "cone_by_cone_real test #4");
-    ### TODO: Tests from cone-by-cone-real-corrected-michele-2014-03-05.mpl
+    ### TODO: ASSERTify the following tests from cone-by-cone-real-corrected-michele-2014-03-05.mpl
+    ## Sstandard:=proc(n) local ze, S,j,zej; ze:=[seq(0,i=1..n)];
+    ## S:=[ze];
+    ## for j from 1 to n do zej:=subsop(j=1,ze);;
+    ##  S:=[op(S),zej];
+    ## od;
+    ## end:
+    ## conebycone-bonfrac
+    ## nov:= [[0,0],[1/3,0],[1/2,1]];
+    ## newnov:=[[1/3,0],[1/2,1],[0,0]];
+    ## novcone0:=cone_by_cone_real(nov,[1,1],0,0);
+    ## novcone1:=sort(cone_by_cone_real(nov,[1,1],0,1),n);
+    ## newnovcone1:=sort(cone_by_cone_real(newnov,[1,1],0,1),n);
+    ## novcone:=sort(cone_by_cone_real(nov,[1,1],0,2),t);
+    ## novcone:=simplify(subs(n=t,novcone));
+    ## newnovcone:=cone_by_cone_real(newnov,[1,1],0,2);
+    ## newnovcone:=simplify(subs(n=t,newnovcone));
+    ## newnovcone-novcone;simplify(3*(1-(1/3)*t)^2-3*(1-(1/3)*t)-(2*t)+(2*t)*(1-(1/3)*t)-3*((1/3)*t)^2+
+    ## (2*t)*((1/3)*t)+3*((1/3)*t));
+    ## evala(subs({t=1,ourfrac=fracpart},novcone));
+    ## evala(subs({t=1,ourfrac=fracpart},newnovcone));
+    ## evala(subs({t=(17/10)^(1/3),ourfrac=fracpart},novcone));
+    ## evala(subs({t=(17/10)^(1/3),ourfrac=fracpart},novcone));
+    ## SS:=subs({t=Pi/3,ourfrac=fracpart},novcone);evalf(fracpart(1/6*Pi));
+    ## evalf(SS);
+    ## simplify(3*(1-(1/3)*t)^2-3*(1-(1/3)*t)-(2*t)+(2*t)*(1-(1/3)*t)-3*((1/3)*t)^2+
+    ## (2*t)*((1/3)*t)+3*((1/3)*t));
+    ## testfrac := [[2, 1, 4], [2, 8, 7], [4, 3, 2], [2, 8, 2]]:
+    ## conetestfrac0:=subs(ourfrac=fracpart,cone_by_cone_real(testfrac,[1,5,7],0,0));
+    ## conetestfrac1:=subs(ourfrac=fracpart,n=t,cone_by_cone_real(testfrac,[1,5,7],0,1));
+    ## conetestfrac2:=subs(ourfrac=fracpart,n=t,cone_by_cone_real(testfrac,[1,5,7],0,2)):
+    ## conetestfrac3:=subs(ourfrac=fracpart,n=t,cone_by_cone_real(testfrac,[1,5,7],0,3)):
+    ## plot([conetestfrac3, conetestfrac2,conetestfrac1,conetestfrac0],t=0..0.5,color=[black,red,blue,green]);
+    ## conetestfrac3, conetestfrac2,;
 end:
