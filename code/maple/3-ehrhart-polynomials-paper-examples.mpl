@@ -32,7 +32,7 @@ with(combinat):
 
 # Computation of the parametric vertices from 4 lines:
 # 
-"Parametric hyperplane arrangement (shown in Example 2.8) given by:";
+printf("## Parametric hyperplane arrangement (shown in Example 2.8) given by:\n");
 mu:=[-x1-b[1],-x2-b[2],x1+x2-b[3],-x1+x2-b[4]];
 
 Vertices:=proc(mu, Bases) local VV,d,ss,sv; 
@@ -47,7 +47,7 @@ end:
 
 Bases := choose(4,2):
 
-"Parametric vertices (shown in Example 2.10):";
+printf("## Parametric vertices (shown in Example 2.10):\n");
 
 Vertices(mu, Bases);
 
@@ -72,7 +72,7 @@ C[[3,4]]:=[[-1,-1],[1,-1]]: s[[3,4]]:=[-(1/2)*b[4]+(1/2)*b[3], (1/2)*b[4]+(1/2)*
 
 # Admissible chambers
 
-"Bases of admissible chambers (shown in Example 2.15):";
+printf("## Bases of admissible chambers (shown in Example 2.15):\n");
 
 Taus:=[[],[],[]]:
 Taus[1] := [[2,3],[2,4],[3,4]];
@@ -82,7 +82,7 @@ Taus[3] := [[1, 2], [1, 3], [2, 3]]; # according to paper
 
 # Subspaces
 
-"Subspaces L to use (in Example 2.29):";
+printf("## Subspaces L to use (in Example 2.29 and following):\n");
 
 V_space := [[0,1],[1,0]];                     #full space 
 L_space := [[0,1]];
@@ -90,9 +90,11 @@ O_space := [];                                #trivial space;
 
 # Computations
 
+printf("## Computations of parametric volume, sum and intermediate sums in Example 2.29:\n");
+
 for L in [V_space, L_space, O_space] do
     for bas in Bases do
-        E[L][bas] := coeff(series(eval(subs({EXP=exp,TODD=Todd},subs(T=1,tfunction_SL(1,s[bas],C[bas],L_space,[t*x1,t*x2])))), t=0), t, 0);
+        E[L][bas] := coeff(series(eval(subs({EXP=exp,TODD=Todd},subs(T=1,tfunction_SL(1,s[bas],C[bas],L,[t*x1,t*x2])))), t=0), t, 0);
     od;
     for tau from 1 to nops(Taus) do
         E[L][tau] := simplify(add(E[L][bas], bas in Taus[tau]));
@@ -102,27 +104,50 @@ od:
 # Output
 
 for tau from 1 to nops(Taus) do
+    printf("## Chamber tau_%d ##\n", tau):
+    "Volume" = factor(E[V_space][tau]);
+    "Sum" = E[O_space][tau];
+    "Intermediate sum" = E[L_space][tau];
+od;
 
-    "Chamber tau", tau;
+#
 
-    "Volume";
+printf("## Specialization to multiples of the following vector from tau_2 (Example 2.34):\n");
 
-    factor(E[V_space][tau]);
+b_0 := [0, 0, 5, 3];
+tau := 2;
 
-    "Sum";
+"Volume" = collect(eval(subs({b = expand(t * b_0)}, E[V_space][tau])), t);
+"Sum" = collect(eval(subs({b = expand(t * b_0)}, E[O_space][tau])), t);
+"Intermediate sum" = collect(eval(subs({b = expand(t * b_0)}, E[L_space][tau])), t);
 
-    E[O_space][tau];
+printf("## Specialization to multiples of the following irrational vector from tau_2 (Example 2.36):\n");
 
-    "Intermediate sum";
+b_I := [0, 0, 3*sqrt(2), 3];
+tau := 2;
 
-    E[L_Space][tau];
+"Volume" = collect(eval(subs({b = expand(t * b_I)}, E[V_space][tau])), t);
+"Sum" = collect(eval(subs({b = expand(t * b_I)}, E[O_space][tau])), t);
+"Intermediate sum" = collect(eval(subs({b = expand(t * b_I)}, E[L_space][tau])), t);
 
-od:
 
-# Example 5.4 - 4-dimensional simplex with vertices
-# [4,6,4,3],[5,7,9,1],[5,7,3,7],[6,8,3,9],[2,1,8,0]. Table 1.
+############################################################
 
-# Example 5.5 - triangle with vertices [1, 1], [1, 2], [2, 2]. Figure 11.
+printf("##### Approximating polynomials for the 4-dimensional lattice simplex with the following vertices (Example 5.4): #####\n");
+
+Simplex4 := [[4,6,4,3],[5,7,9,1],[5,7,3,7],[6,8,3,9],[2,1,8,0]];
+
+# k=0???
+for k from 1 to 4 do
+    printf("## k = %d:\n", k):
+    
+    "Cone-by-cone" = "TBD";
+    "Full-Barvinok" = fullbarvinok(t, Simplex4, k, [1, 2, 3, 4], 0);
+od;
+
+############################################################
+
+printf("##### Example 5.5 - triangle with vertices [1, 1], [1, 2], [2, 2]. Figure 11. #####\n");
 
 mars := [[1,1], [1, 2], [2, 2]];
 #mars0:=FBbonfrac(t,mars,0,[1,5,7,2],0);
