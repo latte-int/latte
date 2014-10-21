@@ -1542,26 +1542,6 @@ list_contribution_approximation:=proc(t,S,L,n,ell,M) local out,FS,Lspace,rho,j,d
     out;
 end:
 
-new_list_contribution_approximation:=proc(t,S,L,n,ell,M) local out,FS,Lspace,rho,j,d,LL; #UNUSED
-    print("enter,L,n",L,n);
-    d:=nops(S)-1; #k0:=d+1-d0;
-    #rho:=patchrho(n+1,L);
-    rho:=Patchrho(n,L);
-    if rho=0 then out:=0; print(rho=0);else
-        LL:=one_possible_I(L,d+1);#print("LL",LL,L);
-        out:=0;
-        for j from 1 to nops(LL) do
-            Lspace:=L_space(S,LL[j]);#print("Lspace",Lspace,LL[j]);
-            #rho:=patchrho(n+1,L);
-            #rho:=
-            #FS:=function_SL_simplex(S,Lspace,x);
-            FS:=SLsimplex(t,S,Lspace,ell,M);#print("j,FS,LL[j]",j,FS,LL[j]);
-            out:=out+rho*FS;
-        od:
-    fi;
-    out;
-end:
-
 fullbarvinok:=proc(t,S,k0,ell,M) local d,d0,L,i,out; #NEW
     d:=nops(S)-1;out:=0;
     d0:=d-k0;
