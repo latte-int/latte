@@ -11,10 +11,8 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 # procedures principales:
 #
 # fullbarvinok(t,[[0,0],[0,1],[1,1]],2,[1,1],0);
-# FBbonfrac(t,[[0,0],[0,1],[1,1]],2,[1,1],0);
 #
 # SLsimplex(t,[[-1/3, 0, 0], [0, 1, 0], [0, 0, 1],[0, 0, 0]],[[1,1,1]],[x,y,z],0); 
-# SLbonfrac
 
 # Find out whether we are to check examples.
 check_examples:=proc()
@@ -1077,12 +1075,22 @@ fi:
 
 #  Dilated polytope
 
-Z:=proc(t) local our; if t=0 then our:=0; else our:=ourfrac(t);fi;end: # FIXME: Replace by Conebycone version
-#Z(t);
-
-bonfrac:=proc(t); frac(t-floor(t));end: # Replace by Conebycone version
-#bonfrac(-0.6);
-
+ourfrac := proc(t) # NEW VERSION
+    local our;
+    our := t - floor(t);
+    if type(our, numeric) 
+    then our;
+    else 'ourfrac'(t); # keep it symbolic (until the next eval).
+    fi:
+end:
+if check_examples() then
+    ASSERT(ourfrac('t') = 'ourfrac'('t'), "ourfrac test #1");
+    ASSERT((ourfrac(t) assuming t::integer) = 0, "ourfrac test #2");
+    ASSERT(ourfrac(1/3) = 1/3, "ourfrac test #3");
+    ASSERT(ourfrac(-1/3) = 2/3, "ourfrac test #4");
+    ASSERT(ourfrac(sqrt(2)) = 'ourfrac'(sqrt(2)), "ourfrac test #5");
+fi:
+    
 # We are dilating the cone by t and compute the function SL
 
 tfunction_SL:=proc(t,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_on_II,function_on_IIc,WW_projected,WW,WWW,signuni,signL,j,II,IIc,out1,out2,s_in_cone_coord,s_II_in_cone_coord,s_prime_II,M,newx,dimL,g,testrank,newP,
@@ -1126,7 +1134,7 @@ tfunction_SL:=proc(t,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_on
                 ASSERT(abs(uni_cones[j][2])=1, "decomposition not unimodular");
                 newP:=MatrixInverse(Transpose(Matrix(WWW))):
                 news:=convert(Multiply(newP,Vector(s_II_in_lattice_coord)),list);
-                s_small_move:=[seq(Z(T*(-numer(news[f])/denom(news[f]))),f=1..nops(news))];  #print("smallmove",s_small_move);
+                s_small_move:=[seq(ourfrac(T*(-numer(news[f])/denom(news[f]))),f=1..nops(news))];  #print("smallmove",s_small_move);
                 function_on_II:=functionS(s_small_move,newx,WWW):
                 ##print("function_on_II",function_on_II);
                 out1:=out1+
@@ -1192,7 +1200,7 @@ if check_examples() then
          subs(t=u, SLsimplex(t,[[0, 0], [1, 0], [1, 2]],[],[1,1],0))];
     end:
     c := checks(15/7):
-    ASSERT(c[1] = eval(subs({ourfrac=bonfrac}, c[2])),
+    ASSERT(c[1] = c[2],
            "SLsimplex test #2");
     ASSERT(c[1] = 484/49+(1/7)^2-44/7*1/7, # Looks correct
            "SLsimplex test #3"); 
@@ -1201,7 +1209,7 @@ if check_examples() then
          subs(t=u,SLsimplex(t,[[0, 0,0],[1,0,0], [1, 2,0], [1, 1,3]],[],[1,1,1],0))];
     end:
     c := threechecks(11/2);
-    ASSERT(c[1] = eval(subs({ourfrac=bonfrac}, c[2])),
+    ASSERT(c[1] = c[2],
            "SLsimplex test #4");
     ASSERT(c[1] = 1027/4-(483/4)*(1/2)+19*(1/2)^2-(1/2)^3, # WHOOAH
            "SLsimplex test #5");
@@ -1554,7 +1562,7 @@ new_list_contribution_approximation:=proc(t,S,L,n,ell,M) local out,FS,Lspace,rho
     out;
 end:
 
-fullbarvinok:=proc(t,S,k0,ell,M) local d,d0,L,i,out;
+fullbarvinok:=proc(t,S,k0,ell,M) local d,d0,L,i,out; #NEW
     d:=nops(S)-1;out:=0;
     d0:=d-k0;
     L:=all_truncated_partition(d+1,d0+1);#print("L",L);
@@ -1564,17 +1572,11 @@ fullbarvinok:=proc(t,S,k0,ell,M) local d,d0,L,i,out;
     out:=out;
 end:
 
-FBbonfrac:=proc(t,S,k,ell,M); subs(ourfrac=bonfrac,fullbarvinok(t,S,k,ell,M));end:
-
-SLbonfrac:=proc(t,S,k,ell,M); subs(ourfrac=bonfrac,SLsimplex(t,S,k,ell,M));end:
-
-
-
 if check_examples() then
     #Exemples - copied from RealBarvinok-avril-forMatthias-2014-10-16.mpl
     A:=[[1,1],[1,2],[2,2]]:
-    ASSERT(eval(FBbonfrac(t,A,2,[9,2],0)) # need eval to expand bonfrac.
-           = 1/2*bonfrac(-t)^2-t*bonfrac(-t)-3/2*bonfrac(-t)+1+3/2*t+1/2*t^2+bonfrac(-t)*bonfrac(2*t)-3/2*bonfrac(2*t)+1/2*bonfrac(2*t)^2-t*bonfrac(2*t),
+    ASSERT(fullbarvinok(t,A,2,[9,2],0)
+           = 1/2*ourfrac(-t)^2-t*ourfrac(-t)-3/2*ourfrac(-t)+1+3/2*t+1/2*t^2+ourfrac(-t)*ourfrac(2*t)-3/2*ourfrac(2*t)+1/2*ourfrac(2*t)^2-t*ourfrac(2*t),
            "fullbarvinok test #1");
     ASSERT(fullbarvinok(t,A,1,[9,2],0)
            = 1/2*t^2-t*ourfrac(-t)+3/2*t-1/2*ourfrac(t)^2+1/2*ourfrac(t)-t*ourfrac(2*t),
