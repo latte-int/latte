@@ -514,7 +514,7 @@ if check_examples() then
     ASSERT(fractionalpart(-1/3) = 2/3, "fractionalpart test #2");
     ASSERT(fractionalpart(xyzzy) = MOD(xyzzy, 1), "fractionalpart test #3");
     ASSERT(fractionalpart(sqrt(2)) = MOD(sqrt(2), 1), "fractionalpart test #4"); # Note that we do NOT replace it by sqrt(2) - 1; we want to keep MOD as the primitive expression for readibility.
-    ASSERT(eval(subs({MOD=latteMod, xyzzy=-1/3}, fractionalpart(-1/3))) = 2/3, "fractionalpart test #5");
+    ASSERT(eval(subs({MOD=latteMod, xyzzy=-1/3}, fractionalpart(xyzzy))) = 2/3, "fractionalpart test #5");
 fi;
 
 ## helper function for nfractionalpart.
