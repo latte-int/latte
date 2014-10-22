@@ -1,6 +1,6 @@
 # Examples from paper "Three Ehrhart Quasi-Polynomials"
 
-read("RealBarvinok-mars-exemples-2014-03-10.mpl"):
+read("RealBarvinok-mars-exemples-2014-03-10.mpl"): # this also loads Conebycone...
 
 ############################################################
 
@@ -15,10 +15,10 @@ L := []:       # we are counting lattice points.
 ell := [1, 0]: # an arbitrary linear form.
 M := 0:        # we compute the sum of ell^M.
 reg := [1, 1]: # a regular linear form.
-S := expand(add(ttruncatedSL('t', vertices[i], simple_vertex_cones[i], L, ell, reg, M), i=1..nops(vertices))):
-E2 := coeff(S, t, 2);
-E1 := coeff(S, t, 1);
-E0 := factor(coeff(S, t, 0));
+S := expand(add(ttruncatedSL('t', 'T', vertices[i], simple_vertex_cones[i], L, ell, reg, M), i=1..nops(vertices))):
+E2 := coeff(S, T, 2);
+E1 := coeff(S, T, 1);
+E0 := factor(coeff(S, T, 0));
 
 ############################################################
 
@@ -140,7 +140,7 @@ Simplex4 := [[4,6,4,3],[5,7,9,1],[5,7,3,7],[6,8,3,9],[2,1,8,0]];
 
 for k from 0 to 4 do
     printf("## k = %d:\n", k):
-    "Cone-by-cone" = "TBD";
+    "Cone-by-cone" = collect((cone_by_cone(Simplex4, [0, 0, 0, 0], 0, k)), t);
     "Full-Barvinok" = collect((fullbarvinok(t, Simplex4, k, [0, 0, 0, 0], 0) assuming t::integer), t);
 od;
 
@@ -152,7 +152,7 @@ mars := [[1,1], [1, 2], [2, 2]];
 
 for k from 0 to 2 do
     printf("## k = %d:\n", k):
-    "Cone-by-cone" = "TBD";
+    "Cone-by-cone" = collect((cone_by_cone_real(mars, [0, 0], 0, k)), t);
     "Full-Barvinok" = collect(fullbarvinok(t, mars, k, [0, 0], 0), t);
 od;
 
