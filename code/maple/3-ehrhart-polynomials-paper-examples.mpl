@@ -84,17 +84,17 @@ Taus[3] := [[1, 2], [1, 3], [2, 3]]; # according to paper
 
 printf("## Subspaces L to use (in Example 2.29 and following):\n");
 
-V_space := [[0,1],[1,0]];                     #full space 
-L_space := [[0,1]];
-O_space := [];                                #trivial space;
+V_linspace := [[0,1],[1,0]];                     #full space 
+L_linspace := [[0,1]];
+O_linspace := [];                                #trivial space;
 
 # Computations
 
 printf("## Computations of parametric volume, sum and intermediate sums in Example 2.29:\n");
 
-for L in [V_space, L_space, O_space] do
+for L in [V_linspace, L_linspace, O_linspace] do
     for bas in Bases do
-        E[L][bas] := coeff(series(eval(subs({EXP=exp,TODD=Todd},subs(T=1,tfunction_SL(1,s[bas],C[bas],L,[t*x1,t*x2])))), t=0), t, 0);
+        E[L][bas] := coeff(series(eval(subs({EXP=exp,TODD=Todd},tfunction_SL(1,1,s[bas],C[bas],L,[t*x1,t*x2]))), t=0), t, 0);
     od;
     for tau from 1 to nops(Taus) do
         E[L][tau] := simplify(add(E[L][bas], bas in Taus[tau]));
@@ -105,9 +105,9 @@ od:
 
 for tau from 1 to nops(Taus) do
     printf("## Chamber tau_%d ##\n", tau):
-    "Volume" = factor(E[V_space][tau]);
-    "Sum" = E[O_space][tau];
-    "Intermediate sum" = E[L_space][tau];
+    "Volume" = factor(E[V_linspace][tau]);
+    "Sum" = E[O_linspace][tau];
+    "Intermediate sum" = E[L_linspace][tau];
 od;
 
 #
@@ -117,49 +117,74 @@ printf("## Specialization to multiples of the following vector from tau_2 (Examp
 b_0 := [0, 0, 5, 3];
 tau := 2;
 
-"Volume" = collect(eval(subs({b = expand(t * b_0)}, E[V_space][tau])), t);
-"Sum" = collect(eval(subs({b = expand(t * b_0)}, E[O_space][tau])), t);
-"Intermediate sum" = collect(eval(subs({b = expand(t * b_0)}, E[L_space][tau])), t);
+"Volume" = collect(eval(subs({b = expand(t * b_0)}, E[V_linspace][tau])), t);
+"Sum" = collect(eval(subs({b = expand(t * b_0)}, E[O_linspace][tau])), t);
+"Intermediate sum" = collect(eval(subs({b = expand(t * b_0)}, E[L_linspace][tau])), t);
+## could as well compute without first calculating the fully
+## parametric sum!!
 
 printf("## Specialization to multiples of the following irrational vector from tau_2 (Example 2.36):\n");
 
 b_I := [0, 0, 3*sqrt(2), 3];
 tau := 2;
 
-"Volume" = collect(eval(subs({b = expand(t * b_I)}, E[V_space][tau])), t);
-"Sum" = collect(eval(subs({b = expand(t * b_I)}, E[O_space][tau])), t);
-"Intermediate sum" = collect(eval(subs({b = expand(t * b_I)}, E[L_space][tau])), t);
-
+"Volume" = collect(eval(subs({b = expand(t * b_I)}, E[V_linspace][tau])), t);
+"Sum" = collect(eval(subs({b = expand(t * b_I)}, E[O_linspace][tau])), t);
+"Intermediate sum" = collect(eval(subs({b = expand(t * b_I)}, E[L_linspace][tau])), t);
 
 ############################################################
 
-printf("##### Approximating polynomials for the 4-dimensional lattice simplex with the following vertices (Example 5.4): #####\n");
+printf("##### Approximating polynomials for the integer dilation of a 4-dimensional lattice simplex with the following vertices (Example 5.4): #####\n");
 
 Simplex4 := [[4,6,4,3],[5,7,9,1],[5,7,3,7],[6,8,3,9],[2,1,8,0]];
 
-# k=0???
-for k from 1 to 4 do
+for k from 0 to 4 do
     printf("## k = %d:\n", k):
-    
     "Cone-by-cone" = "TBD";
-    "Full-Barvinok" = fullbarvinok(t, Simplex4, k, [1, 2, 3, 4], 0);
+    "Full-Barvinok" = collect((fullbarvinok(t, Simplex4, k, [0, 0, 0, 0], 0) assuming t::integer), t);
 od;
 
 ############################################################
 
-printf("##### Example 5.5 - triangle with vertices [1, 1], [1, 2], [2, 2]. Figure 11. #####\n");
+printf("##### Example 5.5 - approximating quasipolynomials for real dilations of triangle with vertices [1, 1], [1, 2], [2, 2]. Figure 11. #####\n");
 
 mars := [[1,1], [1, 2], [2, 2]];
+
+for k from 0 to 2 do
+    printf("## k = %d:\n", k):
+    "Cone-by-cone" = "TBD";
+    "Full-Barvinok" = collect(fullbarvinok(t, mars, k, [0, 0], 0), t);
+od;
+
+#TODO: Plotting.
+
+############################################################
+
+
+printf("##### Example 5.6 - approximating quasipolynomials for real dilations of 3-dimensional simplex with the following vertices (Figures 12, 13): #####\n");
+
+
+Simplex56 := [[0,1,1],[4,2,1],[1,1,2],[1,2,4]];
+
+#TODO: Plotting.
+
+########################### END ############################
+
+
+
+
+
+
+## The following commented-out code could be used for plotting above.
+
+############################################################
+
 #mars0:=FBbonfrac(t,mars,0,[1,5,7,2],0);
 #mars1:=FBbonfrac(t,mars,1,[1,5,7,2],0);
 #mars2:=FBbonfrac(t,mars,2,[1,5,7,2],0):
 #mars3:=FBbonfrac(t,mars,3,[1,5,7,2],0):
 #mars4:=FBbonfrac(t,mars,4,[1,5,7,2],0):
 #### plot([mars4,mars3,mars2,mars1,mars0], t=0.6...0.7,color=[black,red,blue,violet,green], axis[1]=[gridlines=[30, thickness=1, subticks=false]],axis[2]=[gridlines=[6, thickness=1, subticks=false]],thickness=1);
-
-
-# Example 5.6 - 3-dimensional simplex with vertices
-# [0,1,1],[4,2,1],[1,1,2],[1,2,4]. Figures 12, 13.
 
 #====================
 # unrelated tests, moved here from RealBarvinok-mars-exemples-2014-03-10.mpl
