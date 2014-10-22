@@ -333,9 +333,6 @@ fi:
 # Math: we project the vectors in X in Lperp; with  basis H1,H2,...,Hk;
 # Our list  is the list of the projections of the elements of W written in the basis Hk (computed by basis_L_perp(L) as a list):
 # 
-# Example: Oursmallmatrix([[1,0,0],[0,1,0],[0,0,1]],[[1,1,1]])-> `invalid character in short integer encoding 203 Ë`;;
-# 
-# 
 
 Oursmallmatrix:=proc(W,L) local s,d,HH,i,C,M,wbars,j,VV,cW; #NEW
     d:=nops(W[1]); s:=nops(L);
@@ -484,7 +481,6 @@ fi:
 # Math: W represents a cone, we express the characteristic function of C as a  signed sum of cones C_a
 # where the cones C_a have the following property:
 # If d=k+dim(L) these cones C_a  have d-k generators in L and k other generators in W. 
-#  Example: L_cone_dec([[1,0],[0,1]],[[1,1]])-> 202, "unexpected end of statement";;
 # 
 L_cone_dec:=proc(W,L) local d,LL,coeffs,conedec,i,generatorsonL,coe1,coe2,generatorssigma,u,a,vL,g,conesigma; #NEW
     if L=[] 
@@ -757,10 +753,6 @@ fi:
 # We write R^d=V(II)+V(II_c). We computed a basis H1,H2n...H_k of the projection of the lattice Z^d in V(II).
 # Thus the output is the list is <x,h_i> where H_i are the basis of the projected lattice  
 # 
-# Example: changeofcoordinates([[1,0,0],[0,1,0],[1,2,3]],[1,2],[x1,x2,x3])-> 202, "unexpected end of statement";;
-# 
-# 
-# 
 
 changeofcoordinates:=proc(W,II,x) local H,newx,i; # OLD - Conebycone has better version with ProjLattice
     H:=projectedlattice(W,II);
@@ -779,6 +771,9 @@ end:
 # Input: s,list,W a list of list,L a list of lists,x a list of variables.
 # Output:= a  function 
 # Math: the function SL
+
+# FIXME: Should maybe be using our formal version of ceil.
+
 function_SL:=proc(s,W,L,x)  #NEW
     local DD,i,parallel_cones,uni_cones,function_on_II,function_on_IIc,WW_projected,WW,WWW,signuni,signL,j,II,IIc,out1,out2,s_in_cone_coord,s_II_in_cone_coord,s_prime_II,M,newx,dimL,g,testrank,newP,
     s_II_in_lattice_coord,news;
@@ -995,6 +990,8 @@ fi:
 # The output is a function of delta, epsilon;
 # Math: we substitute xi[j]=delta*(ell[j]+epsilon*reg[j]) in the function SL
 # 
+# FIXME: delta, epsilon should be parameters or at least quoted.
+#
 defSLell:=proc(s,W,L,ell,reg) local xx,defell,ff; #NEW
     #reg:=regularWL(W,L); #print("reg",reg);
     xx:=[seq(x[i],i=1..nops(W))];
@@ -1092,8 +1089,9 @@ if check_examples() then
 fi:
     
 # We are dilating the cone by t and compute the function SL
-
-tfunction_SL:=proc(t,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_on_II,function_on_IIc,WW_projected,WW,WWW,signuni,signL,j,II,IIc,out1,out2,s_in_cone_coord,s_II_in_cone_coord,s_prime_II,M,newx,dimL,g,testrank,newP,
+# t is the variable that appears inside frac expressions.
+# T is the variable that corresponds to polynomial degree.
+tfunction_SL:=proc(t,T,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_on_II,function_on_IIc,WW_projected,WW,WWW,signuni,signL,j,II,IIc,out1,out2,s_in_cone_coord,s_II_in_cone_coord,s_prime_II,M,newx,dimL,g,testrank,newP,
     s_II_in_lattice_coord,news,zerost,s_small_move;
     DD:=[seq(i,i=1..nops(W))];
     parallel_cones:=L_cone_dec(W,L):
@@ -1134,7 +1132,7 @@ tfunction_SL:=proc(t,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_on
                 ASSERT(abs(uni_cones[j][2])=1, "decomposition not unimodular");
                 newP:=MatrixInverse(Transpose(Matrix(WWW))):
                 news:=convert(Multiply(newP,Vector(s_II_in_lattice_coord)),list);
-                s_small_move:=[seq(ourfrac(T*(-numer(news[f])/denom(news[f]))),f=1..nops(news))];  #print("smallmove",s_small_move);
+                s_small_move:=[seq(ourfrac(t*(-numer(news[f])/denom(news[f]))),f=1..nops(news))];  #print("smallmove",s_small_move);
                 function_on_II:=functionS(s_small_move,newx,WWW):
                 ##print("function_on_II",function_on_II);
                 out1:=out1+
@@ -1143,51 +1141,57 @@ tfunction_SL:=proc(t,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_on
         fi;
         out2:=out2+out1*function_on_IIc[1]/function_on_IIc[2]*signL;
     od:
-    EXP(add(t*s[i]*x[i],i=1..nops(W)))*out2;
+    EXP(add(T*s[i]*x[i],i=1..nops(W)))*out2;
 end:
 if check_examples() then
-    ASSERT(tfunction_SL(t,[1/2,1/4,1/7],[[1,0,0],[0,1,0],[0,0,1]],[[1,0,0]],[x1,x2,x3])
+    ASSERT(tfunction_SL(t,T,[1/2,1/4,1/7],[[1,0,0],[0,1,0],[0,0,1]],[[1,0,0]],[x1,x2,x3])
            =
-           -EXP(1/2*t*x1+1/4*t*x2+1/7*t*x3)*TODD(ourfrac(-1/4*T),x2)*TODD(ourfrac(-1/7*T),x3)/x2/x3*EXP(0)/x1,
+           -EXP(1/2*T*x1+1/4*T*x2+1/7*T*x3)*TODD(ourfrac(-1/4*t),x2)*TODD(ourfrac(-1/7*t),x3)/x2/x3*EXP(0)/x1,
            "tfunction_SL test #1");
-    ASSERT(tfunction_SL(t,[1/2,1/2],[[0,1],[1,0]],[[1,0]],[x1,x2])
+    ASSERT(tfunction_SL(t,T,[1/2,1/2],[[0,1],[1,0]],[[1,0]],[x1,x2])
            =
-           -EXP(1/2*t*x1+1/2*t*x2)*TODD(ourfrac(-1/2*T),x2)/x2*EXP(0)/x1,
+           -EXP(1/2*T*x1+1/2*T*x2)*TODD(ourfrac(-1/2*t),x2)/x2*EXP(0)/x1,
            "tfunction_SL test #2");
 fi:
 
 # Input: W a cone, L a linear space,x a variable.
 # Output: a list of linear forms.
 #
-tSLell:=proc(t,s,W,L,ell,reg) local xx,defell,ff;
+# t is the variable that appears inside frac expressions.
+# T is the variable that corresponds to polynomial degree.
+tSLell:=proc(t,T,s,W,L,ell,reg) local xx,defell,ff;
     #reg:=regularWL(W,L); #print("reg",reg);
     xx:=[seq(x[i],i=1..nops(W))];
     defell:=[seq(delta*(ell[j]+epsilon*reg[j]),j=1..nops(W))];
-    ff:=tfunction_SL(t,s,W,L,defell);
+    ff:=tfunction_SL(t,T,s,W,L,defell);
     #print(ff,defell);
     ff:=eval(subs({TODD=Todd,EXP=exp},ff)); #print(ff);
     ff;
 end:
 #function_SL([1/2,1/2],[[1,0],[0,1]],[[1,-1]], [x1,x2]);
 
-ttruncatedSL:=proc(t,s,W,L,ell,reg,M) local SS,cc;
-    cc:=convert(series(tSLell(t,s,W,L,ell,reg),delta=0,M+nops(W)+2),polynom);
+# t is the variable that appears inside frac expressions.
+# T is the variable that corresponds to polynomial degree.
+ttruncatedSL:=proc(t,T,s,W,L,ell,reg,M) local SS,cc;
+    cc:=convert(series(tSLell(t,T,s,W,L,ell,reg),delta=0,M+nops(W)+2),polynom);
     coeff(series(cc,epsilon=0,nops(W)+2),epsilon,0); 
 end:
 if check_examples() then
-    ASSERT(simplify(ttruncatedSL(t,[1/2,1/2],[[1,0],[0,1]],[[1,0]],[1,1],[1,1],0))
-           = 1/12*(12+12*delta*ourfrac(-1/2*T)+12*delta*t-6*delta+6*ourfrac(-1/2*T)^2*delta^2+12*t*ourfrac(-1/2*T)*delta^2+6*t^2*delta^2-6*t*delta^2-6*ourfrac(-1/2*T)*delta^2+delta^2)/delta^2,
+    ASSERT(simplify(ttruncatedSL(t,T,[1/2,1/2],[[1,0],[0,1]],[[1,0]],[1,1],[1,1],0))
+           = 1/12*(12+12*delta*ourfrac(-1/2*t)+12*delta*T-6*delta+6*ourfrac(-1/2*t)^2*delta^2+12*T*ourfrac(-1/2*t)*delta^2+6*T^2*delta^2-6*T*delta^2-6*ourfrac(-1/2*t)*delta^2+delta^2)/delta^2,
           "ttruncatedSL test #1");
 fi:
 
+# Simplex S (given by vertices), dilated by t.
+# t may have assumptions.
 SLsimplex:=proc(t,S,L,ell,M) local F,W,i,reg;
     F:=0;
     reg:=regularSL(S,L);
     for i from 1 to nops(S) do 
         W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-        F:=F+ttruncatedSL(t,S[i],W,L,ell,reg,M);
+        F:=F+ttruncatedSL(t,'T',S[i],W,L,ell,reg,M);  ## introduces formal T.
     od:
-    subs(T=t,simplify(coeff(F,delta,M))):
+    subs(T=t,simplify(coeff(F,delta,M))):  ###  Backsubst of formal T.
 end:
 if check_examples() then
     ASSERT(SLsimplex(t,[[0, 0], [1, 0], [1, 1]],[],[x1,x2],0)
@@ -1213,6 +1217,10 @@ if check_examples() then
            "SLsimplex test #4");
     ASSERT(c[1] = 1027/4-(483/4)*(1/2)+19*(1/2)^2-(1/2)^3, # WHOOAH
            "SLsimplex test #5");
+    ASSERT((SLsimplex(t,[[0, 0], [1, 0], [1, 1]],[],[x1,x2],0) assuming t::integer)
+           =  
+           1+1/2*t^2+3/2*t,
+           "SLsimplex test #6");
 fi:
 
 
