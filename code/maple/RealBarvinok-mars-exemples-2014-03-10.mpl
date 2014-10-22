@@ -670,22 +670,33 @@ fi:
 
 #  Dilated polytope
 
+## This function is semi-inert:  If the result would still be symbolic, keep
+## it as the original expression "ourfrac(t)".  
+## Call value() on the result to force expansion to floor().
+## This may be necessary to allow full simplification.
 ourfrac := proc(t) # NEW VERSION
     local our;
     our := t - floor(t);
     if type(our, numeric) 
     then our;
-    else 'ourfrac'(t); # keep it symbolic (until the next eval).
+    else 'ourfrac'(t); # keep it symbolic (until the next "eval" (which feeds it back in here) or "value").
     fi:
 end:
+## The fully evaluated version of the above.
+## Either use eval(subs({ourfrac=bonfrac}, ...)) or value(...).
+bonfrac := t -> t - floor(t):
+`value/ourfrac` := t -> t - floor(t):
+
 if check_examples() then
     ASSERT(ourfrac('t') = 'ourfrac'('t'), "ourfrac test #1");
     ASSERT((ourfrac(t) assuming t::integer) = 0, "ourfrac test #2");
     ASSERT(ourfrac(1/3) = 1/3, "ourfrac test #3");
     ASSERT(ourfrac(-1/3) = 2/3, "ourfrac test #4");
     ASSERT(ourfrac(sqrt(2)) = 'ourfrac'(sqrt(2)), "ourfrac test #5");
+    ASSERT(simplify(value(1/72*Pi^2+1/6*(-ourfrac(1/3*Pi)+3/2-ourfrac(-1/6*Pi))*Pi+1/2*ourfrac(-1/6*Pi)^2-3/2*ourfrac(1/3*Pi)-3/2*ourfrac(-1/6*Pi)+1/2*ourfrac(1/3*Pi)^2+1+ourfrac(-1/6*Pi)*ourfrac(1/3*Pi))) = 1, "ourfrac test #6");
+    ASSERT(simplify(eval(subs({ourfrac=bonfrac}, 1/72*Pi^2+1/6*(-ourfrac(1/3*Pi)+3/2-ourfrac(-1/6*Pi))*Pi+1/2*ourfrac(-1/6*Pi)^2-3/2*ourfrac(1/3*Pi)-3/2*ourfrac(-1/6*Pi)+1/2*ourfrac(1/3*Pi)^2+1+ourfrac(-1/6*Pi)*ourfrac(1/3*Pi)))) = 1, "ourfrac test #7");
 fi:
-    
+
 # We are dilating the cone by t and compute the function SL
 # t is the variable that appears inside frac expressions.
 # T is the variable that corresponds to polynomial degree.
