@@ -677,54 +677,53 @@ functionI:=proc(s,W,II,x) # called functionIb in Conebycone...
     out;
 end: 
 
-# Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expressions, W a cone in R^d.
-# Output: a symbolic expression.
-# Math: Our cone has generator w1,w2,...,wd. 
-# We replace x by <x,w_i> and we compute  the product of Todd(z_i,<x,w_i>); 
-# Example: prod_Todd([z1,z2],[x1,x2],[[1,1],[1,0]])->`invalid character in short integer encoding 17 `;;
-# 
-# 
-prod_Todd:=proc(z,x,W) local d,E,i,T,y; # CHANGED interface - x, W swapped; xi renamed x.
+# Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expressions (or just z,x), W a cone in R^d.
+# Output: a symbolic expression, using the formal function TODD. (substitute by Todd to evaluate).
+# Math: Our cone has generator w1,w2,...,wd.
+# We replace x by <x,w_i> and we compute  the product of Todd(z_i,<x,w_i>);
+prod_Todd:=proc(z,W,xi) local d,E,i,T,y; #SHARED
     d:=nops(W);
-    ASSERT(d = nops(z) and d = nops(x),
-           "z, x, W need to be of the same length");
+    ASSERT((type(z, symbol) or d = nops(z)),
+           "z, W need to be of the same length");
     T:=1;
-    for i from 1 to d do 
-    ASSERT(nops(W[i])=nops(x),"W[i], x need to be of the same length");
-    y:=add(W[i][j]*x[j],j=1..nops(W[i]));
-    T:=T*TODD(z[i],y);
+    for i from 1 to d do
+        ASSERT(type(xi, symbol) or nops(W[i])=nops(xi), "W[i], xi need to be of the same length");
+        y:=add(W[i][j]*xi[j],j=1..nops(W[i]));
+        T:=T*TODD(z[i],y);
     od;
     T;
-end: 
+end:
 if check_examples() then
-    ASSERT(prod_Todd([z1,z2],[x1,x2],[[1,1],[1,0]])
+    ASSERT(prod_Todd(z,[[1,0,0],[1,2,1]],x) 
+           = TODD(z[1], x[1])*TODD(z[2], x[1]+2*x[2]+x[3]), 
+           "prod_Todd test #1");
+    ASSERT(prod_Todd([z1,z2],[[1,1],[1,0]],[x1,x2])
            = TODD(z1,x1+x2)*TODD(z2,x1),
            "prod_Todd test #2");
-fi:
+fi;
 
-# 
-# Input: z =[z1,...,zd], x=[x1,x2,..,xd];  two lists of symbolic expression, W a cone in R^d.
+#
+#
+# Input: z =[z1,...,zd], xi=[xi1,xi2,..,xid];  two lists of symbolic expression, or letters (z,xi); W a cone in R^d.
 # Output: a list of two symbolic expressions [P1,Q1].
-# Math: P1 is the   product of Todd(z_i,<x,w_i>), while Q1 is  the product of the (<x,wi>) 
-# Example: functionS([z[1],z[2],z[3]],[x[1],x[2],x[3]],[[1,1,0],[0,1,0],[0,0,1]]) ->
-# `invalid character in short integer encoding 209 Ñ`;
-# 
-functionS:=proc(z,x,W) local P,Q,y,i; # CHANGED interface - x, W swapped; xi renamed x.
-    P:=prod_Todd(z,x,W);
+# Math: P1 is the   product of Todd(z_i,<xi,w_i>), while Q1 is  the product of the (<xi,wi>)
+#
+functionS:=proc(z,W,xi) local P,Q,y,i;
+    P:=prod_Todd(z,W,xi);
     Q:=1;
     for i from 1 to nops(W) do
-        ASSERT(nops(W[i])=nops(x),"W[i], x need to be of the same length");
-        y:=add(W[i][j]*x[j],j=1..nops(W[i]));
+        ASSERT(type(xi, symbol) or nops(W[i])=nops(xi),"W[i], xi need to be of the same length");
+        y:=add(W[i][j]*xi[j],j=1..nops(W[i]));
         Q:=Q*y;
     od;
     [P,Q];
 end:
 if check_examples() then
-    ASSERT(functionS([z[1],z[2],z[3]],[x[1],x[2],x[3]],[[1,1,0],[0,1,0],[0,0,1]])
-           = [TODD(z[1], x[1] + x[2])*TODD(z[2], x[2])*TODD(z[3], x[3]), (x[1] + x[2])*x[2]*x[3]],
-           "functionS test #2");
-fi:
-
+    ASSERT(functionS(z,[[1,0,0],[1,1,2],[0,5,1]],xi) 
+           = 
+           [TODD(z[1],xi[1]) * TODD(z[2],xi[1]+xi[2]+2*xi[3]) * TODD(z[3],5*xi[2]+xi[3]), xi[1] * (xi[1] + xi[2] + 2*xi[3]) * (5*xi[2]+xi[3])],
+           "functionS test #1");
+fi;
 
 # 
 # 
@@ -798,7 +797,7 @@ function_SL:=proc(s,W,L,x)  #NEW
                 newP:=MatrixInverse(Transpose(Matrix(WWW))):
                 news:=convert(Multiply(newP,Vector(s_II_in_lattice_coord)),list);
                 s_prime_II:=[seq(ceil(news[f]),f=1..nops(news))];
-                function_on_II:=functionS(s_prime_II,newx,WWW);
+                function_on_II:=functionS(s_prime_II,WWW,newx);
                 out1:=out1+
                 signuni*function_on_II[1]/function_on_II[2];
             od:
@@ -1114,7 +1113,7 @@ tfunction_SL:=proc(t,T,s,W,L,x) local st,DD,i,parallel_cones,uni_cones,function_
                 newP:=MatrixInverse(Transpose(Matrix(WWW))):
                 news:=convert(Multiply(newP,Vector(s_II_in_lattice_coord)),list);
                 s_small_move:=[seq(ourfrac(t*(-numer(news[f])/denom(news[f]))),f=1..nops(news))];  #print("smallmove",s_small_move);
-                function_on_II:=functionS(s_small_move,newx,WWW):
+                function_on_II:=functionS(s_small_move,WWW,newx):
                 ##print("function_on_II",function_on_II);
                 out1:=out1+
                 signuni*function_on_II[1]/function_on_II[2];
@@ -1161,6 +1160,20 @@ if check_examples() then
     ASSERT(simplify(ttruncatedSL(t,T,[1/2,1/2],[[1,0],[0,1]],[[1,0]],[1,1],[1,1],0))
            = 1/12*(12+12*delta*ourfrac(-1/2*t)+12*delta*T-6*delta+6*ourfrac(-1/2*t)^2*delta^2+12*T*ourfrac(-1/2*t)*delta^2+6*T^2*delta^2-6*T*delta^2-6*ourfrac(-1/2*t)*delta^2+delta^2)/delta^2,
           "ttruncatedSL test #1");
+    # Example 1.3
+    vertices := [[0, 0], [sqrt(2), 0], [sqrt(2), 1], [0, 1]];
+    simple_vertex_cones := [[[1, 0], [0, 1]], 
+                            [[-1, 0], [0, 1]], 
+                            [[-1, 0], [0, -1]], 
+                            [[1, 0], [0, -1]]]:
+    L := []:       # we are counting lattice points.
+    ell := [1, 0]: # an arbitrary linear form.
+    M := 0:        # we compute the sum of ell^M.
+    reg := [1, 1]: # a regular linear form.
+    S := expand(add(ttruncatedSL('t', 'T', vertices[i], simple_vertex_cones[i], L, ell, reg, M), i=1..nops(vertices))):
+    ASSERT(S                                                                                                                               
+           = 1+T+T*2^(1/2)-ourfrac(2^(1/2)*t)+T^2*2^(1/2)+ourfrac(t)*ourfrac(2^(1/2)*t)-ourfrac(t)*T*2^(1/2)-ourfrac(t)-T*ourfrac(2^(1/2)*t),
+           "ttruncatedSL test #2");
 fi:
 
 # Simplex S (given by vertices), dilated by t.
@@ -1543,6 +1556,7 @@ end:
 
 if check_examples() then
     #Exemples - copied from RealBarvinok-avril-forMatthias-2014-10-16.mpl
+    # corresponds to Example 5.5
     A:=[[1,1],[1,2],[2,2]]:
     ASSERT(fullbarvinok(t,A,2,[9,2],0)
            = 1/2*ourfrac(-t)^2-t*ourfrac(-t)-3/2*ourfrac(-t)+1+3/2*t+1/2*t^2+ourfrac(-t)*ourfrac(2*t)-3/2*ourfrac(2*t)+1/2*ourfrac(2*t)^2-t*ourfrac(2*t),
@@ -1550,4 +1564,8 @@ if check_examples() then
     ASSERT(fullbarvinok(t,A,1,[9,2],0)
            = 1/2*t^2-t*ourfrac(-t)+3/2*t-1/2*ourfrac(t)^2+1/2*ourfrac(t)-t*ourfrac(2*t),
            "fullbarvinok test #2");
+    # Example 5.4
+    ASSERT(collect((fullbarvinok(t, Simplex4, 1, [0, 0, 0, 0], 0) assuming t::integer), t)
+           = 3/4*t^4+7/24*t^2+2*t^3,
+           "fullbarvinok test #3");
 fi:    
