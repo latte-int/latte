@@ -1807,12 +1807,18 @@ end:
 
 
 ################################################################
-# Another set of interface functions for computing the conebycone
-# Ehrhart quasipolynomial. 
+#
+# Functions for computing the canonically defined approximating
+# quasi-polynomial E^{k, cone-by-cone} for a simplex, defined in the
+# paper "Three Ehrhart Quasi-Polynomials".
+#
+# The functions defined above only computed the highest terms of this
+# canonical quasi-polynomial.
 #
 # This comes from cone-by-cone-real-corrected-Nicole-2014-03-09.mpl
 #
-# TODO: What does this do what the other functions don't?
+
+# FIXME: Should have a parameter for "t".
 
 cone_by_cone:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn;
     d:=nops(Simplex)-1;CCn:=0;
