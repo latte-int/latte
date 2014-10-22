@@ -287,25 +287,6 @@ od;
     RETURN(seed[2]);
 end:
 
-# Input: A signed list of cones;
-# Output: a set of vectors;
-
-collectgene:=proc(signedcones) local i,j,gene,newgen1,newgen2,gene1,gene2,cc; # NEW, UNUSED
-    gene:={}; 
-    for i from 1 to nops(signedcones) do 
-        cc:=signedcones[i][2];
-        for j from 1 to nops(cc) do
-            newgen1:=cc[j]; 
-            newgen2:=[seq(-cc[j][q],q=1..nops(cc[j]))];
-            gene1:={op(gene),newgen1}; 
-            gene2:={op(gene),newgen2};
-            if nops(gene1)<=nops(gene2) then
-                gene:=gene1;
-            else gene:=gene2; fi;
-        od;
-    od;
-    gene;
-end:
 # 
 # 
 # 
