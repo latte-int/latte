@@ -134,7 +134,7 @@ tau := 2;
 
 ############################################################
 
-printf("##### Approximating polynomials for the integer dilation of a 4-dimensional lattice simplex with the following vertices (Example 5.4): #####\n");
+printf("##### Approximating polynomials for the integer dilation of a 4-dimensional lattice simplex with the following vertices (Example 5.4): #####\n\n");
 
 Simplex4 := [[4,6,4,3],[5,7,9,1],[5,7,3,7],[6,8,3,9],[2,1,8,0]];
 
@@ -146,15 +146,28 @@ od;
 
 ############################################################
 
-printf("##### Example 5.5 - approximating quasipolynomials for real dilations of triangle with vertices [1, 1], [1, 2], [2, 2]. Figure 11. #####\n");
+printf("##### Example 5.5 - approximating quasipolynomials for real dilations of triangle with the following vertices. Figure 11. #####\n\n");
 
 mars := [[1,1], [1, 2], [2, 2]];
 
 for k from 0 to 2 do
     printf("## k = %d:\n", k):
-    "Cone-by-cone" = collect((cone_by_cone_real(mars, [0, 0], 0, k)), t);
-    "Full-Barvinok" = collect(fullbarvinok(t, mars, k, [0, 0], 0), t);
+    cbc := collect((cone_by_cone_real(mars, [0, 0], 0, k)), t);
+    "Cone-by-cone" = cbc;
+    fb := collect(fullbarvinok(t, mars, k, [0, 0], 0), t);
+    "Full-Barvinok" = fb;
 od;
+
+printf("## Evaluations for k=2:\n"):
+
+for t in [1/2, Pi/6, 1, 1-10^(-6), 1+10^(-6)] do  
+    ## Skipping the example t = (17/10)^(1/3)/2, because 
+    ## of a weird Maple bug in our installation of Maple 14, 
+    ## same as this one: http://www.mapleprimes.com/questions/130220-Maple-15-X86-64-LINUX-Fedora-16-Log2
+    "Cone-by-cone"(t) = simplify(value(cbc));
+    "Full-Barvinok"(t) = simplify(value(fb));
+od;
+
 
 #TODO: Plotting.
 
