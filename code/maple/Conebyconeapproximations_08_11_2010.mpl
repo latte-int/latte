@@ -866,13 +866,13 @@ fi;
 #  Math: this is  the forms in denominator of the   function S_Ispace_Cone(W,Cspace,x). In practice we will not use this procedure.
 # This is useful to determine a "deterministic regular vector", but we will plug a random regular vector;
 
-linindenom:=proc(W,Cspace) local YY,i,ISpace,g,WW,newx,d,a,z,cc,
+linindenom_cbc:=proc(W,Cspace) local YY,i,ISpace,g,WW,newx,d,a,z,cc, #UNUSED
     WW_projected,uni_cones,t,cleanYY,r,ProjLattice;
     d:=nops(W);
     YY:={};
     ProjLattice := projectedlattice(W,Cspace);
     WW_projected:=projectedconeinbasislattice(W,Cspace,ProjLattice):
-###print(WW_projected);
+    ###print(WW_projected);
     newx:=changeofcoordinates(W,Cspace,ProjLattice,x);
     uni_cones:=cone_dec(WW_projected);
     for z from 1 to nops(uni_cones) do
@@ -891,9 +891,9 @@ linindenom:=proc(W,Cspace) local YY,i,ISpace,g,WW,newx,d,a,z,cc,
     cleanYY;
 end:
 if check_examples() then
-    ASSERT(linindenom([[1,0],[1,2]],[1,2])
+    ASSERT(linindenom_cbc([[1,0],[1,2]],[1,2])
            = {x[1], x[2], x[1]+2*x[2]},
-           "linindenom test #1");
+           "linindenom_cbc test #1");
 fi;
 
 #  Approximation for a cone;
@@ -1820,6 +1820,7 @@ end:
 
 # FIXME: Should have a parameter for "t".
 
+# For integer dilations.
 cone_by_cone:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn;
     d:=nops(Simplex)-1;CCn:=0;
     #order:=M+nops(Simplex)-codim; 
@@ -1832,6 +1833,7 @@ cone_by_cone:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn;
     subs({N=n},CCn);
 end:
 
+# For real dilations.
 cone_by_cone_real:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn,newCCn;
     d:=nops(Simplex)-1;CCn:=0;
     reg:=random_vector(5000,d); 
@@ -1841,7 +1843,7 @@ cone_by_cone_real:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn,new
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=add(coeff(CCeps,n,m)*t^(m),m=0..M+d);
     newCCn:=subs({N=n},CCn); newCCn:=subs(n=t,newCCn);
-    eval(subs(MOD=latteMod,newCCn));
+    eval(subs(MOD=latteMod,newCCn));    ### FIXME: Using latteMod gives us the result in terms of floors, that's not what we want.
 end:
 
 if check_examples() then
