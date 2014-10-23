@@ -1074,19 +1074,19 @@ end:
 
 
 #### LATTE INTERFACE FUNCTION:
-##Used by latte to find just the top k coefficients of the ehrhart polynomial.
+##Used by LattE to find just the top k coefficients of the Ehrhart polynomial.
 ##Because we do this by finding the polynomial per linear form, we do not print
 ##  out the coefficients incrementally, and hence do not have to store 
 ##  partial results which gives this function a smaller memory footprint than 
 ##  the printIncrementalEhrhartPolynomial function.
-##But this function could find the entire ehrhart polynomial if asked to.
+##But this function could find the entire Ehrhart polynomial if asked to.
 #input
 #	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
 #	nn: symbolic variable. The coefficients are graded by nn. example (3mod(n,2)^3 + 2)*nn^3
 #	simpleCones: the polytope.
 #	linearForms: list of powers of linear forms
 #	d: dimension of the polytope
-#	useRealDilations: ture=the polynomial can be evaluaded at rational dilations.
+#	useRealDilations: If true, the polynomial is correct for evaluations at arbitrary real dilations, not just integer.
 #	topK: find the top topK coefficients (not the topK +1) or all of them if topk=-1
 #	filename: if -1, the polynomial is not saved to a file. Else, the polynomial is saved to fileName.
 findEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d,useRealDilations, topK, fileName) 
@@ -1637,14 +1637,14 @@ end:
 
 
 #####################################################################
-### Functions I want to delete
+### Functions below were marked for deletion; but some now used in "cone_by_cone".
 #####################################################################
 
 # Input: n a variable,  s a numeric vector in Q^d,
 # W a cone, order is an integer;
 # xi a list of variables.
 # Output a function f(n,xi);
-# This is the sulm of the approximate  function S^{Ispace}(ns+W)(xi), where we emphasize the dependance in n;
+# This is the sum of the approximate  function S^{Ispace}(ns+W)(xi), where we emphasize the dependance in n;
 
 # EXAMPLE IS GIVEN  AFTER;
 
@@ -1746,7 +1746,7 @@ CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
 end:
 
 #####################################################################
-### real Functions I want to delete
+### Functions below were marked for deletion; but some now used in "cone_by_cone_real".
 #####################################################################
 
 
