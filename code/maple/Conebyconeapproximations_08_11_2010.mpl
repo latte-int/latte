@@ -1685,7 +1685,7 @@ fi;
 # EXAMPLE IS GIVEN  AFTER;
 
 #
-ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
+ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P; #used below
     F:=0;  S:=Simplex;
     d:=nops(S)-1;
     for i from 1 to nops(S) do
@@ -1708,7 +1708,7 @@ fi;
 # Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
 # Here I did not employ a deformation vector, so the procedure might return: error; diviasion by zero.
 #
-TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
+TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC; #UNUSED
     d:=nops(Simplex)-1;
     order:=M+d-m;
     xx:=[seq(t*ell[i],i=1..d)];
@@ -1716,13 +1716,14 @@ TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
     CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
     subs({N=n},CC);
 end:
+
 # Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
 # The ouput is  a periodic function of n;
 # Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
 # Here we employ a random deformation vector, so if the procedure might return: error: division by zero. RERUN:
 #
 #
-TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
+TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg; #used below
     d:=nops(Simplex)-1;
     order:=M+d-m;
     reg:=random_vector(5000,d);
@@ -1740,7 +1741,7 @@ end:
 #
 #
 #
-CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d;
+CompleteEhrhartweighted:=proc(n,Simplex,ell,M) local d; # used in ..._examples.mpl
     d:=nops(Simplex)-1;
     add(TopEhrhartweighted(n,Simplex,ell,M,m)*n^m,m=0..M+d);
 end:
@@ -1768,7 +1769,7 @@ dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     output;
 end:
 
-ApproxEhrhartSimplexgeneric_real:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P;
+ApproxEhrhartSimplexgeneric_real:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P; #used below
     F:=0;  S:=Simplex;
     d:=nops(S)-1;
     for i from 1 to nops(S) do
@@ -1780,7 +1781,7 @@ end:
 
 
 #WARNING; THIS WORKS ONLY IF ell is generic;
-TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
+TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC; #UNUSED
     d:=nops(Simplex)-1;
     order:=M+d-m;
     xx:=[seq(t*ell[i],i=1..d)];
@@ -1789,7 +1790,7 @@ TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
     subs({N=n},CC);
 end:
 
-TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg;
+TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,reg; #used below
     d:=nops(Simplex)-1;
     order:=M+d-m;
     reg:=random_vector(5000,d);
@@ -1800,7 +1801,7 @@ TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,C
     CCn:=coeff(CCeps,n,m);
     subs({N=n},CCn);
 end:
-CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d;
+CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d; #used in ..._examples.mpl
     d:=nops(Simplex)-1;
     add(TopEhrhartweighted_real(n,Simplex,ell,M,mTopEhrhartweightedPoly_real)*nn^m,m=0..M+d);
 end:
