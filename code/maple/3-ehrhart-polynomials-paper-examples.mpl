@@ -4,7 +4,7 @@ read("RealBarvinok-mars-exemples-2014-03-10.mpl"): # this also loads Conebycone.
 
 ############################################################
 
-"##### Example 1.3 - Numbers of lattice points in a semi-rational rectangle dilated by a real number t. Figure 3. #####";
+printf("##### Example 1.3 - Numbers of lattice points in a semi-rational rectangle dilated by a real number t. Figure 3. #####\n\n");
 
 vertices := [[0, 0], [sqrt(2), 0], [sqrt(2), 1], [0, 1]];
 simple_vertex_cones := [[[1, 0], [0, 1]], 
@@ -22,7 +22,7 @@ E0 := factor(coeff(S, T, 0));
 
 ############################################################
 
-"##### Examples 2.8/2.10/2.15/2.29/2.34/2.36 - Parametric polytope in dimension 2 from 4 hyperplanes (lines) #####";
+printf("##### Examples 2.8/2.10/2.15/2.29/2.34/2.36 - Parametric polytope in dimension 2 from 4 hyperplanes (lines) #####\n\n");
 
 # - chamber tau2 (rectangle) "was computed with our Maple program". Figure 7, 8.
 
@@ -140,7 +140,7 @@ Simplex4 := [[4,6,4,3],[5,7,9,1],[5,7,3,7],[6,8,3,9],[2,1,8,0]];
 
 for k from 0 to 4 do
     printf("## k = %d:\n", k):
-    "Cone-by-cone" = collect((cone_by_cone(Simplex4, [0, 0, 0, 0], 0, k)), t);
+    "Cone-by-cone" = collect((cone_by_cone(t, Simplex4, [0, 0, 0, 0], 0, k)), t);
     "Full-Barvinok" = collect((fullbarvinok(t, Simplex4, k, [0, 0, 0, 0], 0) assuming t::integer), t);
 od;
 
@@ -152,9 +152,9 @@ mars := [[1,1], [1, 2], [2, 2]];
 
 for k from 0 to 2 do
     printf("## k = %d:\n", k):
-    cbc := collect((cone_by_cone_real(mars, [0, 0], 0, k)), t);
+    cbc := collect((cone_by_cone_real(t, mars, [0, 0], 0, k)), t):
     "Cone-by-cone" = cbc;
-    fb := collect(fullbarvinok(t, mars, k, [0, 0], 0), t);
+    fb := collect(fullbarvinok(t, mars, k, [0, 0], 0), t):
     "Full-Barvinok" = fb;
 od;
 
