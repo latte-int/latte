@@ -2,7 +2,10 @@
 MAPLE FILES FROM THE WEBSITE
 ++++++++++++++++++++++++++++
 
-https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl same as knapsackwithdualdec.14.04.2012.mpl
+https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl was a newer version of  knapsackwithdualdec.14.04.2012.mpl (= code/maple/m-knapsack.mpl). 
+Now code/maple/m-knapsack.mpl has been updated to be identical to the code at the website.
+
+
 
 +++++++++++++++++
 LINKS FROM PAPERS
@@ -28,11 +31,11 @@ PAPER: Computation of the Highest Coefficients of Weighted Ehrhart Quasi-polynom
  -- lists LattE macchiato, version 1.2-mk-0.9.3, available from URL http://www.math.ucdavis.edu/~mkoeppe/latte/
  -- lists Maple programs accompanying the manuscript:
     http://www.math.ucdavis.edu/~latte/topweightedehrhart-maple/
- -- this is a directory with a tar file: release-2010-11-05.tar
-
-    TODO: Check relation to code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
+ -- this is a directory with a tar file: release-2010-11-05.tar, which contains "TopEhrhart_lib.mpl" etc.
+    (slightly revised versions of these files (just some tests changed) are in SVN in code/latte/top-ehrhart.)
 
     TODO: Add README to that directory that points to LattE (to an svn working copy of subdirectory code/maple/)
+         (Brandon)
 
 PAPER: Intermediate Sums on Polyhedra: Computation and Real Ehrhart Theory
  -- mentions "our Maple program" but does not offer a link
@@ -52,9 +55,9 @@ CORE MAPLE FILES
 
 code/maple/m-knapsack.mpl: top knapsack Maple code
 
- --- Same as $PISA_PAPERS/knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl
-
- TODO: Double check it's exactly the same as https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl 
+ --- was the same as $PISA_PAPERS/knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl
+ 
+ done: Now replaced by the better verion from https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl 
 
 code/latte/top-ehrhart/TopEhrhart_lib.mpl: the SL method for finding top Ehrhart coefficients
 
@@ -65,7 +68,7 @@ code/latte/top-ehrhart/TopEhrhart_lib.mpl: the SL method for finding top Ehrhart
 
 code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl: Top (real) weighted Ehrhart coefficients of a simple polytope
 
- TODO:  After above, move to code/maple.  (Update Makefiles.)
+ done:  After above, move to code/maple.  (Update Makefiles.)
 
 
 code/latte/integration/integrationTestsLib.mpl: for integrating polynomials over a simplex
