@@ -1564,6 +1564,7 @@ end:
 latteIntervalMod:=proc(lau, n)
 	local r, l, a, u, lnfloor, unfloor;
 	ASSERT(n > 0, "modulus must be positive");
+    ASSERT(type(lau, list), "lau must be a list of length 3");
     l, a, u := op(lau); 
     if (u < l) then  # this easily happens by multiplying lau by a negative scalar.
         u, l := l, u;
@@ -1591,11 +1592,16 @@ if check_examples() then
 fi;
 
 #### LATTE INTERFACE FUNCTION:
+# Evaluate an Ehrhart quasi-polynomial, written using variables "N" and "n",
+# at a value "a". 
 evaluateEhrhart:=proc(epoly, a)
     local l, u, r;
     if type(a, float) then
         l, u := floatToInterval(a);
         try
+             # NOTE: This trick DEPENDS on the Ehrhart quasi-polynomial
+             # being written with two different variables: n in all
+             # "fractional part" expressions; N for the polynomial degree.
              r := expand(eval(subs({N=n, n=[l, n, u], MOD=latteIntervalMod}, epoly)));
              # The result is a polynomial in n, which has to be constant if
              # epoly was the full Ehrhart quasi-polynomial.
