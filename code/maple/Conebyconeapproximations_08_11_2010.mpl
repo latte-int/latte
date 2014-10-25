@@ -15,6 +15,10 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 # ... includes test cases for "fractionalpart" correctness from
 #     cone-by-cone-real-corrected-Nicole-2014-03-09.mpl 
 #     and cone-by-cone-real-corrected-michele-2014-03-09.mpl
+# ... include new functions "cone_by_cone" and "cone_by_cone_real"
+#     (canonical approximating quasi-polynomials for the simplex)
+#
+# Version info: $Date$ $Revision$ 
 #
 # I PUT SOME EXAMPLES AFTER THE PROCEDURE.
 #
@@ -449,47 +453,83 @@ end:
 # Output: This gives the formal ceil function, written CEIL(t), or the
 # ceil of a number.
 #
-# To evaluate after substituting a symbolic t by a number, substitute CEIL by ceil.
+# This function is semi-inert. To evaluate after substituting a
+# symbolic t by a number, substitute CEIL by ceil, or call value().
 #
 # Examples: see below.
-ourceil:=proc(t) local our:
+CEIL:=proc(t) local our:
     our := ceil(t);
     if type(our, numeric) then our;
-    else CEIL(t);
+    else 'CEIL'(t);  # keep symbolic
+    fi;
+end:
+`value/CEIL` := t -> ceil(t):
+if check_examples() then
+    ASSERT(CEIL(1/2) = 1, "CEIL test #1");
+    ASSERT(CEIL(-1/2) = 0, "CEIL test #2");
+    ASSERT(CEIL(xyzzy) = 'CEIL'(xyzzy), "CEIL test #3");
+    ASSERT(CEIL(sqrt(2)) = 2, "CEIL test #4");
+    ASSERT(eval(subs({CEIL=ceil, xyzzy=-1/2}, CEIL(xyzzy))) = 0, "CEIL test #4");
+    ASSERT(value(subs({xyzzy=-1/2}, CEIL(xyzzy))) = 0, "CEIL test #5");
+fi;
+#print the function myceil(x) in latex ceil
+`latex/CEIL`:=proc(x)
+    cat("\\ceil{",latex(x, output=string),"}");
+end:
+if check_examples() then
+    ASSERT(latex(CEIL('x'), output=string) = "\\ceil{x}", "latex/CEIL test #1");
+fi:
+
+# input:
+#	a: any rational number or symbolic expression.
+#	n: any rational number.
+#	return the number in the half-open interval [0,n) that is equal to a mod n
+# This function is semi-inert. To evaluate after substituting a
+# symbolic t by a number, substitute latteMod for MOD, or call value().
+MOD:=proc(x, n) local our;
+	ASSERT(n > 0);
+    our := x - floor(x/n)*n;
+    if type(our, numeric)
+    then our
+    else 'MOD'(x,n);
+    fi:
+end:
+`value/MOD` := (x, n) -> x - floor(x/n)*n:
+# tests appear below, because we want to test the interplay with latteMod.
+`latex/MOD` := proc(x, n) local res;
+    res := cat("\\{", latex(x, output=string), "\\}");
+    if n = 1 
+    then res
+    else cat(res, "_{", latex(n, output=string), "}");
     fi;
 end:
 if check_examples() then
-    ASSERT(ourceil(1/2) = 1, "ourceil test #1");
-    ASSERT(ourceil(-1/2) = 0, "ourceil test #2");
-    ASSERT(ourceil(xyzzy) = CEIL(xyzzy), "ourceil test #3");
-    ASSERT(ourceil(sqrt(2)) = 2, "ourceil test #4");
-    ASSERT(eval(subs({CEIL=ceil, xyzzy=-1/2}, ourceil(xyzzy))) = 0, "ourceil test #4");
-fi;
+    ASSERT(latex(MOD('x', 1), output=string) = "\\{x\\}", "latex/MOD test #1");
+    ASSERT(latex(MOD('x', 7), output=string) = "\\{x\\}_{7}", "latex/MOD test #2");
+fi:
 
 #### LATTE INTERFACE FUNCTION:
 #
-# Function to be substituted for the formal MOD function to get results.
+# Function to be substituted for the formal MOD function to get
+# results.
+# (can as well just use value().)
 #
 # input:
 #	a: any rational number or symbolic expression.
 #	n: any rational number.
 #	return the number in the half-open interval [0,n) that is equal to  a mod n
-latteMod:=proc(a, n)
-	local x;
+latteMod:=proc(x, n)
 	ASSERT(n > 0);
-	x:=a;
-	#while ( x >= n or x < 0) do
-    ### I don't understand what the intention of this while loop
-    ### was.  It fails in the case that `a' is symbolic, such as
-    ### sqrt(2) with the error message "cannot determine if this
-    ### expression is true or false". 
-    ### On the other hand, `floor' works fine for symbolics, if `Digits'
+    ### Note `floor' works fine for symbolics, if `Digits'
     ### is large enough. --mkoeppe
-	x:= x - floor(x/n)*n;
-	#end;
-	return x;
+    x - floor(x/n)*n;
 end:
 if check_examples() then
+    ASSERT(MOD(1/3, 1) = 1/3, "MOD test #1");
+    ASSERT(MOD(-1/3, 1) = 2/3, "MOD test #2");
+    ASSERT(MOD(sqrt(2), 1) = 'MOD'(sqrt(2), 1), "MOD test #3"); 
+    ASSERT(value(MOD(sqrt(2), 1)) = sqrt(2) - 1, "MOD test #4"); 
+    ASSERT(eval(subs({MOD=latteMod}, MOD(sqrt(2), 1))) = sqrt(2) - 1, "MOD test #5"); 
     ASSERT(latteMod(1/3, 1) = 1/3, "latteMod test #1");
     ASSERT(latteMod(-1/3, 1) = 2/3, "latteMod test #2");
     ASSERT(latteMod(sqrt(2), 1) = sqrt(2) - 1, "latteMod test #3"); # Note the difference to what we output in fractionalpart and nfractionalpartreal!  
@@ -551,6 +591,7 @@ if check_examples() then
     ASSERT(nfractionalpart(xyzzy, 10, 5) = 0, "nfractionalpart test #2");
     ASSERT(nfractionalpart(1,0,1) = 0, "nfractionalpart test #3");
     ASSERT(eval(subs({MOD=latteMod, xyzzy=2}, nfractionalpart(xyzzy, 13, 5))) = 1/5, "nfractionalpart test #4");
+    ASSERT(value(subs({xyzzy=2}, nfractionalpart(xyzzy, 13, 5))) = 1/5, "nfractionalpart test #5");
 fi;
 
 ## helper function for nfractionalpartreal.
@@ -590,6 +631,7 @@ if check_examples() then
     ASSERT(nfractionalpartreal(1,0,1) = 0, "nfractionalpartreal test #5");
     ASSERT(nfractionalpartreal(7/6, 3, 1) = 1/2, "nfractionalpartreal test #6");
     ASSERT(eval(subs({MOD=latteMod, xyzzy=2/13}, nfractionalpartreal(xyzzy, 13, 5))) = 2/5, "nfractionalpartreal test #7");
+    ASSERT(value(subs({xyzzy=2/13}, nfractionalpartreal(xyzzy, 13, 5))) = 2/5, "nfractionalpartreal test #8");
 fi;
 
 # Relative volume
@@ -795,7 +837,7 @@ S_Ispace_Coneformulaa:=proc(s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspa
             ASSERT(abs(uni_cones[j][2])=1, "decomposition not unimodular");
             newP:=MatrixInverse(Transpose(Matrix(WWW)));
             news:=convert(Multiply(newP,Vector(s_Cspace_in_lattice_coord)),list); ##print(news);
-            s_prime_Cspace:=[seq(ourceil(news[f]),f=1..nops(news))];
+            s_prime_Cspace:=[seq(CEIL(news[f]),f=1..nops(news))];
             function_on_Cspace:=functionS(s_prime_Cspace,WWW,newxi);
             out1:=out1+signuni*function_on_Cspace[1]/function_on_Cspace[2]*function_on_ISpace[1]/function_on_ISpace[2];
         od:
@@ -1019,6 +1061,8 @@ fi;
 #
 
 # EXAMPLE ARE GIVEN AFTER THE PROCEDURE:
+#
+# FIXME: This introduces a new variable N; should be a parameter.
 
 dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
     s_Cspace_in_lattice_coord,news,
@@ -1131,6 +1175,7 @@ end:
 #	simpleCones: the polytope.
 #	n: symbolic variable. the coefficients are functions of n. example: 3mod(n,2)^3
 #	nn: symbolic variable. The coefficients are graded by N. example (3mod(n,2)^3 + 2)*nn^3
+#	useRealDilations: If true, the polynomial is correct for evaluations at arbitrary real dilations, not just integer.
 #	topK: compute the top topK+1 coefficients.
 #return: the polynomial
 findEhrhartPolynomial_linearForm:=proc(n,nn,simpleCones,ell,M,d, useRealDilations, topK) 
@@ -1211,7 +1256,7 @@ end:
 #	simpleCones: the polytope.
 #	linearForms: list of powers of linear forms
 #	d: dimension of the polytope
-#	useRealDilations: ture=the polynomial can be evaluaded at rational dilations.
+#	useRealDilations: If true, the polynomial is correct for evaluations at arbitrary real dilations, not just integer.
 #	topK: find the top topK coefficients (note this function does not compute the top topk+1)
 #	filename: if -1, the polynomial is not saved to a file. Else, the polynomial is saved to fileName.
 printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d, useRealDilations, topK, fileName) 
@@ -1390,7 +1435,7 @@ end:
 #
 #
 #
-#
+# FIXME: This introduces new variable "N"; should be a parameter!
 #
 
 dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
@@ -1819,23 +1864,38 @@ end:
 # This comes from cone-by-cone-real-corrected-Nicole-2014-03-09.mpl
 #
 
-# FIXME: Should have a parameter for "t".
-
 # For integer dilations.
-cone_by_cone:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn;
+cone_by_cone:=proc(t,Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn;
     d:=nops(Simplex)-1;CCn:=0;
     #order:=M+nops(Simplex)-codim; 
     reg:=random_vector(5000,d); 
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx); # new symbolic n.
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); 
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=add(coeff(CCeps,n,m)*t^(m),m=0..M+d);
     subs({N=n},CCn);
 end:
+if check_examples() then
+    ### Tests from cone-by-cone-real-corrected-Nicole-2014-03-09.mpl
+    testfrac := [[2, 1, 4], [2, 8, 7], [4, 3, 2], [2, 8, 2]]:
+    testdim2 := [[1, 1], [1, 0], [0, 1]]:
+    ASSERT(cone_by_cone(t, testfrac,[1,5,7],0,0)
+           = 35/3*t^3,
+           "cone_by_cone test #1");
+    ASSERT(cone_by_cone(u, testfrac,[1,5,7],0,0)
+           = 35/3*u^3,
+           "cone_by_cone test #1a");
+    ASSERT(value(cone_by_cone(t, testfrac,[1,5,7],0,1))
+           = 629/420*t+11*t^2+35/3*t^3,
+           "cone_by_cone test #2");
+    ASSERT(value(cone_by_cone(t, testdim2,[1,5],0,2))
+           = 1+3/2*t+1/2*t^2,
+           "cone_by_cone test #3");
+fi:
 
 # For real dilations.
-cone_by_cone_real:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn,newCCn;
+cone_by_cone_real:=proc(t,Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn,newCCn;
     d:=nops(Simplex)-1;CCn:=0;
     reg:=random_vector(5000,d); 
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
@@ -1844,7 +1904,7 @@ cone_by_cone_real:=proc(Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn,new
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=add(coeff(CCeps,n,m)*t^(m),m=0..M+d);
     newCCn:=subs({N=n},CCn); newCCn:=subs(n=t,newCCn);
-    eval(subs(MOD=latteMod,newCCn));    ### FIXME: Using latteMod gives us the result in terms of floors, that's not what we want.
+    newCCn;
 end:
 
 if check_examples() then
@@ -1852,21 +1912,24 @@ if check_examples() then
     testfrac := [[2, 1, 4], [2, 8, 7], [4, 3, 2], [2, 8, 2]]:
     testdim2 := [[1, 1], [1, 0], [0, 1]]:
     testdim4 := [[6,9,5,1],[3,5,4,0],[7,4,9,1],[1,3,7,2],[8,9,1,7]]:
-    bonfrac := proc(x) latteMod(x, 1) end: # defined only! for testing.
-    ASSERT(cone_by_cone_real(testfrac,[1,5,7],0,0)
+    bonfrac := proc(x) x-floor(x) end: # defined only! for testing.
+    ASSERT(cone_by_cone_real(t,testfrac,[1,5,7],0,0)
            = 35/3*t^3, 
            "cone_by_cone_real test #1");
-    ASSERT(cone_by_cone_real(testfrac,[1,5,7],0,1)
+    ASSERT(cone_by_cone_real(u,testfrac,[1,5,7],0,0)
+           = 35/3*u^3, 
+           "cone_by_cone_real test #1a");
+    ASSERT(value(cone_by_cone_real(t,testfrac,[1,5,7],0,1))
            = -1/7350*bonfrac(-40*t)-35/48*bonfrac(-2*t)-1/7350*bonfrac(45*t)-5/2352*bonfrac(26*t)+1/2450*bonfrac(-40*t)^2-1/3675*bonfrac(-40*t)^3+35/16*bonfrac(-2*t)^2-35/24*bonfrac(-2*t)^3+1/2450*bonfrac(45*t)^2-1/3675*bonfrac(45*t)^3+5/784*bonfrac(26*t)^2-5/1176*bonfrac(26*t)^3+(-1/35*bonfrac(-40*t)+1/35*bonfrac(-40*t)^2-35/4*bonfrac(-2*t)+35/4*bonfrac(-2*t)^2+1/35*bonfrac(45*t)^2-1/35*bonfrac(45*t)-5/28*bonfrac(26*t)+5/28*bonfrac(26*t)^2+629/420)*t+(11-bonfrac(-40*t)-35/2*bonfrac(-2*t)-bonfrac(45*t)-5/2*bonfrac(26*t))*t^2+35/3*t^3,
            "cone_by_cone_real test #2");
     #conetestfrac2:=cone_by_cone_real(testfrac,[1,5,7],0,2):
     #conetestfrac3:=cone_by_cone_real(testfrac,[1,5,7],0,3);
-    ASSERT(cone_by_cone_real(testdim2,[1,5],0,2)
+    ASSERT(value(cone_by_cone_real(t,testdim2,[1,5],0,2))
            = 1-(-bonfrac(t)+1/2)*bonfrac(t)-2*(-bonfrac(-t)+1/2)*bonfrac(t)-3/2*bonfrac(-t)-3/2*bonfrac(t)+bonfrac(t)^2+1/2*bonfrac(-t)^2+(-2*bonfrac(t)-bonfrac(-t)+3/2)*t+1/2*t^2,
            "cone_by_cone_real test #3");
     ### Tests from cone-by-cone-real-corrected-michele-2014-03-09.mpl
     testfrac := [[1, 1, 1], [4, 2, 1], [1, 1, 2], [2, 2, 2]];
-    conetestfrac3:=cone_by_cone_real(testfrac,[1,5,7],0,3):
+    conetestfrac3:=cone_by_cone_real(t,testfrac,[1,5,7],0,3):
     ASSERT([seq(eval(subs(t=i/24, conetestfrac3)),i=0..50)] 
            = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 5, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 11, 5, 5],
            "cone_by_cone_real test #4");
