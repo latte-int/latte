@@ -5,7 +5,7 @@ AC_PREREQ(2.59)
 AC_INIT(latte-int, 1.7.2)
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([code/config.h:code/config.hin])
-AM_INIT_AUTOMAKE([gnu])
+AM_INIT_AUTOMAKE([gnu 1.11])  # Need 1.11 for parallel test harness in code/maple
 AM_MAINTAINER_MODE
 AC_CONFIG_FILES([Makefile EXAMPLES/Makefile doc/Makefile code/Makefile code/latte/Makefile code/latte/normalize/Makefile code/test-suite/Makefile code/maple/Makefile code/lidia-include.h:code/lidia-include.hin])
 AC_CONFIG_FILES([code/test-suite/test.pl], [chmod +x code/test-suite/test.pl])
