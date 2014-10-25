@@ -7,6 +7,8 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 # CHECK_EXAMPLES := true:
 
 ### PROGRAM ACCOMPANYING THE ARTICLE "THREE EHRHART POLYNOMIALS".
+###
+### Version info: $Date$ $Revision$ 
 
 # procedures principales:
 #
@@ -22,7 +24,19 @@ check_examples:=proc()
     type(CHECK_EXAMPLES, boolean) and CHECK_EXAMPLES;
 end:
 
-# Helper functions to write ASSERT statements.
+# Like ASSERT, but with better reporting (for automatic tests).
+# FIXME: Use it in all test cases instead of ASSERT.
+TEST_EQUAL:=proc(a_expr, b_expr, message) local a, b;
+    printf("Checking %s\n", message);
+    a := eval(parse(a_expr));
+    b := eval(parse(b_expr));
+    if not (a = b) then
+        printf("FAIL: Results differ:\n  Got:       %a\n  Should be: %a\n", a, b);
+    fi:
+end:
+
+# Helper functions to write ASSERT statements.  FIXME: Update to emit
+# TEST_EQUAL instead.
 print_assertion:=proc(expression, funcname, testnum)
     printf("    ASSERT(%s\n           = %a,\n           \"%s test #%a\");\n", 
            expression, eval(parse(expression)), funcname, testnum);
@@ -400,6 +414,7 @@ function_SL:=proc(s,W,L,x)  #NEW
         #from here express in terms of the basis lattice for projected cone.
 
         WW_projected:=projectedconeinbasislattice(WW,II,ProjLattice):
+        #print(WW_projected);
 
         if WW_projected=[] then 
             out1:=1 
@@ -424,17 +439,15 @@ function_SL:=proc(s,W,L,x)  #NEW
     out2;
 end:
 if check_examples() then
-    ASSERT(function_SL([1/2,0,0],[[-1,0,1],[-1,2,0],[0,0,1]],[[-1,2,0]],[x1,x2,x3])
-           =
-           (2*TODD(1, (1/2)*x1)*TODD(0, -x1+x3)/(x1*(-x1+x3))-2*TODD(0, x3)*TODD(-1, -(1/2)*x1)/(x3*x1))*EXP(0)/(x1-2*x2),
-           "function_SL test #1");
-    ASSERT(function_SL([0,0,0],[[1,0,0],[0,2,1],[0,0,1]],[[1,1,1]],[x1,x2,x3])
-           =
-           TODD(0,x1)*TODD(0,2*x2+x3)/x1/(2*x2+x3)*EXP(0)/(-x1-x2-x3)
-           +TODD(0,-x1)*TODD(0,-x3)/x1/x3*EXP(0)/(-x1-x2-x3)
-           -(-TODD(0,x3)*TODD(0,x2)/x3/x2+TODD(0,2*x2+x3)*TODD(0,x2)/(2*x2+x3)/x2)*EXP(0)/(-x1-x2-x3),
-           "function_SL test #2");
-fi:
+    TEST_EQUAL("function_SL([1/2,0,0],[[-1,0,1],[-1,2,0],[0,0,1]],[[-1,2,0]],[x1,x2,x3])",
+               "(2*TODD(1, (1/2)*x1)*TODD(0, -x1+x3)/(x1*(-x1+x3))-2*TODD(0, x3)*TODD(-1, -(1/2)*x1)/(x3*x1))*EXP(0)/(x1-2*x2)",
+               "function_SL test #1");
+    TEST_EQUAL("function_SL([0,0,0],[[1,0,0],[0,2,1],[0,0,1]],[[1,1,1]],[x1,x2,x3])",
+               " TODD(0,x1)*TODD(0,2*x2+x3)/x1/(2*x2+x3)*EXP(0)/(-x1-x2-x3)\
+                +TODD(0,-x1)*TODD(0,-x3)/x1/x3*EXP(0)/(-x1-x2-x3)\
+                -(-TODD(0,x3)*TODD(0,x2)/x3/x2+TODD(0,2*x2+x3)*TODD(0,x2)/(2*x2+x3)/x2)*EXP(0)/(-x1-x2-x3)",
+               "function_SL test #2");
+fi;
 
 
 # Input: W a cone, L a linear space,x a variable.
@@ -697,6 +710,11 @@ if check_examples() then
     ASSERT(simplify(eval(subs({ourfrac=bonfrac}, 1/72*Pi^2+1/6*(-ourfrac(1/3*Pi)+3/2-ourfrac(-1/6*Pi))*Pi+1/2*ourfrac(-1/6*Pi)^2-3/2*ourfrac(1/3*Pi)-3/2*ourfrac(-1/6*Pi)+1/2*ourfrac(1/3*Pi)^2+1+ourfrac(-1/6*Pi)*ourfrac(1/3*Pi)))) = 1, "ourfrac test #7");
 fi:
 
+## Instead of using ourfrac(t), we now write MOD(t, 1), just as in
+## Conebycone.  (Comment out this line if you want to see "ourfrac" in the
+# output instead.)
+ourfrac := t -> MOD(t, 1):
+
 # We are dilating the cone by t and compute the function SL
 # t is the variable that appears inside frac expressions.
 # T is the variable that corresponds to polynomial degree.
@@ -787,9 +805,9 @@ ttruncatedSL:=proc(t,T,s,W,L,ell,reg,M) local SS,cc;
     coeff(series(cc,epsilon=0,nops(W)+2),epsilon,0); 
 end:
 if check_examples() then
-    ASSERT(simplify(ttruncatedSL(t,T,[1/2,1/2],[[1,0],[0,1]],[[1,0]],[1,1],[1,1],0))
-           = 1/12*(12+12*delta*ourfrac(-1/2*t)+12*delta*T-6*delta+6*ourfrac(-1/2*t)^2*delta^2+12*T*ourfrac(-1/2*t)*delta^2+6*T^2*delta^2-6*T*delta^2-6*ourfrac(-1/2*t)*delta^2+delta^2)/delta^2,
-          "ttruncatedSL test #1");
+    TEST_EQUAL("simplify(ttruncatedSL(t,T,[1/2,1/2],[[1,0],[0,1]],[[1,0]],[1,1],[1,1],0))",
+               "1/12*(12+12*delta*ourfrac(-1/2*t)+12*delta*T-6*delta+6*ourfrac(-1/2*t)^2*delta^2+12*T*ourfrac(-1/2*t)*delta^2+6*T^2*delta^2-6*T*delta^2-6*ourfrac(-1/2*t)*delta^2+delta^2)/delta^2",
+               "ttruncatedSL test #1");
     # Example 1.3
     vertices := [[0, 0], [sqrt(2), 0], [sqrt(2), 1], [0, 1]];
     simple_vertex_cones := [[[1, 0], [0, 1]], 
@@ -800,10 +818,10 @@ if check_examples() then
     ell := [1, 0]: # an arbitrary linear form.
     M := 0:        # we compute the sum of ell^M.
     reg := [1, 1]: # a regular linear form.
-    S := expand(add(ttruncatedSL('t', 'T', vertices[i], simple_vertex_cones[i], L, ell, reg, M), i=1..nops(vertices))):
-    ASSERT(S                                                                                                                               
-           = 1+T+T*2^(1/2)-ourfrac(2^(1/2)*t)+T^2*2^(1/2)+ourfrac(t)*ourfrac(2^(1/2)*t)-ourfrac(t)*T*2^(1/2)-ourfrac(t)-T*ourfrac(2^(1/2)*t),
-           "ttruncatedSL test #2");
+    S := 
+    TEST_EQUAL("expand(add(ttruncatedSL('t', 'T', vertices[i], simple_vertex_cones[i], L, ell, reg, M), i=1..nops(vertices)))",
+               "1+T+T*2^(1/2)-ourfrac(2^(1/2)*t)+T^2*2^(1/2)+ourfrac(t)*ourfrac(2^(1/2)*t)-ourfrac(t)*T*2^(1/2)-ourfrac(t)-T*ourfrac(2^(1/2)*t)",
+               "ttruncatedSL test #2");
 fi:
 
 # Simplex S (given by vertices), dilated by t.
