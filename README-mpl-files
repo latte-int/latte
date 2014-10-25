@@ -12,8 +12,11 @@ PAPER: How to integrate a polynomial over a simplex,
  Maple programs accompanying the manuscript
  -- lists URL http://www.math.ucdavis.edu/~mkoeppe/art/pisa-integration-experiments/
 
-    TODO: Add README to that directory that points to current state of the art 
-          (Maple and C++ implementations in LattE). 
+    done: Add README to that directory that points to current state of the art 
+          (C++ implementations in LattE). 
+
+    MAYBE: If we expose the cleaned up Maple integration code in Latte code/maple again,
+           also point to that.
 
 PAPER: Software for Exact Integration of Polynomials over Polyhedra (published in CGTA)
  -- documents the input format (as in LattE manual).
@@ -29,7 +32,7 @@ PAPER: Computation of the Highest Coefficients of Weighted Ehrhart Quasi-polynom
 
     TODO: Check relation to code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl
 
-    TODO: Add README to that directory that points to LattE (ideally to git subdirectory code/maple/)
+    TODO: Add README to that directory that points to LattE (to an svn working copy of subdirectory code/maple/)
 
 PAPER: Intermediate Sums on Polyhedra: Computation and Real Ehrhart Theory
  -- mentions "our Maple program" but does not offer a link
@@ -39,8 +42,9 @@ PAPER: Intermediate Sums on Polyhedra II: Bidegree and Poisson Formula
     a symbolic vertex s; the resulting formulas are naturally valid for
     any real vector" but does not offer a link  
 
-PAPER: Three Ehrhart Polynomials (to be finished)
+PAPER: Three Ehrhart Quasi-polynomials (to be finished)
 
+    TODO: Refer to files.
 
 ++++++++++++++++
 CORE MAPLE FILES
@@ -76,7 +80,7 @@ NEW FILES FROM DROPBOX
 
  DONE:  Add to tree
 
- TODO:  compare the versions, clean up
+ DONE:  compare the versions, clean up
 
 
 ++++++++++++++++++++++++++
