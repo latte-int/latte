@@ -1,9 +1,24 @@
-This a distribution of the MAPLE programs that test the algorithms
-presented in the paper ``Computation of the Highest coefficients
-of Weighted Ehrhart Quasi-polynomials of rational polyhedra'' by
-V. Baldoni, N. Berline, J. De Loera, M. Koeppe, and M. Vergne.
-We thankful for the help we received from students B. Dutra and
-G. Pinto.
+This directory contains a distribution of the Maple programs that
+implement and test the algorithms presented in the paper:
+
+  - Velleda Baldoni, Nicole Berline, Jesus A. De Loera, Matthias
+    Koeppe, and Michele Vergne, Computation of the highest
+    coefficients of weighted Ehrhart quasi-polynomials of rational
+    polyhedra, Foundations of Computational Mathematics 12 (2012),
+    435-469, doi:10.1007/s10208-011-9106-4
+
+The authors are thankful for the help received from students
+B. Dutra and G. Pinto.
+
+This distribution of Maple programs is available here for archival
+purposes.
+
+For any production use, please use the revised Maple programs instead
+that have been released as part of LattE integrale, version 1.7.
+
+See https://www.math.ucdavis.edu/~latte
+
+
 
 The release has 3 files:
 
