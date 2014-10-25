@@ -1,0 +1,78 @@
+This directory, available both on the LattE website and as part of the
+LattE integrale distribution (in the directory code/maple), contains
+LattE's Maple programs, which can be used independently.
+
+
+Conebyconeapproximations_08_11_2010.mpl
+
+  It contains Maple code for computing the highest coefficients of
+  Ehrhart quasi-polynomials, using the algorithm of this paper:
+
+  - Velleda Baldoni, Nicole Berline, Jesus A. De Loera, Matthias
+    Koeppe, and Michele Vergne, Computation of the highest
+    coefficients of weighted Ehrhart quasi-polynomials of rational
+    polyhedra, Foundations of Computational Mathematics 12 (2012),
+    435-469, doi:10.1007/s10208-011-9106-4
+
+  These functions are also accessible using LattE's "integrate"
+  function; see the LattE manual.
+
+  It can also compute the canonical cone-by-cone patched
+  quasi-polynomial defined in the paper:
+
+  - Velleda Baldoni, Nicole Berline, Jesus A. De Loera, Matthias
+    Koeppe, and Michele Vergne, Three Ehrhart Quasi-polynomials, 2014.
+
+
+m-knapsack.mpl
+
+  It contains Maple code for computing the highest coefficients of
+  Ehrhart quasi-polynomials of knapsack polytopes, using the algorithm
+  of the papers:
+
+  - Velleda Baldoni, Nicole Berline, Jesus A. De Loera, Brandon
+    E. Dutra, Matthias Koeppe, and Michele Vergne, Top degree
+    coefficients of the denumerant, 25th International Conference on
+    Formal Power Series and Algebraic Combinatorics (FPSAC 2013),
+    DMTCS proc. AS, Discrete Mathematics and Theoretical Computer
+    Science (DMTCS), 2013, pp. 1149-1160, available from
+    http://www.dmtcs.org/dmtcs-ojs/index.php/proceedings/article/view/dmAS0197/4324
+    
+  - Velleda Baldoni, Nicole Berline, Jesus A. De Loera, Matthias
+    Koeppe, and Michele Vergne, Coefficients of Sylvester's denumerant,
+    eprint arXiv:1312.7147 [math.CO], 2013
+
+  LattE integrale also contains a native C++ implementation of the
+  same algorithm.  It is MUCH faster, so we recommend that for any
+  production use.  See the LattE manual.
+
+
+RealBarvinok-mars-exemples-2014-03-10.mpl
+
+  It contains Maple code for computing intermediate generating
+  functions S^L (by means of Brion-Vergne decomposition) and
+  intermediate Ehrhart quasi-polynomials, using the algorithms in:
+
+  - Velleda Baldoni, Nicole Berline, Matthias Koeppe, and Michele
+    Vergne, Intermediate sums on polyhedra: Computation and real
+    Ehrhart theory, Mathematika 59 (2013), no. 1, 1-22,
+    doi:10.1112/S0025579312000101
+
+  It also contains Maple code for computing the canonical Barvinok
+  patched generating function and quasi-polynomial for a simplex,
+  as described in:
+
+  - Velleda Baldoni, Nicole Berline, Jesus A. De Loera, Matthias
+    Koeppe, and Michele Vergne, Three Ehrhart Quasi-polynomials, 2014.
+
+
+3-ehrhart-polynomials-paper-examples.mpl
+
+  Computational examples from the paper:
+
+  - Velleda Baldoni, Nicole Berline, Jesus A. De Loera, Matthias
+    Koeppe, and Michele Vergne, Three Ehrhart Quasi-polynomials, 2014.
+
+
+The other files are part of LattE's build system and can be ignored.
+

@@ -294,6 +294,7 @@ code/maple/3-ehrhart-polynomials-paper-examples.mpl -text
 code/maple/Conebyconeapproximations_08_11_2010.mpl -text
 code/maple/Conebyconeapproximations_08_11_2010_examples.mpl -text
 code/maple/Makefile.am -text
+code/maple/README -text
 code/maple/RealBarvinok-mars-exemples-2014-03-10.mpl -text
 code/maple/m-knapsack.mpl -text
 code/maple/test-maple.sh.in -text
