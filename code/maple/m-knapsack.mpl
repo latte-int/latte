@@ -1,4 +1,12 @@
 with(combinat):with(LinearAlgebra):with(linalg):with(numtheory):
+kernelopts(assertlevel=1):       ### Enable checking ASSERTions
+
+## Define this variable to have the code check self-tests (some expensive)
+## (this is for "make check", not for production code).
+#
+CHECK_EXAMPLES := true:
+
+
 # Let A=[A_1,..,A_{N+1}] be a list of  positive integers and t a variable.
 # We compute the knapsack for A: the number of  integral solutions for A_1x_1+..+A_{N+1}x_{N+1}=t.
 # The output of this as a step polynomial function  of t.
@@ -27,10 +35,37 @@ with(combinat):with(LinearAlgebra):with(linalg):with(numtheory):
 #	
 
 
+##################################
+#Start example checking functinos#
+##################################
+
+# Like ASSERT, but with better reporting (for automatic tests).
+# Example usage: TEST_EQUAL("sqrt(4)", "2", "sqrt test #1");
+TEST_EQUAL:=proc(a_expr, b_expr, message) local a, b;
+    printf("Checking %s\n", message);
+    a := eval(parse(a_expr));
+    b := eval(parse(b_expr));
+    if not (a = b) then
+        printf("FAIL: Results differ:\n  Got:       %a\n  Should be: %a\n", a, b);
+    fi:
+end:
+
+# Find out whether we are to check examples.
+# Uses the global CHECK_EXAMPLES
+# Example usage 
+#   if check_examples() then
+#     TEST_EQUAL("sqrt(4)", "2", "sqrt test #1");
+#     TEST_EQUAL("sqrt(0)", "0", "sqrt test #2");
+#     TEST_EQUAL("2^3", "8", "power test #1");
+#   fi;
+check_examples:=proc()
+    type(CHECK_EXAMPLES, boolean) and CHECK_EXAMPLES;
+end:
+
 
 
 ############################
-#Start of Library functions#
+#Start of library functions#
 ############################
 
 
@@ -54,11 +89,18 @@ primitive_vector:=proc(A) local d,n,g;
 		[seq(n*A[i]/g,i=1..d)];
      else [seq(n*A[i],i=1..d)];
 	fi;
-	end:
+end:
+if check_examples() then
+	TEST_EQUAL("primitive_vector([2,2,2,8,16,100])", "[1, 1, 1, 4, 8, 50]", "test primitive_vector #1");
+	TEST_EQUAL("primitive_vector([1234/1345, 1234/122, 2457/3568, 4, -24/2457, -6])", "[219965080608, 2425024864080, 165097758735, 959004970560, -2341892480, -1438507455840]", "test primitive_vector #2");
+fi;
+
+
 #COMPLEMENT LIST 
 #The output is the Complement  List, within the list [1,..,d]
 ComplementList:=proc(K,d);
-	RETURN([seq (`if` (member(i,K)=false, i, op({})),i=1..d)]);end:
+	RETURN([seq (`if` (member(i,K)=false, i, op({})),i=1..d)]);
+end:
 
 random_vector:=proc(N,d) local R;
 	R:=rand(N);
@@ -71,7 +113,6 @@ ortho_basis:=proc(d) local i,v;
 	od;
 	[seq(v[j],j=1..d)];
 end:
-# Cone decomposition
 
 #  Signed decomposition into unimodular cones
 # A "simplicial cone" is a list of  d linearly independent  vectors in Z^d, sometimes assumed primitive. 
@@ -91,7 +132,10 @@ short_vector:=proc(A) local n,base,i,sho;
 	od;
 	sho;
 end:
-
+if check_examples() then
+	TEST_EQUAL("short_vector([[2200,2200],[2,100]])", "[2, 100]", "test short_vector #1");
+	TEST_EQUAL("short_vector([[-2200,-2200,-2346],[2,100,-565], [457,568,-2457]])", "[449, 168, -197]", "test short_vector #2");		
+fi;
 
 # # sign_entries_vector(V)
 # #  Input : vector V of dimension d.
@@ -126,6 +170,10 @@ good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L;
        L:= sign_entries_vector(sho);
 	[V,L];
 end:
+if check_examples() then
+	TEST_EQUAL("good_vector([[2200,2129],[101,100]])", "[[31, 30], [[1, 2], [], []]]", "test good_vector #1");	
+fi;
+
 
 # # signed_decomp(eps,G,v,L)
 # # Input :  eps = 1 or -1
@@ -168,6 +216,7 @@ signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,
  	end if;
  	[Nonuni,Uni];
  end:
+
  
 # # good_cone_dec(eps,G)
 # #  Input: eps = 1 or -1
@@ -182,6 +231,11 @@ good_cone_dec:=proc(eps,G) local n,A,R,Output, det_A;
           	Output:=signed_decomp(eps,G,R[1],R[2]);
    	fi;
 end:
+if check_examples() then
+	TEST_EQUAL("good_cone_dec(-1, [[2200,2129],[101,100]])", "[[[1, 70, [[-101, -100], [31, 30]]]], [[-1, 1, [[2200, 2129], [31, 30]]]]]", "test good_cone_dec #1");
+	TEST_EQUAL("good_cone_dec(-1, [[2200,2129,5675],[101,100,-4545], [45613,345,-135]])", " [[[-1, -10243805, [[1, 0, 0], [2200, 2129, 5675], [101, 100, -4545]]], [-1, -1554525, [[45613, 345, -135], [-1, 0, 0], [101, 100, -4545]]], [1, -2245290, [[45613, 345, -135], [-1, 0, 0], [-2200, -2129, -5675]]]], []]", "test good_cone_dec #2");	
+fi;
+
 
 # # more_decomposition_in_cones(cones)
 # # Input:  cones =[cones[1],cones[2]] as in procedure signed_decomp
@@ -219,6 +273,10 @@ cone_dec:=proc(G) local seed, i,ok;
 	od;
     	RETURN(seed[2]);
 end:
+if check_examples() then
+	TEST_EQUAL("cone_dec([[2200,2129],[101,100]])", "[[1, 1, [[2200, 2129], [31, 30]]], [-1, 1, [[-1, -1], [31, 30]]], [1, 1, [[-1, -1], [101, 100]]]]", "test cone_dec #1");
+	TEST_EQUAL("cone_dec([[7,12,3],[101,0,0], [7,5,-5]])", "[[-1, 1, [[3, 4, 0], [-7, -12, -3], [7, 5, -5]]], [1, 1, [[3, 4, 0], [-7, -12, -3], [0, 1, 1]]], [1, 1, [[0, 1, 1], [1, 1, 0], [-1, 0, 0]]], [1, 1, [[-2, -2, 1], [7, 5, -5], [0, 1, 1]]], [1, 1, [[-1, -1, 1], [2, 2, -1], [0, 1, 1]]], [-1, 1, [[0, -1, -1], [0, 1, 0], [1, 0, 0]]], [1, 1, [[1, 1, -1], [0, 1, 0], [1, 0, 0]]], [1, 1, [[1, 1, -1], [0, 1, 1], [0, -1, 0]]], [1, 1, [[5, 4, -3], [0, -1, -1], [7, 5, -5]]], [-1, 1, [[5, 4, -3], [-3, -4, 0], [7, 5, -5]]], [1, 1, [[5, 4, -3], [-3, -4, 0], [0, 1, 1]]], [1, -1, [[1, 0, 0], [2, 4, 1], [1, 1, 0]]], [-1, -1, [[7, 12, 3], [2, 4, 1], [1, 1, 0]]], [-1, 1, [[0, 1, 1], [1, 1, 0], [3, 5, 1]]], [1, 1, [[7, 12, 3], [1, 1, 0], [3, 5, 1]]], [-1, 1, [[7, 12, 3], [0, -1, -1], [3, 5, 1]]], [-1, -1, [[-4, -3, 3], [-7, -5, 5], [2, 2, -1]]], [1, -1, [[-4, -3, 3], [1, 1, -1], [2, 2, -1]]]]", "test cone_dec #2");	
+fi;
 
 # new Cone dec via polar
 
@@ -240,7 +298,10 @@ new_short_vector:=proc(A) local n,base,i,sho;
 	od;
 	sho;
 end:
-
+if check_examples() then
+	TEST_EQUAL("new_short_vector([[2200,2200],[2,100]])", "[2, 100]", "test new_short_vector #1");
+	TEST_EQUAL("new_short_vector([[-2200,-2200,-2346],[2,100,-565], [457,568,-2457]])", "[449, 168, -197]", "test new_short_vector #2");		
+fi;
 
 
 # # good_vector(G)
@@ -249,22 +310,30 @@ end:
 # #                
 
 polar_good_vector:=proc(G) local n,A,Ainverse,B,sho,V,L,newV,VV,ok,i,out;
-          n:=nops(G);  
-          A:=Transpose(Matrix(G));      
-          Ainverse:=MatrixInverse(A);
-          B:=[seq(convert(Ainverse[1..n,i],list),i=1..n)]; #print("B",B);
-          sho:=new_short_vector(B); 
-          V :=[seq(add(G[j][i]*sho[j],j=1..n),i=1..n)];
- newV:=LinearSolve(A,Vector(V));
-VV:=convert(newV,list);
-ok:=0;i:=1; while i<= nops(VV) and ok=0 do  
- if VV[i]<=0 then i:=i+1;
-else ok:=1; i:=nops(VV)+1;
-fi; od:   
-if ok=1 then out:=V; else out:=[seq(-V[i],i=1..nops(V))];
-fi;
-out;
+	n:=nops(G);  
+	A:=Transpose(Matrix(G));      
+	Ainverse:=MatrixInverse(A);
+	B:=[seq(convert(Ainverse[1..n,i],list),i=1..n)]; #print("B",B);
+	sho:=new_short_vector(B); 
+	V :=[seq(add(G[j][i]*sho[j],j=1..n),i=1..n)];
+	newV:=LinearSolve(A,Vector(V));
+	VV:=convert(newV,list);
+	ok:=0;i:=1; 
+	while i<= nops(VV) and ok=0 do  
+		if VV[i]<=0 then i:=i+1;
+		else ok:=1; i:=nops(VV)+1;
+		fi; 
+	od:   
+	if ok=1 then 
+		out:=V; 
+	else 
+		out:=[seq(-V[i],i=1..nops(V))];
+	fi;
+	out;
 end:
+if check_examples() then
+	TEST_EQUAL("polar_good_vector([[2200,2129],[101,100]])", "[31, 30]", "test polar_good_vector #1");		
+fi;
 
 # # signed_decomp(G,v)
 # # Input :  signum = 1 or -1 
@@ -274,26 +343,29 @@ end:
 # #              Nonuni and Uni are  lists of terms  [eps,G],  where
 # #               eps=1 or -1,  
 # #               G  is a  list of  d linearly independant primitive  vectors in Z^d. 
- 
-
 polar_signed_decomp:=proc(signum,G,v) local eps,Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,kzero,i,j, C,M, detC, Csigned ; 
 	Nonuni:=[]; Uni:=[];
 	
-  eps:=sign(Determinant(Matrix(G)));
-		for i from 1 to nops(G) do
-        		C:=[seq(G[j],j=1..i-1),v,seq(G[j],j=i+1..nops(G))];
-
-		        detC := Determinant(Matrix(C));        
-		        Csigned:=[signum*eps*sign(detC),C];       
-  if detC<>0then
-		       if abs(detC)>1 then
+	eps:=sign(Determinant(Matrix(G)));
+	for i from 1 to nops(G) do
+    	C:=[seq(G[j],j=1..i-1),v,seq(G[j],j=i+1..nops(G))];
+		detC := Determinant(Matrix(C));        
+		Csigned:=[signum*eps*sign(detC),C];       
+		if detC<>0then
+			if abs(detC)>1 then
        			Nonuni:=[op(Nonuni),Csigned] 
-          
-else Uni:=[op(Uni),Csigned];
-        		fi;else fi;
-   		od;
+       		else 
+       			Uni:=[op(Uni),Csigned];
+        	fi;
+        else fi;
+   	od;
  	[Nonuni,Uni];
  end:
+if check_examples() then
+	TEST_EQUAL("polar_signed_decomp(1, [[101,2],[7,5]], [7,6])", "[[[-1, [[7, 6], [7, 5]]], [1, [[101, 2], [7, 6]]]], []]", "test polar_signed_decomp #1");		
+fi; 
+ 
+ 
 # # polar_good_cone_dec(signum,G)
 # #  Input: signum = 1 or -1
 # #             G  is a  simplicial cone
@@ -309,6 +381,11 @@ polar_good_cone_dec:=proc(signum,G) local eps,n,A,R,Output, det_A;
           	Output:=polar_signed_decomp(signum,G,R);
    	fi;
 end:
+if check_examples() then
+	TEST_EQUAL("polar_good_cone_dec(-1, [[2200,2129],[101,100]])", "[[[-1, [[31, 30], [101, 100]]]], [[-1, [[2200, 2129], [31, 30]]]]]", "test polar_good_cone_dec #1");	
+fi;
+
+
 
 # # polar_more_decomposition_in_cones(cones)
 # # Input:  cones =[cones[1],cones[2]] as in procedure polar_signed_decomp
@@ -354,6 +431,11 @@ polar_cone_dec:=proc(G) local A,eps,seed, i,ok;
 	od;
 	RETURN(seed[2]);
 end:
+if check_examples() then
+	TEST_EQUAL("polar_cone_dec([[2200,2129],[101,100]])", "[[1, [[2200, 2129], [31, 30]]], [-1, [[1, 1], [101, 100]]], [1, [[31, 30], [1, 1]]]]", "test polar_cone_dec #1");
+	TEST_EQUAL("polar_cone_dec([[7,12,3],[11,0,0], [7,5,-5]])", "[[1, [[7, 12, 3], [3, 4, 0], [7, 5, -5]]], [-1, [[1, 1, 0], [1, 0, 0], [-1, -1, 1]]], [-1, [[2, 1, -2], [1, 1, 0], [7, 5, -5]]], [-1, [[3, 4, 0], [2, 1, -2], [7, 5, -5]]], [1, [[3, 5, 1], [1, 1, 0], [3, 4, 0]]], [-1, [[7, 12, 3], [3, 5, 1], [3, 4, 0]]], [1, [[7, 12, 3], [1, 1, 0], [3, 5, 1]]], [1, [[2, 4, 1], [1, 0, 0], [1, 1, 0]]], [-1, [[7, 12, 3], [2, 4, 1], [1, 1, 0]]], [-1, [[1, 1, 0], [4, 3, -3], [7, 5, -5]]], [1, [[1, 1, 0], [-1, -1, 1], [4, 3, -3]]], [1, [[3, 3, -1], [1, 1, 0], [2, 1, -2]]], [1, [[3, 4, 0], [3, 3, -1], [2, 1, -2]]], [1, [[3, 4, 0], [1, 1, 0], [3, 3, -1]]]]", "test polar_cone_dec #2");
+fi;
+
 
 
 # Cone decomposition via polar cone
@@ -363,6 +445,10 @@ primitive_vector:=proc(A) local d,n,g;
 	g:=igcd(seq(n*A[i],i=1..d));if g<>0 then
 	[seq(n*A[i]/g,i=1..d)];else [seq(n*A[i],i=1..d)];fi;
 end:
+if check_examples() then
+	TEST_EQUAL("primitive_vector([2200,2120,2340,240])", "[110, 106, 117, 12]", "test primitive_vector #1");
+fi;
+
 
 #The polar cone.
 polarcone:=proc(A) local n,B,Ainverse,out;
@@ -372,6 +458,11 @@ polarcone:=proc(A) local n,B,Ainverse,out;
    Ainverse:=MatrixInverse(B);#print(Ainverse);
 	out:=[seq(convert(Transpose(Column(Ainverse,i)),list),i=1..n)];
 end:
+if check_examples() then
+	TEST_EQUAL("polarcone([[2200,2129],[101,100]])", " [[100/4971, -101/4971], [-2129/4971, 2200/4971]]", "test polarcone #1");
+	TEST_EQUAL("polarcone([[1,0],[0,-1]])", "[[1,0],[0,-1]]", "test polarcone #2");
+fi;
+
 
 #polarcone([[1,0],[1,1]]);
 #Compute the cone decomposition going to polar cone and back
@@ -387,6 +478,10 @@ new_dual_dec_cone:=proc(G)
 	od:
 	out:
 end:
+if check_examples() then
+	TEST_EQUAL("new_dual_dec_cone([[1,0],[1,10]])", "[[1, [[1, 0], [0, 1]]], [1, [[0, -1], [1, 10]]]]", "test new_dual_dec_cone #1");
+fi;
+
 
 #  HERE STARTS BACK TO KNAPSACK;
 # Let  W be a cone basis w_i in R^k. Lambda a lattice with base alpha_i in R^k, s=[s_1..s_k] symbolic in R^k.
@@ -406,8 +501,11 @@ cone_in_basis_Lambda:=proc(W,Lambda)
 		newW:=[op(newW),primitive_vector(convert(Transpose(Multiply(MM,Vector(W[i]))),list))];
 	od;
 	newW;
-end
-:
+end:
+if check_examples() then
+	TEST_EQUAL("cone_in_basis_Lambda([[1,0],[1,10]], [[1,0],[1,-10]])", "[[1, 0], [2, -1]]", "test cone_in_basis_Lambda #1");
+fi;
+
 # INPUT: Small :=[a1,a2,...,ar] a list of  positive integers, f an integer.
 # OUTPUT: a list of r lists. Each of the list is a list of integers.
 # MATH: we compute a basis of the lattice Lambda, consisting of the elements 
@@ -423,7 +521,9 @@ Basis_Lattice:=proc(Small,f) local P,H,U,Lambda,hh,newf;
 	Lambda:=[[seq(newf*convert(row(U,1),list)[i],i=1..nops(Small))],seq([seq(convert(row(U,i),list)[k],k=1..nops(Small))],i=2..nops(Small))];
 	Lambda; 
 end:
-
+if check_examples() then
+	TEST_EQUAL("Basis_Lattice([23,43,21,43,3,1,3], 5234)", "[[0, 0, 0, 0, 0, 5234, 0], [1, 0, 0, 0, 0, -23, 0], [0, 1, 0, 0, 0, -43, 0], [0, 0, 1, 0, 0, -21, 0], [0, 0, 0, 1, 0, -43, 0], [0, 0, 0, 0, 1, -3, 0], [0, 0, 0, 0, 0, -3, 1]]", "test Basis_Lattice #1");
+fi;
 
 # INPUT: Small :=[a1,a2,...,ar] a list of  positive integers, f an integer.
 # OUTPUT: a list of r integers.
@@ -455,7 +555,9 @@ B_and_S:=proc(A,f) local j,B,S;
 	od;
 	[B,S];
 end:
-
+if check_examples() then
+	TEST_EQUAL("B_and_S([2,2,2,3,4,5],2)", "[[2, 2, 2, 4], [3, 5]]", "test B_and_S #1");
+fi;
 
 # find all k subsets of a list of objects
 # @parm inputList: a list. ex [x, y, z, w]
@@ -529,7 +631,9 @@ myChoose:=proc(inputList, k)
 	end;
 	outputList:=[op(outputList), newSubset];
 end:
-
+if check_examples() then
+	TEST_EQUAL("myChoose([2,2,2,3,4,5],2)", "[[2, 2], [2, 2], [2, 3], [2, 4], [2, 5], [2, 2], [2, 3], [2, 4], [2, 5], [2, 3], [2, 4], [2, 5], [3, 4], [3, 5], [4, 5]]", "test myChoose #1");
+fi;
 
 
 
@@ -549,15 +653,13 @@ F_k:=proc(A,k) local N,g,C,i,out,a;
 	od:
 	out:=[op(out)];
 end:
+if check_examples() then
+	TEST_EQUAL("F_k([2,3,3,55],3)", "[1, 2, 3, 55]", "test F_k #1");
+	TEST_EQUAL("F_k([2,3,3,55],2)", "[1, 3]", "test F_k #2");	
+fi;
+
 
 # The coefficient of t^h in the function E(A,f)(t):
-# 
-#smallstep:=proc(a,n) local out;
-#if  a=0 then out:=0;
-#elif type(simplify(a),integer)=true  then out:=0;
-#else out:=Smallstep(a*n);
-#fi;
-#end:
 fract:=proc(a,n) local out,p,q,newa,t; 
 	if  a=0 then out:=0; 
 	elif type(simplify(a),integer)=true  then out:=0;
@@ -567,12 +669,21 @@ fract:=proc(a,n) local out,p,q,newa,t;
 		t:=Frac(newa/q*n);
 	fi;
 end:
+if check_examples() then
+	TEST_EQUAL("fract(2/3,-1)", "Frac(-2/3)", "test fract #1");
+	TEST_EQUAL("fract(3/4,2)", "Frac(3/2)", "fract F_k #2");	
+fi;
+
 
 smallstep:=proc(a,n); fract(-a,n); end:
 
 Todd:=proc(x,order):
 -add(1/j!*bernoulli(j,0)*x^j,j=0..order):
 end:
+if check_examples() then
+	TEST_EQUAL("Todd(t,7)", "-1+1/2*t-1/12*t^2+1/720*t^4-1/30240*t^6", "test Todd #1");
+fi;
+
 
 # Input: U is a  cone, Lambda is a lattice,
 # Here: U is given in coordinates with respect to the  lattice basis,
