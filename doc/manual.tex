@@ -231,6 +231,31 @@ These polytopes are also related to Sylvester's denumerant.  See \cite{baldoni-e
 
 The other executables in latte are drivers, converters, and other small utility functions.
 
+
+\subsection{Maple programs distributed with {\tt LattE}}
+
+\latteInt also comes with a number of Maple programs, which can be used
+independently of the main {\tt LattE} code.  We distribute them for several
+reasons:
+
+\begin{itemize}
+\item As a pedagogical tool, as it is often easier to understand the
+  straightforward version of the algorithm written in Maple than it is to
+  understand the optimized C++ implementation in {\tt LattE}.
+\item As a technology preview, for some advanced algorithms that have not yet
+  been implemented in C++.
+\item For cross-checking the correctness of our C++ implementations.
+\end{itemize}
+
+The Maple programs come from the LattE source directory \path{code/maple}. 
+They are installed in \path{dest/share/latte-int/}. 
+
+The following \path{README} file gives more information.
+
+{\small\verbatiminput{../code/maple/README}}
+
+
+
 %***********************************************************************************
 %***********************************************************************************
 %***********************************************************************************
@@ -1183,7 +1208,7 @@ There are a few things to note from this example:
 \begin{verbatim}
 eval(subs({T=10,t=10,MOD=latteMod}, topKPolynomial))
 \end{verbatim}
-where latteMod can be found in code/maple/m-knapsack.mpl
+where the function \texttt{latteMod} can be found in \path{code/maple/m-knapsack.mpl}.
 \end{itemize}
 
 The option {\tt --gcd-polynomial} controls how poles are computed, which is given by the greatest common divisor of subsets of $\{\alpha_1 , \dots, \alpha_d\}$. For example, the options {\tt --gcd-polynomial 1 -k 5} will require finding all $\binom{d}{5}+\binom{d}{4}+\cdots+\binom{d}{1}$ subsets of size at most $5$ and compute the greatest common divisor of each one. However,~{\tt --gcd-polynomial 0 -k 5} will use a dynamic programming technique to compute the greatest common divisor of every subset of $\{\alpha_1 , \dots, \alpha_d\}$. If the number of unique greatest common divisors from subsets is much smaller than $2^d$, and $d$ is large, {\tt --gcd-polynomial 0} should be much faster. 
