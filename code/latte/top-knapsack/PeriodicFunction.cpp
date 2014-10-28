@@ -268,7 +268,7 @@ ostream& operator<<(ostream& out, const PeriodicFunctionNode & pfn)
 		if(pfn.isNumber)
 			out << "(" << pfn.data << ")";
 		else
-			out << "( Frac( T * (" << pfn.data << ") ) )";
+			out << "( MOD( t * (" << pfn.data << "), 1 ) )";
 	}
 	else
 	{
