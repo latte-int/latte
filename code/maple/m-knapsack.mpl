@@ -963,9 +963,9 @@ if check_examples() then
 	TEST_EQUAL("rho_knap([345,234,6245,3457,4526,3126,2457,235,1,1,2,3,45,456,12,43,67,2,46,2])", "G(345)+G(234)+G(6245)+G(3457)+G(4526)+G(3126)+G(2457)+G(235)-G(1)-6*G(2)-5*G(3)+G(45)+G(456)+G(43)+G(67)+G(46)", "test rho_knap #2");	
 fi;
 
-#######################################
-#Next two are main interface functions#
-#######################################
+#####################################
+#Next 3 are main interface functions#
+#####################################
 
 # The Complete knapsack and one coeff.
 # Input: t a variable, A a list of nonnegative integers
@@ -993,8 +993,7 @@ if check_examples() then
 fi;
 
 
-#printlevel:=0;complete_knapsack([1,2,3],t);
-# Math: compute the Ehrhart coefficient of t^(N-k)
+#Compute the Ehrhart coefficient of t^(N-k)
 coeff_Nminusk_knapsack:=proc(A,t,T, k) local out,N,F,i,c,p,f,noError,Tseries;
 	out:=0;
 	N:=nops(A)-1;
@@ -1041,6 +1040,23 @@ if check_examples() then
 	TEST_EQUAL("coeff_Nminusk_knapsack([1,6,6,6,6],t,T,3)", " -1/72*(2*MOD(1/6*t,1)^3-15*MOD(1/6*t,1)^2+35*MOD(1/6*t,1)-25)*T", "test coeff_Nminusk_knapsack #7");
 	TEST_EQUAL("coeff_Nminusk_knapsack([1,6,6,6,6],t,T,4)", "1-25/12*MOD(1/6*t,1)+35/24*MOD(1/6*t,1)^2-5/12*MOD(1/6*t,1)^3+1/24*MOD(1/6*t,1)^4", "test coeff_Nminusk_knapsack #8");
 fi;
+
+
+#Computes the top k+1 terms: T^N, T^{N-1}, ..., T_{N-k}
+knapsackKTerms:=proc(A, t, T, k)
+	local ans, i;
+	ans:=0;
+	for i from 0 to k do
+		ans:=ans + coeff_Nminusk_knapsack(A, t, T, i);
+	end;
+	
+	return ans;
+end:
+if check_examples() then
+	TEST_EQUAL("knapsackKTerms([2,4,3],t,T,1)", "1/48*T^2-1/4*(-1+MOD(1/2*t,1))*T", "test knapsackKTerms #1");
+	TEST_EQUAL("knapsackKTerms([2,4,3],t,T,2)", "1/48*T^2-1/4*(-1+MOD(1/2*t,1))*T+1-3/2*MOD(1/3*t,1)+3/2*MOD(1/3*t,1)^2-3/2*MOD(1/2*t,1)+1/32*(4*MOD(3/4*t,1)+4*MOD(1/2*t,1))^2-3/2*MOD(3/4*t,1)^2", "test knapsackKTerms #2");
+fi;
+
 
 
 SMALLSTEP:=proc(T);
