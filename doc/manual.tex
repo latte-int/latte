@@ -1153,7 +1153,7 @@ which gives the result
 \begin{verbatim}
 coeff4minus1:= (1/96);
 \end{verbatim}
-and hence the 2nd term is $t^2/96$.
+and hence the 2nd term is $T^2/96$.
 
 Next, we can compute the largest $5$ terms (because the dimension of this knapsack is $4$, this means we are computing the full Ehrhart polynomial), with the command
 \begin{verbatim}
@@ -1162,7 +1162,7 @@ top-ehrhart-knapsack --file knap1.txt --all-k 5 --out results.mpl
 which gives the result
 \begin{verbatim}
 coeff4minus0:= (1/2880);
-coeff4minus1:= ((((((-1/48) + ((((((((1)*(( Frac( T * (1/3) ) )*(3))) + <and so on>;
+coeff4minus1:= ((((((-1/48) + ((((((((1)*((MOD(t*(1/3),1))*(3))) + <and so on>;
 coeff4minus2:= <another large expression>;
 coeff4minus3:= <another large expression>;
 coeff4minus4:= <another large expression>;
@@ -1170,8 +1170,21 @@ coeff4minus4:= <another large expression>;
 topKPolynomial:=(coeff4minus0)*T^(4) + (coeff4minus1)*T^(3) 
  + (coeff4minus2)*T^(2) + (coeff4minus3)*T^(1) + (coeff4minus4)*T^(0);
 \end{verbatim}
-  
-Notice that the expressions for each coefficient might be very long. It is recommended that you always save the results in an output file, and use a computer algebra system to simplify the expressions. Also note that the output can be parsed by \maple. In fact, using \maple to simplify the expressions, ``coeff4minus1" is $1/96$. Finally, the Frac($x$) function represents the fractional part of $x$ and is equal to $x - \lfloor x \rfloor \in [0,1)$, where $\lfloor x \rfloor$ is  the largest integer smaller or equal to $x$.
+
+There are a few things to note from this example:
+\begin{itemize}
+\item The expressions for each coefficient might be very long. It is recommended that you always save the results in an output file, and use a computer algebra system to simplify the expressions. Also note that the output can be parsed by \maple. In fact, using \maple to simplify the expressions, ``coeff4minus1" is $1/96$.
+
+\item The $\text{MOD}$(a,b) function represents the number in the half-open interval $[0,b)$ that is equal to $a \mod b$. For $b=1$, $\text{MOD}(a,1)$ is the fractional part of $a$ and is equal to $a - \lfloor a \rfloor \in [0,1)$, where $\lfloor a \rfloor$ is  the largest integer smaller or equal to $a$.
+
+\item The output uses $``t"$ for the periodic coefficients, and $``T"$ for the monomial terms. This is done so you can use \maple's {\tt coeff} command to extract the coefficients. 
+
+\item To evaluate the polynomial, we can run 
+\begin{verbatim}
+eval(subs({T=10,t=10,MOD=latteMod}, topKPolynomial))
+\end{verbatim}
+where latteMod can be found in code/maple/m-knapsack.mpl
+\end{itemize}
 
 The option {\tt --gcd-polynomial} controls how poles are computed, which is given by the greatest common divisor of subsets of $\{\alpha_1 , \dots, \alpha_d\}$. For example, the options {\tt --gcd-polynomial 1 -k 5} will require finding all $\binom{d}{5}+\binom{d}{4}+\cdots+\binom{d}{1}$ subsets of size at most $5$ and compute the greatest common divisor of each one. However,~{\tt --gcd-polynomial 0 -k 5} will use a dynamic programming technique to compute the greatest common divisor of every subset of $\{\alpha_1 , \dots, \alpha_d\}$. If the number of unique greatest common divisors from subsets is much smaller than $2^d$, and $d$ is large, {\tt --gcd-polynomial 0} should be much faster. 
 

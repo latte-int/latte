@@ -34,7 +34,7 @@ PAPER: Computation of the Highest Coefficients of Weighted Ehrhart Quasi-polynom
  -- this is a directory with a tar file: release-2010-11-05.tar, which contains "TopEhrhart_lib.mpl" etc.
     (slightly revised versions of these files (just some tests changed) are in SVN in code/latte/top-ehrhart.)
 
-    TODO: Add README to that directory that points to LattE (to an svn working copy of subdirectory code/maple/)
+    done: Add README to that directory that points to LattE (to an svn working copy of subdirectory code/maple/)
          (Brandon)
 
 PAPER: Intermediate Sums on Polyhedra: Computation and Real Ehrhart Theory
