@@ -7,8 +7,9 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 CHECK_EXAMPLES := true:
 
 
+# Outline
 # Let A=[A_1,..,A_{N+1}] be a list of  positive integers and t a variable.
-# We compute the knapsack for A: the number of  integral solutions for A_1x_1+..+A_{N+1}x_{N+1}=t.
+# We compute the number of  integral solutions for A_1x_1+..+A_{N+1}x_{N+1}=t.
 # The output of this as a step polynomial function  of t.
 #
 # This program is aimed at computing efficiently the highest k coefficients
@@ -17,17 +18,23 @@ CHECK_EXAMPLES := true:
 # 
 # 
 # Main Functions
-# 1. complete_knapsack(A,t). Computes the Ehrhart polynomial for the knapsack A1x1+..A_{N+1}x_{N+1}=t, t a variable or an integer. The output is a quasi polynomial function of t, expressed in function of t^k and the function frac(T)=T-floor(T);
+# 1. complete_knapsack(A,t,T). Computes the Ehrhart polynomial for the knapsack A1x1+..A_{N+1}x_{N+1}=t, t a variable or an integer. The output is a quasi polynomial function of t and T, expressed as a function of T^k and MOD(a*t, b). MOD(a*t,b)  is the number in the half-open interval [0,b) that is equal to  a*t mod n.
 # 
-# 2. coeff_Nminusk_knapsack(A,t,k). Computes the N-k-term in the Ehrhart polynomial. The output is a periodic function of t;
+# 2. coeff_Nminusk_knapsack(A,t,T,k). Computes the N-k-degree term in the Ehrhart polynomial. The output is a periodic function of t and polynomial in T.
 #
+# 3. latteMod(a,b). Computes the number in the half-open interval [0,b) that is equal to  a mod b.
 #
+# Note that in the Ehrhart polynomial, the periodic coefficients are functions of t, while the monomial terms use T. This is done so that you can use Maple's coeff() function if you wish. T and t should always be evaluated at the same point.  
 #
 # Example usage
 #  L:=[1,2,3,4,5];
-#  coeff4minus0:=coeff_Nminusk_knapsack(L, t, 0); #find t^4 term
-#  coeff4minus3:=coeff_Nminusk_knapsack(L, t, 3); #find t^1 term
-#  eval(subs({T=10, t=10, Frac=fractionalpart}, coeff4minus3)); #evaluate the t^1 term at t=T=10.
+#  coeff4minus0:=coeff_Nminusk_knapsack(L, t, T, 0); #find the T^4 term
+#  coeff4minus3:=coeff_Nminusk_knapsack(L, t, T, 3); #find the T^1 term
+#  eval(subs({T=10, t=10, MOD=latteMod}, coeff4minus3)); #evaluate the t^1 term at t=T=10.
+#  
+#  ehrhartPoly:=complete_knapsack(L,t,T);
+#  coeff(ehrhartPoly, T^4); #get the leading term's coefficient
+#  eval(subs({T=10, t=10, MOD=latteMod}, ehrhartPoly)); #number of solutions to x_1 + 2x_2 + 3x+3 + 4x_4 +5x_5 = 10, x_i >= 0...the answer is 30
 #
 # License
 #   This Maple script is part of the LattE integrale 1.7 package made available
@@ -666,12 +673,12 @@ fract:=proc(a,n) local out,p,q,newa,t;
 	else 
 		p:=numer(a); q:=denom(a); 
 		newa:=modp(p,q);
-		t:=Frac(newa/q*n);
+		t:=MOD(newa/q*n,1);
 	fi;
 end:
 if check_examples() then
-	TEST_EQUAL("fract(2/3,-1)", "Frac(-2/3)", "test fract #1");
-	TEST_EQUAL("fract(3/4,2)", "Frac(3/2)", "fract F_k #2");	
+	TEST_EQUAL("fract(2/3,-1)", "MOD(-2/3,1)", "test fract #1");
+	TEST_EQUAL("fract(3/4,2)", "MOD(3/2,1)", "test fract #2");	
 fi;
 
 
@@ -870,6 +877,11 @@ is_divisor:=proc(L,i) local t,LL,newi,j,newL;
 	fi;
 	newL;
 end:
+if check_examples() then
+	TEST_EQUAL("is_divisor([2,4,3,7,-12],5)", "[]", "test is_divisor #1");
+	TEST_EQUAL("is_divisor([2,4,3,7,12],4)", "[4, 12]", "test is_divisor #2");	
+fi;
+
 
 # INPUT: a list of  positive integers L and  a positive integer i 
 # OUTPUT: a number
@@ -887,6 +899,11 @@ is_divided:=proc(L,i) local t,LL,newL,newi,j;
 	fi;
 	newL;
 end:
+if check_examples() then
+	TEST_EQUAL("is_divided([2,4,3,7,12],12)", "[2, 3, 4, 12]", "test is_divided #1");
+	TEST_EQUAL("is_divided([2,4,3,7,-12],17)", "[]", "test is_divided #2");	
+fi;
+
 
 # Input: a list of  positive integers L, i and j two elements of L with i<=j
 # Output: an integer
@@ -905,17 +922,29 @@ mmu:=proc(L,i,j) local out,L1,L2,indexi,newL,indexj;#L is a list of common divis
 	fi;
 	out;
 end:
+if check_examples() then
+	TEST_EQUAL("mmu([2,4,3,7,12],2,12)", "0", "test mmu #1");
+	TEST_EQUAL("mmu([2,4,3,7,12],12,12)", "1", "test mmu #2");
+	TEST_EQUAL("mmu([2,4,3,7,12],4,7)", "0", "test mmu #3");	
+fi;
+
 
 
 # Input: a list of  positive integers L, i  an element of L
 # Output: an integer
-# Math: we compute ϱ(i) following the patch formula 
+# Math: we compute rho(i) following the patch formula 
 # Example: rho_i([2,3,4,6,8,7],2):= -1;
 rho_i:=proc(L,i) local L1,k,rho;
 	L1:=is_divisor(L,i):
 	rho:=add(mmu(L,i,L1[k]),k=1..nops(L1));###print(seq(mmu1(L,i,k),k=1..nops(L1));
 	rho;
 end:
+if check_examples() then
+	TEST_EQUAL("rho_i([2,4,3,7,12],2)", "0", "test rho_i #1");
+	TEST_EQUAL("rho_i([2,4,3,7,12],12)", "1", "test rho_i #2");
+	TEST_EQUAL("rho_i([2,4,3,7,12],2)", "0", "test rho_i #3");	
+fi;
+
 
 # Input: a list of  positive integers L
 # Output:  a linear combination of G(i), i in L
@@ -931,12 +960,20 @@ rho_knap:=proc(L) local out2,co,i,L1,rho_i,x ;
 	x:=co-1;
 	out2:=out2-x*G(1);
 end:
+if check_examples() then
+	TEST_EQUAL("rho_knap([2,4,3,7,12])", "G(7)+G(12)-G(1)", "test rho_knap #1");
+	TEST_EQUAL("rho_knap([345,234,6245,3457,4526,3126,2457,235,1,1,2,3,45,456,12,43,67,2,46,2])", "G(345)+G(234)+G(6245)+G(3457)+G(4526)+G(3126)+G(2457)+G(235)-G(1)-6*G(2)-5*G(3)+G(45)+G(456)+G(43)+G(67)+G(46)", "test rho_knap #2");	
+fi;
+
+#######################################
+#Next two are main interface functions#
+#######################################
 
 # The Complete knapsack and one coeff.
 # Input: t a variable, A a list of nonnegative integers
 # Math: We compute the knapsack for A and t: that is the whole Ehrhart polynomial
 # Example:=complete_knapsack([1,2,3],17)=403/12+Smallstep(-17/2)^2-Smallstep(-17/2)+(3/2)*Smallstep(-17/3)^2-(3/2)*Smallstep(-17/3);
-complete_knapsack:=proc(A,t) local h,out,F,p,i,f,c,N;
+complete_knapsack:=proc(A,t,T) local h,out,F,p,i,f,c,N;
 	out:=0;
 	N:=nops(A)-1;
 	F:=F_k(A,N):##print("F",F);
@@ -945,16 +982,22 @@ complete_knapsack:=proc(A,t) local h,out,F,p,i,f,c,N;
 		f:=F[i];
 		c:=coeff(p,G(f));
 		if f=1 then 
-			out:=out+c*add(part_one_of_knapsack(A,h)*t^h,h=0..N);
+			out:=out+c*add(part_one_of_knapsack(A,h)*T^h,h=0..N);
 		else 
-		out:=out+c*add(part_f_of_knapsack(A,T,f,h)*t^h,h=0..N);fi ;
+		out:=out+c*add(part_f_of_knapsack(A,t,f,h)*T^h,h=0..N);fi ;
 	od;
-	eval(subs(T=t,simplify(out)));
+	#eval(subs(T=t,simplify(out)));
+	eval(simplify(out));
 end:
+if check_examples() then
+	TEST_EQUAL("complete_knapsack([2,4,3],t,T)", "1-3/2*MOD(1/3*t,1)+3/2*MOD(1/3*t,1)^2-3/2*MOD(1/2*t,1)+1/32*(4*MOD(3/4*t,1)+4*MOD(1/2*t,1))^2-3/2*MOD(3/4*t,1)^2+(1/4-1/4*MOD(1/2*t,1))*T+1/48*T^2", "test complete_knapsack #1");
+	TEST_EQUAL("complete_knapsack([1,6,6,6,6],t,T)", "1-25/12*MOD(1/6*t,1)+35/24*MOD(1/6*t,1)^2-5/12*MOD(1/6*t,1)^3+1/24*MOD(1/6*t,1)^4+(25/72-35/72*MOD(1/6*t,1)+5/24*MOD(1/6*t,1)^2-1/36*MOD(1/6*t,1)^3)*T+(35/864-5/144*MOD(1/6*t,1)+1/144*MOD(1/6*t,1)^2)*T^2+(5/2592-1/1296*MOD(1/6*t,1))*T^3+1/31104*T^4", "test complete_knapsack #2");	
+fi;
+
 
 #printlevel:=0;complete_knapsack([1,2,3],t);
 # Math: compute the Ehrhart coefficient of t^(N-k)
-coeff_Nminusk_knapsack:=proc(A,t,k) local out,N,F,i,c,p,f,noError,Tseries;
+coeff_Nminusk_knapsack:=proc(A,t,T, k) local out,N,F,i,c,p,f,noError,Tseries;
 	out:=0;
 	N:=nops(A)-1;
 	F:=F_k(A,k):##print(rootsk,F);
@@ -974,9 +1017,9 @@ coeff_Nminusk_knapsack:=proc(A,t,k) local out,N,F,i,c,p,f,noError,Tseries;
 		while noError = 0 do
 			try
 				if f=1 then 
-					Tseries:=part_one_of_knapsack(A,N-k)*t^(N-k);
+					Tseries:=part_one_of_knapsack(A,N-k)*T^(N-k);
 				else 
-					Tseries:=part_f_of_knapsack(A,T,f,N-k)*t^(N-k);
+					Tseries:=part_f_of_knapsack(A,t,f,N-k)*T^(N-k);
 				fi;
 				noError := 1;
 			catch:
@@ -990,14 +1033,37 @@ coeff_Nminusk_knapsack:=proc(A,t,k) local out,N,F,i,c,p,f,noError,Tseries;
 	#eval(subs(T=t,simplify(out)));
 	eval(simplify(out));
 end:
+if check_examples() then
+	TEST_EQUAL("coeff_Nminusk_knapsack([2,4,3],t,T,0)", "1/48*T^2", "test coeff_Nminusk_knapsack #1");
+	TEST_EQUAL("coeff_Nminusk_knapsack([2,4,3],t,T,1)", "-1/4*(-1+MOD(1/2*t,1))*T", "test coeff_Nminusk_knapsack #2");
+	TEST_EQUAL("coeff_Nminusk_knapsack([2,4,3],t,T,2)", "1-3/2*MOD(1/3*t,1)+3/2*MOD(1/3*t,1)^2-3/2*MOD(1/2*t,1)+1/32*(4*MOD(3/4*t,1)+4*MOD(1/2*t,1))^2-3/2*MOD(3/4*t,1)^2", "test coeff_Nminusk_knapsack #3");
+	TEST_EQUAL("coeff_Nminusk_knapsack([1,6,6,6,6],t,T,0)", "1/31104*T^4", "test coeff_Nminusk_knapsack #4");
+	TEST_EQUAL("coeff_Nminusk_knapsack([1,6,6,6,6],t,T,1)", "-1/2592*(-5+2*MOD(1/6*t,1))*T^3", "test coeff_Nminusk_knapsack #5");
+	TEST_EQUAL("coeff_Nminusk_knapsack([1,6,6,6,6],t,T,2)", "1/864*(35-30*MOD(1/6*t,1)+6*MOD(1/6*t,1)^2)*T^2", "test coeff_Nminusk_knapsack #6");
+	TEST_EQUAL("coeff_Nminusk_knapsack([1,6,6,6,6],t,T,3)", " -1/72*(2*MOD(1/6*t,1)^3-15*MOD(1/6*t,1)^2+35*MOD(1/6*t,1)-25)*T", "test coeff_Nminusk_knapsack #7");
+	TEST_EQUAL("coeff_Nminusk_knapsack([1,6,6,6,6],t,T,4)", "1-25/12*MOD(1/6*t,1)+35/24*MOD(1/6*t,1)^2-5/12*MOD(1/6*t,1)^3+1/24*MOD(1/6*t,1)^4", "test coeff_Nminusk_knapsack #8");
+fi;
+
 
 SMALLSTEP:=proc(T);
 ceil(T)-T;
 end:
+if check_examples() then
+	TEST_EQUAL("SMALLSTEP(2/3)", "1/3", "test SMALLSTEP #1");
+	TEST_EQUAL("SMALLSTEP(3+2/3)", "1/3", "test SMALLSTEP #2");
+	TEST_EQUAL("SMALLSTEP(-3-1/3)", "1/3", "test SMALLSTEP #3");
+	TEST_EQUAL("SMALLSTEP(-4/5)", "4/5", "test SMALLSTEP #4");
+	TEST_EQUAL("SMALLSTEP(5/4)", "3/4", "test SMALLSTEP #5");
+	TEST_EQUAL("SMALLSTEP(5)", "0", "test SMALLSTEP #6");
+fi;
+
 
 numeric_knapsack:=proc(A,value);
-	eval(subs(t=value,subs(Smallstep=SMALLSTEP,complete_knapsack(A,t))));
+	eval(subs(T=value,t=value,subs(Smallstep=SMALLSTEP,complete_knapsack(A,t,T))));
 end:
+if check_examples() then
+	TEST_EQUAL("numeric_knapsack([1,1,1],30)", "496", "test numeric_knapsack #1");
+fi;
 
 # SOME EXPERIMENTS;
 ASou:=proc(dimension) local n; n:=dimension; 
@@ -1018,31 +1084,6 @@ testTopknapsackrandom:=proc(dimension,k) local start1,AA,n;
 	AA:=random_list(100,n); print(AA); 
 	start1:=time();print(coeff_Nminusk_knapsack(AA,t,k));time()-start1;
 end:
-
-#testTopknapsackASou(18,2); #22 seconds
-#testTopknapsackrandom(18,2);# 114 seconds;
-#testTopknapsackrandom(11,3);
-
-# First we have a few random computations (but without correctness verification) 
-# Next we compare the calculations with 10 well-known knapsack problems for which
-# we know everything (inside the file testedknapsacks) thanks to LattE. We provide
-# some 
-# 
-#read("testedknapsacks");
-
-#for i from 1 to 10 do
-#informa[i]:=[]:
-#od:
-#for i from 6 to 6 do 
-# st:=time();
-# if numeric_knapsack(-L[i],m[i]) <> truenum[i] then
-# print(`MISTAKE`);
-# fi:
-# informa[i]:=time()-st;
-#od;
-
-
-
 
 smallstep3 := proc (s) eval(ceil(s)-s) end proc:
 
@@ -1156,5 +1197,35 @@ fractionalpart:=proc(s) local our,T;
     fi;
     RETURN(our);
 end:
+if check_examples() then
+	TEST_EQUAL("fractionalpart(2/3)", "2/3", "test fractionalpart #1");
+	TEST_EQUAL("fractionalpart(3+2/3)", "2/3", "test fractionalpart #2");
+	TEST_EQUAL("fractionalpart(-3-1/3)", "2/3", "test fractionalpart #3");
+	TEST_EQUAL("fractionalpart(-4/5)", "1/5", "test fractionalpart #4");
+	TEST_EQUAL("fractionalpart(5/4)", "1/4", "test fractionalpart #5");
+	TEST_EQUAL("fractionalpart(5)", "0", "test fractionalpart #6");
+fi;
 
+#### LATTE INTERFACE FUNCTION:
+#
+# Function to be substituted for the formal MOD function to get
+# results.
+# (can as well just use value().)
+#
+# input:
+#	a: any rational number or symbolic expression.
+#	n: any rational number.
+#	return the number in the half-open interval [0,n) that is equal to  a mod n
+latteMod:=proc(x, n)
+	ASSERT(n > 0);
+    ### Note `floor' works fine for symbolics, if `Digits'
+    ### is large enough. --mkoeppe
+    x - floor(x/n)*n;
+end:
+if check_examples() then
+	TEST_EQUAL("latteMod(5+1/3, 2)", "4/3", "test latteMod #1");
+	TEST_EQUAL("latteMod(-1/3, 1)", "2/3", "test latteMod #2");
+	TEST_EQUAL("latteMod(sqrt(2), 1)", "sqrt(2) - 1", "test latteMod #3"); # Note the difference to what we output in fractionalpart!
+    
+fi;
 
