@@ -1,5 +1,4 @@
- read("m-knapsack.mpl");
- 
+$include "m-knapsack.mpl";
  
 randomize(12345);
 #randomize();
@@ -12,6 +11,7 @@ testSame:=proc(a, b, numTValues)
  		dif:=eval(subs({MOD=latteMod, T=i, t=i}, a - b));
  		
  		if ( dif <> 0) then
+            print("Error: Results are not the same");
 	 		print("Maple: ", a);
  			print("latte: ", b);
  	
@@ -64,7 +64,7 @@ nextRandomSequence:=proc(L, k)
 	
 
 	return N;
-end;
+end:
 
 
 #@param termType: if 1, then only coptue the kth coeff, if 2, then comptue the first k+1 terms.
@@ -73,7 +73,7 @@ cmpLatteNminusK:=proc(L, k, termType)
 	
 	if (termType = 1) then 
 		#call latte	
-		system(cat("./top-ehrhart-knapsack -f knapsackEquation.latte -o knapsackEquation.latte.topKehrhart.mpl --gcd-polynomial 0 -k ",k+1, " > /dev/null 2>&1"));
+		system(cat("../latte/top-ehrhart-knapsack -f knapsackEquation.latte -o knapsackEquation.latte.topKehrhart.mpl --gcd-polynomial 0 -k ",k+1, " > /dev/null 2>&1"));
 		read("knapsackEquation.latte.topKehrhart.mpl");
 	
 		#call maple
@@ -85,7 +85,7 @@ cmpLatteNminusK:=proc(L, k, termType)
 		
 	if (termType = 2) then
 		#call latte	
-		system(cat("./top-ehrhart-knapsack -f knapsackEquation.latte -o knapsackEquation.latte.topKehrhart.mpl --gcd-polynomial 0 --all-k ",k+1, " > /dev/null  2>&1"));
+		system(cat("../latte/top-ehrhart-knapsack -f knapsackEquation.latte -o knapsackEquation.latte.topKehrhart.mpl --gcd-polynomial 0 --all-k ",k+1, " > /dev/null  2>&1"));
 		read("knapsackEquation.latte.topKehrhart.mpl");
 	
 		#call maple
@@ -94,7 +94,7 @@ cmpLatteNminusK:=proc(L, k, termType)
 		testSame(mapleNminusK, eval(parse("topKPolynomial", statement)), ilcm(op(L)) );
 		topKPolynomial:='topKPolynomial';#clear the variable we just read in
 	end;
-end;
+end:
 
 testLatteNminusK:=proc(termType)
 
