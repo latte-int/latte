@@ -1,12 +1,4 @@
 with(combinat):with(LinearAlgebra):with(linalg):with(numtheory):
-kernelopts(assertlevel=1):       ### Enable checking ASSERTions
-
-## Define this variable to have the code check self-tests (some expensive)
-## (this is for "make check", not for production code).
-#
-CHECK_EXAMPLES := true:
-
-
 # Outline
 # Let A=[A_1,..,A_{N+1}] be a list of  positive integers and t a variable.
 # We compute the number of  integral solutions for A_1x_1+..+A_{N+1}x_{N+1}=t.
@@ -40,7 +32,13 @@ CHECK_EXAMPLES := true:
 #   This Maple script is part of the LattE integrale 1.7 package made available
 #   under the GNU General Public License at http://www.math.ucdavis.edu/~latte/.
 #	
+# Testing
+#   Define this variable to have the code check self-tests (some are expensive)
+#  (this is for "make check", not for production code).
+#CHECK_EXAMPLES := true:
 
+#   Enable checking ASSERTions
+kernelopts(assertlevel=1):       
 
 ##################################
 #Start example checking functinos#
