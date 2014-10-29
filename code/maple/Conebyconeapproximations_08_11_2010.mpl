@@ -1587,17 +1587,18 @@ if check_examples() then
 fi;
 
 #### LATTE INTERFACE FUNCTION:
-# Evaluate an Ehrhart quasi-polynomial, written using variables "N" and "n",
-# at a value "a". 
+# Evaluate an Ehrhart quasi-polynomial, written using variables "N"
+# and "n" (or "T" and "t"), at a value "a". 
 evaluateEhrhart:=proc(epoly, a)
-    local l, u, r;
+    local l, u, r, epoly_n;
+    epoly_n := subs({T=N, t=n}, epoly); #  This is for backwards compatibility -- we used to use N, n; now we prefer T, t. --mkoeppe
     if type(a, float) then
         l, u := floatToInterval(a);
         try
              # NOTE: This trick DEPENDS on the Ehrhart quasi-polynomial
              # being written with two different variables: n in all
              # "fractional part" expressions; N for the polynomial degree.
-             r := expand(eval(subs({N=n, n=[l, n, u], MOD=latteIntervalMod}, epoly)));
+             r := expand(eval(subs({N=n, n=[l, n, u], MOD=latteIntervalMod}, epoly_n)));
              # The result is a polynomial in n, which has to be constant if
              # epoly was the full Ehrhart quasi-polynomial.
              if type(r, rational) then
@@ -1611,11 +1612,11 @@ evaluateEhrhart:=proc(epoly, a)
         catch "The range [%1, %2] is too large to simplify MOD(%3, %4).  Provide more precision.":
             printf("# The precision of the given floating point dilation factor is not large enough to allow exact computation.  Resorting to floating point evaluation.  Increase Digits if you want more precision in this evaluation.\n");
             #Digits := ilog10(1 + abs(op(1, a))) + 3;
-            return eval(subs({N=a, n=a, MOD=latteMod}, epoly));
+            return eval(subs({N=a, n=a, MOD=latteMod}, epoly_n));
         end;
     else
         # `expand' helps in case that a is a symbolic expression
-        return expand(eval(subs({N=a, n=a, MOD=latteMod}, epoly)));
+        return expand(eval(subs({N=a, n=a, MOD=latteMod}, epoly_n)));
     end if;
 end:
 if check_examples() then
