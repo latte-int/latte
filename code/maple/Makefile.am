@@ -13,3 +13,7 @@ if HAVE_MAPLE
 TESTS += Conebyconeapproximations_08_11_2010.mpl RealBarvinok-mars-exemples-2014-03-10.mpl 
 TESTS += m-knapsack.mpl testMapleLatteKnapsack.mpl
 endif
+
+
+CLEANFILES = knapsackEquation.latte knapsackEquation.latte.topKehrhart.mpl
+
