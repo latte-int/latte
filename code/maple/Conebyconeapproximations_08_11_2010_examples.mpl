@@ -1,5 +1,7 @@
 ### Examples split out from main file
 
+$include "Conebyconeapproximations_08_11_2010.mpl";
+
 #########################################################################
 ## SOME EXAMPLES OF WEIGHTED EHRHART.
 
