@@ -202,9 +202,9 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 
 	functionCall << "epoly:=";
 	if ( numTopCoefficients >=0)
-		functionCall << "findEhrhartPolynomial(n, N, simpleCones, linearForms," << poly->numOfVars;
+		functionCall << "findEhrhartPolynomial(t, T, simpleCones, linearForms," << poly->numOfVars;
 	else
-		functionCall << "printIncrementalEhrhartPolynomial(n, N, simpleCones, linearForms," << poly->numOfVars;
+		functionCall << "printIncrementalEhrhartPolynomial(t, T, simpleCones, linearForms," << poly->numOfVars;
 
 	if (realDilations)
 		functionCall << ", true";
@@ -226,7 +226,7 @@ void TopEhrhart::computeTopEhrhartPolynomial(const linFormSum & linForm)
 	maple << "t2:=time()-t1:" << endl;
 	maple << "\n\n";
 	maple << "printf(\"\\n\\n\\nThe Ehrhart polynomial=%a\\n\", epoly);\n" << endl;
-	maple << "printf(\"Evaluation at 1 is %a\\n\", eval(subs({N=1,n=1, MOD=latteMod},epoly)));\n" << endl;
+	maple << "printf(\"Evaluation at 1 is %a\\n\", eval(subs({T=1,t=1, MOD=latteMod},epoly)));\n" << endl;
 	maple << "printf(\"Total Maple time %a\\n\", t2);\n" << endl;
 	//*/
 	maple.close();
