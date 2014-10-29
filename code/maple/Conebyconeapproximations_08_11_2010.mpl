@@ -1062,9 +1062,8 @@ fi;
 
 # EXAMPLE ARE GIVEN AFTER THE PROCEDURE:
 #
-# FIXME: This introduces a new variable N; should be a parameter.
 
-dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
+dilatedS_Ispace_Cone:=proc(n,N,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
     s_Cspace_in_lattice_coord,news,
     ProjLattice;
     #printf("### dilatedS_Ispace_Cone: W = %a, ISpace = %a\n", W, ISpace);
@@ -1097,7 +1096,7 @@ dilatedS_Ispace_Cone:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Csp
 end:
 
 if check_examples() then
-    ASSERT(dilatedS_Ispace_Cone(n,[1/2,1/2],[[1,0],[1,2]],[1],xi)
+    ASSERT(dilatedS_Ispace_Cone(n,N,[1/2,1/2],[[1,0],[1,2]],[1],xi)
            =
            -EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1]),
            "dilatedS_Ispace_Cone test #1");
@@ -1214,9 +1213,9 @@ findEhrhartPolynomial_linearForm:=proc(n,nn,simpleCones,ell,M,d, useRealDilation
         		
         		#put the loop here: loop over every ell/xi
         		if useRealDilations then
-        			output:=output + dilatedS_Ispace_Cone_real(new_n,s,W,KK,xi) ;
+        			output:=output + dilatedS_Ispace_Cone_real(new_n,N,s,W,KK,xi) ;
         		else
-        			output:=output + dilatedS_Ispace_Cone(new_n,s,W,KK,xi) ;
+        			output:=output + dilatedS_Ispace_Cone(new_n,N,s,W,KK,xi) ;
         		fi;
 
         	od;
@@ -1351,9 +1350,9 @@ printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d, useReal
         		
         			
         			if useRealDilations then
-        				output:=output + coef_current*factorial(M_current)*dilatedS_Ispace_Cone_real(new_n,s,W,KK,xi[iLF]) ;
+        				output:=output + coef_current*factorial(M_current)*dilatedS_Ispace_Cone_real(new_n,N,s,W,KK,xi[iLF]) ;
         			else
-        				output:=output + coef_current*factorial(M_current)*dilatedS_Ispace_Cone(new_n,s,W,KK,xi[iLF]) ;
+        				output:=output + coef_current*factorial(M_current)*dilatedS_Ispace_Cone(new_n,N,s,W,KK,xi[iLF]) ;
         			fi;
         		
         		od; 
@@ -1433,12 +1432,8 @@ end:
 # I did that,  as we will need to pick  up a polynomial term in n, while N are then considered as constants;
 # EXAMPLE IS GIVEN  AFTER;
 #
-#
-#
-# FIXME: This introduces new variable "N"; should be a parameter!
-#
 
-dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
+dilatedS_Ispace_Cone_real:=proc(n,N,s,W,ISpace,xi) local i,ss,uni_cones,function_on_Cspace,function_on_ISpace,W_projected,WW,WWW,signuni,signL,ts,j,Cspace,out1,out2,s_in_cone_coord,s_Cspace_in_cone_coord,s_small_move,M,newxi,dimL,g,testrank,newP,dilateds,
     s_Cspace_in_lattice_coord,news,
     ProjLattice;
     Cspace:=ComplementList(ISpace,nops(W));
@@ -1469,7 +1464,7 @@ dilatedS_Ispace_Cone_real:=proc(n,s,W,ISpace,xi) local i,ss,uni_cones,function_o
     EXP(add(n*s[i]*xi[i],i=1..nops(W)))*out1;
 end:
 if check_examples() then
-    ASSERT(dilatedS_Ispace_Cone_real(n,[0,0],[[1,0],[1,2]],[1],xi)
+    ASSERT(dilatedS_Ispace_Cone_real(n,N,[0,0],[[1,0],[1,2]],[1],xi)
            =
            -EXP(0)*TODD(0,1/2*xi[1]+xi[2])/(1/2*xi[1]+xi[2])/xi[1], ## result has not been checked
            "dilatedS_Ispace_Cone_real test #1");
@@ -1700,13 +1695,13 @@ end:
 # EXAMPLE IS GIVEN  AFTER;
 
 #
-dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+dilated_approxi_cone:=proc(n,N,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     #printf("##### dilated_approxi_cone: order = %d\n", order);
     output:=0;
     d:=nops(W);
     if order=d then
         # Fast path; general code below handles this case just fine.
-        output:=dilatedS_Ispace_Cone(n,s,W,[],xi);
+        output:=dilatedS_Ispace_Cone(n,N,s,W,[],xi);
     else
         for j from 0 to order do
             C:=choose(d,j);
@@ -1714,14 +1709,14 @@ dilated_approxi_cone:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
             cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
             for a from 1 to nops(C) do
                 K:=C[a]; KK:=ComplementList(K,nops(W));
-                output:=output+cc[j]*dilatedS_Ispace_Cone(n,s,W,KK,xi) ;
+                output:=output+cc[j]*dilatedS_Ispace_Cone(n,N,s,W,KK,xi) ;
             od;
         od:
     fi;
     output;
 end:
 if check_examples() then
-    ASSERT(dilated_approxi_cone(n,[1/2,1/2],[[1,0],[1,2]], 1,xi)
+    ASSERT(dilated_approxi_cone(n,N,[1/2,1/2],[[1,0],[1,2]], 1,xi)
            = -2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])/(xi[1]*(xi[1]+2*xi[2]))+2*EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1])/(xi[1]*(-xi[1]-2*xi[2]))-EXP((1/2)*n*xi[1]+(1/2)*n*xi[2])*TODD((1/2)*MOD(N, 2), (1/2)*xi[1]+xi[2])/(((1/2)*xi[1]+xi[2])*xi[1]),
            "dilated_approxi_cone test #1");
 fi;
@@ -1736,19 +1731,19 @@ fi;
 # EXAMPLE IS GIVEN  AFTER;
 
 #
-ApproxEhrhartSimplexgeneric:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P; #used below
+ApproxEhrhartSimplexgeneric:=proc(n,N,Simplex,order,xi) local F,W,i,st,d,S,y,P; #used below
     F:=0;  S:=Simplex;
     d:=nops(S)-1;
     for i from 1 to nops(S) do
         W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-        F:=F+dilated_approxi_cone(n,S[i],W,order,xi) ;
+        F:=F+dilated_approxi_cone(n,N,S[i],W,order,xi) ;
     od:
     F:=eval(subs({TODD=Todd,EXP=exp},F));
     
     return F;
 end:
 if check_examples() then
-    ASSERT(ApproxEhrhartSimplexgeneric(n,[[0,0],[1/2,0],[0,1/2]], 1,xi)
+    ASSERT(ApproxEhrhartSimplexgeneric(n,N,[[0,0],[1/2,0],[0,1/2]], 1,xi)
            = -1/xi[2]/xi[1]-1/(1-exp(xi[1]))/xi[2]-1/(1-exp(xi[2]))/xi[1]+exp(1/2*n*xi[1])/xi[1]/(-xi[1]+xi[2])+exp(1/2*n*xi[1])*exp(-1/2*MOD(N,2)*xi[1])/(1-exp(-xi[1]))/(xi[1]-xi[2])+exp(1/2*n*xi[1])/(1-exp(-xi[1]+xi[2]))/xi[1]+exp(1/2*n*xi[2])/xi[2]/(xi[1]-xi[2])+exp(1/2*n*xi[2])*exp(-1/2*MOD(N,2)*xi[2])/(1-exp(-xi[2]))/(-xi[1]+xi[2])+exp(1/2*n*xi[2])/(1-exp(xi[1]-xi[2]))/xi[2], ## result has not been checked
            "ApproxEhrhartSimplexgeneric test #1");
 fi;
@@ -1763,7 +1758,7 @@ TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC; #UNU
     d:=nops(Simplex)-1;
     order:=M+d-m;
     xx:=[seq(t*ell[i],i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+    AA:=ApproxEhrhartSimplexgeneric(n,N,Simplex,order,xx);
     CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
     subs({N=n},CC);
 end:
@@ -1779,7 +1774,7 @@ TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,re
     order:=M+d-m;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx);
+    AA:=ApproxEhrhartSimplexgeneric(n,N,Simplex,order,xx);
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=coeff(CCeps,n,m);
@@ -1802,30 +1797,30 @@ end:
 #####################################################################
 
 
-dilated_approxi_cone_real:=proc(n,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
+dilated_approxi_cone_real:=proc(n,N,s,W,order,xi) local output,d,j,C,a,K,KK,cc,P;
     output:=0;
     d:=nops(W);
     if order=d then
-        output:=dilatedS_Ispace_Cone_real(n,s,W,[],xi);
+        output:=dilatedS_Ispace_Cone_real(n,N,s,W,[],xi);
     else
         for j from 0 to order do
             C:=choose(d,j);
             cc[j]:=(-1)^(order-j)*binomial(d-j-1,d-order-1);
             for a from 1 to nops(C) do
                 K:=C[a]; KK:=ComplementList(K,nops(W));
-                output:=output+cc[j]*dilatedS_Ispace_Cone_real(n,s,W,KK,xi) ;
+                output:=output+cc[j]*dilatedS_Ispace_Cone_real(n,N,s,W,KK,xi) ;
             od;
         od:
     fi;
     output;
 end:
 
-ApproxEhrhartSimplexgeneric_real:=proc(n,Simplex,order,xi) local F,W,i,st,d,S,y,P; #used below
+ApproxEhrhartSimplexgeneric_real:=proc(n,N,Simplex,order,xi) local F,W,i,st,d,S,y,P; #used below
     F:=0;  S:=Simplex;
     d:=nops(S)-1;
     for i from 1 to nops(S) do
         W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-        F:=F+dilated_approxi_cone_real(n,S[i],W,order,xi) ;
+        F:=F+dilated_approxi_cone_real(n,N,S[i],W,order,xi) ;
     od:
     F:=eval(subs({TODD=Todd,EXP=exp},F));
 end:
@@ -1836,7 +1831,7 @@ TopEhrhartweightedluckyell_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC;
     d:=nops(Simplex)-1;
     order:=M+d-m;
     xx:=[seq(t*ell[i],i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+    AA:=ApproxEhrhartSimplexgeneric_real(n,N,Simplex,order,xx);
     CC:=coeff(coeff(series(AA,t=0,M+d+2),t,M),n,m);
     subs({N=n},CC);
 end:
@@ -1846,15 +1841,15 @@ TopEhrhartweighted_real:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,C
     order:=M+d-m;
     reg:=random_vector(5000,d);
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+    AA:=ApproxEhrhartSimplexgeneric_real(n,N,Simplex,order,xx);
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); #print(CCt);
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=coeff(CCeps,n,m);
     subs({N=n},CCn);
 end:
-CompleteEhrhartweighted_real:=proc(n,nn,Simplex,ell,M) local d; #used in ..._examples.mpl
+CompleteEhrhartweighted_real:=proc(n,Simplex,ell,M) local d; #used in ..._examples.mpl
     d:=nops(Simplex)-1;
-    add(TopEhrhartweighted_real(n,Simplex,ell,M,mTopEhrhartweightedPoly_real)*nn^m,m=0..M+d);
+    add(TopEhrhartweighted_real(n,Simplex,ell,M,m)*n^m,m=0..M+d);
 end:
 
 
@@ -1876,7 +1871,7 @@ cone_by_cone:=proc(t,Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn;
     #order:=M+nops(Simplex)-codim; 
     reg:=random_vector(5000,d); 
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric(n,Simplex,order,xx); # new symbolic n.
+    AA:=ApproxEhrhartSimplexgeneric(n,N,Simplex,order,xx); # new symbolic n.
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); 
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=add(coeff(CCeps,n,m)*t^(m),m=0..M+d);
@@ -1905,7 +1900,7 @@ cone_by_cone_real:=proc(t,Simplex,ell,M,order) local reg,d,xx,AA,CCt,CCeps,CCn,n
     d:=nops(Simplex)-1;CCn:=0;
     reg:=random_vector(5000,d); 
     xx:=[seq(t*(ell[i]+epsilon*reg[i]),i=1..d)];
-    AA:=ApproxEhrhartSimplexgeneric_real(n,Simplex,order,xx);
+    AA:=ApproxEhrhartSimplexgeneric_real(n,N,Simplex,order,xx);
     CCt:=coeff(series(AA,t=0,M+d+2),t,M); 
     CCeps:=coeff(series(CCt,epsilon=0,d+2),epsilon,0);
     CCn:=add(coeff(CCeps,n,m)*t^(m),m=0..M+d);
