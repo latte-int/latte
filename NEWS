@@ -1,3 +1,15 @@
+Changes in release 1.7.2:
+
+	* Maple versions of some LattE commands are now available.
+	
+	* Fixes problems when building on Macs
+
+Changes in release 1.7.1:
+
+	* Fixes problems when building on Macs
+	
+	* Improved the top-ehrhart-knapsack command
+
 Changes in release 1.6:
 
  * New program for computing top Ehrhart coefficients (see manual). 
