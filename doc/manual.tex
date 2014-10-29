@@ -861,26 +861,26 @@ Let us view a few examples of the above options.
 \example
 A concrete example using a file from the library of examples that comes with
 the LattE distribution.  We count the lattice points in the 3-dimensional cube
-$[-1, 1]^3$, dilated by a \emph{real} dilation factor $N$. 
+$[-1, 1]^3$, dilated by a \emph{real} dilation factor $T = t$. 
 \begin{verbatim}
-        integrate --valuation=top-ehrhart --cdd --real-dilations 
-                  --top-ehrhart-save=cube_3_real.txt 
+        integrate --valuation=top-ehrhart --cdd --real-dilations \
+                  --top-ehrhart-save=cube_3_real.txt \
                   dest/share/latte-int/examples/cubes/cube_3.ext
 \end{verbatim}
 This creates a file \path{cube_3_real.txt} with the following content (the
 formulas are long; some parts have been elided here):
 \begin{verbatim}
     epoly:= \ 
-    + 8*N^3\ 
-    + (12-24*MOD(n,1))*N^2\ 
-    + (6-12*MOD(n,1)+359/125245152*(-5521248*MOD(n,1)+2760624)*MOD(n,1)-[...])*N\ 
-    + 1-1700/431*MOD(n,1)+1652/431*MOD(n,1)^2-[...];
+    + 8*T^3\ 
+    + (12-24*MOD(t,1))*T^2\ 
+    + (6-12*MOD(t,1)+359/125245152*(-5521248*MOD(t,1)+2760624)*MOD(t,1)-[...])*T\ 
+    + 1-1700/431*MOD(t,1)+1652/431*MOD(t,1)^2-[...];
 \end{verbatim}
 As this example shows, the quasi-polynomial is expressed as a polynomial in
-$N$ (the dilation factor), whose coefficients are step-polynomials.  
-The polynomial degree in $N$ is 3 (the dimension of the polytope).  
+$T$ (the dilation factor), whose coefficients are step-polynomials.  
+The polynomial degree in $T$ is 3 (the dimension of the polytope).  
 The step-polynomials are expressed using the fractional-part operation
-$\mathrm{MOD}(x, 1)$, using the variable~$n$ (again the dilation factor).
+$\mathrm{MOD}(x, 1)$, using the variable~$t$ (again the dilation factor).
 (Having two different variables for the dilation factor makes it easier to
 manipulate this expression in computer algebra systems such as Maple.)
 
@@ -898,9 +898,9 @@ For comparison, let's compute the same example without the
 This creates a file \path{cube_3_integer.txt} with the following content:
 \begin{verbatim}
     epoly:= \ 
-    + 8*N^3\ 
-    + 12*N^2\ 
-    + 6*N\ 
+    + 8*T^3\ 
+    + 12*T^2\ 
+    + 6*T\ 
     + 1;
 \end{verbatim}
 Since the input was a lattice polytope, this is an Ehrhart polynomial (all
@@ -932,12 +932,12 @@ by typing \textsc{control-C}.
                   --vrep --real-dilations
                   dest/share/latte-int/examples/random-simplex/random-simplex-dim6-digits4-1.vrep
 \end{verbatim}
-If interrupted after the term of $N^5$ is shown on the screen, the file 
+If interrupted after the term of $T^5$ is shown on the screen, the file 
 \path{random-simplex-real-incremental.txt} looks like this:
 \begin{verbatim}
     epoly:= \ 
-    + 15181275198303665635391/360*N^6\ 
-    + (-1/120*MOD(-64173062910517600471035*n,1)-[...])*N^5
+    + 15181275198303665635391/360*T^6\ 
+    + (-1/120*MOD(-64173062910517600471035*t,1)-[...])*T^5
 \end{verbatim}
 To facilitate reading this file into \maple, let's add a semicolon at the end.
 \begin{verbatim}
@@ -946,6 +946,7 @@ To facilitate reading this file into \maple, let's add a semicolon at the end.
 
 
 \subsubsection{Evaluating Ehrhart quasi-polynomials in \maple}
+\label{s:evaluate-ehrhart}
 
 LattE's \maple library has a helper function called \texttt{evaluateEhrhart}
 that is useful for evaluating quasi-polynomials in this form.  You can find it
@@ -1633,7 +1634,7 @@ Let's first compute the unweighted Ehrhart polynomial of the square:
         \begin{verbatim}
         integrate --valuation=top-ehrhart --vrep square.vrep.latte 
         \end{verbatim}
-and we get the answer $N^2 + 2N + 1$. 
+and we get the answer $T^2 + 2T + 1$. 
 
 \emph{Note:} For the case of the unweighted Ehrhart polynomial of a lattice polytope,
 when all coefficients are to be computed, it is faster to use \texttt{count
@@ -1655,10 +1656,10 @@ and then type
         p
         [[1,[2,4]]]
         \end{verbatim}
-The answer is $1/15*N^8+4/15*N^7+71/180*N^6+1/4*N^5+2/45*N^4-1/60*N^3-1/180*N^2$.
+The answer is $1/15*T^8+4/15*T^7+71/180*T^6+1/4*T^5+2/45*T^4-1/60*T^3-1/180*T^2$.
 
 Finally, repeat the above commands, but find the polynomial that is correct if
-$N$ is any rational or real dilation factor and save the answer to a file called
+$T$ is any rational or real dilation factor and save the answer to a file called
 ``bigAnswer''. That is, add \texttt{--real-dilations
   --top-ehrhart-save=bigAnswer} to the command line and use the same
 polynomial.  
@@ -1672,9 +1673,13 @@ Open the file ``bigAnswer.'' To evaluate the polynomial at a point $a \in \R$, f
         a := 5/2;
                 # desired rational dilation factor
         
-        eval(subs({N=a,n=a, MOD=latteMod},epoly));
+        eval(subs({T=a,t=a, MOD=latteMod},epoly));
         \end{verbatim}
-Note that you had to set both $n$ and $N$ to some dilation factor $a \in \R$ and the ``latteMod'' function is defined in the \maple script. If you then run this \maple file with the point $a=5/2$ you will get $85$.
+Note that you had to set both $t$ and $T$ to some dilation factor $a \in \R$ and the ``latteMod'' function is defined in the \maple script. If you then run this \maple file with the point $a=5/2$ you will get $85$.
+
+Section~\ref{s:evaluate-ehrhart} has more information on how to evaluate a
+computed quasi-polynomial.
+
 
 \subsection{Example of Optimization with \latte}
 
@@ -1886,11 +1891,11 @@ applications please acknowledge it by referencing this manual as
 First is {\tt cddlib} \cite{fukuda}, developed by Komei Fukuda, whose webpage can be
 found at:
 
-\makebox[12 cm]{http://www.cs.mcgill.ca/$\sim$fukuda/}
+\makebox[12 cm]{\url{http://www.inf.ethz.ch/personal/fukudak/}}
 
 Next, \latte uses \fourtitwo \cite{4ti2} whose webpage can be found at:
 
-\makebox[12 cm]{http://www.4ti2.de}
+\makebox[12 cm]{\url{http://www.4ti2.de}}
 
 {\tt cddlib} and \fourtitwo is used for finding vertices of polytopes and the
 triangulation of cones.
@@ -1900,7 +1905,7 @@ Library for doing Number Theory, written by Victor Shoup \cite{shoup},
 for LLL algorithm, matrix manipulations, storing variable length
 integers, and floating point numbers.  NTL can be found at:
 
-\makebox[12cm]{http://shoup.net/ntl/}
+\makebox[12cm]{\url{http://shoup.net/ntl/}}
 
 In addition, {\tt LattE} optionally uses the LiDIA library, 
 developed at TU Darmstadt.
