@@ -1,14 +1,22 @@
 Changes in release 1.7.2:
 
-	* Maple versions of some LattE commands are now available.
+ * Maple versions of some LattE commands are now available; see code/maple/README.
 	
-	* Fixes problems when building on Macs
+ * Fixes problems when building on Macs
+
 
 Changes in release 1.7.1:
 
-	* Fixes problems when building on Macs
+ * Fixes problems when building on Macs
 	
-	* Improved the top-ehrhart-knapsack command
+ * Improved the top-ehrhart-knapsack command
+
+
+Changes in release 1.7:
+
+ * New program for computing the highest coefficients of Ehrhart
+   quasipolynomials for knapsack polytopes.  
+
 
 Changes in release 1.6:
 
