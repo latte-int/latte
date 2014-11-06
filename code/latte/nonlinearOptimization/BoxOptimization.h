@@ -34,10 +34,14 @@ public:
 
 class BoxOptimization
 {
+private:
+
 public:
 	RR U;
 	RR L;
-	ZZ N;
+	ZZ N; //number of lattice points in the box.
+	bool isTrivial;
+
 	monomialSum originalPolynomial; //d + 1 variables. (f + s)
 	monomialSum currentPolynomial; //(f + s)^currentPower
 	int currentPower;
@@ -50,6 +54,8 @@ public:
 
 	BoxOptimization();
 	void setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly);
+	void enumerateProblem(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly);
+
 	void setPower(int k);
 	void findRange(int itr);
 	void findNewUpperbound();

@@ -11,6 +11,7 @@
 #include <map>
 
 
+#include "LattException.h"
 
 	//std::map<int, RationalNTL> terms;
 PolynomialMap & PolynomialMap::operator+=(const PolynomialMap &rhs)
@@ -88,20 +89,48 @@ BoxOptimization::BoxOptimization()
 
 void BoxOptimization::setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly)
 {
-	lowerBound = lowBound;
-	upperBound = upBound;
-	N = 1;
 
+	vector<bool> isSame;
+	int ambDim = lowBound.length();
+	int affineDim = 0;
+	int i;
+	int currentIndex;
+
+	isSame.resize(ambDim);
+
+	for(i = 0; i < ambDim; ++i)
+		if ( lowBound[i] == upBound[i])
+			isSame[i] = true;
+		else
+		{
+			isSame[i] = false;
+			++affineDim;
+		}
+
+	//copy lower/upperbound info over only for the full-dimension variables.
+	lowerBound.SetLength(affineDim);
+	upperBound.SetLength(affineDim);
+	for( i = 0, currentIndex = 0; i < ambDim; ++i)
+		if ( lowBound[i] != upBound[i])
+		{
+			lowerBound[currentIndex] = lowBound[i];
+			upperBound[currentIndex] = upBound[i];
+			++currentIndex;
+		}
+
+
+	N = 1;
 	vec_ZZ maxBound;
 	U = 0;
-	maxBound.SetLength(lowBound.length());
-	for(int i = 0; i < lowerBound.length(); ++i)
+	maxBound.SetLength(ambDim);
+	for( i = 0; i < ambDim; ++i)
 	{
-		maxBound[i] = max(abs(lowerBound[i]), abs(upperBound[i]));
-		N *= (upperBound[i] - lowerBound[i] + 1);
+		maxBound[i] = max(abs(lowBound[i]), abs(upBound[i]));
+		N *= (upBound[i] - lowBound[i] + 1);
 	}
+	cout << "Number of lattice points: " << N << endl;
 
-	originalPolynomial.varCount = poly.varCount +1;
+	originalPolynomial.varCount = affineDim +1;
 	originalPolynomial.termCount = 0;
 
 	BTrieIterator<RationalNTL, int>* pItr =	new BTrieIterator<RationalNTL, int> ();
@@ -111,32 +140,82 @@ void BoxOptimization::setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBoun
 
 	term<RationalNTL, int>* term;
 	int * exp;
-	exp = new int[poly.varCount + 1];
+	exp = new int[affineDim + 1];
 	exp[0] = 0;
 
+	isTrivial = true;
 	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
 	{
 		ZZ boundTerm;
 		boundTerm = 1;
-		for (int currentPower = 0; currentPower < poly.varCount; ++currentPower)
+		RationalNTL newCoef(term->coef);
+
+		for (i = 0, currentIndex = 0; i < ambDim; ++i)
 		{
-			exp[currentPower + 1] = term->exps[currentPower];
-			boundTerm *= power(maxBound[currentPower], term->exps[currentPower]);
+			if ( isSame[i] == false)
+			{
+				exp[currentIndex + 1] = term->exps[i];
+				++currentIndex;
+				boundTerm *= power(maxBound[i], term->exps[i]);
+				isTrivial = false; //inserted a monomial
+			}
+			else
+			{
+				newCoef *= power(lowBound[i], term->exps[i]); //lowBound[i] == upBound[i]
+			}
+			//cout << maxBound[i] << " ?? " << term->exps[i] << endl;
+
+
 		}
-		insertMonomial(term->coef, exp, originalPolynomial);
-		U += to_RR((term->coef) * (boundTerm * sign(term->coef)));
+		insertMonomial(newCoef, exp, originalPolynomial);
+		//cout << newCoef << " " << boundTerm << " " << sign(newCoef) << endl;
+		U += to_RR((newCoef) * (boundTerm * sign(newCoef)));
 	}
 	L = U;
 	L *= -1;
-	cout << L << " f(x) " << U << endl;
+	//cout << L << " f(x) " << U << endl;
 
-	for (int currentPower = 0; currentPower < poly.varCount; ++currentPower)
-		exp[currentPower + 1] = 0;
+	for (i = 0; i < affineDim; ++i)
+		exp[i + 1] = 0;
 	exp[0] = 1;
 	insertMonomial(RationalNTL(1,1), exp, originalPolynomial);
+
+	if ( N == 1) //update this to something small?
+		isTrivial = true;
+
 	cout << "updated poly:" << originalPolynomial.varCount << ", " << originalPolynomial.termCount << endl;
 	cout << "updated poly: " << printMonomials(originalPolynomial).c_str() << endl;
+	cout << "isTrivial" << isTrivial << endl;
 	delete [] exp;
+}
+
+void BoxOptimization::enumerateProblem(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly)
+{
+	RationalNTL answer;
+	if ( N != 1)
+		THROW_LATTE_MSG(LattException::bug_NotImplementedHere, "enumerateProblem can only work with N=1 for right now");
+	// so lowBound == upBound
+
+	BTrieIterator<RationalNTL, int>* pItr =	new BTrieIterator<RationalNTL, int> ();
+	pItr->setTrie(poly.myMonomials,	poly.varCount);
+	pItr->begin();
+
+	//evaluate f at one point.
+	term<RationalNTL, int>* term;
+	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
+	{
+		RationalNTL newCoef(term->coef);
+
+		for (int i = 0; i < poly.varCount; ++i)
+		{
+			newCoef *= power(lowBound[i], term->exps[i]);
+		}
+
+		answer += newCoef;
+	}
+
+	U = to_RR(answer);
+	L = to_RR(answer);
 }
 
 
@@ -173,33 +252,11 @@ void BoxOptimization::findNewUpperbound()
 	//so s = -L;
 
 	RR ans;
-
 	ans = 0;
-
-
-	//BTrieIterator<PolynomialMap, ZZ>* xitr = new BTrieIterator<PolynomialMap, ZZ> ();
-	//xitr->setTrie(theTrie, lowerBound.length());
-	//xitr->begin();
 
 	RR s(L);
 	s *= -1;
 
-	//term<PolynomialMap, ZZ>* xitrTerm;
-	//RationalNTL one(1,1);
-	//for(xitrTerm =  xitr->nextTerm(); xitrTerm; xitrTerm =  xitr->nextTerm())
-	//{
-		//cout << xitrTerm->coef << "*( ";
-		//for(int j = 0; j < lowerBound.length(); ++j)
-		//	cout << xitrTerm->exps[j] << ", ";
-		//cout << " )^" << xitrTerm->degree << endl;
-
-		//mpq_class temp = computeWeightedCountingBox_singleForm(lowerBound, upperBound, xitrTerm->exps, xitrTerm->degree, one);
-		//RR rTemp;
-		//rTemp = to_RR(convert_mpz_to_ZZ(temp.get_num()));
-		//rTemp /= to_RR(convert_mpz_to_ZZ(temp.get_den()));
-		//ans += xitrTerm->coef.eval(s) * rTemp;
-//	}
-	//delete xitr;
 	ans = currentMap.eval(s);
 
 	//cout << "(f+s)^" << currentPower << " ans=" << ans << endl;
@@ -221,30 +278,8 @@ void BoxOptimization::findNewLowerbound()
 	RR ans;
 	ans = 0;
 
-
-	//BTrieIterator<PolynomialMap, ZZ>* xitr = new BTrieIterator<PolynomialMap, ZZ> ();
-	//xitr->setTrie(theTrie, lowerBound.length());
-	//xitr->begin();
-
 	RR s(U);
 	s *= -1;
-
-	//term<PolynomialMap, ZZ>* xitrTerm;
-	//RationalNTL one(1,1);
-	//for(xitrTerm =  xitr->nextTerm(); xitrTerm; xitrTerm =  xitr->nextTerm())
-	//{
-		//cout << xitrTerm->coef << "*( ";
-		//for(int j = 0; j < lowerBound.length(); ++j)
-		//	cout << xitrTerm->exps[j] << ", ";
-		//cout << " )^" << xitrTerm->degree << endl;
-
-		//mpq_class temp = computeWeightedCountingBox_singleForm(lowerBound, upperBound, xitrTerm->exps, xitrTerm->degree, one);
-		//RR rTemp;
-		//rTemp = to_RR(convert_mpz_to_ZZ(temp.get_num()));
-		//rTemp /= to_RR(convert_mpz_to_ZZ(temp.get_den()));
-		//ans += xitrTerm->coef.eval(s) * rTemp;
-	//}
-	//delete xitr;
 
 	ans = currentMap.eval(s);
 
@@ -267,8 +302,11 @@ void BoxOptimization::setPower(int k)
 	assert(k >= 1);
 	//currentPower = k;
 
+	if ( k <= currentPower)
+		return; //we only want to increase the power of the currentPolynomial.
 
 	cout << "computing (f(x) + s)^" << k << "..." << flush;
+	cout << "currentPower " << currentPower << endl;
 	if( currentPower == 0)
 	{
 		currentPolynomial.varCount = originalPolynomial.varCount;
@@ -287,8 +325,7 @@ void BoxOptimization::setPower(int k)
 		currentPower = 1;
 	}//copy the origional polynomisl (f(x)+s) into currentPolynomial.
 
-	if ( k <= currentPower)
-		return; //we only want to increase the power of the currentPolynomial.
+
 
 	//********************************************
 	//next, take currentPolynomial to the kth power.
@@ -388,12 +425,13 @@ void BoxOptimization::setPower(int k)
 
 	term<PolynomialMap, ZZ>* mapitrTerm;
 	RationalNTL one(1,1);
+	int progress = 0;
 	for(mapitrTerm =  mapitr->nextTerm(); mapitrTerm; mapitrTerm =  mapitr->nextTerm())
 	{
-		//cout << xitrTerm->coef << "*( ";
+		//cout << mapitrTerm->coef << "*( ";
 		//for(int j = 0; j < lowerBound.length(); ++j)
-		//	cout << xitrTerm->exps[j] << ", ";
-		//cout << " )^" << xitrTerm->degree << endl;
+		//	cout << mapitrTerm->exps[j] << ", ";
+		//cout << " )^" << mapitrTerm->degree << endl;
 
 		mpq_class temp = computeWeightedCountingBox_singleForm(lowerBound, upperBound, mapitrTerm->exps, mapitrTerm->degree, one);
 		RationalNTL rTemp;
@@ -407,6 +445,18 @@ void BoxOptimization::setPower(int k)
 		currentMap += mapitrTerm->coef;
 		//currentMap.print(cout);
 		//cout << endl;
+		++progress;
+		if ( progress % 5 == 0)
+		{
+			cout << "lf processed " << progress << "/" << numLinForms << endl;
+			
+			/*
+			cout << mapitrTerm->coef << "*( ";
+			for(int j = 0; j < lowerBound.length(); ++j)
+				cout << mapitrTerm->exps[j] << ", ";
+			cout << " )^" << mapitrTerm->degree << endl;
+			*/
+		}
 	}
 	cout << "done." << endl;
 	delete theTrie;
