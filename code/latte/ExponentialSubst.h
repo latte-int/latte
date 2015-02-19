@@ -25,6 +25,8 @@
 
 #include "latte_gmp.h"
 #include "barvinok/dec.h"
+#include "MpqClassLazy.h"
+#include "nonlinearOptimization/WeightedCountingBuffer.h"
 
 // The exponential "Memory save" mode: A class of
 // Single_Cone_Parameters that immediately performs exponential
@@ -71,6 +73,7 @@ mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector, const listCone *cone, int numOfVars, const vec_ZZ &linForm, int M)
 throw(NotGenericException);
 
+
 ZZ
 scalar_power(const vec_ZZ &generic_vector,
 	     const vec_ZZ &point,
@@ -112,6 +115,11 @@ computeExponentialResidue_Single(const vec_ZZ &lambda,
  * Fixme: generic_vector is not being used, we are not processing the case if linFrom is orthogonal to some vertex-ray */
 mpq_class
 computeExponentialResidue_Single(const vec_ZZ &generic_vector, listCone *cone, int numOfVars, BarvinokParameters *params, const vec_ZZ & linForm, int M);
+
+//temp hack
+mpq_class computeExponentialResidue_Single_boxOpt(WeightedCountingBuffer & wcb, const vec_ZZ &generic_vector, listCone *cone, int numOfVars,	 BarvinokParameters *params, const vec_ZZ & linForm, int M);
+mpq_class computeExponentialResidue_Single_boxOpt_clean(const vec_ZZ &generic_vector, listCone *cone, int numOfVars,	 BarvinokParameters *params, const vec_ZZ & linForm, int M);
+void computeExponentialResidueWeights_boxOpt(WeightedCountingBuffer &wcb, const vec_ZZ &generic_vector, const listCone *cone, int numOfVars, const vec_ZZ &linForm, int M)   throw(NotGenericException);
 
 /* Likewise, but for the whole list of CONES, summing up the
    results. */

@@ -25,6 +25,8 @@
 
 #include <vector>
 #include "latte_gmp.h"
+#include "MpqClassLazy.h"
+#include "nonlinearOptimization/WeightedCountingBuffer.h"
 
 using namespace std;
 
@@ -60,5 +62,11 @@ evaluate_todd(const mpz_vector &x);
 /* Likewise, but compute the Taylor series up to t=order */
 mpq_vector
 evaluate_todd(const mpz_vector &x, int order);
+
+mpq_lazy_vector taylor_exponential_boxOpt(int order);
+mpq_lazy_vector taylor_reciprocal_boxOpt(const mpq_lazy_vector &a);
+void taylor_for_todd_boxOpt(WeightedCountingBuffer & wcb, int order);
+void taylor_product_boxOpt(WeightedCountingBuffer & wcb, const vector<mpq_lazy_vector> &taylors);
+void evaluate_todd_boxOpt(WeightedCountingBuffer & wcb, const mpz_vector &x, int order);
 
 #endif

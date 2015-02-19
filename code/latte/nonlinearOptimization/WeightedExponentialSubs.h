@@ -13,18 +13,20 @@
 #include "barvinok/barvinok.h"
 #include "integration/burstTrie.h"
 #include "integration/PolyTrie.h"
-
+#include "nonlinearOptimization/WeightedCountingBuffer.h"
 
 /**
- * Class for computing the weighted lattice point count of a polytope where the
- * weight function is one power of a linear form.
+ * Cone consumer.
+ * For finding \sum_{x \in cone} <x, linForm>^linFormPow
+ *
  */
 class Weighted_Exponential_Single_Cone_Parameters
   : public Generic_Vector_Single_Cone_Parameters {
 public:
-  mpq_class result;
-  vec_ZZ linForm;
+  mpq_class result;				// result of \sum_{x \in box} <x, linForm>^linFormPow
+  vec_ZZ linForm;				// has length n (ambient dimension), but real dimension is Number_of_Variables
   int linFormPow;
+  WeightedCountingBuffer *wcb;
   Weighted_Exponential_Single_Cone_Parameters() :
     result(0) {};
   Weighted_Exponential_Single_Cone_Parameters(const BarvinokParameters &params, const vec_ZZ & linform) :
@@ -35,6 +37,22 @@ public:
   virtual int ConsumeCone(listCone *cone);
 };
 
+
+class Weighted_Exponential_Single_Cone_Parameters_BranchBound
+  : public Generic_Vector_Single_Cone_Parameters {
+public:
+  int index;
+  WeightedExponentialTable *table;
+  vec_ZZ linForm;				// has length n (ambient dimension), but real dimension is Number_of_Variables
+  int linFormPow;
+  WeightedCountingBuffer *wcb;
+  Weighted_Exponential_Single_Cone_Parameters_BranchBound() {};
+  Weighted_Exponential_Single_Cone_Parameters_BranchBound(const BarvinokParameters &params, const vec_ZZ & linform) :
+    Generic_Vector_Single_Cone_Parameters(params),
+    linForm(linform) {};
+  virtual void InitializeComputation();
+  virtual int ConsumeCone(listCone *cone);
+};
 
 /**
  * Computes the weighted lattice point count where the weight function is sum of powers of linear forms.
@@ -53,14 +71,14 @@ public:
  *                                             \prod_{rays} (1 - exp(t* <r_i, l>))
  *
  */
-mpq_class computeWeightedExponentialResidue(listCone *cone, BarvinokParameters * params, linFormSum &originalLinearForm);
+mpq_class computeWeightedExponentialResidue(WeightedCountingBuffer &wcb, listCone *cone, BarvinokParameters * params, linFormSum &originalLinearForm);
 
 /**
  * Same as computeWeightedExponentialResidue but only processes one linear form
  * @param generic_vector: should be used if the linear form is orthogonal with one of the rays...but this is not implemented yet. So this parameter is meaningless.
  * @throw NotGenericException
  */
-mpq_class computeWeightedExponentialResidue_singleForm(listCone *cone, BarvinokParameters * params, const vec_ZZ &linFormCoeffs, const vec_ZZ &generic_vector, int M);
+mpq_class computeWeightedExponentialResidue_singleForm(WeightedCountingBuffer &wcb, listCone *cone, BarvinokParameters * params, const vec_ZZ &linFormCoeffs, const vec_ZZ &generic_vector, int M);
 
 
 #endif /* WEIGHTEDEXPONENTIALSUBS_H_ */

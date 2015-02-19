@@ -14,21 +14,12 @@
 #include "integration/burstTrie.h"
 #include "integration/PolyTrie.h"
 #include "integration/multiply.h"
-#include <map>
-#include <ostream>
+#include "nonlinearOptimization/WeightedCountingBuffer.h"
+#include "nonlinearOptimization/PolynomialMap.h"
 
 
-class PolynomialMap
-{
-public:
-	std::map<int, RationalNTL> terms;
-	PolynomialMap & operator+=(const PolynomialMap &rhs);
-	bool  operator==(const int rhs);
-	friend std::ostream & operator<<(std::ostream& os, const PolynomialMap & rhs);
-	RR eval(const RR & s) const;
-	void mult(const RationalNTL &rhs);
-	void print(ostream &out);
-};
+
+
 
 
 
@@ -40,7 +31,7 @@ public:
 	RR U;
 	RR L;
 	ZZ N; //number of lattice points in the box.
-	bool isTrivial;
+
 
 	monomialSum originalPolynomial; //d + 1 variables. (f + s)
 	monomialSum currentPolynomial; //(f + s)^currentPower
@@ -52,14 +43,24 @@ public:
 	PolynomialMap currentMap;
 	int currentMapPower;
 
+	WeightedExponentialTable* cacheWeights;
+
 	BoxOptimization();
-	void setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly);
+	~BoxOptimization();
+	void setPolynomial(const monomialSum & poly);
+	void setBounds(const vec_ZZ &lowBound, const vec_ZZ &upBound);
+	void setPower(int k, bool fixedBounds);
+	void findSPolynomial(const vec_ZZ &lowerBound, const vec_ZZ & upperBound);
+
+
+	bool isTrivial();
 	void enumerateProblem(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly);
 
-	void setPower(int k);
+
 	void findRange(int itr);
 	void findNewUpperbound();
 	void findNewLowerbound();
+
 
 	RR maximumUpperbound();
 	RR maximumLowerBound();
@@ -90,6 +91,7 @@ mpq_class computeWeightedCountingBox(const vec_ZZ &lowerBound, const vec_ZZ &upp
 /**
  * likewise, but for just one linear form.
  */
-mpq_class computeWeightedCountingBox_singleForm(const vec_ZZ &lowerBound, const vec_ZZ &upperBound, const ZZ* linFormExps, const int degree, const RationalNTL & coef);
+mpq_class computeWeightedCountingBox_singleForm(WeightedCountingBuffer & wcb, const vec_ZZ &lowerBound, const vec_ZZ &upperBound, const ZZ* linFormExps, const int degree, const RationalNTL & coef);
+WeightedExponentialTable* computeWeightedCountingBox_singleForm(WeightedCountingBuffer & wcb, const int n, const ZZ* linFormExps, const int degree);
 
 #endif /* BOXOPTIMIZATION_H_ */

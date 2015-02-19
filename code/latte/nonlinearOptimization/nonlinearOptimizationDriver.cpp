@@ -7,8 +7,13 @@
 
 #include <iostream>
 #include <fstream>
-#include <string>
+#include <vector>
+#include <cstdlib>
+#include <ctime>
 #include <climits>
+#include <sstream>
+#include <getopt.h>
+
 
 #include "banner.h"
 #include "barvinok/barvinok.h"
@@ -22,8 +27,33 @@
 #include "integration/burstTrie.h"
 #include "integration/PolyTrie.h"
 
+#include "MpqClassLazy.h"
+
 using namespace std;
 
+
+void printHelpMenu()
+{
+
+
+	cout <<
+	"Input files:\n"
+	"  --boxFile FILENAME{.box}               Input knapsack file.\n"
+	"  --monomials FILENAME{.poly}            Input polynomial file\n"
+	"  --linear-forms FILENAME{.lf}           Input powers of linear forms polynomial (used with --count)\n"
+    "Options that control what to compute:\n"
+    "  --opt                                  Does optimization\n"
+    "  --range                                Finds range of function\n"
+	"  --count                                Finds the weighted average of f(x)\n"
+    "Other options:\n"
+    "  --k, -k INT                            Sets (f(x)+s)^k\n"
+    "  --epi                                  If --opt, sets k\n"
+    "  --help, -h                             Prints this help message\n"
+    "\nExamples:\n"
+    "  ./boxOpt --boxFile box20d.box --monomials deg5.poly --opt -k 5\n"
+    << endl;
+
+}
 
 
 RationalNTL evaluate(monomialSum & poly, const vec_ZZ & point)
@@ -53,11 +83,24 @@ RationalNTL evaluate(monomialSum & poly, const vec_ZZ & point)
 	delete pItr;
 }
 
-int main(int argc, const char *argv[]) {
+void run()
+{
+	vector<MpqLazy> v;
+	MpqLazy a;
+	a = 34;
 
+	v.push_back(a);
+	cout << "ok" <<endl;
+}
+int main(int argc, char *argv[]) {
+
+
+	run();
+	//return 0;
 	string linFormFileName, polynomialFileName, boxFileName;
 	string cmd;
 	int userK = -1;
+	int k;
 	RR epsilon;
 	Timer totalTime("Total Time");
 
@@ -71,38 +114,72 @@ int main(int argc, const char *argv[]) {
 	}
 	cerr << endl;
 
-	for (int i = 1; i < argc; i++) {
-		if (strncmp(argv[i], "--linear-forms=", 15) == 0){
-			linFormFileName = string(argv[i] + 15);
-		} else if (strncmp(argv[i], "--monomials=", 12) == 0){
-			polynomialFileName = string(argv[i] + 12);
-		} else if (strncmp(argv[i], "--boxFile=", 10) == 0) {
-			boxFileName = string(argv[i] + 10);
-		} else if (strncmp(argv[i], "--count", 10) == 0) {
-			cmd = "count";
-		} else if (strcmp(argv[i], "--opt") == 0){
-			cmd = "opt";
-		} else if (strcmp(argv[i], "--range") == 0) {
-			cmd = "range";
-		} else if (strncmp(argv[i], "--k=",4) == 0) {
-			userK = atoi(argv[i]+4);
-		} else if ( strncmp(argv[i], "--epi=", 6) == 0) {
-			epsilon = to_RR(argv[i]+ 6);
-		} else if ( strncmp(argv[i], "--loop", 6) == 0) {
-			cmd = "loop";
-		} else if (strcmp(argv[i], "--help") == 0)	{
-			cout << "--linear-forms=FILE\n"
-				 << "--monomials=FILE\n"
-				 << "--boxFile=FILE\n"
-				 << "--count\n"
-				 << "--range\n"
-				 << "--opt\n";
-			exit(0);
-		} else {
-			cerr << "Unknown command/option " << argv[i] << endl;
-			THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, argv[i]);
+	//process each option.
+	while (1)
+	{
+		static struct option long_options[] =
+		{
+		{ "linear-forms",	  			  required_argument, 0, 0x100 },
+		{ "monomials",  				  required_argument, 0, 0x101 },
+		{ "boxFile",					  required_argument, 0, 0x102 }, //hex value larger than 1 byte/char
+		{ "help",						  no_argument,       0, 'h' },
+		{ "k",							  required_argument, 0, 'k' },
+		{ "epi",          				  required_argument, 0, 0x103},
+		{ "range",						  no_argument, 0, 0x104},
+		{ "opt",						  no_argument, 0, 0x105},
+		{ "count",						  no_argument, 0, 0x106 },
+		{ 0, 0, 0, 0 } };
+		/* getopt_long stores the option index here. */
+
+		int option_index = 0;
+		int c;
+
+		//single-character=short option-name. x: means x takes a required argument, x:: means x takes an optional argument.
+		c = getopt_long(argc, argv, "hk:", long_options, &option_index);
+
+		if (c == -1)
+			break;
+
+		switch (c)
+		{
+			case 0:
+				// If this option set a flag, do nothing
+				break;
+			case 0x100:
+				linFormFileName = optarg;
+				break;
+			case 0x101:
+				polynomialFileName = optarg;
+				break;
+			case 0x102:
+				boxFileName = optarg;
+				break;
+			case 'h':
+				printHelpMenu();
+				exit(0);
+				break;
+			case 'k':
+				userK  = atoi(optarg);
+				break;
+			case 0x103:
+				epsilon = atof(optarg);
+				break;
+			case 0x104:
+				cmd = "range";
+				break;
+			case 0x105:
+				cmd = "opt";
+				break;
+			case 0x106:
+				cmd = "count";
+				break;
+			default:
+				cerr << "Unknown command/option " << endl;
+				THROW_LATTE(LattException::ue_BadCommandLineOption);
+				exit(1);
 		}
-	} //for i.
+	}//while.
+
 
 	if (boxFileName.length() == 0) {
 		cerr << "box file is missing" << endl;
@@ -116,7 +193,7 @@ int main(int argc, const char *argv[]) {
 		string linFormStr;
 		getline(linFormFile, linFormStr);
 		cout << "lin form str: " << linFormStr.c_str() << endl;
-		loadLinForms(originalLinearForm, linFormStr.c_str());
+		loadLinForms(originalLinearForm, linFormStr.c_str()); //incorrect. need to mult or maybe divide by M!
 		linFormFile.close();
 	}
 
@@ -146,6 +223,26 @@ int main(int argc, const char *argv[]) {
 	cout << "ub: " << upperBound << endl;
 
 
+
+	RR N;
+	//cout << "epsilon=" << epsilon << endl;
+	N = 1;
+	for (int i = 0;  i < lowerBound.length(); ++i)
+		N *= to_RR(upperBound[i] - lowerBound[i] + 1);
+	N = ceil((1.0 + inv(epsilon))* log(N));
+	k = INT_MAX;
+	if ( N < INT_MAX)
+		k = to_int(N);
+	else
+		cout << "Warning: k is larger than " << INT_MAX << endl;
+
+
+
+	if (userK > 0)
+		k = userK;
+
+	cout << "k is " << k << endl;
+
 	totalTime.start();
 	if ( cmd == "count")
 	{
@@ -163,68 +260,92 @@ int main(int argc, const char *argv[]) {
 		cout << "Final count: " << weightedCount << endl;
 		destroyLinForms(originalLinearForm);
 	}
-
+/*
 	if ( cmd == "range" )
 	{
 		BoxOptimization bo;
-		bo.setPolynomial(lowerBound, upperBound, originalPolynomial);
-		if ( bo.isTrivial)
+		bo.setPolynomial(originalPolynomial);
+		bo.setBounds(lowerBound, upperBound);
+		if ( bo.isTrivial())
 		{
 			bo.enumerateProblem(lowerBound, upperBound, originalPolynomial);
 			cout << "optimal: " << bo.L << " <= f(x) <= " << bo.U << endl;
 			return 0;
 		}
-		bo.setPower(5);
+
+		bo.setPower(k);
 		bo.findRange(10);
 
 	}
-
+*/
 	if ( cmd == "opt")
 	{
 		BoxOptimization bo;
-		bo.setPolynomial(lowerBound, upperBound, originalPolynomial);
-		if ( bo.isTrivial)
+		bo.setPolynomial(originalPolynomial);
+		bo.setBounds(lowerBound, upperBound);
+
+		if ( bo.isTrivial())
 		{
 			bo.enumerateProblem(lowerBound, upperBound, originalPolynomial);
 			cout << "optimal: " << bo.L << " <= f(x) <= " << bo.U << endl;
 			return 0;
 		}
 
-		RR N;
-		cout << "epsilon=" << epsilon << endl;
-		N = 1;
-		for (int i = 0;  i < lowerBound.length(); ++i)
-			N *= to_RR(upperBound[i] - lowerBound[i] + 1);
-		N = ceil((1.0 + inv(epsilon))* log(N));
-		int k = INT_MAX;
-		if ( N < INT_MAX)
-			k = to_int(N);
-		else
-			cout << "Warning: k is larger than " << k << endl;
+		Timer timeSummation("Total Time for decomp + making the table ");
+		Timer timeSpoly("Total Time for finding s-poly ");
+		timeSummation.start();
+		bo.setPower(k, false);
+		timeSummation.stop();
 
 
-		cout << "starting k was " << k << endl;
-		if (userK > 0)
-			k = userK;
-		k--;
-		while ( bo.maximumUpperbound() - bo.maximumLowerBound() > 0.01)
+		for(int i = 0; i <1000; ++i)
 		{
-			k++;
-			bo.setPower(k);
+
+			for(int a = 0; a < 5; ++a)
+			if ( rand() % 2)
+			{
+				int j = rand() % lowerBound.length();
+				lowerBound[j] = (lowerBound[j] + upperBound[j])/2;
+			}
+			else
+			{
+				int j = rand() % lowerBound.length();
+				upperBound[j] = (lowerBound[j] + upperBound[j])/2;
+			}
+
+			/*
+			for(int j = 0; j < lowerBound.length(); ++j)
+			{
+				lowerBound[j] = (rand() % 10) - 5;
+				upperBound[j] = lowerBound[j] + (rand() % 5);
+			}
+			*/
+
+
+			cout << "\nLow: " << lowerBound << " up: " << upperBound << endl;
+
+			timeSpoly.start();
+			bo.setBounds(lowerBound, upperBound);
+			bo.findSPolynomial(lowerBound, upperBound);
+			timeSpoly.stop();
+
+
+			cout << "old range " << bo.L << " <=f(x)<= " << bo.U << " old max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
 			bo.findRange(10);
-			bo.findNewUpperbound();
-			cout << "k: " << k << " " << bo.L << " <= f(x) <= " << bo.U << "\n";
-			cout << "k: " << k << " " << bo.maximumLowerBound() << " <= max f(x) <= " << bo.maximumUpperbound() << "\n";
-			cout << "gap: " << bo.maximumUpperbound() - bo.maximumLowerBound() << "\n";
-			//if (k > 10)
+			cout << "new range " << bo.L << " <=f(x)<= " << bo.U << " new max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
+			cout << "i=" << i << endl;
+
+			if ( bo.N <= 10)
 				break;
+
 		}
-		cout << "k: " << k << " " << bo.L << " <= f(x) <= " << bo.U << "\n";
-		cout << "k: " << k << " " << bo.maximumLowerBound() << " <= max f(x) <= " << bo.maximumUpperbound() << "\n";
-		cout << "gap: " << bo.maximumUpperbound() - bo.maximumLowerBound() << "\n";
+		cout << timeSummation << endl;
+		cout << timeSpoly << endl;
 	}
+	totalTime.stop();
+	cout << totalTime << endl;
 
-
+/*
 	if( cmd == "loop")
 	{
 		ZZ i;
@@ -249,7 +370,7 @@ int main(int argc, const char *argv[]) {
 	totalTime.stop();
 	cout  << totalTime << endl;
 	cout << "Total time for dim 20 = " << 20*totalTime.get_seconds() << endl;
-
+*/
 
 	return 0;
 }

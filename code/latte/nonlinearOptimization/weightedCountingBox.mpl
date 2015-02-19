@@ -9,9 +9,10 @@ myLessThanEq:=proc(lb, ub)
 		end;
 	end;
 	return true;
-end;
+end:
 
-
+#@param filename: fileName for a file that has a latte-style polynomial on the first line
+#@return [n, poly], where n is the number of variables x[1]..x[n], and poly is a maple-style polynomail in x[i]
 getPolynomial:=proc(fileName)
 	local line, n, poly;
 	line:=readline(fileName);
@@ -25,76 +26,15 @@ getPolynomial:=proc(fileName)
 	
 	return [n,poly];
 	
-end;
-
-sumPolynomial:=proc(lb, ub, poly, point)
-	local current, ans, i;
-	
-	current := lb;
-	ans:=0;
-	while ( myLessThanEq(current, ub)) do
-		#print(current);
-		
-		ans := ans + eval(subs({seq(x[i]=current[i],i=1..n)}, poly));
-		
-		current[1] := current[1] + 1;
-	
-		i := 1;
-		while (current[i] > ub[i] and i < nops(lb)) do
-			current[i] := lb[i];
-			current[i+1] := current[i+1] + 1;
-			i := i + 1;
-		od;
-	
-	od;
-	return ans;
-end;
+end:
 
 
 
-
-#lb, up: lower and upperbound
-#np[1] = number of vars,
-#np[2] = polynomial in x[i], i =1..n
-#k to take the k-norm
-weightedPolynomialLP:=proc(lb, ub, np, k)
-	local current, ans, i;
-	ASSERT(nops(lb) = nops(ub));
-
-	current := lb;
-	n:=np[1]:
-	p:=np[2]:
-	pk:=(p)^k:
-	
-	ans := 0;
-	minVal:=eval(subs({seq(x[i]=lb[i],i=1..n)}, p));
-	maxVal:=minVal;
-	while ( myLessThanEq(current, ub)) do
-		#print(current);
-		
-		ans := ans + eval(subs({seq(x[i]=current[i],i=1..n)}, pk));
-		t:=eval(subs({seq(x[i]=current[i],i=1..n)}, p));
-		minVal:=min(minVal, t);
-		maxVal:=max(maxVal, t);
-		
-		current[1] := current[1] + 1;
-	
-		i := 1;
-		while (current[i] > ub[i] and i < nops(lb)) do
-			current[i] := lb[i];
-			current[i+1] := current[i+1] + 1;
-			i := i + 1;
-		od;
-	
-	od;
-	printf("minValue of f %E\n",minVal);
-	printf("maxValue of f %E\n", maxVal);
-	printf("sum f^k       %E\n", ans);
-	printf("||f||_k       %E\n", evalf(ans^(1/k)));
-	printf(" k            %E\n", k);
-	
-end;
-
+#@param lb, up: bounds
+#@param c: coefficient
+#@param l: linear form list, ex[1,3,4,2]
+#@param p: power for the linear form, ex (1*x[1]+3*x[2]+4*x[3]+2*x[4])^p
+#@return \sum_{x \in box} <x, l>^p
 weightedBoxCount:=proc(lb, ub, c, l, p)
 	local current, ans, i;
 	ASSERT(nops(lb) = nops(ub));
@@ -118,9 +58,11 @@ weightedBoxCount:=proc(lb, ub, c, l, p)
 	
 	od;
 	ans := ans*c;
-end;
+end:
 
-sPolynomial:=proc(lb, ub, fx, k)
+#@param fx: maple expression in x[i], and maybe s.
+#@returns \sum_{x \in box} fx(x). fx(x) can be anything, power of LF or (f+x)^k
+weightedBoxCountExpression:=proc(lb, ub, fx)
 	local current, ans, i;
 	ASSERT(nops(lb) = nops(ub));
 
@@ -130,7 +72,7 @@ sPolynomial:=proc(lb, ub, fx, k)
 	while ( myLessThanEq(current, ub)) do
 		#print(current);
 		
-		ans := ans + subs({seq(x[i]=current[i],i=1..nops(lb))}, (fx)^k);
+		ans := ans + subs({seq(x[i]=current[i],i=1..nops(lb))}, fx);
 		
 		current[1] := current[1] + 1;
 	
@@ -145,21 +87,26 @@ sPolynomial:=proc(lb, ub, fx, k)
 	ans := simplify(expand(ans));
 end:
 
-polynomialRange:=proc(lb, ub, fx)
-	local current, tmax, tmin, i;
+
+#@param fx: maple expression in x[i], and maybe s.
+#@returns \sum_{x \in box} fx(x). fx(x) can be anything, power of LF or (f+x)^k
+maxValueExpression:=proc(lb, ub, fx)
+	local current, ans, i, maxVal, maxFval;
 	ASSERT(nops(lb) = nops(ub));
 
 	current := lb;
-	tmax:= subs({seq(x[i]=current[i],i=1..nops(lb))}, fx);
-	tmin:=tmax;
 	
-	ans := 0;
+	maxVal := lb;
+	maxFval := subs({seq(x[i]=lb[i],i=1..nops(lb))}, fx);
 	while ( myLessThanEq(current, ub)) do
 		#print(current);
 		
-		t := subs({seq(x[i]=current[i],i=1..nops(lb))}, fx);
-		tmax:=max(tmax,t);
-		tmin:=min(tmin,t);
+		
+		ans := subs({seq(x[i]=current[i],i=1..nops(lb))}, fx);
+		if ( ans > maxFval) then
+			maxFval := ans;
+			maxVal := current;
+		end;
 		
 		current[1] := current[1] + 1;
 	
@@ -171,8 +118,57 @@ polynomialRange:=proc(lb, ub, fx)
 		od;
 	
 	od;
-	print("min=", tmin);
-	print("max=", tmax);
+	return [maxFval, maxVal];
 end:
-#weightedBoxCount([4, 10], [5, 13], 1, [1,2], 10);
+
+
+
+#@param fx: maple expression in x[i] only
+#@param lb, ub: bounds arrays
+#@returns [min fx, max fx, avg fx, std dev fx] 
+polynomialStats:=proc(lb, ub, fx)
+	local current, tmax, tmin, i;
+	ASSERT(nops(lb) = nops(ub));
+
+	current := lb;
+	fxMax:= subs({seq(x[i]=current[i],i=1..nops(lb))}, fx);
+	fxMin:=fxMax;
+	
+	N:=product(ub[i] - lb[i]+1, i=1..nops(lb));
+	
+	
+	sumk1:=0;
+	sumk2:=0;
+	while ( myLessThanEq(current, ub)) do
+		#print(current);
+		
+		sumk1_part := subs({seq(x[i]=current[i],i=1..nops(lb))}, fx);
+		sumk2 := sumk2 + subs({seq(x[i]=current[i],i=1..nops(lb))}, fx^2);
+		sumk1 := sumk1 + sumk1_part;
+		fxMax:=max(fxMax,sumk1_part);
+		fxMin:=min(fxMin,sumk1_part);
+		
+		current[1] := current[1] + 1;
+	
+		i := 1;
+		while (current[i] > ub[i] and i < nops(lb)) do
+			current[i] := lb[i];
+			current[i+1] := current[i+1] + 1;
+			i := i + 1;
+		od;
+	
+	od;
+	
+	fxAvg:= evalf(sumk1/N);
+	fxSD:= evalf(sqrt(sumk2/N - (fxAvg^2)));
+	
+	
+	print("min f", fxMin);
+	print("max f", fxMax);
+	print("avg f", fxAvg);
+	print("SD  f", fxSD);
+	
+	return [fxMin, fxMax, fxAvg, fxSD];
+end:
+
 

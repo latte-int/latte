@@ -58,7 +58,9 @@ liblatte_la_SOURCES =							\
 	triangulation/RegularTriangulationWithCdd.cpp			\
 	ReadPolyhedron.cpp						\
 	ProjectUp.cpp							\
-	ReadSubcones.cpp						
+	ReadSubcones.cpp						\
+	MpqClassLazy.cpp						
+	
 
 
 noinst_HEADERS =							\
@@ -89,7 +91,9 @@ noinst_HEADERS =							\
 	ReadPolyhedron.h						\
 	ProjectUp.h							\
 	ReadSubcones.h \
-	integration/GeneralMonomialSum.h 
+	integration/GeneralMonomialSum.h \
+	MpqClassLazy.h					\
+	nonlinearOptimization/WeightedCountingBuffer.h 
 
 
 if HAVE_TOPCOM_LIB
@@ -238,9 +242,13 @@ top_ehrhart_knapsack_LDADD = $(LDADD)
 #main program to find optimization over box domains. 
 bin_PROGRAMS += boxOpt
 boxOpt_SOURCES = nonlinearOptimization/nonlinearOptimizationDriver.cpp
-boxOpt_SOURCES += nonlinearOptimization/WeightedExponentialSubs.cpp
-boxOpt_SOURCES += nonlinearOptimization/BoxOptimization.cpp
 boxOpt_LDADD = $(LDADD)
+noinst_HEADERS += nonlinearOptimization/WeightedExponentialSubs.h
+noinst_HEADERS += nonlinearOptimization/BoxOptimization.h
+noinst_HEADERS += nonlinearOptimization/PolynomialMap.h
+liblatte_la_SOURCES += nonlinearOptimization/WeightedExponentialSubs.cpp
+liblatte_la_SOURCES += nonlinearOptimization/BoxOptimization.cpp
+liblatte_la_SOURCES += nonlinearOptimization/PolynomialMap.cpp
 
 #convert a cdd H-rep to latte H-rep (by clearing the fractions)
 bin_PROGRAMS += ConvertCDDineToLatte

@@ -19,6 +19,7 @@
 */
 
 #include "todd-expansion.h"
+#include <algorithm>
 
 mpq_vector
 taylor_exponential(int order)
@@ -27,6 +28,17 @@ taylor_exponential(int order)
   mpq_class coeff(1);
   int i;
   for (i = 0; i<=order; i++, coeff /= i) 
+    result[i] = coeff;
+  return result;
+}
+
+mpq_lazy_vector
+taylor_exponential_boxOpt(int order)
+{
+  mpq_lazy_vector result(order + 1);
+  mpq_class_lazy coeff(1);
+  int i;
+  for (i = 0; i<=order; i++, coeff /= i)
     result[i] = coeff;
   return result;
 }
@@ -53,6 +65,29 @@ taylor_reciprocal(const mpq_vector &a)
   return b;
 }
 
+mpq_lazy_vector
+taylor_reciprocal_boxOpt(const mpq_lazy_vector &a)
+{
+  // Make the ansatz 1 / (a_0 t^0 + a_1 t^1 + a_2 t^2 + ...)
+  //                   = (b_0 t^0 + b_1 t^1 + b_2 t^2 + ...)
+  // and solve for the b_i.
+  mpq_lazy_vector b(a.size());
+  // Compute the first coefficient.
+  b[0] = 1 / a[0];
+  unsigned int i;
+  for (i = 1; i<a.size(); i++) {
+    // We have 0 = a_0 b_i + a_1 b_{i-1} + ... + a_i b_0.
+    // Compute b_i from that.
+    unsigned int j;
+    mpq_class_lazy sum;
+    sum = 0;
+    for (j = 1; j<=i; j++)
+      sum += a[j] * b[i-j];
+    b[i] = -sum / a[0];
+  }
+  return b;
+}
+
 mpq_vector
 taylor_for_todd(int order)
 {
@@ -65,6 +100,33 @@ taylor_for_todd(int order)
     todd_denom[i] = -exp[i+1];
   return taylor_reciprocal(todd_denom);
 }
+
+
+void
+taylor_for_todd_boxOpt(WeightedCountingBuffer & wcb, int order)
+{
+  if (wcb.factorMaster.size() < order +1)
+  {
+	  // Prepare exp(t).
+	  mpq_lazy_vector exp = taylor_exponential_boxOpt(order + 2);
+	  // We want t/(1-exp(t)); we can cancel one t here.
+	  mpq_lazy_vector todd_denom(order + 1);
+	  int i;
+	  for (i = 0; i<=order; i ++)
+		todd_denom[i] = -exp[i+1];
+	  wcb.factorMaster = taylor_reciprocal_boxOpt(todd_denom);
+  }
+  if (wcb.factor.size() != order + 1)
+  {
+
+	  wcb.factor.resize(0);
+	  //copy(wcb.factorMaster.begin(),wcb.factorMaster.end(), wcb.factor.begin());
+	  wcb.factor.insert(wcb.factor.begin(), wcb.factorMaster.begin(),wcb.factorMaster.end() );
+  }
+
+
+}
+
 
 static mpq_vector
 taylor_product_aux(const mpq_vector &a, const mpq_vector &b)
@@ -82,6 +144,27 @@ taylor_product_aux(const mpq_vector &a, const mpq_vector &b)
   return result;
 }
 
+static void
+taylor_product_aux_boxOpt(WeightedCountingBuffer &wcb, const mpq_lazy_vector &b)
+{
+  //int size = min(a.size(), b.size());
+  int size = wcb.todds.size();
+  wcb.result.resize(size);
+  //mpq_lazy_vector result(size);
+  int i;
+  for (i = 0; i<size; i++) {
+    mpq_class_lazy sum;
+// sum = 0;
+    int j;
+    for (j = 0; j<=i; j++)
+      sum += wcb.todds[j] * b[i-j];
+    wcb.result[i] = sum;
+  }
+
+  wcb.result.swap(wcb.todds);
+
+}
+
 mpq_vector
 taylor_product(const vector<mpq_vector> &taylors)
 {
@@ -96,6 +179,25 @@ taylor_product(const vector<mpq_vector> &taylors)
   for (++p; p != taylors.end(); ++p)
     result = taylor_product_aux(result, *p);
   return result;
+}
+
+void
+taylor_product_boxOpt(WeightedCountingBuffer &wcb, const vector<mpq_lazy_vector> &taylors)
+{
+  vector<mpq_lazy_vector>::const_iterator p = taylors.begin();
+  if (p == taylors.end()) {
+    // Return 1.
+	wcb.todds.resize(1);
+	wcb.todds[0] = 1;
+    return;
+  }
+  wcb.todds.resize(0);
+  wcb.todds.insert(wcb.todds.begin(), p->begin(), p->end());
+
+  //mpq_lazy_vector result(*p);
+  for (++p; p != taylors.end(); ++p)
+    taylor_product_aux_boxOpt(wcb, *p);
+  //return result;
 }
 
 mpq_vector
@@ -145,4 +247,29 @@ evaluate_todd(const mpz_vector &x, int order)
   }
   // Compute their product
   return taylor_product(factors);
+}
+
+void evaluate_todd_boxOpt(WeightedCountingBuffer &wcb, const mpz_vector &x, int order)
+{
+
+  int dimension = x.size();
+  // Compute Taylor series for t/(1-exp(t))
+
+  taylor_for_todd_boxOpt(wcb, order); //factor set.
+
+  // Substitute t -> x_i * t
+  vector<mpq_lazy_vector> factors(dimension);
+  int i;
+  for (i = 0; i<dimension; i++) {
+	factors[i].resize(wcb.factor.size());// = mpq_lazy_vector(factor.size());
+	mpq_lazy_vector::const_iterator source;
+	mpq_lazy_vector::iterator dest;
+	mpz_class coefficient = 1;
+	for (source = wcb.factor.begin(),  dest = factors[i].begin(),  coefficient = 1;	 source != wcb.factor.end(); ++source, ++dest, coefficient *= x[i])
+	  (*dest) =  (*source) * coefficient;
+  }
+
+  // Compute their product
+  taylor_product_boxOpt(wcb, factors);
+
 }

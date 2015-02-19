@@ -72,8 +72,7 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
   throw(NotGenericException)
 {
 
-  vec_ZZ linForm;
-  linForm = generic_vector;
+  const vec_ZZ & linForm = generic_vector;
  return computeExponentialResidueWeights(generic_vector, cone, numOfVars, linForm, 0);
  /*
   // Compute dimension; can be smaller than numOfVars
@@ -113,6 +112,7 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 
 /*
  * todo: if linForm is orthogonal to some ray, and M > 0, we should use the generic_vector to try to perturbe the linear form.
+ * todo: BD add comments and say this is only being called in normal latte
  */
 mpq_vector computeExponentialResidueWeights(const vec_ZZ &generic_vector, const listCone *cone, int numOfVars, const vec_ZZ &linForm, int M)
   throw(NotGenericException)
@@ -154,6 +154,57 @@ mpq_vector computeExponentialResidueWeights(const vec_ZZ &generic_vector, const 
   return weights;
 }
 
+
+/*
+ * todo: if linForm is orthogonal to some ray, and M > 0, we should use the generic_vector to try to perturbe the linear form.
+ */
+void computeExponentialResidueWeights_boxOpt(WeightedCountingBuffer &wcb, const vec_ZZ &generic_vector, const listCone *cone, int numOfVars, const vec_ZZ &linForm, int M)
+  throw(NotGenericException)
+{
+	  // Compute dimension; can be smaller than numOfVars
+	  int dimension = 0;
+	  listVector *ray;
+	  for (ray = cone->rays; ray != NULL; ray = ray->rest)
+	    dimension++;
+	  vector<mpz_class> ray_scalar_products(dimension);
+	  mpz_class prod_ray_scalar_products;
+	  prod_ray_scalar_products = 1;
+	  {
+	    int k;
+	    for (k = 0, ray = cone->rays; ray != NULL; k++, ray = ray->rest) {
+	      ZZ inner;
+	      InnerProduct(inner, linForm, ray->first);
+	      ray_scalar_products[k] = convert_ZZ_to_mpz(inner);
+	      if (ray_scalar_products[k] == 0) {
+		static NotGenericException not_generic;
+		throw not_generic;
+	      }
+	      prod_ray_scalar_products *= ray_scalar_products[k];
+	    }
+	  }
+	  int k;
+	  mpz_class k_factorial;
+	  wcb.weights.resize((dimension + M) + 1);
+	  //mpq_lazy_vector weights((dimension + M) + 1);
+	  evaluate_todd_boxOpt(wcb, ray_scalar_products, dimension + M);
+
+	  //for(int j = 0; j < todds.size(); ++j)
+	//	  todds[j].canonicalize();
+
+	  //cout << "evalute todd is ok..." << endl;
+	  //for(k=0; k < todds.size(); ++k)
+	//	  cout << todds[k] << "*t^" << k << " ";
+	 // cout << endl;
+	  for (k = 0, k_factorial = 1; k<=(dimension + M); k++, k_factorial *= k) {
+		  wcb.weights[k] = wcb.todds[(dimension + M) - k];
+		  wcb.weights[k] /= prod_ray_scalar_products;
+		  wcb.weights[k] /=  k_factorial;
+	    //mpq_class_lazy td = todds[(dimension + M) - k];
+	    //td /= prod_ray_scalar_products;
+	    //weights[k] = td / k_factorial;
+	  }
+	  //return weights;
+}
 
 
 vec_ZZ
@@ -238,13 +289,17 @@ computeExponentialResidue_Single(const vec_ZZ &generic_vector,
   return cone->coefficient * result;
 }
 
-mpq_class computeExponentialResidue_Single(const vec_ZZ &generic_vector, listCone *cone, int numOfVars,	 BarvinokParameters *params, const vec_ZZ & linForm, int M)
+//I think only \sum <l,x>^p code call this, not regular latte :)
+mpq_class computeExponentialResidue_Single_boxOpt(WeightedCountingBuffer &wcb, const vec_ZZ &generic_vector, listCone *cone, int numOfVars,	 BarvinokParameters *params, const vec_ZZ & linForm, int M)
 {
 	//cout << "sers: gv " << generic_vector << endl;
 	//cout << "sers: numofvars " << numOfVars << endl;
 	//cout << "sers: linFomr" << linForm << endl;
 	//cout << "sers: M " << M << endl;
-  mpq_vector weights = computeExponentialResidueWeights(generic_vector, cone, numOfVars, linForm,M);
+    computeExponentialResidueWeights_boxOpt(wcb, generic_vector, cone, numOfVars, linForm,M);
+
+    mpq_lazy_vector  & weights = wcb.weights;
+
 
   //cout << "the weights are " << endl;
   //for(int i = 0; i < weights.size(); ++i)
@@ -253,42 +308,52 @@ mpq_class computeExponentialResidue_Single(const vec_ZZ &generic_vector, listCon
 
   int dimension =  weights.size() - M - 1;
   int k;
-  mpq_class result = 0;
+  mpq_class_lazy result;
+  //mpq_class_lazy result = 0;
 
   // Equivalent, but faster code:
-  computeLatticePointsScalarProducts(cone, numOfVars, linForm, params);
+  //computeLatticePointsScalarProducts(cone, numOfVars, linForm, params);
   //cout << "say..." << endl;
   vec_ZZ sum = compute_sums_of_scalar_powers(cone, numOfVars, linForm, params, numOfVars + M);
-  //cout << "what..." << endl;
+  //cout << "the sums are" << sum << endl;
   for (k = 0; k<=(dimension+M); k++)
-	result +=  convert_ZZ_to_mpz(sum[k]) * weights[k];
-  return cone->coefficient * result;
+	result +=  weights[k] * convert_ZZ_to_mpz(sum[k]);
+  result *= cone->coefficient;
 
- /*
-  mpq_vector weights
-    = computeExponentialResidueWeights(generic_vector, cone, numOfVars);
-  int dimension = weights.size() - 1;
-  int k;
-  mpq_class result = 0;
-#if 1
-  // Equivalent, but faster code:
-  computeLatticePointsScalarProducts(cone, numOfVars, generic_vector, params);
-  mpz_vector sum = compute_sums_of_scalar_powers_mpz(cone, numOfVars, generic_vector, params);
-  for (k = 0; k<=dimension; k++)
-    result += sum[k] * weights[k];
-#else
-  computePointsInParallelepiped(cone, numOfVars);
-  for (k = 0; k<=dimension; k++) {
-    Integer sum = sum_of_scalar_powers(generic_vector,
-				       cone->latticePoints, k);
-    result += convert_ZZ_to_mpz(sum) * weights[k];
-  }
-#endif
-//   cerr << "Cone contributes: "
-//        << cone->coefficient << " * " << result << endl;
-  return cone->coefficient * result;
-*/
+  //cout << "result = " << result << " vs " << result.canonicalize() << endl;
+
+  //cout << "next one is to_mpq" << endl;
+  //return result.to_mpq();
+  /*
+	if (linForm[0] == 2 && linForm[1] == 4 && linForm[2] == 1)
+	{
+		cout << " sum = " << sum <<endl;
+		cout << "x1vertex ";
+		vec_ZZ num = cone->vertex->vertex->numerators();
+		for(k = 0; k < numOfVars; ++k)
+			cout << ", " << num[k];
+		cout <<" = " << result   <<endl;
+
+	}
+	*/
+  return result;
 }
+mpq_class computeExponentialResidue_Single_boxOpt_clean(const vec_ZZ &generic_vector, listCone *cone, int numOfVars,	 BarvinokParameters *params, const vec_ZZ & linForm, int M)
+{
+	 mpq_vector weights = computeExponentialResidueWeights(generic_vector, cone, numOfVars, linForm, M);
+
+	  int dimension = weights.size() - M - 1;
+	  int k;
+	  mpq_class result = 0;
+	  /* Equivalent, but faster code: */
+	  vec_ZZ sum = compute_sums_of_scalar_powers(cone, numOfVars, linForm, params, numOfVars + M);
+
+	  for (k = 0; k<=dimension+M; k++)
+	    result += weights[k] * convert_ZZ_to_mpz(sum[k]);
+	  result *= cone->coefficient;
+	  return result;
+}
+
 
 
 Integer

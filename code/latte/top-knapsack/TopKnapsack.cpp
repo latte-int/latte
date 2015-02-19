@@ -305,8 +305,8 @@ void TopKnapsack::packageAnswer()
 
 				ZZ hFactorial;
 				hFactorial = 1;
-				for(int i = 2; i <= h; ++i)
-					hFactorial *= i;
+				for(int j = 2; j <= h; ++j)
+					hFactorial *= j;
 
 				RationalNTL factor;
 				if ( h % 2 == 0)
@@ -838,11 +838,11 @@ void TopKnapsack::findResidue(GeneralMonomialSum<PeriodicFunction, int> & fSerie
 
 		vector<RationalNTL> fractionalPart;
 		fractionalPart.resize(I);
-		for(int i = 0; i < I; ++i)
+		for(int j = 0; j < I; ++j)
 		{
-			fractionalPart[i] = RationalNTL(temp[i], invBd*coneRaysInvD);
-			if (fractionalPart[i].getDenominator() == 1)
-				fractionalPart[i] = 0; //fractionalPart(integer) = 0
+			fractionalPart[j] = RationalNTL(temp[j], invBd*coneRaysInvD);
+			if (fractionalPart[j].getDenominator() == 1)
+				fractionalPart[j] = 0; //fractionalPart(integer) = 0
 		}
 
 		//now, fractionalPart[i] = {-B^-1 T s}_i

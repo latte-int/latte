@@ -8,74 +8,8 @@
 #include "BoxOptimization.h"
 #include "ramon.h"
 #include "nonlinearOptimization/WeightedExponentialSubs.h"
-#include <map>
-
 
 #include "LattException.h"
-
-	//std::map<int, RationalNTL> terms;
-PolynomialMap & PolynomialMap::operator+=(const PolynomialMap &rhs)
-{
-	for (std::map<int,RationalNTL>::const_iterator it=rhs.terms.begin(); it!=rhs.terms.end(); ++it)
-	{
-
-	    terms[it->first] += it->second;
-	}
-	return *this;
-}
-
-
-bool  PolynomialMap::operator==(const int rhs)
-{
-	if ( terms.size() != 1)
-		return false;
-
-	std::map<int,RationalNTL>::const_iterator it = terms.find(0);
-	if (it != terms.end() && it->second == rhs)
-	    return true;
-	return false;
-}
-
-void PolynomialMap::mult(const RationalNTL &rhs)
-{
-	for (std::map<int,RationalNTL>::iterator it=terms.begin(); it!=terms.end(); ++it)
-	{
-
-	    it->second *= rhs;
-	}
-}
-
-void PolynomialMap::print(ostream &out)
-{
-	for (std::map<int,RationalNTL>::const_iterator it=terms.begin(); it!=terms.end(); ++it)
-	{
-		out << it->second << "* S^( " << it->first << " ) + ";
-	}
-	out << endl;
-}
-
-
-RR PolynomialMap::eval(const RR & s) const
-{
-	RR ans;
-	for (std::map<int,RationalNTL>::const_iterator it=terms.begin(); it!=terms.end(); ++it)
-	{
-		ans += to_RR((it->second)) * power(s, it->first);
-	}
-	return ans;
-}
-
-std::ostream & operator<<(std::ostream& os, const PolynomialMap & rhs)
-{
-	os << "(";
-	for (std::map<int,RationalNTL>::const_iterator it=rhs.terms.begin(); it!=rhs.terms.end(); ++it)
-	{
-	    os << " +" << it->second << "*(s^" << it->first << ")";
-	}
-	os << ")";
-
-	return os;
-}
 
 BoxOptimization::BoxOptimization()
 {
@@ -84,12 +18,27 @@ BoxOptimization::BoxOptimization()
 	N = 0;
 	currentPower = 0;
 	//theTrie = NULL;
+	cacheWeights = NULL;
+}
+
+BoxOptimization::~BoxOptimization()
+{
+	destroyMonomials(originalPolynomial);
+	destroyMonomials(currentPolynomial);
+
+	WeightedExponentialTable *t;
+	while (	cacheWeights )
+	{
+		t = cacheWeights;
+		cacheWeights = cacheWeights->next;
+		delete t;
+	}
 }
 
 
-void BoxOptimization::setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly)
+void BoxOptimization::setPolynomial(const monomialSum & poly)
 {
-
+/*
 	vector<bool> isSame;
 	int ambDim = lowBound.length();
 	int affineDim = 0;
@@ -132,6 +81,10 @@ void BoxOptimization::setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBoun
 
 	originalPolynomial.varCount = affineDim +1;
 	originalPolynomial.termCount = 0;
+*/
+	originalPolynomial.varCount = poly.varCount +1;
+	originalPolynomial.termCount = 0;
+
 
 	BTrieIterator<RationalNTL, int>* pItr =	new BTrieIterator<RationalNTL, int> ();
 	pItr->setTrie(poly.myMonomials,	poly.varCount);
@@ -140,9 +93,10 @@ void BoxOptimization::setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBoun
 
 	term<RationalNTL, int>* term;
 	int * exp;
-	exp = new int[affineDim + 1];
+	exp = new int[poly.varCount + 1];
 	exp[0] = 0;
 
+	/*
 	isTrivial = true;
 	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
 	{
@@ -171,22 +125,143 @@ void BoxOptimization::setPolynomial(const vec_ZZ &lowBound, const vec_ZZ &upBoun
 		//cout << newCoef << " " << boundTerm << " " << sign(newCoef) << endl;
 		U += to_RR((newCoef) * (boundTerm * sign(newCoef)));
 	}
+	*/
+	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
+	{
+		ZZ boundTerm;
+		boundTerm = 1;
+		for (int i = 0; i < poly.varCount; ++i)
+		{
+			exp[i + 1] = term->exps[i];
+		}
+		insertMonomial(term->coef, exp, originalPolynomial);
+
+	}
+	RationalNTL one;
+	one = 1;
+	for(int i = 1; i <poly.varCount + 1; ++i)
+		exp[i] = 0;
+	exp[0] = 1;
+
+	insertMonomial(one, exp, originalPolynomial);
+	delete [] exp;
+}
+
+
+void BoxOptimization::setBounds(const vec_ZZ &lowBound, const vec_ZZ &upBound)
+{
+	vec_ZZ maxBound;
+	int ambDim = originalPolynomial.varCount - 1;
+
+	//copy the bounds.
+	lowerBound = lowBound;
+	upperBound = upBound;
+
+
+	N = 1;
+	maxBound.SetLength(ambDim);
+	for(int i = 0; i < ambDim; ++i)
+	{
+		maxBound[i] = max(abs(lowBound[i]), abs(upBound[i]));
+		N *= (upBound[i] - lowBound[i] + 1);
+	}
+	cout << "Number of lattice points: " << N << endl;
+
+
+
+	BTrieIterator<RationalNTL, int>* pItr =	new BTrieIterator<RationalNTL, int> ();
+	pItr->setTrie(originalPolynomial.myMonomials,	originalPolynomial.varCount);
+	pItr->begin();
+
+
+	term<RationalNTL, int>* term;
+	int * exp;
+	exp = new int[ambDim + 1];
+	exp[0] = 0;
+
+
+/*
+	U = 0;
+	ZZ boundTerm;
+	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
+	{
+		if ( term->exps[0] != 0)
+			continue;
+		boundTerm = 1;
+
+		RationalNTL newCoef(term->coef);
+
+		for (int i = 0; i < ambDim; ++i)
+		{
+			boundTerm *= power(maxBound[i], term->exps[i+1]);
+		}
+		U += to_RR((newCoef) * (boundTerm * sign(newCoef)));
+	}
 	L = U;
 	L *= -1;
-	//cout << L << " f(x) " << U << endl;
+	cout << "Simple bounds " << L << "<= f(x) <=" << U << endl;
+*/
+	//starta
+	pItr->begin();
+	ZZ u,l;
+	u=0;
+	l=0;
+	for(term = pItr->nextTerm(); term; term = pItr->nextTerm())
+	{
+		if (term->exps[0] != 0)
+			continue;
 
-	for (i = 0; i < affineDim; ++i)
-		exp[i + 1] = 0;
-	exp[0] = 1;
-	insertMonomial(RationalNTL(1,1), exp, originalPolynomial);
+		ZZ uu,ll;
+		uu = term->coef.getNumerator();
+		assert(term->coef.getDenominator() == 1);
+		ll = uu;
+		for(int i = 0; i < ambDim; ++i)
+		{
+			ZZ a,b;
+			if ( term->exps[i+1] == 0 )
+				continue;
+			if( term->exps[i+1] % 2 == 0 && upBound[i] > 0 && lowBound[i] < 0)
+			{
+				a = power(max(abs(upBound[i]), abs(lowBound[i])), term->exps[i+1]); //power(max(abs(upBound[i]), abs(lowBound[i]), term->exps[i]));
+				b = 0;
+			}
+			else
+			{
+				a = power(upBound[i], term->exps[i+1]);
+				b = power(lowBound[i], term->exps[i+1]);
 
-	if ( N == 1) //update this to something small?
-		isTrivial = true;
+			}
+			//cout << "uu=" << uu << ", ll=" << ll << endl;
+			//cout << "a=" << a << ", b=" << b << endl;
+			ZZ tempUU;
+			tempUU = max(uu*a, max(uu*b, max(ll*a,ll*b)));
+			ZZ tempLL;
+			tempLL = min(uu*a, min(uu*b, min(ll*a,ll*b)));
+			uu = tempUU;
+			ll = tempLL;
+			//cout << "nuu=" << uu << ", nll=" << ll << endl;
 
-	cout << "updated poly:" << originalPolynomial.varCount << ", " << originalPolynomial.termCount << endl;
-	cout << "updated poly: " << printMonomials(originalPolynomial).c_str() << endl;
-	cout << "isTrivial" << isTrivial << endl;
+		}
+		u += uu;
+		l += ll;
+
+	}
+	U = to_RR(u);
+	L = to_RR(l);
+	//cout << "Smarter bounds " << l << "<= f(x) <=" << u << endl;
+
+
+
 	delete [] exp;
+
+	//cout << "updated poly:" << originalPolynomial.varCount << ", " << originalPolynomial.termCount << endl;
+	//cout << "updated poly: " << printMonomials(originalPolynomial).c_str() << endl;
+	//cout << "isTrivial" << isTrivial << endl;
+}
+
+bool BoxOptimization::isTrivial()
+{
+	return (N <= 1);
 }
 
 void BoxOptimization::enumerateProblem(const vec_ZZ &lowBound, const vec_ZZ &upBound, const monomialSum & poly)
@@ -223,8 +298,8 @@ void BoxOptimization::findRange(int itr)
 {
 
 
-	cout << " Starting L: " << L << endl;
-	cout << " Starting U: " << U << endl;
+	//cout << "k: " << currentPower << " Starting range " << L << " f(x) " << U << endl;
+	//cout << "k: " << currentPower << " Starting U: " << U << endl;
 
 	RR oldU, oldL;
 	for(int i = 0; i < itr; ++i)
@@ -234,8 +309,8 @@ void BoxOptimization::findRange(int itr)
 		findNewUpperbound();
 		findNewLowerbound();
 
-		cout << i << " new U: " << U << endl;
-		cout << i << " new L: " << L << endl;
+		//cout << "k: " << currentPower << " range " << L << " <=f(x)<= " << U << " max: " << maximumLowerBound() << " <=max(f)<= " << maximumUpperbound() << " gap:" << maximumUpperbound() - maximumLowerBound() << endl;
+
 
 		if ( (oldU - U)  + (L - oldL) < 1)
 			return; //difference between new and old range bounds is less than one, so just stop.
@@ -259,11 +334,13 @@ void BoxOptimization::findNewUpperbound()
 
 	ans = currentMap.eval(s);
 
-	//cout << "(f+s)^" << currentPower << " ans=" << ans << endl;
+	//cout << "(f+s)^" << currentPower << " ans=" << ans  << " with s=" << s << endl;
 	RR newU;
 	newU = L + pow(ans, to_RR(1)/to_RR(currentPower));
 	if (newU < U)
 		U = newU;
+	else
+	cout << newU << " newU >= U " << U << endl;
 }
 
 // 0 <= U - f
@@ -291,13 +368,28 @@ void BoxOptimization::findNewLowerbound()
 	newL = U - pow(ans, inv(to_RR(currentPower)));
 	if ( newL > L)
 		L = newL;
+	else
+		cout << newL << " newL <= L " << L << endl;
 }
 
+RR BoxOptimization::maximumUpperbound()
+{
+	// 0 <= f - L <= u, where u:=pow(currentMap.eval(-L), to_RR(1)/to_RR(currentPower));
+	return L + pow(currentMap.eval(-L), to_RR(1)/to_RR(currentPower));
+}
+
+RR BoxOptimization::maximumLowerBound()
+{
+	// 0 <= f - L <= u
+	//then u/N^{1/k} <= max (f - L)
+	return L + pow(currentMap.eval(-L), to_RR(1)/to_RR(currentPower))/pow(to_RR(N), inv(to_RR(currentPower)));
+}
 
 /**
  * @param k: sets currentPolynomial = originalPolynomial^k if k > currentPower, else the currentPolynomial is not changed.
+ * todo: maybe delete current poly as it is not needed. Also, are we deleting the linear forms 2x?
  */
-void BoxOptimization::setPower(int k)
+void BoxOptimization::setPower(int k, bool fixedBounds)
 {
 	assert(k >= 1);
 	//currentPower = k;
@@ -306,7 +398,7 @@ void BoxOptimization::setPower(int k)
 		return; //we only want to increase the power of the currentPolynomial.
 
 	cout << "computing (f(x) + s)^" << k << "..." << flush;
-	cout << "currentPower " << currentPower << endl;
+	cout << "currentPower is " << currentPower;
 	if( currentPower == 0)
 	{
 		currentPolynomial.varCount = originalPolynomial.varCount;
@@ -348,8 +440,8 @@ void BoxOptimization::setPower(int k)
 		currentPolynomial = temp;
 	}
 	currentPower = k;
-	//cout << "power poly: " << printMonomials(currentPolynomial).c_str() << endl;
-	//cout << "power poly deg: " << k << endl;
+	cout << "power poly: " << printMonomials(currentPolynomial).c_str() << endl;
+	cout << "power poly deg: " << k << endl;
 	delete it1;
 	delete it2;
 	cout << "done. \n";
@@ -389,6 +481,7 @@ void BoxOptimization::setPower(int k)
 		originalMonomial.length = currentMonomial->length -1;
 
 		//decompose the monomial into a power of linear forms.
+		//s^k *monomial -> s^k *( c_1\ell_1^m_1 + ....)
 		linFormSum tempLF;
 		tempLF.varCount = originalMonomial.length;
 		decompose(&originalMonomial, tempLF);
@@ -406,12 +499,13 @@ void BoxOptimization::setPower(int k)
 
 			//insert each linear form back in.
 			theTrie->insertTerm(newCoef, tempLFTerm->exps, 0, tempLFTerm->length, tempLFTerm->degree);
-			++numLinForms;
 			assert(tempLFTerm->length == originalMonomial.length);
 		}
+
+		destroyLinForms(tempLF);
 	}
 	delete tempLFItr;
-	cout << "done. At most " << numLinForms << " decomposed.\n";
+	cout << "done.\n";
 
 	//****************************************************
 	//next, integrate the linear forms.
@@ -423,42 +517,61 @@ void BoxOptimization::setPower(int k)
 	mapitr->begin();
 
 
+	while (mapitr->nextTerm())
+		++numLinForms;
+	mapitr->begin();
+
 	term<PolynomialMap, ZZ>* mapitrTerm;
 	RationalNTL one(1,1);
 	int progress = 0;
+	WeightedCountingBuffer wcb;
 	for(mapitrTerm =  mapitr->nextTerm(); mapitrTerm; mapitrTerm =  mapitr->nextTerm())
 	{
 		//cout << mapitrTerm->coef << "*( ";
 		//for(int j = 0; j < lowerBound.length(); ++j)
 		//	cout << mapitrTerm->exps[j] << ", ";
-		//cout << " )^" << mapitrTerm->degree << endl;
-
-		mpq_class temp = computeWeightedCountingBox_singleForm(lowerBound, upperBound, mapitrTerm->exps, mapitrTerm->degree, one);
-		RationalNTL rTemp;
-		rTemp = convert_mpq_to_RationalNTL(temp);
-		//cout << rTemp << "*(";
-		//mapitrTerm->coef.print(cout);
-		mapitrTerm->coef.mult(rTemp);
-		//mapitrTerm->coef.print(cout);
+		//cout << " )^" << mapitrTerm->degree;
 
 
-		currentMap += mapitrTerm->coef;
-		//currentMap.print(cout);
-		//cout << endl;
-		++progress;
-		if ( progress % 5 == 0)
+
+		if (fixedBounds == false)
 		{
-			cout << "lf processed " << progress << "/" << numLinForms << endl;
-			
-			/*
-			cout << mapitrTerm->coef << "*( ";
-			for(int j = 0; j < lowerBound.length(); ++j)
-				cout << mapitrTerm->exps[j] << ", ";
-			cout << " )^" << mapitrTerm->degree << endl;
-			*/
+			WeightedExponentialTable* t = computeWeightedCountingBox_singleForm(wcb, lowerBound.length(), mapitrTerm->exps, mapitrTerm->degree);
+
+			//cout << " = " << temp << endl;
+			t->linFormPow = mapitrTerm->degree;
+			t->linForm.SetLength(lowerBound.length());
+			for(int i = 0; i <lowerBound.length(); ++i)
+				t->linForm[i] = mapitrTerm->exps[i];
+			t->sPoly = mapitrTerm->coef;
+			t->next = cacheWeights;
+			cacheWeights = t;
+		} //cache table
+		else
+		{
+			mpq_class temp = computeWeightedCountingBox_singleForm(wcb, lowerBound, upperBound, mapitrTerm->exps, mapitrTerm->degree, one);
+			RationalNTL rTemp;
+			rTemp = convert_mpq_to_RationalNTL(temp);
+			//cout << rTemp << "*(";
+			//mapitrTerm->coef.print(cout);
+			mapitrTerm->coef.mult(rTemp);
+			//mapitrTerm->coef.print(cout);
+
+
+			currentMap += mapitrTerm->coef;
+			//currentMap.print(cout);
 		}
+
+		++progress;
+		if ( progress % 100 == 0)
+		{
+			cout << "linear forms processed " << progress << "/" <<  numLinForms << endl;
+		}
+
 	}
 	cout << "done." << endl;
+	if (fixedBounds == true)
+		cout << "currentMap " << currentMap << endl;
 	delete theTrie;
 	delete mapitr;
 
@@ -466,15 +579,110 @@ void BoxOptimization::setPower(int k)
 
 
 
-
-RR BoxOptimization::maximumUpperbound() { return U; }
-
-RR BoxOptimization::maximumLowerBound()
+void BoxOptimization::findSPolynomial(const vec_ZZ &lowerBound, const vec_ZZ & upperBound)
 {
-	if ( currentPower)
-		return U/pow(to_RR(N), inv(to_RR(currentPower)));
-	return L;
+	PolynomialMap spoly;
+	int dim = originalPolynomial.varCount - 1;
+	int n; //dim of amb box
+	int index;
+	ZZ two;
+	ZZ twon;
+	ZZ vDotL;
+	ZZ Namb; //number of int points in the projected smaller box
+	ZZ Nother; //number of int points that was projected out.
+
+	//cout << "start s poly "<< endl;
+	for(WeightedExponentialTable * ptr = cacheWeights; ptr; ptr = ptr->next)
+	{
+
+		//cout << ptr->linForm << " pow " <<ptr->linFormPow << " num vertex " << ptr->weights.size() << " M+d " << ptr->weights[0].size() <<endl;
+		//cout << "got here" <<endl;
+		n = 0;
+		Namb = 1;
+		Nother = 1;
+
+		for(int i = 0; i <dim; ++i)
+		{
+			//cout << "i " <<i << " dim" <<dim <<endl;
+			if (ptr->linForm[i] != 0)
+			{
+				++n; //dim of amb box
+				Namb *= (upperBound[i] - lowerBound[i] + 1);
+			}
+			else
+			{
+				Nother *= (upperBound[i] - lowerBound[i] + 1);
+			}
+		}
+
+		two = to_ZZ(2);
+		twon = power(two, n);//2^n
+
+		//cout << "ptr" << ptr <<" lf " << ptr->linForm << "^" << ptr->linFormPow << " non-zero's "<< n << endl;
+
+		//cout <<"found num N" <<endl;
+
+		int wIndex = 0;
+		mpq_class_lazy oneCone;
+		for(ZZ i = to_ZZ(0); i < twon; ++i, ++wIndex)
+		{
+
+
+			vDotL = 0;
+			index = 0;
+			//if (ptr->linForm[0] == 2 && ptr->linForm[1] == 4 && ptr->linForm[2] == 1)
+			//	cout << " vertex ";
+			//use the binary representation of i to pick the current vertex along with its tangent cone.
+			for(int j = 0; j < n; ++j)
+			{
+				while(ptr->linForm[index] == 0)
+					++index;
+
+				if ( bit(i, j) )
+				{
+					vDotL += ptr->linForm[index] * upperBound[index];
+					//if (ptr->linForm[0] == 2 && ptr->linForm[1] == 4 && ptr->linForm[2] == 1)
+					//	cout << ", " << upperBound[index];
+				}
+				else
+				{
+					vDotL += ptr->linForm[index] * lowerBound[index];
+					//if (ptr->linForm[0] == 2 && ptr->linForm[1] == 4 && ptr->linForm[2] == 1)
+					//	cout << ", " << lowerBound[index];
+				}
+				++index;
+			}
+			mpq_class_lazy vDotLmpq = convert_ZZ_to_mpq(vDotL);
+
+			//check if vDotL is zero.
+
+			//cout << "vdotl "<< vDotL <<endl;
+			mpq_class_lazy oneVertex;
+			mpq_class_lazy inner = 1;
+			for(int j = 0; j <= n+ptr->linFormPow; ++j)
+			{
+				oneVertex += inner * ptr->weights[wIndex][j];
+				inner = inner * vDotLmpq;
+			}
+
+			//if (ptr->linForm[0] == 2 && ptr->linForm[1] == 4 && ptr->linForm[2] == 1)
+			//	cout << "oneVertex = " << oneVertex <<endl;
+			oneCone += oneVertex;
+
+		}//for each vertex of a box.
+
+		oneCone *= convert_ZZ_to_mpq(Nother);
+
+		//cout << ptr->sPoly << " * " << oneCone << endl;
+
+		spoly.add(ptr->sPoly, convert_mpq_to_RationalNTL(oneCone));
+
+	}//for each linear form
+
+	cout << "Final spoly "<< spoly <<endl;
+	currentMap = spoly;
 }
+
 
 
 WeightedBoxProducer::WeightedBoxProducer(const vec_ZZ & lowerb, const vec_ZZ & upperb):
@@ -542,6 +750,7 @@ void WeightedBoxProducer::Produce(ConeConsumer &consumer)
 
 		oneCone->latticePoints = createListVector(theVertex); //cone is unimodular
 
+
 		//finally, process this tangent cone.
 		consumer.ConsumeCone(oneCone);
 	}//for each vertex of a box.
@@ -571,10 +780,12 @@ mpq_class computeWeightedCountingBox(const vec_ZZ &lowerBound, const vec_ZZ &upp
 	term<RationalNTL, ZZ>* lform;
 
 	//loop over the linear forms
+	WeightedCountingBuffer wcb;
 	for (lform = linearFormsItr->nextTerm(); lform; lform
 			= linearFormsItr->nextTerm())
 	{
-		ans += computeWeightedCountingBox_singleForm(lowerBound, upperBound, lform->exps, lform->degree, lform->coef);
+		ans += computeWeightedCountingBox_singleForm(wcb, lowerBound, upperBound, lform->exps, lform->degree, lform->coef);
+		//cout << "Running sum: " << ans << endl;
 	}//for every term in the originalPolynomial
 
 	delete linearFormsItr;
@@ -583,7 +794,7 @@ mpq_class computeWeightedCountingBox(const vec_ZZ &lowerBound, const vec_ZZ &upp
 	return ans;
 }
 
-mpq_class computeWeightedCountingBox_singleForm(const vec_ZZ &lowerBound, const vec_ZZ &upperBound, const ZZ* linFormExps, const int degree, const RationalNTL & coef)
+mpq_class computeWeightedCountingBox_singleForm(WeightedCountingBuffer & wcb, const vec_ZZ &lowerBound, const vec_ZZ &upperBound, const ZZ* linFormExps, const int degree, const RationalNTL & coef)
 {
 	mpq_class ans;
 	ans = 0;
@@ -628,8 +839,7 @@ mpq_class computeWeightedCountingBox_singleForm(const vec_ZZ &lowerBound, const 
 		return ans;
 	}//if the linear form is a constant
 
-	//cout << "newUB" << newUB << endl;
-	//cout << "newLB" << newLB << endl;
+
 
 
 	//construct a producer-consumer pair.
@@ -643,10 +853,66 @@ mpq_class computeWeightedCountingBox_singleForm(const vec_ZZ &lowerBound, const 
 	wParams.InitializeComputation();
 	wParams.linForm = linFormCoeffs;
 	wParams.linFormPow = degree;
+	wParams.wcb = &wcb;
 	wbp.Produce(wParams);
 
 	ans = mpq_class(convert_ZZ_to_mpz(coef.getNumerator()), convert_ZZ_to_mpz(coef.getDenominator())) * wParams.result * convert_ZZ_to_mpz(zeroTerms);
+/*
+	cout << " sum of " << lowerBound << endl;
+	cout << "        " << upperBound << endl;
+	cout << "        " << coef << "*(";
+	for(int i = 0;i < lowerBound.length(); ++i)
+		cout << linFormExps[i] << "*x[" << i << "] + ";
+	cout << ")^" << degree << endl;
+	cout << "        " << " is " << ans << endl;
+*/
+
 	return ans;
 
+}
+
+
+//only the weights info will be saved.
+WeightedExponentialTable* computeWeightedCountingBox_singleForm(WeightedCountingBuffer & wcb, const int n, const ZZ* linFormExps, const int degree)
+{
+	mpq_class ans;
+	ans = 0;
+
+	//project the box into a smaller dimension if one of the linear form coeffs is zero.
+	vec_ZZ linFormCoeffs, newLB, newUB;
+	linFormCoeffs.SetLength(n);
+	newLB.SetLength(n);
+	newUB.SetLength(n);
+
+	int j = 0;
+	for(int i = 0; i < n; ++i)
+	{
+		if ( linFormExps[i] != 0)
+		{
+			linFormCoeffs[j] = linFormExps[i];
+			++j;
+		}
+	}
+	linFormCoeffs.SetLength(j); //ignore the zeros at the end if any.
+	newUB.SetLength(j);
+	newLB.SetLength(j);
+
+
+	//construct a producer-consumer pair.
+	WeightedBoxProducer wbp(newLB, newUB);
+	Weighted_Exponential_Single_Cone_Parameters_BranchBound wParams;
+
+	wParams.substitution = BarvinokParameters::PolynomialSubstitution;
+	wParams.decomposition = BarvinokParameters::DualDecomposition;
+	wParams.max_determinant = 1;
+	wParams.Number_of_Variables = j;
+	wParams.InitializeComputation();
+	wParams.linForm = linFormCoeffs;
+	wParams.linFormPow = degree;
+	wParams.wcb = &wcb;
+	wbp.Produce(wParams);
+
+
+	return wParams.table;
 }
 

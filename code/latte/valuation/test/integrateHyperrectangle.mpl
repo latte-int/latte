@@ -31,7 +31,7 @@ for myDim from 2 to 5 do
 
 		printf("Testing products of powers of linear forms of dimension %d, and at most degree %d\n", myDim, myDegree);
   
-#                   the parameters are:  formMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
+		#the parameters are:  formMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
     	returnStatus:=test_hyperrectangle_integtation_product_linear_forms(myDegree, myDim, 10, fileName, 1):
    
 		if ( not(returnStatus = 0)) then 
@@ -47,7 +47,7 @@ for myDim from 2 to -5 do
 	
 		printf("Testing polynomials of dimension %d, and at most degree %d\n", myDim, myDegree);
   
-#                   the parameters are:  polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
+		#the parameters are:  polyMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
     	returnStatus:=test_hyperrectangle_integtation_polynomials(myDegree, myDim, 10, 30000, fileName, 1):
    
 		if ( not(returnStatus = 0)) then 
@@ -57,7 +57,7 @@ for myDim from 2 to -5 do
 		
 		printf("Testing powers of linear forms of dimension %d, and at most degree %d\n", myDim, myDegree);
   
-#                   the parameters are:  formMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
+		#the parameters are:  formMaxDegree, polytopeDimension, maxNumberOfTermsPerDegree, integrationLimit, fileName, rationalCoefficents)    
     	returnStatus:=test_hyperrectangle_integtation_linear_forms(myDegree, myDim, 10, 30000, fileName, 1):
    
 		if ( not(returnStatus = 0)) then 
