@@ -89,7 +89,7 @@ end:
 
 
 #@param fx: maple expression in x[i], and maybe s.
-#@returns \sum_{x \in box} fx(x). fx(x) can be anything, power of LF or (f+x)^k
+#@returns \sum_{x \in box} fx(x). fx(x) can be anything, power of LF or (f+s)^k
 maxValueExpression:=proc(lb, ub, fx)
 	local current, ans, i, maxVal, maxFval;
 	ASSERT(nops(lb) = nops(ub));

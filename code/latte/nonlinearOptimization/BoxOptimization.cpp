@@ -11,6 +11,115 @@
 
 #include "LattException.h"
 
+#include "top-knapsack/TopKnapsack.h"
+
+
+ZZ oneVarPositiveSum(map<int, vector<RationalNTL> > & summationFormulas, const ZZ & lb, const ZZ & ub, int deg)
+{
+
+	//cout << "pos deg " << deg << " [" << lb << ", " << ub << "] " << endl;
+
+	assert(lb >= 0);
+
+	map<int, vector<RationalNTL> >::iterator it = summationFormulas.find(deg);
+
+	if(it == summationFormulas.end())
+	{
+		//cout << "building formula for deg " << deg << endl;
+		BernoulliFirstKind b;
+		b.setBernoulli(deg+1);
+
+		vector<RationalNTL> sum1n;
+		sum1n.resize(deg+2);
+
+		for(int k = 0; k <= deg ; ++k)
+		{
+			sum1n[deg+1-k] = b[k] * TopKnapsack::binomial(deg+1, k);
+			sum1n[deg+1-k] /= (deg + 1);
+			if ( k % 2 == 1)
+				sum1n[deg+1-k].changeSign();
+		}
+
+		//cout << "sum1^" << deg << " =  ";
+		//for(int k = 0; k < sum1n.size(); ++k)
+		//	cout << sum1n[k] << "n^" << k << ",  ";
+		//cout << endl;
+
+		summationFormulas[deg] = sum1n;
+
+		it = summationFormulas.find(deg);
+
+		assert(it != summationFormulas.end());
+	}//build the summation formula for \sum_1^n m^deg if this is the first time we needed this.
+
+
+
+
+
+
+
+	RationalNTL eu, el;
+	ZZ lpow,upow;
+	lpow = lb - 1;
+	upow = ub;
+	for(int k = 1; k <= deg + 1; ++k)
+	{
+		eu += it->second[k]*upow;
+		el += it->second[k]*lpow;
+		lpow *= (lb-1);
+		upow *= ub;
+	}
+
+
+	RationalNTL ans;
+	ans = eu-el;
+
+	assert(ans.getDenominator() == 1);
+	return ans.getNumerator();
+}
+
+//fix me:
+//--break into pos, neg, and zero parts?
+//--save the computation of the powers.
+ZZ oneVarSum(map<int, vector<RationalNTL> > & summationFormulas, const ZZ & lb, const ZZ & ub, int deg)
+{
+
+	//cout << "deg " << deg << " [" << lb << ", " << ub << "] " << endl;
+	ZZ ans;
+
+	if (deg == 0)
+			ans = (ub - lb + 1);
+	else if ( 0 <= lb)
+	{
+		ans = oneVarPositiveSum(summationFormulas, lb, ub, deg);
+	}
+	else if ( ub <= 0)
+	{
+		if (deg % 2 == 0)
+			ans = oneVarPositiveSum(summationFormulas, -ub, -lb, deg);
+		else
+			ans = oneVarPositiveSum(summationFormulas, -ub, -lb, deg)*(-1);
+	}
+	else
+	{
+		ZZ one;
+		one = 1;
+		ans = oneVarPositiveSum(summationFormulas, one, ub, deg);
+		ans += oneVarPositiveSum(summationFormulas, one, -lb, deg)*(deg % 2 == 0 ? 1 : -1);
+		//0^deg = 0, for deg!=0
+	}
+
+
+	return ans;
+}
+
+
+
+
+
+
+
+
 BoxOptimization::BoxOptimization()
 {
 	U = 0;
@@ -19,6 +128,7 @@ BoxOptimization::BoxOptimization()
 	currentPower = 0;
 	//theTrie = NULL;
 	cacheWeights = NULL;
+	summationFormulas = NULL;
 }
 
 BoxOptimization::~BoxOptimization()
@@ -33,6 +143,59 @@ BoxOptimization::~BoxOptimization()
 		cacheWeights = cacheWeights->next;
 		delete t;
 	}
+
+	if ( summationFormulas)
+		delete summationFormulas;
+}
+
+BoxOptimization & BoxOptimization::operator=(const BoxOptimization & rhs)
+{
+	U = rhs.U;
+	L = rhs.L;
+	N = rhs.N;
+
+	BTrieIterator<RationalNTL, int>* itr =	new BTrieIterator<RationalNTL, int> ();
+	term<RationalNTL, int>* term;
+
+	originalPolynomial.termCount = 0;
+	originalPolynomial.varCount = rhs.originalPolynomial.varCount;
+	itr->setTrie(rhs.originalPolynomial.myMonomials,	rhs.originalPolynomial.varCount);
+	itr->begin();
+	for (term = itr->nextTerm(); term; term = itr->nextTerm())
+		insertMonomial(term->coef, term->exps, originalPolynomial);
+
+	currentPolynomial.termCount = 0;
+	currentPolynomial.varCount = rhs.currentPolynomial.varCount;
+	itr->setTrie(rhs.currentPolynomial.myMonomials,	rhs.currentPolynomial.varCount);
+	itr->begin();
+	for (term = itr->nextTerm(); term; term = itr->nextTerm())
+		insertMonomial(term->coef, term->exps, currentPolynomial);
+
+	delete itr;
+
+	currentPower = rhs.currentPower;
+
+	lowerBound = rhs.lowerBound;
+	upperBound = rhs.upperBound;
+
+	currentMap = rhs.currentMap;
+	currentMapPower = rhs.currentMapPower;
+
+	if ( rhs.cacheWeights)
+	{
+		THROW_LATTE_MSG(LattException::bug_NotImplementedHere,"cannot copy BoxOptimization with a cache table yet");
+	}
+	else
+	{
+		cacheWeights = NULL;
+	}
+
+
+	if ( rhs.summationFormulas)
+		summationFormulas = new map<int, vector<RationalNTL> >(*rhs.summationFormulas);
+	else
+		summationFormulas = NULL;
+
 }
 
 
@@ -165,7 +328,7 @@ void BoxOptimization::setBounds(const vec_ZZ &lowBound, const vec_ZZ &upBound)
 		maxBound[i] = max(abs(lowBound[i]), abs(upBound[i]));
 		N *= (upBound[i] - lowBound[i] + 1);
 	}
-	cout << "Number of lattice points: " << N << endl;
+	//cout << "Number of lattice points: " << N << endl;
 
 
 
@@ -257,6 +420,11 @@ void BoxOptimization::setBounds(const vec_ZZ &lowBound, const vec_ZZ &upBound)
 	//cout << "updated poly:" << originalPolynomial.varCount << ", " << originalPolynomial.termCount << endl;
 	//cout << "updated poly: " << printMonomials(originalPolynomial).c_str() << endl;
 	//cout << "isTrivial" << isTrivial << endl;
+}
+
+void BoxOptimization::printNumberOfPoints() const
+{
+	cout << "Number of lattice points: " << N << endl;
 }
 
 bool BoxOptimization::isTrivial()
@@ -385,11 +553,41 @@ RR BoxOptimization::maximumLowerBound()
 	return L + pow(currentMap.eval(-L), to_RR(1)/to_RR(currentPower))/pow(to_RR(N), inv(to_RR(currentPower)));
 }
 
+
+RR BoxOptimization::sampleLowerBound(monomialSum &poly, const vec_ZZ & point)
+{
+	RationalNTL ans;
+	BTrieIterator<RationalNTL, int>* pItr =	new BTrieIterator<RationalNTL, int> ();
+	pItr->setTrie(poly.myMonomials,	poly.varCount);
+	pItr->begin();
+
+	term<RationalNTL, int>* term;
+
+	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
+	{
+		//cout << "term " << term->coef << endl;
+		RationalNTL value;
+		value = 1;
+		for (int currentPower = 0; currentPower < poly.varCount; ++currentPower)
+		{
+			//cout << term->exps[currentPower] << ".";
+			value *= power(point[currentPower], term->exps[currentPower]);
+		}
+		//cout << endl;
+		value *= term->coef;
+		ans += value;
+	}
+
+	delete pItr;
+	//cout << ans << endl;
+	return to_RR(ans);
+}
+
 /**
  * @param k: sets currentPolynomial = originalPolynomial^k if k > currentPower, else the currentPolynomial is not changed.
  * todo: maybe delete current poly as it is not needed. Also, are we deleting the linear forms 2x?
  */
-void BoxOptimization::setPower(int k, bool fixedBounds)
+void BoxOptimization::setPower(int k)
 {
 	assert(k >= 1);
 	//currentPower = k;
@@ -397,8 +595,8 @@ void BoxOptimization::setPower(int k, bool fixedBounds)
 	if ( k <= currentPower)
 		return; //we only want to increase the power of the currentPolynomial.
 
-	cout << "computing (f(x) + s)^" << k << "..." << flush;
-	cout << "currentPower is " << currentPower;
+	cout << "computing (f(x) + s)^" << k << "...\n" << flush;
+
 	if( currentPower == 0)
 	{
 		currentPolynomial.varCount = originalPolynomial.varCount;
@@ -427,7 +625,6 @@ void BoxOptimization::setPower(int k, bool fixedBounds)
 	it1->setTrie(originalPolynomial.myMonomials, originalPolynomial.varCount);
 	it2->setTrie(originalPolynomial.myMonomials, originalPolynomial.varCount);
 
-
 	for( int i  = currentPower; i < k; ++i)
 	{
 		it1->setTrie(originalPolynomial.myMonomials, originalPolynomial.varCount);
@@ -438,20 +635,50 @@ void BoxOptimization::setPower(int k, bool fixedBounds)
 		multiply(it1, it2, temp);
 		destroyMonomials(currentPolynomial);
 		currentPolynomial = temp;
+		cout << "  finished computing (f(x) + s)^ " << i+1 << "\n";
 	}
 	currentPower = k;
-	cout << "power poly: " << printMonomials(currentPolynomial).c_str() << endl;
-	cout << "power poly deg: " << k << endl;
+	//cout << "power poly: " << printMonomials(currentPolynomial).c_str() << endl;
+	//cout << "power poly deg: " << k << endl;
+
+
+	//****************************************************
+	//just for fun, lets count the number of terms we have
+	it2->setTrie(currentPolynomial.myMonomials, currentPolynomial.varCount);
+	it2->begin();
+	term<RationalNTL, int> * t;
+	long numMonomials = 0;
+	for(t = it2->nextTerm(); t; t = it2->nextTerm())
+		++numMonomials;
+
+
 	delete it1;
 	delete it2;
-	cout << "done. \n";
+	cout << "done. " << numMonomials << " monomials computed\n";
 
 
+
+
+
+}
+
+
+/**
+ * algoType:
+ * 		lf      -- decompose to linear forms and find the s-polynomial
+ * 		lfCache -- decompose to linear forms and build the cache table
+ * 		naturalSummation -- do nothing here.
+ */
+void BoxOptimization::decomposePoly(AlgoType algoType)
+{
+
+	if (algoType != BoxOptimization::lf && algoType != BoxOptimization::lfCache)
+		return;
 
 	//****************************************************
 	//next, decompose currentPolynomial into linear forms.
 
-	cout << "decomposing (f(x) + s)^" << k << " into powers of linear forms..." << flush;
+	cout << "decomposing (f(x) + s)^" << currentPower << " into powers of linear forms..." << flush;
 	BTrieIterator<RationalNTL, int>* pitr =	new BTrieIterator<RationalNTL, int> ();
 	pitr->setTrie(currentPolynomial.myMonomials, currentPolynomial.varCount);
 	pitr->begin();
@@ -534,7 +761,7 @@ void BoxOptimization::setPower(int k, bool fixedBounds)
 
 
 
-		if (fixedBounds == false)
+		if (algoType == BoxOptimization::lfCache)
 		{
 			WeightedExponentialTable* t = computeWeightedCountingBox_singleForm(wcb, lowerBound.length(), mapitrTerm->exps, mapitrTerm->degree);
 
@@ -547,7 +774,7 @@ void BoxOptimization::setPower(int k, bool fixedBounds)
 			t->next = cacheWeights;
 			cacheWeights = t;
 		} //cache table
-		else
+		if ( algoType == BoxOptimization::lf)
 		{
 			mpq_class temp = computeWeightedCountingBox_singleForm(wcb, lowerBound, upperBound, mapitrTerm->exps, mapitrTerm->degree, one);
 			RationalNTL rTemp;
@@ -570,16 +797,65 @@ void BoxOptimization::setPower(int k, bool fixedBounds)
 
 	}
 	cout << "done." << endl;
-	if (fixedBounds == true)
-		cout << "currentMap " << currentMap << endl;
 	delete theTrie;
 	delete mapitr;
-
 }
 
 
+void BoxOptimization::printSpolynomial() const
+{
+	cout << "Final spoly "<< currentMap <<endl;
+}
 
-void BoxOptimization::findSPolynomial(const vec_ZZ &lowerBound, const vec_ZZ & upperBound)
+/**
+ * algoType:
+ * 		lf      -- do nothing, s-polynomial already computed
+ * 		lfCache -- use the cache table to build the s-polynomial
+ * 		naturalSummation -- build the s-polynomial
+ */
+void BoxOptimization::findSPolynomial(AlgoType algoType, const vec_ZZ &lowerBound, const vec_ZZ & upperBound)
+{
+	if (algoType == BoxOptimization::lfCache)
+		findSPolynomial_lfCache(lowerBound, upperBound);
+	if (algoType == BoxOptimization::naturalSummation)
+		findSPolynomial_naturalSummation(lowerBound, upperBound);
+
+
+
+}
+
+void BoxOptimization::findSPolynomial_naturalSummation(const vec_ZZ &lowerBound, const vec_ZZ &upperBound)
+{
+	PolynomialMap spoly;
+	int dim = lowerBound.length();
+
+	if (summationFormulas == NULL)
+		summationFormulas = new map<int, vector<RationalNTL> >;
+
+
+	BTrieIterator<RationalNTL, int>* pitr =	new BTrieIterator<RationalNTL, int> ();
+	pitr->setTrie(currentPolynomial.myMonomials, currentPolynomial.varCount);
+	pitr->begin();
+	term<RationalNTL, int>* term;
+	for(term =  pitr->nextTerm(); term; term =  pitr->nextTerm())
+	{
+		RationalNTL prod(1,1);
+
+		for(int i = 1; i<= dim; ++i)
+			prod *= oneVarSum(*summationFormulas, lowerBound[i-1], upperBound[i-1], term->exps[i]);
+
+
+
+		spoly.terms[term->exps[0]] += prod * term->coef;
+
+	}//for each monomial,
+
+
+	delete pitr;
+	currentMap = spoly;
+}
+
+void BoxOptimization::findSPolynomial_lfCache(const vec_ZZ &lowerBound, const vec_ZZ & upperBound)
 {
 	PolynomialMap spoly;
 	int dim = originalPolynomial.varCount - 1;

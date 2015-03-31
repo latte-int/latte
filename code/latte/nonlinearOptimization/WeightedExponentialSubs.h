@@ -15,6 +15,8 @@
 #include "integration/PolyTrie.h"
 #include "nonlinearOptimization/WeightedCountingBuffer.h"
 
+
+
 /**
  * Cone consumer.
  * For finding \sum_{x \in cone} <x, linForm>^linFormPow

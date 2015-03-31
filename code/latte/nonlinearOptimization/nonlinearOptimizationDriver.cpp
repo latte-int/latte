@@ -42,8 +42,9 @@ void printHelpMenu()
 	"  --monomials FILENAME{.poly}            Input polynomial file\n"
 	"  --linear-forms FILENAME{.lf}           Input powers of linear forms polynomial (used with --count)\n"
     "Options that control what to compute:\n"
-    "  --opt                                  Does optimization\n"
-    "  --range                                Finds range of function\n"
+    "  --opt-lf                               Optimization via linear forms\n"
+	"  --opt-lfc                              Optimization via linear forms with cache\n"
+	"  --opt-ns                               Optimization via natural summation\n"
 	"  --count                                Finds the weighted average of f(x)\n"
     "Other options:\n"
     "  --k, -k INT                            Sets (f(x)+s)^k\n"
@@ -56,32 +57,9 @@ void printHelpMenu()
 }
 
 
-RationalNTL evaluate(monomialSum & poly, const vec_ZZ & point)
-{
-	RationalNTL ans;
-	BTrieIterator<RationalNTL, int>* pItr =	new BTrieIterator<RationalNTL, int> ();
-	pItr->setTrie(poly.myMonomials,	poly.varCount);
-	pItr->begin();
 
 
-	term<RationalNTL, int>* term;
-	int * exp;
-	exp = new int[poly.varCount];
 
-	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
-	{
-		RationalNTL value;
-		value = 1;
-		for (int currentPower = 0; currentPower < poly.varCount; ++currentPower)
-		{
-			value *= power(point[currentPower], term->exps[currentPower]);
-			value *= term->coef;
-		}
-		ans += value;
-	}
-	return ans;
-	delete pItr;
-}
 
 void run()
 {
@@ -126,8 +104,11 @@ int main(int argc, char *argv[]) {
 		{ "k",							  required_argument, 0, 'k' },
 		{ "epi",          				  required_argument, 0, 0x103},
 		{ "range",						  no_argument, 0, 0x104},
-		{ "opt",						  no_argument, 0, 0x105},
-		{ "count",						  no_argument, 0, 0x106 },
+		{ "opt-lf",						  no_argument, 0, 0x105},
+		{ "opt-lfc",					  no_argument, 0, 0x106},
+		{ "opt-ns",						  no_argument, 0, 0x107},
+		{ "opt-ratio",					  no_argument, 0, 0x108},
+		{ "count",						  no_argument, 0, 0x109 },
 		{ 0, 0, 0, 0 } };
 		/* getopt_long stores the option index here. */
 
@@ -168,9 +149,18 @@ int main(int argc, char *argv[]) {
 				cmd = "range";
 				break;
 			case 0x105:
-				cmd = "opt";
+				cmd = "opt-lf";
 				break;
 			case 0x106:
+				cmd = "opt-lfc";
+				break;
+			case 0x107:
+				cmd = "opt-ns";
+				break;
+			case 0x108:
+				cmd = "opt-ratio";
+				break;
+			case 0x109:
 				cmd = "count";
 				break;
 			default:
@@ -223,7 +213,6 @@ int main(int argc, char *argv[]) {
 	cout << "ub: " << upperBound << endl;
 
 
-
 	RR N;
 	//cout << "epsilon=" << epsilon << endl;
 	N = 1;
@@ -260,12 +249,14 @@ int main(int argc, char *argv[]) {
 		cout << "Final count: " << weightedCount << endl;
 		destroyLinForms(originalLinearForm);
 	}
-/*
-	if ( cmd == "range" )
+
+
+	if ( cmd == "opt-lf")
 	{
 		BoxOptimization bo;
 		bo.setPolynomial(originalPolynomial);
 		bo.setBounds(lowerBound, upperBound);
+
 		if ( bo.isTrivial())
 		{
 			bo.enumerateProblem(lowerBound, upperBound, originalPolynomial);
@@ -273,12 +264,22 @@ int main(int argc, char *argv[]) {
 			return 0;
 		}
 
+		Timer timeSummation("Total Time for lf decomp + counting");
+		timeSummation.start();
 		bo.setPower(k);
+		bo.decomposePoly(BoxOptimization::lf);
+		bo.findSPolynomial(BoxOptimization::lf, lowerBound, upperBound);
+		timeSummation.stop();
+		cout << timeSummation << endl;
+
+		cout << "old range " << bo.L << " <=f(x)<= " << bo.U << " old max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
 		bo.findRange(10);
+		cout << "new range " << bo.L << " <=f(x)<= " << bo.U << " new max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
 
 	}
-*/
-	if ( cmd == "opt")
+
+
+	if ( cmd == "opt-lfc")
 	{
 		BoxOptimization bo;
 		bo.setPolynomial(originalPolynomial);
@@ -294,7 +295,8 @@ int main(int argc, char *argv[]) {
 		Timer timeSummation("Total Time for decomp + making the table ");
 		Timer timeSpoly("Total Time for finding s-poly ");
 		timeSummation.start();
-		bo.setPower(k, false);
+		bo.setPower(k);
+		bo.decomposePoly(BoxOptimization::lfCache);
 		timeSummation.stop();
 
 
@@ -313,20 +315,11 @@ int main(int argc, char *argv[]) {
 				upperBound[j] = (lowerBound[j] + upperBound[j])/2;
 			}
 
-			/*
-			for(int j = 0; j < lowerBound.length(); ++j)
-			{
-				lowerBound[j] = (rand() % 10) - 5;
-				upperBound[j] = lowerBound[j] + (rand() % 5);
-			}
-			*/
-
-
 			cout << "\nLow: " << lowerBound << " up: " << upperBound << endl;
 
 			timeSpoly.start();
 			bo.setBounds(lowerBound, upperBound);
-			bo.findSPolynomial(lowerBound, upperBound);
+			bo.findSPolynomial(BoxOptimization::lfCache,lowerBound, upperBound);
 			timeSpoly.stop();
 
 
@@ -335,42 +328,86 @@ int main(int argc, char *argv[]) {
 			cout << "new range " << bo.L << " <=f(x)<= " << bo.U << " new max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
 			cout << "i=" << i << endl;
 
-			if ( bo.N <= 10)
+			if ( bo.N <= 50)
 				break;
 
 		}
 		cout << timeSummation << endl;
 		cout << timeSpoly << endl;
 	}
+
+
+	if ( cmd == "opt-ns")
+	{
+		BoxOptimization bo;
+		bo.setPolynomial(originalPolynomial);
+		bo.setBounds(lowerBound, upperBound);
+
+
+		if ( bo.isTrivial())
+		{
+			bo.enumerateProblem(lowerBound, upperBound, originalPolynomial);
+			cout << "optimal: " << bo.L << " <= f(x) <= " << bo.U << endl;
+			return 0;
+		}
+
+		bo.setPower(k);
+		bo.decomposePoly(BoxOptimization::naturalSummation);
+		bo.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+		bo.printSpolynomial();
+
+		cout << "old range " << bo.L << " <=f(x)<= " << bo.U << " old max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
+		bo.findRange(10);
+		cout << "new range " << bo.L << " <=f(x)<= " << bo.U << " new max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
+
+	}
+
+
+	if ( cmd == "opt-ratio")
+	{
+		BoxOptimization bo1, bo2;
+		bo1.setPolynomial(originalPolynomial);
+		bo1.setBounds(lowerBound, upperBound);
+
+		bo2.setPolynomial(originalPolynomial);
+		bo2.setBounds(lowerBound, upperBound);
+
+		//todo: if trivial?
+
+		bo1.setPower(k);
+		bo1.decomposePoly(BoxOptimization::naturalSummation);
+		bo1.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+
+
+		bo2.setPower(k+1);
+		bo2.decomposePoly(BoxOptimization::naturalSummation);
+		bo2.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+
+
+
+
+		bo1.printSpolynomial();
+		bo2.printSpolynomial();
+
+
+
+		cout << "old range " << bo1.L << " <=f(x)<= " << bo1.U << endl;;
+		bo1.findRange(10);
+		bo2.findRange(10);
+
+		cout << "new range k   " << bo1.L << " <=f(x)<= " << bo1.U << " new max bounds: " << bo1.maximumLowerBound() << " <=max(f)<= " << bo1.maximumUpperbound() << " gap %:" << (bo1.maximumUpperbound() - bo1.maximumLowerBound())/bo1.maximumUpperbound() << endl;
+		cout << "new range k+1 " << bo2.L << " <=f(x)<= " << bo2.U << " new max bounds: " << bo2.maximumLowerBound() << " <=max(f)<= " << bo2.maximumUpperbound() << " gap %:" << (bo2.maximumUpperbound() - bo2.maximumLowerBound())/bo2.maximumUpperbound() << endl;
+
+		cout << bo2.L + bo2.currentMap.eval(-bo2.L) / bo1.currentMap.eval(-bo2.L) << " max(f)" << endl;
+
+	}
+
+
+
 	totalTime.stop();
 	cout << totalTime << endl;
 
-/*
-	if( cmd == "loop")
-	{
-		ZZ i;
-		for(i = lowerBound[0]; i <= upperBound[0]; ++i)
-		{
-			vec_ZZ current;
-			current = lowerBound;
-			current[0] = i;
-			RationalNTL value;
-			value = evaluate(originalPolynomial, current);
-		}
-		totalTime.stop();
-		i = 1;
-		for(int j = 1; j < 20; ++j)
-			i *= (upperBound[0] - lowerBound[0] + 1);
-		cout << "Total time  = " << totalTime.get_seconds() << endl;
-		cout << "Total time for dim 20 = " << to_RR(i)*totalTime.get_seconds() << endl;
 
-		exit(1);
-	}
-
-	totalTime.stop();
-	cout  << totalTime << endl;
-	cout << "Total time for dim 20 = " << 20*totalTime.get_seconds() << endl;
-*/
 
 	return 0;
 }

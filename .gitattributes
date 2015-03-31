@@ -230,6 +230,9 @@ code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
 code/latte/nonlinearOptimization/BoxOptimization.cpp -text
 code/latte/nonlinearOptimization/BoxOptimization.h -text
+code/latte/nonlinearOptimization/PolynomialMap.cpp -text
+code/latte/nonlinearOptimization/PolynomialMap.h -text
+code/latte/nonlinearOptimization/WeightedCountingBuffer.h -text
 code/latte/nonlinearOptimization/WeightedExponentialSubs.cpp -text
 code/latte/nonlinearOptimization/WeightedExponentialSubs.h -text
 code/latte/nonlinearOptimization/nonlinearOptimizationDriver.cpp -text

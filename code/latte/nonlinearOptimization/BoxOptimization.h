@@ -20,7 +20,7 @@
 
 
 
-
+#include <map>
 
 
 class BoxOptimization
@@ -31,6 +31,11 @@ public:
 	RR U;
 	RR L;
 	ZZ N; //number of lattice points in the box.
+
+	typedef enum AlgoType
+	{
+	    lf, lfCache, naturalSummation, handelman
+	} AlgoType;
 
 
 	monomialSum originalPolynomial; //d + 1 variables. (f + s)
@@ -44,13 +49,20 @@ public:
 	int currentMapPower;
 
 	WeightedExponentialTable* cacheWeights;
+	map<int, vector<RationalNTL> > * summationFormulas;
 
 	BoxOptimization();
 	~BoxOptimization();
 	void setPolynomial(const monomialSum & poly);
 	void setBounds(const vec_ZZ &lowBound, const vec_ZZ &upBound);
-	void setPower(int k, bool fixedBounds);
-	void findSPolynomial(const vec_ZZ &lowerBound, const vec_ZZ & upperBound);
+	void setPower(int k);
+	void decomposePoly(AlgoType algoType);
+	void findSPolynomial(AlgoType algoType, const vec_ZZ &lowerBound, const vec_ZZ & upperBound);
+	void printSpolynomial() const;
+	void printNumberOfPoints() const;
+
+	void findSPolynomial_lfCache(const vec_ZZ &lowerBound, const vec_ZZ &upperBound);
+	void findSPolynomial_naturalSummation(const vec_ZZ &lowerBound, const vec_ZZ &upperBound);
 
 
 	bool isTrivial();
@@ -64,6 +76,9 @@ public:
 
 	RR maximumUpperbound();
 	RR maximumLowerBound();
+	RR sampleLowerBound(monomialSum &poly, const vec_ZZ & point);
+
+	BoxOptimization & operator=(const BoxOptimization & rhs);
 };
 
 
