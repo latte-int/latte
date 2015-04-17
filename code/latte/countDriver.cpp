@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 		ans = mainCountDriver(argc,  argv);
 	} catch ( LattException & e)
 	{
-		;//do nothing, a message has already been displayed.
+		return 1;//do nothing, a message has already been displayed.
 	}
 
 	/*
@@ -46,4 +46,5 @@ int main(int argc, char *argv[])
 
 	THROW_LATTE(LattException::bug_Unknown);
 	*/
+	return 0;
 }//main
