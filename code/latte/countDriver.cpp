@@ -18,6 +18,7 @@
  along with LattE; if not, write to the Free Software Foundation,
  Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
  */
+#include <iostream>
 #include "count.h"
 
 int main(int argc, char *argv[])
@@ -29,6 +30,7 @@ int main(int argc, char *argv[])
 		ans = mainCountDriver(argc,  argv);
 	} catch ( LattException & e)
 	{
+		std::cout << e.what() << std::endl;
 		return 1;//do nothing, a message has already been displayed.
 	}
 

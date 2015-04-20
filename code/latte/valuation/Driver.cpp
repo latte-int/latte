@@ -8,13 +8,21 @@
  *
  *  type --help to print the help menu.
  */
-
+#include <iostream>
 #include "valuation.h"
 
 
 int main(int argc, char *argv[])
 {
-	Valuation::mainValuationDriver((const char **) argv, argc);
+	try {
+		Valuation::mainValuationDriver((const char **) argv, argc);
+	} catch ( LattException & e)
+	{
+		std::cout << e.what() << std::endl;
+		return 1;
+	}
+
+
 	return 0;
 }
 //main()

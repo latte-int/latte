@@ -31,6 +31,7 @@
 #include "latte_system.h"
 #include "latte_relocatable.h"
 #include "ReadingFile.h"
+#include "LattException.h"
 
 /* ----------------------------------------------------------------- */
 
@@ -54,7 +55,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
   ifstream IN(Filename.c_str());
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
-    exit(1);
+    THROW_LATTE(LattException::ue_FileNameMissing);
   }
   while(IN >> tmpString){
     if(tmpString == "linearity"){

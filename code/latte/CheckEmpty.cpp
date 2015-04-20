@@ -44,6 +44,7 @@
 #include "binarySearchIP.h"
 #include "latte_system.h"
 #include "latte_relocatable.h"
+#include "LattException.h"
 
 void CheckEmpty(const char * Filename){
   int numOfConsts, numOfDims, numOfEqu = 0, flag = 0;
@@ -58,7 +59,7 @@ void CheckEmpty(const char * Filename){
   ifstream IN(Filename);
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
-    exit(1);
+    THROW_LATTE(LattException::ue_FileNameMissing);
   }
   while(IN >> tmpString){
     if(tmpString == "linearity"){

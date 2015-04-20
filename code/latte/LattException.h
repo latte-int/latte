@@ -64,7 +64,7 @@ public:
 	virtual const char* what() const throw();
 
 private:
-	void printErrorMessages() const;
+	string printErrorMessages() const;
 
 	UserError userError;
 
