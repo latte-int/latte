@@ -546,7 +546,7 @@ RationalNTL PolytopeValuation::findIntegral(const linFormProductSum& originalLin
 		if ( linearForms.termCount > 0 && currentConstantMonomial != 0)
 		{
 			cout << "lf: " << printLinForms(originalLinearFormProducts[i]).c_str() << endl;
-			THROW_LATTE_MSG(LattException::ie_BadIntegrandFormat, "product of linear forms contains a constant factor");
+			THROW_LATTE_MSG(LattException::ie_BadIntegrandFormat, 1, "product of linear forms contains a constant factor");
 		}
 
 		if ( currentConstantMonomial != 0)

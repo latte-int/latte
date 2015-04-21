@@ -59,7 +59,7 @@ void CheckEmpty(const char * Filename){
   ifstream IN(Filename);
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
-    THROW_LATTE(LattException::ue_FileNameMissing);
+    THROW_LATTE(LattException::ue_FileNameMissing,0);
   }
   while(IN >> tmpString){
     if(tmpString == "linearity"){
@@ -174,7 +174,7 @@ void CheckEmpty(const char * Filename){
     cerr << "Empty polytope or unbounded polytope!"<< endl;
     ofstream NOL("numOfLatticePoints");
     NOL << 0 << endl;
-    THROW_LATTE(LattException::pe_Unbounded);
+    THROW_LATTE(LattException::pe_Unbounded,0);
   }
   cerr << "done." << endl;
 }

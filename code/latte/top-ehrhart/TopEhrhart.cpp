@@ -18,7 +18,7 @@ TopEhrhart::TopEhrhart(Polyhedron * polyhedron, BarvinokParameters & para, int n
 	assert(poly->dualized == false);
 
 	if (numTopCoefficients != -1 && numTopCoefficients <= 0)
-		THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, "unexpected numTopCoefficients given");
+		THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, 1, "unexpected numTopCoefficients given");
 }
 
 TopEhrhart::~TopEhrhart()

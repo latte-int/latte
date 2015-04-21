@@ -63,7 +63,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		cerr << "valuation.cpp: the two volume methods are different." << endl;
 		cerr << "Cone-decompose:      " << ans2 << endl;
 		cerr << "Triangulation: " << ans1 << endl;
-		THROW_LATTE_MSG( LattException::bug_Unknown, "volume computed by both methods are different. Please send bug report" );
+		THROW_LATTE_MSG( LattException::bug_Unknown, 1, "volume computed by both methods are different. Please send bug report" );
 	}//if error.
 	else if (intInput.volumeCone && intInput.volumeTriangulation)
 		delete poly2;
@@ -91,7 +91,7 @@ Valuation::ValuationContainer Valuation::computeIntegral(Polyhedron *poly,
 	}
 	else
 	{
-		THROW_LATTE_MSG(LattException::bug_Unknown, "integrand type not supported.");
+		THROW_LATTE_MSG(LattException::bug_Unknown, 1, "integrand type not supported.");
 	}
 }
 Valuation::ValuationContainer Valuation::computeIntegralPolynomial(Polyhedron *poly,
@@ -202,7 +202,7 @@ Valuation::ValuationContainer Valuation::computeIntegralPolynomial(Polyhedron *p
 				<< "cone-decomposition: " << ans2 << "\n"
 				<< "prod linear form  : " << ans3 << "\n"
 				<< endl;
-		THROW_LATTE_MSG(LattException::bug_Unknown, "The integrals are different. Please send bug report.");
+		THROW_LATTE_MSG(LattException::bug_Unknown, 1, "The integrals are different. Please send bug report.");
 	}//if error.
 
 
@@ -277,7 +277,7 @@ Valuation::ValuationContainer Valuation::computeIntegralLinearForm(Polyhedron *p
 		cerr << "computeIntegralLinearForm(): the two methods are different.\n"
 				<< "triangulation: " << ans1 << "\nlawrence       " << ans2
 				<< endl;
-		THROW_LATTE_MSG(LattException::bug_Unknown, "The integrals are different.");
+		THROW_LATTE_MSG(LattException::bug_Unknown, 1, "The integrals are different. Please send bug report");
 	}//if error.
 	if (intInput.integrateLinearFormTriangulation && intInput.integrateLinearFormCone)
 	{
@@ -360,7 +360,7 @@ void Valuation::computeTopEhrhart(Polyhedron *poly,
 	}
 	else
 	{
-		THROW_LATTE_MSG(LattException::bug_NotImplementedHere, "integrand type not supported");
+		THROW_LATTE_MSG(LattException::bug_NotImplementedHere, 1, "integrand type not supported");
 	}
 
 }//computeTopEhrhart
@@ -408,7 +408,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	if (argc < 2)
 	{
 		usage(argv[0]);
-		THROW_LATTE_MSG( LattException::ue_BadCommandLineOption, "too few command line options given. Type --help");
+		THROW_LATTE( LattException::ue_BadCommandLineOption, 0);
 	}
 
 	//setbuf(stdout,0);
@@ -646,7 +646,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 		} else
 		{
 			cerr << "Unknown command/option " << argv[i] << endl;
-			THROW_LATTE_MSG(LattException::ue_UnknownCommandLineOption, argv[i]);
+			THROW_LATTE(LattException::ue_UnknownCommandLineOption, 0);
 		}
 	}
 
@@ -655,7 +655,8 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			&& !integrationInput.valuationVolume
 			)
 	{
-		THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, "--valuation=??? missing");
+		cerr << "--valuation=??? missing. Type --help" << endl;
+		THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 	}
 
 
@@ -679,7 +680,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	if (read_polyhedron_data.expect_filename)
 	{
 		cerr << "Filename missing" << endl;
-		THROW_LATTE( LattException::ue_FileNameMissing );
+		THROW_LATTE( LattException::ue_FileNameMissing,0);
 	}
 
 	if (params->shortvector == BarvinokParameters::SubspaceAvoidingLLL)
@@ -809,7 +810,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 				if (!inFile.is_open())
 				{
 					cerr << "Error: cannot open " << integrationInput.fileName;
-					THROW_LATTE_MSG( LattException::fe_Open, "Cannot open the integrand file" );
+					THROW_LATTE( LattException::fe_Open, 0);
 				}
 				inStream.rdbuf(inFile.rdbuf());
 			}//set the inStream.
@@ -852,7 +853,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 				else
 				{
 					cerr << "The character " << pl << " is not a p or l or d" << endl;
-					THROW_LATTE( LattException::ue_BadCommandLineOption );
+					THROW_LATTE( LattException::ue_BadCommandLineOption, 0);
 				}
 
 				integrationInput.unweightedCounting = false;
@@ -938,7 +939,7 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 			destroyLinForms(linform);
 		}
 		cout << "valuation.cpp exit called" << endl;
-		THROW_LATTE_MSG( LattException::bug_NotImplementedHere, "Stokes is experimental code, answer may not be correct" );
+		THROW_LATTE_MSG( LattException::bug_NotImplementedHere, 1, "Stokes is experimental code, answer may not be correct" );
 
 	}//else. use strokes.
 

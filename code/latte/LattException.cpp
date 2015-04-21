@@ -10,12 +10,13 @@
 
 LattException::~LattException() throw() {}
 
-LattException::LattException(UserError ue, const char * file, const int line, const char * message)
+LattException::LattException(UserError ue, const char * file, const int line, const bool b, const char * message)
 {
 	userError = ue;
 	fileName = file;
 	lineNumber = line;
 	msg = message;
+	printStatus = b;
 }
 
 
@@ -57,6 +58,9 @@ string  LattException::printErrorMessages() const
 
 const char* LattException::what() const throw()
 {
-	string s = printErrorMessages();
+	string s = "";
+	if ( LATTEXCEPTION_PRINTSTATUS || printStatus == 1 )
+	s = printErrorMessages();
+
 	return s.c_str();
 }

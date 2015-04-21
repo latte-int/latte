@@ -71,7 +71,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 	  cerr << "usage: " << shell_quote(argv[0]) << " [OPTIONS...] " << "INPUTFILE" << endl;
 	  cerr << "Type `" << shell_quote(argv[0]) << " --help' \n"
 	       << "for a list of options and input specifications." << endl;
-	  THROW_LATTE_MSG(LattException::ue_BadCommandLineOptionCount, "too few command line options given. Type --help");
+	  THROW_LATTE(LattException::ue_BadCommandLineOptionCount, 0);
 	}
 
 	//setbuf(stdout,0);
@@ -244,20 +244,20 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 			show_standard_smith_option(cerr);
 			show_standard_dualization_option(cerr);
 			show_standard_triangulation_options(cerr);
-			exit(0);//THROW_LATTE(LattException::ue_HelpMenuDisplayed);
+			THROW_LATTE(LattException::ue_HelpMenuDisplayed,0);
 		} else if (read_polyhedron_data.parse_option(argv[i]))
 		{
 		} else
 		{
 			cerr << "Unknown command/option " << argv[i] << endl;
-			THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, argv[i]);
+			THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 		}
 	}//for i.
 
 	if (read_polyhedron_data.expect_filename)
 	{
 		cerr << "Filename missing" << endl;
-		THROW_LATTE(LattException::ue_FileNameMissing);
+		THROW_LATTE(LattException::ue_FileNameMissing, 0);
 	}
 
 	if (params->shortvector == BarvinokParameters::SubspaceAvoidingLLL)
@@ -388,7 +388,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 						<< "for integral polytopes." << endl
 						<< "Use `--ehrhart-series' or `--simplfied-ehrhart-series' for computing "
 						<< "the Ehrhart series of rational polytopes." << endl;
-				THROW_LATTE_MSG(LattException::pe_RationalPolytope, "Ehrhart (quasi-)polynomials is only implemented for integral polytopes");
+				THROW_LATTE(LattException::pe_RationalPolytope, 0);
 			}
 			delete cone->vertex->vertex;
 			cone->vertex->vertex = new rationalVector(Poly->numOfVars);
@@ -505,12 +505,12 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 				cerr
 						<< "Computation of Ehrhart polynomials is only implemented "
 						<< "for the exponential substitution (--exp)." << endl;
-				THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, "Must use --exp for Ehrhart polynomials");
+				THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 			}
 			if (Poly->unbounded)
 			{
 				cerr << "The polyhedron is unbounded." << endl;
-				THROW_LATTE(LattException::pe_Unbounded);
+				THROW_LATTE(LattException::pe_Unbounded, 0);
 			}
 			if (read_polyhedron_data.assumeUnimodularCones[0] == 'n')
 			{
@@ -550,14 +550,14 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 			if (Poly->unbounded)
 			{
 				cerr << "The polyhedron is unbounded." << endl;
-				THROW_LATTE(LattException::pe_Unbounded);
+				THROW_LATTE(LattException::pe_Unbounded, 0);
 			}
 			if (read_polyhedron_data.dualApproach[0] == 'y')
 			{
 				cerr
 						<< "Exponential substitution is not yet implemented for the homogenized version."
 						<< endl;
-				THROW_LATTE_MSG(LattException::ue_BadCommandLineOption, "Exponential substitution is not implemented for homogenized polytopes");
+				THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 			} else
 			{
 				if (approx)
@@ -575,7 +575,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 #else
 					cerr << "Approximation code is not compiled in, sorry."
 							<< endl;
-					THROW_LATTE(LattException::ue_BadCommandLineOption);
+					THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 #endif
 				} else if (ehrhart_polynomial)
 				{

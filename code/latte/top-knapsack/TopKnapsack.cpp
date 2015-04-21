@@ -63,7 +63,7 @@ void MobiusList::computeMobius()
 	}
 
 	if (indexOne == -1)
-		THROW_LATTE_MSG(LattException::bug_Unknown, "gcd of entire list is not one");
+		THROW_LATTE_MSG(LattException::bug_Unknown, 1, "gcd of entire list is not one");
 	computeMobius(indexOne);
 }
 
@@ -305,8 +305,8 @@ void TopKnapsack::packageAnswer()
 
 				ZZ hFactorial;
 				hFactorial = 1;
-				for(int i = 2; i <= h; ++i)
-					hFactorial *= i;
+				for(int j = 2; j <= h; ++j)
+					hFactorial *= j;
 
 				RationalNTL factor;
 				if ( h % 2 == 0)
@@ -786,8 +786,8 @@ void TopKnapsack::findResidue(GeneralMonomialSum<PeriodicFunction, int> & fSerie
 
 			if ( IsZero(expa[i]) && IsZero(expe[i]) )
 			{
-				cout << "beta not random enough";
-				THROW_LATTE_MSG(LattException::de_divisionByZero, "trying new random perturbation");
+				cout << "beta not random enough, trying new random perturbation";
+				THROW_LATTE_MSG(LattException::de_divisionByZero, 0, "trying new random perturbation");
 			}
 			if( IsZero(expa[i]))
 				numPoles++;
@@ -838,11 +838,11 @@ void TopKnapsack::findResidue(GeneralMonomialSum<PeriodicFunction, int> & fSerie
 
 		vector<RationalNTL> fractionalPart;
 		fractionalPart.resize(I);
-		for(int i = 0; i < I; ++i)
+		for(int ii = 0; ii < I; ++ii)
 		{
-			fractionalPart[i] = RationalNTL(temp[i], invBd*coneRaysInvD);
-			if (fractionalPart[i].getDenominator() == 1)
-				fractionalPart[i] = 0; //fractionalPart(integer) = 0
+			fractionalPart[ii] = RationalNTL(temp[ii], invBd*coneRaysInvD);
+			if (fractionalPart[ii].getDenominator() == 1)
+				fractionalPart[ii] = 0; //fractionalPart(integer) = 0
 		}
 
 		//now, fractionalPart[i] = {-B^-1 T s}_i

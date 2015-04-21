@@ -144,7 +144,7 @@ bool ReadPolyhedronData::parse_option(const char *arg) {
 		cerr
 				<< "WARNING: Options `--interior' and `int' are broken for most methods."
 				<< endl;
-		THROW_LATTE(LattException::bug_Unknown);
+		THROW_LATTE(LattException::bug_Unknown,0);
 	} else if (strncmp(arg, "homog", 3) == 0)
 		strcpy(dualApproach, "yes");
 	else if (strncmp(arg, "equ", 3) == 0) {
@@ -177,7 +177,7 @@ bool ReadPolyhedronData::parse_option(const char *arg) {
 		cerr
 				<< "WARNING: Options `--interior' and `int' are broken for most methods."
 				<< endl;
-		THROW_LATTE(LattException::bug_Unknown); //If we cannot stand by our computation, we should not let the user run it ~Brandon 2010. (I added the exit statement).
+		THROW_LATTE(LattException::bug_Unknown,0); //If we cannot stand by our computation, we should not let the user run it ~Brandon 2010. (I added the exit statement).
 		strcpy(interior, "yes");
 	} else if (strcmp(arg, "--vrep") == 0) {
 		strcpy(Vrepresentation, "yes");
@@ -229,7 +229,7 @@ bool ReadPolyhedronData::parse_option(const char *arg) {
 			vertexcones = VertexConesWith4ti2;
 		else {
 			cerr << "Unknown vertex cone method: " << arg + 23 << endl;
-			THROW_LATTE(LattException::ue_BadCommandLineOption);
+			THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 		}
 	} else if (strncmp(arg, "--redundancy-check=", 19) == 0) {
 		if (strcmp(arg + 19, "none") == 0)
@@ -240,7 +240,7 @@ bool ReadPolyhedronData::parse_option(const char *arg) {
 			redundancycheck = FullRedundancyCheckWithCddlib;
 		else {
 			cerr << "Unknown redundancy check method: " << arg + 19 << endl;
-			THROW_LATTE(LattException::ue_BadCommandLineOption);
+			THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 		}
 	} else if (strncmp(arg, "--", 2) != 0) {
 		// Regular argument, see if we expect one
@@ -310,7 +310,7 @@ void  ReadPolyhedronData::matrixToVerticesOrCones(listVector * theMatrix, int nu
 					Poly->unbounded);
 #else
 			cerr << "VertexConesWith4ti2 not compiled in, sorry" << endl;
-			THROW_LATTE(LattException::ue_BadCommandLineOption);
+			THROW_LATTE(LattException::ue_BadCommandLineOption,0);
 #endif
 			break;
 		default:
@@ -335,14 +335,14 @@ read_cone_cdd_format(const string &filename) {
 	FILE *in = fopen(filename.c_str(), "r");
 	if (in == NULL) {
 		cerr << "Unable to open CDD-style input file " << filename << endl;
-		THROW_LATTE(LattException::fe_Open);
+		THROW_LATTE(LattException::fe_Open, 0);
 	}
 	dd_MatrixPtr M;
 	dd_ErrorType err = dd_NoError;
 	M = dd_PolyFile2Matrix(in, &err);
 	if (err != dd_NoError) {
 		cerr << "Parse error in CDD-style input file " << filename << endl;
-		THROW_LATTE(LattException::fe_Parse);
+		THROW_LATTE(LattException::fe_Parse, 0);
 	}
 	listCone *cone = cddlib_matrix_to_cone(M);
 	dd_FreeMatrix(M);
@@ -365,7 +365,7 @@ listVector *ReadPolyhedronData::read_full_rank_inequality_matrix(BarvinokParamet
 
 	if (expect_filename) {
 		cerr << "The input file name is missing." << endl;
-		THROW_LATTE(LattException::ue_FileNameMissing);
+		THROW_LATTE(LattException::ue_FileNameMissing,0);
 	}
 
 	dd_MatrixPtr M;
@@ -375,7 +375,7 @@ listVector *ReadPolyhedronData::read_full_rank_inequality_matrix(BarvinokParamet
 		if (Vrepresentation[0] == 'y') {
 			cerr
 					<< "ReadPolyhedronData::read_full_rank_inequality_matrix:: Sorry, cannot compute projected H-rep starting from a V-rep.";
-			THROW_LATTE(LattException::bug_NotImplementedHere);
+			THROW_LATTE(LattException::bug_NotImplementedHere, 0);
 		}
 		cerr << "Warning: Not performing check for empty polytope, "
 				<< "because it is unimplemented for the CDD-style input format. "
@@ -387,7 +387,7 @@ listVector *ReadPolyhedronData::read_full_rank_inequality_matrix(BarvinokParamet
 			/* The polyhedron is given by its V-representation in a
 			 LattE-style input format. */
 			cerr << "ReadPolyhedronData::read_full_rank_inequality_matrix:: Sorry, cannot compute projected H-rep starting from a V-rep.";
-			THROW_LATTE(LattException::bug_NotImplementedHere);
+			THROW_LATTE(LattException::bug_NotImplementedHere, 0);
 
 		}
 
@@ -415,7 +415,7 @@ Polyhedron *
 ReadPolyhedronData::read_polyhedron(BarvinokParameters *params) {
 	if (expect_filename) {
 		cerr << "The input file name is missing." << endl;
-		THROW_LATTE(LattException::ue_FileNameMissing);
+		THROW_LATTE(LattException::ue_FileNameMissing, 0);
 	}
 
 	if (input_homog_cone)
@@ -576,14 +576,14 @@ static dd_MatrixPtr ReadCddStyleMatrix(const string &filename) {
 	FILE *in = fopen(filename.c_str(), "r");
 	if (in == NULL) {
 		cerr << "Unable to open CDD-style input file " << filename << endl;
-		THROW_LATTE(LattException::fe_Open);
+		THROW_LATTE(LattException::fe_Open, 0);
 	}
 	dd_MatrixPtr M;
 	dd_ErrorType err = dd_NoError;
 	M = dd_PolyFile2Matrix(in, &err);
 	if (err != dd_NoError) {
 		cerr << "Parse error in CDD-style input file " << filename << endl;
-		THROW_LATTE(LattException::fe_Parse);
+		THROW_LATTE(LattException::fe_Parse, 0);
 	}
 	return M;
 }
@@ -594,7 +594,7 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params) {
 
 	if (expect_filename) {
 		cerr << "The input file name is missing." << endl;
-		THROW_LATTE(LattException::ue_FileNameMissing);
+		THROW_LATTE(LattException::ue_FileNameMissing, 0);
 	}
 
 	dd_MatrixPtr M;
@@ -609,7 +609,7 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params) {
 					<< endl
 					<< "the a V-representation in CDD format, just do that, but don't use "
 					<< endl << "the `vrep' keyword." << endl;
-			THROW_LATTE(LattException::ue_BadCommandLineOption);
+			THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 		}
 		cerr << "Warning: Not performing check for empty polytope, "
 				<< "because it is unimplemented for the CDD-style input format. "
@@ -622,7 +622,7 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params) {
 			 LattE-style input format. */
 			if (dilation_const != 1) {
 				cerr << "Dilation unimplemented for `vrep' input" << endl;
-				THROW_LATTE(LattException::ue_BadCommandLineOption);
+				THROW_LATTE(LattException::ue_BadCommandLineOption, 0);
 			}
 			if (dualApproach[0] != 'y') {
 				/* FIXME: Special case that ought to be handled uniformly.
@@ -660,7 +660,7 @@ ReadPolyhedronData::read_polyhedron_hairy(BarvinokParameters *params) {
 		return PolyhedronFromHrepMatrix(M, params);
 	default:
 		cerr << "Unknown representation" << endl;
-		THROW_LATTE(LattException::bug_Unknown);
+		THROW_LATTE(LattException::bug_Unknown, 0);
 	}
 }
 
@@ -864,7 +864,7 @@ listVector * ReadPolyhedronData::projectOutVariables(dd_MatrixPtr &M, int &numOf
 	}else
 	{
 		cout << "ReadPolyhedronData::findLatticeBasis: should only be called when the polytope has equations, error." << endl;
-		THROW_LATTE(LattException::pe_UnexpectedRepresentation);
+		THROW_LATTE(LattException::pe_UnexpectedRepresentation, 0);
 	}//else {
 		/* No equations. */
 		//dilateListVector(inequalities, numOfVars, dilation_const);
@@ -1373,12 +1373,12 @@ void ReadPolyhedronDataRecursive::readHrepMatrixFromFile(string filename, Barvin
 
 	if (cddstyle[0] == 'y') {
 		cout << "readHrepMatrixFromFile:: we can only work with latte h-reps currently, sorry." << endl;
-		THROW_LATTE(LattException::pe_UnexpectedRepresentation);
+		THROW_LATTE(LattException::pe_UnexpectedRepresentation, 0);
 	} else {
 		/* Read an input file in LattE format. */
 		if (Vrepresentation[0] == 'y') {
 			cout << "readHrepMatrixFromFile:: we can only work with latte h-reps currently, sorry." << endl;
-			THROW_LATTE(LattException::pe_UnexpectedRepresentation);
+			THROW_LATTE(LattException::pe_UnexpectedRepresentation, 0);
 		} else {
 			/* Not VREP. */
 			CheckEmpty(filename.c_str());
@@ -1392,7 +1392,7 @@ void ReadPolyhedronDataRecursive::readHrepMatrixFromFile(string filename, Barvin
 	if ( M->representation != dd_Inequality)
 	{
 		cout << "readHrepMatrixFromFile:: M is not an h-rep, error" << endl;
-		THROW_LATTE(LattException::pe_UnexpectedRepresentation);
+		THROW_LATTE(LattException::pe_UnexpectedRepresentation, 0);
 	}
 
 	/*start of read PolyhedronFromHrepMatrix */

@@ -55,7 +55,7 @@ CheckRed(string &Filename, char *equ, char * max, char* nonneg, char* interior, 
   ifstream IN(Filename.c_str());
   if(!IN){
     cerr << "Input file is missing!!  Please check input file." << endl;
-    THROW_LATTE(LattException::ue_FileNameMissing);
+    THROW_LATTE(LattException::ue_FileNameMissing, 0);
   }
   while(IN >> tmpString){
     if(tmpString == "linearity"){

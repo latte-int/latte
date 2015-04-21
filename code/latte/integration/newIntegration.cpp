@@ -345,7 +345,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 		monomialCount *= (temp->degree+1); //monomialCount = number of monomials (m1, ..., md) <= (deg1, ..., degD).
 	}
 	if ( i != productCount)
-		THROW_LATTE_MSG(LattException::ue_BadPolynomialLinFormInput, "count of terms differ");
+		THROW_LATTE_MSG(LattException::ue_BadPolynomialLinFormInput, 1, "count of terms differ");
 
 	ZZ factorialDim = to_ZZ(1); // = (|M|+d)!
 	for (ZZ j = to_ZZ(2); j <=  lenM + mySimplex.d; ++j)
