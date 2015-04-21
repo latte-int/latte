@@ -71,7 +71,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 	  cerr << "usage: " << shell_quote(argv[0]) << " [OPTIONS...] " << "INPUTFILE" << endl;
 	  cerr << "Type `" << shell_quote(argv[0]) << " --help' \n"
 	       << "for a list of options and input specifications." << endl;
-	  THROW_LATTE_MSG(LattException::ue_BadCommandLineOptionCount, "too few options used");
+	  THROW_LATTE_MSG(LattException::ue_BadCommandLineOptionCount, "too few command line options given. Type --help");
 	}
 
 	//setbuf(stdout,0);
