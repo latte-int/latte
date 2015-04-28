@@ -236,6 +236,12 @@ code/latte/nonlinearOptimization/WeightedCountingBuffer.h -text
 code/latte/nonlinearOptimization/WeightedExponentialSubs.cpp -text
 code/latte/nonlinearOptimization/WeightedExponentialSubs.h -text
 code/latte/nonlinearOptimization/nonlinearOptimizationDriver.cpp -text
+code/latte/nonlinearOptimization/scipFiles/LatteIntegrationRelaxor.cpp -text
+code/latte/nonlinearOptimization/scipFiles/LatteIntegrationRelaxor.h -text
+code/latte/nonlinearOptimization/scipFiles/LatteSummationRelaxor.cpp -text
+code/latte/nonlinearOptimization/scipFiles/LatteSummationRelaxor.h -text
+code/latte/nonlinearOptimization/scipFiles/cppmain.cpp -text
+code/latte/nonlinearOptimization/scipFiles/runBuild.sh -text
 code/latte/nonlinearOptimization/testBox.mpl -text
 code/latte/nonlinearOptimization/weightedCountingBox.mpl -text
 code/latte/polyintegration.tex -text
