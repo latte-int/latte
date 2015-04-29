@@ -1,6 +1,22 @@
 	To update this ChangeLog, use `make update-changelog' and then
 	copy (and edit) entries from ChangeLog.svn2cl
 
+
+2015-04-21 Brandon Dutra <bedutra@ucdavis.edu>
+
+	* updated the exception class and use
+	  Version number 1.7.3
+
+2014-01-15 Matthias Koeppe <mkoeppe@math.ucdavis.edu>
+
+	* compile fix with current NTL
+
+2014-01-10  Matthias Koeppe <mkoeppe@math.ucdavis.edu>
+
+	* Fix compiler warnings with XCode 5.0.2, Apple LLVM version 5.0 (clang-500.2.79).
+	  configure.ac: Bump version number
+
+
 2013-12-23 Brandon Dutra <bedutra@ucdavis.edu>
 
 	configure.ac: Bump version number to 1.7
