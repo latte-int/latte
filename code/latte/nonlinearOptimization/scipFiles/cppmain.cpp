@@ -35,6 +35,7 @@
 //my scip headers
 #include "LatteSummationRelaxor.h"
 #include "LatteIntegrationRelaxor.h"
+#include "LatteBranchRule.h"
 
 //latte headers
 #include "barvinok/barvinok.h"
@@ -68,16 +69,8 @@ SCIP_RETCODE SCIPrunMyShell(
 		if ( strcmp(argv[i], "-f") == 0 && i + 1 < argc)
 			fileName = argv[i+1];
 
-	if ( strcmp(argv[1], "--int") == 0)
-		type = 2;
-	else if (strcmp(argv[1], "--sum") == 0)
-		type = 1;
-	else
-	{
-		cout << "usage: " << argv[0] << " --int | --sum -f filename\n"
-				"Where --int is for integration and --sum is for summation" <<endl;
-		exit(1);
-	}
+	cout << "Usage  : " << argv[0] <<" <--int | --sum | --none for integration or summation> <--bb | --none for branch and bound> -f filename" << endl;
+	cout << "Example: " << argv[0] << " --sum --none -f file.pip" <<endl;
 
 	if ( fileName == NULL )
 	{
@@ -96,13 +89,22 @@ SCIP_RETCODE SCIPrunMyShell(
    SCIP_CALL( SCIPincludeDefaultPlugins(scip) );
 
    /* include latte plugins */
-   if (type == 1)
+   ///*
+   if (strcmp(argv[1], "--sum") == 0)
 	   SCIP_CALL( SCIPincludeObjRelax(scip, new LatteSummationRelaxor(scip, fileName), TRUE) );
-   else if (type == 2)
+   else if (strcmp(argv[1], "--int") == 0)
 	   SCIP_CALL( SCIPincludeObjRelax(scip, new LatteIntegrationRelaxor(scip, fileName), TRUE) );
    else
    {
-	   cout << "this should never happen" <<endl;
+	   cout << "Latte NOT being used" <<endl;
+   }
+   //*/
+
+   /* include latte branch rule */
+   if (strcmp(argv[2], "--bb") == 0)
+   {
+	   SCIP_CALL( SCIPincludeObjBranchrule(scip, new LatteBranchRule(scip), TRUE) );
+       cout << "Latte BB used" << endl;
    }
 
    /**********************************
@@ -110,7 +112,7 @@ SCIP_RETCODE SCIPrunMyShell(
     **********************************/
 
    //remove the --sum/--int arg.
-   SCIP_CALL( SCIPprocessShellArguments(scip, argc-1, argv+1, defaultsetname) );
+   SCIP_CALL( SCIPprocessShellArguments(scip, argc-2, argv+2, defaultsetname) );
 
 
    /********************

@@ -139,7 +139,7 @@ SCIP_DECL_RELAXEXITSOL(LatteSummationRelaxor::scip_exitsol)
 //SCIP_DECL_RELAXEXEC(x) SCIP_RETCODE x (SCIP* scip, SCIP_RELAX* relax, SCIP_Real* lowerbound, SCIP_RESULT* result)
 SCIP_DECL_RELAXEXEC(LatteSummationRelaxor::scip_exec)
 {
-
+/*
 	bool isImprovement = false;
 	SCIP_VAR** orgVars = SCIPgetOrigVars(scip);
 	int orgVarsNum = SCIPgetNOrigVars(scip);
@@ -160,12 +160,85 @@ SCIP_DECL_RELAXEXEC(LatteSummationRelaxor::scip_exec)
 	{
 		lowerBound[i] = SCIPvarGetLbLocal(orgVars[i]);
 		upperBound[i] = SCIPvarGetUbLocal(orgVars[i]);
+		//cout << "node" << SCIPgetNNodes(scip) << " index "<< i << " " << SCIPvarGetLbLocal(orgVars[i]) << "<= " << orgVars[i]->name << "<= " << SCIPvarGetUbLocal(orgVars[i]) << endl;
 
 	}
 
 	//> Note that SCIPgetLowerbound() and SCIPgetUpperbound() do the same as
 	//> SCIPgetDualbound() and SCIPgetPrimalbound(), but with respect to the
 	//> transformed problem space.
+
+
+*/
+	bool isImprovement = false;
+	SCIP_VAR** orgVars = SCIPgetOrigVars(scip);
+	int orgVarsNum = SCIPgetNOrigVars(scip);
+	vec_ZZ lowerBound, upperBound;
+	static vec_ZZ prevLB, prevUB;
+	static std::vector<int> varMap;
+	lowerBound.SetLength(orgVarsNum - 1);
+	upperBound.SetLength(orgVarsNum - 1);
+
+	*result = SCIP_SUCCESS;
+	numCalled++;
+
+	if ( !varMap.size())
+		varMap.resize(orgVarsNum-1);
+
+	int var;
+	ZZ boxLen;
+	for(int i = 0; i < orgVarsNum ; ++i)
+	{
+		if (orgVars[i]->name[0] == 'x')
+		{
+			var = atoi(orgVars[i]->name + 1) -1;
+			//cout << "var = " << var << endl;
+			lowerBound[var] = SCIPvarGetLbLocal(orgVars[i]);
+			upperBound[var] = SCIPvarGetUbLocal(orgVars[i]);
+			boxLen += upperBound[var] - lowerBound[var];
+			varMap[var] = i;
+		}
+		//cout << "node" << SCIPgetNNodes(scip) << " index "<< i << " " << SCIPvarGetLbLocal(orgVars[i]) << "<= " << orgVars[i]->name << "<= " << SCIPvarGetUbLocal(orgVars[i])  << endl;
+	}
+
+
+
+
+	bool newProblem = false;
+	if (numCalled <= 1)
+	{
+		prevLB = lowerBound;
+		prevUB = upperBound;
+		newProblem = true;
+	}
+	else
+	{
+		for (int i = 0; i < orgVarsNum - 1 && !newProblem; ++i)
+		{
+			if ( lowerBound[i] != prevLB[i] || upperBound[i] != prevUB[i])
+			{
+				//cout << SCIPgetNNodes(scip) << "old: " << prevLB[i] << " <=x[" << i << "]<= " << prevLB[i] << " new: "   << lowerBound[i] << " <=x[" << i << "]<= " << upperBound[i] << "\n";
+				newProblem = true;
+			}
+		}
+
+		prevLB = lowerBound;
+		prevUB = upperBound;
+	}
+
+	if (! newProblem )
+	{
+		//cout << " same box on " << SCIPgetNNodes(scip) << "; ";
+		//cout << "attempted to branch on x" << maxIndex << endl;
+		//SCIPaddExternBranchCand(scip, orgVars[varMap[maxIndex]], -1000000, SCIPvarGetAvgSol(orgVars[varMap[maxIndex]]));
+		 //  SCIP*                 scip,               /**< SCIP data structure */
+		  // SCIP_VAR*             var,                /**< variable to insert */
+		  // SCIP_Real             score,              /**< score of external candidate, e.g. infeasibility */
+		  // SCIP_Real             solval              /**< value of the variable in the current solution */
+		  // )
+		numCalled--;
+		return SCIP_OKAY;
+	}
 
 	box1.setBounds(lowerBound, upperBound);
 
@@ -242,7 +315,8 @@ SCIP_DECL_RELAXEXEC(LatteSummationRelaxor::scip_exec)
 	//*******************
 	//end of cheap tricks
 	//*******************
-	if ( box1.N > 500000 || box1.N < 5000  || isImprovement)
+	//cout << "box1.N " <<box1.N << endl;
+	if ( box1.N > 1000000 || box1.N < 5000  || isImprovement)
 		return SCIP_OKAY;
 
 	if ( numFailedToImprove < 0)
@@ -256,15 +330,18 @@ SCIP_DECL_RELAXEXEC(LatteSummationRelaxor::scip_exec)
 	//SCIPsetObjlimit(scip, 2);
 
 
+	cout << "before scip bound " <<  SCIPgetLocalLowerbound(scip) << " <=min -f <= " <<scip->primal->upperbound  <<endl;
 
 	box1.decomposePoly(BoxOptimization::naturalSummation);
 	box1.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+	box1.U = min(box1.U, -to_RR(SCIPgetLocalLowerbound(scip)));
 	box1.findRange(10);
 
 
 	box2.setBounds(lowerBound, upperBound);
 	box2.decomposePoly(BoxOptimization::naturalSummation);
 	box2.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+	box2.U = min(box2.U, -to_RR(SCIPgetLocalLowerbound(scip)));
 	box2.findRange(10);
 
 
@@ -281,13 +358,17 @@ SCIP_DECL_RELAXEXEC(LatteSummationRelaxor::scip_exec)
 	{	numRatioGlobal++; isImprovement = true;}
 	numLatteCalled++;
 
+
+
 	if ( isImprovement == false)
 		numFailedToImprove++;
 	if (numFailedToImprove >= 1)
-		numFailedToImprove = -1000;
+		numFailedToImprove = -100;
 
 
-	SCIPupdateLocalLowerbound(scip, min(-to_double(box2.maximumUpperbound()), -to_double(box2.U))); //Maybe not better than -box1.U, but the scip function will take the best of the two.
+
+
+	SCIPupdateLocalLowerbound(scip, max(-to_double(box2.maximumUpperbound()), -to_double(box2.U))); //Maybe not better than -box1.U, but the scip function will take the best of the two.
 
 	// |f|_{k+1}/|f|_{k} \leq max f -L
 
@@ -301,8 +382,10 @@ SCIP_DECL_RELAXEXEC(LatteSummationRelaxor::scip_exec)
 	}
 
 
-
-
+	cout << "after scip bound " <<  SCIPgetLocalLowerbound(scip) << " <=min -f <= " <<scip->primal->upperbound  <<endl;
+	cout << "isImprovement" << isImprovement << endl;
+	if ( isImprovement)
+		cout << "#<---------------------------------------------------------------------------------------------------------------------------------------\n";
 
 
 	*result = SCIP_SUCCESS;

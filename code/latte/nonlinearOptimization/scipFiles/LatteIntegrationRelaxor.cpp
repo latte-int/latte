@@ -35,6 +35,20 @@ SCIP_DECL_RELAXFREE(LatteIntegrationRelaxor::scip_free)
 	cout << "Latte Integration Relaxor Stats" << endl;
 
 
+	cout << "     BASIC BOUNDS" << endl;
+	cout << "       numBasicLocal " << numBasicLocal << endl;
+	cout << "       numBasicGlobal " << numBasicGlobal << endl;
+	cout << "       numRandPointImprove " << numRandPointImprove << endl;
+	cout << "     K NORM RANGE" << endl;
+	cout << "       numKnormRangeLocal " << numKnormRangeLocal << endl;
+	cout << "       numKnormRangeGlobal " << numKnormRangeGlobal << endl;
+	cout << "     K NORM BOUNDS " << endl;
+	cout << "       numKnormLocal " << numKnormLocal << endl;
+	cout << "       numKnormGlobal " << numKnormGlobal << endl;
+	cout << "       numRatioGlobal " << numRatioGlobal << endl;
+	cout << "     STATS" << endl;
+	cout << "       numCalled " << numCalled << endl;
+	cout << "       numLatteCalled " << numLatteCalled << endl;
 
 	return SCIP_OKAY;
 }
@@ -60,7 +74,15 @@ SCIP_DECL_RELAXINIT(LatteIntegrationRelaxor::scip_init)
 	polynomialFile.close();
 
 
-	int k = 3;
+	int k = 4;
+
+	box1.setPolynomial(originalPolynomial);
+	box1.setPower(k);
+
+	box2 = box1;
+
+	//box2.setPolynomial(originalPolynomial);
+	box2.setPower(k+1);
 
 
 
@@ -123,25 +145,87 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 	bool isImprovement = false;
 	SCIP_VAR** orgVars = SCIPgetOrigVars(scip);
 	int orgVarsNum = SCIPgetNOrigVars(scip);
+	int numLatteVars = 0;
 	vec_RR lowerBound, upperBound;
-	lowerBound.SetLength(orgVarsNum - 1);
-	upperBound.SetLength(orgVarsNum - 1);
+	static vec_RR prevLB, prevUB;
+	static std::vector<int> varMap;
 
 
-	for(int i = 0; i < orgVarsNum - 1; ++i)
+	*result = SCIP_SUCCESS;
+	if (SCIPgetLocalLowerbound(scip) + 0.001> scip->primal->upperbound)
 	{
-		lowerBound[i] = SCIPvarGetLbLocal(orgVars[i]);
-		upperBound[i] = SCIPvarGetUbLocal(orgVars[i]);
+		*result = SCIP_DIDNOTRUN;
+		return SCIP_OKAY;
+	}
+	numCalled++;
 
+	for(int i = 0; i < orgVarsNum; ++i)
+		if (orgVars[i]->name[0] == 'x')
+			numLatteVars++;
+
+	lowerBound.SetLength(numLatteVars);
+	upperBound.SetLength(numLatteVars);
+
+	if ( !varMap.size())
+		varMap.resize(numLatteVars);
+
+	int var;
+	RR boxLen;
+	for(int i = 0; i < orgVarsNum ; ++i)
+	{
+		if (orgVars[i]->name[0] == 'x')
+		{
+			var = atoi(orgVars[i]->name + 1) -1;
+			//cout << "var = " << var << endl;
+			lowerBound[var] = SCIPvarGetLbLocal(orgVars[i]);
+			upperBound[var] = SCIPvarGetUbLocal(orgVars[i]);
+			boxLen += upperBound[var] - lowerBound[var];
+			varMap[var] = i;
+		}
+		cout << "node" << SCIPgetNNodes(scip) << " index "<< i << " " << SCIPvarGetLbLocal(orgVars[i]) << "<= " << orgVars[i]->name << "<= " << SCIPvarGetUbLocal(orgVars[i])  << endl;
 	}
 
-	//> Note that SCIPgetLowerbound() and SCIPgetUpperbound() do the same as
-	//> SCIPgetDualbound() and SCIPgetPrimalbound(), but with respect to the
-	//> transformed problem space.
-
-	box1.setBounds(lowerBound, upperBound);
 
 
+
+	bool newProblem = false;
+	if (numCalled <= 1)
+	{
+		prevLB = lowerBound;
+		prevUB = upperBound;
+		newProblem = true;
+	}
+	else
+	{
+		for (int i = 0; i < numLatteVars && !newProblem; ++i)
+		{
+			if ( lowerBound[i] != prevLB[i] || upperBound[i] != prevUB[i])
+			{
+				//cout << SCIPgetNNodes(scip) << "old: " << prevLB[i] << " <=x[" << i << "]<= " << prevLB[i] << " new: "   << lowerBound[i] << " <=x[" << i << "]<= " << upperBound[i] << "\n";
+				newProblem = true;
+			}
+		}
+
+		prevLB = lowerBound;
+		prevUB = upperBound;
+	}
+
+	if (! newProblem )
+	{
+		//cout << " same box on " << SCIPgetNNodes(scip) << "; ";
+		//cout << "attempted to branch on x" << maxIndex << endl;
+		//SCIPaddExternBranchCand(scip, orgVars[varMap[maxIndex]], -1000000, SCIPvarGetAvgSol(orgVars[varMap[maxIndex]]));
+		 //  SCIP*                 scip,               /**< SCIP data structure */
+		  // SCIP_VAR*             var,                /**< variable to insert */
+		  // SCIP_Real             score,              /**< score of external candidate, e.g. infeasibility */
+		  // SCIP_Real             solval              /**< value of the variable in the current solution */
+		  // )
+		numCalled--;
+		return SCIP_OKAY;
+	}
+
+
+	box1.setBounds(lowerBound, upperBound); //k
 
 	//********************************************
 	//New local lower bound in transformed problem
@@ -175,13 +259,41 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 	//*********************************************************************
 	//eval some points. Gives new global upper bound in transformed problem
 	//*********************************************************************
-	//TODO
+	/*
+	vec_ZZ point;
+	point.SetLength(orgVarsNum-1);
+	for(int i = 0; i < orgVarsNum-1; ++i)
+	{
+		point[i] = (upperBound[i]+lowerBound[i])/2;
+	}
+
+	SCIP_SOL* newsol;
+	SCIPcreateOrigSol(scip, &newsol,NULL);
+	for(int i = 0; i < orgVarsNum-1; ++i)
+	{
+		SCIPsetSolVal(scip, newsol, orgVars[i], to_double(point[i]));
+	}
+
+	SCIPsetSolVal(scip, newsol, orgVars[orgVarsNum-1], to_double(box1.sampleLowerBound(originalPolynomial,point)) );
+	unsigned int success;
+	//for(int i = 0; i < orgVarsNum; ++i)
+	//	cout << "var" << i << " " << SCIPgetSolVal(scip, newsol, orgVars[i]) << endl;
+
+	SCIPtrySol(scip, newsol, TRUE, TRUE, TRUE, FALSE, &success);
+	if (success)
+	{
+		numRandPointImprove++;
+		isImprovement = true;
+	}
+	*/
+
 
 	//*******************
 	//end of cheap tricks
 	//*******************
-	if ( box1.N > 500000 || box1.N < 5000  || isImprovement)
+	if ( isImprovement )//|| boxLen > 10)
 		return SCIP_OKAY;
+
 
 	if ( numFailedToImprove < 0)
 	{
@@ -189,22 +301,84 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 		return SCIP_OKAY;
 	}
 
-	//box1.printNumberOfPoints();
-	//SCIPretransformObj(scip, 2);
-	//SCIPsetObjlimit(scip, 2);
 
+	cout << "**before scip bound " <<  SCIPgetLocalLowerbound(scip) << " <=min -f <= " <<scip->primal->upperbound  <<endl;
 
-
-	box1.decomposePoly(BoxOptimization::naturalSummation);
-	box1.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
-	box1.findRange(10);
+	box1.findSPolynomial(BoxOptimizationContinuous::naturalSummation, lowerBound, upperBound);
 
 
 	box2.setBounds(lowerBound, upperBound);
-	box2.decomposePoly(BoxOptimization::naturalSummation);
-	box2.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
-	box2.findRange(10);
+	cout << lowerBound <<endl;
+	cout <<upperBound <<endl;
+	box2.printStats();
+	box2.lipschitz = 10000  ;
+	box2.findSPolynomial(BoxOptimizationContinuous::naturalSummation, lowerBound, upperBound);
+	box2.printSpolynomial();
 
+	//see if we can get a better range bound for f(x).
+	box2.U = min(box2.U, -to_RR(SCIPgetLocalLowerbound(scip)));
+	box1.U = min(box1.U, -to_RR(SCIPgetLocalLowerbound(scip)));
+	cout << "range update is off b/c lipschitz is invalid" <<endl;
+	//bool fr = box2.findRange(100);
+	//if (fr)
+	//	cout << fr << "=range update improved box bound <-----------------------------------------------------------------------------------" << endl;
+
+
+
+
+
+	/*
+	int d = box2.originalPolynomial.varCount -1;
+	RR p1, p2;
+	p1 = d;
+	p1 /= d+box2.currentPower;
+	p2 = box2.currentPower;
+	p2 /= d+box2.currentPower;
+
+	//p1 = d/(d+k)
+	//p2 = k/(d+k)
+
+	RR f1, f2, f3,newL;
+
+	int sign = 1;
+	if (box2.currentPower % 2 )
+		sign = -1;
+
+	cout << sign << " cur pow" << box2.currentPower << endl;
+	cout << "box2.evalSpoly(-box2.U)*|sign|=" <<box2.evalSpoly(-box2.U) << endl;
+
+	f1 = pow(box2.evalSpoly(-box2.U)*sign/box2.V, inv(to_RR(d+box2.currentPower)));
+	f2 = pow( (box2.M*box2.lipschitz * (d+box2.currentPower)) * inv(to_RR(d)), p1);
+	f3 = pow( to_RR(d+box2.currentPower)/to_RR(box2.currentPower), p2);
+
+
+	newL = box2.U - f1*f2*f3;
+
+	cout << "wtf2" << endl;
+	*/
+
+
+	{
+		int d = box2.originalPolynomial.varCount -1;
+		RR p1, p2;
+		p1 = d;
+		p1 /= d+box2.currentPower;
+		p2 = box2.currentPower;
+		p2 /= d+box2.currentPower;
+
+		//p1 = d/(d+k)
+		//p2 = k/(d+k)
+
+		RR f1, f2, f3;
+
+		f1 = pow(box2.evalSpoly(-box2.L)/box2.V, inv(to_RR(d+box2.currentPower)));
+		f2 = pow( (box2.M*box2.lipschitz * (d+box2.currentPower)) * inv(to_RR(d)), p1);
+		f3 = pow( to_RR(d+box2.currentPower)/to_RR(box2.currentPower), p2);
+
+		cout << "s-poly at " << -box2.L << " is " << box2.evalSpoly(-box2.L) << endl;
+		cout << f1 << " * " << f2 << " *  " << f3 << " = " << f1*f2*f3 <<endl;
+		cout << "u()="  << box2.L + f1*f2*f3 << endl;
+	}
 
 
 	if (SCIPgetLocalLowerbound(scip) < -to_double(box2.maximumUpperbound()) )
@@ -215,33 +389,105 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 	{	numKnormGlobal++; isImprovement = true;}
 	if ( scip->primal->upperbound >  -to_double(box2.L) )
 	{	numKnormRangeGlobal++; isImprovement = true;}
-	if ( scip->primal->upperbound >  -to_double(box2.L + box2.currentMap.eval(-box2.L) / box1.currentMap.eval(-box2.L)) )
+	if ( scip->primal->upperbound >  -to_double(box2.L + box2.evalSpoly(-box2.L) / box1.evalSpoly(-box2.L)) )
 	{	numRatioGlobal++; isImprovement = true;}
 	numLatteCalled++;
 
-	if ( isImprovement == false)
-		numFailedToImprove++;
-	if (numFailedToImprove >= 1)
-		numFailedToImprove = -1000;
+
+	//cout << "node " << SCIPgetNNodes(scip) << " k " << box1.currentPower <<  endl;
+
+	//cout << "k-nomr " <<  -to_double(box2.maximumUpperbound()) << " <=min -f <= " << -to_double(box2.maximumLowerBound()) << endl;
+	//cout <<  box2.maximumLowerBound() << " <= max f <= " << box2.maximumUpperbound() << endl;
+	//cout << "Ratio " <<  " min -f <= "<< -to_double(box2.L + box2.evalSpoly(-box2.L) / box1.evalSpoly(-box2.L)) << endl;
+	//cout << "      " << "L=" <<box2.L << " b2=" << box2.evalSpoly(-box2.L) << " b1=" << box1.evalSpoly(-box2.L) << endl;
 
 
-	SCIPupdateLocalLowerbound(scip, min(-to_double(box2.maximumUpperbound()), -to_double(box2.U))); //Maybe not better than -box1.U, but the scip function will take the best of the two.
+
+	cout << "box len " << boxLen << endl;
 
 
-	newUpperBound = -to_double(box2.L + box2.currentMap.eval(-box2.L) / box1.currentMap.eval(-box2.L));
+	numFailedToImprove = -50;
+//	if ( isImprovement == false)
+//		numFailedToImprove++;
+//	if (numFailedToImprove >= 1)
+//		numFailedToImprove = -1000;
+
+
+
+
+	cout << "lower bound s" << SCIPgetLocalLowerbound(scip) << ", -U=" << -to_double(box2.U) << ", -u()=" << -to_double(box2.maximumUpperbound()) << endl;
+	SCIPupdateLocalLowerbound(scip, max(-to_double(box2.maximumUpperbound()), -to_double(box2.U))); //Maybe not better than -box1.U, but the scip function will take the best of the two.
+
+
+	newUpperBound = -to_double(box2.L + box2.evalSpoly(-box2.L) / box1.evalSpoly(-box2.L));
 	newUpperBound = min(newUpperBound, -to_double(box2.maximumLowerBound()) );
 	newUpperBound = min(newUpperBound, -to_double(box2.L));
+
+	cout << "*latte bound " <<  -to_double(box2.maximumUpperbound()) << " <=min -f <= " << newUpperBound <<endl;
+
+	//cout << "new global bound by summation: new= " << newUpperBound << " old=" << scip->primal->upperbound << endl;
 	if ( newUpperBound < scip->primal->upperbound)
 	{
+		//cout << "new global bound by summation: new= " << newUpperBound << " old=" << scip->primal->upperbound << endl;
 		SCIPprimalSetUpperbound(scip->primal, scip->mem->probmem, scip->set, scip->stat, scip->eventqueue, scip->transprob, scip->tree, scip->lp, newUpperBound);
-		cout << "new global bound by summation" << endl;
+
 	}
 
 
+	cout << "**after scip bound " <<  SCIPgetLocalLowerbound(scip) << " <=min -f <= " <<scip->primal->upperbound  <<endl;
+	cout << "isImprovement" << isImprovement << endl;
+	if ( isImprovement)
+		cout << "#<---------------------------------------------------------------------------------------------------------------------------------------\n";
+
+	/*
+	cout << "isImprov = " << isImprovement << endl;
+	if (isImprovement == false)
+	{
+		double maxWidth = 0;
+		double midPoint, width;
+		int maxIndex;
+	   SCIP_Real brpoint;
+	   SCIP_NODE* downchild;
+	   SCIP_NODE* eqchild;
+	   SCIP_NODE* upchild;
+		for(int i = 0; i < orgVarsNum ; ++i)
+		{
+			if (orgVars[i]->name[0] == 'x')
+			{
+				width = SCIPvarGetUbLocal(orgVars[i]) - SCIPvarGetLbLocal(orgVars[i]);
+				if ( width > maxWidth)
+				{
+					maxWidth = width;
+					maxIndex = i;
+					midPoint = (SCIPvarGetUbLocal(orgVars[i]) + SCIPvarGetLbLocal(orgVars[i]))/2.0;
+				}
+			}
+		}
+
+		brpoint = SCIPgetBranchingPoint(scip, orgVars[maxIndex], midPoint);
+
+
+		// perform the branching
+		SCIP_CALL( SCIPbranchVarVal(scip, orgVars[maxIndex], brpoint, &downchild, &eqchild, &upchild) );
+
+		if( downchild != NULL || eqchild != NULL || upchild != NULL )
+		{
+		 // *result = SCIP_BRANCHED;
+		  cout << "Branched on x" << maxIndex << " at " << midPoint << endl;
+		}
+		else
+		{
+		  // if there are no children, then variable should have been fixed by SCIPbranchVarVal
+		  assert(SCIPisEQ(scip, SCIPvarGetLbLocal(orgVars[maxIndex]), SCIPvarGetUbLocal(orgVars[maxIndex])));
+		  cout << "var " << maxIndex << " fixed" << endl;
+		  // *result = SCIP_REDUCEDDOM;
+		}
+	}
+	*/
 
 
 
-	*result = SCIP_SUCCESS;
+
 	return SCIP_OKAY;
 }
 

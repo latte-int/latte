@@ -19,7 +19,7 @@
 #include "ReadPolyhedron.h"
 #include "LattException.h"
 #include "nonlinearOptimization/WeightedExponentialSubs.h"
-#include "nonlinearOptimization/BoxOptimization.h"
+#include "nonlinearOptimization/BoxOptimizationContinuous.h"
 #include "print.h"
 #include "dual.h"
 #include "rational.h"
@@ -34,6 +34,9 @@ class LatteIntegrationRelaxor: public scip::ObjRelax
 private:
 	char * pipFileName;
 	monomialSum originalPolynomial;
+
+	BoxOptimizationContinuous box1;
+	BoxOptimizationContinuous box2;
 
 	ZZ numFailedToImprove;
 
