@@ -182,7 +182,7 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 			boxLen += upperBound[var] - lowerBound[var];
 			varMap[var] = i;
 		}
-		cout << "node" << SCIPgetNNodes(scip) << " index "<< i << " " << SCIPvarGetLbLocal(orgVars[i]) << "<= " << orgVars[i]->name << "<= " << SCIPvarGetUbLocal(orgVars[i])  << endl;
+		//cout << "node" << SCIPgetNNodes(scip) << " index "<< i << " " << SCIPvarGetLbLocal(orgVars[i]) << "<= " << orgVars[i]->name << "<= " << SCIPvarGetUbLocal(orgVars[i])  << endl;
 	}
 
 
@@ -318,7 +318,9 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 	//see if we can get a better range bound for f(x).
 	box2.U = min(box2.U, -to_RR(SCIPgetLocalLowerbound(scip)));
 	box1.U = min(box1.U, -to_RR(SCIPgetLocalLowerbound(scip)));
-	cout << "range update is off b/c lipschitz is invalid" <<endl;
+	//cout << "range update is off b/c lipschitz is invalid" <<endl;
+
+	box2.setFmaxLowerbound(-SCIPgetLocalLowerbound(scip));
 	//bool fr = box2.findRange(100);
 	//if (fr)
 	//	cout << fr << "=range update improved box bound <-----------------------------------------------------------------------------------" << endl;
@@ -357,7 +359,7 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 	cout << "wtf2" << endl;
 	*/
 
-
+	/*
 	{
 		int d = box2.originalPolynomial.varCount -1;
 		RR p1, p2;
@@ -379,6 +381,8 @@ SCIP_DECL_RELAXEXEC(LatteIntegrationRelaxor::scip_exec)
 		cout << f1 << " * " << f2 << " *  " << f3 << " = " << f1*f2*f3 <<endl;
 		cout << "u()="  << box2.L + f1*f2*f3 << endl;
 	}
+	*/
+
 
 
 	if (SCIPgetLocalLowerbound(scip) < -to_double(box2.maximumUpperbound()) )

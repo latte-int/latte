@@ -70,7 +70,7 @@ SCIP_RETCODE SCIPrunMyShell(
 			fileName = argv[i+1];
 
 	cout << "Usage  : " << argv[0] <<" <--int | --sum | --none for integration or summation> <--bb | --none for branch and bound> -f filename" << endl;
-	cout << "Example: " << argv[0] << " --sum --none -f file.pip" <<endl;
+	cout << "Example: " << argv[0] << " --sum  --none -f file.pip" <<endl;
 
 	if ( fileName == NULL )
 	{
