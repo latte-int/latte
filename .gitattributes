@@ -232,6 +232,8 @@ code/latte/interpolation/PolynomialInterpolation.h -text
 code/latte/interpolation/testDriver.cpp -text
 code/latte/nonlinearOptimization/BoxOptimization.cpp -text
 code/latte/nonlinearOptimization/BoxOptimization.h -text
+code/latte/nonlinearOptimization/BoxOptimizationContinuous.cpp -text
+code/latte/nonlinearOptimization/BoxOptimizationContinuous.h -text
 code/latte/nonlinearOptimization/PolynomialMap.cpp -text
 code/latte/nonlinearOptimization/PolynomialMap.h -text
 code/latte/nonlinearOptimization/WeightedCountingBuffer.h -text
@@ -244,6 +246,7 @@ code/latte/nonlinearOptimization/scipFiles/LatteIntegrationRelaxor.cpp -text
 code/latte/nonlinearOptimization/scipFiles/LatteIntegrationRelaxor.h -text
 code/latte/nonlinearOptimization/scipFiles/LatteSummationRelaxor.cpp -text
 code/latte/nonlinearOptimization/scipFiles/LatteSummationRelaxor.h -text
+code/latte/nonlinearOptimization/scipFiles/ReadmeNotes.txt -text
 code/latte/nonlinearOptimization/scipFiles/cppmain.cpp -text
 code/latte/nonlinearOptimization/scipFiles/runBuild.sh -text
 code/latte/nonlinearOptimization/testBox.mpl -text
