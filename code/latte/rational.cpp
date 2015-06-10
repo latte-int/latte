@@ -239,6 +239,11 @@ RationalNTL RationalNTL::operator+(const RationalNTL & rhs) const
 	RationalNTL answer(*this);
 	return answer.add(rhs.numerator, rhs.denominator);
 }
+RationalNTL RationalNTL::operator+(const int rhs) const
+{
+	RationalNTL answer(*this);
+	return answer.add(to_ZZ(rhs), to_ZZ(1));
+}
 RationalNTL RationalNTL::operator-(const RationalNTL & rhs) const
 {
 	RationalNTL answer(*this);
@@ -282,6 +287,18 @@ RationalNTL RationalNTL::operator/(const ZZ & rhs) const
 	RationalNTL answer(*this);
 	return answer.div(rhs);
 }
+RationalNTL RationalNTL::operator/(const long int & rhs) const
+{
+	RationalNTL ans(*this);
+	return ans.div(to_ZZ(rhs));
+}
+RationalNTL & RationalNTL::operator/=(const int rhs)
+{
+	denominator *= rhs;
+	canonicalize();
+	return *this;
+}
+
 
 const ZZ & RationalNTL::getNumerator() const
 {
@@ -435,7 +452,32 @@ bool RationalNTL::operator!=(const long rhs) const
 {
 	return !(*this == to_ZZ(rhs));
 }
+bool RationalNTL::operator>(const long rhs) const
+{
+	assert(denominator > 0);
+	return (numerator > denominator*rhs);
+}
+bool RationalNTL::operator<(const int rhs) const
+{
+	return numerator < denominator * rhs;
+}
+bool RationalNTL::operator<(const RationalNTL & rhs) const
+{
+	return numerator * rhs.denominator < rhs.numerator * denominator;
+}
+bool RationalNTL::operator>=(const long rhs) const
+{
+	return (*this > rhs || *this == rhs);
+}
 
+bool RationalNTL::operator>=(const RationalNTL & rhs) const
+{
+	return numerator * rhs.denominator >= rhs.numerator * denominator;
+}
+bool RationalNTL::operator<=(const RationalNTL & rhs) const
+{
+	return numerator * rhs.denominator <= rhs.numerator * denominator;
+}
 RationalNTL & RationalNTL::operator=(const long rhs)
 {
 	numerator = rhs;
@@ -600,6 +642,35 @@ long sign(const RationalNTL& a)
 	return sign(a.getNumerator());
 }
 
+RationalNTL abs(const RationalNTL & a)
+{
+	RationalNTL ans(a);
+	if ( ans.getNumerator() < 0)
+		ans.changeSign();
+	return ans;
+}
+
+RationalNTL power(const RationalNTL & a, long int p)
+{
+	ZZ n, d;
+	n = power(a.getNumerator(), p);
+	d = power(a.getDenominator(), p);
+	return RationalNTL(n, d);
+}
+
+RationalNTL min(const RationalNTL & l, const RationalNTL & r)
+{
+	if ( l < r)
+		return l;
+	return r;
+}
+RationalNTL max(const RationalNTL & l, const RationalNTL & r)
+{
+	if ( l < r)
+		return r;
+	return l;
+}
+
 RationalNTL convert_mpq_to_RationalNTL(const mpq_class &q)
 {
 	return RationalNTL(convert_mpz_to_ZZ(q.get_num()), convert_mpz_to_ZZ(q.get_den()));
@@ -622,6 +693,14 @@ vec_RationalNTL::vec_RationalNTL(const vec_RationalNTL& a)
 	vec = a.vec;
 }// copy constructor;
 
+
+vec_RationalNTL::vec_RationalNTL(const vec_ZZ & a)
+{
+	vec.resize(a.length());
+	for(int i = 0; i < a.length(); ++i)
+		vec[i] = a[i];
+
+}
 
 // assignment...performs an element-wise assignment
 vec_RationalNTL& vec_RationalNTL::operator=(const vec_RationalNTL& a)

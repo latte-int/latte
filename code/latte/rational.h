@@ -191,6 +191,7 @@ public:
 	RationalNTL & add(const ZZ &num, const ZZ& denom); // adds fractions and then reduces them.
 	RationalNTL & add(const RationalNTL & rationalNTL);
 	RationalNTL operator+(const RationalNTL & rhs) const; //rhs stands for "right hand size: object + rhs.
+	RationalNTL operator+(const int rhs) const;
 	RationalNTL operator-(const RationalNTL & rhs) const;
 	RationalNTL & operator+=(const RationalNTL &rhs);
 	RationalNTL & operator-=(const RationalNTL &rhs);
@@ -199,8 +200,9 @@ public:
 	RationalNTL & div(const ZZ & rhs); // divides by rhs.
 	RationalNTL & div(const RationalNTL & rhs);
 	RationalNTL operator/(const RationalNTL & rhs) const;
-
 	RationalNTL operator/(const ZZ & rhs) const;
+	RationalNTL operator/(const long int & rhs) const;
+	RationalNTL & operator/=(const int rhs);
 
 	//GET FUNCTIONS
 	const ZZ & getNumerator() const;
@@ -236,6 +238,12 @@ public:
 	bool operator==(const ZZ & rhs) const;
 	bool operator!=(const RationalNTL & rhs) const;
 	bool operator!=(const long rhs) const;
+	bool operator>(const long rhs) const;
+	bool operator<(const int rhs) const;
+	bool operator<(const RationalNTL & rhs) const;
+	bool operator>=(const long rhs) const;
+	bool operator>=(const RationalNTL & rhs) const;
+	bool operator<=(const RationalNTL & rhs) const;
 
 	//ASSIGNMENT
 	RationalNTL & operator=(const long rhs);
@@ -246,6 +254,12 @@ public:
 
 RR to_RR(const RationalNTL & r);
 long sign(const RationalNTL& a); // returns sign of a (-1, 0, +1)
+RationalNTL abs(const RationalNTL & a);
+RationalNTL power(const RationalNTL & a, long int p);
+RationalNTL min(const RationalNTL & l, const RationalNTL & r);
+RationalNTL max(const RationalNTL & l, const RationalNTL & r);
+
+
 RationalNTL convert_mpq_to_RationalNTL(const mpq_class &q);
 mpq_class convert_RationalNTL_to_mpq(const RationalNTL &q);
 
@@ -260,6 +274,7 @@ public:
 	vec_RationalNTL(); // initially length 0
 	~vec_RationalNTL();
 	vec_RationalNTL(const vec_RationalNTL& a);	// copy constructor;
+	vec_RationalNTL(const vec_ZZ & a);
 
 	vec_RationalNTL& operator=(const vec_RationalNTL& a);
 	// assignment...performs an element-wise assignment

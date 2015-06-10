@@ -245,9 +245,11 @@ boxOpt_SOURCES = nonlinearOptimization/nonlinearOptimizationDriver.cpp
 boxOpt_LDADD = $(LDADD)
 noinst_HEADERS += nonlinearOptimization/WeightedExponentialSubs.h
 noinst_HEADERS += nonlinearOptimization/BoxOptimization.h
+noinst_HEADERS += nonlinearOptimization/BoxOptimizationContinuous.h
 noinst_HEADERS += nonlinearOptimization/PolynomialMap.h
 liblatte_la_SOURCES += nonlinearOptimization/WeightedExponentialSubs.cpp
 liblatte_la_SOURCES += nonlinearOptimization/BoxOptimization.cpp
+liblatte_la_SOURCES += nonlinearOptimization/BoxOptimizationContinuous.cpp
 liblatte_la_SOURCES += nonlinearOptimization/PolynomialMap.cpp
 
 #convert a cdd H-rep to latte H-rep (by clearing the fractions)

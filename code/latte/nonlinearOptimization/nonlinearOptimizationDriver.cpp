@@ -21,6 +21,7 @@
 #include "LattException.h"
 #include "nonlinearOptimization/WeightedExponentialSubs.h"
 #include "nonlinearOptimization/BoxOptimization.h"
+#include "nonlinearOptimization/BoxOptimizationContinuous.h"
 #include "print.h"
 #include "dual.h"
 #include "rational.h"
@@ -46,6 +47,7 @@ void printHelpMenu()
 	"  --opt-lfc                              Optimization via linear forms with cache\n"
 	"  --opt-ns                               Optimization via natural summation\n"
 	"  --count                                Finds the weighted average of f(x)\n"
+	"  --opt-cont-ns                          Finds lower bound for continuous optimization\n"
     "Other options:\n"
     "  --k, -k INT                            Sets (f(x)+s)^k\n"
     "  --epi                                  If --opt, sets k\n"
@@ -109,6 +111,7 @@ int main(int argc, char *argv[]) {
 		{ "opt-ns",						  no_argument, 0, 0x107},
 		{ "opt-ratio",					  no_argument, 0, 0x108},
 		{ "count",						  no_argument, 0, 0x109 },
+		{ "opt-cont-ns",				  no_argument, 0, 0x10A},
 		{ 0, 0, 0, 0 } };
 		/* getopt_long stores the option index here. */
 
@@ -163,6 +166,9 @@ int main(int argc, char *argv[]) {
 			case 0x109:
 				cmd = "count";
 				break;
+			case 0x10A:
+				cmd = "opt-cont-ns";
+				break;
 			default:
 				cerr << "Unknown command/option " << endl;
 				THROW_LATTE(LattException::ue_BadCommandLineOption);
@@ -203,7 +209,7 @@ int main(int argc, char *argv[]) {
 	int dim;
 	boxFile >> dim;
 
-	vec_ZZ lowerBound, upperBound;
+	vec_RR lowerBound, upperBound;
 	lowerBound.SetLength(dim);
 	upperBound.SetLength(dim);
 	for(int i = 0; i < dim; ++i)
@@ -217,7 +223,7 @@ int main(int argc, char *argv[]) {
 	//cout << "epsilon=" << epsilon << endl;
 	N = 1;
 	for (int i = 0;  i < lowerBound.length(); ++i)
-		N *= to_RR(upperBound[i] - lowerBound[i] + 1);
+		N *= (upperBound[i] - lowerBound[i] + 1);
 	N = ceil((1.0 + inv(epsilon))* log(N));
 	k = INT_MAX;
 	if ( N < INT_MAX)
@@ -245,7 +251,7 @@ int main(int argc, char *argv[]) {
 			destroyMonomials(originalPolynomial);
 		}//decompose polynomial into power of linear forms
 
-		mpq_class weightedCount = computeWeightedCountingBox(lowerBound, upperBound, originalLinearForm);
+		mpq_class weightedCount = computeWeightedCountingBox(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound), originalLinearForm);
 		cout << "Final count: " << weightedCount << endl;
 		destroyLinForms(originalLinearForm);
 	}
@@ -255,11 +261,11 @@ int main(int argc, char *argv[]) {
 	{
 		BoxOptimization bo;
 		bo.setPolynomial(originalPolynomial);
-		bo.setBounds(lowerBound, upperBound);
+		bo.setBounds(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 
 		if ( bo.isTrivial())
 		{
-			bo.enumerateProblem(lowerBound, upperBound, originalPolynomial);
+			bo.enumerateProblem(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound), originalPolynomial);
 			cout << "optimal: " << bo.L << " <= f(x) <= " << bo.U << endl;
 			return 0;
 		}
@@ -268,9 +274,10 @@ int main(int argc, char *argv[]) {
 		timeSummation.start();
 		bo.setPower(k);
 		bo.decomposePoly(BoxOptimization::lf);
-		bo.findSPolynomial(BoxOptimization::lf, lowerBound, upperBound);
+		bo.findSPolynomial(BoxOptimization::lf, conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 		timeSummation.stop();
 		cout << timeSummation << endl;
+		bo.printSpolynomial();
 
 		cout << "old range " << bo.L << " <=f(x)<= " << bo.U << " old max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
 		bo.findRange(10);
@@ -283,11 +290,11 @@ int main(int argc, char *argv[]) {
 	{
 		BoxOptimization bo;
 		bo.setPolynomial(originalPolynomial);
-		bo.setBounds(lowerBound, upperBound);
+		bo.setBounds(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 
 		if ( bo.isTrivial())
 		{
-			bo.enumerateProblem(lowerBound, upperBound, originalPolynomial);
+			bo.enumerateProblem(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound), originalPolynomial);
 			cout << "optimal: " << bo.L << " <= f(x) <= " << bo.U << endl;
 			return 0;
 		}
@@ -307,20 +314,23 @@ int main(int argc, char *argv[]) {
 			if ( rand() % 2)
 			{
 				int j = rand() % lowerBound.length();
-				lowerBound[j] = (lowerBound[j] + upperBound[j])/2;
+				lowerBound[j] = to_int((lowerBound[j] + upperBound[j])/2);
 			}
 			else
 			{
 				int j = rand() % lowerBound.length();
-				upperBound[j] = (lowerBound[j] + upperBound[j])/2;
+				upperBound[j] = to_int((lowerBound[j] + upperBound[j])/2);
 			}
 
 			cout << "\nLow: " << lowerBound << " up: " << upperBound << endl;
 
 			timeSpoly.start();
-			bo.setBounds(lowerBound, upperBound);
-			bo.findSPolynomial(BoxOptimization::lfCache,lowerBound, upperBound);
+			bo.setBounds(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
+			bo.findSPolynomial(BoxOptimization::lfCache,conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 			timeSpoly.stop();
+			bo.printSpolynomial();
+			cout << "WARNING: lfc is broken for rational polynomials. Remove this code in production" << endl;
+			THROW_LATTE(LattException::bug_Unknown);
 
 
 			cout << "old range " << bo.L << " <=f(x)<= " << bo.U << " old max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
@@ -339,21 +349,28 @@ int main(int argc, char *argv[]) {
 
 	if ( cmd == "opt-ns")
 	{
+
+		vec_ZZ zzLowerBound(conv<vec_ZZ>(lowerBound));
+		vec_ZZ zzUpperBound(conv<vec_ZZ>(upperBound));
+
 		BoxOptimization bo;
 		bo.setPolynomial(originalPolynomial);
-		bo.setBounds(lowerBound, upperBound);
+		bo.setBounds(zzLowerBound, zzUpperBound);
 
-
+		/*
 		if ( bo.isTrivial())
 		{
 			bo.enumerateProblem(lowerBound, upperBound, originalPolynomial);
 			cout << "optimal: " << bo.L << " <= f(x) <= " << bo.U << endl;
 			return 0;
 		}
+		*/
+
+
 
 		bo.setPower(k);
 		bo.decomposePoly(BoxOptimization::naturalSummation);
-		bo.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+		bo.findSPolynomial(BoxOptimization::naturalSummation, conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 		bo.printSpolynomial();
 
 		cout << "old range " << bo.L << " <=f(x)<= " << bo.U << " old max bounds: " << bo.maximumLowerBound() << " <=max(f)<= " << bo.maximumUpperbound() << " gap %:" << (bo.maximumUpperbound() - bo.maximumLowerBound())/bo.maximumUpperbound() << endl;
@@ -367,21 +384,21 @@ int main(int argc, char *argv[]) {
 	{
 		BoxOptimization bo1, bo2;
 		bo1.setPolynomial(originalPolynomial);
-		bo1.setBounds(lowerBound, upperBound);
+		bo1.setBounds(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 
 		bo2.setPolynomial(originalPolynomial);
-		bo2.setBounds(lowerBound, upperBound);
+		bo2.setBounds(conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 
 		//todo: if trivial?
 
 		bo1.setPower(k);
 		bo1.decomposePoly(BoxOptimization::naturalSummation);
-		bo1.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+		bo1.findSPolynomial(BoxOptimization::naturalSummation, conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 
 
 		bo2.setPower(k+1);
 		bo2.decomposePoly(BoxOptimization::naturalSummation);
-		bo2.findSPolynomial(BoxOptimization::naturalSummation, lowerBound, upperBound);
+		bo2.findSPolynomial(BoxOptimization::naturalSummation, conv<vec_ZZ>(lowerBound), conv<vec_ZZ>(upperBound));
 
 
 
@@ -402,8 +419,59 @@ int main(int argc, char *argv[]) {
 
 	}
 
+	if (cmd == "opt-cont-ns")
+	{
+
+		ifstream bf(boxFileName.c_str());
+		int dim;
+		bf >> dim;
+
+		vec_RR rrLowerBound, rrUpperBound;
+		rrLowerBound.SetLength(dim);
+		rrUpperBound.SetLength(dim);
+		for(int i = 0; i < dim; ++i)
+			bf >> rrLowerBound[i] >> rrUpperBound[i];
+		bf.close();
+
+		RR::SetPrecision(2000);
+		cout << "current precision " << RR::precision() << endl;
+
+		BoxOptimizationContinuous bo1;
+		bo1.setPolynomial(originalPolynomial);
 
 
+
+		//vec_RationalNTL rrLowerBound(lowerBound);
+		//vec_RationalNTL rrUpperBound(upperBound);
+
+
+		bo1.setPower(k);
+		bo1.setBounds(rrLowerBound, rrUpperBound);
+		bo1.findSPolynomial(BoxOptimizationContinuous::naturalSummation, rrLowerBound, rrUpperBound);
+		bo1.printSpolynomial();
+
+		BoxOptimizationContinuous bo2;
+		bo2 = bo1;
+		bo2.setPower(k+1);
+		bo2.setBounds(rrLowerBound, rrUpperBound);
+		bo2.findSPolynomial(BoxOptimizationContinuous::naturalSummation, rrLowerBound, rrUpperBound);
+		bo2.printSpolynomial();
+		//bo2.findRange(10);
+		cout << "Range helped: " << bo2.findRange(10) << endl;
+
+
+
+		cout << "results " << endl;
+		cout << " range " << bo1.L << " <=f(x)<= " << bo1.U << endl;
+		cout << " new max bounds: " << bo1.maximumLowerBound() << " <=max(f)<= " << bo1.maximumUpperbound() << endl; //" gap %:" << (bo1.maximumUpperbound() - bo1.maximumLowerBound())/bo1.maximumUpperbound() << endl;
+        cout << " new ratio lower bound: " << bo2.L + bo2.evalSpoly(-bo2.L)/ bo1.evalSpoly(-bo2.L) << endl;
+        cout << "                       bo2.L=" << bo2.L << endl;
+        cout << "                       \\int f^{k+1}=" << bo2.evalSpoly(-bo2.L)<< endl;
+        cout << "                       \\int f^k    =" << bo1.evalSpoly(-bo2.L)<< endl;
+
+
+        bo2.printStats();
+	}
 	totalTime.stop();
 	cout << totalTime << endl;
 

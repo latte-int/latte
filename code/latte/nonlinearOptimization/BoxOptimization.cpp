@@ -343,40 +343,29 @@ void BoxOptimization::setBounds(const vec_ZZ &lowBound, const vec_ZZ &upBound)
 	exp[0] = 0;
 
 
-/*
-	U = 0;
-	ZZ boundTerm;
-	for (term = pItr->nextTerm(); term; term = pItr->nextTerm())
-	{
-		if ( term->exps[0] != 0)
-			continue;
-		boundTerm = 1;
 
-		RationalNTL newCoef(term->coef);
-
-		for (int i = 0; i < ambDim; ++i)
-		{
-			boundTerm *= power(maxBound[i], term->exps[i+1]);
-		}
-		U += to_RR((newCoef) * (boundTerm * sign(newCoef)));
-	}
-	L = U;
-	L *= -1;
-	cout << "Simple bounds " << L << "<= f(x) <=" << U << endl;
-*/
 	//starta
 	pItr->begin();
-	ZZ u,l;
-	u=0;
-	l=0;
+	RationalNTL u,l;
+	//u=0;
+	//l=0;
 	for(term = pItr->nextTerm(); term; term = pItr->nextTerm())
 	{
+
+		//cout << "monomial " << term->coef << endl;
+		//cout <<  term->coef << "* s^" << term->exps[0];
+		//for(int i = 0; i < ambDim; ++i)
+		//	cout <<  " * x[" << i << "]^" << term->exps[i+1] ;
+		//cout << endl;
+
 		if (term->exps[0] != 0)
 			continue;
 
 		ZZ uu,ll;
-		uu = term->coef.getNumerator();
-		assert(term->coef.getDenominator() == 1);
+		uu = 1;
+
+		//term->coef.getNumerator();
+		//assert(term->coef.getDenominator() == 1);
 		ll = uu;
 		for(int i = 0; i < ambDim; ++i)
 		{
@@ -394,19 +383,32 @@ void BoxOptimization::setBounds(const vec_ZZ &lowBound, const vec_ZZ &upBound)
 				b = power(lowBound[i], term->exps[i+1]);
 
 			}
-			//cout << "uu=" << uu << ", ll=" << ll << endl;
-			//cout << "a=" << a << ", b=" << b << endl;
+			//cout << "  uu=" << uu << ", ll=" << ll << endl;
+			//cout << "  a=" << a << ", b=" << b << endl;
 			ZZ tempUU;
 			tempUU = max(uu*a, max(uu*b, max(ll*a,ll*b)));
 			ZZ tempLL;
 			tempLL = min(uu*a, min(uu*b, min(ll*a,ll*b)));
 			uu = tempUU;
 			ll = tempLL;
-			//cout << "nuu=" << uu << ", nll=" << ll << endl;
+			//cout << "  nuu=" << uu << ", nll=" << ll << endl;
 
 		}
-		u += uu;
-		l += ll;
+		RationalNTL ru(uu, 1);
+		RationalNTL rl(ll, 1);
+		ru *= term->coef;
+		rl *= term->coef;
+		if ( ru >= rl )
+		{
+			u += ru;
+			l += rl;
+		}
+		else
+		{
+			u += rl;
+			l += ru;
+		}
+		//cout << "added bounds " << ru << ", " <<rl << endl;
 
 	}
 	U = to_RR(u);

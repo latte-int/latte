@@ -172,6 +172,8 @@ code/gnulib/verify.h -text
 code/gnulib/xalloc-oversized.h -text
 code/latte/LattException.cpp -text
 code/latte/LattException.h -text
+code/latte/MpqClassLazy.cpp -text
+code/latte/MpqClassLazy.h -text
 code/latte/buildPolytopes/BuildGraphPolytope.cpp -text
 code/latte/buildPolytopes/BuildGraphPolytope.h -text
 code/latte/buildPolytopes/BuildHypersimplexEdgePolytope.cpp -text
