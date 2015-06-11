@@ -74,7 +74,7 @@ SCIP_DECL_RELAXINIT(LatteSummationRelaxor::scip_init)
 	polynomialFile.close();
 
 
-	int k = 3;
+	int k = 4;
 
 	box1.setPolynomial(originalPolynomial);
 	box1.setPower(k);
