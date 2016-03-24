@@ -1,5 +1,6 @@
 # Examples from paper "Three Ehrhart Quasi-Polynomials"
 
+with(plots):
 read("RealBarvinok-mars-exemples-2014-03-10.mpl"): # this also loads Conebycone...
 
 ############################################################
@@ -19,6 +20,18 @@ S := expand(add(ttruncatedSL('t', 'T', vertices[i], simple_vertex_cones[i], L, e
 E2 := coeff(S, T, 2);
 E1 := coeff(S, T, 1);
 E0 := factor(coeff(S, T, 0));
+
+# Plot Figure 3.
+Ex13Volume := E2*t^2:
+Ex13LatticePoints := evaluateEhrhart(S, 't'):
+Ex13Plot := plot([Ex13LatticePoints, Ex13Volume], 't' = 0 .. 3.4,
+                 color = ["Black", "Blue"],
+                 discont = true, symbolsize = 15, symbol = solidcircle,
+                 tickmarks = [[0 = 0, 1/sqrt(2) = "", 1 = 1, sqrt(2) = sqrt(2), 2 = 2,
+                               (3/2)*sqrt(2) = "", 2*sqrt(2) = "", 3 = 3],
+                              [0, 1, 2, 4, 6, 9, 12, 15, 20]],
+                 axis = [gridlines = [linestyle = dot]]):
+display(Ex13Plot);
 
 ############################################################
 
@@ -117,20 +130,75 @@ printf("## Specialization to multiples of the following vector from tau_2 (Examp
 b_0 := [0, 0, 5, 3];
 tau := 2;
 
-"Volume" = collect(eval(subs({b = expand(t * b_0)}, E[V_linspace][tau])), t);
-"Sum" = collect(eval(subs({b = expand(t * b_0)}, E[O_linspace][tau])), t);
-"Intermediate sum" = collect(eval(subs({b = expand(t * b_0)}, E[L_linspace][tau])), t);
+Ex234Volume := collect(eval(subs({b = expand(t * b_0)}, E[V_linspace][tau])), t);
+Ex234Sum := collect(eval(subs({b = expand(t * b_0)}, E[O_linspace][tau])), t);
+Ex234IntermediateSum := collect(eval(subs({b = expand(t * b_0)}, E[L_linspace][tau])), t);
 ## could as well compute without first calculating the fully
 ## parametric sum!!
+
+printf("## Figure 7:\n");
+
+Ex234Plots := Array(1..2):
+Ex234Plots[1] := plot([value(Ex234Sum), value(Ex234IntermediateSum), Ex234Volume],
+                      't' = 0 .. 1,
+                      color = ["Black", "Red", "Blue"],
+                      discont = true, symbolsize = 15, symbol = solidcircle,
+                      axis = [gridlines = [linestyle = dot]],
+                      tickmarks = [[0 = 0, 1/5 = 1/5, 1/3 = 1/3, 2/5 = 2/5, 3/5 = 3/5,
+                                    2/3 = 2/3, 4/5 = 4/5, 1 = 1],
+                                   [1, 2, 3, 5, 8, 9, 13, 19]]):
+Ex234Plots[2] := plot([value(Ex234Sum), value(Ex234IntermediateSum), Ex234Volume],
+                      't' = 1 .. 2.4,
+                      color = ["Black", "Red", "Blue"],
+                      discont = true, symbolsize = 15, symbol = solidcircle,
+                      axis = [gridlines = [linestyle = dot]],
+                      tickmarks = [[1 = 1, 6/5 = 6/5, 4/3 = 4/3, 7/5 = 7/5, 8/5 = 8/5,
+                                    5/3 = 5/3, 2 = 2, 11/5 = 11/5, 7/3 = 7/3, 12/5 = 12/5],
+                                   [19 = 19, 24 = 24, 26 = 26, 32 = 32, 39 = 39,
+                                    41 = 41, 49 = 49, 60 = 60, 69 = 69, 72 = 72]]):
+display(Ex234Plots);
 
 printf("## Specialization to multiples of the following irrational vector from tau_2 (Example 2.36):\n");
 
 b_I := [0, 0, 3*sqrt(2), 3];
 tau := 2;
 
-"Volume" = collect(eval(subs({b = expand(t * b_I)}, E[V_linspace][tau])), t);
-"Sum" = collect(eval(subs({b = expand(t * b_I)}, E[O_linspace][tau])), t);
-"Intermediate sum" = collect(eval(subs({b = expand(t * b_I)}, E[L_linspace][tau])), t);
+Ex236Volume := collect(eval(subs({b = expand(t * b_I)}, E[V_linspace][tau])), t);
+Ex236Sum := collect(eval(subs({b = expand(t * b_I)}, E[O_linspace][tau])), t);
+Ex236IntermediateSum := collect(eval(subs({b = expand(t * b_I)}, E[L_linspace][tau])), t);
+
+printf("## Figure 8:\n");
+
+Ex236Plots := Array(1..2):
+# simplify for plotting purposes; otherwise too many discontinuity
+# markers are shown.
+Ex236Sum:=simplify(evaluateEhrhart(Ex236Sum, 't')):
+Ex236IntermediateSum:=simplify(evaluateEhrhart(Ex236IntermediateSum, 't')):
+Ex236Plots[1] := plot([Ex236Sum, Ex236IntermediateSum, Ex236Volume],
+                      't' = 0 .. 1,
+                      color = ["Black", "Red", "Blue"],
+                      discont = true, symbolsize = 15, symbol = solidcircle,
+                      axis = [gridlines = [linestyle = dot]],
+                      tickmarks = [default,
+                                   [0, 1, 2, 3, 5, 6, 9, 13, 14]]):
+# must plot separately, otherwise a discontinuity marker is displayed
+# in the intermediate sum graph.
+Ex236DiscontinuousPlot := plot([Ex236Sum],
+                               't' = 1 .. 2,
+                               color = ["Black"],
+                               discont = true, symbolsize = 15, symbol = solidcircle,
+                               axis = [gridlines = [linestyle = dot]],
+                               tickmarks = [default,
+                                            [14, 18, 20, 26, 32, 34, 41]]):
+Ex236ContinuousPlot := plot([Ex236IntermediateSum, Ex236Volume],
+                            't' = 1 .. 2,
+                            color = ["Red", "Blue"],
+                            discont = false,
+                            axis = [gridlines = [linestyle = dot]],
+                            tickmarks = [default,
+                                         [14, 18, 20, 26, 32, 34, 41]]):
+Ex236Plots[2] := display({Ex236DiscontinuousPlot, Ex236ContinuousPlot}):
+display(Ex236Plots);
 
 ############################################################
 
@@ -153,9 +221,9 @@ mars := [[1,1], [1, 2], [2, 2]];
 for k from 0 to 2 do
     printf("## k = %d:\n", k):
     cbc := collect((cone_by_cone_real(t, mars, [0, 0], 0, k)), t):
-    "Cone-by-cone" = cbc;
+    Ex55ConeByCone[k] := cbc;
     fb := collect(fullbarvinok(t, mars, k, [0, 0], 0), t):
-    "Full-Barvinok" = fb;
+    Ex55FullBarvinok[k] := fb;
 od;
 
 printf("## Evaluations for k=2:\n"):
@@ -167,9 +235,31 @@ for t in [1/2, Pi/6, 1, 1-10^(-6), 1+10^(-6)] do
     "Cone-by-cone"(t) = simplify(value(cbc));
     "Full-Barvinok"(t) = simplify(value(fb));
 od;
+t := 't';
 
-
-#TODO: Plotting.
+# Plot Figure 11.
+Figure11 := Array(1..2):
+subplots := {}:
+# Can't just use "plot" with a list of functions here;
+# or discontinuity markers will have the wrong colors.
+for k from 0 to 2 do
+    Ex55ConeByCone[k] := simplify(evaluateEhrhart(Ex55ConeByCone[k], 't'));
+    subplots := subplots union {plot(Ex55ConeByCone[k], 't' = 0 .. 5.4,
+                                     color = ["Green", "Red", "Black"][k+1],
+                                     discont = true, symbolsize = 15, symbol = solidcircle,
+                                     axis = [gridlines = [linestyle = dot]])};
+od:
+Figure11[1] := display(subplots):
+subplots := {}:
+for k from 0 to 2 do
+    Ex55FullBarvinok[k] := simplify(evaluateEhrhart(Ex55FullBarvinok[k], 't'));
+    subplots := subplots union {plot(Ex55FullBarvinok[k], 't' = 0 .. 5.4,
+                                     color = ["Green", "Red", "Black"][k+1],
+                                     discont = true, symbolsize = 15, symbol = solidcircle,
+                                      axis = [gridlines = [linestyle = dot]])};
+od:
+Figure11[2] := display(subplots):
+display(Figure11);
 
 ############################################################
 
@@ -179,7 +269,38 @@ printf("##### Example 5.6 - approximating quasipolynomials for real dilations of
 
 Simplex56 := [[0,1,1],[4,2,1],[1,1,2],[1,2,4]];
 
-#TODO: Plotting.
+for k from 0 to 3 do
+    printf("## k = %d:\n", k):
+    cbc := collect((cone_by_cone_real(t, Simplex56, [0, 0, 0], 0, k)), t):
+    Ex56ConeByCone[k] := cbc;
+    fb := collect(fullbarvinok(t, Simplex56, k, [0, 0, 0], 0), t):
+    Ex56FullBarvinok[k] := fb;
+od;
+
+# Plot Figures 12 and 13.
+subplots := {}:
+# Can't just use "plot" with a list of functions here;
+# or discontinuity markers will have the wrong colors.
+for k from 0 to 3 do
+    Ex56ConeByCone[k] := simplify(evaluateEhrhart(Ex56ConeByCone[k], 't'));
+    subplots := subplots union {plot(Ex56ConeByCone[k], 't' = 1.3 .. 3.9,
+                                     color = ["Green", "Blue", "Red", "Black"][k+1],
+                                     discont = true, symbolsize = 15, symbol = solidcircle,
+                                     axis = [gridlines = [linestyle = dot]])};
+od:
+Figure12 := display(subplots):
+display(Figure12);
+subplots := {}:
+for k from 0 to 3 do
+    Ex56FullBarvinok[k] := simplify(evaluateEhrhart(Ex56FullBarvinok[k], 't'));
+    subplots := subplots union {plot(Ex56FullBarvinok[k], 't' = 1.3 .. 3.9,
+                                     color = ["Green", "Blue", "Red", "Black"][k+1],
+                                     discont = true, symbolsize = 15, symbol = solidcircle,
+                                     axis = [gridlines = [linestyle = dot]])};
+od:
+Figure13 := display(subplots):
+display(Figure13);
+
 
 ########################### END ############################
 
