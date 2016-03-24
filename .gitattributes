@@ -297,6 +297,7 @@ code/maple/Makefile.am -text
 code/maple/README -text
 code/maple/RealBarvinok-mars-exemples-2014-03-10.mpl -text
 code/maple/m-knapsack.mpl -text
+code/maple/make-3-ehrhart-polynomials-figures.mpl -text
 code/maple/test-maple.sh.in -text
 code/maple/testMapleLatteKnapsack.mpl -text
 code/test-suite/test-4ti2.sh -text
