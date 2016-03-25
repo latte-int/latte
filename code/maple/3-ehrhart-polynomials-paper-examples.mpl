@@ -3,6 +3,8 @@
 with(plots):
 read("RealBarvinok-mars-exemples-2014-03-10.mpl"): # this also loads Conebycone...
 
+plotfont := [Times, roman, 12]:
+
 ############################################################
 
 printf("##### Example 1.3 - Numbers of lattice points in a semi-rational rectangle dilated by a real number t. Figure 3. #####\n\n");
@@ -22,6 +24,26 @@ E1 := coeff(S, T, 1);
 E0 := factor(coeff(S, T, 0));
 
 # Plot Figure 3.
+BasisPlots := Array(1 .. 3, 1 .. 1):
+XRange := -1.5 .. 2.5:
+BasisPlotsTicks := [-1=-1, 0=0, 1=1, 2=2]:
+BasisPlots[1, 1] := plot(t, 't' = XRange, color = "Blue",
+                         tickmarks = [BasisPlotsTicks, [-1=-1, 1=1]],
+                         axis = [gridlines = [linestyle = dot]],
+                         font = plotfont):
+YRange := 0..1.1:
+BasisPlots[2, 1] := plot([t-floor(t)], 't' = XRange, YRange, color = "Green",
+                         discont = true, symbolsize = 15, symbol = solidcircle,
+                         tickmarks = [BasisPlotsTicks, [1=1]],
+                         axis = [gridlines = [linestyle = dot]],
+                         font = plotfont):
+BasisPlots[3, 1] := plot([sqrt(2)*t-floor(sqrt(2)*t)], 't' = XRange, YRange, color = "Red",
+                         discont = true, symbolsize = 15, symbol = solidcircle,
+                         tickmarks = [BasisPlotsTicks, [1=1]],
+                         axis = [gridlines = [linestyle = dot]],
+                         font = plotfont):
+display(BasisPlots);
+
 Ex13Volume := E2*t^2:
 Ex13LatticePoints := evaluateEhrhart(S, 't'):
 Ex13Plot := plot([Ex13LatticePoints, Ex13Volume], 't' = 0 .. 3.4,
@@ -30,7 +52,8 @@ Ex13Plot := plot([Ex13LatticePoints, Ex13Volume], 't' = 0 .. 3.4,
                  tickmarks = [[0 = 0, 1/sqrt(2) = "", 1 = 1, sqrt(2) = sqrt(2), 2 = 2,
                                (3/2)*sqrt(2) = "", 2*sqrt(2) = "", 3 = 3],
                               [0, 1, 2, 4, 6, 9, 12, 15, 20]],
-                 axis = [gridlines = [linestyle = dot]]):
+                 axis = [gridlines = [linestyle = dot]],
+                 font = plotfont):
 display(Ex13Plot);
 
 ############################################################
@@ -146,7 +169,8 @@ Ex234Plots[1] := plot([value(Ex234Sum), value(Ex234IntermediateSum), Ex234Volume
                       axis = [gridlines = [linestyle = dot]],
                       tickmarks = [[0 = 0, 1/5 = 1/5, 1/3 = 1/3, 2/5 = 2/5, 3/5 = 3/5,
                                     2/3 = 2/3, 4/5 = 4/5, 1 = 1],
-                                   [1, 2, 3, 5, 8, 9, 13, 19]]):
+                                   [1, 2, 3, 5, 8, 9, 13, 19]],
+                      font = plotfont):
 Ex234Plots[2] := plot([value(Ex234Sum), value(Ex234IntermediateSum), Ex234Volume],
                       't' = 1 .. 2.4,
                       color = ["Black", "Red", "Blue"],
@@ -155,7 +179,8 @@ Ex234Plots[2] := plot([value(Ex234Sum), value(Ex234IntermediateSum), Ex234Volume
                       tickmarks = [[1 = 1, 6/5 = 6/5, 4/3 = 4/3, 7/5 = 7/5, 8/5 = 8/5,
                                     5/3 = 5/3, 2 = 2, 11/5 = 11/5, 7/3 = 7/3, 12/5 = 12/5],
                                    [19 = 19, 24 = 24, 26 = 26, 32 = 32, 39 = 39,
-                                    41 = 41, 49 = 49, 60 = 60, 69 = 69, 72 = 72]]):
+                                    41 = 41, 49 = 49, 60 = 60, 69 = 69, 72 = 72]],
+                      font = plotfont):
 display(Ex234Plots);
 
 printf("## Specialization to multiples of the following irrational vector from tau_2 (Example 2.36):\n");
@@ -179,24 +204,29 @@ Ex236Plots[1] := plot([Ex236Sum, Ex236IntermediateSum, Ex236Volume],
                       color = ["Black", "Red", "Blue"],
                       discont = true, symbolsize = 15, symbol = solidcircle,
                       axis = [gridlines = [linestyle = dot]],
-                      tickmarks = [default,
-                                   [0, 1, 2, 3, 5, 6, 9, 13, 14]]):
+                      tickmarks = [[sqrt(2)/6 = sqrt(2)/6, 1/3 = 1/3, sqrt(2)/3 = sqrt(2)/3, 2/3 = 2/3, sqrt(2)/2 = sqrt(2)/2, 2*sqrt(2)/3 = 2*sqrt(2)/3, 1 = 1],
+                                   [0, 1, 2, 3, 5, 6, 9, 13, 14]],
+                      font = plotfont):
 # must plot separately, otherwise a discontinuity marker is displayed
 # in the intermediate sum graph.
+Ex236Ticks := [1, 5*sqrt(2)/6, 4/3, sqrt(2), 7*sqrt(2)/6, 5/3, 8*sqrt(2)/6]:
+Ex236Ticks := map(x -> (x=x), Ex236Ticks):
 Ex236DiscontinuousPlot := plot([Ex236Sum],
                                't' = 1 .. 2,
                                color = ["Black"],
                                discont = true, symbolsize = 15, symbol = solidcircle,
                                axis = [gridlines = [linestyle = dot]],
-                               tickmarks = [default,
-                                            [14, 18, 20, 26, 32, 34, 41]]):
+                               tickmarks = [Ex236Ticks,
+                                            [14, 18, 20, 26, 32, 34, 41]],
+                               font = plotfont):
 Ex236ContinuousPlot := plot([Ex236IntermediateSum, Ex236Volume],
                             't' = 1 .. 2,
                             color = ["Red", "Blue"],
                             discont = false,
                             axis = [gridlines = [linestyle = dot]],
-                            tickmarks = [default,
-                                         [14, 18, 20, 26, 32, 34, 41]]):
+                            tickmarks = [Ex236Ticks,
+                                         [14, 18, 20, 26, 32, 34, 41]],
+                            font = plotfont):
 Ex236Plots[2] := display({Ex236DiscontinuousPlot, Ex236ContinuousPlot}):
 display(Ex236Plots);
 
@@ -247,7 +277,8 @@ for k from 0 to 2 do
     subplots := subplots union {plot(Ex55ConeByCone[k], 't' = 0 .. 5.4,
                                      color = ["Green", "Red", "Black"][k+1],
                                      discont = true, symbolsize = 15, symbol = solidcircle,
-                                     axis = [gridlines = [linestyle = dot]])};
+                                     axis = [gridlines = [linestyle = dot]],
+                                     font = plotfont)};
 od:
 Figure11[1] := display(subplots):
 subplots := {}:
@@ -256,7 +287,8 @@ for k from 0 to 2 do
     subplots := subplots union {plot(Ex55FullBarvinok[k], 't' = 0 .. 5.4,
                                      color = ["Green", "Red", "Black"][k+1],
                                      discont = true, symbolsize = 15, symbol = solidcircle,
-                                      axis = [gridlines = [linestyle = dot]])};
+                                      axis = [gridlines = [linestyle = dot]],
+                                     font = plotfont)};
 od:
 Figure11[2] := display(subplots):
 display(Figure11);
@@ -286,7 +318,8 @@ for k from 0 to 3 do
     subplots := subplots union {plot(Ex56ConeByCone[k], 't' = 1.3 .. 3.9,
                                      color = ["Green", "Blue", "Red", "Black"][k+1],
                                      discont = true, symbolsize = 15, symbol = solidcircle,
-                                     axis = [gridlines = [linestyle = dot]])};
+                                     axis = [gridlines = [linestyle = dot]],
+                                     font = plotfont)};
 od:
 Figure12 := display(subplots):
 display(Figure12);
@@ -296,7 +329,8 @@ for k from 0 to 3 do
     subplots := subplots union {plot(Ex56FullBarvinok[k], 't' = 1.3 .. 3.9,
                                      color = ["Green", "Blue", "Red", "Black"][k+1],
                                      discont = true, symbolsize = 15, symbol = solidcircle,
-                                     axis = [gridlines = [linestyle = dot]])};
+                                     axis = [gridlines = [linestyle = dot]],
+                                     font = plotfont)};
 od:
 Figure13 := display(subplots):
 display(Figure13);
