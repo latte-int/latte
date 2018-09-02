@@ -17,6 +17,8 @@ matrix:
            - libntl-dev
            - libcdd-dev
            - libcdd-test
+      before_script:
+       - PATH="/usr/lib/cdd-test:$PATH"; export PATH
 
 script:
   - ./.travis-build.sh
