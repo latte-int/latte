@@ -6,4 +6,11 @@ if [ $? != 0 ]; then
     cat config.log
     exit 1
 fi
-make -j2 distcheck || exit 1
+make -j2 distcheck
+if [ $? != 0 ]; then
+    for a in `find . -name "*.log"`; do
+        echo  "==================== $a ===================="
+        cat $a
+    done
+    exit 1
+fi
