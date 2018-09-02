@@ -72,7 +72,7 @@ AC_CACHE_SAVE
 AC_PATH_PROGS(CDD, [scdd_gmp scdd])
 AC_DEFINE_UNQUOTED(CDD_PATH, "${CDD}", [The path to the CDD binary.])
 if test -z "$CDD"; then
-  AC_MSG_ERROR([The `scdd_gmp' or `scdd' binary from CDDLIB is required for LattE.])			
+  AC_MSG_ERROR([The `scdd_gmp' or `scdd' binary from cddlib is required for LattE.])			
 fi
 
 AC_CACHE_SAVE
@@ -92,7 +92,7 @@ if test "x$cddlib_found" = "xno" ; then
    AC_LANG(C)
    LB_CHECK_CDDLIB
    if test "x$cddlib_found" = "xyes" ; then
-      AC_DEFINE(HAVE_CDDLIB_C_LINKAGE, 1, [Define if the CDDLIB library has C linkage])
+      AC_DEFINE(HAVE_CDDLIB_C_LINKAGE, 1, [Define if the cddlib library has C linkage])
    fi
    AC_LANG(C++)
 fi   
