@@ -16,6 +16,7 @@ matrix:
            - libglpk-dev
            - libntl-dev
            - libcdd-dev
+           - libcdd-test
 
 script:
   - ./.travis-build.sh
