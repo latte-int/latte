@@ -97,8 +97,7 @@ if test "x$cddlib_found" = "xno" ; then
    AC_LANG(C++)
 fi   
 if test "x$cddlib_found" = "xno" ; then
-   AC_MSG_WARN([cddlib not found!
-LattE needs it.])
+   AC_MSG_ERROR([The cddlib headers and library are required for LattE.])
 fi
 AC_CACHE_SAVE
 	  
