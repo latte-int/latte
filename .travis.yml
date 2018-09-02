@@ -22,3 +22,6 @@ matrix:
 
 script:
   - ./.travis-build.sh
+
+after_failure:
+  - for a in `find . -name "*.log"`; do echo  "==================== $a ===================="; cat $a; done
