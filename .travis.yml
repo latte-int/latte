@@ -1,0 +1,21 @@
+language: cpp
+
+sudo: false
+
+matrix:
+  include:
+    - os: linux
+      env:
+      addons:
+        apt:
+          packages:
+           - autoconf
+           - automake
+           - libtool
+           - libgmp-dev
+           - libglpk-dev
+           - libntl-dev
+           - libcdd-dev
+
+script:
+  - ./.travis-build.sh
