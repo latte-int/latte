@@ -39,12 +39,20 @@ fi
 
 for CDDLIB_HOME in ${CDDLIB_HOME_PATH} 
  do	
-if test -r "$CDDLIB_HOME/include/cdd.h"; then
+if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
 	if test "x$CDDLIB_HOME" != "x/usr" -a "x$CDDLIB_HOME" != "x/usr/local"; then
-		CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
+	        if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
+		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
+		else
+		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
+		fi
 		CDDLIB_LIBS="-L${CDDLIB_HOME}/lib -lcddgmp"
 	else
-		CDDLIB_CFLAGS=
+	        if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
+		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
+		else
+		   CDDLIB_CFLAGS=
+		fi
 		CDDLIB_LIBS="-lcddgmp"		
 	fi	
 	CXXFLAGS="${BACKUP_CXXFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
