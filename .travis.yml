@@ -43,7 +43,7 @@ matrix:
        - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" && make -j2 V=0)
        - export PATH="$DISTRO_DEST/bin:$PATH"
       script:
-       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k distcheck
+       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
     ##################################################
     ## macOS, use distro.
     ##################################################
@@ -59,7 +59,7 @@ matrix:
        - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" && make -j2 V=0)
        - export PATH="$DISTRO_DEST/bin:$PATH"
       script:
-       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k distcheck
+       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
 
 
 after_failure:
