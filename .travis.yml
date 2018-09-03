@@ -19,9 +19,28 @@ matrix:
            - libcdd-test
       before_script:
        - PATH="/usr/lib/cdd-test:$PATH"; export PATH
+    - os: linux
+      env:
+       - LATTE_DISTRO=https://github.com/latte-int/latte-distro.git
+      addons:
+        apt:
+          packages:
+           - autoconf
+           - automake
+           - libtool
+      before_script:
+       - (cd $HOME && if [ -d latte-distro/.git ]; then ( cd latte-distro && git pull ); else git clone $LATTE_DISTRO; fi )
+       - (cd $HOME/latte-distro && autoreconf -fi && ./configure --disable-latte && make -j2 V=0)
+       - export PATH="$HOME/latte-distro/dest/bin:$PATH"
+      script:
+       - autoreconf -fi && ./configure --with-default=$HOME/latte-distro/dest && make -j2 -k check
 
 script:
   - ./.travis-build.sh
 
 after_failure:
-  - for a in `find . -name "*.log"`; do echo  "==================== $a ===================="; cat $a; done
+  - for a in `find . -name "testingSLandTopEhrhart" -prune -o -name "*.log" -print -o -name "log" -print`; do echo  "==================== $a ===================="; cat $a; done
+
+cache:
+  directories:
+  - "$HOME/latte-distro"
