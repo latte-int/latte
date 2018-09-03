@@ -253,8 +253,10 @@ Polyhedron * building_polyhedron_with_files(const ReadProblemType readProblemTyp
 
 		//params->max_determinant = 1; //if you want unimodular cones.
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(params);
@@ -287,8 +289,10 @@ Polyhedron * building_polyhedron_with_files(const ReadProblemType readProblemTyp
 		readPolyData.parse_option("--redundancy-check=full-cddlib");
 		readPolyData.parse_option(hFile.c_str()); //set the file name last.
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(params);
@@ -315,8 +319,10 @@ Polyhedron * building_polyhedron_with_files(const ReadProblemType readProblemTyp
 		readPolyData.parse_option(vFile.c_str()); //set the file name last.
 		readPolyData.parse_option("--vrep"); //the input file is a latte style v-rep file.
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(params);
@@ -336,8 +342,10 @@ Polyhedron * building_polyhedron_with_files(const ReadProblemType readProblemTyp
 		readPolyData.parse_option(vFile.c_str()); //set the file name last.
 		readPolyData.parse_option("--vrep"); //the input file is a latte style v-rep file.
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(params);
@@ -382,8 +390,10 @@ Polyhedron * building_polyhedron_without_files(const ReadProblemType readProblem
 		//readPolyData.parse_option("--redundancy-check=cddlib");
 		readPolyData.parse_option("--redundancy-check=full-cddlib");
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(M, params, ReadPolyhedronData::computeVertices);
@@ -398,8 +408,10 @@ Polyhedron * building_polyhedron_without_files(const ReadProblemType readProblem
 		M = getHrepMatrix();
 		readPolyData.parse_option("--redundancy-check=full-cddlib");
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(M, params, ReadPolyhedronData::computePrimalCones);
@@ -414,8 +426,10 @@ Polyhedron * building_polyhedron_without_files(const ReadProblemType readProblem
 		M = getVrepMatrix();
 		readPolyData.parse_option("--redundancy-check=full-cddlib");
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(M, params, ReadPolyhedronData::computeVertices);
@@ -428,8 +442,10 @@ Polyhedron * building_polyhedron_without_files(const ReadProblemType readProblem
 		M = getVrepMatrix();
 		readPolyData.parse_option("--redundancy-check=full-cddlib");
 
+#ifdef HAVE_FORTYTWO_LIB
 		parse_standard_triangulation_option("--triangulation=4ti2", params);
 		parse_standard_dualization_option("--dualization=4ti2", params);
+#endif
 
 		//ok that's all the set up we need. Read in the polyhedron.
 		Poly = readPolyData.read_polyhedron(M, params, ReadPolyhedronData::computePrimalCones);
