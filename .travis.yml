@@ -39,7 +39,7 @@ script:
   - ./.travis-build.sh
 
 after_failure:
-  - for a in `find . -name "testingSLandTopEhrhart" -prune -o -name "*.log" -print -o -name "log" -print`; do echo  "==================== $a ===================="; cat $a; done
+  - for a in `find . -name "testingSLandTopEhrhart" -prune -o -name "*.log" -print -o -name "log" -print`; do echo "###########################################################################"; echo  "###LOG### $a ##############################"; echo "###########################################################################"; cat $a; done
 
 cache:
   directories:
