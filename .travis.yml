@@ -4,6 +4,9 @@ sudo: false
 
 matrix:
   include:
+    ##################################################
+    ## Use Ubuntu (trusty) distribution packages.  This is a build without 4ti2.
+    ##################################################
     - os: linux
       env:
       addons:
@@ -13,12 +16,16 @@ matrix:
            - automake
            - libtool
            - libgmp-dev
-           - libglpk-dev
            - libntl-dev
            - libcdd-dev
            - libcdd-test
       before_script:
        - PATH="/usr/lib/cdd-test:$PATH"; export PATH
+      script:
+        - ./.travis-build.sh
+    ##################################################
+    ## Linux, use distro.
+    ##################################################
     - os: linux
       env:
        - LATTE_DISTRO=https://github.com/latte-int/latte-distro.git
@@ -36,10 +43,24 @@ matrix:
        - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" && make -j2 V=0)
        - export PATH="$DISTRO_DEST/bin:$PATH"
       script:
-       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k check
+       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k distcheck
+    ##################################################
+    ## macOS, use distro.
+    ##################################################
+    - os: osx
+      compiler: clang
+      env:
+       - LATTE_DISTRO=https://github.com/latte-int/latte-distro.git
+      install:
+       - DISTRO_DEST="$HOME/latte-distro/dest-shared"
+       - DISTRO_BUILD="$HOME/latte-distro/build-shared"
+       - (cd $HOME && if [ -d latte-distro/.git ]; then ( cd latte-distro && git pull ); else git clone $LATTE_DISTRO; fi )
+       - (cd $HOME/latte-distro && autoreconf -fi)
+       - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" && make -j2 V=0)
+       - export PATH="$DISTRO_DEST/bin:$PATH"
+      script:
+       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k distcheck
 
-script:
-  - ./.travis-build.sh
 
 after_failure:
   - ./.travis-print-logs.sh
