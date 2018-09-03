@@ -245,8 +245,9 @@ $EXAMPLESDIR = "@abs_top_srcdir@/EXAMPLES";
 chop($DATE = `/bin/date +%Y-%m-%d`);
 chop($HOSTNAME = `hostname`);
 #$LOGDIR = "/home/mkoeppe/w/latte/results/log-$DATE-count $PARAMETERS-pid$$\@$HOSTNAME";
-$LOGDIR = "results/log-$DATE-count $PARAMETERS-pid$$\@$HOSTNAME";
-$LOGDIR =~ s![ /]!_!g;
+$LOGNAME = "log-$DATE-count $PARAMETERS-pid$$\@$HOSTNAME";
+$LOGNAME =~ s![ /]!_!g;
+$LOGDIR = "results/$LOGNAME";
 
 print "Logging to '$LOGDIR/log'\n";
 
