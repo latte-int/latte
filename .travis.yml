@@ -28,7 +28,7 @@ matrix:
            - autoconf
            - automake
            - libtool
-      before_script:
+      install:
        - (cd $HOME && if [ -d latte-distro/.git ]; then ( cd latte-distro && git pull ); else git clone $LATTE_DISTRO; fi )
        - (cd $HOME/latte-distro && autoreconf -fi && ./configure --disable-latte && make -j2 V=0)
        - export PATH="$HOME/latte-distro/dest/bin:$PATH"
@@ -39,7 +39,7 @@ script:
   - ./.travis-build.sh
 
 after_failure:
-  - for a in `find . -name "testingSLandTopEhrhart" -prune -o -name "*.log" -print -o -name "log" -print`; do echo "###########################################################################"; echo  "###LOG### $a ##############################"; echo "###########################################################################"; cat $a; done
+  - ./.travis-print-logs.sh
 
 cache:
   directories:
