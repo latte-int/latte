@@ -259,6 +259,7 @@ TESTS += test-library-examples
 ### Delete them.
 DISTCLEANFILES = 								\
 	4ti2_triangulation_output Check_emp.lp Check_emp.lps Check_emp.out 	\
+	tri.ext tri.ine tri.iad tri.ead tri.icd tri.ecd				\
 	latte_stats lifted_cone_for_4ti2_triangulation numOfLatticePoints 	\
 	numOfUnimodularCones test-library-examples.hrep totalTime
 
