@@ -1,6 +1,6 @@
 // This is a -*- C++ -*- header file.
 
-/* Cone.cpp -- Barvinok's decomposition of a cone.
+/* ComputeOmega.h -- Barvinok's decomposition of a cone.
 
    Copyright 2002 Ruriko Yoshida
    Copyright 2006 Matthias Koeppe
@@ -21,8 +21,8 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
-#ifndef CONE__H
-#define CONE__H
+#ifndef COMPUTEOMEGA__H
+#define COMPUTEOMEGA__H
 
 #include "latte_ntl.h"
 

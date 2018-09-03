@@ -21,7 +21,7 @@
 #include <cassert>
 #include <iostream>
 #include "barvinok/SubspaceAvoidingDecomposition.h"
-#include "barvinok/Cone.h"
+#include "barvinok/ComputeOmega.h"
 
 using namespace std;
 

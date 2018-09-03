@@ -1,4 +1,4 @@
-/* Cone.cpp -- Barvinok's decomposition of a cone.
+/* ComputeOmega.cpp -- Barvinok's decomposition of a cone.
 
    Copyright 2002 Ruriko Yoshida
    Copyright 2006 Matthias Koeppe
@@ -25,7 +25,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Cone.h"
+#include "ComputeOmega.h"
 using namespace std;
 
 int Test_Points(int level, vector<RR> &Mins, vector<RR> &Maxs, int dim, mat_RR *A_inverse, vec_RR *point);

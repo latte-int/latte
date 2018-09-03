@@ -34,7 +34,7 @@ lib_LTLIBRARIES = liblatte.la
 # when running the binary.  --mkoeppe
 liblatte_la_LIBADD = ../gnulib/libgnu.la
 liblatte_la_SOURCES =							\
-	barvinok/dec.cpp barvinok/barvinok.cpp  barvinok/Cone.cpp	\
+	barvinok/dec.cpp barvinok/barvinok.cpp  barvinok/ComputeOmega.cpp	\
 	count.cpp \
 	LattException.cpp \
 	barvinok/Triangulation.cpp					\
@@ -68,7 +68,7 @@ noinst_HEADERS =							\
 	ConeInfo.h Grobner.h IntegralHull.h PolyTree.h ReadingFile.h	\
 	RudyResNTL.h banner.h binarySearchIP.h cone.h dual.h flags.h	\
 	preprocess.h print.h ramon.h rational.h timing.h		\
-	Residue.h barvinok/Cone.h					\
+	Residue.h barvinok/ComputeOmega.h					\
 	barvinok/Triangulation.h					\
 	barvinok/barvinok.h barvinok/dec.h genFunction/maple.h		\
 	genFunction/piped.h vertices/cdd.h				\

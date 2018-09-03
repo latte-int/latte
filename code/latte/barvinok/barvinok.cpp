@@ -29,7 +29,7 @@
 #include <math.h>
 #include <time.h>
 
-#include "Cone.h"
+#include "ComputeOmega.h"
 #include "barvinok.h"
 #include "../ramon.h"
 #include "../RudyResNTL.h"
