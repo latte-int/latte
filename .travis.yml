@@ -29,11 +29,14 @@ matrix:
            - automake
            - libtool
       install:
+       - DISTRO_DEST="$HOME/latte-distro/dest-shared"
+       - DISTRO_BUILD="$HOME/latte-distro/build-shared"
        - (cd $HOME && if [ -d latte-distro/.git ]; then ( cd latte-distro && git pull ); else git clone $LATTE_DISTRO; fi )
-       - (cd $HOME/latte-distro && autoreconf -fi && ./configure --disable-latte && make -j2 V=0)
-       - export PATH="$HOME/latte-distro/dest/bin:$PATH"
+       - (cd $HOME/latte-distro && autoreconf -fi)
+       - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" && make -j2 V=0)
+       - export PATH="$DISTRO_DEST/bin:$PATH"
       script:
-       - autoreconf -fi && ./configure --with-default=$HOME/latte-distro/dest && make -j2 -k check
+       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k check
 
 script:
   - ./.travis-build.sh
