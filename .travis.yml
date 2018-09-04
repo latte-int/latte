@@ -23,6 +23,7 @@ matrix:
        - PATH="/usr/lib/cdd-test:$PATH"; export PATH
       script:
         - ./.travis-build.sh
+
     ##################################################
     ## Linux, use distro.
     ##################################################
@@ -44,6 +45,13 @@ matrix:
        - export PATH="$DISTRO_DEST/bin:$PATH"
       script:
        - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
+      deploy:
+        - provider: script
+          on:
+            tags: true
+            condition: $TRAVIS_TAG =~ ^version_
+          script: bash .travis-deploy-to-latte-distro.sh
+
     ##################################################
     ## macOS, use distro.
     ##################################################
