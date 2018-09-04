@@ -26,6 +26,7 @@ if test -r $srcdir/.travis_ci_latte_distro_deploy_key; then
     rm -f latte-distro-deploy/$DISTPATTERN
     cp $DISTNAME latte-distro-deploy/
     sed -i.orig 's/^LATTE_VERSION=[$]/#LATTE_VERSION=$/g;s/^LATTE_VERSION=[0-9]*.*/LATTE_VERSION='${VERSION}'/g' Makefile.am
+    rm -f Makefile.am.orig
     msg="Upgrade LattE to $VERSION."
     msg="${msg} (Automatic upload from Travis CI, ${TRAVIS_REPO_SLUG} job=${TRAVIS_JOB_NUMBER} branch=${TRAVIS_BRANCH}"
     if [[ -n ${TRAVIS_TAG} ]]; then
