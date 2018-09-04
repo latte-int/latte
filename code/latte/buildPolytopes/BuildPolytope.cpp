@@ -725,14 +725,15 @@ void BuildPolytope::makeIntegerList(vector<vector<mpq_class> > &list)
 	//debugPrintList(list);
 	//cout << "makeIntegerList:: the lcm is " << mpz_class(currentLCM) << endl;
 
-	assert(currentLCM > 0);
+	mpz_class currentLCM_mpz_class(currentLCM);
+	assert(currentLCM_mpz_class > 0);
 	
 	//loop over everything again and times by the lcm.
 	for (size_t i = 0; i < list.size(); ++i)
 	{
 		for (size_t k = 0; k < list[i].size(); ++k)
 		{
-			list[i][k] = list[i][k]* mpz_class(currentLCM);
+			list[i][k] = list[i][k] * currentLCM_mpz_class;
 		}//for k
 	}//for i
 }//makeIntegerList
