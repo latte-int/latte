@@ -47,10 +47,11 @@ matrix:
        - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
       deploy:
         - provider: script
+          skip_cleanup: true
           on:
             tags: true
             condition: $TRAVIS_TAG =~ ^version_
-          script: bash .travis-deploy-to-latte-distro.sh
+          script: (cd bash .travis-deploy-to-latte-distro.sh
 
     ##################################################
     ## macOS, use distro.
