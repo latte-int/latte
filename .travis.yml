@@ -51,7 +51,7 @@ matrix:
           on:
             tags: true
             condition: $TRAVIS_TAG =~ ^version_
-          script: (cd bash .travis-deploy-to-latte-distro.sh
+          script: bash .travis-deploy-to-latte-distro.sh
 
     ##################################################
     ## macOS, use distro.
