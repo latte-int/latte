@@ -46,8 +46,6 @@ extern "C" {
 #include "gnulib/progname.h"
 #include "latte/latte_system.h"
 
-using namespace std;
-
 // Silly interface to hilbert-from-rays
 int normalize_commandline(char *command);
 
