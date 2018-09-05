@@ -37,8 +37,8 @@
 #include <NTL/HNF.h>
 #include <NTL/LLL.h>
 
-#if defined(NTL_STD_CXX) || defined(NTL_PSTD_NNS)
-using namespace NTL_NAMESPACE;
+#if defined(NTL_USE_NNS)
+NTL_USE_NNS
 #endif
 
 // Additional functions.
