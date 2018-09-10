@@ -61,7 +61,11 @@ AC_CACHE_SAVE
 LB_CHECK_NTL(,,[AC_MSG_ERROR([NTL not found!
 NTL version 5.4 or greater is required for LattE to compile. Please
 make sure NTL is installed and specify its location with the option
---with-ntl=<prefix> when running configure.])
+--with-ntl=<prefix> when running configure.
+Hint:  If NTL was configured in C++11 mode, then LattE needs to
+be configured with a compiler in C++11 mode as well by passing
+CXX="g++ -std=c++11" or similar.
+])
 ])
 AC_CACHE_SAVE
 LB_CHECK_LIDIA(,,
