@@ -36,6 +36,7 @@ my @files_nums = (
    "tests/missing-newline-2.latte::::1",
    "tests/missing-newline-3.latte::::1",
    "tests/implied-equation.latte::1::1",
+   "tests/preproc-integrally-empty.latte::0::1",
    # 
    "hickerson/hickerson-7::8::1",
    "hickerson/hickerson-8::22::1",

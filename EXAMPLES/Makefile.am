@@ -288,6 +288,7 @@ nobase_dist_examples_DATA =						\
     tests/missing-newline-2.latte					\
     tests/missing-newline-3.latte					\
     tests/missing-newline.latte						\
+    tests/preproc-integrally-empty.latte				\
     van-herick/k-flow-3							\
     van-herick/k-flow-4							\
     van-herick/k-flow-5							\
