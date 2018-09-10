@@ -25,7 +25,7 @@ matrix:
         - ./.travis-build.sh
 
     ##################################################
-    ## Linux, use distro.
+    ## Linux, use distro, build with NTL range checks.
     ##################################################
     - os: linux
       env:
@@ -41,7 +41,7 @@ matrix:
        - DISTRO_BUILD="$HOME/latte-distro/build-shared"
        - (cd $HOME && if [ -d latte-distro/.git ]; then ( cd latte-distro && git pull ); else git clone $LATTE_DISTRO; fi )
        - (cd $HOME/latte-distro && autoreconf -fi)
-       - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" && make -j2 V=0)
+       - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" NTL_RANGE_CHECK=on && make -j2 V=0)
        - export PATH="$DISTRO_DEST/bin:$PATH"
       script:
        - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
