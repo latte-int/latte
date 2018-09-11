@@ -1,3 +1,25 @@
+Changes in release 1.7.5, 2018-09-10:
+
+ This is a portability release.
+
+ * Fix compilation errors for NTL version >= 9: don't depend on NTL_STD_CXX macro
+
+ * Fix runtime errors for NTL builds with NTL_RANGE_CHECK=on and for NTL version >= 11
+
+
+Changes in release 1.7.4, 2018-09-03:
+
+ This is a bug fix and portability release.
+
+ * Fix compile errors with clang.
+
+ * Make it an error, not a warning, when cddlib is not found at configure time.
+
+ * Make test suite pass when configured without 4ti2.
+
+ * Relax test for location of gmp.h, needed for Ubuntu
+
+
 Changes in release 1.7.3:
 
  * count and integrate commands now correctly return a non-zero error code on failure

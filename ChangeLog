@@ -2,6 +2,8 @@
 	copy (and edit) entries from ChangeLog.svn2cl
 
 
+	*** Newer changes - see https://github.com/latte-int/latte ***
+	
 2015-04-21 Brandon Dutra <bedutra@ucdavis.edu>
 
 	* updated the exception class and use
