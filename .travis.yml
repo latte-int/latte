@@ -4,9 +4,9 @@ sudo: false
 
 matrix:
   include:
-    ##################################################
+    ############################################################################
     ## Use Ubuntu (trusty) distribution packages.  This is a build without 4ti2.
-    ##################################################
+    ############################################################################
     - os: linux
       env:
       addons:
@@ -20,9 +20,8 @@ matrix:
            - libcdd-dev
            - libcdd-test
       before_script:
+       - DISTRO_DEST=/no-distro
        - PATH="/usr/lib/cdd-test:$PATH"; export PATH
-      script:
-        - ./.travis-build.sh
 
     ##################################################
     ## Linux, use distro, build with NTL range checks.
@@ -43,8 +42,6 @@ matrix:
        - (cd $HOME/latte-distro && autoreconf -fi)
        - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" NTL_RANGE_CHECK=on && make -j2 V=0)
        - export PATH="$DISTRO_DEST/bin:$PATH"
-      script:
-       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
       deploy:
         - provider: script
           skip_cleanup: true
@@ -58,7 +55,8 @@ matrix:
     ##############################################################################################
     - os: linux
       env:
-       - LATTE_DISTRO=https://github.com/latte-int/latte-distro.git
+       - MATRIX_EVAL="CC=gcc-7 && CXX='g++-7 -std=c++11'"
+         LATTE_DISTRO=https://github.com/latte-int/latte-distro.git
       addons:
         apt:
           sources:
@@ -66,15 +64,12 @@ matrix:
           packages:
             - g++-7
       install:
-       - CC=gcc-7 && CXX="g++-7 -std=c++11"
        - DISTRO_BUILD="$HOME/latte-distro/build-shared-c++11"
        - DISTRO_DEST="$DISTRO_BUILD/dest"
        - (cd $HOME && if [ -d latte-distro/.git ]; then ( cd latte-distro && git pull ); else git clone $LATTE_DISTRO; fi )
        - (cd $HOME/latte-distro && autoreconf -fi)
        - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --disable-lidia --enable-shared --prefix="$DISTRO_DEST" NTL_STD_CXX11=on NTL_THREADS=on NTL_SAFE_VECTORS=on NTL_DISABLE_MOVE_ASSIGN=off && make -j2 V=0)
        - export PATH="$DISTRO_DEST/bin:$PATH"
-      script:
-       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
 
     ##################################################
     ## macOS, use distro.
@@ -90,8 +85,12 @@ matrix:
        - (cd $HOME/latte-distro && autoreconf -fi)
        - (mkdir -p "$DISTRO_BUILD" && cd "$DISTRO_BUILD" && ../configure --srcdir=.. --disable-latte --enable-shared --prefix="$DISTRO_DEST" && make -j2 V=0)
        - export PATH="$DISTRO_DEST/bin:$PATH"
-      script:
-       - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
+
+before_install:
+ - eval "${MATRIX_EVAL}"
+
+script:
+ - autoreconf -fi && ./configure --with-default="$DISTRO_DEST" && make -j2 -k DISTCHECK_CONFIGURE_FLAGS=--with-default="$DISTRO_DEST" distcheck
 
 after_failure:
   - ./.travis-print-logs.sh
