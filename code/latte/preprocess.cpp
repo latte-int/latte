@@ -395,8 +395,11 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 	vec_ZZ sol2;
 	sol = createVector(*numOfVars);
 	sol2 = createVector(*numOfVars);
-	if (DD != 0)
-		sol2 = (invHH * rhs);
+	if (DD != 0) {
+	  vec_ZZ solb = invHH * rhs;
+	  for (i = 0; i < solb.length(); i++)
+	    sol2[i] = solb[i];
+	}
 
 	for (i = 0; i < (*numOfVars); i++)
 		sol[i] = 0;
@@ -794,8 +797,11 @@ listVector* preprocessProblem_hack(listVector *equations, listVector *inequaliti
 	vec_ZZ sol2;
 	sol = createVector(*numOfVars);
 	sol2 = createVector(*numOfVars);
-	if (DD != 0)
-		sol2 = (invHH * rhs);
+	if (DD != 0) {
+	  vec_ZZ solb = invHH * rhs;
+	  for (i = 0; i < solb.length(); i++)
+	    sol2[i] = solb[i];
+	}
 
 	for (i = 0; i < (*numOfVars); i++)
 		sol[i] = 0;
