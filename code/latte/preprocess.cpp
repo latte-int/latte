@@ -255,7 +255,6 @@ listVector* preprocessProblem(listVector *equations, listVector *inequalities,
 			}
 			// cerr << Solve << sol << endl;
 			vec_ZZ x;
-			x.SetLength(*numOfVars);
 			ZZ d, sum, sum2;
 			mat_ZZ Inv;
 			inv(d, Inv, Solve);

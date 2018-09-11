@@ -343,11 +343,9 @@ int Test_Points(int level, vector<RR> &Mins, vector<RR> &Maxs, int dim, mat_RR *
 			if((*point)(i) > 0.5 || (*point)(i) < -0.5)
 				non_zero = 1;
 		
-		vec_RR coordinates;
 		RR Norm;
-		coordinates.SetLength(dim);
 
-		coordinates = (*A_inverse) * (*point);
+		vec_RR coordinates = (*A_inverse) * (*point);
 		
 		Norm = norm2(coordinates, dim);
 
