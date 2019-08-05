@@ -200,6 +200,11 @@ void RationalNTL::canonicalize()
 		denominator *= -1;
 		numerator *= -1;
 	}//make denominator positive.
+	else if (denominator == 0) 
+	{
+		denominator = 1;
+		return;
+	}
 
 	ZZ gcd = GCD(numerator, denominator); //GCD(numerator, denominator);
 
