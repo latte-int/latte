@@ -45,7 +45,7 @@ at the directory $HOME/latte.
 
 1. Install the GNU Multiple Precision Library
 
-   Download it from http://www.swox.com/gmp/
+   Obtain it from your distribution, or else https://gmplib.org/
    Unpack it, then in the source directory do:
 
      ./configure --prefix=$HOME/latte --enable-cxx
@@ -54,7 +54,7 @@ at the directory $HOME/latte.
 
 2. Install Victor Shoup's Number Theoretic Library
 
-   Obtain it from http://www.shoup.net/ntl/ 
+   Obtain it from your distribution, or else http://www.shoup.net/ntl/
    Unpack it, then in the source directory do:
    
       cd src
@@ -64,7 +64,7 @@ at the directory $HOME/latte.
 
 3. Install Komei Fukuda's package cddlib
 
-   Obtain then from https://github.com/cddlib/cddlib
+   Obtain it from your distribution, or else https://github.com/cddlib/cddlib
 
 4. Put $HOME/latte/bin into your $PATH
    and $HOME/latte/lib into your $LD_LIBRARY_PATH:
