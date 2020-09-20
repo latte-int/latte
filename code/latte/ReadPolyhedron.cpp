@@ -1224,7 +1224,7 @@ exit(1);
 //			dilationNum = (dilationNum *  (cone->vertex->vertex->denominators())[i])/ GCD(dilationNum, (cone->vertex->vertex->denominators())[i]);
 //	}
 
-
+	return RationalNTL();
 }//ReadPolyhedronDataRecursive
 
 int ReadPolyhedronDataRecursive::getNumberEqualities() const
