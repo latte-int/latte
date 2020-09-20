@@ -90,19 +90,6 @@ fi
 
 # Cddlib library
 LB_CHECK_CDDLIB
-if test "x$cddlib_found" = "xno" ; then
-   # Older versions of cddlib are compiled with the C compiler;
-   # also some people compile newer versions with the C compiler instead of the C++ compiler.
-   AC_LANG(C)
-   LB_CHECK_CDDLIB
-   if test "x$cddlib_found" = "xyes" ; then
-      AC_DEFINE(HAVE_CDDLIB_C_LINKAGE, 1, [Define if the cddlib library has C linkage])
-   fi
-   AC_LANG(C++)
-fi   
-if test "x$cddlib_found" = "xno" ; then
-   AC_MSG_ERROR([The cddlib headers and library are required for LattE.])
-fi
 AC_CACHE_SAVE
 	  
 # From LRS

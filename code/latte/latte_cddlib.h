@@ -26,15 +26,9 @@
 #include <gmp.h>
 #include "config.h"
 
-#ifdef HAVE_CDDLIB_C_LINKAGE
-extern "C" {
-#endif
 #define GMPRATIONAL
-#include <setoper.h>
-#include <cdd.h>
-#ifdef HAVE_CDDLIB_C_LINKAGE
-}
-#endif
+#include <cddlib/setoper.h>
+#include <cddlib/cdd.h>
 
 #include "cone.h"
 
