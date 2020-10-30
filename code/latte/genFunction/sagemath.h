@@ -1,6 +1,6 @@
 // This is a -*- C++ -*- header file.
 
-/* maple.h -- Create Maple input
+/* sagemath.h -- Create SagMath input
 
    Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
       Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
@@ -22,8 +22,8 @@
    Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
 */
 
-#ifndef GENFUNCTION_MAPLE_H
-#define GENFUNCTION_MAPLE_H
+#ifndef GENFUNCTION_SAGEMATH_H
+#define GENFUNCTION_SAGEMATH_H
 
 #include <string>
 #include <fstream>
@@ -34,8 +34,8 @@
 
 void writeTermToFile(ofstream & out, const vec_ZZ &, int);
 void writeTermOfGeneratingFunctionToFile(ofstream & out, listCone*, int);
-void createGeneratingFunctionAsMapleInput(const char*, listCone*, int);
-void createGeneratingFunctionAsMapleInputGrob(listCone* cones, 
+void createGeneratingFunctionAsSageMathInput(const char*, listCone*, int);
+void createGeneratingFunctionAsSageMathInputGrob(listCone* cones, 
 					      int numOfVars, ofstream & out);
 
 class GeneratingFunctionWritingConeConsumer : public ConeConsumer {
