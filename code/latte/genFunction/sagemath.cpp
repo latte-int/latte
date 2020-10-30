@@ -1,9 +1,9 @@
 /* 
- * This modified version of latte-int-1.7.3/code/latte/genFunction/maple.cpp
- * encodes short rational functions in a human- and machine-friendly format.
- */
+   This modified version of /code/latte/genFunction/maple.cpp
+   encodes short rational functions in a human- and machine-friendly format.
+*/
 
-/* maple.cpp -- Create Maple input
+/* sagemath.cpp -- Create Sagemath input
 
    Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
       Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
@@ -26,7 +26,7 @@
 */
 
 #include <climits>
-#include "maple.h"
+#include "sagemath.h"
 
 /* ----------------------------------------------------------------- */
 void writeTermToFile(ofstream & out, const vec_ZZ &v, int numOfVars) {
@@ -70,17 +70,17 @@ void writeTermOfGeneratingFunctionToFile(ofstream & out, listCone *cone,
 }
 
 /* ----------------------------------------------------------------- */
-void createGeneratingFunctionAsMapleInput(const char *fileName, listCone* cones, 
+void createGeneratingFunctionAsSageMathInput(const char *fileName, listCone* cones, 
 					  int numOfVars) {
-  char mapleInFileName[PATH_MAX];
+  char sagemathInFileName[PATH_MAX];
   listCone *tmp;
 
-  strcpy(mapleInFileName,fileName);
-  strcat(mapleInFileName,".maple");
+  strcpy(sagemathInFileName,fileName);
+  strcat(sagemathInFileName,".sage");
 
-  ofstream out(mapleInFileName);
+  ofstream out(sagemathInFileName);
   if (!out) {
-    printf("Error opening output file in createGeneratingFunctionAsMapleInput!");
+    printf("Error opening output file in createGeneratingFunctionAsSageMathInput!");
     exit(1);
   }
 
@@ -99,13 +99,13 @@ void createGeneratingFunctionAsMapleInput(const char *fileName, listCone* cones,
 }
 /* ----------------------------------------------------------------- */
 
-void createGeneratingFunctionAsMapleInputGrob(listCone* cones, 
+void createGeneratingFunctionAsSageMathInputGrob(listCone* cones, 
 					  int numOfVars, ofstream & out) {
 
   listCone *tmp;
 
   if (!out) {
-    printf("Error opening output file in createGeneratingFunctionAsMapleInput!");
+    printf("Error opening output file in createGeneratingFunctionAsSageMathInput!");
     exit(1);
   }
 
