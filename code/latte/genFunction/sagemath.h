@@ -1,6 +1,6 @@
 // This is a -*- C++ -*- header file.
 
-/* sagemath.h -- Create SagMath input
+/* sagemath.h -- Create SageMath input
 
    Copyright 2002-2004 Jesus A. De Loera, David Haws, Raymond
       Hemmecke, Peter Huggins, Jeremy Tauzer, Ruriko Yoshida
