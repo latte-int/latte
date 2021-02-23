@@ -39,10 +39,12 @@ fi
 
 for CDDLIB_HOME in ${CDDLIB_HOME_PATH}
  do
-if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
+if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h" -o -r "$CDDLIB_HOME/include/cddlib/cdd.h"; then
         if test "x$CDDLIB_HOME" != "x/usr" -a "x$CDDLIB_HOME" != "x/usr/local"; then
                 if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
                    CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
+                elif test -r "$CDDLIB_HOME/include/cddlib/cdd.h"; then
+                   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cddlib"
                 else
                    CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
                 fi
@@ -50,6 +52,8 @@ if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h"; 
         else
                 if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
                    CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
+                elif test -r "$CDDLIB_HOME/include/cddlib/cdd.h"; then
+                   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cddlib"
                 else
                    CDDLIB_CFLAGS=
                 fi
