@@ -10,19 +10,19 @@ AC_DEFUN([LB_CHECK_CDDLIB],
 CDDLIB_HOME_PATH="${DEFAULT_CHECKING_PATH}"
 
 AC_ARG_WITH(cddlib,
-	    [  --with-cddlib=<path>|yes|no 
-					   Use cddlib. 
-					   If argument is no, you do not have the library installed on your machine (set as default).
-					   If argument is yes or <empty> that means the library is reachable with the standard
-					   search path (/usr or /usr/local).
-	 				   Otherwise you give the <path> to the directory which contain the library. 
-	     ],
-	     [if test "$withval" = yes ; then
-			CDDLIB_HOME_PATH="${DEFAULT_CHECKING_PATH}"
-	      elif test "$withval" != no ; then
-			CDDLIB_HOME_PATH="$withval"
-	     fi],
-	     [])
+            [  --with-cddlib=<path>|yes|no
+                                           Use cddlib.
+                                           If argument is no, you do not have the library installed on your machine (set as default).
+                                           If argument is yes or <empty> that means the library is reachable with the standard
+                                           search path (/usr or /usr/local).
+                                           Otherwise you give the <path> to the directory which contain the library.
+             ],
+             [if test "$withval" = yes ; then
+                        CDDLIB_HOME_PATH="${DEFAULT_CHECKING_PATH}"
+              elif test "$withval" != no ; then
+                        CDDLIB_HOME_PATH="$withval"
+             fi],
+             [])
 
 min_cddlib_version=ifelse([$1], , 093c,$1)
 
@@ -37,29 +37,29 @@ if test -n "$CDDLIB_HOME_PATH" ; then
 AC_MSG_CHECKING(for CDDLIB >= $min_cddlib_version)
 fi
 
-for CDDLIB_HOME in ${CDDLIB_HOME_PATH} 
- do	
+for CDDLIB_HOME in ${CDDLIB_HOME_PATH}
+ do
 if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
-	if test "x$CDDLIB_HOME" != "x/usr" -a "x$CDDLIB_HOME" != "x/usr/local"; then
-	        if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
-		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
-		else
-		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
-		fi
-		CDDLIB_LIBS="-L${CDDLIB_HOME}/lib -lcddgmp"
-	else
-	        if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
-		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
-		else
-		   CDDLIB_CFLAGS=
-		fi
-		CDDLIB_LIBS="-lcddgmp"		
-	fi	
-	CXXFLAGS="${BACKUP_CXXFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
-	CFLAGS="${BACKUP_CFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
-	LIBS="${BACKUP_LIBS} ${CDDLIB_LIBS} ${GMP_LIBS}"
+        if test "x$CDDLIB_HOME" != "x/usr" -a "x$CDDLIB_HOME" != "x/usr/local"; then
+                if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
+                   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
+                else
+                   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
+                fi
+                CDDLIB_LIBS="-L${CDDLIB_HOME}/lib -lcddgmp"
+        else
+                if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
+                   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
+                else
+                   CDDLIB_CFLAGS=
+                fi
+                CDDLIB_LIBS="-lcddgmp"
+        fi
+        CXXFLAGS="${BACKUP_CXXFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}"
+        CFLAGS="${BACKUP_CFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}"
+        LIBS="${BACKUP_LIBS} ${CDDLIB_LIBS} ${GMP_LIBS}"
 
-	AC_TRY_LINK([
+        AC_TRY_LINK([
 #define GMPRATIONAL
 #include <setoper.h>
 #include <cddmp.h>
@@ -69,25 +69,25 @@ if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h"; 
   dd_init(a);
   dd_abs(a, a);
 ],
-[	cddlib_found="yes"
-	break
+[       cddlib_found="yes"
+        break
 ]
 )
 else
-	cddlib_found="no"
+        cddlib_found="no"
 fi
 done
 
-if test "x$cddlib_found" = "xyes" ; then		
-	AC_SUBST(CDDLIB_CFLAGS)
-	AC_SUBST(CDDLIB_LIBS)
-	AC_DEFINE(HAVE_CDDLIB,1,[Define if CDDLIB is installed])
-	HAVE_CDDLIB=yes
-	AC_MSG_RESULT(found)
+if test "x$cddlib_found" = "xyes" ; then
+        AC_SUBST(CDDLIB_CFLAGS)
+        AC_SUBST(CDDLIB_LIBS)
+        AC_DEFINE(HAVE_CDDLIB,1,[Define if CDDLIB is installed])
+        HAVE_CDDLIB=yes
+        AC_MSG_RESULT(found)
 else
-	AC_MSG_RESULT(not found)
-	ifelse([$3], , :, [$3])
-fi	
+        AC_MSG_RESULT(not found)
+        ifelse([$3], , :, [$3])
+fi
 
 AM_CONDITIONAL(HAVE_CDDLIB, test "x$HAVE_CDDLIB" = "xyes")
 
