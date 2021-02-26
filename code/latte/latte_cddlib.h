@@ -30,8 +30,8 @@
 extern "C" {
 #endif
 #define GMPRATIONAL
-#include <setoper.h>
-#include <cdd.h>
+#include CDDLIB_SETOPER_H
+#include CDDLIB_CDD_H
 #ifdef HAVE_CDDLIB_C_LINKAGE
 }
 #endif
