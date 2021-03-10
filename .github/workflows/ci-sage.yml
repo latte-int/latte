@@ -45,6 +45,8 @@ on: [push, pull_request]
 ##   push:
 ##     tags:
 ##       - '*'
+##   workflow_dispatch:
+##     # Allow to run manually
 
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
@@ -53,16 +55,15 @@ env:
   SPKG:             latte_int
   # Sage distribution packages to build
   TARGETS_PRE:      build/make/Makefile
-  TARGETS:          SAGE_CHECK=yes  latte_int
+  TARGETS:          SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
   TARGETS_OPTIONAL:
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:        sagemath/sage
   SAGE_REF:         develop
-  # Temporarily test on the branch from sage ticket 31064 (updated cygwin workflow)
-  SAGE_TRAC_GIT:    git://trac.sagemath.org/sage.git
-  SAGE_TRAC_COMMAND: try
-  SAGE_TICKET:      31064
-  REMOVE_PATCHES:   "*"
+  # Temporarily test on the branch from sage ticket 29413 (updated cddlib)
+  ## SAGE_TRAC_GIT:    https://github.com/sagemath/sagetrac-mirror.git
+  ## SAGE_TICKET:      29413
+  ## REMOVE_PATCHES:   "*"
 
 jobs:
 
@@ -125,6 +126,7 @@ jobs:
       with:
         repository: ${{ env.SAGE_REPO }}
         ref: ${{ env.SAGE_REF }}
+        fetch-depth: 2000
       if: env.SAGE_REPO != ''
     - name: Check out git-trac-command
       uses: actions/checkout@v2
@@ -136,7 +138,9 @@ jobs:
       shell: bash {0}
       # Random sleep and retry to limit the load on trac.sagemath.org
       run: |
-        if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac ${{ env.SAGE_TRAC_COMMAND }} $SAGE_TICKET; then exit 0; fi; sleep 40; done; exit 1
+        git config --global user.email "ci-sage@example.com"
+        git config --global user.name "ci-sage workflow"
+        if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac fetch $SAGE_TICKET; then git merge FETCH_HEAD || echo "(ignored)"; exit 0; fi; sleep 40; done; exit 1
       if: env.SAGE_TRAC_GIT != ''
     - uses: actions/download-artifact@v2
       with:
@@ -205,6 +209,7 @@ jobs:
         with:
           repository: ${{ env.SAGE_REPO }}
           ref: ${{ env.SAGE_REF }}
+          fetch-depth: 2000
         if: env.SAGE_REPO != ''
       - name: Check out git-trac-command
         uses: actions/checkout@v2
@@ -215,7 +220,9 @@ jobs:
       - name: Check out SageMath from trac.sagemath.org
         shell: bash {0}
         run: |
-          if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac ${{ env.SAGE_TRAC_COMMAND }} $SAGE_TICKET; then exit 0; fi; sleep 40; done; exit 1
+          git config --global user.email "ci-sage@example.com"
+          git config --global user.name "ci-sage workflow"
+          if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac fetch $SAGE_TICKET; then git merge FETCH_HEAD || echo "(ignored)"; exit 0; fi; sleep 40; done; exit 1
         if: env.SAGE_TRAC_GIT != ''
       - uses: actions/download-artifact@v2
         with:
@@ -294,6 +301,7 @@ jobs:
         with:
           repository: ${{ env.SAGE_REPO }}
           ref: ${{ env.SAGE_REF }}
+          fetch-depth: 2000
         if: env.SAGE_REPO != ''
       - name: Check out git-trac-command
         uses: actions/checkout@v2
@@ -304,7 +312,9 @@ jobs:
       - name: Check out SageMath from trac.sagemath.org
         shell: bash {0}
         run: |
-          if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac ${{ env.SAGE_TRAC_COMMAND }} $SAGE_TICKET; then exit 0; fi; sleep 40; done; exit 1
+          git config --global user.email "ci-sage@example.com"
+          git config --global user.name "ci-sage workflow"
+          if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac fetch $SAGE_TICKET; then git merge FETCH_HEAD || echo "(ignored)"; exit 0; fi; sleep 40; done; exit 1
         if: env.SAGE_TRAC_GIT != ''
       - uses: actions/download-artifact@v2
         with:
