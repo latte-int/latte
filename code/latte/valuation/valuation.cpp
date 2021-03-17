@@ -399,7 +399,6 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	bool interactiveLatte = false; //only in the case of top ehrhart do we look at this value.
 
 	ReadPolyhedronData read_polyhedron_data;
-	//ReadPolyhedronDataRecursive read_polyhedron_data;
 
 	struct BarvinokParameters *params = new BarvinokParameters;
 
@@ -886,62 +885,9 @@ Valuation::ValuationContainer Valuation::mainValuationDriver(
 	{ //use Stokes
 		//NOTE:: THIS RECURSIVE METHOD IS NOT DONE.
 		//THIS SHOULD NOT WORK.
+		THROW_LATTE_MSG( LattException::bug_NotImplementedHere, 1, "The experimental Stokes code has been removed" );
 
-		ReadPolyhedronDataRecursive rpdr(read_polyhedron_data);
-		rpdr.readHrepMatrixFromFile(read_polyhedron_data.filename, params);
-
-		RecursivePolytopeValuation rpv;
-		rpv.setMaxRecursiveLevel(4);
-		int d;
-		cout << "min dim: ";
-		cin >> d;
-		if ( d >= 0)
-		{
-			rpv.setMinDimension(d);
-			rpv.findVolume(rpdr, params);
-		}
-		else
-		{
-			d *= (-1);
-			linFormSum linform;
-			Polyhedron *Poly2 = rpdr.findTangentCones();
-			vec_ZZ exp;
-			exp.SetLength(Poly2->numOfVars);
-			for(int i = 0; i < exp.length(); ++i)
-				exp[i]=i+1;
-			//exp[0]=0;
-			//exp[1]=1;
-			//exp[2]=2;
-			//exp[3]=0;
-
-			linform.termCount = 0;
-			linform.varCount = Poly2->numOfVars;
-			int powerFactorial = 1;
-			for(int i = 1; i <= d; ++i)
-				powerFactorial *= i;
-			insertLinForm(RationalNTL(powerFactorial,1), d, exp, linform);
-
-			rpdr.latticeInverse();
-
-			PolytopeValuation pv(Poly2, *params);
-			if ( rpdr.getFullDimensionCount() < Poly2->numOfVars)
-			{
-				cout << " getFull dim = " << rpdr.getFullDimensionCount() << endl;
-				pv.setLatticeInverse(rpdr.getLatticeInverse(), rpdr.getLatticeInverseDilation());
-				pv.setFullDimension(rpdr.getFullDimensionCount());
-			}
-
-			RationalNTL ans;
-			//ans = pv.findIntegral(linform);
-			ans = pv.findVolume(PolytopeValuation::volumeCone);
-
-			cout << "volume non-stokes, not full-dim" << ans << endl;
-			destroyLinForms(linform);
-		}
-		cout << "valuation.cpp exit called" << endl;
-		THROW_LATTE_MSG( LattException::bug_NotImplementedHere, 1, "Stokes is experimental code, answer may not be correct" );
-
-	}//else. use strokes.
+	}//else use stokes.
 
 
 

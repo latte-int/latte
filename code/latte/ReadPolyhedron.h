@@ -106,54 +106,6 @@ public:
 };
 
 
-/**
- * Class ReadPolyhedronDataRecursive's job is to set each facet inequalities to equality
- *   and compute the reduced polytope.
- *
- *  DO NOT USE THIS CLASS: it is only partly finished.
- */
-class ReadPolyhedronDataRecursive: public ReadPolyhedronData
-{
-private:
-	dd_MatrixPtr ddHrep;
-	mat_ZZ latticeBasis;
-	mat_ZZ latticeLeftInverse;
-	ZZ     latticeLeftInverseDilation;
-	ZZ dilationNum;
-public:
-	ReadPolyhedronDataRecursive(const ReadPolyhedronData & rpd); //consturctor.
-	~ReadPolyhedronDataRecursive(); //we are in charge of freeing the memory of matrix.
-
-	//A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
-	void dilatePolytope();
-	int dimension();
-	int getFullDimensionCount() const;
-
-	Polyhedron * findTangentCones();
-	void getFacetPolytope(int row, ReadPolyhedronDataRecursive &newMatrix, vec_ZZ & l, RationalNTL &lDotNormal);
-	const mat_ZZ * getLatticeInverse() const;
-	const ZZ * getLatticeInverseDilation() const;
-	RationalNTL getNormalFactor() const;
-	int getNumberEqualities() const;
-	int getNumberRows() const;
-	void latticeInverse();
-	void readHrepMatrixFromFile(string fileName, BarvinokParameters *params);
-	void readHrepMatrix();
-
-	//void setInequalityMatrix(listVector *newMatrix);
-
-	void setInequalityToEquality(int i, listVector * &newMatrix, BarvinokParameters &newParm);
-	void setInequality(int row);
-	void setMatrix(dd_MatrixPtr m);
-
-	RationalNTL volumeCorrection(const RationalNTL & a) const;
-
-};
-
-
-
-
-
 /* Helper functions. */
 
 /* Read a VREP file in LattE format

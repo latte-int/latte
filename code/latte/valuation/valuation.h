@@ -24,7 +24,6 @@
 #include <NTL/mat_ZZ.h>
 
 #include "valuation/PolytopeValuation.h"
-#include "valuation/RecursivePolytopeValuation.h"
 #include "top-ehrhart/TopEhrhart.h"
 
 #include "CheckEmpty.h"
