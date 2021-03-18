@@ -27,7 +27,6 @@ RELOCATABLE_LIBRARY_PATH='$(libdir)'
 RELOCATABLE_CONFIG_H_DIR='$(top_builddir)/code'
 
 AC_LANG(C++)
-AX_CXX_MAXOPT
 
 # Checks for header files.
 AC_HEADER_STDC
