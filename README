@@ -14,6 +14,7 @@ LattE requires the following programs and libraries:
   * (optional) LRS
   * (optional) LiDIA
   * (optional) 4ti2
+  * (optional) TOPCOM
   * (optional) Maple (non-free)
 
 If you do not have these libraries installed yet, follow the
@@ -80,7 +81,9 @@ at the directory $HOME/latte.
 
 6. Optionally, install 4ti2.
 
-7. Optionally, if you have Maple, make sure that the directory where
+7. Optionally, install TOPCOM.
+
+8. Optionally, if you have Maple, make sure that the directory where
    the command-line executable of Maple lives ("maple" or, on Windows,
    "cmaple.exe") is in your $PATH:
 
