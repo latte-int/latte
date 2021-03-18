@@ -79,7 +79,7 @@ fi
 
 for CDDLIB_HOME in ${CDDLIB_HOME_PATH} 
  do	
-	if test "x$CDDLIB_HOME" != "DEFAULTS" ; then
+	if test "$CDDLIB_HOME" != "DEFAULTS" ; then
 		CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
 		CDDLIB_LIBS="-L${CDDLIB_HOME}/lib -lcddgmp"
 	else
@@ -91,7 +91,9 @@ for CDDLIB_HOME in ${CDDLIB_HOME_PATH}
 	LIBS="${CDDLIB_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
 	LB_CDDLIB_TEST_HEADERS_ALL
-
+	if test "x$cddlib_found" = "xyes" ; then
+	    break
+	fi
 done
 
 if test "x$cddlib_found" = "xyes" ; then		
