@@ -24,7 +24,8 @@ AC_TRY_LINK([
 
 AC_DEFUN([LB_CDDLIB_TEST_HEADERS_ALL], [
     cddlib_found=no
-    for cdd_h_path in "" "cdd/" "cddlib/"
+    dnl cddlib is the prefix used by modern cddlib (0.94m).
+    for cdd_h_path in "cddlib/" "" "cdd/"
         do
             AS_IF([test -z $cdd_h_path], [cdd_h_path_print="inclusion directory"], [cdd_h_path_print="${cdd_h_path}"])
             LB_CDDLIB_TEST_HEADERS([${cdd_h_path}], [${CDDLIB_HOME}])
