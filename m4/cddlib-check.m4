@@ -1,5 +1,45 @@
 # Check for cddlib, derived from lidia-check.m4
 
+dnl LB_CDDLIB_TEST_HEADERS  ([header_prefix, path])
+
+AC_DEFUN([LB_CDDLIB_TEST_HEADERS], [
+cdd_header_found=no
+    AC_DEFINE_UNQUOTED(CDDLIB_SETOPER_H, [<$1setoper.h>], [header setoper.h])
+    AC_DEFINE_UNQUOTED(CDDLIB_CDDMP_H, [<$1cddmp.h>], [header cddmp.h])
+    AC_DEFINE_UNQUOTED(CDDLIB_CDD_H, [<$1cdd.h>], [header cdd.h])
+AC_TRY_LINK([
+#define GMPRATIONAL
+#include CDDLIB_SETOPER_H
+#include CDDLIB_CDDMP_H
+#include CDDLIB_CDD_H
+],
+[ mytype a;
+  dd_init(a);
+  dd_abs(a, a);
+],
+[       cdd_header_found=yes
+]
+)
+])
+
+AC_DEFUN([LB_CDDLIB_TEST_HEADERS_ALL], [
+    cddlib_found=no
+    for cdd_h_path in "" "cdd/" "cddlib/"
+        do
+            AS_IF([test -z $cdd_h_path], [cdd_h_path_print="inclusion directory"], [cdd_h_path_print="${cdd_h_path}"])
+            LB_CDDLIB_TEST_HEADERS([${cdd_h_path}], [${CDDLIB_HOME}])
+            AS_IF([test "x$cdd_header_found" = "xyes"],
+            [
+                AC_MSG_NOTICE([headers are in ${cdd_h_path_print}])
+                cddlib_found=yes
+                break
+            ],
+            [
+                AC_MSG_NOTICE([headers are not in ${cdd_h_path_print}])
+            ])
+    done
+])
+
 dnl LB_CHECK_CDDLIB ([MINIMUM-VERSION [, ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]]])
 dnl
 dnl Test for CDDLIB Library and define CDDLIB_CFLAGS and CDDLIB_LIBS
@@ -46,24 +86,12 @@ for CDDLIB_HOME in ${CDDLIB_HOME_PATH}
 		CDDLIB_CFLAGS=
 		CDDLIB_LIBS="-lcddgmp"		
 	fi	
-	CXXFLAGS="${BACKUP_CXXFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
-	CFLAGS="${BACKUP_CFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
-	LIBS="${BACKUP_LIBS} ${CDDLIB_LIBS} ${GMP_LIBS}"
+	CXXFLAGS="${CDDLIB_CFLAGS} ${GMP_CFLAGS} ${BACKUP_CXXFLAGS} "
+	CFLAGS="${CDDLIB_CFLAGS} ${BACKUP_CFLAGS} {GMP_CFLAGS}"
+	LIBS="${CDDLIB_LIBS} ${GMP_LIBS} ${BACKUP_LIBS}"
 
-	AC_TRY_LINK([
-#define GMPRATIONAL
-#include <setoper.h>
-#include <cddmp.h>
-#include <cdd.h>
-],
-[ mytype a;
-  dd_init(a);
-  dd_abs(a, a);
-],
-[	cddlib_found="yes"
-	break
-]
-)
+	LB_CDDLIB_TEST_HEADERS_ALL
+
 done
 
 if test "x$cddlib_found" = "xyes" ; then		
