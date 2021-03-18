@@ -24,7 +24,7 @@ AC_ARG_WITH(ntl,
 					   Use NTL library. 
 					   If argument is no, you do not have the library installed on your machine (set as default).
 					   If argument is yes or <empty> that means the library is reachable with the standard
-					   search path (/usr or /usr/local).
+					   search path.
 	 				   Otherwise you give the <path> to the directory which contain the library. 
 	     ],
 	     [if test "$withval" = yes ; then
@@ -47,9 +47,7 @@ fi
 
 for NTL_HOME in ${NTL_HOME_PATH} 
  do	
-if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
-
-	if test "x$NTL_HOME" != "x/usr" -a "x$NTL_HOME" != "x/usr/local"; then
+	if test "$NTL_HOME" != "DEFAULTS"; then
 		NTL_CFLAGS="-I${NTL_HOME}/include"
 		NTL_LIBS="-L${NTL_HOME}/lib -lntl"
 	else
@@ -91,9 +89,6 @@ if test -r "$NTL_HOME/include/NTL/ZZ.h"; then
 	unset NTL_CFLAGS
 	unset NTL_LIBS	
 	])
-else
-	ntl_found="no"
-fi
 done
 
 if test "x$ntl_found" = "xyes" ; then		

@@ -15,7 +15,7 @@ AC_ARG_WITH(gmp,
 	   				   Use GMP library. 
 					   If argument is no, you do not have the library installed on your machine.
 					   If argument is yes or <empty> that means the library is reachable with the standard
-					   search path "/usr" or "/usr/local"  (set as default).
+					   search path (set as default).
 	 				   Otherwise you give the <path> to the directory which contain the library. 
 		],
 		[if test "$withval" = yes ; then
@@ -35,11 +35,7 @@ AC_MSG_CHECKING(for GMP >= $min_gmp_version)
 
 for GMP_HOME in ${GMP_HOME_PATH} 
   do	
-		if test "x$GMP_HOME" != "x/usr" -a "x$GMP_HOME" != "x/usr/local"; then
-		   	if test !  -r "$GMP_HOME/include/gmp.h"; then
-			     gmp_found="no"
-			     continue
-			fi
+		if test "$GMP_HOME" != "DEFAULTS" ; then
 			GMP_CFLAGS="-I${GMP_HOME}/include"
 			GMP_LIBS="-L${GMP_HOME}/lib -lgmp"	
 		else

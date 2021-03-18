@@ -14,7 +14,7 @@ AC_ARG_WITH(4ti2,
 					   Use 4ti2. 
 					   If argument is no, you do not have the library installed on your machine (set as default).
 					   If argument is yes or <empty> that means the library is reachable with the standard
-					   search path (/usr or /usr/local).
+					   search path.
 	 				   Otherwise you give the <path> to the directory which contain the library. 
 	     ],
 	     [if test "$withval" = yes ; then
@@ -35,14 +35,13 @@ fi
 
 for FORTYTWO_HOME in ${FORTYTWO_HOME_PATH} 
  do	
-    if test -r "$FORTYTWO_HOME/include/4ti2/4ti2.h"; then
-	if test "x$FORTYTWO_HOME" != "x/usr" -a "x$FORTYTWO_HOME" != "x/usr/local"; then
+	if test "$FORTYTWO_HOME" != "DEFAULTS"; then
 		FORTYTWO_CXXFLAGS="-I${FORTYTWO_HOME}/include -D__STDC_LIMIT_MACROS -D_4ti2_GMP_"
 		FORTYTWO_LIBS="-L${FORTYTWO_HOME}/lib -l4ti2gmp -lzsolve"
 	else
 		FORTYTWO_CXXFLAGS="-D__STDC_LIMIT_MACROS -D_4ti2_GMP_"
 		FORTYTWO_LIBS="-l4ti2gmp -lzsolve"
-	fi	
+	fi
 	CXXFLAGS="${BACKUP_CXXFLAGS} ${FORTYTWO_CXXFLAGS} ${GMP_CFLAGS}" 
 	LIBS="${BACKUP_LIBS} ${FORTYTWO_LIBS} ${GMP_LIBS}"
 
@@ -54,24 +53,25 @@ for FORTYTWO_HOME in ${FORTYTWO_HOME_PATH}
 [	FORTYTWO_found="yes"
 	break
 ])
-fi
 done
 
 if test "x$FORTYTWO_found" = "xyes" ; then		
-	AC_SUBST(FORTYTWO_CXXFLAGS)
-	AC_SUBST(FORTYTWO_LIBS)
 	AC_DEFINE(HAVE_FORTYTWO_LIB,1,[Define if the 4ti2 library is installed])
 	HAVE_FORTYTWO_LIB=yes
 	AC_MSG_RESULT(found)
 else
+        FORTYTWO_CXXFLAGS=
+	FORTYTWO_LIBS=
 	AC_MSG_RESULT(not found)
 	ifelse([$3], , :, [$3])
 fi	
+
+AC_SUBST(FORTYTWO_CXXFLAGS)
+AC_SUBST(FORTYTWO_LIBS)
 
 AM_CONDITIONAL(HAVE_FORTYTWO_LIB, test "x$HAVE_FORTYTWO_LIB" = "xyes")
 
 CXXFLAGS=${BACKUP_CXXFLAGS}
 LIBS=${BACKUP_LIBS}
-#unset LD_LIBRARY_PATH
 
 ])

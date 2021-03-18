@@ -14,7 +14,7 @@ AC_ARG_WITH(topcom,
 					   Use TOPCOM. 
 					   If argument is no, you do not have the library installed on your machine (set as default).
 					   If argument is yes or <empty> that means the library is reachable with the standard
-					   search path (/usr or /usr/local).
+					   search path.
 	 				   Otherwise you give the <path> to the directory which contain the library. 
 	     ],
 	     [if test "$withval" = yes ; then
@@ -77,12 +77,13 @@ AM_CONDITIONAL(HAVE_TOPCOM_LIB, test "x$HAVE_TOPCOM_LIB" = "xyes")
 
 CXXFLAGS=${BACKUP_CXXFLAGS}
 LIBS=${BACKUP_LIBS}
-#unset LD_LIBRARY_PATH
 
 BACKUP_PATH=${PATH}
 for TOPCOM_HOME in ${TOPCOM_HOME_PATH} 
-do	
-	PATH=${TOPCOM_HOME}/bin:$PATH
+do
+	if test "$TOPCOM_HOME" != "DEFAULTS" ; then
+                PATH=${TOPCOM_HOME}/bin:$PATH
+	fi
 done
 AC_PATH_PROG(TOPCOM_POINTS2TRIANGS, points2triangs)
 AC_PATH_PROG(TOPCOM_POINTS2PLACINGTRIANG, points2placingtriang)

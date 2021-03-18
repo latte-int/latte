@@ -23,7 +23,7 @@ AC_ARG_WITH(lidia,
 					   Use Lidia library. 
 					   If argument is no, you do not have the library installed on your machine (set as default).
 					   If argument is yes or <empty> that means the library is reachable with the standard
-					   search path (/usr or /usr/local).
+					   search path.
 	 				   Otherwise you give the <path> to the directory which contain the library. 
 	     ],
 	     [if test "$withval" = yes ; then
@@ -51,8 +51,7 @@ LIDIA_INCDIR=LiDIA
 
 for LIDIA_HOME in ${LIDIA_HOME_PATH} 
  do	
-if test -r "$LIDIA_HOME/include/LiDIA/LiDIA.h"; then
-	if test "x$LIDIA_HOME" != "x/usr" -a "x$LIDIA_HOME" != "x/usr/local"; then
+	if test "$LIDIA_HOME" != "DEFAULTS" ; then
 		LIDIA_CFLAGS="-I${LIDIA_HOME}/include"
 		LIDIA_LIBS="-L${LIDIA_HOME}/lib -lLiDIA"
 	else
@@ -88,7 +87,10 @@ if test -r "$LIDIA_HOME/include/LiDIA/LiDIA.h"; then
 	unset LIDIA_CFLAGS
 	unset LIDIA_LIBS	
 	])
-elif test -r "$LIDIA_HOME/include/lidia/LiDIA.h"; then
+
+
+    AS_IF([test "$lidia_found" != "yes"], [
+        dnl Check for lidia/
 	if test "x$LIDIA_HOME" != "x/usr" -a "x$LIDIA_HOME" != "x/usr/local"; then
 		LIDIA_CFLAGS="-I${LIDIA_HOME}/include"
 		LIDIA_LIBS="-L${LIDIA_HOME}/lib -lLiDIA"
@@ -100,7 +102,8 @@ elif test -r "$LIDIA_HOME/include/lidia/LiDIA.h"; then
 	LIBS="${BACKUP_LIBS} ${LIDIA_LIBS} ${GMP_LIBS}"
 
 	AC_TRY_LINK(
-	[#include <lidia/bigint.h>],
+	[#include <lidia/bigint.h>
+	],
 	[LiDIA::bigint a;],
 	[
 	AC_TRY_RUN(
@@ -127,9 +130,7 @@ elif test -r "$LIDIA_HOME/include/lidia/LiDIA.h"; then
 	unset LIDIA_CFLAGS
 	unset LIDIA_LIBS	
 	])
-else
-	lidia_found="no"
-fi
+    ])
 done
 
 if test "x$lidia_found" = "xyes" ; then		

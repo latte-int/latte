@@ -14,7 +14,7 @@ AC_ARG_WITH(cddlib,
 					   Use cddlib. 
 					   If argument is no, you do not have the library installed on your machine (set as default).
 					   If argument is yes or <empty> that means the library is reachable with the standard
-					   search path (/usr or /usr/local).
+					   search path.
 	 				   Otherwise you give the <path> to the directory which contain the library. 
 	     ],
 	     [if test "$withval" = yes ; then
@@ -39,20 +39,11 @@ fi
 
 for CDDLIB_HOME in ${CDDLIB_HOME_PATH} 
  do	
-if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
-	if test "x$CDDLIB_HOME" != "x/usr" -a "x$CDDLIB_HOME" != "x/usr/local"; then
-	        if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
-		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
-		else
-		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
-		fi
+	if test "x$CDDLIB_HOME" != "DEFAULTS" ; then
+		CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include"
 		CDDLIB_LIBS="-L${CDDLIB_HOME}/lib -lcddgmp"
 	else
-	        if test -r "$CDDLIB_HOME/include/cdd/cdd.h"; then
-		   CDDLIB_CFLAGS="-I${CDDLIB_HOME}/include/cdd"
-		else
-		   CDDLIB_CFLAGS=
-		fi
+		CDDLIB_CFLAGS=
 		CDDLIB_LIBS="-lcddgmp"		
 	fi	
 	CXXFLAGS="${BACKUP_CXXFLAGS} ${CDDLIB_CFLAGS} ${GMP_CFLAGS}" 
@@ -73,9 +64,6 @@ if test -r "$CDDLIB_HOME/include/cdd.h" -o -r "$CDDLIB_HOME/include/cdd/cdd.h"; 
 	break
 ]
 )
-else
-	cddlib_found="no"
-fi
 done
 
 if test "x$cddlib_found" = "xyes" ; then		
