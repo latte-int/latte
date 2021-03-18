@@ -1,11 +1,11 @@
 // This is a -*- C++ -*- header file.
-   
+
 /* latte_cddlib.h -- Interface to cddlib
 
    Copyright 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
-   
+
    LattE is free software; you can redistribute it and/or modify it
    under the terms of the version 2 of the GNU General Public License
    as published by the Free Software Foundation.
@@ -30,8 +30,8 @@
 extern "C" {
 #endif
 #define GMPRATIONAL
-#include <setoper.h>
-#include <cdd.h>
+#include CDDLIB_SETOPER_H
+#include CDDLIB_CDD_H
 #ifdef HAVE_CDDLIB_C_LINKAGE
 }
 #endif
@@ -42,7 +42,7 @@ extern "C" {
    called. */
 class init_cddlib_class {
 public:
-  init_cddlib_class(); 
+  init_cddlib_class();
 };
 extern init_cddlib_class init_cddlib;
 
@@ -56,8 +56,8 @@ void check_cddlib_error(dd_ErrorType error, const char *proc);
    are introduced in front of the ray data. */
 dd_MatrixPtr
 rays_to_cddlib_matrix(listVector *rays, int numOfVars,
-		      int num_homogenization_vars = 1,
-		      int num_extra_rows = 0);
+                      int num_homogenization_vars = 1,
+                      int num_extra_rows = 0);
 
 dd_PolyhedraPtr
 cone_to_cddlib_polyhedron(listCone *cone, int numOfVars);
@@ -71,8 +71,8 @@ cddlib_matrix_to_cone(dd_MatrixPtr matrix);
    Return equations and inequalities. */
 void
 cddlib_matrix_to_equations_and_inequalities(dd_MatrixPtr matrix,
-					    listVector **equations,
-					    listVector **inequalities);
+                                            listVector **equations,
+                                            listVector **inequalities);
 
 #endif
 
