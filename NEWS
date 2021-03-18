@@ -1,3 +1,14 @@
+Changes in release 1.7.6, 2021-03-17:
+
+ This is a portability release.
+
+ * Fix for new NTL versions
+
+ * Find cddlib headers in new installation location (cddlib/...)
+
+ * Remove problematic code and compiler options
+
+
 Changes in release 1.7.5, 2018-09-10:
 
  This is a portability release.
