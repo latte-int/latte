@@ -98,6 +98,7 @@ jobs:
       prefix: /opt/sage-latte
       sage_repo: sagemath/sage
       sage_ref: develop
+      upstream_artifact: upstream
     needs: [dist]
 
   docker:
