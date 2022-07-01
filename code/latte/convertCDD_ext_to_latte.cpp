@@ -21,7 +21,7 @@ int main( int argc, const char* argv[] )
 {
 	if ( argc != 3)
 	{
-		cout << "usage: " << argv[0] << "inputFileName.ine outputFileName" << endl;
+		cout << "usage: " << argv[0] << " inputFileName.ine outputFileName" << endl;
 		exit(1);
 	}
 	cout << "not implemented yet" << endl;
