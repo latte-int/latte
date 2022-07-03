@@ -581,8 +581,8 @@ void CheckLength2(const char * filename, char * equ)
 
    if(Total > counts){
      ofstream out("Error");
-     out << "The wrong number of elements in the file.  The number of elements are less than you indicated" << endl;
-     cerr <<"The wrong number of elements in the file.  The number of elements are less than you indicated." << endl;
+     out << "Wrong number of elements in the file: there are less than you indicated." << endl;
+     cerr << "Wrong number of elements in the file: there are less than you indicated." << endl;
      exit (1);
    }
    /*   else if(Total < counts){
