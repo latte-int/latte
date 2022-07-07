@@ -104,6 +104,21 @@ jobs:
   linux:
     uses: sagemath/sagetrac-mirror/.github/workflows/docker.yml@u/mkoeppe/tox_yml__refactor_using_reusable_workflows
     with:
+      tox_system_factors: >-
+          ["ubuntu-trusty-toolchain-gcc_9",
+           "ubuntu-xenial-toolchain-gcc_9",
+           "ubuntu-bionic",
+           "ubuntu-focal",
+           "ubuntu-jammy",
+           "ubuntu-kinetic",
+           "fedora-26",
+           "fedora-36",
+           "fedora-37",
+           "gentoo-python3.10",
+           "archlinux-latest",
+           "opensuse-tumbleweed",
+           "manylinux-2_24-i686",
+           ]
       # FIXME: duplicated from env.TARGETS
       targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
       sage_repo: sagemath/sage
