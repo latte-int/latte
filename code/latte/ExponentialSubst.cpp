@@ -57,7 +57,6 @@ mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 mpz_class &prod_ray_scalar_products,
 				 const listCone *cone, int numOfVars)
-  throw(NotGenericException)
 {
   // Compute dimension; can be smaller than numOfVars
   int dimension = 0;
@@ -95,7 +94,6 @@ computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 const listCone *cone, int numOfVars)
-  throw(NotGenericException)
 {
   mpz_class prod_ray_scalar_products;
   return computeExponentialResidueWeights(generic_vector,

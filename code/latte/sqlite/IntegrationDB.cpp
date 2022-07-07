@@ -1277,7 +1277,7 @@ void  IntegrationDB::insertSpecficPolytopeIntegrationTest(string polymakeFile, i
  * @parm filePath: to the latte-style polynomial.
  * @return rowid of the inserted row.
  */
-int IntegrationDB::insertPolynomial(int dim, int degree, const char*filePath) throw(SqliteDBexception)
+int IntegrationDB::insertPolynomial(int dim, int degree, const char*filePath)
 {
 	if ( doesPolynomialExist(filePath))
 		throw SqliteDBexception(string("insertPolynomial::Polynomial ")+filePath+" already exist");

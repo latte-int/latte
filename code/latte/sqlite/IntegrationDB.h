@@ -67,7 +67,7 @@ public:
 	int insertIntegrationTest(int polynomialID, int polytopeID);
 	void insertIntegrationTest(int dim, int degree, int vertexCount, int count);
 	void insertSpecficPolytopeIntegrationTest(string polymakeFile, int degree, int count);
-	int insertPolynomial(int dim, int degree, const char*filePath) throw(SqliteDBexception);
+        int insertPolynomial(int dim, int degree, const char*filePath);
 
 	int insertPolytope(int dim, int vertexCount, int simple, int dualRowID, const char* latteFilePath, const char* polymakeFilePath);
 

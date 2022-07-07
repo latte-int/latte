@@ -58,13 +58,11 @@ public:
 mpq_vector /* FIXME: This version can probably go away */
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
 				 mpz_class &prod_ray_scalar_products,
-				 const listCone *cone, int numOfVars)
-  throw(NotGenericException);
+				 const listCone *cone, int numOfVars);
 
 mpq_vector
 computeExponentialResidueWeights(const vec_ZZ &generic_vector,
-				 const listCone *cone, int numOfVars)
-  throw(NotGenericException);
+				 const listCone *cone, int numOfVars);
 
 ZZ
 scalar_power(const vec_ZZ &generic_vector,
