@@ -540,7 +540,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	if(print_flag == 1)
 		 {
 		   //system_with_error_check("rm func.rat");
-	 		 cerr << "Outputing rational functions to file" << endl;
+			cerr << "Outputting rational functions to file" << endl;
 			Rational_Function_Output_File.open ("func.rat");
 		 }
 
