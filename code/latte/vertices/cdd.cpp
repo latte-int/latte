@@ -339,7 +339,7 @@ void createCddExtFile2(const char* filename)
 }
 /* ----------------------------------------------------------------- */
 /**
- * Creats a cdd ext file from a dd_matrix of rays.
+ * Creates a cdd ext file from a dd_matrix of rays.
  */
 void createCddExtFile2(const dd_MatrixPtr M)
 {

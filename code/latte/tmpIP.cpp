@@ -487,7 +487,7 @@ vector SolveIP(listCone* cones,listVector* matrix, vector cost, int numOfVars, i
 	
 		for (For_Counter = 0; For_Counter < For_Limit; For_Counter++)
 		{
-		// Check current possible value agains max_ip
+		// Check current possible value against max_ip
 		
 			flag = 0;
 			tmpmatrix = matrix;      

@@ -50,7 +50,7 @@ FindSpecialSimplex(listCone *cone, int numOfVars)
   int status;
   env = CPXopenCPLEX(&status);
   if (status != 0) {
-    cerr << "Failed to obtain CPLEX environent." << endl;
+    cerr << "Failed to obtain CPLEX environment." << endl;
     abort();
   }
 

@@ -36,7 +36,7 @@ PolynomialInterpolation::PolynomialInterpolation(unsigned int degree):
 
 //A B C D E F G H I J K L M N O P Q R S T U V W X Y Z	
 
-//sets matrix(toRow,:) = matirx(toRow,:) - value * matrix(fromRow, :) (matlab syntax)
+//sets matrix(toRow,:) = matrix(toRow,:) - value * matrix(fromRow, :) (matlab syntax)
 void PolynomialInterpolation::addMultRows(mpq_class  &value, int fromRow, int toRow)
 {
 	value.canonicalize();
@@ -130,11 +130,11 @@ void PolynomialInterpolation::GE()
 
         if(matrix[perfectRow][currentColumn] == 0 )
         {
-            cerr << "GE:assert matirx[perfectRow][currentColumn] != 0" << endl;
+            cerr << "GE:assert matrix[perfectRow][currentColumn] != 0" << endl;
             //cout << "perfectRow = " << perfectRow << ", curCol=" << currentColumn << endl;
             //cout << "row, col size=" << rowSize << ", " << colSize << endl;
             //printMatrix();
-            //cout << "origional matirx\n";
+            //cout << "original matrix\n";
             //copy.printMatrix();
             exit(1);
         }

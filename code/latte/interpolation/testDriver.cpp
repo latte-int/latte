@@ -89,8 +89,8 @@ bool isReduced(mpq_class r)
 }//isReduced
 
 
-/*	Randomly generate polynomials, and create the coefficient matirx. Then solves the matrix and
- *  	makes sure the returnd answer is the same as the polynomial we randomly generated.
+/*	Randomly generate polynomials, and create the coefficient matrix. Then solves the matrix and
+ *  	makes sure the returned answer is the same as the polynomial we randomly generated.
  *
  * 	The polynomials have a max degree of MAXDEG and each coefficient is negative with prob. PNEG..
  * 		and coefficients are limited by MAXCOEF.
@@ -114,7 +114,7 @@ void test1Poly()
 	;
 
 	PolynomialInterpolation p(degree);
-	PolynomialInterpolation pCopy(degree); //pCopy is printed as the origional matrix if there is an error.
+	PolynomialInterpolation pCopy(degree); //pCopy is printed as the original matrix if there is an error.
 	vector<mpq_class> allX(degree); //keep track of points added so far.
 
 	//insert degree+1 many unique points (x, f(x)).

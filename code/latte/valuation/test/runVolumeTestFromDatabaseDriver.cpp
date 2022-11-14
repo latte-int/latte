@@ -31,7 +31,7 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 	ofstream log;
 	for(vector<vector<string> >::const_iterator row = toTest.begin(); row != toTest.end(); ++row)
 	{
-		string latte       =  directoryPrefix+(*row)[0];//look at ../filePath (assumes latte is in the form ./filePath for specfic files). OR look at ./filePath (assumes random database is in the form filepath).
+		string latte       =  directoryPrefix+(*row)[0];//look at ../filePath (assumes latte is in the form ./filePath for specific files). OR look at ./filePath (assumes random database is in the form filepath).
 		string lawrence    = (*row)[1];
 		string triangulate = (*row)[2];
 		string value       = (*row)[3];
@@ -232,6 +232,6 @@ int main(int argc, char *argv[])
 		                     //db file, file name, use dual, alg, log
 		runSpecficPolytopeTest(argv[1], argv[3], string(argv[4]) == "true", atoi(argv[5]), string(argv[0])+".log");
 	else
-		cout << "unkown sequence of parameters" << endl;
+		cout << "unknown sequence of parameters" << endl;
 	return 0;
 }//main

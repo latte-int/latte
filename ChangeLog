@@ -3,7 +3,7 @@
 
 
 	*** Newer changes - see https://github.com/latte-int/latte ***
-	
+
 2015-04-21 Brandon Dutra <bedutra@ucdavis.edu>
 
 	* updated the exception class and use
@@ -45,18 +45,18 @@
 
 	* code/latte/interpolation/PolynomialInterpolation.cpp: From Jerry
 	  James:
-	  
+
 	  I just happened to spot a compiler warning as it went by:
-	  
+
 	  interpolation/PolynomialInterpolation.cpp: In member function
 	  'void PolynomialInterpolation::GE()':
 	  interpolation/PolynomialInterpolation.cpp:116:59: warning: left
 	  operand of comma operator has no effect [-Wunused-value]
 	  while( currentRow < rowSize && matrix[currentRow, currentColumn]
 	  == 0)
-	  
+
 	  It looks like that line should read:
-	  
+
 	  while( currentRow < rowSize && matrix[currentRow][currentColumn]
 	  == 0)
 
@@ -94,7 +94,7 @@
 	  install-reloc: Make sure that strerror-override.c compiles, no
 	  matter what.
 	  Patch from Dima Pasechnik.
-	  
+
 	  This fixes build on Solaris (and would also on Cygwin -- but we
 	  have
 	  already worked around that in a different way).
@@ -191,7 +191,7 @@
 	  code/latte/valuation/valuation.cpp: (rename_with_error_check):
 	  New function, invokes rename(2) system
 	  call.
-	  
+
 	  Use it instead of calling the mv(1) shell command. This fixes
 	  some
 	  problems with whitespace in filenames.
@@ -537,7 +537,7 @@
 	  number of coefficients and
 	  we use another function when computing the entire ehrhart
 	  polynomial.
-	  
+
 	  conebyconeap....mpl: removed the old latte interface functions.
 	  Added comments. Should I remove the older "ehrhart polynomial"
 	  functions also?
@@ -557,12 +557,12 @@
 	  code/latte/valuation/valuation.cpp,
 	  code/latte/valuation/valuation.h: banner: changed the name of the
 	  software...again.
-	  
+
 	  valuation.*: added command line options for interactive mode and
 	  the unweighted case for the top ehrhart mode.
-	  
+
 	  latteException.h: new comments.
-	  
+
 	  Conebycone....mpl: added a new function that computes the
 	  coefficients one at a time.
 	  We now compute the top k coefficients and not the top k+1.
@@ -574,8 +574,7 @@
 	  the old latte interface functions
 	  --run a few tests to check correctness. Maybe do this via a
 	  script?
-	  
-	  
+
 	  general todo list:
 	  --update the manual.
 
@@ -584,7 +583,7 @@
 	* code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl:
 	  conebycone...mpl: we are now computing the coefficients of the
 	  entire integrand one at a time.
-	  
+
 	  todo:
 	  clean things up
 	  test: cube, simplex
@@ -619,7 +618,7 @@
 	* code/latte/top-ehrhart/Conebyconeapproximations_08_11_2010.mpl,
 	  code/latte/top-ehrhart/TopEhrhart.cpp: topEhrhart.cpp: added an
 	  "evaluate at one" after printing the polynomial.
-	  
+
 	  conebyconeapproximations....mpl: we where dividing by an extra
 	  M!. This is fixed.
 
@@ -702,7 +701,7 @@
 
 	* code/latte/Makefile.am, code/latte/valuation/PolytopeValuation.h:
 	  Makefile.am: I was getting an error from HAVE_PROGRAMMER_EXTRA if
-	  statment. Quick fix: replaced it with have_database.
+	  statement. Quick fix: replaced it with have_database.
 	  
 	  PolytopeValuation.h: removed double declearation. todo: remove
 	  std simplex integration to get this working with the new changes.
@@ -975,7 +974,7 @@
 	* AUTHORS, Makefile.am, configure.ac, doc/manual.tex: Makefile.am:
 	  updated manual name
 	  doc/manual: changed version to 1.5
-	  configure: changed verson to 1.5
+	  configure: changed version to 1.5
 
 2011-07-30 17:02  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -992,7 +991,7 @@
 	  code/latte/valuation/testLibraryExamples.cpp: updated the
 	  volumeAndInt...Test.cpp file so the check program should finish
 	  on logic.
-	  Makefile added "HAVE_PROGRAMMER_HELPER" condition...so reguler
+	  Makefile added "HAVE_PROGRAMMER_HELPER" condition...so regular
 	  users don't have to see it.
 
 2011-07-28 23:37  Brandon Dutra <bedutra@ucdavis.edu>
@@ -1011,7 +1010,7 @@
 
 2011-07-28 18:05  Brandon Dutra <bedutra@ucdavis.edu>
 
-	* code/gnulib/setenv.h: added gnulib/setevn.h to svn.
+	* code/gnulib/setenv.h: added gnulib/setenv.h to svn.
 
 2011-07-21 08:18  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -1096,7 +1095,7 @@
 	  count.cpp: now the main functions to do the work (it does not
 	  have a main()).
 	  countDriver.cpp: this one has the main for the count exe.
-	  barvinok/dec: decomposeAndComputeResidue now retuns the
+	  barvinok/dec: decomposeAndComputeResidue now returns the
 	  polynomial or lattice count.
 	  PolytopeValuation: changed cout to cerr.
 	  valuation.cpp: cout to cerr + forgot to add one location where
@@ -1106,7 +1105,7 @@
 
 	* doc/latte-integrale.jpg, doc/manual.tex, doc/truncatedCube.jpg:
 	  added the truncated cube and latte graphic to the manual.
-	  
+
 	  fixed some spelling issues, added another integration example.
 
 2011-07-12 22:29  Brandon Dutra <bedutra@ucdavis.edu>
@@ -1167,7 +1166,7 @@
 
 2011-07-11 23:50  Brandon Dutra <bedutra@ucdavis.edu>
 
-	* code/latte/valuation/valuation.cpp: commiting before a major
+	* code/latte/valuation/valuation.cpp: committing before a major
 	  update.
 
 2011-07-08 18:13  Brandon Dutra <bedutra@ucdavis.edu>
@@ -1191,25 +1190,25 @@
 	  code/latte/valuation/valuation.cpp,
 	  code/latte/valuation/valuation.h, code/latte/vertices/cdd.cpp,
 	  code/latte/vertices/cdd.h: this is commit 2/2.
-	  
+
 	  This contains the unfinished stokes method code with a poor
 	  interface and poor code reuse (I cut/pasted the core latte read
 	  function instead of dividing them because I didn't want to mess
 	  anything up. This will be fixed once the stokes method is done.)
-	  
+
 	  So said, again, these last two commits is me saving my work. But
-	  the user has no knowlege the stokes method is half there...it is
-	  save to take this as the next release to latte.
+	  the user has no knowledge the stokes method is half there...it is
+	  safe to take this as the next release to latte.
 
 2011-06-29 03:19  Brandon Dutra <bedutra@ucdavis.edu>
 
 	* code/latte/Makefile.am: Makefile:: added the .cpp/.h files from
 	  the stokes integration method.
-	  
+
 	  This is a major update to a lot of core reading/preprocess files,
 	  and new functions for the stokes recursive valuation method have
 	  been added.
-	  
+
 	  The stokes method is not finished, and it does not work. Also,
 	  the interface to the stokes method is not done. For example,
 	  calling the stokes method is 'hidden' in the valuation driver,
@@ -1219,10 +1218,9 @@
 	  divide up the core latte functions and only call the ones I need.
 	  I will do all this once the THEORY of how the stokes method
 	  should work is known (we do not know yet the correct formula for
-	  the recursive valuation for non-full dimentional polytopes.)
-	  
-	  
-	  This is commint 1/2. (I want a new revision number starting here
+	  the recursive valuation for non-full dimensional polytopes.)
+
+	  This is commit 1/2. (I want a new revision number starting here
 	  just in case the stokes update messing something up).
 
 2011-06-25 01:35  Brandon Dutra <bedutra@ucdavis.edu>
@@ -1274,29 +1272,29 @@
 	  code/latte/valuation/testCorrectnessAndBenchmark/testIntegrationHyperrectanglesDriver.cpp,
 	  code/latte/valuation/testCorrectnessAndBenchmark/valuationTestsLib.mpl:
 	  we can now integrate constants (and polynomials with constants)
-	  
+
 	  PolyTrie.cpp: you can insert a constant monomial as a linear form
 	  [c, [0,...,0]]. We do not use this in the polytope valuation
 	  class, but it is nice to have this defined in the linear-form
 	  level.
-	  
+
 	  iterators.hpp: added constructors and error checking when calling
 	  delete.
-	  
+
 	  burstTrie.hpp: no changes, spacing.
-	  
+
 	  integrationTestsLib.mpl: you can now make a non-homo polynomial.
-	  
+
 	  burstTrie.h added constructors
-	  
+
 	  PolytopeValuation.*: the integration functions call the volume
 	  functions to integrage constants. Constants are removed from the
 	  input polynomial when we dilate the polynomial.
-	  
+
 	  testIntegrationHyprrectanglesDriver.cpp: now testing the lawrence
 	  starting from tangent-cones and triangulate starting from lifted
 	  cone. You could convert back by uncommenting a block.
-	  
+
 	  valuationTestsLib.mpl: reduced the number of test cases..so
 	  scripts ends within 1 min. or so.
 
@@ -1531,7 +1529,7 @@
 	  1) points (and everything else) now assumes there is a slot for
 	  the leading 1
 	  2) when finding the dual, we modify the org. polytope by
-	  centering it. Before I was keeping the origional but
+	  centering it. Before I was keeping the original but
 	  I feel this is bad. Duals are only defined for centered
 	  polytopes, and so the org. should change so that the dual becomes
 	  defined.
@@ -1540,15 +1538,15 @@
 	  4) dilating facets or vertices in the primal and dual settings is
 	  now down through the same two functions.
 	  5) Updated child classes: changed how they used the points vector
-	  
-	  rational.* : In ReadCDD, numbers chould only be 200 char long.
+
+	  rational.* : In ReadCDD, numbers should only be 200 char long.
 	  This restruction is removed. There are other functions that have
 	  hard-coded limits (like the HugeInt class, which could be
 	  replaced by the RationalNTL class).
-	  
+
 	  testBuildPolytopes.cpp: also making a copy of the polytope before
 	  center is called.
-	  
+
 	  printDatabaseTimeTablesDriver.cpp: changed css color codes
 
 2011-01-18 08:46  Brandon Dutra <bedutra@ucdavis.edu>
@@ -1602,10 +1600,10 @@
 	  comes from command line (I'll add/commit the bash script that
 	  calls the exe next). Not computing duals, but still inserting it
 	  in the database for reference.
-	  
+
 	  IntegrationDB.h: comments, shanged the simple column (1=simple,
 	  0=not simple, -1=not known).
-	  
+
 	  Makefile: added 1 comment.
 
 2011-01-08 21:09  Brandon Dutra <bedutra@ucdavis.edu>
@@ -1615,14 +1613,14 @@
 	  code/latte/sqlite/IntegrationDB.cpp,
 	  code/latte/sqlite/IntegrationDB.h,
 	  code/latte/valuation/testCorrectnessAndBenchmark/runIntegrationTestFromDatabaseDriver.cpp:
-	  rational.*: added a "to string" fuction.
-	  
+	  rational.*: added a "to string" function.
+
 	  IntegrationDB: moved a function in the driver to the class.
 	  BuildPolytope: now centering the vertices before finding the
 	  dual. This is still not correctly giving me the dual. After
 	  looking into this more, I NOT know how to find the dual in
 	  polymake.
-	  
+
 	  This is not the final commit, just saving work. It does compile.
 
 2011-01-06 08:22  Brandon Dutra <bedutra@ucdavis.edu>
@@ -2633,7 +2631,7 @@
 	  EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim8/rp_8_8.hrep.latte,
 	  EXAMPLES/volumeIntegrationPaperComparison/randomPolytopes/dim8/rp_8_9.hrep.latte:
 	  Added a much of polytpes for the integration testing. Still
-	  working on the higher dimentions.
+	  working on the higher dimensions.
 
 2010-11-25 15:50  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -2707,11 +2705,10 @@
 	  code/latte/valuation/valuationTestsLib.mpl: valuation:
 	  +++++++++
 	  deleted the testing functions in valuation.
-	  
+
 	  added/moved the testing functions to
 	  valuation/testCorrectnessAndBenchmark
-	  
-	  
+
 	  Files that end in "Driver.cpp" contain int main()'s.
 
 2010-11-20 02:18  Brandon Dutra <bedutra@ucdavis.edu>
@@ -2722,15 +2719,15 @@
 	  code/latte/valuation/valuation.h: renamed the testEhrhart folder
 	  to buildPolytopes. Will need to work on making the interface to
 	  the polytope building classes nicer.
-	  
+
 	  moved the testing functions in valuation to
-	  valuation/testCorrectnessAndBenchmark. We sould place the
+	  valuation/testCorrectnessAndBenchmark. We should place the
 	  functions that we will write for the paper in this folder.
-	  
+
 	  valuation/valuation.*, valuation/Driver.cpp: removed the volume
 	  testing functions and placed them in the
 	  testCorrestnessAndBenchmark folder.
-	  
+
 	  Cleaned up the makefile to reflect the above changes.
 
 2010-11-20 02:12  Brandon Dutra <bedutra@ucdavis.edu>
@@ -2743,10 +2740,10 @@
 	  then checks to see if any are negative. The non-projected simplex
 	  is saved in a maple file as a vector and I refer to this as the
 	  simplex "database" of birkhoff polytopes.
-	  
+
 	  testingTopEhrhart.mpl: added more comments.
-	  
-	  BirkhoffGenerator: returns the full-dimention and non-projected
+
+	  BirkhoffGenerator: returns the full-dimension and non-projected
 	  simplex.
 
 2010-11-18 07:16  Brandon Dutra <bedutra@ucdavis.edu>
@@ -2835,10 +2832,10 @@
 	  from the valuation driver and make it into it's own exe.
 	  
 	  rational.* yet another function added to RationalNTL.
-	  
+
 	  integration/residue.*: need to remove the old functions that are
 	  incorrect.
-	  
+
 	  Also, I need to remove ton's of debug cout's. We need to look
 	  into using a real (free) c++ ide.
 
@@ -2851,11 +2848,11 @@
 	  integration because not done yet.
 	  Perturbation.*: almost done processing dot products. We try no
 	  perturbation, then we try one normal to l, then we just try
-	  random ones from adding a random abount to one slot of the
+	  random ones from adding a random amount to one slot of the
 	  vector. We also scale down the perturbation vectors if we can.
-	  
+
 	  it should compile!
-	  
+
 	  to do:
 	  +++++++
 	  --'sort' or group the same terms <l+e,r> and update the power
@@ -2865,7 +2862,7 @@
 	  --update/make new residue function for finding our new style
 	  residues?
 	  --think about maybe one day having the option to select different
-	  perturbation ideas (say non-linear) (so use virtural functions?)
+	  perturbation ideas (say non-linear) (so use virtual functions?)
 	  --have fun :)
 
 2010-11-05 01:28  Brandon Dutra <bedutra@ucdavis.edu>
@@ -2875,7 +2872,7 @@
 	  code/latte/valuation/PolytopeValuation.cpp: added new class
 	  Perturbation for finding the integrations using the
 	  lawrence-style theorem.
-	  
+
 	  Will not compile. Saving work.
 
 2010-10-29 01:14  Brandon Dutra <bedutra@ucdavis.edu>
@@ -2909,8 +2906,8 @@
 	  fixed why we where off by a sign for simplex cases: we where
 	  doing <l, ray directed from vertex>, but we should have done <l,
 	  ray directed TO vertex>, where <.,.> is the inner product.
-	  
-	  Still working on why it does not work fo non-simplex cases, and
+
+	  Still working on why it does not work for non-simplex cases, and
 	  so the debug cout's are still there.
 
 2010-10-22 01:17  Brandon Dutra <bedutra@ucdavis.edu>
@@ -2921,7 +2918,7 @@
 	  code/latte/valuation/valuation.h: valuation.*, residue.cpp,
 	  newIntegration.cpp: added debugging couts. Our lawrence seems to
 	  be working (on simplices) but is off by a sign.
-	  I'm commiting this because I do not want to loose my progress.
+	  I'm committing this because I do not want to loose my progress.
 
 2010-10-15 20:24  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -2947,7 +2944,7 @@
 	  code/latte/integration/newIntegration.h,
 	  code/latte/valuation/PolytopeValuation.cpp,
 	  code/latte/valuation/PolytopeValuation.h: updated files for
-	  integration using a lawrence=tye formula
+	  integration using a lawrence-type formula
 
 2010-10-12 20:44  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -2959,12 +2956,12 @@
 	  top ehrhart functions no longer looks at the time (it turns out
 	  that Maple saves recently computed values, and so the same
 	  simplex should not be used if you want to compare the times of
-	  the v1 and v2 functions). However, the function is usefull if you
+	  the v1 and v2 functions). However, the function is useful if you
 	  want to make sure they both give the same answer.
-	  
+
 	  compareTopEhrhartFunctions.mpl: Deleted this driver. No longer
 	  needed because of what I said above.
-	  
+
 	  BirkhoffGenerator.mpl, testingTopEhrhartBirkhoffSimplex.mpl:
 	  Added to discuss with Jesus at today's meeting.
 
@@ -2989,7 +2986,7 @@
 	* code/latte/testingSLandTopEhrhart/BirkhoffGenerator.mpl,
 	  code/latte/testingSLandTopEhrhart/TopEhrhart/BirkhoffGenerator.mpl:
 	  BirkhoffGenerator.mpl: I noticed the status was 'A'. I must not
-	  have commited when I moved the file to the TopEhrhart directory.
+	  have committed when I moved the file to the TopEhrhart directory.
 
 2010-10-06 23:35  Jesus De Loera <deloera@math.ucdavis.edu>
 
@@ -3061,10 +3058,10 @@
 	  code/latte/testingSL/testingSL_lib.mpl,
 	  code/latte/testingSL/topCoeffProfiling: Added an automatic test
 	  for the top 3 coef.
-	  
+
 	  Running table_time_sl_ehrhart(2, 50, file) will find the average
 	  time it takes to find the top 3 ehrhart coeff. with 50 test
-	  samples for each dimention between 2 and infinity. When it takes
+	  samples for each dimension between 2 and infinity. When it takes
 	  longer than 30min to find the top 3 coeff. of one simplex, the
 	  script stops. The final and partial results are saved in a file.
 
@@ -3074,7 +3071,7 @@
 	  code/latte/testingSL/testSLEhrhart.mpl,
 	  code/latte/testingSL/testingSL_lib.mpl,
 	  code/latte/testingSL/topCoeffProfiling: updated the top ehrhart
-	  fuctions, made them 3-5 times faster!
+	  functions, made them 3-5 times faster!
 
 2010-09-23 18:14  Gregory Pinto <gpinto@math.ucdavis.edu>
 
@@ -3091,14 +3088,14 @@
 	  compare SL volume with latte's triangulation method or 2)run SL
 	  volume on harder test cases (currently, the SL volume can do a
 	  dim-20+ simplex in over an hour)
-	  
+
 	  testingSL_lib.mpl: fixed an SL volume timing error. Currently
 	  passing the time of the SL computation. I should change this to
 	  pass the latte time too.
-	  
+
 	  testingSLIntegration.mpl: added profiling commands. Again, the
-	  lin. alg. is what takes the most abount of time.
-	  
+	  lin. alg. is what takes the most amount of time.
+
 	  TO DO:
 	  --change how the times are passed back
 	  --add more comments before functions
@@ -3115,15 +3112,15 @@
 	  code/latte/testingSL/testingSLVolume.mpl,
 	  code/latte/testingSL/testingSL_lib.mpl: added
 	  BirkhoffGenerator.mpl
-	  
+
 	  testingSL_lib: updated the main volume function. Currently, we k
 	  tests using latte/old maple, and then do k tests with the SL
 	  functions. My goal is to mix the order of which method is used,
 	  so that that you do not have to wait for every test before you
-	  compair the results!
-	  
+	  compare the results!
+
 	  testingSLVolume.mpl: Added profile recording and printing for the
-	  SL functons.
+	  SL functions.
 
 2010-09-10 22:28  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -3147,8 +3144,7 @@
 	  code/latte/testingSL/testingSLVolume.mpl,
 	  code/latte/testingSL/testingSL_lib.mpl: updated testing of the
 	  integration code (SL vs old maple).
-	  
-	  
+
 	  to do: I found out that the 'make random integer simplex'
 	  function is cut-and-pased in a few files. This function should be
 	  moved to the integraton lib file.
@@ -3164,7 +3160,7 @@
 2010-09-09 01:05  Brandon Dutra <bedutra@ucdavis.edu>
 
 	* code/latte/testingSL, code/latte/testingSL/SL_lib.mpl,
-	  code/latte/testingSL/testingSL_lib.mpl: adding testing scrips for
+	  code/latte/testingSL/testingSL_lib.mpl: adding testing scripts for
 	  SL functions.
 
 2010-09-08 22:46  Brandon Dutra <bedutra@ucdavis.edu>
@@ -3546,7 +3542,7 @@
 	  EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.tex:
 	  have testing times for vinci lawrence vs our lawrence and HOT vs
 	  RLASS.
-	  
+
 	  So, our times are really poor, BUT at least we can say our
 	  answers are EXACT.
 
@@ -3560,13 +3556,13 @@
 	  code/latte/valuation/valuation.cpp,
 	  code/latte/valuation/valuation.h:
 	  RegularTriangulationWIth4ti2.cpp, dec.*: converted cout to cerr
-	  before using 4ti2 if debug_trangulation is false.
-	  
+	  before using 4ti2 if debug_triangulation is false.
+
 	  valuation.cpp: the main driver now passes the valuation answer
 	  and time in a vector.
-	  
+
 	  PolytopeValuation.h: changed comment.
-	  
+
 	  testIntegrationHyperrectangles.cpp: updated b/c of valuation's
 	  new return value.
 	  Makefile: add volume testing for hypersimplex.
@@ -3577,7 +3573,7 @@
 
 2010-09-03 22:55  Brandon Dutra <bedutra@ucdavis.edu>
 
-	* EXAMPLES/aimPresentation: Added forlder for the aim presentation.
+	* EXAMPLES/aimPresentation: Added folder for the aim presentation.
 	  Will remove from SVN after Spet 11.
 
 2010-09-03 06:11  Brandon Dutra <bedutra@ucdavis.edu>
@@ -3702,7 +3698,7 @@
 	  EXAMPLES/volumeIntegrationPaperComparison/bueler/.settings,
 	  EXAMPLES/volumeIntegrationPaperComparison/bueler/.settings/org.eclipse.ltk.core.refactoring.prefs,
 	  EXAMPLES/volumeIntegrationPaperComparison/bueler/.texlipse,
-	  EXAMPLES/volumeIntegrationPaperComparison/bueler/READEME.txt,
+	  EXAMPLES/volumeIntegrationPaperComparison/bueler/README.txt,
 	  EXAMPLES/volumeIntegrationPaperComparison/bueler/paper,
 	  EXAMPLES/volumeIntegrationPaperComparison/bueler/paper/bueler.pdf,
 	  EXAMPLES/volumeIntegrationPaperComparison/bueler/tables_1and2.dvi,
@@ -3859,13 +3855,13 @@
 	  valuation, PolytopeValuation, Driver.* changed the driver and
 	  timed test the integration by dilation and the new "direct"
 	  method.
-	  
+
 	  It turns out the "direct" method of integration is slower than
 	  the dilation method, even after trying to put off reducing most
 	  of the fractional results. The dilation method was faster for
 	  hyper-rectangles and for random polytopes (made from polymake).
-	  
-	  I am commiting this direct integration method, and then I will
+
+	  I am committing this direct integration method, and then I will
 	  merge/revert the trunk back to 1221 so there is a record of the
 	  direct integration method... but it should not be used.
 
@@ -3928,8 +3924,8 @@
 	  code/latte/valuation/integrateHyperrectangle.mpl,
 	  code/latte/valuation/valuationTestsLib.mpl: added option to make
 	  rational or integer coeff. polynomials or linear forms.
-	  
-	  decompostTest: currently not seeting a random seed and using
+
+	  decompostTest: currently not seeding a random seed and using
 	  integer coefficients because test 8 fails because there a
 	  different number of linear forms in myLinForms and mapleLinForms;
 	  however, the integration answer is correct. I forgot to comment
@@ -4577,9 +4573,9 @@
 2010-02-18 22:43  Jianqiu Wu <wxmwbh14@math.ucdavis.edu>
 
 	* [r1038] code/latte/integration/newIntegration.cpp: deleted
-	  debuging output
+	  debugging output
 	  This line, and those below, will be ignored--
-	  
+
 	  M integration/newIntegration.cpp
 
 2010-02-18 22:19  Jianqiu Wu <wxmwbh14@math.ucdavis.edu>
@@ -4858,12 +4854,12 @@
 	  code/latte/valuation/PolytopeValuation.cpp: It seems
 	  ValuationComputation is now working using the count-way of
 	  reading in the file.
-	  
+
 	  TO DO:
-	  
+
 	  --Fix the PolytopeValuation: change the constructor to take a
 	  polytope.
-	  --use gdb to set through the main funtion to see what is used
+	  --use gdb to set through the main function to see what is used
 	  (with and without using the strong cdd option), so we can learn
 	  what we can cut in the main function
 	  --add command line options like before.
@@ -4888,7 +4884,7 @@
 	* code/latte/rational.cpp, code/latte/rational.h,
 	  code/latte/valuation/Driver.cpp,
 	  code/latte/valuation/PolytopeValuation.cpp: 1) forgot to free
-	  some memeory in triangulating in the lawrence volume computation.
+	  some memory in triangulating in the lawrence volume computation.
 	  2) Added another constructor to the rationalNTL class.
 
 2010-07-07 23:53  Brandon Dutra <bedutra@ucdavis.edu>
@@ -4922,7 +4918,7 @@
 
 	* code/latte/valuation/Driver.cpp,
 	  code/latte/valuation/PolytopeValuation.cpp,
-	  code/latte/valuation/PolytopeValuation.h: did the raional funcion
+	  code/latte/valuation/PolytopeValuation.h: did the rational function
 	  printing, SHOULD work
 
 2010-07-06 19:45  Brandon Dutra <bedutra@ucdavis.edu>
@@ -4944,8 +4940,8 @@
 	  testEhrhart/*: added options to make a random-rational vertex
 	  polytope. (I force the randome polytope to have at least one
 	  integer vertex, so the number of lattice points is positive).
-	  
-	  valuation/*: added an automatic testing function to find volums
+
+	  valuation/*: added an automatic testing function to find volumes
 	  on different polytopes. I do call polymake to find the volume but
 	  this number is meaning less if the polytope is not fully dim, and
 	  so I do not use it to check our answers. Instead, I simply check
@@ -4955,14 +4951,13 @@
 	  the same objects, so you cannot simply just call free on
 	  everything. I need to look closely at what *matrix, *temp, etc
 	  are pointing to.
-	  
-	  valuation/Driver.cpp: The main function calles 3 other functions,
+
+	  valuation/Driver.cpp: The main function calls 3 other functions,
 	  but only one should be compiled at a time. 1) the old main
 	  programe, 2) test a random polytope (usage:
 	  ./ValuationComputation amb_dim num_points), and 3) A automatic
 	  test script.
-	  
-	  
+
 	  ok, good night.
 
 2010-07-04 00:58  Brandon Dutra <bedutra@ucdavis.edu>
@@ -5016,12 +5011,12 @@
 
 2010-07-02 20:26  Brandon Dutra <bedutra@ucdavis.edu>
 
-	* code/latte/valuation/Driver.cpp: fixed poly in trangulated volume
+	* code/latte/valuation/Driver.cpp: fixed poly in triangulated volume
 
 2010-07-02 20:20  Gregory Pinto <gpinto@math.ucdavis.edu>
 
 	* code/latte/valuation/Driver.cpp: merged the change to
-	  traingulated volume
+	  triangulated volume
 
 2010-07-02 20:18  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -5079,11 +5074,11 @@
 2010-06-30 19:54  Brandon Dutra <bedutra@ucdavis.edu>
 
 	* code/latte/ehrhart2: Different runs are now isolated from
-	  eachother, except from the matlab/maple command files.
+	  each other, except from the matlab/maple command files.
 
 2010-06-30 00:58  Gregory Pinto <gpinto@math.ucdavis.edu>
 
-	* code/latte/valuation/Driver.cpp: began implementing genreic
+	* code/latte/valuation/Driver.cpp: began implementing generic
 	  lawrence algorithm and symbolic function printing
 
 2010-06-30 00:56  Brandon Dutra <bedutra@ucdavis.edu>
@@ -5093,7 +5088,7 @@
 
 2010-06-29 22:21  Brandon Dutra <bedutra@ucdavis.edu>
 
-	* code/latte/valuation/Driver.cpp: I merged the trangulation and
+	* code/latte/valuation/Driver.cpp: I merged the triangulation and
 	  rational function methods.
 
 2010-06-29 22:03  Gregory Pinto <gpinto@math.ucdavis.edu>
@@ -5106,7 +5101,7 @@
 	* code/latte/Makefile.am, code/latte/valuation/Driver.cpp,
 	  code/latte/valuation/PolytopeValuation.cpp,
 	  code/latte/valuation/PolytopeValuation.h: Added computing volume
-	  by trangulating the polytope for polytopes with INTEGER vertices
+	  by triangulating the polytope for polytopes with INTEGER vertices
 	  only. This will need to be updated later.
 
 2010-06-29 20:02  Brandon Dutra <bedutra@ucdavis.edu>
@@ -5125,7 +5120,7 @@
 	  code/latte/testEhrhart/Driver.cpp,
 	  code/latte/valuation/Driver.cpp, code/latte/volume: delete the
 	  volume director.
-	  I still do not know how to fix the trangulation problem.
+	  I still do not know how to fix the triangulation problem.
 
 2010-06-25 20:39  Brandon Dutra <bedutra@ucdavis.edu>
 
@@ -5139,9 +5134,9 @@
 	* code/latte/Makefile.am, code/latte/valuation,
 	  code/latte/valuation/Driver.cpp: Apply a valuation function (like
 	  volume) to any polytope.
-	  
+
 	  This is not done.
-	  
+
 	  To do:
 	  +find the volume
 	  +Move the code out of Driver to some class like PolytopeValuation
@@ -5153,10 +5148,9 @@
 
 	* code/latte/volume, code/latte/volume/Driver.cpp,
 	  code/latte/volume/PolytopeVolume.cpp,
-	  code/latte/volume/PolytopeVolume.h: We sould change the name of
+	  code/latte/volume/PolytopeVolume.h: We should change the name of
 	  these files.....
-	  
-	  
+
 	  This is not done. Will be able to compute any valuations on
 	  polytopes.
 
@@ -5364,7 +5358,7 @@
 	  the polynomial that matches the given points.
 
 	  to do:
-	  1) write a test driver to test many differnt polynomials to make
+	  1) write a test driver to test many different polynomials to make
 	  sure this class is correct (expand the current driver)
 	  2) clean up the code
 	  --improve comments before functions (add assumptions)
@@ -6860,7 +6854,7 @@
 2006-11-23  Matthias Koeppe  <mkoeppe@mail.math.uni-magdeburg.de>
 
 	* code/latte/count.cpp: Merge functionality of ehrhart into count,
-	using commmand-line options --ehrhart-series,
+	using command-line options --ehrhart-series,
 	--simplified-ehrhart-series, --ehrhart-taylor=N.
 
 	* code/latte/ReadLatteStyle.cpp,

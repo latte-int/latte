@@ -23,7 +23,7 @@ PolytopeValuation::PolytopeValuation(Polyhedron *p, BarvinokParameters &bp) :
 			latticeInverse(NULL), latticeInverseDilation(NULL)
 
 {
-	numOfVars = parameters.Number_of_Variables; //keep number of origional variables.
+	numOfVars = parameters.Number_of_Variables; //keep number of original variables.
 	dimension = numOfVars;
 
 	if (p->unbounded)
@@ -617,7 +617,7 @@ RationalNTL PolytopeValuation::findIntegral(linFormSum& linearForms)
 
 
 	//we only have 1 method lawrence/stokes
-	//assume linear forms is homogenous (we cannot integrate a constant in this function currently).
+	//assume linear forms is homogeneous (we cannot integrate a constant in this function currently).
 	triangulatePolytopeVertexRayCone(); //triangulate the vertex ray cones
 
 	//cout << "find integral stokes" << endl;
@@ -1162,10 +1162,10 @@ RationalNTL PolytopeValuation::findVolumeUsingDeterminant(
 }//findDetermiantForVolume
 
 
-/* computes the volume of a polytope using the lawrence forumla
+/* computes the volume of a polytope using the lawrence formula
  * takes into account the coefficient given to a cone when decomposed into unimodular cones
  * thus it works on all inputs
- * @input: a listCone of the cones and the nnumber of variables (dimension of the space)
+ * @input: a listCone of the cones and the number of variables (dimension of the space)
  * @return RationalNTL: the volume of the polytope
  *
  * Math: For each simple vertex-ray cone, we sum the fractions

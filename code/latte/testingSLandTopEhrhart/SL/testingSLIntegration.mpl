@@ -3,7 +3,7 @@ with(CodeTools[Profiling]):
 #
 #  Sept. 9, 2010
 #  Author: Brandon
-#  Description: Uses the main SL testing lib to compute the volume of simplies and compare the answer's with latte's tirangulation method.
+#  Description: Uses the main SL testing lib to compute the volume of simplices and compare the answer's with latte's triangulation method.
 #
 
 lattice_random_simplex:=proc(d,N) local R,U;

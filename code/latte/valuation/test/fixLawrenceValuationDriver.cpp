@@ -103,7 +103,7 @@ bool findMonomialDegree(const string & monomialFileName, int & monomialDegree)
 			totalDegree += originalMonomial->exps[currentPower];
 
 		//finally, we have the degree of the monomial.
-		monomialDegree = totalDegree; //save the degree to the ouput parameter.
+		monomialDegree = totalDegree; //save the degree to the output parameter.
 		monomialCount++;
 	}
 	assert( monomialCount == 1);
@@ -128,7 +128,7 @@ bool findMonomialDegree(const string & monomialFileName, int & monomialDegree)
  * answer by a^dim(P) to get vol(P).
  *
  * NOTE::I have fixed the volume. Please comment out the db-write commands when done, so
- * no one accidently messes with the db.
+ * no one accidentally messes with the db.
  */
 void fixTheVolume(const char * dbFile)
 {

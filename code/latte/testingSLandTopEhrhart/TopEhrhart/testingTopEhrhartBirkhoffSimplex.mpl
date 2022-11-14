@@ -14,8 +14,8 @@ read("BirkhoffGenerator.mpl"); #read the Birkhoff Simplex Generator Code.
 
 #Parameters:
 #	baseFileName: base name of the data files.
-#	dim: the full-dimention 
-#	numberToTest: number of test cases to run in the same dimention.
+#	dim: the full-dimension 
+#	numberToTest: number of test cases to run in the same dimension.
 baseFileName:="debug":#"birkhoffNonProjectDim5";
 numberToTest:=5000;
 dim:=4;
@@ -31,7 +31,7 @@ numFinishedTest:=0;
 
 
 #Important:
-#	if this is the first time testing a new dimention (a database does not exist), then please set 1=1 so that 
+#	if this is the first time testing a new dimension (a database does not exist), then please set 1=1 so that 
 #	this if-statement runs. This if-statement makes a new database file and inserts a dummy value into it
 #	because I could not get maple to read an empty file.
 if 1 = 1 then:
@@ -50,7 +50,7 @@ end: #used if want to make a new db file.
 
 #This while loop does all the work, here is its logic:
 #	for ever test case 
-#		make a new simplex. save the full-dimention and non-projected simplex.
+#		make a new simplex. save the full-dimension and non-projected simplex.
 #		
 while numFinishedTest < numberToTest do;
 	#print to screen
@@ -62,7 +62,7 @@ while numFinishedTest < numberToTest do;
 	fprintf(logFile_ptr,"Starting test %d out of %d\n", numFinishedTest+1, numberToTest);
 	fflush(logFile_ptr);
 
-	#find a simplex. save the full-dimention and non-projected simplex.
+	#find a simplex. save the full-dimension and non-projected simplex.
 	twoSimplex:=gensimplexB_n_nonProjected(dim,(dim -1)^2 +1,[]):
 	simplexForTopEhrhart:=twoSimplex[1]:
 	simplexNonProjected:=twoSimplex[2]:

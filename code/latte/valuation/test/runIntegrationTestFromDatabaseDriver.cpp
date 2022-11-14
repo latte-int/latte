@@ -62,7 +62,7 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		argv[index++] = "./runTheTests";
 		argv[index++] = "--redundancy-check=none";
 		argv[index++] =  "--valuation=integrate";
-		if (alg == 1) //if you cange this, allso need to chage the other alg get below.
+		if (alg == 1) //if you change this, also need to change the other alg get below.
 			argv[index++] = "--cone-decompose";
 		else if (alg == 2)
 			argv[index++] = "--triangulate";
@@ -128,7 +128,7 @@ void runTheTests(const vector<vector<string> > &toTest, int alg, const char*dbFi
 		//finally, save it.
 		IntegrationDB db;
 		db.open(dbFile);
-		//cout << "SAVING TO DB COMMENTED OUT FOR NOW" << endl; //remove this if you are serious about running the tests. (you check everthing is working well)
+		//cout << "SAVING TO DB COMMENTED OUT FOR NOW" << endl; //remove this if you are serious about running the tests. (you check everything is working well)
 		db.updateIntegrationTimeAndValue((alg == 1 ? IntegrationDB::Lawrence : IntegrationDB::Triangulate)
 							, theTotalTime, theComputedIntegral, value, rowid);
 		db.close();
@@ -231,6 +231,6 @@ int main(int argc, char *argv[])
 		runSpecficPolytopeTest(argv[1], argv[3], atoi(argv[4]), string(argv[5]) == "true", atoi(argv[6]), 50, string(argv[0])+".log");
 	}
 	else
-		cout << "unkown sequence of parameters" << endl;
+		cout << "unknown sequence of parameters" << endl;
 	return 0;
 }//main
