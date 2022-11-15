@@ -160,7 +160,7 @@ void PeriodicFunction::pow(int p)
 }
 
 /**
- * @parm d is assumed to be non-zero.
+ * @param d is assumed to be non-zero.
  */
 void PeriodicFunction::div(const ZZ & d)
 {
@@ -173,7 +173,7 @@ void PeriodicFunction::div(const ZZ & d)
 }
 
 /**
- * @parm d we are not checking of d is zero or one.
+ * @param d we are not checking of d is zero or one.
  */
 void PeriodicFunction::times(const RationalNTL & d)
 {
