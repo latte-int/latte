@@ -47,14 +47,14 @@ void VolumeTests::printVolumeTest(const RationalNTL &correctVolumeAnswer,
 		cerr << "lawrence: " << lawrence << endl;
 		cerr << "triangulate: " << triangulate << endl;
 		cerr << "see file " << file.c_str() << endl;
-		exit(1); //dont' delete the latte file.
+		exit(1); //do not delete the latte file.
 	}//if error
 	else
 		cerr << comments.c_str() << " CORRECT!" << endl;
 }//printVolumeTest
 
 /**
- * Calls polymake to make a random interger (or rational) vertex polytope, and then makes the latte file.
+ * Calls polymake to make a random integer (or rational) vertex polytope, and then makes the latte file.
  * The latte file is then passed into mainValuationDriver() to find the volume
  *
  * We cannot check our volume with polymake for low-dimensional polytopes.
@@ -221,7 +221,7 @@ void VolumeTests::runBirkhoffTests()
 			argv2[2] = "--vrep";
 			argv2[3] = sFile;
 			volumeAnswer = Valuation::mainValuationDriver(argv2, 4);
-		}//need to handel the v-rep file differently.
+		}//need to handle the v-rep file differently.
 		delete[] sFile;
 
 		RationalNTL correctVolumeAnswer(birkhoffVolume[i][0],

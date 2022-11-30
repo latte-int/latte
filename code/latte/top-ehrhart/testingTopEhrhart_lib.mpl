@@ -57,7 +57,7 @@ write_facets_to_file:=proc(equations, fileName, simplexDim)
 
 
 
-	#sorry, I had to do a bunch of converting because I couldn't pull the elements in the origional structure.
+	#sorry, I had to do a bunch of converting because I couldn't pull the elements in the original structure.
 	M:=convert(equations, Matrix);
 	#print(M, "=M1");
 	M:=convert(M, list);
@@ -137,7 +137,7 @@ end:
 
 
 #Makes a random simplex, saves it to a file, and calls both top ehrhart functions.
-#This function is usefull if you want to make sure both functions are returning the same answers.
+#This function is useful if you want to make sure both functions are returning the same answers.
 test_top_ehrhart_compare_v1_v2:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version1, version2:
 	randomize():
@@ -151,7 +151,7 @@ test_top_ehrhart_compare_v1_v2:=proc(mydim, myfilename)
 	return [version1, version2];
 end:
 
-#Makes a random simplex, saves it to a file, and calles the origional (version 1) TopEhrhart functions.
+#Makes a random simplex, saves it to a file, and calls the original (version 1) TopEhrhart functions.
 test_top_ehrhart_v1:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version1:
 	randomize():
@@ -167,7 +167,7 @@ test_top_ehrhart_v1:=proc(mydim, myfilename)
 end:
 
 
-#Makes a random simplex, saves it to a file, and calles the new (version 1) TopEhrhart functions.
+#Makes a random simplex, saves it to a file, and calls the new (version 1) TopEhrhart functions.
 test_top_ehrhart_v2:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version2:
 	randomize():
@@ -180,7 +180,7 @@ test_top_ehrhart_v2:=proc(mydim, myfilename)
 	return version2;
 end:
 
-#Makes a random simplex, saves it to a file, and calles the new (version 1) TopEhrhart functions.
+#Makes a random simplex, saves it to a file, and calls the new (version 1) TopEhrhart functions.
 test_top_ehrhart_v3:=proc(mydim, myfilename)
 	local myi, myCC:=[], mysimplex, myfileName, startTime, totalTime, version3:
 	randomize():
@@ -196,7 +196,7 @@ end:
 
 
 #Tests top-ehrhart functions
-#These are the orgigional functions we recieved before Oct 2010.
+#These are the original functions we received before Oct 2010.
 test_top_ehrhart_given_simplex_v1:=proc(mysimplex)
 	local myi, myCC:=[], startTime, totalTime:
 
@@ -213,7 +213,7 @@ test_top_ehrhart_given_simplex_v1:=proc(mysimplex)
 end:
 
 #Tests top-ehrhart functions
-#These are the new functions we recieved on Oct 2010.
+#These are the new functions we received on Oct 2010.
 test_top_ehrhart_given_simplex_v2:=proc(mysimplex)
 	local startTime, myCC, totalTime;
 

@@ -126,7 +126,7 @@ test_sl_integration:=proc(simplexDim, numTests, degreeL)
   	mapleTime:=time();
   	#find maple and SL integraton. 
 	for myIndex from 1 to numTests do
-		printf("Integrating %d-linear form to the %d power using origional maple code. Test %d out of %d\n", simplexDim, degreeL, myIndex, numTests);
+		printf("Integrating %d-linear form to the %d power using original maple code. Test %d out of %d\n", simplexDim, degreeL, myIndex, numTests);
     	mapleResults[myIndex]:=0:
     	
     	for formIndex from 1 to nops(mapleLinForms[myIndex]) do
@@ -137,7 +137,7 @@ test_sl_integration:=proc(simplexDim, numTests, degreeL)
  		#print("[1][2]",mapleLinForms[myIndex][1][2]);	    
     od:
     mapleTime:=time()-mapleTime;
-    printf("Total time using origional maple code: %f\n", mapleTime);
+    printf("Total time using original maple code: %f\n", mapleTime);
 
 	SLTime:=time();    
     for myIndex from 1 to numTests do
@@ -165,7 +165,7 @@ test_sl_integration:=proc(simplexDim, numTests, degreeL)
     	fi;
   	od;
   	
-  	#if got here, no errrors.
+  	#if got here, no errors.
   	printf("NO INTEGRATION ERRORS\n");
 end:
 
@@ -302,10 +302,8 @@ write_facets_to_file:=proc(equations, fileName, simplexDim)
 	
 	#print(equations, "=equations");
 	#print(fileName, "=fileName");
-	
-	
-	
-	#sorry, I had to do a bunch of converting because I couldn't pull the elements in the origional structure.
+
+	#sorry, I had to do a bunch of converting because I couldn't pull the elements in the original structure.
 	M:=convert(equations, Matrix);
 	#print(M, "=M1");
 	M:=convert(M, list);

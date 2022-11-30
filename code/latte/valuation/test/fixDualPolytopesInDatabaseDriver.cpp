@@ -5,7 +5,7 @@
  *      Author: bedutra
  *
  * 1st goal: Fix the dual v-reps files
- * 2nd gola: repace the dual v-reps with h-reps.
+ * 2nd gola: replace the dual v-reps with h-reps.
  */
 
 #include <string>
@@ -119,7 +119,7 @@ void makeDualHrepFiles(char *dbFile, int dim, int vertexCount)
 {
 	if (dim == 3 || dim == 4)
 	{
-		cout	<< "makeDualHrepFiles::sorry, this test case was done before this function was written. I will not overwite the latte files for which you already tested!!!"
+		cout	<< "makeDualHrepFiles::sorry, this test case was done before this function was written. I will not overwrite the latte files for which you already tested!!!"
 				<< endl;
 		return;
 	}//if dim 3 or 4.
@@ -128,7 +128,7 @@ void makeDualHrepFiles(char *dbFile, int dim, int vertexCount)
 	IntegrationDB db;
 	vector<vector<string> > rows;
 	stringstream sql;
-	sql		<< "select p.rowid, p.latteFilePath, p.polymakeFilePath, org.polymakeFilePath as origionalPolytope"
+	sql		<< "select p.rowid, p.latteFilePath, p.polymakeFilePath, org.polymakeFilePath as originalPolytope"
 			<< " from polytope as p, polytope as org "
 			<< " where p.dual = org.rowid and p.dual is not null "
 			<< " and org.dim = " << dim << " and org.vertexCount = "<< vertexCount
@@ -172,9 +172,9 @@ void makeDualHrepFiles(char *dbFile, int dim, int vertexCount)
 		{
 			cout << "new and old dual polymake file names differ\n"
 				 << " dual latte file expected: " << bp.getLatteVRepDualFile().c_str()
-				 << " dual latte file recieved: " << dualLatteFile.c_str()
+				 << " dual latte file received: " << dualLatteFile.c_str()
 				 << " dual polymake file expected: " << bp.getPolymakeDualFile().c_str()
-				 << " dual polymkae file recieved: " << dualPolymakeFile.c_str();
+				 << " dual polymkae file received: " << dualPolymakeFile.c_str();
 			exit(1);
 		}//if error. the database should contain vrep.dual.latte files.
 
@@ -209,7 +209,7 @@ void makeDualFiles(char *dbFile, int dim, int vertexCount)
 	vector<vector<string> > rows;
 	stringstream sql;
 	sql
-			<< "select p.rowid, p.latteFilePath, p.polymakeFilePath, org.polymakeFilePath as origionalPolytope,  org.simple, p.simple, p.vertexCount "
+			<< "select p.rowid, p.latteFilePath, p.polymakeFilePath, org.polymakeFilePath as originalPolytope,  org.simple, p.simple, p.vertexCount "
 			<< " from polytope as p, polytope as org "
 			<< " where p.dual = org.rowid and p.dual is not null "
 			<< " and org.dim = " << dim << " and org.vertexCount = "

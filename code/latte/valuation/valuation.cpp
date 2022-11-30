@@ -40,7 +40,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		timer_and_result.valuationType = PolytopeValuation::volumeTriangulation;
 		timer_and_result.answer = ans1;
 		ans.add(timer_and_result);
-	}//if triangulate. origional polytope should not have changed.
+	}//if triangulate. original polytope should not have changed.
 
 	if (intInput.volumeCone)
 	{
@@ -56,7 +56,7 @@ Valuation::ValuationContainer Valuation::computeVolume(Polyhedron * poly,
 		timer_and_result.valuationType = PolytopeValuation::volumeCone;
 		timer_and_result.answer = ans2;
 		ans.add(timer_and_result);
-	}//if lawrence. Origional polytope is now dilated.
+	}//if lawrence. Original polytope is now dilated.
 
 	if (intInput.volumeCone && intInput.volumeTriangulation && ans1 != ans2)
 	{
@@ -219,7 +219,7 @@ Valuation::ValuationContainer Valuation::computeIntegralLinearForm(Polyhedron *p
 	ValuationData lawrence_timer_and_result;
 	ValuationData product_time_and_result;
 	RationalNTL ans1, ans2;
-	Polyhedron *poly2 = poly;//if doing both methods, make a deep copy of the origional polytopel.
+	Polyhedron *poly2 = poly;//if doing both methods, make a deep copy of the original polytope.
 
 	assert(intInput.integrandType == IntegrationInput::inputLinearForm);
 
@@ -956,14 +956,14 @@ void Valuation::polyhedronToCones(const IntegrationInput &intInput, Polyhedron *
 	//	cout << "poly.homogenized:" << Poly->homogenized << endl;
 	//	cout << "poly.dualized:" << Poly->dualized << endl;
 	//	cout << "read:dualApproach:" << read_polyhedron_data.dualApproach << endl;
-	//	cout << "raed.input_dualized" << read_polyhedron_data.input_dualized << endl;
+	//	cout << "read.input_dualized" << read_polyhedron_data.input_dualized << endl;
 
 		if (intInput.volumeCone
 				|| intInput.integrateLinearFormCone
 				|| intInput.integratePolynomialAsLinearFormCone
 				|| intInput.topEhrhart
 				|| (intInput.useTangentCones == false && intInput.useTriangulation == false) //the user didn't give an integrand nor integration method
-				|| (intInput.useTangentCones == true) //the user gave --cone-decompose but didn't gvie an integrand.
+				|| (intInput.useTangentCones == true) //the user gave --cone-decompose but didn't give an integrand.
 				)
 		{
 			assert(Poly->homogenized == false);

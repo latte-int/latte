@@ -349,6 +349,6 @@ public:
 
 	friend class BTrieIterator<T, S> ;
 private:
-	S* range; //S can be a class or a primitve
+	S* range; //S can be a class or a primitive
 	trieElem *firstElem; //first element in the trie
 }; //BurstTrie

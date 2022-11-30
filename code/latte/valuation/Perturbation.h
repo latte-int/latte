@@ -28,7 +28,7 @@ using namespace std;
  *       l is the linear form
  *       r is a ray of the simply cone
  *       M is the power of the linear form
- *       d is the dimention.
+ *       d is the dimension.
  *
  * If we divide by zero, we pick a perturbation e s.t
  *  	<v, l+e>^d+M * abs(det(matrix formed by the rays)) * M!/(d+M)!
@@ -55,7 +55,7 @@ private:
 	bool tryNoPerturbation(const vec_ZZ &l);
 
 	bool divideByZero; //true = currentPerturbation causes a divide by zero (currentPerturbation could be the zero vector).
-	int dimention;
+	int dimension;
 	int numOfRays;
 	vec_ZZ currentPerturbation;
 	vector<LinearLawrenceIntegration> coneTerms;

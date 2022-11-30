@@ -244,7 +244,7 @@ ConvertCDDextToLatte_LDADD = $(LDADD)
 
 
 #Run ./valuation/test/integrateHyperrectangleTest.sh 
-#  to start a maple script that will test integration of polynomials over rectangles in many dimentions.
+#  to start a maple script that will test integration of polynomials over rectangles in many dimensions.
 check_PROGRAMS += test-hyperrectangle-integration
 test_hyperrectangle_integration_SOURCES = valuation/test/testIntegrationHyperrectanglesDriver.cpp 
 

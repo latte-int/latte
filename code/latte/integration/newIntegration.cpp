@@ -85,7 +85,7 @@ void convertToSimplex(simplexZZ &mySimplex, string line)
 /**
  * Integrate a simplex over a linear form.
  *
- * @parm a, b: ouput parameters, we return a/b += integration answer.
+ * @parm a, b: output parameters, we return a/b += integration answer.
  * @parm l: a linear form.
  * @parm mySimplex: integer simplex
  * @parm m: the power the linear form is raised to
@@ -340,7 +340,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 		++i;
 		lenM += temp->degree; //add the power
 
-		coef *= temp->coef; // M1! M2! ... MD! * (coefficents ^ powers)
+		coef *= temp->coef; // M1! M2! ... MD! * (coefficients ^ powers)
 
 		monomialCount *= (temp->degree+1); //monomialCount = number of monomials (m1, ..., md) <= (deg1, ..., degD).
 	}
@@ -364,7 +364,7 @@ RationalNTL integrateLinFormProducts(PolyIterator<RationalNTL, ZZ>* it, const si
 	//ok, now we just need to find the coeff of M in the polynomial expansion.
 
 
-	vec_ZZ tVector; //the coefficent vector of ( 1- a_1t_1 - ... - a_Dt_D) (we don't save the leading 1)
+	vec_ZZ tVector; //the coefficient vector of ( 1- a_1t_1 - ... - a_Dt_D) (we don't save the leading 1)
 	int* counter; //current power n
 	tVector.SetLength(productCount);
 	counter = new int[productCount];

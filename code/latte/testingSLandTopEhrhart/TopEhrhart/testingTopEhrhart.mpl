@@ -56,7 +56,7 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 				#time_coeff:=test_top_ehrhart_v1(currentDim, fileBaseName||".debug");
 				 time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
 
-				failFlag:=0; #no erros. break out of while loop.
+				failFlag:=0; #no errors. break out of while loop.
 			catch:
 				printf("Something went wrong: %q\n",lastexception);
 				failFlag:=1; #try again.
@@ -89,7 +89,7 @@ table_time_top_ehrhart:=proc(startingDim, numTests, fileBaseName)
 				try
 					#time_coeff:=test_top_ehrhart_v1(currentDim, fileBaseName||".debug");
 					 time_coeff:=test_top_ehrhart_v2(currentDim, fileBaseName||".debug");
-					failFlag:=0; #no erros. break out of while loop.
+					failFlag:=0; #no errors. break out of while loop.
 
 					#print to log.
 					fprintf(filePtrLog, "Dim %d:\t test %d out of %d:\t time %f\n", currentDim, currentTestNumber, numTests, time_coeff[1]);

@@ -18,14 +18,14 @@ read("integration/createLinear.mpl"):
 #  A linear forms is called alpha, it is  represented by  a vector in Q^d.
 # A monomial m is a list of d integers
 #  A polynomial represented  in a sparse way;
-#  Exemple x*y^2+2*x^2 with be given as a list of lists [[1,[1,2]],[2,[2,0]]. Each list represents a monomial with his coefficients. 
+#  Example x*y^2+2*x^2 with be given as a list of lists [[1,[1,2]],[2,[2,0]]. Each list represents a monomial with his coefficients. 
 # Thus a sparse polynomial is represented as a list of lists.
 # 
 # .
 # 
 # Simplex and multiplicities.
 # 
-# INPUT: d an integer, S  list of d+1 lists of lenght d, alpha: list of lenght d . 
+# INPUT: d an integer, S  list of d+1 lists of length d, alpha: list of length d . 
 # OUTPUT: set of lists {[a_S], [m_S]} 
 # MATH: S a simplex of dimension d+1, alpha a linear form, m_S is the list of the number of vertices S where <\alpha,S> = a_S.
 # 
@@ -136,7 +136,7 @@ L:=[seq([j],j=0..m[1])];fi;
 newL;
 end:
 # INPUT: m a list of integers, coe a number
-# OUTPUT: a list of lists of lenght nops(m)
+# OUTPUT: a list of lists of length nops(m)
 # MATH:  The list $m$ represents the monomial x^m=x_1^{m[1]}x_2^{m[2]}\cdots x_d^{m[d].
 # The output is a list of lists. Each element in the list represents a linear form ([1,2]=x+2y). The output exausts all the linear form with exponents M=m[1]+..+m[d] which appear when  expressing   x^m as  linear combinations of linear form with exponent M. The first element is the coefficient multiplied by coe;
 list_and_coeff_for_monome:=proc(m,coe) local M,L,out:
@@ -157,9 +157,9 @@ out;
 end:
 ##integral_monome_via_waring([[0,0],[0,1],[1,0]],2,[9,2]);
 # Integral of a polynomial via Waring.
-# We give a polynomial in a sparse way; Exemple x*y^2+2*x^2 with be given as a list of lists [[1,[1,2]],[2,[2,0]]. Each list represents a monomial with his coefficients. 
+# We give a polynomial in a sparse way; Example x*y^2+2*x^2 with be given as a list of lists [[1,[1,2]],[2,[2,0]]. Each list represents a monomial with his coefficients. 
 #  We start by cleaning the sets for example we replace [[1,[1,2]],[1,[1,2]] by [2,[1,2]];
-# Input  L; a list of lists [[a,alpha],[b,beta],...]. here a is a number, alpha is a list. The ouptput is
+# Input  L; a list of lists [[a,alpha],[b,beta],...]. here a is a number, alpha is a list. The output is
 # a set of lists.
 # If alpha=beta, we replace by [a+b,alpha]; if a=0 we skip;
 # The input is a list  L of lists [a,\alpha] where a is a number. The output is of the same kind.
@@ -187,7 +187,7 @@ od;
 Y;
 end:
 # The input is a simplex S, d the dimension, sparse_poly a sparse polynomial. 
-# The ouput is a number; the integral over S of the polynomial.
+# The output is a number; the integral over S of the polynomial.
 integral_via_waring:=proc(S,d,sparse_poly) local output,i, L ;output:=0;
 L:=list_integral_via_waring(sparse_poly);
 for i from 1 to nops(L) do 

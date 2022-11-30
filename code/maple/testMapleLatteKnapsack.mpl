@@ -67,7 +67,7 @@ nextRandomSequence:=proc(L, k)
 end:
 
 
-#@param termType: if 1, then only coptue the kth coeff, if 2, then comptue the first k+1 terms.
+#@parm termType: if 1, then only compute the kth coeff, if 2, then compute the first k+1 terms.
 cmpLatteNminusK:=proc(L, k, termType)
 	local typeStr;
 	

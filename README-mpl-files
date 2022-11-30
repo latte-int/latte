@@ -57,7 +57,7 @@ code/maple/m-knapsack.mpl: top knapsack Maple code
 
  --- was the same as $PISA_PAPERS/knapsack/moreKnapsacks/knapsackwithdualdec.14.04.2012.mpl
  
- done: Now replaced by the better verion from https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl 
+ done: Now replaced by the better version from https://www.math.ucdavis.edu/~latte/software/packages/m-knapsack.mpl 
 
 code/latte/top-ehrhart/TopEhrhart_lib.mpl: the SL method for finding top Ehrhart coefficients
 

@@ -31,9 +31,9 @@ struct QuickFraction
 
 /**
  * Makes a cube, [0, scale]^n, as a latte facet file.
- * @parm filename: output file name
- * @parm dim: dim = n from above.
- * @parm scale: we scale the unit cube.
+ * @param filename: output file name
+ * @param dim: dim = n from above.
+ * @param scale: we scale the unit cube.
  */
 void makeCubeFile(const char *fileName, const long &dim, const QuickFraction& scale)
 {

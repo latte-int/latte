@@ -521,7 +521,7 @@ ConeInfo::ConeInfo (vec_ZZ *cost, listCone *listCone_pointer, int numOfVars)
 				Coefficient *= -1;
 			
 				S_Values[i] *= -1;
-				// sign is the sign of the orginal dot product
+				// sign is the sign of the original dot product
 				signs[i] = 1;
 					
 			}
@@ -1374,7 +1374,7 @@ int	ConeInfo::Calculate_Integral_Point (vec_ZZ &Temp_Vector)
 	{
 		for(int j = 0; j < Number_of_Variables; j++)
 		{
-			// sign[] is the sign of the orginal dot product with the cost
+			// sign[] is the sign of the original dot product with the cost
 			Temp_Vector[j] -= signs[i] * temp->first[j] * temp_coefficients[i];
 		}
 		temp = temp->rest;

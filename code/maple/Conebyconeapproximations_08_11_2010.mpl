@@ -66,7 +66,7 @@ kernelopts(assertlevel=1):       ### Enable checking ASSERTions
 #TopEhrhartweightedluckyell(n,Delta,2,[1,1],1);
 #
 #
-# If luckyell  return an error message: that is ell is singular for one of the thousands cone occuring in the procedure, uses
+# If luckyell  return an error message: that is ell is singular for one of the thousands cone occurring in the procedure, uses
 # the next procedure. it might also return an error message:;
 # In this case we have to rerun (there is a random choice there).
 #
@@ -98,7 +98,7 @@ ComplementList:=proc(K,d);
 end:
 
 
-# Input: a a list of lenght m , v a list of m vectors  in R^n, n an integer:
+# Input: a a list of length m , v a list of m vectors  in R^n, n an integer:
 # Output: a list of length n; 
 # The program check also if  a and v have the same nimber of elements
 # Here we deal with the special case where v:=[] where we return the vector with coordinates 0;
@@ -212,7 +212,7 @@ end:
 # #              Nonuni and Uni are  lists of terms  [eps,detG,G],  where
 # #               eps=1 or -1,
 # #               detG is an integer,
-# #               G  is a  list of  d linearly independant primitive  vectors in Z^d.
+# #               G  is a  list of  d linearly independent primitive  vectors in Z^d.
 signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,kzero,i,j, C,M, detC, Csigned ;
     Nonuni:=[]; Uni:=[];
     Lplus:=L[1]; Lminus:=L[2]; Lzero:=L[3];
@@ -302,10 +302,10 @@ fi:
 
 #
 # Projections:
-# Input: W is a list of vectors  of V , [v[1],..v[d]], of lenght d.
+# Input: W is a list of vectors  of V , [v[1],..v[d]], of length d.
 # Cspace =[i[1]..,i[s]],  a list of integers.
-#  b is a vector of lenght d.
-# Output: a vector of lenght d.
+#  b is a vector of length d.
+# Output: a vector of length d.
 #
 # Math:
 # We decompose the space V in lin(Cspace)+lin(ISpace) where lin(Cspace) is the linear span  of the vectors v[i], i in Cspace,
@@ -348,7 +348,7 @@ end:
 # decompose V in lin(Cspace)+lin(ISpace);
 #  we project the standard lattice (that is Ze[1]+..+Ze[d], that is  Z[1,0,0..0]+... Z.[0,0,0..,1]])
 # on lin[Cspace] which is a  subspace of dimension k  of a space of dim d.
-# output: (using ihermite) a basis of k elements (of lenght d) of the projected lattice  on lin(Cspace).
+# output: (using ihermite) a basis of k elements (of length d) of the projected lattice  on lin(Cspace).
 # We will use over and over again this list H1,H2,..., Hk, so that we will work in Z^k  (embedded in R^d via H1,H2,..Hk).
 #
 projectedlattice:=proc(W,Cspace) local m,B, d,k,i,r,S,IS,List,M_inverse, temp_projectedVectors;
@@ -378,7 +378,7 @@ fi;
 # Output: A "Cone" in Z^k;
 
 # Be careful: our input must have integral coordinates.
-# The ouput then will have integral coordinates.
+# The output then will have integral coordinates.
 #
 #
 # Here W is the cone and we are projecting W over lin(Cspace) and
@@ -403,11 +403,11 @@ fi;
 #         Cspace a subset of [1,2,..d] of cardinal k;
 #         ProjLattice := projectedlattice(W,Cspace);
 #         s a vector in R^d with rational coordinates (or symbolic coordinates);
-# #Ouput: a vector in R^k with rational coordinates (or symbolic coordinates);
+# #Output: a vector in R^k with rational coordinates (or symbolic coordinates);
 
 # Math: Here W is the cone and we are projecting V over lin( Cspace)  using  V:=lin(Cspace) oplus
 #  lin(ISpace). We express the projection of s
-# with respect to the basis of the projected lattice. If the ouput is [a1,a2], this means that our
+# with respect to the basis of the projected lattice. If the output is [a1,a2], this means that our
 # projected vertex is s_Cspace=a1*H1+a2*H2 where H1,H2 is the basis of the projected lattice computed before.
 #
 projectedvertexinbasislattice:=proc(W,Cspace,ProjLattice,s) local m,P,M,output,i,F;
@@ -553,7 +553,7 @@ if check_examples() then
     ASSERT(fractionalpart(1/3) = 1/3, "fractionalpart test #1");
     ASSERT(fractionalpart(-1/3) = 2/3, "fractionalpart test #2");
     ASSERT(fractionalpart(xyzzy) = MOD(xyzzy, 1), "fractionalpart test #3");
-    ASSERT(fractionalpart(sqrt(2)) = MOD(sqrt(2), 1), "fractionalpart test #4"); # Note that we do NOT replace it by sqrt(2) - 1; we want to keep MOD as the primitive expression for readibility.
+    ASSERT(fractionalpart(sqrt(2)) = MOD(sqrt(2), 1), "fractionalpart test #4"); # Note that we do NOT replace it by sqrt(2) - 1; we want to keep MOD as the primitive expression for readability.
     ASSERT(eval(subs({MOD=latteMod, xyzzy=-1/3}, fractionalpart(xyzzy))) = 2/3, "fractionalpart test #5");
 fi;
 
@@ -638,7 +638,7 @@ fi;
 #
 #
 # Input: W is a Cone in R^d and Cspace is a subset of [1,..,d] of cardinal k;
-# Ouput: a number;
+# Output: a number;
 #
 # Math: the volume of the Box(v[i], i not in Cspace), with respect to the intersected lattice.
 #
@@ -772,7 +772,7 @@ fi;
 #        Cspace a subset of [1..d] of cardinality k;
 #        xi a letter;
 #        ProjLattice := projectedlattice(W,Cspace);
-# Ouput: a list of  k linear forms in variables xi[1],...xi[d].
+# Output: a list of  k linear forms in variables xi[1],...xi[d].
 #
 #
 #  Math:
@@ -806,7 +806,7 @@ fi;
 #
 # Input: s a vector in Q^d,  or a symbolic variable ; BUT THEN IT HAS TO BE ENTERED AS A LIST OF  d SYMBOLIC VARIABLES
 # s:=[s1,s2,...,sd]; W a cone in Z^d, Ispace a subset of [1,...,d]
-# xi a list of lenght d  of variable (or xi);
+# xi a list of length d  of variable (or xi);
 
 # The output is a function of xi[i].
 #
@@ -853,7 +853,7 @@ fi;
 
 # Input: s a vector in Q^d,  or a symbolic variable ; BUT THEN IT HAS TO BE ENTERED AS A LIST OF  d SYMBOLIC VARIABLES
 # s:=[s1,s2,...,sd]; W a cone in Z^d, Ispace a subset of [1,...,d]
-# xi a list of lenght d  of variable (or xi);
+# xi a list of length d  of variable (or xi);
 
 # The output is a function of xi[i].
 #
@@ -1018,7 +1018,7 @@ fi;
 
 # ADDING THE CONES APPROXIMATIONS FOR A RATIONAL SIMPLEX;
 # Input: A SIMPLEX entered as a list of d+1 rational vectors in R^d; order is an integer, xi is a variable.
-# xi can also be entered as a numeric list of lenght d, but there can be then an error message (division by zero).
+# xi can also be entered as a numeric list of length d, but there can be then an error message (division by zero).
 # OUTPUT: a function of xi;
 
 #
@@ -1031,7 +1031,6 @@ cone_by_cone_approxi_simplex_formulaa:=proc(Simplex,order,xi) local F,W,i,st,d,S
     d:=nops(S)-1;
     for i from 1 to nops(S) do
         W:=[seq(primitive_vector(S[j]-S[i]),j=1..i-1),seq(primitive_vector(S[j]-S[i]),j=i+1..nops(S))];
-        #print(datas,S[i],W,P,xi);
         F:=F+approx_Cone_formulaa(S[i],W,P,xi);
     od:
     F:=eval(subs({TODD=Todd,EXP=exp},F));
@@ -1056,7 +1055,7 @@ fi;
 # W a cone, Ispace a subset of [1,2,...d];
 # xi a list of variables.
 # Output a function f(n,xi);
-# This is the function S^{Isplace}(ns+W)(xi), where we emphasize the dependance in n;
+# This is the function S^{Isplace}(ns+W)(xi), where we emphasize the dependence in n;
 # We use formulab;
 #
 
@@ -1106,7 +1105,7 @@ fi;
 # Input: two integers N,d:
 # Output: a vector of length d:
 #
-# Math: the vector is randomly chosen with coordiantes between 1 and N:
+# Math: the vector is randomly chosen with coordinates between 1 and N:
 # 
 random_vector:=proc(N,d) local R;
     R:=rand(N);
@@ -1407,7 +1406,7 @@ printIncrementalEhrhartPolynomial:=proc(n,nn,simpleCones,linearForms, d, useReal
    	fi;
 
     
-	#finaly, we are done!    
+	#finally, we are done!    
     return ehrhartPoly;
 end:
 
@@ -1427,7 +1426,7 @@ end:
 
 #
 
-# Output a function f(n,N,xi);  where we emphasize the dependance in n;
+# Output a function f(n,N,xi);  where we emphasize the dependence in n;
 # N is the same than n, but here the function of N are perodic;
 # I did that,  as we will need to pick  up a polynomial term in n, while N are then considered as constants;
 # EXAMPLE IS GIVEN  AFTER;
@@ -1663,7 +1662,7 @@ end:
 
 #### LATTE INTERFACE FUNCTION:
 #input
-#	Simplex: list of d+1 verticies
+#	Simplex: list of d+1 vertices
 #return maple-list of the tangent-cones.
 SimplexToTangentCones:=proc(Simplex)
 	local simpleCones;
@@ -1691,7 +1690,7 @@ end:
 # W a cone, order is an integer;
 # xi a list of variables.
 # Output a function f(n,xi);
-# This is the sum of the approximate  function S^{Ispace}(ns+W)(xi), where we emphasize the dependance in n;
+# This is the sum of the approximate  function S^{Ispace}(ns+W)(xi), where we emphasize the dependence in n;
 
 # EXAMPLE IS GIVEN  AFTER;
 
@@ -1726,7 +1725,7 @@ fi;
 # order is an integer;
 # xi a list of variables. xi can be numeric but then there can be an error message;
 # Output a function f(n,N,xi);
-# This is the sum of the approximate  functions  over the tangent cones  for the dilated simplex nS; where we emphasize the dependance in n;
+# This is the sum of the approximate  functions  over the tangent cones  for the dilated simplex nS; where we emphasize the dependence in n;
 # N is the same as n, but here the functions of N are periodic;
 # I did that, as we will need to pick up a polynomial term in n, while N are then considered as constants;
 # EXAMPLE IS GIVEN  AFTER;
@@ -1751,7 +1750,7 @@ fi;
 
 #WARNING; THIS WORKS ONLY IF ell is generic;
 # Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
-# The ouput is  a periodic function of n;
+# The output is  a periodic function of n;
 # Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
 # Here I did not employ a deformation vector, so the procedure might return: error; diviasion by zero.
 #
@@ -1765,7 +1764,7 @@ TopEhrhartweightedluckyell:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CC; #UNU
 end:
 
 # Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
-# The ouput is  a periodic function of n;
+# The output is  a periodic function of n;
 # Math: the output is the m coefficient Ehrhart polynomial E(n S, ell^M)
 # Here we employ a random deformation vector, so if the procedure might return: error: division by zero. RERUN:
 #
@@ -1782,9 +1781,9 @@ TopEhrhartweighted:=proc(n,Simplex,ell,M,m) local d,order,xx,AA,CCt,CCeps,CCn,re
     return subs({N=n},CCn);
 end:
 # Input; n is a variable, Simplex is a rational simplex, ell is a linear form fiven as a numeric list of d+1 rational numbers; M is in integer, m is an integer.
-# The ouput is  a polynomial with coefficients  periodic function of n;
+# The output is  a polynomial with coefficients  periodic function of n;
 # Math: the output is Ehrhart polynomial E(n S, ell^M)
-# Here we employ a random deformation vector, so if the procedure might return: error; diviasion by zero. RERUN:
+# Here we employ a random deformation vector, so if the procedure might return: error; division by zero. RERUN:
 #
 #
 #

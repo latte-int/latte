@@ -349,7 +349,7 @@ void computeResidueLawrence(const int d, const int M, const LinearLawrenceIntegr
 			continue; //really, at this point, the power should not be zero. It could be negative if this term is a repeat or positive.
 		if (coneTerm.rayDotProducts[i].epsilon == 0)
 		{
-			//cout << "factored anoter term: " << coneTerm.rayDotProducts[i].constant << "^" << coneTerm.rayDotProducts[i].power << endl;
+			//cout << "factored another term: " << coneTerm.rayDotProducts[i].constant << "^" << coneTerm.rayDotProducts[i].power << endl;
 			de *= Power_ZZ(coneTerm.rayDotProducts[i].constant, coneTerm.rayDotProducts[i].power);
 			continue;
 		}//factor the constant out: (a + 0*e)^power.

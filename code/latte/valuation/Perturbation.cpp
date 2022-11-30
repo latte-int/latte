@@ -14,7 +14,7 @@ using namespace std;
 
 
 LinearPerturbationContainer::LinearPerturbationContainer()
-  :divideByZero(false), dimention(0), latticeInverse(NULL), latticeInverseDilation(NULL), numOfRays(0)
+  :divideByZero(false), dimension(0), latticeInverse(NULL), latticeInverseDilation(NULL), numOfRays(0)
 {
 
 }
@@ -28,7 +28,7 @@ void LinearPerturbationContainer::setLatticeInformation(const mat_ZZ *_latticeIn
 
 /**
  * Allocates space for each term in the integration formula.
- * @dim: dimention of the polytope (number of slots in each vertex).
+ * @dim: dimension of the polytope (number of slots in each vertex).
  * @simpleConeList: linked list of every simple cone.
  */
 void LinearPerturbationContainer::setListCones(int dim,
@@ -37,7 +37,7 @@ void LinearPerturbationContainer::setListCones(int dim,
 
 	coneTerms.resize(lengthListCone(simpleConeList));
 	currentPerturbation.SetLength(dim);
-	dimention = dim;
+	dimension = dim;
 	numOfRays = lengthListVector(simpleConeList->rays);
 
 	//build the vector of cones.
@@ -50,7 +50,7 @@ void LinearPerturbationContainer::setListCones(int dim,
 }
 
 /**
- * Computes the dot products of <e, l> where e is the current pertrubation.
+ * Computes the dot products of <e, l> where e is the current perturbation.
  * If we still divide by zero, we break and return true;
  * @l: the same linear form  tryNoPerturbation() was called with.
  */
@@ -80,7 +80,7 @@ bool LinearPerturbationContainer::tryNoPerturbation(const vec_ZZ &l)
 	divideByZero = false;
 	for (unsigned int i = 0; i < coneTerms.size(); ++i)
 		if (coneTerms[i].computeDotProducts(l, latticeInverse, latticeInverseDilation))
-			divideByZero = true; //don't break b/c want to find all inner products w/o pertrubation.
+			divideByZero = true; //don't break b/c want to find all inner products w/o perturbation.
 	return divideByZero;
 }
 
@@ -278,7 +278,7 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l, const mat_ZZ
 
 	//build the ray matrix and compute the dot products and init. epsilon and power.
 	mat_ZZ rayMatrix;
-	rayMatrix.SetDims((simplicialCone->rays->first).length(), rayDotProducts.size());//dimention.
+	rayMatrix.SetDims((simplicialCone->rays->first).length(), rayDotProducts.size());//dimension.
 	for (listVector * ray = simplicialCone->rays; ray; ray = ray->rest, ++i)
 	{
 		//cout << "i=" << i << endl;
@@ -296,7 +296,7 @@ bool LinearLawrenceIntegration::computeDotProducts(const vec_ZZ &l, const mat_ZZ
 		//cout << "start of ray i" << endl;
 		//printVector(ray->first, l.length());
 	}//for each ray.
-	//cout << "ray matrix fromed from cone" << endl;
+	//cout << "ray matrix formed from cone" << endl;
 	//printCone(simplicialCone, l.length());
 	//now find the abs. value of the det. of the rays
 	if ( latticeInverse == NULL) //or we could check that length of rays = # of rays.

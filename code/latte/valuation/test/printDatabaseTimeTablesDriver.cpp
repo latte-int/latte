@@ -179,7 +179,7 @@ void printLatexTableIntegration_sideways(char * dbFile, int dim)
 
 	cout << "\\begin{sidewaystable}\n";
 	cout << "\\caption{Triangulation vs Lawrence Integration on Random Polytopes in Dimension " << dim << "}\n";
-	cout << "\\label{tabel:lawrence-random-integration-dim" << dim <<  "}\n";
+	cout << "\\label{table:lawrence-random-integration-dim" << dim <<  "}\n";
 	cout << "\\begin{tabular}{l";
 	for(int i= 0; i < results[0].size(); ++i)
 		cout << "rr";
@@ -421,7 +421,7 @@ void printLatexTableVolume(const char *dbFile)
 
 	cout << "\\begin{table}\n";
 	cout << "\\caption{Triangulation vs Lawrence Volume on Random Polytopes}\n";
-	cout << "\\label{tabel:lawrence-random-volume}\n";
+	cout << "\\label{table:lawrence-random-volume}\n";
 	cout << "\\begin{tabular}{l";
 	for(int i= 0; i < results[0].size(); ++i)
 		cout << "rr";
@@ -643,7 +643,7 @@ void printLatexTableIntegrationPerPolymakeFile(const char *dbFile)
 
 	cout << "\\begin{table}\n";
 	cout << "\\caption{Triangulation vs Lawrence Integration on the Ziegler Database}\n";
-	cout << "\\label{tabel:lawrence-ziegler-integration}\n";
+	cout << "\\label{table:lawrence-ziegler-integration}\n";
 	cout << "\\begin{tabular}{l";
 	for(int i= 0; i < results[0].size(); ++i)
 		cout << "rr";
@@ -916,7 +916,7 @@ int main(int argc, char *argv[])
 		cerr << "ex: \"sqlite-db volume [html | latex]\" prints the volume tables" << endl;
 		//cerr << "ex: \"sqlite-db volume \" prints the volume table per file in latex." << endl;
 		//cerr << "ex: \"sqlite-db volume matlab\" prints the volume mesh to a matlab file " << argv[0] << "-volume.m " << endl;
-		cerr << "ex: \"sqlite-db integration\" prints the integration db on the specfic file db" << endl;
+		cerr << "ex: \"sqlite-db integration\" prints the integration db on the specific file db" << endl;
 		cerr << "ex: \"sqlite-db integration [html | latex ] 5\" prints the integration table for dim 5 only" << endl;
 		exit(1);
 	}

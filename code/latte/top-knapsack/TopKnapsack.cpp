@@ -1325,7 +1325,7 @@ void TopKnapsack::everyGCDFromEntireList(int k)
 }
 
 /**
- * @parm k: integer 1 <= k <= alphaSize = N+1
+ * @param k: integer 1 <= k <= alphaSize = N+1
  * Computes every k-subset of alpha and computes the gcd of these sublists.
  * Assumes the gcd of the entire list is one.
  */

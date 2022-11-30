@@ -59,7 +59,7 @@
 # entered as a list of d+1
 # vectors.
 
-# A Cone in R^d : a list of d vectors of lenght d: (we will only consider simplicial cones)
+# A Cone in R^d : a list of d vectors of length d: (we will only consider simplicial cones)
 # when we say Cone in Z^d we mean that the vectors have integral coordinates;
 
 # A Signed cone:  [epsilon, Cone] where epsilon is -1 or 1.
@@ -198,7 +198,7 @@ end:
 # #              Nonuni and Uni are  lists of terms  [eps,detG,G],  where
 # #               eps=1 or -1,
 # #               detG is an integer,
-# #               G  is a  list of  d linearly independant primitive  vectors in Z^d.
+# #               G  is a  list of  d linearly independent primitive  vectors in Z^d.
 signed_decomp:=proc(eps,G,v,L) local Nonuni,Uni,Lplus,Lminus,Lzero,kplus,kminus,kzero,i,j, C,M, detC, Csigned ;
     Nonuni:=[]; Uni:=[];
     Lplus:=L[1]; Lminus:=L[2]; Lzero:=L[3];
@@ -283,9 +283,9 @@ end:
 
 ###############################
 # Projections:
-# Input: W is a list of vectors  of V , [v[1],..v[d]], of lenght d.
-# iota =[i[1]..,i[s]], is a list of integers, b is a vector of lenght d.
-# Output: a vector of lenght d,.
+# Input: W is a list of vectors  of V , [v[1],..v[d]], of length d.
+# iota =[i[1]..,i[s]], is a list of integers, b is a vector of length d.
+# Output: a vector of length d,.
 # Math:
 # We decompose the space V in lin(II)+lin(iotac) where lin(iota) of the vectors v[i], i in iota, and lin(iota_c) of the vectors in the complement indices. We project a vector b on lin(iota)
 # Thus we write b=b_iota+b_iota_c;
@@ -313,7 +313,7 @@ end:
 # decompose V in lin(iota)+lin(iota_c);
 #  we project the standard lattice (that is Ze[1]+..+Ze[d], that is  Z[1,0,0..0]+... Z.[0,0,0..,1]])
 # on lin[iota] which is a  subspace of dimension k  of a space of dim d.
-# output: (using ihermite) a basis of k elements (of lenght d) of the projected lattice  on lin(iota).
+# output: (using ihermite) a basis of k elements (of length d) of the projected lattice  on lin(iota).
 # We will use over and over again this list H1,H2,..., Hk, so that we will work in Z^k  (embedded in R^d via H1,H2,..Hk).
 # EXAMPLE:
 #projectedlattice([[1,3,0],[0,1,0],[0,0,2]],[1,3])-># [[0, 1/2, 0]];
@@ -339,7 +339,7 @@ end:
 # Input: W is a Cone in Z^d and iota is a subset of [1,..,d] of cardinal k;
 #  Output: A "Cone" in Z^k;
 # Be careful: our input must have integral coordinates.
-# The ouput then will have integral coordinates.
+# The output then will have integral coordinates.
 # Here W is the cone and we are projecting W over lin( iota) and expressing it in term of the standard projectedlattice(W,iota).
 #  Example: projectedconeinbasislattice([[1,1,0],[0,1,0],[0,0,2]],[1,3])→[[1,0],[0,1]]
 projectedconeinbasislattice:=proc(W,iota) local P,M,output,i,F;
@@ -361,7 +361,7 @@ end:
 
 # Relative volume
 # Input: W is a Cone in R^d and iota is a subset of [1,..,d] ( of cardinal k);
-# Ouput: a number;
+# Output: a number;
 # Math; the volume of the Box(v[i], i not in iota), with respect to the intersected lattice.
 # Example: relativevolumeoffaceiotac([[1,1],[0,1]],[1])->1;
 relativevolumeoffaceiotac:=proc(W,iota) local DD,iotac,P,M,H,MM,output;
@@ -436,7 +436,7 @@ functionSzero:=proc(x,W) local P,Q,y,i;
 end:
 
 # Input: a Cone W;  iota a subset of [1..d] of cardinal k; x a list [x1,x2,...,xd]:
-# Ouput: a list of  k linear forms
+# Output: a list of  k linear forms
 #  Math:
 # We write R^d=V(iota)+V(iota_c). We computed a basis H1,H2n...H_k of the projection of the lattice Z^d in V(iota).
 # Thus the output is the list is <x,h_i> where H_i are the basis of the projected lattice
@@ -525,7 +525,7 @@ end:
 
 #######################################################
 #  Top Ehrhart coefficients for S a vertex with integral vertices.
-# Input:  S a simplex, k an integer, reg  a list of lenght d.
+# Input:  S a simplex, k an integer, reg  a list of length d.
 # Output: a number (or an error message if reg is not regular).
 # This is the coefficient of  t^(d-k) of the Ehrhart polynomial.
 # Math: we collect all terms along the vertices of our 'aproximate' S(W_s), where
@@ -560,7 +560,7 @@ end:
 # This happens with low probability, but if it does RERUN.
 #
 # INPUT: N a large integer; d  an integer.
-# OUTPUT : a random list of lenght d with coefficients between 1 and N.
+# OUTPUT : a random list of length d with coefficients between 1 and N.
 random_vector:=proc(N,d) local R;
     R:=rand(N);
     [seq(R()+1,i=1..d)]:
@@ -710,11 +710,11 @@ end:
 
 # The code Topk_Eh outputs a POLYNOMIAL:
 # If Eh(t)=\sum_{i=0}^d e_i t^(d-i);
-# the ouput is sum_(i=0}^k e_i t^(d-i);
+# the output is sum_(i=0}^k e_i t^(d-i);
 # Top Ehrhart coefficients for S a vertex with integral vertices.
 # are precisely the few coefficients of the polynomial.
 #
-# Input;  S a simplex, k an integer, reg  a list of lenght d.
+# Input;  S a simplex, k an integer, reg  a list of length d.
 # Output: a polynomial in t.
 #
 # This function relies on Brion's theorem that allows to
