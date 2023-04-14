@@ -319,7 +319,7 @@ PeriodicFunctionNode::PeriodicFunctionNode(Operation operation, PeriodicFunction
 }
 
 /**
- * Recursivly call the copy constructor to make a deep copy of this tree.
+ * Recursively call the copy constructor to make a deep copy of this tree.
  */
 PeriodicFunctionNode::PeriodicFunctionNode(const PeriodicFunctionNode& p):
 		isNumber(p.isNumber), data(p.data), opt(p.opt)

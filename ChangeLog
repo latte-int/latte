@@ -4105,10 +4105,10 @@
 	  code/latte/valuation/PolytopeValuation.cpp,
 	  code/latte/valuation/PolytopeValuation.h: rational: added a
 	  constructor.
-	  
+
 	  Driver: changed the constant polynomial. Next, I will need add
 	  the option to pass a user-defined polynomial.
-	  
+
 	  Polytopevaluation: integrate a polynomial by integrating each
 	  monomial one at a time in isolation. This is not the best method,
 	  but it works until we learn why the bust trie cannot hold more
@@ -4120,8 +4120,8 @@
 	  code/latte/valuation/PolytopeValuation.cpp: Note: we are passing
 	  a constant polynomial function and a constant polytope right now
 	  for testing.
-	  
-	  Tries to compute intergrals over polytopes, but need to simplify
+
+	  Tries to compute integrals over polytopes, but need to simplify
 	  things for just monomials.
 
 2010-07-16 23:24  Brandon Dutra <bedutra@ucdavis.edu>

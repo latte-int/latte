@@ -45,7 +45,7 @@ void doHypersimplex()
 	int n, k;
 	stringstream comments;
 
-	cout << "Enter: n (vector lenght) k (number of ones) >> ";
+	cout << "Enter: n (vector length) k (number of ones) >> ";
 	cin >> n >> k;
 	BuildHypersimplexEdgePolytope rPoly;
 	rPoly.generatePoints(n, k);
@@ -124,7 +124,7 @@ void doGraphs()
 		cin >> numVertx;
 		g.makePetersenFunGraph(numVertx);
 		comments << "A Fun Peterson Graph";
-	}//if petersen fun (need to read source, this funtion will change now and then)
+	}//if petersen fun (need to read source, this function will change now and then)
 	else if (type == "my")
 	{
 		g.makeYourOwnGraph();

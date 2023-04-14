@@ -37,7 +37,7 @@ void buildSpecficPolytopeAndTestCase(char * dbFile, int count, char * polymakeFi
 	string baseFileName(polymakeFile);
 	string fileEnding(".polymake");
 	baseFileName.replace(baseFileName.find(fileEnding),fileEnding.length(),"");
-	//now baseFileName does not contain the .polymake file extention.
+	//now baseFileName does not contain the .polymake file extension.
 
 	//cout << "entered main fun" << endl;
 	BuildPolytope newPolytope;

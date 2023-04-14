@@ -293,7 +293,7 @@ int main(int argc, char *argv[]) {
   }
 
   numOfVars--;
-  /* Binary seach IP*/
+  /* Binary search IP*/
 
   if(binary[0] == 'y'){
     cerr << "The number of optimal solutions: " << binarySearch(equations, inequalities,cost, numOfVars, minimize) << endl;
