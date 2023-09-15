@@ -60,7 +60,7 @@ env:
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:        sagemath/sage
   SAGE_REF:         develop
-  ## REMOVE_PATCHES:   "*"
+  REMOVE_PATCHES:   "*"
 
 jobs:
 
