@@ -720,7 +720,7 @@ listCone* TopKnapsack::findUnimodularCones(const mat_ZZ & invLatticeBasis)const
  *        This scaling issue is taken care of in packageAnswer()
  * @param s: the vertex of the cone
  * @param u: list of unimodular cones
- * @param B: colums are a basis for the lattice of all solutions for \sum \alpha_i x_i in f\Z
+ * @param B: columns are a basis for the lattice of all solutions for \sum \alpha_i x_i in f\Z
  * @param invB: matrix such that B*invB/invBd = I
  * @param invBd: det(B)
  * @param fnDivAlpha list of alpha's that f does Not divide

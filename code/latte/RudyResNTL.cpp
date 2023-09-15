@@ -396,11 +396,11 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
   //  Simplify all the generators of each cone such that all the
   //  exponents are nonnegative, changing the sign and Form_Type accordingly.
   //  Also, we look through all the Exponents on R of each cone and 
-  //  record the minimum into Numerator_R_Exponent_Minumum.
-  //  We use the minumum afterwards to make the exponents of the numerators
+  //  record the minimum into Numerator_R_Exponent_Minimum.
+  //  We use the minimum afterwards to make the exponents of the numerators
   //  nonnegative for every cone
 	
-	ZZ	Numerator_R_Exponent_Minimum; //Used to store the minumum exponent
+	ZZ	Numerator_R_Exponent_Minimum; //Used to store the minimum exponent
 	
 	for (int q = 0;q < noCones; q++)
 	{
@@ -455,7 +455,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			Numerator_R_Exponent_Minimum = Cones_Array[q].Numerator_Generator.R_Exponent;
 
 		//  If we find an element smaller than our current minimum
-		//  record it as our new minumum
+		//  record it as our new minimum
 		if (Cones_Array[q].Numerator_Generator.R_Exponent < Numerator_R_Exponent_Minimum)
 				Numerator_R_Exponent_Minimum = Cones_Array[q].Numerator_Generator.R_Exponent;
 			
@@ -465,11 +465,11 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	}
 
 	//cerr << "Minimum exponent is " << Numerator_R_Exponent_Minimum << endl;
-	//cerr << "Factoring out minumum exponent of r" << endl;
+	//cerr << "Factoring out minimum exponent of r" << endl;
   
   //************************************************************************
   //  Peter/Dave: Here we make sure all the numerators of the Cones are
-  //  nonnegative.  We use the Minumum of the numerators calculated previously.
+  //  nonnegative.  We use the Minimum of the numerators calculated previously.
   //  We do this assuming that we can factor out any number of R's, as long
   //  as we factor out the same amount from each cone.  R = 1 so this should
   //  be ok.   	
@@ -530,7 +530,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 	for (int i = noCones;i > 0; i /= 10)
 		*Ten_Power *= 10;
 	
-	//Calculate the taylor expasion for the first DEGREE + 1 many terms
+	//Calculate the taylor expansion for the first DEGREE + 1 many terms
 	Cone_Taylor_Parameters->Result = new ZZ [DEGREE + 1];
 	Cone_Taylor_Parameters->Ten_Power = Ten_Power;
 	Cone_Taylor_Parameters->Degree_of_Expansion = DEGREE;
@@ -877,7 +877,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 			//   Shushing is the process of multiplying our polynomials for each generator but only retaining
 			//   the coefficients for powers of s up to s^m, where m is the order of the pole for the cone
 			
-			for (int r = Cones_Array[i].order; r > 0; r--)  //Calculate the coeffiecient of s^order on down
+			for (int r = Cones_Array[i].order; r > 0; r--)  //Calculate the coefficient of s^order on down
 			{
 				Coefficient_Addition_Root = Controller.Get_PolyTree_Node ();
 				Coefficient_Addition_Root->Number_of_Children = r + 1;
@@ -899,7 +899,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 				
 			}
 			
-			// Handle the s^0 coeffiecient
+			// Handle the s^0 coefficient
 			
 			Coefficient_Multiplication_Root = Controller.Get_PolyTree_Node ();
 			Coefficient_Multiplication_Root->Node_Type = POLYTREE_MUL;
@@ -910,7 +910,7 @@ vec_ZZ ResidueFunction(listCone* cones, int numOfVars, int print_flag,
 
 			Denominator_Result[0] = Coefficient_Multiplication_Root;
 			
-			} // end of if statment OUTPUT_CONE == 0
+			} // end of if statement OUTPUT_CONE == 0
 	
 			// DEBUG
 			/*

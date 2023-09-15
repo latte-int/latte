@@ -441,7 +441,7 @@ void Vector_Heap::Restore_Up (Heap_Node *Temp_Heap_Node)
 	{
 		if ( *(Temp_Heap_Node->Total_Sum) > *(Temp_Heap_Node->Parent->Total_Sum) )
 		{
-			//cerr << "Restore_Up: swaping" << endl;			
+			//cerr << "Restore_Up: swapping" << endl;			
 			int	*Temp_Int;
 			ZZ	*Temp_ZZ;
 
@@ -1300,7 +1300,7 @@ void ConeInfo_Heap::Restore_Up (ConeInfo_Heap_Node *Temp_ConeInfo_Heap_Node)
 	{
 		if ( *(Temp_ConeInfo_Heap_Node->ConeInfo_Pointer->Get_Current_Highest_Term () ) > *(Temp_ConeInfo_Heap_Node->Parent->ConeInfo_Pointer->Get_Current_Highest_Term () ) )
 		{
-			//cerr << "Restore_Up: swaping" << endl;			
+			//cerr << "Restore_Up: swapping" << endl;			
 			ConeInfo	*Temp_ConeInfo;
 			
 

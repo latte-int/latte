@@ -1,7 +1,7 @@
 /* heap.cpp -- Binary heaps
 
    Copyright 2003 Utz-Uwe Haus
-   Copuright 2004, 2006, 2007 Matthias Koeppe
+   Copyright 2004, 2006, 2007 Matthias Koeppe
 
    This file is part of LattE.
    

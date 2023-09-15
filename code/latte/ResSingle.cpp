@@ -183,11 +183,11 @@ int ResidueFunction_Single_Cone(listCone *cones,
   	//  Simplify all the generators of each cone such that all the
   	//  exponents are nonnegative, changing the sign and Form_Type accordingly.
   	//  Also, we look through all the Exponents on R of each cone and 
-  	//  record the minimum into Numerator_R_Exponent_Minumum.
-  	//  We use the minumum afterwards to make the exponents of the numerators
+  	//  record the minimum into Numerator_R_Exponent_Minimum.
+  	//  We use the minimum afterwards to make the exponents of the numerators
   	//  nonnegative for every cone
 	
-	ZZ	Numerator_R_Exponent_Minimum; //Used to store the minumum exponent
+	ZZ	Numerator_R_Exponent_Minimum; //Used to store the minimum exponent
 	
 	for (int q = 0;q < noCones; q++)
 	{
@@ -242,7 +242,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 			Numerator_R_Exponent_Minimum = Cones_Array[q].Numerator_Generator.R_Exponent;
 
 		//  If we find an element smaller than our current minimum
-		//  record it as our new minumum
+		//  record it as our new minimum
 		if (Cones_Array[q].Numerator_Generator.R_Exponent < Numerator_R_Exponent_Minimum)
 				Numerator_R_Exponent_Minimum = Cones_Array[q].Numerator_Generator.R_Exponent;
 			
@@ -252,11 +252,11 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	}
 
 	//cerr << "Minimum exponent is " << Numerator_R_Exponent_Minimum << endl;
-	//cerr << "Factoring out minumum exponent of r" << endl;
+	//cerr << "Factoring out minimum exponent of r" << endl;
   
   //************************************************************************
   //  Peter/Dave: Here we make sure all the numerators of the Cones are
-  //  nonnegative.  We use the Minumum of the numerators calculated previously.
+  //  nonnegative.  We use the Minimum of the numerators calculated previously.
   //  We do this assuming that we can factor out any number of R's, as long
   //  as we factor out the same amount from each cone.  R = 1 so this should
   //  be ok.   	
@@ -308,7 +308,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 	
 	Taylor_Parameters *Cone_Taylor_Parameters = new Taylor_Parameters;
 	
-	//Calculate the taylor expasion for the first DEGREE + 1 many terms
+	//Calculate the taylor expansion for the first DEGREE + 1 many terms
 	Cone_Taylor_Parameters->Result = new ZZ [DEGREE + 1];
 	Cone_Taylor_Parameters->Ten_Power = &Residue_Parameters->Ten_Power;
 	Cone_Taylor_Parameters->Degree_of_Expansion = DEGREE;
@@ -631,7 +631,7 @@ int ResidueFunction_Single_Cone(listCone *cones,
 
 			Denominator_Result[0] = Coefficient_Multiplication_Root;
 			
-			} // end of if statment OUTPUT_CONE == 0
+			} // end of if statement OUTPUT_CONE == 0
 	
 	
 		} //End of loop iterating through generators.	

@@ -128,7 +128,7 @@ vector<vector<string> > SqliteDB::query(const char* query)
 		s << "SqliteDB ERROR:: ." << query << ". " << error << endl;
 		cout << s.str().c_str() << endl;
 		throw SqliteDBexception(s.str());
-	}//else there was errors running the sql statment
+	}//else there were errors when running the sql statement
 	     
 	return results; 
 }//query

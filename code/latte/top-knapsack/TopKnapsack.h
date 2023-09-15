@@ -158,7 +158,7 @@ public:
 
 	void coeff_NminusK(int k); //!< computes the coeff of t^{N-k}
 	void coeff_topK(int k); //!< computes the coeff of t^{N}, t^{N-1}, ..., t^{N-k}
-	void printAnswer(ostream & out); //!< prints the answer in a Maple friendly way becuase a computer algebra system should be used to simplify the expressions.
+	void printAnswer(ostream & out); //!< prints the answer in a Maple friendly way because a computer algebra system should be used to simplify the expressions.
 	PeriodicFunction getCoeffNminusK(int k); //!< gets the coeff of t^{N-k}. Assumes coeff_NminusK or coeff_topK was already called
 };
 

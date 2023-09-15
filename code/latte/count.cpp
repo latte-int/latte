@@ -357,7 +357,7 @@ CountAnswerContainer mainCountDriver(int argc, char *argv[])
 
 	/* Compute the facet information from tight inequalities if
 	 possible.  It is essential that this is done BEFORE translating
-	 vertexes to the origin (in Ehrhart polynomial mode) -- otherwise
+	 vertices to the origin (in Ehrhart polynomial mode) -- otherwise
 	 tightness information is wrong. */
 	if (not Poly->dualized && Poly->cones != NULL
 			&& read_polyhedron_data.matrix != NULL
