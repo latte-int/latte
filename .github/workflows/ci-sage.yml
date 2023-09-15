@@ -60,9 +60,6 @@ env:
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:        sagemath/sage
   SAGE_REF:         develop
-  # Temporarily test on the branch from sage ticket 29413 (updated cddlib)
-  SAGE_TRAC_GIT:    https://github.com/sagemath/sagetrac-mirror.git
-  SAGE_TICKET:      34115
   ## REMOVE_PATCHES:   "*"
 
 jobs:
@@ -90,44 +87,27 @@ jobs:
           path: upstream
           name: upstream
 
-  cygwin:
-    uses: sagemath/sagetrac-mirror/.github/workflows/cygwin.yml@u/mkoeppe/ci_cygwin__refactor_using_reusable_workflows
-    with:
-      # FIXME: duplicated from env.TARGETS
-      targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
-      prefix: /opt/sage-latte
-      sage_repo: sagemath/sage
-      sage_ref: develop
-      sage_trac_git: https://github.com/sagemath/sagetrac-mirror.git
-      sage_trac_ticket: 34115
-      upstream_artifact: upstream
-    needs: [dist]
+  ## cygwin:
+  ##   uses: sagemath/sage/.github/workflows/cygwin.yml@develop
+  ##   with:
+  ##     # FIXME: duplicated from env.TARGETS
+  ##     targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
+  ##     prefix: /opt/sage-latte
+  ##     sage_repo: sagemath/sage
+  ##     sage_ref: develop
+  ##     sage_trac_git: https://github.com/sagemath/sagetrac-mirror.git
+  ##     sage_trac_ticket: 34115
+  ##     upstream_artifact: upstream
+  ##   needs: [dist]
 
   linux:
-    uses: sagemath/sagetrac-mirror/.github/workflows/docker.yml@u/mkoeppe/tox_yml__refactor_using_reusable_workflows
+    uses: sagemath/sage/.github/workflows/docker.yml@develop
     with:
-      tox_system_factors: >-
-          ["ubuntu-trusty-toolchain-gcc_9",
-           "ubuntu-xenial-toolchain-gcc_9",
-           "ubuntu-bionic",
-           "ubuntu-focal",
-           "ubuntu-jammy",
-           "ubuntu-kinetic",
-           "fedora-26",
-           "fedora-36",
-           "fedora-37",
-           "gentoo-python3.10",
-           "archlinux-latest",
-           "opensuse-tumbleweed",
-           "manylinux-2_24-i686",
-           ]
       # FIXME: duplicated from env.TARGETS
       targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
       sage_repo: sagemath/sage
       sage_ref: develop
       upstream_artifact: upstream
-      sage_trac_git: https://github.com/sagemath/sagetrac-mirror.git
-      sage_trac_ticket: 34115
       # We prefix the image name with the SPKG name ("latte-") to avoid the error
       # 'Package "sage-docker-..." is already associated with another repository.'
       docker_push_repository: ghcr.io/${{ github.repository }}/latte-
@@ -140,7 +120,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        os: [ macos-10.15, macos-11.0 ]
+        os: [ macos-12 ]
         tox_system_factor: [homebrew-macos-usrlocal, conda-forge-macos]
         tox_packages_factor: [minimal, standard]
         xcode_version_factor: [default]
@@ -162,21 +142,6 @@ jobs:
         with:
           repository: ${{ env.SAGE_REPO }}
           ref: ${{ env.SAGE_REF }}
-          fetch-depth: 2000
-        if: env.SAGE_REPO != ''
-      - name: Check out git-trac-command
-        uses: actions/checkout@v2
-        with:
-          repository: sagemath/git-trac-command
-          path: git-trac-command
-        if: env.SAGE_TRAC_GIT != ''
-      - name: Check out SageMath from trac.sagemath.org
-        shell: bash {0}
-        run: |
-          git config --global user.email "ci-sage@example.com"
-          git config --global user.name "ci-sage workflow"
-          if [ ! -d .git ]; then git init; fi; git remote add trac ${{ env.SAGE_TRAC_GIT }} && x=1 && while [ $x -le 5 ]; do x=$(( $x + 1 )); sleep $(( $RANDOM % 60 + 1 )); if git-trac-command/git-trac fetch $SAGE_TICKET; then git merge FETCH_HEAD || echo "(ignored)"; exit 0; fi; sleep 40; done; exit 1
-        if: env.SAGE_TRAC_GIT != ''
       - uses: actions/download-artifact@v2
         with:
           path: upstream
