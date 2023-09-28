@@ -53,10 +53,6 @@ env:
   DIST_PREREQ:      libcdd-dev libgmp-dev libcdd-tools libntl-dev libtool
   # Name of this project in the Sage distribution
   SPKG:             latte_int
-  # Sage distribution packages to build
-  TARGETS_PRE:      build/make/Makefile
-  TARGETS:          SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
-  TARGETS_OPTIONAL:
   # Standard setting: Test the current beta release of Sage:
   SAGE_REPO:        sagemath/sage
   SAGE_REF:         develop
@@ -68,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out ${{ env.SPKG }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           path: build/pkgs/${{ env.SPKG }}/src
       - name: Install prerequisites
@@ -82,7 +78,7 @@ jobs:
           && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=optional" > upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
           && ls -l upstream/
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           path: upstream
           name: upstream
@@ -114,61 +110,16 @@ jobs:
     needs: [dist]
 
   macos:
-
-    runs-on: macos-latest
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-      matrix:
-        os: [ macos-12 ]
-        tox_system_factor: [homebrew-macos-usrlocal, conda-forge-macos]
-        tox_packages_factor: [minimal, standard]
-        xcode_version_factor: [default]
-
+    uses: sagemath/sage/.github/workflows/macos.yml@develop
+    with:
+      osversion_xcodeversion_toxenv_tuples: >-
+        [["latest", "",           "homebrew-macos-usrlocal-minimal"],
+         ["latest", "",           "homebrew-macos-usrlocal-standard"],
+         ["13",     "xcode_15.0", "homebrew-macos-usrlocal-standard"],
+         ["latest", "",           "conda-forge-macos-standard"]]
+      # FIXME: duplicated from env.TARGETS
+      targets:           SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
+      sage_repo:         sagemath/sage
+      sage_ref:          develop
+      upstream_artifact: upstream
     needs: [dist]
-
-    env:
-      TOX_ENV: local-${{ matrix.tox_system_factor }}-${{ matrix.tox_packages_factor }}
-      LOGS_ARTIFACT_NAME: logs-commit-${{ github.sha }}-tox-local-${{ matrix.tox_system_factor }}-${{ matrix.tox_packages_factor }}-${{ matrix.os }}-xcode_${{ matrix.xcode_version_factor }}
-      DOCKER_TARGETS: configured with-targets with-targets-optional
-
-    steps:
-
-      - name: Select Xcode version
-        run: |
-          if [ ${{ matrix.xcode_version_factor }} != default ]; then sudo xcode-select -s /Applications/Xcode_${{ matrix.xcode_version_factor }}.app; fi
-      - name: Check out SageMath
-        uses: actions/checkout@v2
-        with:
-          repository: ${{ env.SAGE_REPO }}
-          ref: ${{ env.SAGE_REF }}
-      - uses: actions/download-artifact@v2
-        with:
-          path: upstream
-          name: upstream
-      - name: Update Sage packages from upstream artifact
-        run: |
-          (export PATH=$(pwd)/build/bin:$PATH; (cd upstream && bash -x update-pkgs.sh) && git diff)
-
-      - name: Install test prerequisites
-        run: |
-          brew install tox
-      - name: Build and test with tox
-        # We use a high parallelization on purpose in order to catch possible parallelization bugs in the build scripts.
-        # For doctesting, we use a lower parallelization to avoid timeouts.
-        run: |
-          MAKE="make -j12" tox -e $TOX_ENV -- SAGE_NUM_THREADS=4 $TARGETS
-      - name: Prepare logs artifact
-        run: |
-          mkdir -p "artifacts/$LOGS_ARTIFACT_NAME"; cp -r .tox/*/log "artifacts/$LOGS_ARTIFACT_NAME"
-        if: always()
-      - uses: actions/upload-artifact@v1
-        with:
-          path: artifacts
-          name: ${{ env.LOGS_ARTIFACT_NAME }}
-        if: always()
-      - name: Print out logs for immediate inspection
-        # and markup the output with GitHub Actions logging commands
-        run: |
-          .github/workflows/scan-logs.sh "artifacts/$LOGS_ARTIFACT_NAME"
-        if: always()
