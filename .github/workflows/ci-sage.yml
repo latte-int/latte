@@ -1,9 +1,9 @@
-name: Run Sage CI for Linux/Cygwin/macOS
+name: Run Sage CI
 
 ## This GitHub Actions workflow provides:
 ##
 ##  - portability testing, by building and testing this project on many platforms
-##    (Linux variants and Cygwin), each with two configurations (installed packages),
+##    (Linux variants and macOS), each with two configurations (installed packages),
 ##
 ##  - continuous integration, by building and testing other software
 ##    that depends on this project.
@@ -34,28 +34,28 @@ name: Run Sage CI for Linux/Cygwin/macOS
 ## Many copies of the second step are run in parallel for each of the tested
 ## systems/configurations.
 
-on: [push, pull_request, workflow_dispatch]
+#on: [push, pull_request]
 
-## Uncomment this (and comment the above) to run only on pushes to a tag,
-## not on all pushes to a branch.
-##
-## on:
-##   pull_request:
-##     types: [opened, synchronize]
-##   push:
-##     tags:
-##       - '*'
-##   workflow_dispatch:
-##     # Allow to run manually
+on:
+  pull_request:
+    types: [opened, synchronize]
+  push:
+    branches:
+      - master
+    tags:
+      - '*'
+  workflow_dispatch:
+    # Allow to run manually
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
 
 env:
   # Ubuntu packages to install so that the project's "make dist" can succeed
   DIST_PREREQ:      libcdd-dev libgmp-dev libcdd-tools libntl-dev libtool
   # Name of this project in the Sage distribution
   SPKG:             latte_int
-  # Standard setting: Test the current beta release of Sage:
-  SAGE_REPO:        sagemath/sage
-  SAGE_REF:         develop
   REMOVE_PATCHES:   "*"
 
 jobs:
@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out ${{ env.SPKG }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           path: build/pkgs/${{ env.SPKG }}/src
       - name: Install prerequisites
@@ -78,31 +78,28 @@ jobs:
           && echo "sage-package create ${{ env.SPKG }} --version git --tarball ${{ env.SPKG }}-git.tar.gz --type=optional" > upstream/update-pkgs.sh \
           && if [ -n "${{ env.REMOVE_PATCHES }}" ]; then echo "(cd ../build/pkgs/${{ env.SPKG }}/patches && rm -f ${{ env.REMOVE_PATCHES }}; :)" >> upstream/update-pkgs.sh; fi \
           && ls -l upstream/
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           path: upstream
           name: upstream
-
-  ## cygwin:
-  ##   uses: sagemath/sage/.github/workflows/cygwin.yml@develop
-  ##   with:
-  ##     # FIXME: duplicated from env.TARGETS
-  ##     targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
-  ##     prefix: /opt/sage-latte
-  ##     sage_repo: sagemath/sage
-  ##     sage_ref: develop
-  ##     sage_trac_git: https://github.com/sagemath/sagetrac-mirror.git
-  ##     sage_trac_ticket: 34115
-  ##     upstream_artifact: upstream
-  ##   needs: [dist]
+      - name: Create GitHub release
+        if:   github.repository == 'latte-int/latte' && startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          files: |
+            build/pkgs/${{ env.SPKG }}/src/*.tar.gz
+    permissions:
+      contents: write
 
   linux:
-    uses: sagemath/sage/.github/workflows/docker.yml@develop
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
     with:
-      # FIXME: duplicated from env.TARGETS
       targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
-      sage_repo: sagemath/sage
-      sage_ref: develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
       # We prefix the image name with the SPKG name ("latte-") to avoid the error
       # 'Package "sage-docker-..." is already associated with another repository.'
@@ -110,16 +107,34 @@ jobs:
     needs: [dist]
 
   macos:
-    uses: sagemath/sage/.github/workflows/macos.yml@develop
+    uses: passagemath/passagemath/.github/workflows/macos.yml@main
     with:
-      osversion_xcodeversion_toxenv_tuples: >-
-        [["latest", "",           "homebrew-macos-usrlocal-minimal"],
-         ["latest", "",           "homebrew-macos-usrlocal-standard"],
-         ["13",     "xcode_15.0", "homebrew-macos-usrlocal-standard"],
-         ["latest", "",           "conda-forge-macos-standard"]]
-      # FIXME: duplicated from env.TARGETS
       targets:           SAGE_CHECK=no SAGE_CHECK_PACKAGES=latte_int latte_int
-      sage_repo:         sagemath/sage
-      sage_ref:          develop
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
       upstream_artifact: upstream
+    needs: [dist]
+
+  passagemath-latte-4ti2:
+    uses: passagemath/passagemath/.github/workflows/docker.yml@main
+    with:
+      targets: SAGE_CHECK=no SAGE_CHECK_PACKAGES="sagemath_latte_4ti2" sagemath_latte_4ti2
+      # Standard setting: Test the current HEAD of passagemath:
+      sage_repo: passagemath/passagemath
+      sage_ref: main
+      upstream_artifact: upstream
+      # Build incrementally from published Docker image
+      incremental: true
+      free_disk_space: true
+      from_docker_repository: ghcr.io/passagemath/passagemath/
+      from_docker_target: "with-targets"
+      from_docker_tag: "dev"
+      docker_targets: "with-targets"
+      tox_system_factors: >-
+        ["ubuntu-jammy"]
+      tox_packages_factors: >-
+        ["standard"]
+      # avoid clash with linux job for the same platform
+      logs_artifact: false
     needs: [dist]
