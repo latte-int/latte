@@ -18,17 +18,11 @@ LattE requires the following programs and libraries:
   * (optional) Maple (non-free)
 
 If you do not have these libraries installed yet, follow the
-instructions below to install them.  However, we also package a source
-code distribution called
+instructions below to install them.  
 
-   "latte-integrale" 
-
-(also called LattE integrale "for tea, too") that includes all of
-these libraries (except, of course, Maple) and will build them
-automatically.  You can get it at the same place where you got this
-package,
-
-    http://www.math.ucdavis.edu/~latte/
+Note: We used to provide a source code distribution called
+"latte-integrale" (also called LattE integrale "for tea, too") that 
+included these libraries. This distribution is no longer maintained.
 
 
 Building and installing LattE
