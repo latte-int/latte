@@ -401,7 +401,7 @@ void CheckInputFileCDDRep4(const char *InputFile){
   int dim, constrains;
   string tmp;
   ZZ zztmp;
-  char* tmpString = new char[200];
+  char tmpString[200];
   while(tmp != "begin") getline(in, tmp);
   in >> zztmp;
   conv(constrains, zztmp);
@@ -437,7 +437,6 @@ void CheckInputFileCDDRep4(const char *InputFile){
     cerr << "Your input file contains non-number!" << endl;
     exit (1);
   }
-  delete [] tmpString;
   return ;
 }
 
@@ -453,7 +452,7 @@ void CheckInputFile(const char *InputFile){
   
   ifstream in(InputFile);
   int i, len, flag = 0;
-  char* tmpString = new char[200];
+  char tmpString[200];
   while(in >> tmpString)
     {
       len = strlen(tmpString);
@@ -482,7 +481,6 @@ void CheckInputFile(const char *InputFile){
     cerr << "Your input file contains non-number!" << endl;
     exit (1);
   }
-  delete [] tmpString;
   return ;
 }
 /* ----------------------------------------------------------------- */
@@ -496,7 +494,7 @@ void CheckInputFileVrep(const char *InputFile){
   
   ifstream in(InputFile);
   int i, len, flag = 0;
-  char* tmpString = new char[200];
+  char tmpString[200];
   while(in >> tmpString)
     {
       len = strlen(tmpString);
@@ -524,7 +522,6 @@ void CheckInputFileVrep(const char *InputFile){
     cerr << "Your input file contains non-number!" << endl;
     exit (1);
   }
-  delete [] tmpString;
   return ;
 }
 
